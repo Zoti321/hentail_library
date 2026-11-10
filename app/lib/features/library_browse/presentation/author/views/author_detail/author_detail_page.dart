@@ -60,6 +60,14 @@ class AuthorDetailPage extends ConsumerWidget {
   }
 }
 
+/// 按 Author 稳定 id 跳转到作者资料页（有引用时的首选路径）。
+void openAuthorDetailById({
+  required BuildContext context,
+  required int authorId,
+}) {
+  context.push('/author/$authorId');
+}
+
 /// 按作者名跳转到作者资料页；名称不存在时静默忽略。
 Future<void> openAuthorDetailByName({
   required BuildContext context,

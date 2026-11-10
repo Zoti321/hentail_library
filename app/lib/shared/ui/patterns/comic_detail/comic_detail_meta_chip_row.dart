@@ -8,17 +8,21 @@ const double kComicDetailMetaLabelWidth = 88;
 const double kComicDetailMetaChipGap = 8;
 
 /// One KV row: fixed-width label + wrapping suggestion chips (detail tag / author / …).
-class ComicDetailMetaChipRow extends StatelessWidget {
+class ComicDetailMetaChipRow<T> extends StatelessWidget {
   const ComicDetailMetaChipRow({
     super.key,
     required this.label,
     required this.items,
+    this.labelOf,
     this.onItemTap,
   });
 
   final String label;
-  final List<String> items;
-  final ValueChanged<String>? onItemTap;
+  final List<T> items;
+
+  /// chip 文案；缺省取 `toString()`（`String` 项即为自身）。
+  final String Function(T item)? labelOf;
+  final ValueChanged<T>? onItemTap;
 
   @override
   Widget build(BuildContext context) {
@@ -49,9 +53,9 @@ class ComicDetailMetaChipRow extends StatelessWidget {
             runSpacing: kComicDetailMetaChipGap,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: <Widget>[
-              for (final String item in items)
+              for (final T item in items)
                 M3EChip(
-                  label: item,
+                  label: labelOf?.call(item) ?? '$item',
                   type: M3EChipType.suggestion,
                   onPressed: () => onItemTap?.call(item),
                 ),

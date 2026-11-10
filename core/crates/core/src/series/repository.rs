@@ -9,7 +9,8 @@ use sea_orm::sea_query::Expr;
 
 use crate::comic::visibility::{series_browsable_sql, visible_comic_id_sql, visible_comic_sql};
 use crate::comic::{
-    load_comics_ordered, paginate, search_comic_ids_by_tag_expression, ComicDto, PageRequestDto,
+    load_comics_ordered, paginate, search_comic_ids_by_tag_expression, ComicAuthorDto, ComicDto,
+    PageRequestDto,
 };
 use crate::db::{connection, map_db_err};
 use crate::entity::{prelude::*, series, series_items};
@@ -72,7 +73,8 @@ pub struct PagedSeriesBrowseResultDto {
 
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct SeriesComicsMetadataDto {
-    pub authors: Vec<String>,
+    /// 成员 Comic 的 Author 引用投影并集（按 id 去重，`name` 升序）。
+    pub authors: Vec<ComicAuthorDto>,
     pub tags: Vec<String>,
     pub has_r18: bool,
     /// Member order + first-seen dedupe (flattened across member Language lists).
@@ -728,11 +730,11 @@ fn append_first_seen(out: &mut Vec<String>, seen: &mut HashSet<String>, values: 
 async fn query_series_author_names(
     db: &DatabaseConnection,
     series_id: &str,
-) -> Result<Vec<String>, HentaiError> {
+) -> Result<Vec<ComicAuthorDto>, HentaiError> {
     let stmt = Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
         format!(
-            "SELECT DISTINCT a.name \
+            "SELECT DISTINCT a.id, a.name \
              FROM series_items si \
              INNER JOIN comics c ON c.comic_id = si.comic_id \
              INNER JOIN comic_authors ca ON ca.comic_id = si.comic_id \
@@ -745,7 +747,18 @@ async fn query_series_author_names(
             series_id.to_string(),
         )))],
     );
-    query_string_column(db, stmt).await
+    let rows = db.query_all(stmt).await.map_err(map_db_err)?;
+    rows.into_iter()
+        .map(|row| {
+            let id = row
+                .try_get_by_index::<i64>(0)
+                .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?;
+            let name = row
+                .try_get_by_index::<String>(1)
+                .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?;
+            Ok(ComicAuthorDto { id: Some(id), name })
+        })
+        .collect()
 }
 
 async fn query_series_tag_names(

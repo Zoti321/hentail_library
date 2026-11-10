@@ -1,4 +1,5 @@
 import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_view_object.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
 import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_view_object.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/patterns/library/lab_catalog_item_preview.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
@@ -17,7 +18,7 @@ abstract final class Md3eLabCatalogDetailPreviewData {
       pageCount: pageCount,
       publishedLabel:
           '2020-${(catalogIndex % 12 + 1).toString().padLeft(2, '0')}-15',
-      authors: <String>[item.listAuthor ?? '作者未知'],
+      authors: <AuthorRef>[AuthorRef.byName(item.listAuthor ?? '作者未知')],
       tags: <String>['Lab', '预览', '漫画'],
       resourceFormat: 'ZIP',
       resourceSizeLabel: '${12 + catalogIndex}.${catalogIndex % 10} MB',
@@ -54,7 +55,7 @@ abstract final class Md3eLabCatalogDetailPreviewData {
       showAgeRestrictionChip: catalogIndex.isOdd,
       volumeCurrent: comics.length,
       volumeTotal: comics.length + 2,
-      authors: <String>['Lab 作者 ${catalogIndex % 4 + 1}'],
+      authors: <AuthorRef>[AuthorRef.byName('Lab 作者 ${catalogIndex % 4 + 1}')],
       tags: <String>['系列', 'Lab', item.subtitle],
       comics: comics,
     );

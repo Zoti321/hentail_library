@@ -1,3 +1,5 @@
+import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
+
 /// 系列内漫画聚合元数据（作者、标签、Language / Parody / Character、R18）。
 class SeriesComicsMetadata {
   const SeriesComicsMetadata({
@@ -9,7 +11,8 @@ class SeriesComicsMetadata {
     this.characters = const <String>[],
   });
 
-  final List<String> authors;
+  /// 成员 Comic 的 Author 引用投影（按 id 去重）。
+  final List<AuthorRef> authors;
   final List<String> tags;
   final bool hasR18;
 

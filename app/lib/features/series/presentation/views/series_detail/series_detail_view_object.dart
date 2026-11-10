@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
 import 'package:hentai_library/shared/ui/models/series_serialization_status.dart';
 
 export 'package:hentai_library/shared/ui/models/series_serialization_status.dart';
@@ -37,7 +38,7 @@ class SeriesDetailViewObject {
     this.volumeTotal,
     this.showMetadataBlock = true,
     this.parodies = const <String>[],
-    this.authors = const <String>[],
+    this.authors = const <AuthorRef>[],
     this.characters = const <String>[],
     this.tags = const <String>[],
     this.comics = const <SeriesDetailComicItem>[],
@@ -56,7 +57,7 @@ class SeriesDetailViewObject {
   final int? volumeTotal;
   final bool showMetadataBlock;
   final List<String> parodies;
-  final List<String> authors;
+  final List<AuthorRef> authors;
   final List<String> characters;
   final List<String> tags;
   final List<SeriesDetailComicItem> comics;

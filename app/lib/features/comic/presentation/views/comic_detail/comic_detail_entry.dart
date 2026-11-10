@@ -24,7 +24,7 @@ ComicDetailViewObject comicDetailEntry({
     pageCount: pageCount == null || pageCount == 0 ? null : pageCount,
     publishedLabel: publishedLabel,
     parodies: comic.parodies,
-    authors: <String>[for (final author in comic.authors) author.name],
+    authors: comic.authors,
     characters: comic.characters,
     tags: <String>[for (final tag in comic.tags) tag.name],
     resourceFormat: comic.resourceType.name.toUpperCase(),

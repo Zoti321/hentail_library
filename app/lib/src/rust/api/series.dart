@@ -360,7 +360,7 @@ class SeriesComicPageItemDto {
 }
 
 class SeriesComicsMetadataDto {
-  final List<String> authors;
+  final List<ComicAuthorDto> authors;
   final List<String> tags;
   final bool hasR18;
   final List<String> languages;

@@ -1,10 +1,10 @@
 import 'package:hentai_library/features/library_browse/presentation/integrations/series_presentation_bridge.dart';
 import 'package:hentai_library/features/library_browse/presentation/integrations/comic_presentation_bridge.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/comic_metadata_form.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/series_metadata_form.dart';
 import 'package:intl/intl.dart';
@@ -26,7 +26,9 @@ ComicMetadataEditDraft comicMetadataDraftFromComic(
     isR18: comic.contentRating == ContentRating.r18,
     languages: List<String>.from(comic.languages),
     parodies: List<String>.from(comic.parodies),
-    authors: <String>[for (final Author author in comic.authors) author.name],
+    authors: <String>[
+      for (final AuthorRef author in comic.authors) author.name,
+    ],
     characters: List<String>.from(comic.characters),
     tags: <String>[for (final Tag tag in comic.tags) tag.name],
     seriesSortOrderText: seriesSortOrderText,
@@ -38,8 +40,8 @@ ComicMetadataForm comicMetadataFormFromDraft(
   ComicMetadataEditDraft draft,
   Comic original,
 ) {
-  final Map<String, Author> authorsByName = <String, Author>{
-    for (final Author author in original.authors) author.name: author,
+  final Map<String, AuthorRef> authorsByName = <String, AuthorRef>{
+    for (final AuthorRef author in original.authors) author.name: author,
   };
   final Map<String, Tag> tagsByName = <String, Tag>{
     for (final Tag tag in original.tags) tag.name: tag,
@@ -52,9 +54,9 @@ ComicMetadataForm comicMetadataFormFromDraft(
         ? null
         : DateTime.tryParse(publishedText),
     isR18: draft.isR18,
-    authors: <Author>[
+    authors: <AuthorRef>[
       for (final String name in draft.authors)
-        authorsByName[name] ?? Author(name: name),
+        authorsByName[name] ?? AuthorRef.byName(name),
     ],
     tags: <Tag>[
       for (final String name in draft.tags) tagsByName[name] ?? Tag(name: name),

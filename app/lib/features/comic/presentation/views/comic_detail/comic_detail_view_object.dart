@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
 
 /// Lab 漫画详情数据（无 [Comic] 领域类型）。
 class ComicDetailViewObject {
@@ -8,7 +9,7 @@ class ComicDetailViewObject {
     this.pageCount,
     this.publishedLabel,
     this.parodies = const <String>[],
-    this.authors = const <String>[],
+    this.authors = const <AuthorRef>[],
     this.characters = const <String>[],
     this.tags = const <String>[],
     this.resourceFormat = 'ZIP',
@@ -28,7 +29,7 @@ class ComicDetailViewObject {
   final int? pageCount;
   final String? publishedLabel;
   final List<String> parodies;
-  final List<String> authors;
+  final List<AuthorRef> authors;
   final List<String> characters;
   final List<String> tags;
   final String resourceFormat;

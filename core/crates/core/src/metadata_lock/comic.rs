@@ -1,4 +1,4 @@
-use crate::comic::{ComicDto, ComicMetaLocks};
+use crate::comic::{ComicAuthorDto, ComicDto, ComicMetaLocks};
 use crate::util::decode_basic_html_entities;
 
 fn scanned_text_present(value: &str) -> bool {
@@ -58,6 +58,27 @@ fn merge_list(locked: bool, existing: &[String], scanned: &[String]) -> Vec<Stri
     }
 }
 
+/// Author 合并：语义同 [`merge_list`]，但保留已有 id（合并后 id 未知者标 `None`）。
+fn merge_author_refs(
+    locked: bool,
+    existing: &[ComicAuthorDto],
+    scanned: &[ComicAuthorDto],
+) -> Vec<ComicAuthorDto> {
+    let existing_names: Vec<String> = existing.iter().map(|a| a.name.clone()).collect();
+    let scanned_names: Vec<String> = scanned.iter().map(|a| a.name.clone()).collect();
+    let picked = merge_list(locked, &existing_names, &scanned_names);
+    picked
+        .into_iter()
+        .map(|name| {
+            existing
+                .iter()
+                .find(|a| a.name == name)
+                .cloned()
+                .unwrap_or_else(|| ComicAuthorDto::from_name(name))
+        })
+        .collect()
+}
+
 /// Keep-path Comic merge for Library sync / Metadata refresh.
 ///
 /// - Locked → keep library value
@@ -113,7 +134,7 @@ fn merge_scan_with_existing(
             scanned.published_at,
         ),
         last_read_time_ms: existing.last_read_time_ms.or(scanned.last_read_time_ms),
-        authors: merge_list(locks.authors, &existing.authors, &scanned.authors),
+        authors: merge_author_refs(locks.authors, &existing.authors, &scanned.authors),
         tags: merge_list(locks.tags, &existing.tags, &scanned.tags),
         languages: merge_list(locks.languages, &existing.languages, &scanned.languages),
         parodies: merge_list(locks.parodies, &existing.parodies, &scanned.parodies),

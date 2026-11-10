@@ -5572,6 +5572,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ComicAuthorDto dco_decode_comic_author_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return ComicAuthorDto(
+      id: dco_decode_opt_box_autoadd_i_64(arr[0]),
+      name: dco_decode_String(arr[1]),
+    );
+  }
+
+  @protected
   ComicBrowseItemDto dco_decode_comic_browse_item_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -5604,7 +5616,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       description: dco_decode_opt_String(arr[9]),
       publishedAt: dco_decode_opt_box_autoadd_i_64(arr[10]),
       lastReadTimeMs: dco_decode_opt_box_autoadd_i_64(arr[11]),
-      authors: dco_decode_list_String(arr[12]),
+      authors: dco_decode_list_comic_author_dto(arr[12]),
       tags: dco_decode_list_String(arr[13]),
       languages: dco_decode_list_String(arr[14]),
       parodies: dco_decode_list_String(arr[15]),
@@ -5985,6 +5997,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return (raw as List<dynamic>)
         .map(dco_decode_author_top_comic_frb_dto)
         .toList();
+  }
+
+  @protected
+  List<ComicAuthorDto> dco_decode_list_comic_author_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_comic_author_dto).toList();
   }
 
   @protected
@@ -6738,7 +6756,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     if (arr.length != 6)
       throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
     return SeriesComicsMetadataDto(
-      authors: dco_decode_list_String(arr[0]),
+      authors: dco_decode_list_comic_author_dto(arr[0]),
       tags: dco_decode_list_String(arr[1]),
       hasR18: dco_decode_bool(arr[2]),
       languages: dco_decode_list_String(arr[3]),
@@ -7639,6 +7657,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ComicAuthorDto sse_decode_comic_author_dto(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_id = sse_decode_opt_box_autoadd_i_64(deserializer);
+    var var_name = sse_decode_String(deserializer);
+    return ComicAuthorDto(id: var_id, name: var_name);
+  }
+
+  @protected
   ComicBrowseItemDto sse_decode_comic_browse_item_dto(
     SseDeserializer deserializer,
   ) {
@@ -7670,7 +7696,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_description = sse_decode_opt_String(deserializer);
     var var_publishedAt = sse_decode_opt_box_autoadd_i_64(deserializer);
     var var_lastReadTimeMs = sse_decode_opt_box_autoadd_i_64(deserializer);
-    var var_authors = sse_decode_list_String(deserializer);
+    var var_authors = sse_decode_list_comic_author_dto(deserializer);
     var var_tags = sse_decode_list_String(deserializer);
     var var_languages = sse_decode_list_String(deserializer);
     var var_parodies = sse_decode_list_String(deserializer);
@@ -8195,6 +8221,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var ans_ = <AuthorTopComicFrbDto>[];
     for (var idx_ = 0; idx_ < len_; ++idx_) {
       ans_.add(sse_decode_author_top_comic_frb_dto(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<ComicAuthorDto> sse_decode_list_comic_author_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <ComicAuthorDto>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_comic_author_dto(deserializer));
     }
     return ans_;
   }
@@ -9202,7 +9242,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     SseDeserializer deserializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_authors = sse_decode_list_String(deserializer);
+    var var_authors = sse_decode_list_comic_author_dto(deserializer);
     var var_tags = sse_decode_list_String(deserializer);
     var var_hasR18 = sse_decode_bool(deserializer);
     var var_languages = sse_decode_list_String(deserializer);
@@ -10275,6 +10315,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_comic_author_dto(
+    ComicAuthorDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_opt_box_autoadd_i_64(self.id, serializer);
+    sse_encode_String(self.name, serializer);
+  }
+
+  @protected
   void sse_encode_comic_browse_item_dto(
     ComicBrowseItemDto self,
     SseSerializer serializer,
@@ -10301,7 +10351,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_String(self.description, serializer);
     sse_encode_opt_box_autoadd_i_64(self.publishedAt, serializer);
     sse_encode_opt_box_autoadd_i_64(self.lastReadTimeMs, serializer);
-    sse_encode_list_String(self.authors, serializer);
+    sse_encode_list_comic_author_dto(self.authors, serializer);
     sse_encode_list_String(self.tags, serializer);
     sse_encode_list_String(self.languages, serializer);
     sse_encode_list_String(self.parodies, serializer);
@@ -10686,6 +10736,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
       sse_encode_author_top_comic_frb_dto(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_comic_author_dto(
+    List<ComicAuthorDto> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_comic_author_dto(item, serializer);
     }
   }
 
@@ -11571,7 +11633,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     SseSerializer serializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_list_String(self.authors, serializer);
+    sse_encode_list_comic_author_dto(self.authors, serializer);
     sse_encode_list_String(self.tags, serializer);
     sse_encode_bool(self.hasR18, serializer);
     sse_encode_list_String(self.languages, serializer);

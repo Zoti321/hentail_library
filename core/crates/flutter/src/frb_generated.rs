@@ -5371,6 +5371,18 @@ impl SseDecode for crate::api::comic::BulkPatchResultFrbDto {
     }
 }
 
+impl SseDecode for crate::api::comic::ComicAuthorDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_id = <Option<i64>>::sse_decode(deserializer);
+        let mut var_name = <String>::sse_decode(deserializer);
+        return crate::api::comic::ComicAuthorDto {
+            id: var_id,
+            name: var_name,
+        };
+    }
+}
+
 impl SseDecode for crate::api::comic::ComicBrowseItemDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -5402,7 +5414,7 @@ impl SseDecode for crate::api::comic::ComicDto {
         let mut var_description = <Option<String>>::sse_decode(deserializer);
         let mut var_publishedAt = <Option<i64>>::sse_decode(deserializer);
         let mut var_lastReadTimeMs = <Option<i64>>::sse_decode(deserializer);
-        let mut var_authors = <Vec<String>>::sse_decode(deserializer);
+        let mut var_authors = <Vec<crate::api::comic::ComicAuthorDto>>::sse_decode(deserializer);
         let mut var_tags = <Vec<String>>::sse_decode(deserializer);
         let mut var_languages = <Vec<String>>::sse_decode(deserializer);
         let mut var_parodies = <Vec<String>>::sse_decode(deserializer);
@@ -5931,6 +5943,20 @@ impl SseDecode for Vec<crate::api::author::AuthorTopComicFrbDto> {
         let mut ans_ = Vec::with_capacity(len_ as usize);
         for idx_ in 0..len_ {
             ans_.push(<crate::api::author::AuthorTopComicFrbDto>::sse_decode(
+                deserializer,
+            ));
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<crate::api::comic::ComicAuthorDto> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(<crate::api::comic::ComicAuthorDto>::sse_decode(
                 deserializer,
             ));
         }
@@ -6949,7 +6975,7 @@ impl SseDecode for crate::api::series::SeriesComicPageItemDto {
 impl SseDecode for crate::api::series::SeriesComicsMetadataDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_authors = <Vec<String>>::sse_decode(deserializer);
+        let mut var_authors = <Vec<crate::api::comic::ComicAuthorDto>>::sse_decode(deserializer);
         let mut var_tags = <Vec<String>>::sse_decode(deserializer);
         let mut var_hasR18 = <bool>::sse_decode(deserializer);
         let mut var_languages = <Vec<String>>::sse_decode(deserializer);
@@ -8330,6 +8356,27 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::comic::BulkPatchResultFrbDto>
     for crate::api::comic::BulkPatchResultFrbDto
 {
     fn into_into_dart(self) -> crate::api::comic::BulkPatchResultFrbDto {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::comic::ComicAuthorDto {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.id.into_into_dart().into_dart(),
+            self.name.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::comic::ComicAuthorDto
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::comic::ComicAuthorDto>
+    for crate::api::comic::ComicAuthorDto
+{
+    fn into_into_dart(self) -> crate::api::comic::ComicAuthorDto {
         self
     }
 }
@@ -10558,6 +10605,14 @@ impl SseEncode for crate::api::comic::BulkPatchResultFrbDto {
     }
 }
 
+impl SseEncode for crate::api::comic::ComicAuthorDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <Option<i64>>::sse_encode(self.id, serializer);
+        <String>::sse_encode(self.name, serializer);
+    }
+}
+
 impl SseEncode for crate::api::comic::ComicBrowseItemDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -10583,7 +10638,7 @@ impl SseEncode for crate::api::comic::ComicDto {
         <Option<String>>::sse_encode(self.description, serializer);
         <Option<i64>>::sse_encode(self.published_at, serializer);
         <Option<i64>>::sse_encode(self.last_read_time_ms, serializer);
-        <Vec<String>>::sse_encode(self.authors, serializer);
+        <Vec<crate::api::comic::ComicAuthorDto>>::sse_encode(self.authors, serializer);
         <Vec<String>>::sse_encode(self.tags, serializer);
         <Vec<String>>::sse_encode(self.languages, serializer);
         <Vec<String>>::sse_encode(self.parodies, serializer);
@@ -10952,6 +11007,16 @@ impl SseEncode for Vec<crate::api::author::AuthorTopComicFrbDto> {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
             <crate::api::author::AuthorTopComicFrbDto>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<crate::api::comic::ComicAuthorDto> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::api::comic::ComicAuthorDto>::sse_encode(item, serializer);
         }
     }
 }
@@ -11736,7 +11801,7 @@ impl SseEncode for crate::api::series::SeriesComicPageItemDto {
 impl SseEncode for crate::api::series::SeriesComicsMetadataDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <Vec<String>>::sse_encode(self.authors, serializer);
+        <Vec<crate::api::comic::ComicAuthorDto>>::sse_encode(self.authors, serializer);
         <Vec<String>>::sse_encode(self.tags, serializer);
         <bool>::sse_encode(self.has_r18, serializer);
         <Vec<String>>::sse_encode(self.languages, serializer);

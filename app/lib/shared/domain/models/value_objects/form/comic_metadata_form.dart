@@ -1,8 +1,8 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
 
 part 'comic_metadata_form.freezed.dart';
 
@@ -15,7 +15,7 @@ abstract class ComicMetadataForm with _$ComicMetadataForm {
     DateTime? publishedAt,
     @Default(false) bool isR18,
     @Default([]) List<Tag> tags,
-    @Default([]) List<Author> authors,
+    @Default([]) List<AuthorRef> authors,
     @Default([]) List<String> languages,
     @Default([]) List<String> parodies,
     @Default([]) List<String> characters,
@@ -28,7 +28,7 @@ abstract class ComicMetadataForm with _$ComicMetadataForm {
       publishedAt: comic.publishedAt,
       isR18: comic.contentRating == ContentRating.r18,
       tags: List<Tag>.from(comic.tags),
-      authors: List<Author>.from(comic.authors),
+      authors: List<AuthorRef>.from(comic.authors),
       languages: List<String>.from(comic.languages),
       parodies: List<String>.from(comic.parodies),
       characters: List<String>.from(comic.characters),
@@ -87,7 +87,7 @@ final class ComicMetadataDraftChanges extends ComicMetadataDraftDiff {
   final DateTime? publishedAt;
   final bool clearPublishedAt;
   final ContentRating? contentRating;
-  final List<Author>? authors;
+  final List<AuthorRef>? authors;
   final List<Tag>? tags;
   final List<String>? languages;
   final List<String>? parodies;
@@ -118,20 +118,17 @@ extension ComicMetadataFormOps on ComicMetadataForm {
     if (trimmed.isEmpty) {
       return this;
     }
-    if (authors.any((Author a) => a.name == trimmed)) {
+    if (authors.any((AuthorRef a) => a.name == trimmed)) {
       return this;
     }
     return copyWith(
-      authors: <Author>[
-        ...authors,
-        Author(name: trimmed),
-      ],
+      authors: <AuthorRef>[...authors, AuthorRef.byName(trimmed)],
     );
   }
 
   ComicMetadataForm removeAuthor(String name) {
     return copyWith(
-      authors: authors.where((Author a) => a.name != name).toList(),
+      authors: authors.where((AuthorRef a) => a.name != name).toList(),
     );
   }
 
@@ -235,10 +232,10 @@ extension ComicMetadataFormOps on ComicMetadataForm {
         ? (ready.isR18 ? ContentRating.r18 : ContentRating.safe)
         : null;
 
-    final List<Author>? authors =
+    final List<AuthorRef>? authors =
         !_sameOrderedNames(
-          ready.authors.map((Author a) => a.name),
-          original.authors.map((Author a) => a.name),
+          ready.authors.map((AuthorRef a) => a.name),
+          original.authors.map((AuthorRef a) => a.name),
         )
         ? ready.authors
         : null;

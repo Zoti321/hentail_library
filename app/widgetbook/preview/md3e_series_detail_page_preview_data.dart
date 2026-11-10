@@ -1,4 +1,5 @@
 import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_view_object.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
 
 /// Widgetbook / 预览用示例系列详情。
 abstract final class SeriesDetailPagePreviewData {
@@ -21,7 +22,10 @@ abstract final class SeriesDetailPagePreviewData {
       volumeCurrent: comics.length,
       volumeTotal: 28,
       parodies: const <String>['迷宫饭'],
-      authors: const <String>['山田钟人', 'アベツカサ'],
+      authors: const <AuthorRef>[
+        AuthorRef(id: 201, name: '山田钟人'),
+        AuthorRef(id: 202, name: 'アベツカサ'),
+      ],
       characters: const <String>['芙莉莲', '费伦', '修塔尔克'],
       tags: const <String>['奇幻', '冒险', '长篇', '连载中'],
       comics: comics,

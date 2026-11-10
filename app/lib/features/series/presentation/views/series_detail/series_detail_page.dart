@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
@@ -179,8 +180,13 @@ class _SeriesDetailCatalogLayout extends ConsumerWidget {
           onPressed: () => _showInExplorer(context, series),
         ),
       ],
-      onAuthorTap: (String name) =>
-          openAuthorDetailByName(context: context, ref: ref, name: name),
+      onAuthorTap: (AuthorRef author) => author.hasIdentity
+          ? openAuthorDetailById(context: context, authorId: author.id!)
+          : openAuthorDetailByName(
+              context: context,
+              ref: ref,
+              name: author.name,
+            ),
       onComicTap: (int globalIndex) {
         final int localIndex = globalIndex - (page - 1) * pageSize;
         if (localIndex < 0 || localIndex >= items.length) {

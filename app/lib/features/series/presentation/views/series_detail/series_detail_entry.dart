@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_view_object.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/series_comic_page_item.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/series_comics_metadata.dart';
 
@@ -33,7 +34,7 @@ SeriesDetailViewObject seriesDetailEntry({
     volumeTotal: series.totalCount,
     showMetadataBlock: hasMetadata,
     parodies: metadata?.parodies ?? const <String>[],
-    authors: metadata?.authors ?? const <String>[],
+    authors: metadata?.authors ?? const <AuthorRef>[],
     characters: metadata?.characters ?? const <String>[],
     tags: metadata?.tags ?? const <String>[],
     comics: <SeriesDetailComicItem>[

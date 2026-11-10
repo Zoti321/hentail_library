@@ -236,7 +236,7 @@ pub(crate) async fn upsert_comics<C: ConnectionTrait>(
         if !is_new {
             let existing_authors = load_author_names_for_comic(db, &comic.comic_id).await?;
             let existing_tags = load_tag_names_for_comic(db, &comic.comic_id).await?;
-            changed |= existing_authors != comic.authors || existing_tags != comic.tags;
+            changed |= existing_authors != comic.author_names() || existing_tags != comic.tags;
         }
         let last_updated_at = if changed { now } else { comic.last_updated_at };
 
@@ -313,7 +313,7 @@ pub(crate) async fn upsert_comics<C: ConnectionTrait>(
             .await
             .map_err(map_db_err)?;
 
-        replace_comic_authors(db, &comic.comic_id, &comic.authors).await?;
+        replace_comic_authors(db, &comic.comic_id, &comic.author_names()).await?;
         replace_comic_tags(db, &comic.comic_id, &comic.tags).await?;
         replace_comic_parodies(db, &comic.comic_id, &comic.parodies).await?;
         replace_comic_characters(db, &comic.comic_id, &comic.characters).await?;

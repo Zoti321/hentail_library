@@ -115,6 +115,27 @@ pub struct ComicMetaLocks {
     pub characters: bool,
 }
 
+/// Comic 附着的 Author **引用投影**：`id` 是稳定身份（ADR-0024），
+/// `name` 仅为当前显示名的只读投影，不是关联对象。
+///
+/// `id == None` 只出现在"仅有名字"的中间态（扫描结果 / 用户新输入的作者名），
+/// 该状态不可作为跨模块引用使用。
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ComicAuthorDto {
+    pub id: Option<i64>,
+    pub name: String,
+}
+
+impl ComicAuthorDto {
+    /// 由名字构造无 id 的中间态（仅写路径 / 扫描使用）。
+    pub fn from_name(name: impl Into<String>) -> Self {
+        Self {
+            id: None,
+            name: name.into(),
+        }
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ComicDto {
     pub comic_id: String,
@@ -129,7 +150,7 @@ pub struct ComicDto {
     pub description: Option<String>,
     pub published_at: Option<i64>,
     pub last_read_time_ms: Option<i64>,
-    pub authors: Vec<String>,
+    pub authors: Vec<ComicAuthorDto>,
     pub tags: Vec<String>,
     /// Ordered canonical English language names; empty = unset.
     #[serde(default)]
@@ -144,6 +165,21 @@ pub struct ComicDto {
     pub locks: ComicMetaLocks,
     #[serde(default)]
     pub library_id: String,
+}
+
+impl ComicDto {
+    /// Author 显示名列表：写路径（`replace_comic_authors`）与变更比对用；id 不参与。
+    pub fn author_names(&self) -> Vec<String> {
+        self.authors.iter().map(|a| a.name.clone()).collect()
+    }
+}
+
+/// 由名字列表构造无 id 的引用投影（扫描 / 用户新输入）。
+pub fn author_refs_from_names(names: &[String]) -> Vec<ComicAuthorDto> {
+    names
+        .iter()
+        .map(|n| ComicAuthorDto::from_name(n.clone()))
+        .collect()
 }
 
 /// Serialize Language list for `comic_meta.languages` JSON column.

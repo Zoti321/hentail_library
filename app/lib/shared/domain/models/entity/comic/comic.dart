@@ -1,7 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/comic_meta_locks.dart';
 
 part 'comic.freezed.dart';
@@ -17,7 +17,8 @@ abstract class Comic with _$Comic {
     required DateTime lastUpdatedAt,
     required String title,
 
-    @Default(<Author>[]) List<Author> authors,
+    /// Author 引用投影（id + 显示名）；**不是** Author 聚合（ADR-0024/ADR-0034）。
+    @Default(<AuthorRef>[]) List<AuthorRef> authors,
     @Default(ContentRating.unknown) ContentRating contentRating,
     @Default(<Tag>[]) List<Tag> tags,
 

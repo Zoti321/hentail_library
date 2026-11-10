@@ -123,7 +123,7 @@ pub struct PagedSeriesComicsResultDto {
 
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct SeriesComicsMetadataDto {
-    pub authors: Vec<String>,
+    pub authors: Vec<super::comic::ComicAuthorDto>,
     pub tags: Vec<String>,
     pub has_r18: bool,
     pub languages: Vec<String>,
@@ -234,7 +234,14 @@ impl From<CorePagedSeries> for PagedSeriesResultDto {
 impl From<CoreSeriesComicsMetadata> for SeriesComicsMetadataDto {
     fn from(value: CoreSeriesComicsMetadata) -> Self {
         Self {
-            authors: value.authors,
+            authors: value
+                .authors
+                .into_iter()
+                .map(|a| super::comic::ComicAuthorDto {
+                    id: a.id,
+                    name: a.name,
+                })
+                .collect(),
             tags: value.tags,
             has_r18: value.has_r18,
             languages: value.languages,

@@ -14,9 +14,9 @@ pub use bulk_patch::{
     MultiValuePatch, PublishedAtPatch, ScalarPatch, BULK_PATCH_MAX_IDS,
 };
 pub use dto::{
-    now_ms, parse_languages_json, serialize_languages, ComicBrowseItemDto, ComicDto,
-    ComicFilterDto, ComicMetaLocks, ComicSortFieldDto, ComicSortOptionDto, PageRequestDto,
-    PagedComicBrowseResultDto, PagedComicResultDto,
+    author_refs_from_names, now_ms, parse_languages_json, serialize_languages, ComicAuthorDto,
+    ComicBrowseItemDto, ComicDto, ComicFilterDto, ComicMetaLocks, ComicSortFieldDto,
+    ComicSortOptionDto, PageRequestDto, PagedComicBrowseResultDto, PagedComicResultDto,
 };
 pub use grouping::ComicGrouping;
 pub use pagination::{paginate, PageWindow};

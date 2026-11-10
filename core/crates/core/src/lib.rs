@@ -44,13 +44,13 @@ pub use author::{
 };
 pub use character::{list_all_characters, list_distinct_characters};
 pub use comic::{
-    apply_comic_metadata_bulk_patch, count_all, count_trashed_comics, fetch_comics_browse_page,
-    fetch_comics_page, fetch_trashed_comics_page, find_comic_by_id, find_comics_by_ids,
-    is_comic_trashed, list_trashed_comic_ids, now_ms, paginate, purge_comics, restore_comics,
-    search_by_keyword, search_by_keyword_page, search_by_tag_expression,
+    apply_comic_metadata_bulk_patch, author_refs_from_names, count_all, count_trashed_comics,
+    fetch_comics_browse_page, fetch_comics_page, fetch_trashed_comics_page, find_comic_by_id,
+    find_comics_by_ids, is_comic_trashed, list_trashed_comic_ids, now_ms, paginate, purge_comics,
+    restore_comics, search_by_keyword, search_by_keyword_page, search_by_tag_expression,
     search_by_tag_expression_page, set_comic_meta_locks, trash_comics, update_comic_user_meta,
-    BulkPatchResultDto, ComicBrowseItemDto, ComicDto, ComicFilterDto, ComicGrouping,
-    ComicMetaLocks, ComicMetadataBulkPatch, ComicPurgeResultDto, ComicSortFieldDto,
+    BulkPatchResultDto, ComicAuthorDto, ComicBrowseItemDto, ComicDto, ComicFilterDto,
+    ComicGrouping, ComicMetaLocks, ComicMetadataBulkPatch, ComicPurgeResultDto, ComicSortFieldDto,
     ComicSortOptionDto, MultiValueOp, MultiValuePatch, PageRequestDto, PageWindow,
     PagedComicBrowseResultDto, PagedComicResultDto, PagedTrashedComicResultDto, PublishedAtPatch,
     ScalarPatch, SetComicMetaLocksDto, TrashedComicCountsDto, TrashedComicDto,

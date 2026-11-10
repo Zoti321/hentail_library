@@ -1,4 +1,3 @@
-import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 
@@ -12,7 +11,9 @@ abstract class ComicUserMetadataRepository {
     String? description,
     DateTime? publishedAt,
     bool clearPublishedAt = false,
-    List<Author>? authors,
+
+    /// Author 显示名列表（写路径按名字 upsert 稳定身份，ADR-0024）。
+    List<String>? authors,
     ContentRating? contentRating,
     List<Tag>? tags,
     List<String>? languages,

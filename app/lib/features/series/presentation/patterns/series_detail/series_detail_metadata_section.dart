@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
 import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_view_object.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/detail_metadata_chip_rows.dart';
 
@@ -13,7 +14,7 @@ class SeriesDetailMetadataSection extends StatelessWidget {
 
   final SeriesDetailViewObject entry;
   final ValueChanged<String>? onChipTap;
-  final ValueChanged<String>? onAuthorTap;
+  final ValueChanged<AuthorRef>? onAuthorTap;
 
   @override
   Widget build(BuildContext context) {

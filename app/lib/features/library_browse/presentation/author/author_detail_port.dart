@@ -13,6 +13,14 @@ class _AuthorDetailAdapter implements AuthorDetailPort {
   final Ref _ref;
 
   @override
+  Future<void> showById(BuildContext context, int authorId) async {
+    if (!context.mounted) {
+      return;
+    }
+    GoRouter.of(context).push('/author/$authorId');
+  }
+
+  @override
   Future<void> showByName(BuildContext context, String name) async {
     final int? authorId = await _ref
         .read(authorDetailCommandsProvider)

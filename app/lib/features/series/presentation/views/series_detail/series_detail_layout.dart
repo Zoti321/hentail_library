@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/library_browse/public/catalog/for_comic_and_series.dart';
 import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
@@ -46,7 +47,7 @@ class SeriesDetailLayout extends ConsumerStatefulWidget {
   final ValueChanged<int>? onComicTap;
 
   /// 作者 chip 点击（生产：打开作者详情）；为空时作者 chip 走 [onMetadataChipTap]。
-  final ValueChanged<String>? onAuthorTap;
+  final ValueChanged<AuthorRef>? onAuthorTap;
   final ScrollController? scrollController;
 
   final int page;

@@ -1,5 +1,7 @@
 import 'dart:math' as math;
 
+import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
+
 import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:hentai_library/shared/ui/layout/comic_detail_page_metrics.dart';
@@ -24,7 +26,7 @@ class ComicDetailMetadataSection extends StatelessWidget {
 
   final ComicDetailViewObject entry;
   final ValueChanged<String>? onChipTap;
-  final ValueChanged<String>? onAuthorTap;
+  final ValueChanged<AuthorRef>? onAuthorTap;
 
   @override
   Widget build(BuildContext context) {

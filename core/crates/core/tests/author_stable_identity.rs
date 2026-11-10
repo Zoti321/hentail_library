@@ -87,6 +87,46 @@ fn fixture_migration_keeps_author_attachments() {
 }
 
 #[test]
+fn comic_dto_carries_author_stable_id() {
+    common::with_global_db(|| {
+        let temp = TempDir::new().expect("tempdir");
+        let root = temp.path().join("lib");
+        std::fs::create_dir_all(&root).expect("mkdir");
+        let db_path = common::create_fixture_db(temp.path());
+        let runtime = tokio::runtime::Runtime::new().expect("runtime");
+        runtime.block_on(async {
+            init_db_at_path(&db_path).await.expect("init_db");
+            let lib = create_local_library(&root.to_string_lossy(), None)
+                .await
+                .expect("library");
+            let db = connection().expect("connection");
+            seed_comic(&db, "c1", &lib.library_id, "E:/lib/a.cbz", "Alpha", "safe").await;
+            replace_comic_authors(&db, "c1", &["Alice".to_string()])
+                .await
+                .expect("attach");
+            let expected_id = author_id_named(&db, "Alice").await;
+
+            let comic = hentai_core::find_comic_by_id("c1")
+                .await
+                .expect("find")
+                .expect("row");
+            assert_eq!(comic.authors.len(), 1);
+            assert_eq!(comic.authors[0].name, "Alice");
+            assert_eq!(
+                comic.authors[0].id,
+                Some(expected_id),
+                "读路径必须携带 Author 稳定 id（ADR-0024）"
+            );
+
+            let series_meta = hentai_core::fetch_series_comics_metadata("no-such-series")
+                .await
+                .expect("empty series ok");
+            assert!(series_meta.authors.is_empty());
+        });
+    });
+}
+
+#[test]
 fn rename_keeps_links_delete_cascades_and_filter_uses_id() {
     common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");

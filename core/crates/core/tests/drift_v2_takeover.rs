@@ -65,7 +65,7 @@ fn drift_v2_fixture_comic_rows_preserved() {
                 .expect("row");
             assert_eq!(comic.comic_id, "86408880d30b0de95ca959feb60a3b72dcb1889b");
             assert_eq!(comic.title, "测试漫画");
-            assert_eq!(comic.authors, vec!["作者A".to_string()]);
+            assert_eq!(comic.author_names(), vec!["作者A".to_string()]);
             assert_eq!(comic.tags, vec!["冒险".to_string()]);
         });
     });
@@ -276,7 +276,14 @@ fn fetch_series_comics_page_returns_ordered_comics() {
             let metadata = fetch_series_comics_metadata(&author_series_id)
                 .await
                 .expect("metadata");
-            assert_eq!(metadata.authors, vec!["作者A".to_string()]);
+            assert_eq!(
+                metadata
+                    .authors
+                    .iter()
+                    .map(|a| a.name.clone())
+                    .collect::<Vec<_>>(),
+                vec!["作者A".to_string()]
+            );
             assert_eq!(metadata.tags, vec!["冒险".to_string()]);
 
             let r18_series_id = series_page

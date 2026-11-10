@@ -1,7 +1,7 @@
-import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/comic_meta_locks.dart';
 import 'package:hentai_library/src/rust/api/comic.dart' as rust;
 
@@ -15,7 +15,11 @@ Comic mapRustComic(rust.ComicDto dto) {
     createdAt: comicTimestampFromMs(dto.createdAt.toInt()),
     lastUpdatedAt: comicTimestampFromMs(dto.lastUpdatedAt.toInt()),
     title: dto.title,
-    authors: dto.authors.map((String n) => Author(name: n)).toList(),
+    authors: dto.authors
+        .map(
+          (rust.ComicAuthorDto a) => AuthorRef(id: a.id?.toInt(), name: a.name),
+        )
+        .toList(),
     contentRating: ContentRating.values.byName(dto.contentRating),
     tags: dto.tags.map((String n) => Tag(name: n)).toList(),
     languages: List<String>.from(dto.languages),

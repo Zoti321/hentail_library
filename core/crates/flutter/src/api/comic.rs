@@ -57,6 +57,13 @@ pub struct ComicMetaLocksDto {
     pub characters: bool,
 }
 
+/// Comic 附着的 Author 引用投影（见 core `ComicAuthorDto`，ADR-0024）。
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ComicAuthorDto {
+    pub id: Option<i64>,
+    pub name: String,
+}
+
 #[derive(Debug, Clone)]
 pub struct ComicDto {
     pub comic_id: String,
@@ -71,7 +78,7 @@ pub struct ComicDto {
     pub description: Option<String>,
     pub published_at: Option<i64>,
     pub last_read_time_ms: Option<i64>,
-    pub authors: Vec<String>,
+    pub authors: Vec<ComicAuthorDto>,
     pub tags: Vec<String>,
     pub languages: Vec<String>,
     pub parodies: Vec<String>,
@@ -127,7 +134,14 @@ impl From<hentai_core::ComicDto> for ComicDto {
             description: value.description,
             published_at: value.published_at,
             last_read_time_ms: value.last_read_time_ms,
-            authors: value.authors,
+            authors: value
+                .authors
+                .into_iter()
+                .map(|a| ComicAuthorDto {
+                    id: a.id,
+                    name: a.name,
+                })
+                .collect(),
             tags: value.tags,
             languages: value.languages,
             parodies: value.parodies,

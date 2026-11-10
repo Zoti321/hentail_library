@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
@@ -152,8 +153,13 @@ class _ComicDetailContent extends ConsumerWidget {
       ],
       onRead: () => _openReader(ref, incognito: false),
       onReadIncognito: () => _openReader(ref, incognito: true),
-      onAuthorTap: (String name) =>
-          openAuthorDetailByName(context: context, ref: ref, name: name),
+      onAuthorTap: (AuthorRef author) => author.hasIdentity
+          ? openAuthorDetailById(context: context, authorId: author.id!)
+          : openAuthorDetailByName(
+              context: context,
+              ref: ref,
+              name: author.name,
+            ),
       onSeriesSelect: (int index) {
         final List<ComicDetailSeriesNavItem>? items = seriesNav?.items;
         if (items == null || index < 0 || index >= items.length) {

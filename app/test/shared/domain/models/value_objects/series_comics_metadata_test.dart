@@ -1,4 +1,5 @@
 import 'package:hentai_library/shared/domain/models/value_objects/series_comics_metadata.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -6,7 +7,7 @@ void main() {
     test('false when authors/tags/characters/parodies all empty', () {
       expect(
         const SeriesComicsMetadata(
-          authors: <String>[],
+          authors: <AuthorRef>[],
           tags: <String>[],
           hasR18: false,
           languages: <String>['Japanese'],
@@ -20,7 +21,7 @@ void main() {
       () {
         expect(
           const SeriesComicsMetadata(
-            authors: <String>[],
+            authors: <AuthorRef>[],
             tags: <String>[],
             hasR18: false,
             parodies: <String>['Fate'],
@@ -33,7 +34,7 @@ void main() {
     test('true when characters non-empty even if authors/tags empty', () {
       expect(
         const SeriesComicsMetadata(
-          authors: <String>[],
+          authors: <AuthorRef>[],
           tags: <String>[],
           hasR18: false,
           characters: <String>['Saber'],

@@ -499,7 +499,7 @@ pub async fn load_comics_ordered(
         .map(|m| (m.comic_id.clone(), m))
         .collect();
     let tag_map = load_tag_names(db, &comic_ids).await?;
-    let author_map = crate::author::load_author_names_for_comics(db, &comic_ids).await?;
+    let author_map = crate::author::load_comic_authors_for_comics(db, &comic_ids).await?;
     let parody_map = load_parody_names(db, &comic_ids).await?;
     let character_map = load_character_names(db, &comic_ids).await?;
     let last_read_map = load_last_read_times(db, &comic_ids).await?;

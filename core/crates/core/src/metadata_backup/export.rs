@@ -40,6 +40,7 @@ pub async fn export_comic_metadata(
             let relative_path = library_roots
                 .get(&comic.library_id)
                 .and_then(|root| compute_relative_path(&comic.path, root));
+            let author_names = comic.author_names();
             ComicExportRecord {
                 comic_id: comic.comic_id,
                 path: comic.path,
@@ -53,7 +54,7 @@ pub async fn export_comic_metadata(
                     languages: comic.languages,
                     locks: comic.locks,
                 },
-                authors: comic.authors,
+                authors: author_names,
                 tags: comic.tags,
                 parodies: comic.parodies,
                 characters: comic.characters,

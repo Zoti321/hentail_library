@@ -7,7 +7,6 @@ import 'package:hentai_library/features/comic/domain/library_comic_grouping.dart
 import 'package:hentai_library/features/comic/domain/comic_user_metadata_repository.dart';
 import 'package:hentai_library/features/comic/domain/library_comic_filter.dart';
 import 'package:hentai_library/features/comic/domain/library_comic_sort_option.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
@@ -112,7 +111,7 @@ class ComicRepositoryImpl
     String? description,
     DateTime? publishedAt,
     bool clearPublishedAt = false,
-    List<Author>? authors,
+    List<String>? authors,
     ContentRating? contentRating,
     List<Tag>? tags,
     List<String>? languages,
@@ -131,7 +130,7 @@ class ComicRepositoryImpl
               : publishedAt == null
               ? null
               : comicTimestampToMs(publishedAt),
-          authors: authors?.map((Author a) => a.name).toList(),
+          authors: authors,
           tags: tags?.map((Tag t) => t.name).toList(),
           languages: languages,
           parodies: parodies,

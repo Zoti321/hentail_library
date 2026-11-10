@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
@@ -10,7 +10,7 @@ Comic _comic({
   String? description,
   DateTime? publishedAt,
   ContentRating contentRating = ContentRating.safe,
-  List<Author> authors = const <Author>[],
+  List<AuthorRef> authors = const <AuthorRef>[],
   List<Tag> tags = const <Tag>[],
   List<String> languages = const <String>[],
   List<String> parodies = const <String>[],
@@ -49,7 +49,7 @@ void main() {
         _comic(
           description: '简介',
           contentRating: ContentRating.r18,
-          authors: <Author>[Author(name: 'A')],
+          authors: <AuthorRef>[AuthorRef.byName('A')],
           tags: <Tag>[Tag(name: 'T')],
         ),
       );
@@ -102,16 +102,13 @@ void main() {
       form = form.addAuthor('  A  ');
       form = form.addAuthor('A');
       form = form.addAuthor('  ');
-      expect(form.authors, <Author>[Author(name: 'A')]);
+      expect(form.authors, <AuthorRef>[AuthorRef.byName('A')]);
     });
 
     test('removeAuthor / addTag / removeTag', () {
       ComicMetadataForm form = ComicMetadataForm(
         title: 't',
-        authors: <Author>[
-          Author(name: 'A'),
-          Author(name: 'B'),
-        ],
+        authors: <AuthorRef>[AuthorRef.byName('A'), AuthorRef.byName('B')],
         tags: <Tag>[Tag(name: 'X')],
       );
       form = form.removeAuthor('A').addTag('Y').removeTag('X');
@@ -176,23 +173,20 @@ void main() {
 
     test('submits authors when their order changes', () {
       final Comic original = _comic(
-        authors: <Author>[
-          Author(name: 'A'),
-          Author(name: 'B'),
-        ],
+        authors: <AuthorRef>[AuthorRef.byName('A'), AuthorRef.byName('B')],
       );
       final ComicMetadataDraftChanges changes = _changedFields(
         ComicMetadataForm.fromComic(original)
             .copyWith(
-              authors: <Author>[
-                Author(name: 'B'),
-                Author(name: 'A'),
+              authors: <AuthorRef>[
+                AuthorRef.byName('B'),
+                AuthorRef.byName('A'),
               ],
             )
             .diffAgainst(original),
       );
 
-      expect(changes.authors?.map((Author a) => a.name).toList(), <String>[
+      expect(changes.authors?.map((AuthorRef a) => a.name).toList(), <String>[
         'B',
         'A',
       ]);
@@ -247,7 +241,7 @@ void main() {
           description: ' 概要 ',
           publishedAt: published,
           isR18: true,
-          authors: <Author>[Author(name: 'A')],
+          authors: <AuthorRef>[AuthorRef.byName('A')],
           tags: <Tag>[Tag(name: 'T')],
           languages: <String>['Chinese'],
           parodies: <String>['Fate'],
@@ -260,7 +254,7 @@ void main() {
       expect(changes.publishedAt, published);
       expect(changes.clearPublishedAt, isFalse);
       expect(changes.contentRating, ContentRating.r18);
-      expect(changes.authors, <Author>[Author(name: 'A')]);
+      expect(changes.authors, <AuthorRef>[AuthorRef.byName('A')]);
       expect(changes.tags, <Tag>[Tag(name: 'T')]);
       expect(changes.languages, <String>['Chinese']);
       expect(changes.parodies, <String>['Fate']);

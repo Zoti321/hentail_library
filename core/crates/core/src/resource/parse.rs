@@ -603,7 +603,7 @@ pub fn parsed_to_comic(parsed: &ParsedResource) -> crate::comic::ComicDto {
         description: parsed.description.clone(),
         published_at: parsed.published_at,
         last_read_time_ms: None,
-        authors: parsed.authors.clone(),
+        authors: crate::comic::author_refs_from_names(&parsed.authors),
         tags: vec![],
         languages: vec![],
         parodies: vec![],

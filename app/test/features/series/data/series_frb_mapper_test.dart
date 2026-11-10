@@ -1,4 +1,5 @@
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/series/data/series_frb_mapper.dart';
 import 'package:hentai_library/features/series/domain/library_series_projection.dart';
@@ -123,7 +124,9 @@ void main() {
   test('mapRustSeriesComicsMetadata maps facet lists and hasR18', () {
     const rust_series.SeriesComicsMetadataDto dto =
         rust_series.SeriesComicsMetadataDto(
-          authors: <String>['Alice'],
+          authors: <rust_comic.ComicAuthorDto>[
+            rust_comic.ComicAuthorDto(id: 3, name: 'Alice'),
+          ],
           tags: <String>['tag'],
           hasR18: true,
           languages: <String>['zh'],
@@ -132,7 +135,7 @@ void main() {
         );
 
     final SeriesComicsMetadata meta = mapRustSeriesComicsMetadata(dto);
-    expect(meta.authors, <String>['Alice']);
+    expect(meta.authors, <AuthorRef>[const AuthorRef(id: 3, name: 'Alice')]);
     expect(meta.tags, <String>['tag']);
     expect(meta.hasR18, isTrue);
     expect(meta.languages, <String>['zh']);
@@ -291,7 +294,7 @@ rust_comic.ComicDto _comicDto(String comicId) {
     title: 'Title $comicId',
     contentRating: 'safe',
     pageCount: 3,
-    authors: const <String>[],
+    authors: const <rust_comic.ComicAuthorDto>[],
     tags: const <String>[],
     languages: const <String>[],
     parodies: const <String>[],

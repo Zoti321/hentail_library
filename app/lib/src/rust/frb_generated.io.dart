@@ -246,6 +246,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   BulkPatchResultFrbDto dco_decode_bulk_patch_result_frb_dto(dynamic raw);
 
   @protected
+  ComicAuthorDto dco_decode_comic_author_dto(dynamic raw);
+
+  @protected
   ComicBrowseItemDto dco_decode_comic_browse_item_dto(dynamic raw);
 
   @protected
@@ -354,6 +357,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<AuthorTopComicFrbDto> dco_decode_list_author_top_comic_frb_dto(
     dynamic raw,
   );
+
+  @protected
+  List<ComicAuthorDto> dco_decode_list_comic_author_dto(dynamic raw);
 
   @protected
   List<ComicBrowseItemDto> dco_decode_list_comic_browse_item_dto(dynamic raw);
@@ -985,6 +991,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  ComicAuthorDto sse_decode_comic_author_dto(SseDeserializer deserializer);
+
+  @protected
   ComicBrowseItemDto sse_decode_comic_browse_item_dto(
     SseDeserializer deserializer,
   );
@@ -1123,6 +1132,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<AuthorTopComicFrbDto> sse_decode_list_author_top_comic_frb_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  List<ComicAuthorDto> sse_decode_list_comic_author_dto(
     SseDeserializer deserializer,
   );
 
@@ -1908,6 +1922,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_comic_author_dto(
+    ComicAuthorDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_comic_browse_item_dto(
     ComicBrowseItemDto self,
     SseSerializer serializer,
@@ -2078,6 +2098,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_author_top_comic_frb_dto(
     List<AuthorTopComicFrbDto> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_comic_author_dto(
+    List<ComicAuthorDto> self,
     SseSerializer serializer,
   );
 

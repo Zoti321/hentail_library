@@ -196,7 +196,7 @@ fn bulk_patch_replace_authors_overwrites_list() {
             .expect("bulk patch");
 
             let c1 = find_comic_by_id("c1").await.expect("find").expect("exists");
-            assert_eq!(c1.authors, vec!["New"]);
+            assert_eq!(c1.author_names(), vec!["New"]);
             assert!(c1.locks.authors);
         });
     });

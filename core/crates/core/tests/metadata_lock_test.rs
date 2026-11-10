@@ -18,7 +18,7 @@ fn comic(id: &str, path: &str, resource_type: &str, title: &str, page_count: i32
         description: None,
         published_at: None,
         last_read_time_ms: None,
-        authors: vec!["作者".to_string()],
+        authors: hentai_core::author_refs_from_names(&["作者".to_string()]),
         tags: vec!["标签".to_string()],
         languages: vec![],
         parodies: vec![],
@@ -125,16 +125,16 @@ fn merge_unlocked_authors_keep_existing_when_scan_empty() {
     scanned.authors = vec![];
     let existing = comic("id1", "/a/b", "zip", "用户标题", 5);
     let merged = merge_kept_scan_with_existing(&scanned, &existing);
-    assert_eq!(merged.authors, vec!["作者".to_string()]);
+    assert_eq!(merged.author_names(), vec!["作者".to_string()]);
 }
 
 #[test]
 fn merge_unlocked_authors_replace_when_scan_non_empty() {
     let mut scanned = comic("id1", "/a/b", "zip", "扫描标题", 5);
-    scanned.authors = vec!["扫描作者".to_string()];
+    scanned.authors = hentai_core::author_refs_from_names(&["扫描作者".to_string()]);
     let existing = comic("id1", "/a/b", "zip", "用户标题", 5);
     let merged = merge_kept_scan_with_existing(&scanned, &existing);
-    assert_eq!(merged.authors, vec!["扫描作者".to_string()]);
+    assert_eq!(merged.author_names(), vec!["扫描作者".to_string()]);
 }
 
 #[test]

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_entry.dart';
 import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_view_object.dart';
@@ -35,7 +36,7 @@ void main() {
         series: series,
         cover: const SizedBox(),
         metadata: const SeriesComicsMetadata(
-          authors: <String>['作者'],
+          authors: <AuthorRef>[AuthorRef(id: 9, name: '作者')],
           tags: <String>['tag'],
           hasR18: true,
           languages: <String>['English'],
@@ -50,7 +51,7 @@ void main() {
       expect(entry.title, '系列甲');
       expect(entry.serializationStatus, SeriesSerializationStatus.hiatus);
       expect(entry.languages, <String>['English']);
-      expect(entry.authors, <String>['作者']);
+      expect(entry.authors, <AuthorRef>[AuthorRef(id: 9, name: '作者')]);
       expect(entry.tags, <String>['tag']);
       expect(entry.showAgeRestrictionChip, isTrue);
       expect(entry.showMetadataBlock, isTrue);

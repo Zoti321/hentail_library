@@ -1,10 +1,10 @@
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/shared/data/frb/comic_entity_mapper.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
 import 'package:hentai_library/src/rust/api/comic.dart' as rust;
 
 void main() {
@@ -25,7 +25,14 @@ void main() {
     expect(mapped.contentRating, ContentRating.r18);
     expect(mapped.pageCount, 12);
     expect(mapped.description, '简介');
-    expect(mapped.authors.map((Author a) => a.name), <String>['Alice', 'Bob']);
+    expect(mapped.authors.map((AuthorRef a) => a.name), <String>[
+      'Alice',
+      'Bob',
+    ]);
+    expect(mapped.authors.map((AuthorRef a) => a.id), <int?>[
+      1,
+      2,
+    ], reason: 'Author 引用必须携带稳定 id（ADR-0024）');
     expect(mapped.tags.map((Tag t) => t.name), <String>['tag-a']);
     expect(mapped.languages, <String>['zh']);
     expect(mapped.parodies, <String>['p']);
@@ -87,7 +94,10 @@ rust.ComicDto _comicDto({
     description: description,
     publishedAt: publishedAt,
     lastReadTimeMs: lastReadTimeMs,
-    authors: const <String>['Alice', 'Bob'],
+    authors: const <rust.ComicAuthorDto>[
+      rust.ComicAuthorDto(id: 1, name: 'Alice'),
+      rust.ComicAuthorDto(id: 2, name: 'Bob'),
+    ],
     tags: const <String>['tag-a'],
     languages: const <String>['zh'],
     parodies: const <String>['p'],

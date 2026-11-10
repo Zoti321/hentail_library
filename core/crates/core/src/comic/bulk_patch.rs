@@ -87,8 +87,9 @@ async fn apply_patch_to_one(
         }
     }
     if let Some(authors_patch) = &patch.authors {
-        let merged = merge_multi_value(&comic.authors, authors_patch);
-        if merged != comic.authors {
+        let author_names = comic.author_names();
+        let merged = merge_multi_value(&author_names, authors_patch);
+        if merged != author_names {
             meta.authors = Some(merged);
             changed = true;
         }

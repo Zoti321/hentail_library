@@ -94,7 +94,10 @@ rust.ComicDto _comicDto({
     description: description,
     publishedAt: publishedAt,
     lastReadTimeMs: lastReadTimeMs,
-    authors: const <String>['Alice', 'Bob'],
+    authors: const <rust.ComicAuthorDto>[
+      rust.ComicAuthorDto(id: 1, name: 'Alice'),
+      rust.ComicAuthorDto(id: 2, name: 'Bob'),
+    ],
     tags: const <String>['tag-a'],
     languages: const <String>['zh'],
     parodies: const <String>['p'],

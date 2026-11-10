@@ -12,6 +12,7 @@ use sea_orm::{
 };
 
 use crate::comic::visibility::{visible_comic_id_sql, visible_comic_sql};
+use crate::comic::ComicAuthorDto;
 use crate::db::{connection, map_db_err};
 use crate::entity::{author_links, authors, prelude::*};
 use crate::error::HentaiError;
@@ -394,6 +395,25 @@ pub async fn load_author_names_for_comics<C: ConnectionTrait>(
     db: &C,
     comic_ids: &[String],
 ) -> Result<std::collections::HashMap<String, Vec<String>>, HentaiError> {
+    Ok(load_comic_authors_for_comics(db, comic_ids)
+        .await?
+        .into_iter()
+        .map(|(comic_id, authors)| {
+            (
+                comic_id,
+                authors.into_iter().map(|a| a.name).collect::<Vec<String>>(),
+            )
+        })
+        .collect())
+}
+
+/// 读路径专用：Comic 附着的 Author 引用投影（`id` + 显示名，ADR-0024）。
+///
+/// 写路径仍用 [`load_author_names_for_comics`]（用户输入的是名字，需 upsert 成 id）。
+pub async fn load_comic_authors_for_comics<C: ConnectionTrait>(
+    db: &C,
+    comic_ids: &[String],
+) -> Result<std::collections::HashMap<String, Vec<ComicAuthorDto>>, HentaiError> {
     let mut map = std::collections::HashMap::new();
     if comic_ids.is_empty() {
         return Ok(map);
@@ -406,7 +426,7 @@ pub async fn load_author_names_for_comics<C: ConnectionTrait>(
         .query_all(Statement::from_sql_and_values(
             sea_orm::DatabaseBackend::Sqlite,
             format!(
-                "SELECT ca.comic_id, a.name \
+                "SELECT ca.comic_id, a.id, a.name \
                  FROM comic_authors ca \
                  INNER JOIN authors a ON a.id = ca.author_id \
                  WHERE ca.comic_id IN ({placeholders}) \
@@ -418,8 +438,13 @@ pub async fn load_author_names_for_comics<C: ConnectionTrait>(
         .map_err(map_db_err)?;
     for row in rows {
         let comic_id = string_column(&row, 0)?;
-        let name = string_column(&row, 1)?;
-        map.entry(comic_id).or_default().push(name);
+        let id = row
+            .try_get_by_index::<i64>(1)
+            .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?;
+        let name = string_column(&row, 2)?;
+        map.entry(comic_id)
+            .or_default()
+            .push(ComicAuthorDto { id: Some(id), name });
     }
     Ok(map)
 }

@@ -93,7 +93,7 @@ fn export_import_round_trip_restores_user_metadata_and_locks() {
             let comic = find_comic_by_id("c1").await.expect("find").expect("exists");
             assert_eq!(comic.title, "恢复标题");
             assert_eq!(comic.tags, vec!["标签A".to_string()]);
-            assert_eq!(comic.authors, vec!["作者A".to_string()]);
+            assert_eq!(comic.author_names(), vec!["作者A".to_string()]);
             assert_eq!(comic.languages, vec!["Chinese".to_string()]);
             assert!(comic.locks.title);
             assert!(comic.locks.tags);
