@@ -8,8 +8,7 @@ import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/core/util/app_root_navigator.dart';
 import 'package:hentai_library/core/util/semver_utils.dart';
 import 'package:hentai_library/features/app_settings/domain/app_release_info.dart';
-import 'package:hentai_library/shared/domain/models/models.dart'
-    show AppSetting;
+import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hentai_library/features/app_settings/presentation/views/dialogs/app_update_dialog.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';

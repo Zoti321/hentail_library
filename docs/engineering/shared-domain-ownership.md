@@ -52,7 +52,6 @@ UI / 编排命令类型；发现面经 owner `public/` re-export（ADR-0034）�
 - `ports/author_detail_port.dart`
 - `ports/comic_trash_command_port.dart`
 - `ports/library_management_port.dart`
-- `ports/library_revision_port.dart`、`ports/library_revision_signal_port.dart`
 - `ports/series_reading_context_port.dart`
 - `ports/reader_launch_port.dart`（旧名 `read_session_launch_port`；ADR-0038）
 - `library/comic_detail_return_series_port.dart`（实现 @ `comic`）

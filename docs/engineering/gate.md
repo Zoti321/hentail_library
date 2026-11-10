@@ -2,7 +2,7 @@
 
 **决策**：ADR-0018（三层缝、CI tier 词汇）、ADR-0002（业务真值在 Rust）、**ADR-0033**（feature `application/`）、**ADR-0034**（cross-feature `public/`）。**Job 列表以** `.github/workflows/gate.yml` **为准**；本地与 CI 同源：`./scripts/run-gate.sh`。
 
-**Wayfinder `lib/` 顶层目录**（Phase A/B）：`app/test/gate/lib_layout_scan_helpers.dart` · `project_layout_test.dart`。产品 feature 之间 **仅允许** import `features/<owner>/public/**` 或 `features/<owner>/public.dart`（M1）；`shared/**` **禁止** import feature public（R11）。
+**Wayfinder `lib/` 顶层目录**（Phase A/B）：`app/test/gate/lib_layout_scan_helpers.dart` · `project_layout_test.dart`。产品 feature 之间 **仅允许** import `features/<owner>/public/**` 或 `features/<owner>/public.dart`（M1）；`shared/**` **禁止** import feature public（R11），且 **不得** import `features/**`（R13，ratchet：`shared/di`、`shared/domain`、`core/**` 等既有边只许减不许增）。
 
 **工具链**：CI 固定 **Flutter 3.47.8**（`gate.yml` → `FLUTTER_VERSION`）。本地请用同 major/minor 的 stable；`flutter analyze` 在 GitHub Actions（`CI=true`）下会将 info 级 lint 也计为失败。`riverpod_lint` 为可选 dev 依赖（不依赖 `custom_lint`）；**Gate 的 `flutter analyze` 暂未挂 `plugins: riverpod_lint`**，避免未偿还的 Riverpod 风格债挡合并。本地可在 `analysis_options.yaml` 临时启用做增量清理。SDK 升级记录见 `docs/engineering/flutter-3.47-migration.md`。
 
@@ -161,6 +161,7 @@ Epic [#447](https://github.com/Zoti321/hentail_library/issues/447) 清理 Flutte
 |  concern | 测试 / 文件 |
 |----------|-------------|
 | L1 domain↔data、FRB 面、application 依赖、shared→feature public、public→presentation（含 `export`，R12 allowlist） | `import_boundary_test.dart`（R1–R12）；`public_presentation_export_allowlist.txt`（只缩不扩） |
+| L1b shared→features ratchet（R13） | `import_boundary_test.dart`（R13）+ `import_boundary_baseline.json`；生成器 `dart run tool/generate_import_boundary_baseline.dart` |
 | L2 product 图 ratchet（M1 非 public 边、M2/M3） | `import_boundary_baseline.json` → `dart run tool/generate_import_boundary_baseline.dart` |
 | Cross-feature 协作约定 | [`cross-feature-collaboration.md`](cross-feature-collaboration.md) |
 | 领域事件（E1 事件子类位置 / E2 仅 application·data 发布 / E4 实现收敛） | `domain_event_rules_test.dart`（ADR-0039） |

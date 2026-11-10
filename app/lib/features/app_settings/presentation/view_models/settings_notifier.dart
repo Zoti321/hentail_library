@@ -1,12 +1,6 @@
 import 'dart:async';
 
-import 'package:hentai_library/shared/domain/models/models.dart'
-    show
-        AppColorSchemePreference,
-        AppFontPreference,
-        AppLocalePreference,
-        AppSetting,
-        AppThemePreference;
+import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 import 'package:hentai_library/features/app_settings/domain/reader_session_preference_types.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';

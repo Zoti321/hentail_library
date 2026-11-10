@@ -102,10 +102,25 @@ void main() {
     final List<ImportViolation> structural = structuralViolations(all);
     if (structural.isNotEmpty) {
       fail(
-        'Structural import violations (R1–R12):\n'
+        'Structural import violations (R1–R12; R13 is ratcheted):\n'
         '${_formatViolations(structural)}',
       );
     }
+  });
+
+  test('R13 shared→features edges only shrink', () {
+    final List<ImportViolation> all = collectImportViolations(libDir);
+    final Set<String> baselineKeys = _readBaselineKeys(baselineFile);
+    final Set<String> added = all
+        .where((ImportViolation v) => v.ruleId == 'R13')
+        .map(violationKey)
+        .toSet()
+        .difference(baselineKeys);
+    expect(
+      added,
+      isEmpty,
+      reason: 'New shared→features imports:\n${added.join('\n')}',
+    );
   });
 
   test('import boundaries: no cycles in public cross-feature graph', () {

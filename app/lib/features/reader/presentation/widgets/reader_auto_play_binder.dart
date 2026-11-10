@@ -7,8 +7,6 @@ import 'package:hentai_library/features/reader/presentation/view_models/reader_n
 import 'package:hentai_library/features/reader/presentation/view_models/reader_view_model.dart';
 import 'package:hentai_library/features/reader/presentation/routing/reader_route_context.dart';
 import 'package:hentai_library/shared/di/app_settings_providers.dart';
-import 'package:hentai_library/shared/domain/models/models.dart'
-    show AppSetting;
 import 'package:hentai_library/features/reader/domain/auto_play_mode.dart';
 import 'package:hentai_library/features/reader/domain/reading_mode.dart';
 import 'package:hentai_library/shared/ui/motion/app_motion.dart';
@@ -40,14 +38,12 @@ class ReaderAutoPlayBinder extends HookConsumerWidget {
     );
     final int readerAutoPlayIntervalSeconds = ref.watch(
       appSettingsStateProvider.select(
-        (AsyncValue<AppSetting> value) =>
-            value.asData?.value.readerAutoPlayIntervalSeconds ?? 5,
+        (value) => value.asData?.value.readerAutoPlayIntervalSeconds ?? 5,
       ),
     );
     final AutoPlayMode autoPlayMode = ref.watch(
       appSettingsStateProvider.select(
-        (AsyncValue<AppSetting> value) =>
-            value.asData?.value.autoPlayMode ?? kDefaultAutoPlayMode,
+        (value) => value.asData?.value.autoPlayMode ?? kDefaultAutoPlayMode,
       ),
     );
     final ({int currentIndex, int totalPages, ReadingMode readingMode})?

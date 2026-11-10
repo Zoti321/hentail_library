@@ -491,6 +491,21 @@ void _checkStructuralRules({
     );
   }
 
+  // R13 (ratchet): `shared/**` must not import `features/**` at all
+  // (ADR-0035 Catalog Shared Kernel). Existing edges live in the baseline and
+  // must only shrink.
+  if (sourceModule == 'shared' && importPath.startsWith('features/')) {
+    found.add(
+      violation(
+        ruleId: 'R13',
+        sourceModule: sourceModule,
+        targetModule: targetModule,
+        sourceFile: sourceRel,
+        importUri: importUri,
+      ),
+    );
+  }
+
   if (isFeaturePublicLayerPath(sourceRel) &&
       isProductModule(sourceModule) &&
       importPath.startsWith('features/$sourceModule/presentation/') &&
@@ -575,16 +590,21 @@ void _checkModuleGraphRules({
   }
 }
 
+/// Rules enforced with a shrink-only baseline instead of zero tolerance.
+const Set<String> kRatchetRuleIds = <String>{'M1', 'M2', 'M3', 'R13'};
+
 List<ImportViolation> structuralViolations(List<ImportViolation> all) {
-  return all.where((ImportViolation v) => v.ruleId.startsWith('R')).toList();
+  return all
+      .where(
+        (ImportViolation v) =>
+            v.ruleId.startsWith('R') && !kRatchetRuleIds.contains(v.ruleId),
+      )
+      .toList();
 }
 
 List<ImportViolation> ratchetViolations(List<ImportViolation> all) {
   return all
-      .where(
-        (ImportViolation v) =>
-            v.ruleId == 'M1' || v.ruleId == 'M2' || v.ruleId == 'M3',
-      )
+      .where((ImportViolation v) => kRatchetRuleIds.contains(v.ruleId))
       .toList();
 }
 
