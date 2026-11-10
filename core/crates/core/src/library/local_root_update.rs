@@ -74,6 +74,7 @@ async fn update_local_library_root_locked(id: &str, root: &str) -> Result<Librar
     active.root_path = Set(root.to_string());
     let updated = active.update(&txn).await.map_err(map_db_err)?;
     txn.commit().await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
     clear_reader_sessions();
     Ok(model_to_dto(updated))
 }

@@ -2,8 +2,6 @@ import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
-import 'package:hentai_library/shared/domain/ports/library_revision_port.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/di/domain_event_bus_providers.dart';
 import 'package:hentai_library/shared/domain/events/events.dart';
 import 'package:hentai_library/features/bootstrap/presentation/view_models/app_startup_coordinator_notifier.dart';
@@ -26,15 +24,6 @@ LocalLibrary _lib({required String id, bool scanOnStartup = false}) {
     pinned: true,
     sidebarOrder: 0,
   );
-}
-
-class _FakeLibraryRevisionPort implements LibraryRevisionPort {
-  _FakeLibraryRevisionPort(this._events);
-
-  final StreamController<void> _events;
-
-  @override
-  Stream<void> watchRevision() => _events.stream;
 }
 
 class _FakeLibrariesNotifier extends LibrariesNotifier {
@@ -202,18 +191,11 @@ void main() {
     test(
       'library revision bumps during startup do not cancel remaining scans',
       () async {
-        final StreamController<void> revisionEvents =
-            StreamController<void>.broadcast();
-        addTearDown(revisionEvents.close);
-
         scan = _RecordingScanLibraryController()
           ..expectStarts(2)
           ..holdNextStart();
         container = ProviderContainer(
           overrides: <Override>[
-            libraryRevisionPortProvider.overrideWithValue(
-              _FakeLibraryRevisionPort(revisionEvents),
-            ),
             ...domainEventBusOverrides(),
             librariesProvider.overrideWith(
               () => _FakeLibrariesNotifier(<LocalLibrary>[

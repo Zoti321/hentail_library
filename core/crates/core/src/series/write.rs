@@ -92,6 +92,7 @@ pub async fn update_series_user_meta(
         apply_series_lock(&mut active, field, true);
     }
     active.update(&db).await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(())
 }
 
@@ -116,6 +117,7 @@ pub async fn set_series_meta_locks(
         }
     }
     active.update(&db).await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(())
 }
 
@@ -150,6 +152,7 @@ pub async fn update_series_item_sort_order(
     active.sort_order = Set(sort_order);
     active.sort_order_locked = Set(true);
     active.update(&db).await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(())
 }
 
@@ -178,6 +181,7 @@ pub async fn set_series_item_sort_order_locked(
     let mut active: series_items::ActiveModel = existing.into();
     active.sort_order_locked = Set(locked);
     active.update(&db).await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(())
 }
 

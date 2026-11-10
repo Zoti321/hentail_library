@@ -246,6 +246,7 @@ pub async fn add_author(name: &str) -> Result<AuthorIdentity, HentaiError> {
     let trimmed = validate_author_name(name)?;
     let db = connection()?;
     let id = ensure_author_id(&db, &trimmed).await?;
+    crate::revision::notify_committed();
     Ok(AuthorIdentity {
         id,
         name: trimmed,
@@ -268,6 +269,7 @@ pub(crate) async fn delete_authors_by_names_locked(names: Vec<String>) -> Result
     let ids = author_ids_for_names(&txn, &names).await?;
     delete_authors_by_ids(&txn, &ids).await?;
     txn.commit().await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(())
 }
 
@@ -320,7 +322,11 @@ pub(crate) async fn rename_author_locked(
     let Some(id) = find_author_id_by_name(&db, old_name).await? else {
         return Err(HentaiError::validation(format!("作者不存在: {old_name}")));
     };
-    rename_author_by_id(&db, id, &new_name).await
+    let result = rename_author_by_id(&db, id, &new_name).await;
+    if result.is_ok() {
+        crate::revision::notify_committed();
+    }
+    result
 }
 
 pub async fn rename_author_by_id<C: ConnectionTrait>(
@@ -478,6 +484,7 @@ pub async fn add_author_link(
         platform_display_name: display,
         sort_key: next_key,
     };
+    crate::revision::notify_committed();
     schedule_author_image_refresh(author_id);
     Ok(link)
 }
@@ -539,6 +546,7 @@ pub async fn update_author_link(
             .map_err(map_db_err)?;
     }
     transaction.commit().await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
     if let Some(cache) = cache {
         if let Err(error) = cache.invalidate_platform_link(link_id) {
             tracing::debug!(
@@ -578,6 +586,7 @@ pub async fn delete_author_link(author_id: i64, link_id: i64) -> Result<(), Hent
         return Err(HentaiError::validation("Author link 不存在"));
     }
     transaction.commit().await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
     if let Some(cache) = cache {
         if let Err(error) = cache.invalidate_platform_link(link_id) {
             tracing::debug!(

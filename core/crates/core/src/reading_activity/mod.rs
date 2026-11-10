@@ -62,7 +62,10 @@ pub async fn watch_reading_activity_stats(
 }
 
 /// Idempotent Finished comic mark（粘性：已存在则保留原 finished_at）。
-pub async fn upsert_finished_comic_mark(comic_id: &str, finished_at_ms: i64) -> Result<(), HentaiError> {
+pub async fn upsert_finished_comic_mark(
+    comic_id: &str,
+    finished_at_ms: i64,
+) -> Result<(), HentaiError> {
     let db = connection()?;
     db.execute(Statement::from_sql_and_values(
         db.get_database_backend(),
@@ -106,6 +109,7 @@ pub async fn record_reading_activity(
     if mark_finished {
         upsert_finished_comic_mark(comic_id, now_ms()).await?;
     }
+    crate::revision::notify_committed();
     Ok(())
 }
 
@@ -127,6 +131,7 @@ pub async fn backfill_finished_comics_from_history_on(
         ))
         .await
         .map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(result.rows_affected() as i32)
 }
 
@@ -360,11 +365,9 @@ mod tests {
         )
         .await
         .unwrap();
-        db.execute_unprepared(
-            "INSERT INTO comics (comic_id, deleted_at) VALUES ('a', NULL)",
-        )
-        .await
-        .unwrap();
+        db.execute_unprepared("INSERT INTO comics (comic_id, deleted_at) VALUES ('a', NULL)")
+            .await
+            .unwrap();
         db.execute_unprepared(
             "INSERT INTO comic_finished_marks (comic_id, finished_at_ms) VALUES ('a', 1)",
         )

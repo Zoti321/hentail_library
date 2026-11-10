@@ -5,8 +5,6 @@ import 'package:hentai_library/features/library_admin/presentation/view_models/l
 import 'package:hentai_library/features/library_admin/presentation/view_models/scan_library_controller.dart';
 import 'package:hentai_library/features/library_admin/domain/sync_library_port.dart';
 import 'package:hentai_library/features/library_admin/domain/sync_library_types.dart';
-import 'package:hentai_library/shared/domain/ports/library_revision_port.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:riverpod/riverpod.dart';
 import 'package:test/test.dart';
@@ -36,25 +34,12 @@ class _ScriptedSyncAdapter implements SyncLibraryPort {
   }
 }
 
-class _FakeLibraryRevisionPort implements LibraryRevisionPort {
-  _FakeLibraryRevisionPort(this._events);
-
-  final StreamController<void> _events;
-
-  @override
-  Stream<void> watchRevision() => _events.stream;
-}
-
 void main() {
   test('start bumps library revision after successful sync', () async {
-    final StreamController<void> events = StreamController<void>.broadcast();
     final ProviderContainer container = ProviderContainer(
       overrides: <Override>[
         syncLibraryPortProvider.overrideWithValue(
           _ScriptedSyncAdapter(({required isCancelled, onProgress}) async {}),
-        ),
-        libraryRevisionPortProvider.overrideWithValue(
-          _FakeLibraryRevisionPort(events),
         ),
         ...domainEventBusOverrides(),
       ],
@@ -71,7 +56,6 @@ void main() {
   });
 
   test('cancel before sync completes does not bump revision', () async {
-    final StreamController<void> events = StreamController<void>.broadcast();
     late ScanLibraryController controller;
     final ProviderContainer container = ProviderContainer(
       overrides: <Override>[
@@ -79,9 +63,6 @@ void main() {
           _ScriptedSyncAdapter(({required isCancelled, onProgress}) async {
             controller.cancel();
           }),
-        ),
-        libraryRevisionPortProvider.overrideWithValue(
-          _FakeLibraryRevisionPort(events),
         ),
         ...domainEventBusOverrides(),
       ],

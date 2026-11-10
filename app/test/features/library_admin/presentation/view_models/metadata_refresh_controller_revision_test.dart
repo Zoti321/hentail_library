@@ -6,8 +6,6 @@ import 'package:hentai_library/features/library_admin/presentation/view_models/m
 import 'package:hentai_library/features/library_admin/presentation/view_models/scan_library_controller.dart';
 import 'package:hentai_library/features/library_admin/domain/metadata_refresh_port.dart';
 import 'package:hentai_library/features/library_admin/domain/metadata_refresh_types.dart';
-import 'package:hentai_library/shared/domain/ports/library_revision_port.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:riverpod/riverpod.dart';
 import 'package:test/test.dart';
@@ -52,15 +50,6 @@ class _ScriptedRefreshAdapter implements MetadataRefreshPort {
   }
 }
 
-class _FakeLibraryRevisionPort implements LibraryRevisionPort {
-  _FakeLibraryRevisionPort(this._events);
-
-  final StreamController<void> _events;
-
-  @override
-  Stream<void> watchRevision() => _events.stream;
-}
-
 class _IdleScanLibraryController extends ScanLibraryController {
   @override
   ScanLibraryState build() => const ScanLibraryState();
@@ -68,7 +57,6 @@ class _IdleScanLibraryController extends ScanLibraryController {
 
 void main() {
   test('refreshComic bumps library revision after success', () async {
-    final StreamController<void> events = StreamController<void>.broadcast();
     final ProviderContainer container = ProviderContainer(
       overrides: <Override>[
         metadataRefreshPortProvider.overrideWithValue(
@@ -77,9 +65,6 @@ void main() {
               expect(comicId, 'c1');
             },
           ),
-        ),
-        libraryRevisionPortProvider.overrideWithValue(
-          _FakeLibraryRevisionPort(events),
         ),
         ...domainEventBusOverrides(),
         scanLibraryControllerProvider.overrideWith(
@@ -99,7 +84,6 @@ void main() {
   });
 
   test('refreshLibrary does not bump revision when skipped', () async {
-    final StreamController<void> events = StreamController<void>.broadcast();
     final ProviderContainer container = ProviderContainer(
       overrides: <Override>[
         metadataRefreshPortProvider.overrideWithValue(
@@ -114,9 +98,6 @@ void main() {
               );
             },
           ),
-        ),
-        libraryRevisionPortProvider.overrideWithValue(
-          _FakeLibraryRevisionPort(events),
         ),
         ...domainEventBusOverrides(),
         scanLibraryControllerProvider.overrideWith(

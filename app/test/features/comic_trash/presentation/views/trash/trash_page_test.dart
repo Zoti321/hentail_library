@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/comic/di/comic_cover_providers.dart';
@@ -11,7 +9,6 @@ import 'package:hentai_library/features/comic_trash/domain/trashed_comic.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/shared/domain/ports/comic_trash_reader_session_port.dart';
-import 'package:hentai_library/shared/domain/ports/library_revision_port.dart';
 import 'package:hentai_library/features/comic_trash/domain/comic_trash_repository.dart';
 import 'package:hentai_library/shared/ui/models/comic_cover_state.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
@@ -21,13 +18,6 @@ import 'package:riverpod/misc.dart' show Override;
 import '../../../../../support/pump_localized_app.dart';
 
 import 'package:hentai_library/features/bootstrap/di/overrides/domain_event_bus_overrides.dart';
-
-class _FakeLibraryRevisionPort implements LibraryRevisionPort {
-  final StreamController<void> events = StreamController<void>.broadcast();
-
-  @override
-  Stream<void> watchRevision() => events.stream;
-}
 
 class _TrashComicRepo implements ComicTrashRepository {
   _TrashComicRepo(this.items);
@@ -89,14 +79,11 @@ Future<void> _pumpTrash(WidgetTester tester, List<TrashedComic> items) async {
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.resetPhysicalSize);
   addTearDown(tester.view.resetDevicePixelRatio);
-  final _FakeLibraryRevisionPort revision = _FakeLibraryRevisionPort();
-  addTearDown(revision.events.close);
   await pumpLocalizedApp(
     tester,
     home: const Scaffold(body: TrashPage()),
     overrides: <Override>[
       ...domainEventBusOverrides(),
-      libraryRevisionPortProvider.overrideWithValue(revision),
       comicTrashRepositoryProvider.overrideWithValue(_TrashComicRepo(items)),
       comicTrashNativeReaderPortProvider.overrideWithValue(
         _NoopNativeReaderPort(),

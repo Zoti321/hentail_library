@@ -96,7 +96,9 @@ impl LibraryWriteTxn {
     }
 
     pub async fn commit(self) -> Result<(), HentaiError> {
-        self.txn.commit().await.map_err(map_db_err)
+        self.txn.commit().await.map_err(map_db_err)?;
+        crate::revision::notify_committed();
+        Ok(())
     }
 
     /// 显式回滚（等价于未提交就 drop，但回滚在本调用内完成）。

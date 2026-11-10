@@ -3,7 +3,6 @@ import 'package:hentai_library/shared/di/injected_di.dart';
 import 'package:hentai_library/shared/domain/ports/comic_trash_reader_session_port.dart';
 import 'package:hentai_library/shared/domain/ports/remote_library_credentials_port.dart';
 import 'package:hentai_library/features/reader/domain/comic_page_source_port.dart';
-import 'package:hentai_library/shared/domain/ports/library_revision_port.dart';
 import 'package:hentai_library/features/reader/domain/native_reader_port.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting_repository.dart';
 import 'package:hentai_library/features/named_metadata/domain/author_repository.dart';
@@ -81,8 +80,4 @@ final Provider<ComicTrashNativeReaderPort> comicTrashNativeReaderPortProvider =
 
 final Provider<ComicPageSourcePort> comicPageSourcePortProvider = injectedDi(
   'comicPageSourcePortProvider',
-);
-
-final Provider<LibraryRevisionPort> libraryRevisionPortProvider = injectedDi(
-  'libraryRevisionPortProvider',
 );

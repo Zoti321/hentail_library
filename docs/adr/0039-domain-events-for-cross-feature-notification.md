@@ -13,7 +13,7 @@ ADR-0034（public only）解决了「谁能 import 谁」，但**同一次写入
 | 1 | DI 注入回调闭包 | `library_admin/di/{library_sync,metadata_refresh,comic_metadata_bulk_patch}.dart` 的 `onCatalogRevision` / `onSucceeded` / `onDictionariesChanged` |
 | 2 | 命令端口 | `LibraryRevisionSignalPort.notifyExternalChange()`（已并入事件，见 §5） |
 | 3 | 伪事件总线（Riverpod notifier 累加版本号） | `shared/di/library_change_bus.dart` 的 `LibraryChangeBus.publish(LibraryChange)` |
-| 4 | 数据层 revision 流 | `LibraryRevisionPort.watchRevision()`（SQLite `data_version`） |
+| 4 | 数据层 revision 流 | `LibraryRevisionPort.watchRevision()`（SQLite `data_version`；已移除，见 §6） |
 | 5 | 领域事件类（已定义、无订阅者） | `features/*/domain/*_events.dart`（`LibraryAdminEvent`、`ComicTrashEvent`、`ReadingHistoryEvent`、`AppSettingEvent`） |
 
 1/2/3/5 都在表达「某件事发生了」，边界模糊：presentation 可直接发布状态变更、订阅方各自 `ref.listen`、新增一条通知要同时改 coordinator 回调与 provider。5 证明事件语义已被认可，但缺一条统一通道落地。
@@ -71,10 +71,17 @@ ADR-0034（public only）解决了「谁能 import 谁」，但**同一次写入
   - `LibraryCatalogChanged(source)`（sync / metadata refresh / library CRUD / series 排序）
   - `ComicsTrashed(comicIds)` / `ComicsRestored(comicIds)`
 - 发布（application 层；presentation 只调 Port / 用例）：`comic/application/comic_metadata_service.dart`、`library_admin/application/{comic_metadata_bulk_patch_coordinator,sync_library_use_case,metadata_refresh_use_case,library_write_service}.dart`、`comic_trash/application/comic_trash_service.dart`、`series/application/series_item_sort_service.dart`。
-- 投影：`DomainEventRevisions{dictionaryRevision, metadataSaveRevision, catalogRevision}` 唯一 reducer；`LibraryRevisionNotifier` 不再自带通知入口，`revision` 由 reducer 的 `catalogRevision` 驱动，叠加 `LibraryRevisionPort`（SQLite `data_version`）外部流。
+- 投影：`DomainEventRevisions{dictionaryRevision, metadataSaveRevision, catalogRevision}` 唯一 reducer；`LibraryRevisionNotifier` 不再自带通知入口，`revision` **只**由 reducer 的 `catalogRevision` 驱动（单一来源）。
 - 死事件清理：`app_settings/domain/app_setting_events.dart`、`reading_history/domain/reading_history_events.dart` 删除（无订阅方，设置 / 进度读取本就由 Riverpod 状态与仓储流承担）。
 
-`LibraryRevisionPort`（SQLite `data_version`）**保持为数据层外部事实流**：它不是「应用写入后的通知」，而是外部/底层写入的兜底信号。
+### 6. 2026-11-10 决策变更：移除 Rust `data_version` 轮询
+
+原决策把 `LibraryRevisionPort`（Rust 侧 400ms 轮询 `PRAGMA data_version`）保留为「数据层外部事实流」。该双源已被撤销：
+
+- **Rust**：删除轮询器、`read_data_version` 与专用版本连接；`revision::subscribe()` 的上游改为写路径显式 `revision::notify_committed()`（事务提交 / autocommit 写成功后调用）。10 个 watch API 的形态不变。
+- **Dart**：删除 `LibraryRevisionPort`、`LibraryRevisionFrbAdapter`、`libraryRevisionPortProvider` 与全部测试 fake；`LibraryRevisionNotifier` 只消费 `catalogRevision`。
+- **代价**：跨进程 / 外部工具直接改 SQLite 不再被自动感知。凡需要感知的外部入口（如 metadata backup import）必须在完成处显式发布事件；这是「单一事实来源」换来的确定性。
+- **测试**：`crates/core/tests/revision_notify_contract.rs` 按写入类别断言 generation 递增。
 
 ## Consequences
 

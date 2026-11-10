@@ -95,6 +95,7 @@ pub async fn refresh_comic_metadata_with(
         )));
     }
     txn.commit().await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(())
 }
 

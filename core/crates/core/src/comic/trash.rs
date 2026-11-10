@@ -91,6 +91,7 @@ pub async fn trash_comics(comic_ids: Vec<String>) -> Result<(), HentaiError> {
             .map_err(map_db_err)?;
     }
     write.commit().await?;
+    crate::revision::notify_committed();
     for id in &ids {
         close_reader(id);
     }
@@ -117,6 +118,7 @@ pub async fn restore_comics(comic_ids: Vec<String>) -> Result<(), HentaiError> {
             .map_err(map_db_err)?;
     }
     write.commit().await?;
+    crate::revision::notify_committed();
     Ok(())
 }
 
@@ -171,6 +173,7 @@ async fn rebuild_series_after_purge(db: &DatabaseConnection) -> Result<(), Henta
     let txn = db.begin().await.map_err(map_db_err)?;
     rebuild_series_from_comics(&txn, None).await?;
     txn.commit().await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(())
 }
 
@@ -180,6 +183,7 @@ async fn purge_one(db: &DatabaseConnection, target: &PurgeTarget) -> Result<(), 
     let txn = db.begin().await.map_err(map_db_err)?;
     delete_comics_side_effects(&txn, std::slice::from_ref(&target.comic_id)).await?;
     txn.commit().await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(())
 }
 

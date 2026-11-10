@@ -418,6 +418,7 @@ async fn apply_comic_record(
     // column; an extra set_comic_meta_locks(true × 9) pass would be a second transaction
     // with no additional effect.
     txn.commit().await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(())
 }
 

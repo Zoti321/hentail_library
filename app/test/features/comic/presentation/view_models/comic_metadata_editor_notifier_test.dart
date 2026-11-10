@@ -5,7 +5,6 @@ import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/comic_metadata_form.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/series_item_membership.dart';
-import 'package:hentai_library/shared/domain/ports/library_revision_port.dart';
 import 'package:hentai_library/features/comic/domain/comic_user_metadata_repository.dart';
 import 'package:hentai_library/features/comic/di/comic_repository_providers.dart';
 import 'package:hentai_library/features/series/domain/series_repository.dart';
@@ -80,11 +79,6 @@ class _RecordingSeriesRepository implements SeriesRepository {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-class _SilentRevisionPort implements LibraryRevisionPort {
-  @override
-  Stream<void> watchRevision() => const Stream<void>.empty();
-}
-
 Comic _comic() {
   final DateTime now = DateTime.utc(2024, 1, 1);
   return Comic(
@@ -126,7 +120,6 @@ void main() {
         ...bootstrapCompositionOverrides(),
         comicUserMetadataRepositoryProvider.overrideWithValue(comicRepo),
         seriesRepoProvider.overrideWithValue(seriesRepo),
-        libraryRevisionPortProvider.overrideWithValue(_SilentRevisionPort()),
       ],
     );
   });

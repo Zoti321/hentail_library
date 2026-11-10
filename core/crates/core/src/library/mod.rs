@@ -40,6 +40,7 @@ pub async fn record_library_sync_success(library_id: &str) -> Result<(), HentaiE
     active.last_successful_sync_at = Set(Some(now));
     active.last_sync_error = Set(None);
     active.update(&db).await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(())
 }
 
@@ -60,5 +61,6 @@ pub async fn record_library_sync_failure(
         .into();
     active.last_sync_error = Set(Some(trimmed.to_string()));
     active.update(&db).await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(())
 }

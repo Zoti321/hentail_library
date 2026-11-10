@@ -1,23 +1,14 @@
-import 'dart:async';
-
 import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
 import 'package:hentai_library/shared/di/domain_event_bus_providers.dart';
 import 'package:hentai_library/shared/domain/events/events.dart';
-import 'package:hentai_library/shared/domain/ports/library_revision_port.dart';
 import 'package:riverpod/misc.dart' show Override, ProviderException;
 import 'package:hentai_library/features/bootstrap/di/overrides/domain_event_bus_overrides.dart';
-
-class _SilentRevisionPort implements LibraryRevisionPort {
-  @override
-  Stream<void> watchRevision() => const Stream<void>.empty();
-}
 
 void main() {
   test('未注入时 shared 端口与状态 Provider 抛出 UnimplementedError', () {
@@ -59,10 +50,7 @@ void main() {
 
   test('LibraryCatalogChanged 事件 bumps libraryRevisionProvider', () {
     final ProviderContainer container = ProviderContainer(
-      overrides: <Override>[
-        libraryRevisionPortProvider.overrideWithValue(_SilentRevisionPort()),
-        ...domainEventBusOverrides(),
-      ],
+      overrides: <Override>[...domainEventBusOverrides()],
     );
     addTearDown(container.dispose);
 
@@ -76,7 +64,6 @@ void main() {
   test('bootstrap 注入后 shared 状态 Provider 跟随 library_admin 变化', () {
     final ProviderContainer container = ProviderContainer(
       overrides: <Override>[
-        libraryRevisionPortProvider.overrideWithValue(_SilentRevisionPort()),
         ...domainEventBusOverrides(),
         ...sharedLibraryStateOverrides(),
         ...bootstrapCompositionOverrides(),

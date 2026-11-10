@@ -5,9 +5,7 @@ import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart'
 import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/shared/domain/ports/library_revision_port.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_revision_coordinator.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/di/domain_event_bus_providers.dart';
 import 'package:hentai_library/shared/domain/events/events.dart';
 import 'package:hentai_library/shared/di/browse_library_scope_providers.dart';
@@ -17,15 +15,6 @@ import 'package:riverpod/riverpod.dart';
 import 'package:test/test.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:hentai_library/features/bootstrap/di/overrides/domain_event_bus_overrides.dart';
-
-class _FakeLibraryRevisionPort implements LibraryRevisionPort {
-  _FakeLibraryRevisionPort(this._events);
-
-  final StreamController<void> _events;
-
-  @override
-  Stream<void> watchRevision() => _events.stream;
-}
 
 class _FakeLibrariesNotifier extends LibrariesNotifier {
   static const LocalLibrary _libraryA = (
@@ -95,14 +84,12 @@ class _ControllableThumbnailEventCoordinator extends ThumbnailEventCoordinator {
 
 void main() {
   group('LibraryCatalogRevisionCoordinator', () {
-    late StreamController<void> events;
     late _FakeLibrariesNotifier librariesNotifier;
     late _ControllableScanLibraryController scanLibrary;
     late _ControllableThumbnailEventCoordinator thumbnails;
     late ProviderContainer container;
 
     setUp(() {
-      events = StreamController<void>.broadcast();
       librariesNotifier = _FakeLibrariesNotifier();
       scanLibrary = _ControllableScanLibraryController(running: false);
       thumbnails = _ControllableThumbnailEventCoordinator();
@@ -111,9 +98,6 @@ void main() {
           ...sharedLibraryStateOverrides(),
           ...bootstrapCompositionOverrides(),
           ...domainEventBusOverrides(),
-          libraryRevisionPortProvider.overrideWithValue(
-            _FakeLibraryRevisionPort(events),
-          ),
           librariesProvider.overrideWith(() => librariesNotifier),
           scanLibraryControllerProvider.overrideWith(() => scanLibrary),
           thumbnailEventCoordinatorProvider.overrideWith(() => thumbnails),
@@ -127,9 +111,8 @@ void main() {
       container.read(libraryCatalogRevisionCoordinatorProvider);
     });
 
-    tearDown(() async {
+    tearDown(() {
       container.dispose();
-      await events.close();
     });
 
     test(

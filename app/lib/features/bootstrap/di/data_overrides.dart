@@ -60,7 +60,4 @@ List<Override> dataProviderOverrides() => <Override>[
         ComicTrashReaderSessionAdapter(ref.read(nativeReaderPortProvider)),
   ),
   comicPageSourcePortProvider.overrideWith(createComicPageSourcePort),
-  libraryRevisionPortProvider.overrideWith(
-    (Ref ref) => createLibraryRevisionPort(),
-  ),
 ];

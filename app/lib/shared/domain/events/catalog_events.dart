@@ -5,8 +5,7 @@ enum CatalogChangeSource { sync, metadataRefresh, libraryAdmin, comicTrash }
 
 /// 库 / 漫画集合已变化，订阅方应重读 catalog（ADR-0039）。
 ///
-/// 与 SQLite `data_version` 流（[LibraryRevisionPort]）的区别：本事件覆盖
-/// stream 可能已错过的、由应用自身写入触发的变更。
+/// 应用自身写入成功后发布；Dart 侧 catalog 刷新只认本事件（ADR-0039）。
 final class LibraryCatalogChanged extends DomainEvent {
   const LibraryCatalogChanged([this.source = CatalogChangeSource.libraryAdmin]);
 

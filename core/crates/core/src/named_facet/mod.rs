@@ -333,6 +333,7 @@ pub async fn add_named_facet_name(
     ))
     .await
     .map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(())
 }
 
@@ -416,6 +417,7 @@ async fn rename_named_facet_name_locked(
     .map_err(map_db_err)?;
 
     txn.commit().await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(())
 }
 
@@ -490,6 +492,7 @@ async fn merge_named_facet_name_locked(
     .await
     .map_err(map_db_err)?;
     txn.commit().await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(())
 }
 

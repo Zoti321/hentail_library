@@ -46,8 +46,8 @@ pub use character::{list_all_characters, list_distinct_characters};
 pub use comic::{
     apply_comic_metadata_bulk_patch, count_all, count_trashed_comics, fetch_comics_browse_page,
     fetch_comics_page, fetch_trashed_comics_page, find_comic_by_id, find_comics_by_ids,
-    is_comic_trashed, list_trashed_comic_ids, now_ms, paginate, purge_comics, read_data_version,
-    restore_comics, search_by_keyword, search_by_keyword_page, search_by_tag_expression,
+    is_comic_trashed, list_trashed_comic_ids, now_ms, paginate, purge_comics, restore_comics,
+    search_by_keyword, search_by_keyword_page, search_by_tag_expression,
     search_by_tag_expression_page, set_comic_meta_locks, trash_comics, update_comic_user_meta,
     BulkPatchResultDto, ComicBrowseItemDto, ComicDto, ComicFilterDto, ComicGrouping,
     ComicMetaLocks, ComicMetadataBulkPatch, ComicPurgeResultDto, ComicSortFieldDto,
@@ -70,11 +70,6 @@ pub use home::{
     watch_library_home_stats, watch_recently_added_on_home, HomeContinueReadingDto,
     HomeLibraryAlertDto, HomeLibraryAlertKindDto, HomePageCountsDto, HomeRecentlyAddedDto,
     LibraryHomeStatDto,
-};
-pub use reading_activity::{
-    add_reading_duration_ms, backfill_finished_comics_from_history, load_reading_activity_stats,
-    record_reading_activity, upsert_finished_comic_mark, watch_reading_activity_stats,
-    ReadingActivityStatsDto,
 };
 pub use library::{
     clear_remote_library_credentials, create_local_library, create_remote_library, delete_library,
@@ -108,6 +103,11 @@ pub use reader::{
     clear_reader_page_cache, clear_reader_sessions, close_reader, load_page_bytes, load_page_list,
     load_reader_page, open_reader, open_reader_with, prefetch_reader_pages, session_path_and_type,
     writeback_after_open, writeback_with_access, ReaderPageDto, ReaderPageListDto,
+};
+pub use reading_activity::{
+    add_reading_duration_ms, backfill_finished_comics_from_history, load_reading_activity_stats,
+    record_reading_activity, upsert_finished_comic_mark, watch_reading_activity_stats,
+    ReadingActivityStatsDto,
 };
 pub use series::{
     count_all_series, fetch_series_browse_page, fetch_series_comics_metadata,

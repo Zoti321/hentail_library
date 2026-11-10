@@ -39,6 +39,7 @@ pub async fn record_reading(dto: &ReadingHistoryDto) -> Result<(), HentaiError> 
         .await
         .map_err(map_db_err)?;
     purge_expired_reading_histories(&db).await?;
+    crate::revision::notify_committed();
     Ok(())
 }
 
@@ -197,6 +198,7 @@ pub async fn delete_reading_by_comic_id(comic_id: &str) -> Result<i32, HentaiErr
         .exec(&db)
         .await
         .map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(res.rows_affected as i32)
 }
 
@@ -210,6 +212,7 @@ pub async fn delete_reading_by_comic_ids(comic_ids: &[String]) -> Result<i32, He
         .exec(&db)
         .await
         .map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(res.rows_affected as i32)
 }
 
@@ -224,6 +227,7 @@ async fn clear_all_reading_locked() -> Result<i32, HentaiError> {
         .exec(&db)
         .await
         .map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(res.rows_affected as i32)
 }
 

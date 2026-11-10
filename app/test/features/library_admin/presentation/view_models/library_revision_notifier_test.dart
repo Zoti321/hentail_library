@@ -1,33 +1,16 @@
-import 'dart:async';
-
 import 'package:riverpod/riverpod.dart';
-import 'package:hentai_library/shared/domain/ports/library_revision_port.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/shared/di/domain_event_bus_providers.dart';
+import 'package:hentai_library/shared/domain/events/events.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:test/test.dart';
 import 'package:hentai_library/features/bootstrap/di/overrides/domain_event_bus_overrides.dart';
 
-class _FakeLibraryRevisionPort implements LibraryRevisionPort {
-  _FakeLibraryRevisionPort(this._events);
-
-  final StreamController<void> _events;
-
-  @override
-  Stream<void> watchRevision() => _events.stream;
-}
-
 void main() {
   group('LibraryRevisionNotifier', () {
-    test('starts at revision 0 before first emit', () {
-      final StreamController<void> events = StreamController<void>.broadcast();
+    test('starts at revision 0 before any event', () {
       final ProviderContainer container = ProviderContainer(
-        overrides: <Override>[
-          libraryRevisionPortProvider.overrideWithValue(
-            _FakeLibraryRevisionPort(events),
-          ),
-          ...domainEventBusOverrides(),
-        ],
+        overrides: <Override>[...domainEventBusOverrides()],
       );
       addTearDown(container.dispose);
 
@@ -38,66 +21,23 @@ void main() {
       );
     });
 
-    test('bumps revision and marks first emit on stream event', () async {
-      final StreamController<void> events = StreamController<void>.broadcast();
+    test('bumps revision on catalog domain event', () {
       final ProviderContainer container = ProviderContainer(
-        overrides: <Override>[
-          libraryRevisionPortProvider.overrideWithValue(
-            _FakeLibraryRevisionPort(events),
-          ),
-          ...domainEventBusOverrides(),
-        ],
+        overrides: <Override>[...domainEventBusOverrides()],
       );
       addTearDown(container.dispose);
+      container.read(libraryRevisionProvider);
 
-      final Completer<LibraryRevisionState> completer =
-          Completer<LibraryRevisionState>();
-      container.listen(libraryRevisionProvider, (
-        LibraryRevisionState? previous,
-        LibraryRevisionState next,
-      ) {
-        if (next.revision == 1 && !completer.isCompleted) {
-          completer.complete(next);
-        }
-      }, fireImmediately: true);
+      container
+          .read(domainEventBusProvider)
+          .publish(const LibraryCatalogChanged(CatalogChangeSource.sync));
 
-      events.add(null);
-
-      final LibraryRevisionState state = await completer.future;
+      final LibraryRevisionState state = container.read(
+        libraryRevisionProvider,
+      );
       expect(state.revision, 1);
       expect(state.hasReceivedFirstEmit, isTrue);
       expect(state.streamError, isNull);
-    });
-
-    test('records stream errors', () async {
-      final StreamController<void> events = StreamController<void>.broadcast();
-      final ProviderContainer container = ProviderContainer(
-        overrides: <Override>[
-          libraryRevisionPortProvider.overrideWithValue(
-            _FakeLibraryRevisionPort(events),
-          ),
-          ...domainEventBusOverrides(),
-        ],
-      );
-      addTearDown(container.dispose);
-
-      final Completer<LibraryRevisionState> completer =
-          Completer<LibraryRevisionState>();
-      container.listen(libraryRevisionProvider, (
-        LibraryRevisionState? previous,
-        LibraryRevisionState next,
-      ) {
-        if (next.streamError != null && !completer.isCompleted) {
-          completer.complete(next);
-        }
-      }, fireImmediately: true);
-
-      final StateError error = StateError('stream failed');
-      events.addError(error);
-
-      final LibraryRevisionState state = await completer.future;
-      expect(state.hasReceivedFirstEmit, isTrue);
-      expect(state.streamError, same(error));
     });
   });
 }

@@ -46,6 +46,7 @@ pub async fn apply_scan_replace_plan(
     purge_expired_reading_histories(&txn).await?;
     rebuild_series_from_comics(&txn, Some(library_id)).await?;
     txn.commit().await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(())
 }
 
@@ -64,6 +65,7 @@ pub async fn clear_all_comics(db: &DatabaseConnection) -> Result<i32, HentaiErro
         .map_err(map_db_err)?;
     }
     txn.commit().await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(count)
 }
 
@@ -94,6 +96,7 @@ pub async fn clear_comics_for_library(
     .await
     .map_err(map_db_err)?;
     txn.commit().await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(count)
 }
 

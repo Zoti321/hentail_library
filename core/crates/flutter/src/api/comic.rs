@@ -563,7 +563,7 @@ pub async fn watch_comic_changes(
     let mut changes = hentai_core::revision::subscribe();
     while changes.changed().await.is_ok() {
         // Dart 侧只关心「变了」（`watchComicChanges().map((_) {})`），
-        // 故推送 generation 而非 data_version 本身。
+        // 故推送写路径通知产生的 generation。
         let generation = *changes.borrow_and_update();
         if sink.add((generation & 0x7fff_ffff) as i32).is_err() {
             break;

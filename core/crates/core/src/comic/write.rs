@@ -112,6 +112,7 @@ pub async fn update_comic_user_meta(
     let txn = db.begin().await.map_err(map_db_err)?;
     update_comic_user_meta_in(&txn, comic_id, meta).await?;
     txn.commit().await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(())
 }
 
@@ -203,6 +204,7 @@ pub async fn set_comic_meta_locks(
     active.update(&txn).await.map_err(map_db_err)?;
     touch_comic(&txn, comic_id).await?;
     txn.commit().await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(())
 }
 

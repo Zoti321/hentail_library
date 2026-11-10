@@ -535,6 +535,7 @@ pub async fn set_series_items_order(
             .map_err(map_db_err)?;
     }
     txn.commit().await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(())
 }
 
