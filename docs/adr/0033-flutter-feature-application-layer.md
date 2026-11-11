@@ -39,6 +39,8 @@ Wayfinder feature 模块已有 `domain` / `data` / `presentation`，但 `*Servic
 
 > **实现修订（2026-11-02）**：Epic [#436](https://github.com/Zoti321/hentail_library/issues/436)（#437–#444）将 purge/阅读/库筛选·管理/Repository/周边 read model 等 **Dart 域真源**迁入各 owner `features/<id>/domain/`；`shared/domain/**` 对迁出符号仅保留 **export-only strangler**（`app/test/gate/strangler_shims.txt`）。Catalog 实体与分页/thumbnail 内核仍 @ shared（**ADR-0035**）。归属表与仍留 shared 的 UI 契约见 [`docs/engineering/shared-domain-ownership.md`](../engineering/shared-domain-ownership.md)。
 
+> **实现修订（2026-11-11）**：漫画封面写入命令从 reader 的 VM 移入 `features/comic/application/comic_cover_service.dart`，经 `comicCoverSetCommandProvider`（`comic/public/di/`）供 reader 调用；封面缓存刷新留在装配层。系列封面仍归 series owner。
+
 ## Consequences
 
 ### Positive

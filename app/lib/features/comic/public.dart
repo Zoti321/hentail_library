@@ -9,6 +9,7 @@ export 'public/comic_display_title.dart';
 export 'public/comic_lookup_repository.dart';
 export 'public/di/comic_browse_repository_factory.dart';
 export 'public/di/comic_cover_providers.dart';
+export 'public/di/comic_cover_service.dart';
 export 'public/di/comic_detail_providers.dart';
 export 'public/di/comic_detail_return_series_factory.dart';
 export 'public/di/comic_repository_providers.dart';

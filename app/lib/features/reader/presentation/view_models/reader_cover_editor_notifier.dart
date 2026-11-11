@@ -1,38 +1,28 @@
-import 'dart:typed_data';
-
-import 'package:hentai_library/shared/domain/models/resource_type_frb_wire.dart';
-import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
 import 'package:hentai_library/features/comic/public.dart';
+import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
 import 'package:hentai_library/features/series/public/di/series_cover_providers.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/shared/domain/models/resource_type_frb_wire.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'reader_cover_editor_notifier.g.dart';
 
-/// 阅读器内「设为封面」命令：以当前页（0-based）替换漫画 / 系列封面。
+/// 阅读器内「设为封面」命令：当前页（0-based）替换漫画 / 系列封面。
+///
+/// 漫画封面写入真源在 `comic/application`（经 `comicCoverSetCommandProvider`）；
+/// 系列封面仍由 series owner 承担。
 @Riverpod(keepAlive: true)
 class ReaderCoverEditorNotifier extends _$ReaderCoverEditorNotifier {
   @override
   void build() {}
 
-  Future<void> setComicCover(
-    ReaderComicRef comic, {
-    required int pageIndex,
-  }) async {
-    final repo = ref.read(comicThumbnailRepoProvider);
-    await repo.setComicCoverFromPage(
+  Future<void> setComicCover(ReaderComicRef comic, {required int pageIndex}) {
+    return ref.read(comicCoverSetCommandProvider)(
       comicId: comic.comicId,
       path: comic.path,
-      resourceType: mapResourceType(comic.resourceType),
+      resourceType: comic.resourceType,
       pageIndex: pageIndex,
     );
-    final Uint8List? bytes = (await repo.findByComicId(comic.comicId))
-        ?.thumbnail;
-    if (bytes != null && bytes.isNotEmpty) {
-      ref
-          .read(comicCoverThumbnailCacheProvider(comic.comicId).notifier)
-          .set(bytes);
-    }
   }
 
   Future<void> setSeriesCover(
