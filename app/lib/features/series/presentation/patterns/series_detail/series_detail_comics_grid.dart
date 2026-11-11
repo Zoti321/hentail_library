@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/shared/domain/catalog/selection/catalog_selection_notifier.dart';
-import 'package:hentai_library/features/comic/public/ui/comic_card_actions.dart';
 import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_view_object.dart';
+import 'package:hentai_library/shared/di/series_slot_providers.dart';
+import 'package:hentai_library/shared/ui/slots/series_slots.dart';
 import 'package:hentai_library/features/comic/public/comic.dart';
 import 'package:hentai_library/shared/ui/layout/catalog_grid.dart';
 import 'package:hentai_library/shared/ui/layout/catalog_grid_metrics.dart';
@@ -31,6 +32,11 @@ class SeriesDetailComicsGrid extends ConsumerWidget {
     final CatalogSelectionNotifier selectionNotifier = ref.read(
       catalogSelectionProvider.notifier,
     );
+    final SeriesMemberCardSlot? cardSlot =
+        !selectionActive &&
+            items.any((SeriesDetailComicItem i) => i.comic != null)
+        ? ref.watch(seriesMemberCardSlotProvider)
+        : null;
 
     if (items.isEmpty) {
       return SliverToBoxAdapter(
@@ -85,14 +91,18 @@ class SeriesDetailComicsGrid extends ConsumerWidget {
             onComicTap?.call(index);
           },
         );
-        if (comic == null) {
+        final SeriesMemberCardSlot? slot = cardSlot;
+        if (comic == null || slot == null) {
           return card;
         }
-        return ComicCardActions(
+        return KeyedSubtree(
           key: ValueKey<String>(comic.comicId),
-          comic: comic,
-          enabled: !selectionActive,
-          child: card,
+          child: slot((
+            comicId: comic.comicId,
+            title: item.title,
+            pageCount: item.pageCount,
+            path: comic.path,
+          ), card),
         );
       },
     );

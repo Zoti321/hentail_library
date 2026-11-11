@@ -5,7 +5,7 @@ import 'package:hentai_library/features/comic/presentation/views/comic_detail/co
 import 'package:hentai_library/features/comic/presentation/patterns/comic_detail/comic_detail_description.dart';
 import 'package:hentai_library/features/comic/presentation/patterns/comic_detail/comic_detail_primary_actions.dart';
 import 'package:hentai_library/features/comic/presentation/patterns/comic_detail/comic_detail_summary_meta_row.dart';
-import 'package:hentai_library/features/comic/presentation/patterns/comic_detail/comic_detail_title.dart';
+import 'package:hentai_library/shared/ui/layout/comic_detail_title.dart';
 
 /// 封面右侧：标题 + 摘要 + 操作 + 简介。
 class ComicDetailPrimaryColumn extends StatelessWidget {

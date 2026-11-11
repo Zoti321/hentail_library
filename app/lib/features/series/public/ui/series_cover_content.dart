@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:hentai_library/features/comic/public/di/comic_cover_providers.dart';
-import 'package:hentai_library/features/comic/public/ui/comic_cover_content.dart';
+import 'package:hentai_library/shared/di/series_slot_providers.dart';
+import 'package:hentai_library/shared/ui/slots/series_slots.dart';
 import 'package:hentai_library/features/series/public/di/series_cover_providers.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/thumbnail/series_cover_source.dart';
@@ -49,16 +49,20 @@ class SeriesCoverContent extends ConsumerWidget {
         SeriesCoverCustomThumbnail(:final thumbnail) => _SeriesCustomCoverImage(
           thumbnail: thumbnail,
         ),
-        SeriesCoverFallbackComic(:final comicId) => ComicCoverContent(
-          comicId: comicId,
-          priority: priority,
-          gridIndex: gridIndex,
-          coverViewportScope: coverViewportScope,
-          // 外层 Series 已挂 CoverViewportSensor。
-          attachViewportSensor: false,
-          // 外层已有系列 Hero，避免嵌套 comic Hero。
-          enableHero: false,
-        ),
+        SeriesCoverFallbackComic(:final comicId) =>
+          ref.watch(seriesCoverSlotProvider)(
+            SeriesCoverSlotArgs(
+              seriesId: seriesId,
+              fallbackComicId: comicId,
+              priority: priority.index,
+              gridIndex: gridIndex,
+              coverViewportScope: coverViewportScope,
+              attachViewportSensor:
+                  gridIndex != null && coverViewportScope != null,
+              // 外层已有系列 Hero，避免嵌套 comic Hero。
+              enableHero: false,
+            ),
+          ),
         SeriesCoverMissing() => const ComicCoverPlaceholder(
           variant: ComicCoverPlaceholderVariant.card,
           kind: ComicCoverPlaceholderKind.noCover,
@@ -66,18 +70,11 @@ class SeriesCoverContent extends ConsumerWidget {
       },
     );
 
-    Widget result = CatalogCoverHero.wrap(
+    return CatalogCoverHero.wrap(
       tag: CatalogCoverHero.seriesTag(seriesId),
       enabled: enableHero,
       child: cover,
     );
-
-    final int? index = gridIndex;
-    final String? scope = coverViewportScope;
-    if (index != null && scope != null) {
-      result = CoverViewportSensor(scope: scope, index: index, child: result);
-    }
-    return result;
   }
 }
 

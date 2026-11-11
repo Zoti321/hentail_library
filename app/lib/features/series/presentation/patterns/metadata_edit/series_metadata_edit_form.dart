@@ -9,11 +9,11 @@ import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_field_l
 import 'package:hentai_library/features/series/presentation/patterns/metadata_edit/series_metadata_edit_draft.dart';
 import 'package:hentai_library/features/series/presentation/patterns/metadata_edit/series_metadata_locks_pane.dart';
 import 'package:hentai_library/shared/ui/widgets/inputs/outlined_text_field.dart';
-import 'package:hentai_library/shared/ui/widgets/inputs/series_serialization_dropdown.dart';
+import 'package:hentai_library/features/series/presentation/patterns/metadata_edit/series_serialization_dropdown.dart';
 import 'package:hentai_library/shared/ui/widgets/list_detail/list_detail_detail_transition.dart';
 import 'package:hentai_library/shared/ui/widgets/list_detail/list_detail_nav_item.dart';
 import 'package:hentai_library/shared/ui/widgets/selection/segmented_capsule_bar.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/series_meta_locks.dart';
+import 'package:hentai_library/features/series/domain/value_objects/series_meta_locks.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:hentai_library/shared/ui/catalog/metadata_edit/metadata_lock_callbacks.dart';
 
@@ -250,7 +250,7 @@ class _SeriesContentFields extends StatelessWidget {
         SizedBox(height: spacing.sm),
         SeriesSerializationDropdown(
           value: draft.serializationStatus,
-          onChanged: (SeriesSerializationStatus status) {
+          onChanged: (SerializationStatus status) {
             onDraftChanged(draft.copyWith(serializationStatus: status));
           },
         ),

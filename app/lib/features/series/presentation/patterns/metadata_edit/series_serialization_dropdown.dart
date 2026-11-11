@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/ui/models/series_serialization_status.dart';
+import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 系列连载状态单选（[M3EDropdownMenu]）。
@@ -13,16 +13,15 @@ class SeriesSerializationDropdown extends StatelessWidget {
     this.enabled = true,
   });
 
-  final SeriesSerializationStatus value;
-  final ValueChanged<SeriesSerializationStatus> onChanged;
+  final SerializationStatus value;
+  final ValueChanged<SerializationStatus> onChanged;
   final bool enabled;
 
-  static const List<SeriesSerializationStatus> _selectable =
-      <SeriesSerializationStatus>[
-        SeriesSerializationStatus.ongoing,
-        SeriesSerializationStatus.ended,
-        SeriesSerializationStatus.hiatus,
-      ];
+  static const List<SerializationStatus> _selectable = <SerializationStatus>[
+    SerializationStatus.ongoing,
+    SerializationStatus.ended,
+    SerializationStatus.hiatus,
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -30,13 +29,13 @@ class SeriesSerializationDropdown extends StatelessWidget {
     final M3EThemeData theme = M3ETheme.of(context);
     final bool hasSelection = _selectable.contains(value);
 
-    return M3EDropdownMenu<SeriesSerializationStatus>(
+    return M3EDropdownMenu<SerializationStatus>(
       enabled: enabled,
       singleSelect: true,
       showChipAnimation: false,
       items: _selectable
           .map(
-            (SeriesSerializationStatus status) => M3EDropdownItem(
+            (SerializationStatus status) => M3EDropdownItem(
               label: _label(l10n, status),
               value: status,
               selected: hasSelection && status == value,
@@ -50,26 +49,22 @@ class SeriesSerializationDropdown extends StatelessWidget {
           color: theme.colorScheme.onSurface,
         ),
       ),
-      onSelectionChanged:
-          (List<M3EDropdownItem<SeriesSerializationStatus>> items) {
-            if (items.isEmpty) {
-              onChanged(SeriesSerializationStatus.unknown);
-              return;
-            }
-            onChanged(items.first.value);
-          },
+      onSelectionChanged: (List<M3EDropdownItem<SerializationStatus>> items) {
+        if (items.isEmpty) {
+          onChanged(SerializationStatus.unknown);
+          return;
+        }
+        onChanged(items.first.value);
+      },
     );
   }
 
-  static String _label(
-    AppLocalizations l10n,
-    SeriesSerializationStatus status,
-  ) {
+  static String _label(AppLocalizations l10n, SerializationStatus status) {
     return switch (status) {
-      SeriesSerializationStatus.ongoing => l10n.serializationStatusOngoing,
-      SeriesSerializationStatus.ended => l10n.serializationStatusEnded,
-      SeriesSerializationStatus.hiatus => l10n.serializationStatusHiatus,
-      SeriesSerializationStatus.unknown => l10n.serializationStatusUnknown,
+      SerializationStatus.ongoing => l10n.serializationStatusOngoing,
+      SerializationStatus.ended => l10n.serializationStatusEnded,
+      SerializationStatus.hiatus => l10n.serializationStatusHiatus,
+      SerializationStatus.unknown => l10n.serializationStatusUnknown,
     };
   }
 }

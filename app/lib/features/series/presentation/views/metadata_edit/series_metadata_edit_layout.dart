@@ -6,7 +6,7 @@ import 'package:hentai_library/shared/ui/motion/motion.dart';
 import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_surface.dart';
 import 'package:hentai_library/features/series/presentation/patterns/metadata_edit/series_metadata_edit_draft.dart';
 import 'package:hentai_library/features/series/presentation/patterns/metadata_edit/series_metadata_edit_form.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/series_meta_locks.dart';
+import 'package:hentai_library/features/series/domain/value_objects/series_meta_locks.dart';
 
 export 'package:hentai_library/features/series/presentation/patterns/metadata_edit/series_metadata_edit_draft.dart';
 

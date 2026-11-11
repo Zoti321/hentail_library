@@ -4,10 +4,8 @@
 features/app_settings/public/presentation/settings_view_model_exports.dart
 features/app_settings/public/ui/diagnostic_mode_banner.dart
 features/app_settings/public/ui/settings_page.dart
-features/comic/public/comic_detail_return_series.dart
 features/comic/public/smart_facet_match_preference.dart
 features/comic/public/ui/comic_cover_content.dart
-features/comic/public/ui/comic_detail_layout.dart
 features/comic/public/ui/comic_detail_page.dart
 features/comic_trash/public/ui/trash_page.dart
 features/home/public/ui/home_page.dart

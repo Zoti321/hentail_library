@@ -4,10 +4,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_entry.dart';
 import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_view_object.dart';
 import 'package:hentai_library/features/comic/public/comic.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
+import 'package:hentai_library/features/series/domain/series.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/series/domain/series_comic_page_item.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/series_comics_metadata.dart';
+import 'package:hentai_library/features/series/domain/value_objects/series_comics_metadata.dart';
 
 Comic _comic(String id, String title) {
   return Comic.restore(
@@ -49,7 +49,7 @@ void main() {
       );
 
       expect(entry.title, '系列甲');
-      expect(entry.serializationStatus, SeriesSerializationStatus.hiatus);
+      expect(entry.serializationStatus, SerializationStatus.hiatus);
       expect(entry.languages, <String>['English']);
       expect(entry.authors, <AuthorRef>[AuthorRef(id: 9, name: '作者')]);
       expect(entry.tags, <String>['tag']);
@@ -80,7 +80,7 @@ void main() {
 
       expect(entry.showMetadataBlock, isFalse);
       expect(entry.comics, isEmpty);
-      expect(entry.serializationStatus, SeriesSerializationStatus.unknown);
+      expect(entry.serializationStatus, SerializationStatus.unknown);
     });
   });
 }

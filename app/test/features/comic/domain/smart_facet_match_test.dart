@@ -346,21 +346,24 @@ void main() {
     });
   });
 
-  group('isLibraryRootSeriesFolder', () {
-    test('detects equal paths case-insensitively on Windows', () {
-      expect(
-        isLibraryRootSeriesFolder(
-          seriesFolderPath: r'E:\Libs\Mine',
-          libraryRoot: r'e:\libs\mine',
-        ),
-        isTrue,
-      );
-    });
+  group('isLibraryRootSeriesComicPath', () {
+    test(
+      'detects comics directly under root case-insensitively on Windows',
+      () {
+        expect(
+          isLibraryRootSeriesComicPath(
+            resourcePath: r'E:\Libs\Mine\a.cbz',
+            libraryRoot: r'e:\libs\mine',
+          ),
+          isTrue,
+        );
+      },
+    );
 
-    test('returns false for nested folder series', () {
+    test('returns false for comics nested under a folder series', () {
       expect(
-        isLibraryRootSeriesFolder(
-          seriesFolderPath: r'E:\libs\mine\story',
+        isLibraryRootSeriesComicPath(
+          resourcePath: r'E:\libs\mine\story\a.cbz',
           libraryRoot: r'E:\libs\mine',
         ),
         isFalse,

@@ -19,6 +19,7 @@ class ComicCoverContent extends ConsumerWidget {
     this.fit,
     this.alignment = Alignment.center,
     this.enableHero = true,
+    this.paintVariant = ComicCoverPaintVariant.card,
   });
 
   /// 非空时强制拟合（如横幅 [BoxFit.cover]）；默认软裁切 letterbox。
@@ -43,6 +44,9 @@ class ComicCoverContent extends ConsumerWidget {
   /// 为 false 时不包 [Hero]（例如系列封面回退到成员漫画图，避免嵌套 Hero）。
   final bool enableHero;
 
+  /// 卡片（默认）或详情页封面绘制。
+  final ComicCoverPaintVariant paintVariant;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ThumbnailPriority effectivePriority = _effectivePriority(ref);
@@ -61,7 +65,7 @@ class ComicCoverContent extends ConsumerWidget {
       enabled: enableHero,
       child: ComicCoverRenderer(
         state: state,
-        variant: ComicCoverPaintVariant.card,
+        variant: paintVariant,
         fit: fit,
         alignment: alignment,
         onDecodeError: notifier.markDecodeError,

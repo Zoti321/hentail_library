@@ -2,7 +2,7 @@
 
 **2026-11-05**：Comic 与 Series 已拆为独立 feature **`comic`**、**`series`**（[#457](https://github.com/Zoti321/hentail_library/issues/457)）。本文件描述 **browse 壳** 与两 feature 的协作；完整决策见 **ADR-0036**。
 
-**Catalog 实体 DTO**：`Series` 等仍 @ `shared/domain`（**ADR-0035**）；**`Comic` 已迁 `features/comic/domain/`**（**ADR-0041**），跨模块经 `features/comic/public/**`。
+**Catalog 实体 DTO**：仅 Author / AuthorDetail / Tag 等仍 @ `shared/domain`（**ADR-0035**）。**`Comic` 已迁 `features/comic/domain/`**（**ADR-0041**）；**`Series` 已迁 `features/series/domain/`**（**ADR-0042**），Series public 不暴露实体，跨模块只经 Port / 只读 record。
 
 ## 模块一览
 
@@ -28,7 +28,7 @@ Comics/Series Tab **筛选/排序/投影规则类型** 分别 @ `comic/domain`�
 - **Comic 聚合写集**（Rust 真源，ADR-0002 / 0026）：同事务内 `comics` + `comic_meta`（含 Metadata field lock）+ authors/tags/parodies/characters junction。单本用户元数据写**不持**库级写锁。
 - **Dart `features/comic`** 是 feature / 限界上下文：`Comic` 投影型实体（构造不变式、草稿迁移、元数据 diff）、仓储契约、Comics Tab 规则、详情与元数据 UX、窄 public。**不是** Aggregate Root 类，也不在 Dart application 复刻 lock / sync merge。
 - **外置**：Series 成员与排序（`series`）、Comic trash 生命周期（`comic_trash`）、阅读历史、跨本 bulk / sync（`library_admin` + 库级写锁）。
-- Catalog 实体：`Series` 等仍 @ Shared Kernel（ADR-0035）；`Comic` 归 `comic/domain`（ADR-0041）。Rust 仍是事务写集与字段锁合并的唯一真源。
+- Catalog 实体：Author / AuthorDetail / Tag 等仍 @ Shared Kernel（ADR-0035）；`Comic` 归 `comic/domain`（ADR-0041）、`Series` 归 `series/domain`（ADR-0042）。Rust 仍是事务写集与字段锁合并的唯一真源。
 
 ## browse ↔ comic/series 壳接缝（2026-11-11 终态，#488）
 
@@ -37,14 +37,15 @@ Comics/Series Tab **筛选/排序/投影规则类型** 分别 @ `comic/domain`�
 - **模块持规则与能力**：`comic` / `series` 的筛选/排序/分组/年龄限制规则通过 owner `public/library_*_browse_rules.dart` 与 `public/library_age_restriction_*.dart` 暴露；列表行是匿名 record（见 ADR-0040）。
 - **browse 单向 watch**：`ref.watch` owner `public/di` 的 token（`comicDetailProvider`、`comicReadPageIndexByIdProvider` 等）；模块不反向读壳。
 - **R12**：`public/` 对自身 `presentation/` 的 `import`/`export` 见 `app/test/gate/public_presentation_export_allowlist.txt`（条目数棘轮只减不增）。
+- **UI 组合槽位**：壳/模块跨 feature 的封面、成员卡、批量动作经 `shared/ui/slots/**` + `shared/di` token；`series` 不 import `comic/public/ui/**`，`reader` 不 import `series/**`（ADR-0042）。
 
 ## Cross-feature
 
-- 允许：`library_browse` → `comic` / `series` public；`series` → `comic` public（封面）。
-- 禁止：`comic` → `library_browse` / `series` / `reader`；`series` → `library_browse`（连读上下文经 `SeriesReadingContextPort` @ shared/di）。
+- 允许：`library_browse` → `comic` / `series` public；`series` → `comic` public；跨 feature UI 组合经 `shared/ui/slots/**`（ADR-0042）。
+- 禁止：`comic` → `library_browse` / `series` / `reader`；`series` → `library_browse`（连读上下文经 `SeriesReadingContextPort` @ shared/di）；`reader` → `series`（封面失效经 `SeriesCoverInvalidationSlot`）。
 - 门禁：`module_boundary_test.dart` 的显式禁止边表；`reader → comic` 存量 public 边 shrink-only。
 
 ## 参考
 
-- ADR-0036、ADR-0035、ADR-0034、ADR-0002、ADR-0026
+- ADR-0036、ADR-0035、ADR-0034、ADR-0042、ADR-0002、ADR-0026
 - [`shared-domain-ownership.md`](shared-domain-ownership.md)

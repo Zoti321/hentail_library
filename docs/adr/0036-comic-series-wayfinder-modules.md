@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted
+Accepted；**Series owner 面与模块边由 [ADR-0042](0042-series-entity-ownership-and-cross-module-contracts.md) 收紧（2026-11-11）**。
 
 ## Context
 
@@ -18,12 +18,13 @@ Accepted
 | **`series`** | Series 仓储、库 Series Tab 规则类型、详情与 metadata UI、Series metadata application、`SeriesReadingContextPort` 实现 |
 | **`library_browse`** | 当前库双 Tab 壳、搜索、作者详情、`presentation/catalog` 共用基础设施；跨 Tab 年龄限制等壳层偏好 public |
 
-**Catalog 实体 DTO**（`Series` 等）、分页 VO、`thumbnail/**`、`SeriesReadingContext` **类型** 仍 @ `shared/domain`（**ADR-0035**）。**Comic 例外（2026-11-11，#489 / ADR-0041）**：`Comic` 实体、字段锁、元数据草稿与 FRB 映射已迁 `features/comic/`，跨模块经 `features/comic/public/**` thin re-export；reader 自持窄读模型。
+**Catalog 实体 DTO** 中仅 Author / AuthorDetail / Tag 与分页 VO、`thumbnail/**` 仍 @ `shared/domain`（**ADR-0035**）。**Comic（#489 / ADR-0041）**：实体、字段锁、元数据草稿与 FRB 映射迁 `features/comic/`，跨模块经 thin re-export。**Series（#490 / ADR-0042）**：实体/VO/表单/仓储迁 `features/series/domain/`，`public` **不**暴露 `Series`，跨模块只经 `SeriesReadingContext` / `SeriesItemMembership` / `SeriesItemSortPort` / `SeriesCoverSource` 与匿名 record。
 
 ### 2. Cross-feature public 依赖（无环）
 
-- 允许：`library_browse` → `comic` / `series` public；`series` → `comic` public（封面/展示）；`reader` / `home` / `reading_history` / `comic_trash` → `comic` public；`bootstrap` → 各 module public。
-- **禁止**：`comic` → `library_browse` / `series` / `reader`；`series` → `library_browse`；`reader` → `comic`（存量三条 public 读取边 shrink-only，见 `test/architecture/module_boundary_test.dart`）。reading context 经 **`shared/di` + `SeriesReadingContextPort`**（series 实现）。
+- 允许：`library_browse` → `comic` / `series` public；`series` → `comic` public；`reader` / `home` / `reading_history` / `comic_trash` → `comic` public；`bootstrap` → 各 module public。
+- **UI 组合**：`series` 不 import `comic/public/ui/**`，改用 `shared/ui/slots/**` + `shared/di` token（ADR-0042）；`reader` 不 import `series/**`（封面失效经 `SeriesCoverInvalidationSlot`）。
+- **禁止**：`comic` → `library_browse` / `series` / `reader`；`series` → `library_browse`；`reader` → `comic` / `series`（存量 public 读取边 shrink-only，见 `test/architecture/module_boundary_test.dart`）。reading context 经 **`shared/di` + `SeriesReadingContextPort`**（series 实现）。
 - Gate：`kImportBoundaryModules` 含 `comic`、`series`；**R5** 扩展至 `comic` / `series`（禁止 import `reader`）。2026-11-11 起由 `test/architecture` 执行**显式禁止边表**（`import` + `export`）。
 
 ### 2.1 跨模块只读投影（2026-11-11，#488）
@@ -41,7 +42,7 @@ Accepted
 ### 4. 文档取代关系
 
 - **`library-browse-zones.md`** 中「不新增 Wayfinder module」表述由本 ADR **supersede**；分区表修订为三 module + browse 壳保留路径。
-- **`shared-domain-ownership.md`** owner 表同步：`comic` / `series` / `library_browse` 分列。
+- **`shared-domain-ownership.md`** owner 表同步：`comic` / `series` / `library_browse` 分列；Series 归属细节见 ADR-0042。
 
 ## Consequences
 

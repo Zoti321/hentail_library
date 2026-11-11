@@ -1,7 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/shared/di/injected_di.dart';
-import 'package:riverpod/misc.dart' show FutureProviderFamily;
 import 'package:hentai_library/features/library_admin/domain/libraries_port.dart';
 import 'package:hentai_library/features/library_admin/domain/comic_metadata_bulk_edit_command_port.dart';
 import 'package:hentai_library/shared/domain/library/comic_detail_return_series_port.dart';
@@ -11,7 +10,6 @@ import 'package:hentai_library/features/library_admin/domain/library_reorder_mod
 import 'package:hentai_library/shared/domain/library/library_revision_state.dart';
 import 'package:hentai_library/shared/domain/library/library_age_restriction_filter.dart';
 import 'package:hentai_library/shared/domain/library/library_scan_activity_state.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 
 /// 跨 feature 共享的库状态与端口 Provider 声明（#261a）。
 ///
@@ -74,7 +72,6 @@ final Provider<bool> libraryScanRunningStateProvider = injectedDi(
 
 final Provider<LibraryScanActivityState> libraryScanActivityStateProvider =
     injectedDi('libraryScanActivityStateProvider');
-
 final Provider<bool> libraryMetadataRefreshRunningStateProvider = injectedDi(
   'libraryMetadataRefreshRunningStateProvider',
 );
@@ -87,7 +84,3 @@ final Provider<String?> libraryMetadataRefreshTargetLibraryIdStateProvider =
 final Provider<bool> libraryMutationBusyStateProvider = injectedDi(
   'libraryMutationBusyStateProvider',
 );
-
-/// 系列详情入口（原 `seriesByIdProvider`，按 id 查询）。
-final FutureProviderFamily<Series?, String> seriesByIdStateProvider =
-    injectedFutureDiFamily('seriesByIdStateProvider');

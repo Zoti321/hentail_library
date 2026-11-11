@@ -16,7 +16,7 @@ abstract final class SeriesDetailPagePreviewData {
 
     return SeriesDetailViewObject(
       title: '葬送的芙莉莲',
-      serializationStatus: SeriesSerializationStatus.ongoing,
+      serializationStatus: SerializationStatus.ongoing,
       languages: const <String>['日文'],
       showAgeRestrictionChip: true,
       volumeCurrent: comics.length,

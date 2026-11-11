@@ -6,6 +6,7 @@ import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/comic/domain/repositories/comic_thumbnail_repository.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/reader_cover_editor_notifier.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/shared/di/series_slot_providers.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:riverpod/riverpod.dart';
 import 'package:test/test.dart';
@@ -56,12 +57,19 @@ ReaderComicRef _comic() {
 
 void main() {
   late _RecordingThumbnailRepository repo;
+  late List<String> invalidatedSeries;
   late ProviderContainer container;
 
   setUp(() {
     repo = _RecordingThumbnailRepository();
+    invalidatedSeries = <String>[];
     container = ProviderContainer(
-      overrides: <Override>[comicThumbnailRepoProvider.overrideWithValue(repo)],
+      overrides: <Override>[
+        comicThumbnailRepoProvider.overrideWithValue(repo),
+        seriesCoverInvalidationSlotProvider.overrideWithValue(
+          (String seriesId) => invalidatedSeries.add(seriesId),
+        ),
+      ],
     );
   });
 
@@ -85,5 +93,6 @@ void main() {
     await editor().setSeriesCover('series-1', _comic(), pageIndex: 2);
 
     expect(repo.calls, <String>['series:series-1:comic-1:2']);
+    expect(invalidatedSeries, <String>['series-1']);
   });
 }

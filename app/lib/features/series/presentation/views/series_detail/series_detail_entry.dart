@@ -1,10 +1,9 @@
 import 'package:flutter/widgets.dart';
 import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_view_object.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
-import 'package:hentai_library/shared/domain/models/enums.dart';
+import 'package:hentai_library/features/series/domain/series.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
 import 'package:hentai_library/features/series/domain/series_comic_page_item.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/series_comics_metadata.dart';
+import 'package:hentai_library/features/series/domain/value_objects/series_comics_metadata.dart';
 
 /// 将领域 [Series] 与当前页漫画映射为 MD3E 系列详情数据（纯函数，便于测试）。
 ///
@@ -27,7 +26,7 @@ SeriesDetailViewObject seriesDetailEntry({
   return SeriesDetailViewObject(
     title: series.name,
     cover: cover,
-    serializationStatus: _mapStatus(series.serializationStatus),
+    serializationStatus: series.serializationStatus,
     languages: metadata?.languages ?? const <String>[],
     showAgeRestrictionChip: metadata?.hasR18 ?? false,
     volumeCurrent: series.items.length,
@@ -49,13 +48,4 @@ SeriesDetailViewObject seriesDetailEntry({
     initialPage: page,
     initialPageSize: pageSize,
   );
-}
-
-SeriesSerializationStatus _mapStatus(SerializationStatus status) {
-  return switch (status) {
-    SerializationStatus.unknown => SeriesSerializationStatus.unknown,
-    SerializationStatus.ongoing => SeriesSerializationStatus.ongoing,
-    SerializationStatus.ended => SeriesSerializationStatus.ended,
-    SerializationStatus.hiatus => SeriesSerializationStatus.hiatus,
-  };
 }

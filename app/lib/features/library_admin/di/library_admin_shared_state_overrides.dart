@@ -32,10 +32,6 @@ List<Override> libraryAdminSharedStateOverrides() => <Override>[
   libraryRevisionThrottleBusyStateProvider.overrideWith(
     (Ref ref) => ref.watch(libraryRevisionThrottleBusyProvider),
   ),
-  seriesByIdStateProvider.overrideWith(
-    (Ref ref, String seriesId) =>
-        ref.watch(seriesByIdProvider(seriesId).future),
-  ),
   libraryMutationBusyStateProvider.overrideWith(
     (Ref ref) =>
         ref.watch(scanLibraryControllerProvider.select((s) => s.running)) ||

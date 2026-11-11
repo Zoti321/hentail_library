@@ -4,7 +4,10 @@ import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/core/util/utils.dart';
-import 'package:hentai_library/features/comic/public/comic_detail_return_series.dart';
+import 'package:hentai_library/shared/di/library_state_providers.dart';
+import 'package:hentai_library/shared/di/series_slot_providers.dart';
+import 'package:hentai_library/shared/ui/slots/series_slots.dart';
+import 'package:hentai_library/features/series/di/series_by_id_provider.dart';
 import 'package:hentai_library/features/series/presentation/view_models/series_detail_comics_catalog_controller.dart';
 import 'package:hentai_library/features/series/presentation/view_models/series_detail_comics_catalog_state.dart';
 import 'package:hentai_library/features/series/presentation/view_models/series_detail_page_size_notifier.dart';
@@ -14,13 +17,10 @@ import 'package:hentai_library/features/series/presentation/views/series_detail/
 import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_layout.dart';
 import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
 import 'package:hentai_library/shared/di/app_router_provider.dart';
-import 'package:hentai_library/features/comic/public/di/comic_cover_providers.dart';
-import 'package:hentai_library/features/comic/public/ui/comic_cover_content.dart';
 import 'package:hentai_library/shared/di/library_command_providers.dart';
-import 'package:hentai_library/shared/di/library_state_providers.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
+import 'package:hentai_library/features/series/domain/series.dart';
 import 'package:hentai_library/features/series/domain/series_comic_page_item.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/series_comics_metadata.dart';
+import 'package:hentai_library/features/series/domain/value_objects/series_comics_metadata.dart';
 import 'package:hentai_library/shared/domain/library/metadata_refresh_types.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/metadata_refresh_toasts.dart';
@@ -46,7 +46,7 @@ class SeriesDetailPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AsyncValue<Series?> seriesAsync = ref.watch(
-      seriesByIdStateProvider(seriesId),
+      seriesByIdProvider(seriesId),
     );
 
     return M3ETheme(
@@ -139,6 +139,10 @@ class _SeriesDetailCatalogLayout extends ConsumerWidget {
     final List<SeriesComicPageItem> items =
         catalog?.items ?? const <SeriesComicPageItem>[];
 
+    final SeriesMemberCoverSlot memberCover = ref.watch(
+      seriesMemberCoverSlotProvider,
+    );
+    final String coverViewportScope = 'series-detail:$seriesId';
     final SeriesDetailViewObject entry = seriesDetailEntry(
       series: series,
       cover: SeriesDetailCover(seriesId: seriesId),
@@ -146,10 +150,12 @@ class _SeriesDetailCatalogLayout extends ConsumerWidget {
       pageItems: items,
       page: page,
       pageSize: pageSize,
-      comicCoverBuilder: (String comicId, int index) => ComicCoverContent(
-        comicId: comicId,
-        gridIndex: index,
-        coverViewportScope: CoverViewportScopes.seriesDetail(seriesId),
+      comicCoverBuilder: (String comicId, int index) => memberCover(
+        SeriesMemberCoverSlotArgs(
+          comicId: comicId,
+          gridIndex: index,
+          coverViewportScope: coverViewportScope,
+        ),
       ),
     );
     final AppLocalizations l10n = context.l10n;
@@ -193,7 +199,7 @@ class _SeriesDetailCatalogLayout extends ConsumerWidget {
         if (localIndex < 0 || localIndex >= items.length) {
           return;
         }
-        ref.read(comicDetailReturnSeriesProvider.notifier).remember(seriesId);
+        ref.read(comicDetailReturnSeriesPortProvider).remember(seriesId);
         ref
             .read(appRouterProvider)
             .pushNamed(

@@ -2,9 +2,11 @@
 
 ## Status
 
-Accepted；**Comic 部分被 [ADR-0041](0041-comic-entity-ownership.md) 局部取代（2026-11-11）**。Series / Author / AuthorDetail / Tag / 分页 VO / `enums.dart` 结论仍有效。
+Accepted；**Comic 部分被 [ADR-0041](0041-comic-entity-ownership.md) 局部取代（2026-11-11）；Series 部分被 [ADR-0042](0042-series-entity-ownership-and-cross-module-contracts.md) 局部取代（2026-11-11）**。Author / AuthorDetail / Tag / 分页 VO / `enums.dart` 结论仍有效。
 
-> **实现修订（2026-11-11，#489 / ADR-0041）**：`Comic` 实体、`ComicMetaLocks`、`ComicMetadataForm` 与 FRB 映射已迁入 `features/comic/`；`shared/domain` 不再有 Comic 类型，跨模块经 `features/comic/public/**` thin re-export。下文凡称「Comic 作为内核 DTO 留在 shared」的表述仅对 Series 等其余内核类型成立。
+> **实现修订（2026-11-11，#489 / ADR-0041）**：`Comic` 实体、`ComicMetaLocks`、`ComicMetadataForm` 与 FRB 映射已迁入 `features/comic/`；`shared/domain` 不再有 Comic 类型，跨模块经 `features/comic/public/**` thin re-export。
+>
+> **实现修订（2026-11-11，#490 / ADR-0042）**：`Series` / `SeriesItem` / 系列锁、元数据表单与 FRB 映射已迁入 `features/series/`；`shared/domain` 不再有 Series 实体/VO，跨模块只经 Port 与只读 record。下文凡称「Series 等内核 DTO 留在 shared」的表述仅对 Author / AuthorDetail / Tag / 分页 VO / `enums.dart` 成立。
 
 ## Context
 
@@ -12,7 +14,7 @@ Epic [#436](https://github.com/Zoti321/hentail_library/issues/436) 将各限界�
 
 | 区域 | 典型路径 | 主要消费者 |
 |------|----------|------------|
-| 实体 DTO | `models/entity/comic/**`（Series、Author、Tag 等；**Comic 已于 2026-11-11 迁出**，见 ADR-0041） | library_browse、reader、home、named_metadata、comic_trash、shared/data FRB mapper、`shared/ui` |
+| 实体 DTO | `models/entity/comic/**`（Author、AuthorDetail、Tag 等；**Comic 已于 2026-11-11 迁出**，见 ADR-0041；**Series 迁出**，见 ADR-0042） | library_browse、reader、home、named_metadata、comic_trash、shared/data FRB mapper、`shared/ui` |
 | 枚举与展示辅助 | `models/enums.dart` | 库筛选、阅读、UI 组件 |
 | 分页值对象 | `models/value_objects/page_request.dart`、`paged_result.dart`、`page_jump.dart` | 各 Repository 契约、FRB 分页 |
 | 缩略图 seam | `thumbnail/**` | 封面/缩略图组件、Series cover、FRB 事件 |
@@ -34,7 +36,7 @@ Rust `core/` 仍为扫描、sync 与 catalog 谓词真值（ADR-0002）；Dart �
 
 以下路径 **继续作为 Shared Kernel**，**不**在 Epic #436 后续批次中整体迁入单一 product feature：
 
-- `shared/domain/models/entity/comic/**`（**仅 Series / Author / AuthorDetail / Tag / library**；`comic/comic.dart` 已于 ADR-0041 迁出）
+- `shared/domain/models/entity/comic/**`（**仅 Author / AuthorDetail / Tag / library**；`comic/comic.dart` 于 ADR-0041 迁出，Series 于 ADR-0042 迁出）
 - `shared/domain/models/enums.dart`（及与 catalog 强绑定的 enum 导出面）
 - `shared/domain/models/value_objects/page_request.dart`、`paged_result.dart`、`page_jump.dart`
 - `shared/domain/thumbnail/**`
@@ -43,8 +45,9 @@ Rust `core/` 仍为扫描、sync 与 catalog 谓词真值（ADR-0002）；Dart �
 
 | 语义 owner | 已 / 将 位于 feature `domain/` 的内容 | 仍 @ Shared Kernel 的内容 |
 |------------|----------------------------------------|---------------------------|
-| library_browse | 筛选/排序/投影、`comic_display_title` 等 | Series / Author / Tag 等 **实体 DTO**、分页 VO |
+| library_browse | 筛选/排序/投影、`comic_display_title` 等 | Author / Tag 等 **实体 DTO**、分页 VO（Series 已迁 series，ADR-0042） |
 | reader | 阅读域类型、`ReaderComicRef` 窄读模型、会话端口（ADR-0038；旧 read_session） | —（Comic 已迁 comic，ADR-0041） |
+| series | Series 实体/VO/仓储/表单（ADR-0042） | 跨模块契约：`SeriesReadingContext`、`SeriesItemMembership`、`SeriesItemSortPort`、`SeriesCoverSource` |
 | 其他 feature | 各自 Repository 契约、read model（#443–#444） | 通过 import **`shared/domain`** 引用内核类型 |
 
 ### 2. 与 ADR-0034 的关系
@@ -55,14 +58,14 @@ Rust `core/` 仍为扫描、sync 与 catalog 谓词真值（ADR-0002）；Dart �
 
 ### 3. 明确拒绝的方案
 
-- 将 Comic/Series 等 **整体**迁入 `library_browse/domain` 并强制其余模块只读 browse public——**本阶段不采用**（成本与 ADR-0034 宪章风险高于收益）。
+- 将 Comic/Series 等 **整体**迁入 `library_browse/domain` 并强制其余模块只读 browse public——**不采用**（Comic 归 `comic`、Series 归 `series`，见 ADR-0041 / ADR-0042）。
 
 ### 4. 后续迁移触发条件（再开 ADR 或修订本 ADR）
 
 仅当 **至少一条**成立时，才启动「内核迁出 shared」专项（新 Epic / ADR 修订），并单独评估 Gate：
 
-1. **消费者收缩**：除 `library_browse` 外，不再有 product feature 或 `shared/data` 直接依赖 Comic/Series 实体（含 FRB mapper 上移为 browse-owned data）。
-2. **`shared/ui` 解耦**：封面/列表/详情组件不再直接依赖 catalog 实体（Comic 已由 ADR-0041 移出 shared；该条件对 Series 等其余内核类型仍适用）。
+1. **消费者收缩**：除 `library_browse` 外，不再有 product feature 或 `shared/data` 直接依赖 Comic/Series 实体（Comic/Series 已分别迁出，ADR-0041 / ADR-0042）。
+2. **`shared/ui` 解耦**：封面/列表/详情组件不再直接依赖 catalog 实体（Comic / Series 的 shared/ui 专属资产已分别由 ADR-0041 / ADR-0042 收割）。
 3. **Dart 域行为膨胀**：Comic/Series 上需长期维护的 **Dart-only 不变式**明显多于 FRB 映射，且 owner 可单一化为 browse（或独立 `catalog` 包）。
 4. **包边界**：Catalog 内核拆为独立 Dart package（非 Wayfinder feature id），由 app 与 features 共同依赖。
 

@@ -7,7 +7,7 @@ import 'package:hentai_library/features/app_settings/domain/app_setting_migratio
 import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting_repository.dart';
-import 'package:hentai_library/features/series/domain/library_prefer_library_root_series.dart';
+import 'package:hentai_library/features/app_settings/domain/legacy_browse_preferences.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -191,17 +191,17 @@ class AppSettingRepositoryImpl implements AppSettingRepository {
     SharedPreferences prefs,
     AppSetting setting,
   ) async {
-    if (!prefs.containsKey(LibraryPreferLibraryRootSeries.storageKey)) {
+    if (!prefs.containsKey(LegacyLibraryPreferLibraryRootSeries.storageKey)) {
       return setting;
     }
-    final bool legacy = LibraryPreferLibraryRootSeries.fromStorage(
-      prefs.getBool(LibraryPreferLibraryRootSeries.storageKey),
+    final bool legacy = LegacyLibraryPreferLibraryRootSeries.fromStorage(
+      prefs.getBool(LegacyLibraryPreferLibraryRootSeries.storageKey),
     );
     final AppSetting migrated = setting.copyWith(
       preferLibraryRootSeries: legacy,
     );
     await save(migrated);
-    await prefs.remove(LibraryPreferLibraryRootSeries.storageKey);
+    await prefs.remove(LegacyLibraryPreferLibraryRootSeries.storageKey);
     return migrated;
   }
 }

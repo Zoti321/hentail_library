@@ -4,12 +4,12 @@ import 'package:hentai_library/features/series/presentation/views/series_detail/
 class SeriesMetadataEditDraft {
   const SeriesMetadataEditDraft({
     required this.name,
-    this.serializationStatus = SeriesSerializationStatus.ongoing,
+    this.serializationStatus = SerializationStatus.ongoing,
     this.totalCountText = '',
   });
 
   final String name;
-  final SeriesSerializationStatus serializationStatus;
+  final SerializationStatus serializationStatus;
   final String totalCountText;
 
   factory SeriesMetadataEditDraft.fromEntry(SeriesDetailViewObject entry) {
@@ -23,7 +23,7 @@ class SeriesMetadataEditDraft {
 
   SeriesMetadataEditDraft copyWith({
     String? name,
-    SeriesSerializationStatus? serializationStatus,
+    SerializationStatus? serializationStatus,
     String? totalCountText,
   }) {
     return SeriesMetadataEditDraft(

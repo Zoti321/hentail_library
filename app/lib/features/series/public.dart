@@ -3,6 +3,8 @@
 /// 跨模块只经本 barrel 或 `public/**`；壳（library_browse）单向 watch owner。
 library;
 
+export 'public/di/series_item_membership_port_factory.dart';
+export 'public/di/series_cover_invalidation_slot_factory.dart';
 export 'public/di/series_cover_providers.dart';
 export 'public/di/series_item_sort_port_factory.dart';
 export 'public/di/series_reading_context_port_factory.dart';

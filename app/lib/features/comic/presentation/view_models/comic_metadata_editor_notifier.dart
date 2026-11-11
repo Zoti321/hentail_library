@@ -1,6 +1,6 @@
 import 'package:hentai_library/features/comic/application/comic_metadata_service.dart';
 import 'package:hentai_library/features/comic/di/comic_metadata_service.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/shared/di/series_item_membership_providers.dart';
 import 'package:hentai_library/shared/di/series_item_sort_providers.dart';
 import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/features/comic/domain/value_objects/comic_metadata_form.dart';
@@ -50,7 +50,9 @@ class ComicMetadataEditorNotifier extends _$ComicMetadataEditorNotifier {
   }
 
   Future<SeriesItemMembership?> findSeriesMembership(String comicId) {
-    return ref.read(seriesRepoProvider).findMembershipByComicId(comicId);
+    return ref
+        .read(seriesItemMembershipPortProvider)
+        .findMembershipByComicId(comicId);
   }
 
   Future<void> persistSeriesSort({

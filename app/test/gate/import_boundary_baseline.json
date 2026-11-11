@@ -1,5 +1,4 @@
 [
-  "M1|app_settings|series|features/app_settings/data/repositories/app_setting_repository_impl.dart|package:hentai_library/features/series/domain/library_prefer_library_root_series.dart",
   "M1|library_browse|app_settings|features/library_browse/presentation/browse/view_models/library_series_filters_notifier.dart|package:hentai_library/features/app_settings/domain/app_setting.dart",
   "M1|library_browse|app_settings|features/library_browse/presentation/browse/view_models/library_tab_filter_sort_providers.dart|package:hentai_library/features/app_settings/domain/app_setting.dart",
   "M1|reader|app_settings|features/reader/presentation/views/reader/reader_settings_sheet.dart|package:hentai_library/features/app_settings/domain/app_setting.dart",
@@ -35,6 +34,5 @@
   "R13|shared|named_metadata|shared/di/data_providers.dart|package:hentai_library/features/named_metadata/domain/tag_repository.dart",
   "R13|shared|reader|shared/di/data_providers.dart|package:hentai_library/features/reader/domain/comic_page_source_port.dart",
   "R13|shared|reader|shared/di/data_providers.dart|package:hentai_library/features/reader/domain/native_reader_port.dart",
-  "R13|shared|reading_history|shared/di/data_providers.dart|package:hentai_library/features/reading_history/domain/reading_history_repository.dart",
-  "R13|shared|series|shared/di/data_providers.dart|package:hentai_library/features/series/domain/series_repository.dart"
+  "R13|shared|reading_history|shared/di/data_providers.dart|package:hentai_library/features/reading_history/domain/reading_history_repository.dart"
 ]

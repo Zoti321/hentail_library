@@ -1,7 +1,5 @@
 import 'package:hentai_library/features/library_browse/presentation/browse/models/comic_browse_view_object.dart';
-import 'package:hentai_library/features/library_browse/presentation/browse/models/series_browse_view_object.dart';
 import 'package:hentai_library/features/comic/public/comic.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 
 ComicBrowseViewObject comicBrowseViewObjectFromComic(Comic comic) {
   return (
@@ -10,8 +8,4 @@ ComicBrowseViewObject comicBrowseViewObjectFromComic(Comic comic) {
     pageCount: comic.pageCount,
     path: comic.path,
   );
-}
-
-SeriesBrowseViewObject seriesBrowseViewObjectFromSeries(Series series) {
-  return (id: series.id, name: series.name, volumeCount: series.items.length);
 }

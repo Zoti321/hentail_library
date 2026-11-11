@@ -11,6 +11,10 @@ class _ComicDetailReturnSeriesAdapter implements ComicDetailReturnSeriesPort {
   final Ref _ref;
 
   @override
+  void remember(String seriesId) =>
+      _ref.read(comicDetailReturnSeriesProvider.notifier).remember(seriesId);
+
+  @override
   void clear() => _ref.read(comicDetailReturnSeriesProvider.notifier).clear();
 }
 

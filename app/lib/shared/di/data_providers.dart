@@ -3,7 +3,6 @@ import 'package:hentai_library/shared/di/injected_di.dart';
 import 'package:hentai_library/shared/domain/ports/comic_trash_reader_session_port.dart';
 import 'package:hentai_library/features/comic/domain/repositories/comic_lookup_repository.dart';
 import 'package:hentai_library/features/comic/domain/repositories/comic_thumbnail_repository.dart';
-import 'package:hentai_library/features/series/domain/series_repository.dart';
 import 'package:hentai_library/shared/domain/ports/remote_library_credentials_port.dart';
 import 'package:hentai_library/features/reader/domain/comic_page_source_port.dart';
 import 'package:hentai_library/features/reader/domain/native_reader_port.dart';
@@ -27,10 +26,6 @@ final Provider<ComicLookupRepository> comicLookupRepositoryProvider =
 
 final Provider<ComicTrashRepository> comicTrashRepositoryProvider = injectedDi(
   'comicTrashRepositoryProvider',
-);
-
-final Provider<SeriesRepository> seriesRepoProvider = injectedDi(
-  'seriesRepoProvider',
 );
 
 final Provider<TagRepository> tagRepoProvider = injectedDi('tagRepoProvider');

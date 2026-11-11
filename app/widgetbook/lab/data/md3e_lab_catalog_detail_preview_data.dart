@@ -50,7 +50,7 @@ abstract final class Md3eLabCatalogDetailPreviewData {
 
     return SeriesDetailViewObject(
       title: item.title,
-      serializationStatus: SeriesSerializationStatus.ongoing,
+      serializationStatus: SerializationStatus.ongoing,
       languages: const <String>['日文'],
       showAgeRestrictionChip: catalogIndex.isOdd,
       volumeCurrent: comics.length,

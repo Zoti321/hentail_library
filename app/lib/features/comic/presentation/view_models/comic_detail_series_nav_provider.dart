@@ -1,10 +1,8 @@
 import 'package:hentai_library/features/comic/domain/comic_display_title.dart';
 import 'package:hentai_library/features/comic/domain/repositories/comic_lookup_repository.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
-import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/shared/di/series_reading_context_providers.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/series_item.dart';
+import 'package:hentai_library/shared/domain/reading/series_reading_context.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'comic_detail_series_nav_provider.g.dart';
@@ -47,18 +45,6 @@ class ComicDetailSeriesNavData {
       hasNext ? items[currentIndex + 1] : null;
 }
 
-class ComicDetailSeriesNavSeriesData {
-  const ComicDetailSeriesNavSeriesData({
-    required this.seriesId,
-    required this.seriesName,
-    required this.items,
-  });
-
-  final String seriesId;
-  final String seriesName;
-  final List<ComicDetailSeriesNavItem> items;
-}
-
 sealed class ComicDetailSeriesNavResult {
   const ComicDetailSeriesNavResult();
 }
@@ -73,80 +59,49 @@ final class ComicDetailSeriesNavReady extends ComicDetailSeriesNavResult {
   final ComicDetailSeriesNavData data;
 }
 
-Future<ComicDetailSeriesNavSeriesData?> buildSeriesNavData(
-  Ref ref,
-  Series series,
-) async {
-  final List<SeriesItem> sortedItems = List<SeriesItem>.from(series.items)
-    ..sort((SeriesItem a, SeriesItem b) => a.order.compareTo(b.order));
-  final ComicLookupRepository repo = ref.read(comicLookupRepositoryProvider);
-  final List<String> comicIds = sortedItems
-      .map((SeriesItem item) => item.comicId)
-      .toList(growable: false);
-  final Map<String, String> titlesById = await resolveComicTitlesForDisplay(
-    repo,
-    comicIds,
-  );
-  final List<ComicDetailSeriesNavItem> items = <ComicDetailSeriesNavItem>[
-    for (int index = 0; index < sortedItems.length; index++)
-      ComicDetailSeriesNavItem(
-        displayIndex: index + 1,
-        comicId: sortedItems[index].comicId,
-        title: titlesById[sortedItems[index].comicId]!,
-      ),
-  ];
-  if (items.isEmpty) {
-    return null;
-  }
-  return ComicDetailSeriesNavSeriesData(
-    seriesId: series.id,
-    seriesName: series.name,
-    items: items,
-  );
-}
-
-@Riverpod(keepAlive: true)
-Future<ComicDetailSeriesNavSeriesData?> comicDetailSeriesNavForSeries(
-  Ref ref,
-  String seriesId,
-) async {
-  final Series? series = await ref.watch(
-    seriesByIdStateProvider(seriesId).future,
-  );
-  if (series == null) {
-    return null;
-  }
-  return buildSeriesNavData(ref, series);
-}
-
+/// 漫画详情「系列上一卷 / 下一卷」（#490）。
+///
+/// 只消费 series owner 的 [SeriesReadingContext] 事实（成员顺序 + 当前下标），
+/// 标题仍由 comic 自有 `ComicLookupRepository` 解析；comic 不持有 Series 类型。
+/// 刷新信号由 `SeriesReadingContextPort` 的实现决定（series 侧随库 revision 重算）。
 @Riverpod(keepAlive: true)
 Future<ComicDetailSeriesNavResult> comicDetailSeriesNav(
   Ref ref,
   String comicId,
 ) async {
-  final readingContext = await ref
+  final SeriesReadingContext? context = await ref
       .read(seriesReadingContextPortProvider)
       .getReadingContextByComicId(comicId);
-  if (readingContext == null) {
+  if (context == null || context.orderedComicIds.isEmpty) {
     return const ComicDetailSeriesNavNone();
   }
-  final ComicDetailSeriesNavSeriesData? seriesData = await ref.watch(
-    comicDetailSeriesNavForSeriesProvider(readingContext.seriesId).future,
-  );
-  if (seriesData == null) {
-    return const ComicDetailSeriesNavNone();
-  }
-  final int currentIndex = seriesData.items.indexWhere(
-    (ComicDetailSeriesNavItem item) => item.comicId == comicId,
-  );
+
+  final List<String> comicIds = context.orderedComicIds;
+  final int currentIndex = comicIds.indexOf(comicId);
   if (currentIndex < 0) {
     return const ComicDetailSeriesNavNone();
   }
+
+  final ComicLookupRepository repo = ref.read(comicLookupRepositoryProvider);
+  final Map<String, String> titlesById = await resolveComicTitlesForDisplay(
+    repo,
+    comicIds,
+  );
+
   return ComicDetailSeriesNavReady(
     ComicDetailSeriesNavData(
-      seriesId: seriesData.seriesId,
-      seriesName: seriesData.seriesName,
-      items: seriesData.items,
+      seriesId: context.seriesId,
+      seriesName: context.seriesName,
+      items: <ComicDetailSeriesNavItem>[
+        for (int index = 0; index < comicIds.length; index++)
+          ComicDetailSeriesNavItem(
+            displayIndex: index + 1,
+            comicId: comicIds[index],
+            title:
+                titlesById[comicIds[index]] ??
+                comicTitleFallbackForDisplay(comicIds[index]),
+          ),
+      ],
       currentIndex: currentIndex,
     ),
   );

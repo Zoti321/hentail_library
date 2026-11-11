@@ -270,15 +270,21 @@ bool _looksLikeWindowsPath(String path) {
   return path.contains('\\');
 }
 
-/// Whether [seriesFolderPath] is the Library root series for [libraryRoot].
-bool isLibraryRootSeriesFolder({
-  required String? seriesFolderPath,
+/// Whether the comic at [resourcePath] lives directly under [libraryRoot]。
+///
+/// Library root series 的成员漫画直接位于库根目录（直接父目录 == 库根）。
+bool isLibraryRootSeriesComicPath({
+  required String resourcePath,
   required String? libraryRoot,
 }) {
-  if (seriesFolderPath == null || libraryRoot == null) {
+  if (libraryRoot == null) {
     return false;
   }
-  final String folder = _trimTrailingSeparators(seriesFolderPath);
+  final String? parent = _parentDirectoryPath(resourcePath);
+  if (parent == null) {
+    return false;
+  }
+  final String folder = _trimTrailingSeparators(parent);
   final String root = _trimTrailingSeparators(libraryRoot);
   if (folder.isEmpty || root.isEmpty) {
     return false;
@@ -287,6 +293,18 @@ bool isLibraryRootSeriesFolder({
     return folder.toLowerCase() == root.toLowerCase();
   }
   return folder == root;
+}
+
+String? _parentDirectoryPath(String resourcePath) {
+  final String trimmed = _trimTrailingSeparators(resourcePath);
+  if (trimmed.isEmpty) {
+    return null;
+  }
+  final int slash = trimmed.lastIndexOf(RegExp(r'[/\\]'));
+  if (slash <= 0) {
+    return null;
+  }
+  return trimmed.substring(0, slash);
 }
 
 /// Longest Library root under which [resourcePath] lives, if any.

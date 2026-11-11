@@ -1,13 +1,13 @@
 import 'package:hentai_library/features/named_metadata/public/named_metadata_form.dart';
 import 'package:hentai_library/features/comic/domain/smart_facet_match.dart';
 import 'package:hentai_library/features/comic/domain/comic.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/features/comic/domain/repositories/comic_lookup_repository.dart';
 import 'package:hentai_library/features/comic/presentation/view_models/smart_facet_match_preference_notifier.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
+import 'package:hentai_library/shared/di/series_reading_context_providers.dart';
+import 'package:hentai_library/shared/domain/reading/series_reading_context.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hentai_library/shared/domain/library/libraries_state.dart';
 
@@ -166,15 +166,17 @@ Future<Map<String, int>> _siblingMatchedNames({
     );
   }
 
-  final seriesRepo = ref.read(seriesRepoProvider);
-  final Series? series = await seriesRepo.findById(seriesId);
-  if (series == null) {
+  // 邻居语义归 series：只消费 owner 给出的成员顺序事实（#490）。
+  final SeriesReadingContext? context = await ref
+      .read(seriesReadingContextPortProvider)
+      .getReadingContextByComicId(scope.comicId);
+  if (context == null) {
     return const <String, int>{};
   }
 
   final String? libraryRoot = _libraryRootForPath(ref, scope.resourcePath);
-  final bool rootSeries = isLibraryRootSeriesFolder(
-    seriesFolderPath: series.folderPath,
+  final bool rootSeries = isLibraryRootSeriesComicPath(
+    resourcePath: scope.resourcePath,
     libraryRoot: libraryRoot,
   );
   if (rootSeries) {
@@ -191,11 +193,11 @@ Future<Map<String, int>> _siblingMatchedNames({
     comicLookupRepositoryProvider,
   );
   final Set<String> siblingNames = <String>{};
-  for (final SeriesItem item in series.items) {
-    if (item.comicId == scope.comicId) {
+  for (final String siblingComicId in context.orderedComicIds) {
+    if (siblingComicId == scope.comicId) {
       continue;
     }
-    final Comic? comic = await comicRepo.findById(item.comicId);
+    final Comic? comic = await comicRepo.findById(siblingComicId);
     if (comic == null) {
       continue;
     }

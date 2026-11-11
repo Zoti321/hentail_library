@@ -1,5 +1,5 @@
 import 'package:hentai_library/features/series/presentation/patterns/metadata_edit/series_metadata_edit_draft.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/series_meta_locks.dart';
+import 'package:hentai_library/features/series/domain/value_objects/series_meta_locks.dart';
 
 /// [SeriesMetadataEditSession.save] 结果。
 enum SeriesMetadataEditSaveResult { succeeded, busy, validationFailed }

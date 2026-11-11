@@ -1,6 +1,6 @@
 # Gate 与测试缝
 
-**决策**：ADR-0018（三层缝、CI tier 词汇）、ADR-0002（业务真值在 Rust）、**ADR-0033**（feature `application/`）、**ADR-0034**（cross-feature `public/`）。**Job 列表以** `.github/workflows/gate.yml` **为准**；本地与 CI 同源：`./scripts/run-gate.sh`。
+**决策**：ADR-0018（三层缝、CI tier 词汇）、ADR-0002（业务真值在 Rust）、**ADR-0033**（feature `application/`）、**ADR-0034**（cross-feature `public/`）、**ADR-0041**（Comic 实体归属）、**ADR-0042**（Series 实体归属 + 槽位契约）。**Job 列表以** `.github/workflows/gate.yml` **为准**；本地与 CI 同源：`./scripts/run-gate.sh`。
 
 **Wayfinder `lib/` 顶层目录**（Phase A/B）：`app/test/gate/lib_layout_scan_helpers.dart` · `project_layout_test.dart`。产品 feature 之间 **仅允许** import `features/<owner>/public/**` 或 `features/<owner>/public.dart`（M1）；`shared/**` **禁止** import feature public（R11），且 **不得** import `features/**`（R13，ratchet：`shared/di`、`shared/domain`、`core/**` 等既有边只许减不许增）。
 
@@ -17,6 +17,8 @@
 | DI token 覆盖 | `cd app && flutter test test/gate/shared_di_override_coverage_test.dart`（`shared/di` 声明 ⊆ override，漏注入即红） |
 | 领域事件门禁 | `cd app && flutter test test/gate/domain_event_rules_test.dart`（ADR-0039） |
 | Comic 实体归属 | `cd app && flutter test test/architecture/comic_entity_ownership_test.dart`（ADR-0041；shared 内不得再出现 `Comic`） |
+| Series 实体归属 | `cd app && flutter test test/architecture/series_entity_ownership_test.dart`（ADR-0042；shared 内不得再出现 `Series` 实体/VO 引用） |
+| 槽位契约 | `cd app && flutter test test/architecture/series_slot_contract_test.dart`（ADR-0042；`shared/ui/slots/**` 不得 import `features/**`） |
 | Shared UI 无 feature import | `cd app && flutter test test/gate/shared_ui_no_feature_import_test.dart` |
 | Dart 测试盘存（inventory + rubric） | `python scripts/audit_dart_tests.py`（可选 `--summary-json` / `--json`；见下节） |
 

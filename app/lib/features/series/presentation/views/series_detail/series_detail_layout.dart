@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/features/comic/public/ui/comic_catalog_selection_actions.dart';
 import 'package:hentai_library/shared/domain/catalog/selection/catalog_selection_notifier.dart';
 import 'package:hentai_library/shared/ui/catalog/selection/library_selection_header.dart';
 import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_view_object.dart';
+import 'package:hentai_library/shared/di/series_slot_providers.dart';
 import 'package:hentai_library/shared/ui/motion/mode_chrome_transition.dart';
 import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/page_header.dart';
@@ -155,14 +155,7 @@ class _SeriesDetailPageState extends ConsumerState<SeriesDetailLayout> {
     final Widget modeHeader = seriesSelection
         ? LibrarySelectionHeader(
             pageComicIds: pageComicIds,
-            onEditMetadata:
-                (BuildContext context, WidgetRef ref, List<String> ids) =>
-                    openComicMetadataEditorForIds(
-                      context,
-                      ref,
-                      ids,
-                      exitSelectionOnDone: true,
-                    ),
+            onEditMetadata: ref.watch(seriesMemberSelectionActionsSlotProvider),
           )
         : SeriesDetailPageHeader(
             onBack: _resolveVoid(widget.onBack),

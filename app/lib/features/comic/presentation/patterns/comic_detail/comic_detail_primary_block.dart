@@ -3,7 +3,7 @@ import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:hentai_library/shared/ui/layout/comic_detail_page_metrics.dart';
 import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_view_object.dart';
 import 'package:hentai_library/features/comic/presentation/patterns/comic_detail/comic_detail_primary_column.dart';
-import 'package:hentai_library/features/comic/presentation/patterns/comic_detail/comic_detail_primary_row_layout.dart';
+import 'package:hentai_library/shared/ui/layout/comic_detail_primary_row_layout.dart';
 import 'package:hentai_library/shared/ui/widgets/catalog/comic_detail_cover.dart';
 
 /// 详情首屏：封面 + 主信息列（响应式横竖排）。

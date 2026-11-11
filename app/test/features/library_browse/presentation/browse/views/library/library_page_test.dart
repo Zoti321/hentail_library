@@ -20,7 +20,6 @@ import 'package:hentai_library/shared/ui/widgets/catalog/comic_card.dart';
 import 'package:hentai_library/features/comic/di/comic_cover_providers.dart';
 import 'package:hentai_library/features/series/di/series_cover_providers.dart';
 import 'package:hentai_library/features/comic/public/comic.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/thumbnail/series_cover_source.dart';
@@ -51,9 +50,7 @@ ComicBrowseViewObject _comicViewObject(String id, String title) {
 }
 
 SeriesBrowseViewObject _seriesViewObject(String id, String name) {
-  return seriesBrowseViewObjectFromSeries(
-    Series(id: id, name: name, folderPath: '/$id'),
-  );
+  return (id: id, name: name, volumeCount: 0);
 }
 
 const LibraryPagination _onePage = LibraryPagination(

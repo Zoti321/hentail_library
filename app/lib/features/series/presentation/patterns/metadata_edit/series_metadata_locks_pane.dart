@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/series_meta_locks.dart';
+import 'package:hentai_library/features/series/domain/value_objects/series_meta_locks.dart';
 import 'package:hentai_library/shared/ui/catalog/metadata_edit/metadata_field_locks_kv_list.dart';
 import 'package:hentai_library/shared/ui/catalog/metadata_edit/metadata_lock_callbacks.dart';
 

@@ -1,16 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
-import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
 import 'package:hentai_library/features/comic/domain/comic.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/series_item.dart';
-import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/features/comic/domain/repositories/comic_lookup_repository.dart';
-import 'package:hentai_library/features/series/domain/series_repository.dart';
-import 'package:hentai_library/shared/domain/reading/series_reading_context.dart';
 import 'package:hentai_library/features/comic/public/comic_display_title.dart';
 import 'package:hentai_library/features/comic/presentation/view_models/comic_detail_series_nav_provider.dart';
+import 'package:hentai_library/features/comic/domain/repositories/comic_lookup_repository.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/shared/di/series_reading_context_providers.dart';
+import 'package:hentai_library/shared/domain/models/enums.dart';
+import 'package:hentai_library/shared/domain/ports/series_reading_context_port.dart';
+import 'package:hentai_library/shared/domain/reading/series_reading_context.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:test/test.dart';
@@ -19,6 +16,21 @@ class _FakeLibraryRevision extends LibraryRevisionNotifier {
   @override
   LibraryRevisionState build() {
     return const LibraryRevisionState(revision: 1, hasReceivedFirstEmit: true);
+  }
+}
+
+class _FakeReadingContextPort implements SeriesReadingContextPort {
+  _FakeReadingContextPort(this.contexts);
+
+  final Map<String, SeriesReadingContext> contexts;
+  final List<String> requestedComicIds = <String>[];
+
+  @override
+  Future<SeriesReadingContext?> getReadingContextByComicId(
+    String comicId,
+  ) async {
+    requestedComicIds.add(comicId);
+    return contexts[comicId];
   }
 }
 
@@ -69,110 +81,76 @@ class _FakeComicRepo implements ComicLookupRepository {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-class _FakeSeriesRepo implements SeriesRepository {
-  _FakeSeriesRepo(this._series);
-
-  final List<Series> _series;
-
-  @override
-  Future<Series?> findById(String seriesId) async {
-    for (final Series series in _series) {
-      if (series.id == seriesId) {
-        return series;
-      }
-    }
-    return null;
-  }
-
-  @override
-  Future<SeriesReadingContext?> getReadingContextByComicId(
-    String comicId,
-  ) async {
-    for (final Series series in _series) {
-      if (!series.items.any((SeriesItem item) => item.comicId == comicId)) {
-        continue;
-      }
-      final List<SeriesItem> sorted = List<SeriesItem>.from(series.items)
-        ..sort((SeriesItem a, SeriesItem b) => a.order.compareTo(b.order));
-      final List<String> orderedComicIds = sorted
-          .map((SeriesItem item) => item.comicId)
-          .toList(growable: false);
-      return (
-        seriesId: series.id,
-        seriesName: series.name,
-        orderedComicIds: orderedComicIds,
-        currentIndex: orderedComicIds.indexOf(comicId),
-      );
-    }
-    return null;
-  }
-
-  @override
-  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
-}
-
-Series _testSeries() {
-  return Series(
-    id: 'series-1',
-    name: 'Test Series',
-    folderPath: '/series',
-    items: <SeriesItem>[
-      SeriesItem(comicId: 'comic-a', order: 0.0),
-      SeriesItem(comicId: 'comic-b', order: 1.0),
-      SeriesItem(comicId: 'comic-c', order: 2.0),
-    ],
-  );
-}
+const SeriesReadingContext _seriesContext = (
+  seriesId: 'series-1',
+  seriesName: 'Test Series',
+  orderedComicIds: <String>['comic-a', 'comic-b', 'comic-c'],
+  currentIndex: 0,
+);
 
 void main() {
-  late Series series;
   late _FakeComicRepo comicRepo;
+  late _FakeReadingContextPort contextPort;
   late ProviderContainer container;
 
+  ProviderContainer buildContainer({
+    required _FakeComicRepo repo,
+    required _FakeReadingContextPort port,
+  }) {
+    return ProviderContainer(
+      overrides: <Override>[
+        libraryRevisionProvider.overrideWith(_FakeLibraryRevision.new),
+        comicLookupRepositoryProvider.overrideWith((Ref ref) => repo),
+        seriesReadingContextPortProvider.overrideWithValue(port),
+      ],
+    );
+  }
+
   setUp(() {
-    series = _testSeries();
     comicRepo = _FakeComicRepo(<String, String>{
       'comic-a': 'Alpha',
       'comic-b': 'Beta',
       'comic-c': 'Gamma',
     });
-    container = ProviderContainer(
-      overrides: <Override>[
-        ...sharedLibraryStateOverrides(),
-        ...bootstrapCompositionOverrides(),
-        libraryRevisionProvider.overrideWith(_FakeLibraryRevision.new),
-        comicLookupRepositoryProvider.overrideWith((Ref ref) => comicRepo),
-        seriesRepoProvider.overrideWith(
-          (Ref ref) => _FakeSeriesRepo(<Series>[series]),
+    contextPort = _FakeReadingContextPort(<String, SeriesReadingContext>{
+      for (final String id in _seriesContext.orderedComicIds)
+        id: (
+          seriesId: _seriesContext.seriesId,
+          seriesName: _seriesContext.seriesName,
+          orderedComicIds: _seriesContext.orderedComicIds,
+          currentIndex: _seriesContext.orderedComicIds.indexOf(id),
         ),
-      ],
-    );
+    });
+    container = buildContainer(repo: comicRepo, port: contextPort);
   });
 
   tearDown(() {
     container.dispose();
   });
 
-  group('comicDetailSeriesNavForSeriesProvider', () {
-    test('caches series navigation data by series id', () async {
-      final ComicDetailSeriesNavSeriesData? first = await container.read(
-        comicDetailSeriesNavForSeriesProvider('series-1').future,
-      );
-      final ComicDetailSeriesNavSeriesData? second = await container.read(
-        comicDetailSeriesNavForSeriesProvider('series-1').future,
+  group('comicDetailSeriesNavProvider', () {
+    test('builds nav items from Port facts and comic titles', () async {
+      final ComicDetailSeriesNavResult result = await container.read(
+        comicDetailSeriesNavProvider('comic-b').future,
       );
 
-      expect(first, isNotNull);
-      expect(identical(first, second), isTrue);
-      expect(first!.items.map((item) => item.title).toList(), <String>[
+      expect(result, isA<ComicDetailSeriesNavReady>());
+      final ComicDetailSeriesNavReady ready =
+          result as ComicDetailSeriesNavReady;
+      expect(ready.data.seriesId, 'series-1');
+      expect(ready.data.seriesName, 'Test Series');
+      expect(ready.data.currentIndex, 1);
+      expect(ready.data.items.map((item) => item.title).toList(), <String>[
         'Alpha',
         'Beta',
         'Gamma',
       ]);
+      expect(ready.data.previousItem?.comicId, 'comic-a');
+      expect(ready.data.nextItem?.comicId, 'comic-c');
       expect(comicRepo.findByIdsCalls, <List<String>>[
         <String>['comic-a', 'comic-b', 'comic-c'],
       ]);
-      expect(comicRepo.findByIdCalls, 0);
+      expect(contextPort.requestedComicIds, <String>['comic-b']);
     });
 
     test('uses truncated id fallback for missing comics', () async {
@@ -181,59 +159,42 @@ void main() {
         'comic-c': 'Gamma',
       });
       container.dispose();
-      container = ProviderContainer(
-        overrides: <Override>[
-          ...sharedLibraryStateOverrides(),
-          ...bootstrapCompositionOverrides(),
-          libraryRevisionProvider.overrideWith(_FakeLibraryRevision.new),
-          comicLookupRepositoryProvider.overrideWith((Ref ref) => comicRepo),
-          seriesRepoProvider.overrideWith(
-            (Ref ref) => _FakeSeriesRepo(<Series>[series]),
-          ),
-        ],
+      container = buildContainer(repo: comicRepo, port: contextPort);
+
+      final ComicDetailSeriesNavResult result = await container.read(
+        comicDetailSeriesNavProvider('comic-a').future,
       );
 
-      final ComicDetailSeriesNavSeriesData? data = await container.read(
-        comicDetailSeriesNavForSeriesProvider('series-1').future,
-      );
-
-      expect(data, isNotNull);
-      expect(data!.items.map((item) => item.title).toList(), <String>[
+      final ComicDetailSeriesNavReady ready =
+          result as ComicDetailSeriesNavReady;
+      expect(ready.data.items.map((item) => item.title).toList(), <String>[
         'Alpha',
         comicTitleFallbackForDisplay('comic-b'),
         'Gamma',
       ]);
-      expect(comicRepo.findByIdsCalls.length, 1);
-      expect(comicRepo.findByIdCalls, 0);
     });
-  });
 
-  group('comicDetailSeriesNavProvider', () {
-    test(
-      'reuses cached series data when comic id changes within series',
-      () async {
-        await container.read(comicDetailSeriesNavProvider('comic-a').future);
-        final ComicDetailSeriesNavSeriesData? cachedSeriesData = container
-            .read(comicDetailSeriesNavForSeriesProvider('series-1'))
-            .value;
-
-        final ComicDetailSeriesNavResult result = await container.read(
-          comicDetailSeriesNavProvider('comic-b').future,
-        );
-
-        expect(result, isA<ComicDetailSeriesNavReady>());
-        final ComicDetailSeriesNavReady ready =
-            result as ComicDetailSeriesNavReady;
-        expect(ready.data.currentIndex, 1);
-        expect(identical(ready.data.items, cachedSeriesData?.items), isTrue);
-        expect(comicRepo.findByIdsCalls.length, 1);
-        expect(comicRepo.findByIdCalls, 0);
-      },
-    );
-
-    test('returns none when reading context has no membership', () async {
+    test('returns none when Port has no membership', () async {
       final ComicDetailSeriesNavResult result = await container.read(
         comicDetailSeriesNavProvider('comic-missing').future,
+      );
+      expect(result, isA<ComicDetailSeriesNavNone>());
+    });
+
+    test('returns none when comic id is not in ordered ids', () async {
+      contextPort = _FakeReadingContextPort(<String, SeriesReadingContext>{
+        'comic-x': (
+          seriesId: 'series-1',
+          seriesName: 'Test Series',
+          orderedComicIds: <String>['comic-a', 'comic-b'],
+          currentIndex: 0,
+        ),
+      });
+      container.dispose();
+      container = buildContainer(repo: comicRepo, port: contextPort);
+
+      final ComicDetailSeriesNavResult result = await container.read(
+        comicDetailSeriesNavProvider('comic-x').future,
       );
       expect(result, isA<ComicDetailSeriesNavNone>());
     });

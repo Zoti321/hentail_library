@@ -1,9 +1,10 @@
 import 'package:flutter/widgets.dart';
 import 'package:hentai_library/features/comic/public/comic.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
-import 'package:hentai_library/shared/ui/models/series_serialization_status.dart';
+import 'package:hentai_library/shared/domain/models/enums.dart';
 
-export 'package:hentai_library/shared/ui/models/series_serialization_status.dart';
+export 'package:hentai_library/shared/domain/models/enums.dart'
+    show SerializationStatus;
 
 /// 系列内单册预览项。
 class SeriesDetailComicItem {
@@ -31,7 +32,7 @@ class SeriesDetailViewObject {
   const SeriesDetailViewObject({
     required this.title,
     this.cover,
-    this.serializationStatus = SeriesSerializationStatus.ongoing,
+    this.serializationStatus = SerializationStatus.ongoing,
     this.languages = const <String>[],
     this.showAgeRestrictionChip = false,
     this.volumeCurrent = 0,
@@ -48,7 +49,7 @@ class SeriesDetailViewObject {
 
   final String title;
   final Widget? cover;
-  final SeriesSerializationStatus serializationStatus;
+  final SerializationStatus serializationStatus;
 
   /// 已本地化的语言展示名（卷册语言并集；多数系列仅一项）。
   final List<String> languages;
@@ -67,7 +68,7 @@ class SeriesDetailViewObject {
   SeriesDetailViewObject copyWith({
     bool? showAgeRestrictionChip,
     bool? showMetadataBlock,
-    SeriesSerializationStatus? serializationStatus,
+    SerializationStatus? serializationStatus,
   }) {
     return SeriesDetailViewObject(
       title: title,

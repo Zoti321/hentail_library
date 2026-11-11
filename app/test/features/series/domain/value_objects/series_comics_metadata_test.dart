@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/domain/models/value_objects/series_comics_metadata.dart';
+import 'package:hentai_library/features/series/domain/value_objects/series_comics_metadata.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
 import 'package:test/test.dart';
 

@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/series/presentation/views/metadata_edit/series_metadata_edit_page.dart';
 import 'package:hentai_library/features/series/presentation/view_models/series_metadata_editor_notifier.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
+import 'package:hentai_library/features/series/domain/series.dart';
 import 'package:hentai_library/shared/ui/catalog/metadata_edit/metadata_field_locks_kv_list.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/form/series_metadata_form.dart';
+import 'package:hentai_library/features/series/domain/value_objects/series_metadata_form.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 import '../../../../../support/pump_localized_app.dart';
