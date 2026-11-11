@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/domain/library/home_page_counts.dart';
+import 'package:hentai_library/features/reading_stats/domain/home_page_counts.dart';
 
 /// Home page counts 仓储契约（owner：`reading_stats`）。
 abstract class HomePageCountsRepository {

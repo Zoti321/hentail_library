@@ -3,7 +3,7 @@ import 'package:hentai_library/features/reader/application/read_session_applicat
 import 'package:hentai_library/features/reader/application/open_read_session_service.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/di/reading_history_providers.dart';
-import 'package:hentai_library/shared/di/reading_stats_providers.dart';
+import 'package:hentai_library/features/reading_stats/public.dart';
 
 final Provider<OpenReadSessionService> openReadSessionServiceProvider =
     Provider<OpenReadSessionService>((Ref ref) {

@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/reading_stats/domain/home_page_counts_extensions.dart';
-import 'package:hentai_library/shared/domain/library/home_page_counts.dart';
+import 'package:hentai_library/features/reading_stats/domain/home_page_counts.dart';
 
 void main() {
   test('HomePageCounts.isCatalogEmpty', () {

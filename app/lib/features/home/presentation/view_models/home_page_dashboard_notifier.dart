@@ -6,11 +6,7 @@ import 'package:hentai_library/features/home/domain/home_page_repository.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/di/domain_event_revisions.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
-import 'package:hentai_library/shared/di/reading_stats_providers.dart';
-import 'package:hentai_library/shared/domain/library/home_page_counts.dart';
-import 'package:hentai_library/shared/domain/library/reading_activity_stats.dart';
-import 'package:hentai_library/shared/domain/ports/home_page_counts_port.dart';
-import 'package:hentai_library/shared/domain/ports/reading_activity_stats_port.dart';
+import 'package:hentai_library/features/reading_stats/public.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

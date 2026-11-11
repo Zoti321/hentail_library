@@ -4,9 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/home/presentation/view_models/home_page_dashboard_notifier.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
-import 'package:hentai_library/shared/di/reading_stats_providers.dart';
-import 'package:hentai_library/shared/domain/library/reading_activity_stats.dart';
-import 'package:hentai_library/shared/domain/ports/reading_activity_stats_port.dart';
+import 'package:hentai_library/features/reading_stats/public.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 void main() {

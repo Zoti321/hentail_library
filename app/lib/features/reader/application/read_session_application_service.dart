@@ -3,7 +3,7 @@ import 'package:hentai_library/features/reader/application/open_reader_args.dart
 import 'package:hentai_library/features/reader/application/open_read_session_service.dart';
 import 'package:hentai_library/features/reader/domain/read_session.dart';
 import 'package:hentai_library/shared/domain/ports/reading_history_command_port.dart';
-import 'package:hentai_library/shared/domain/ports/record_read_session_activity_port.dart';
+import 'package:hentai_library/features/reading_stats/public.dart';
 
 /// 系列切卷时 Application Service 返回的计划；UI 负责 prefetch 与路由跳转。
 typedef SeriesSwitchPlan = ({

@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/reading_stats/application/record_read_session_activity.dart';
 import 'package:hentai_library/features/reading_stats/domain/reading_activity_stats_repository.dart';
-import 'package:hentai_library/shared/domain/library/reading_activity_stats.dart';
+import 'package:hentai_library/features/reading_stats/domain/reading_activity_stats.dart';
 
 void main() {
   test('skips repository when neither duration nor finished applies', () async {

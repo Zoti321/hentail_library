@@ -6,9 +6,7 @@ import 'package:hentai_library/features/bootstrap/di/overrides/domain_event_bus_
 import 'package:hentai_library/features/home/presentation/view_models/home_page_dashboard_notifier.dart';
 import 'package:hentai_library/features/library_browse/public/library_age_restriction_filter.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
-import 'package:hentai_library/shared/di/reading_stats_providers.dart';
-import 'package:hentai_library/shared/domain/library/home_page_counts.dart';
-import 'package:hentai_library/shared/domain/ports/home_page_counts_port.dart';
+import 'package:hentai_library/features/reading_stats/public.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 void main() {
