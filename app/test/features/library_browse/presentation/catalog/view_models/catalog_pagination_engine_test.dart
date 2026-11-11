@@ -1,7 +1,7 @@
 import 'package:hentai_library/shared/domain/models/value_objects/page_jump.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
-import 'package:hentai_library/features/library_browse/presentation/catalog/view_models/catalog_pagination_engine.dart';
+import 'package:hentai_library/shared/domain/catalog/pagination/catalog_pagination_engine.dart';
 import 'package:test/test.dart';
 
 PagedResult<String> _pageResult({

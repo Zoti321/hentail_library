@@ -15,7 +15,7 @@ import 'package:hentai_library/shared/ui/widgets/list_detail/list_detail_nav_ite
 import 'package:hentai_library/shared/ui/widgets/selection/segmented_capsule_bar.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/series_meta_locks.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
-import 'package:hentai_library/features/library_browse/public/catalog/for_comic_and_series.dart';
+import 'package:hentai_library/shared/ui/catalog/metadata_edit/metadata_lock_callbacks.dart';
 
 enum _SeriesMetadataEditTab { content, fieldLocks }
 

@@ -8,7 +8,8 @@ import 'package:hentai_library/features/library_browse/presentation/browse/view_
 import 'package:hentai_library/shared/di/browse_library_scope_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:hentai_library/features/library_browse/presentation/integrations/series_presentation_bridge.dart';
+import 'package:hentai_library/features/series/public.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/models/series_catalog_query_assembly.dart';
 
 part 'library_series_filters_notifier.g.dart';
 
@@ -199,7 +200,8 @@ class LibrarySeriesFiltersNotifier extends _$LibrarySeriesFiltersNotifier {
   }
 }
 
-const LibrarySeriesProjection _seriesProjection = LibrarySeriesProjection();
+const SeriesCatalogQueryAssembly _seriesProjection =
+    SeriesCatalogQueryAssembly();
 
 final Provider<bool> librarySeriesFiltersIsCustomizedProvider = Provider<bool>((
   Ref ref,

@@ -21,13 +21,18 @@ import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/series_comic_page_item.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/series_comics_metadata.dart';
+import 'package:hentai_library/shared/domain/library/metadata_refresh_types.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/metadata_refresh_toasts.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
-import 'package:hentai_library/features/library_admin/public.dart';
-import 'package:hentai_library/features/library_browse/public/catalog/for_comic_and_series.dart';
+import 'package:hentai_library/features/series/public/ui/series_metadata_edit_presenters.dart';
+import 'package:hentai_library/shared/di/author_detail_providers.dart';
+import 'package:hentai_library/shared/domain/catalog/selection/catalog_selection_notifier.dart';
+import 'package:hentai_library/shared/ui/catalog/detail/content_breadcrumb_labels.dart';
+import 'package:hentai_library/shared/ui/catalog/detail/detail_back_header.dart';
+import 'package:hentai_library/shared/ui/catalog/detail/detail_status_scaffold.dart';
 
 export 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_layout.dart';
 export 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_view_object.dart';
@@ -181,12 +186,8 @@ class _SeriesDetailCatalogLayout extends ConsumerWidget {
         ),
       ],
       onAuthorTap: (AuthorRef author) => author.hasIdentity
-          ? openAuthorDetailById(context: context, authorId: author.id!)
-          : openAuthorDetailByName(
-              context: context,
-              ref: ref,
-              name: author.name,
-            ),
+          ? ref.read(authorDetailPortProvider).showById(context, author.id!)
+          : ref.read(authorDetailPortProvider).showByName(context, author.name),
       onComicTap: (int globalIndex) {
         final int localIndex = globalIndex - (page - 1) * pageSize;
         if (localIndex < 0 || localIndex >= items.length) {

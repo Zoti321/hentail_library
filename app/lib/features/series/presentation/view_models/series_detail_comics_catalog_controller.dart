@@ -10,7 +10,8 @@ import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
-import 'package:hentai_library/features/library_browse/public/catalog/for_comic_and_series.dart';
+import 'package:hentai_library/shared/domain/catalog/pagination/catalog_pagination_engine.dart';
+import 'package:hentai_library/shared/domain/catalog/pagination/library_pagination.dart';
 
 part 'series_detail_comics_catalog_controller.g.dart';
 

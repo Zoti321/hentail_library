@@ -5,7 +5,12 @@ import 'package:hentai_library/shared/ui/motion/shared_axis_route.dart';
 
 import '../data/md3e_lab_catalog_detail_preview_data.dart';
 
-import 'package:hentai_library/features/library_browse/presentation/catalog/patterns/metadata_edit/metadata_edit_navigation.dart';
+import 'package:hentai_library/features/comic/public/ui/comic_metadata_edit_draft.dart';
+import 'package:hentai_library/features/comic/public/ui/comic_metadata_edit_layout.dart';
+import 'package:hentai_library/features/comic/public/ui/comic_metadata_edit_present.dart';
+import 'package:hentai_library/features/series/public/ui/series_metadata_edit_draft.dart';
+import 'package:hentai_library/features/series/public/ui/series_metadata_edit_layout.dart';
+import 'package:hentai_library/features/series/public/ui/series_metadata_edit_present.dart';
 
 import 'md3e_lab_reader_navigation.dart';
 
@@ -24,8 +29,9 @@ Future<void> openLabCatalogDetail(
   required LibraryDisplayTarget displayTarget,
   required int catalogIndex,
 }) {
-  final OverlayRouteScopeSnapshot scope =
-      OverlayRouteScopeSnapshot.capture(context);
+  final OverlayRouteScopeSnapshot scope = OverlayRouteScopeSnapshot.capture(
+    context,
+  );
   return Navigator.of(context, rootNavigator: false).push<void>(
     sharedAxisRoute<void>(
       context,

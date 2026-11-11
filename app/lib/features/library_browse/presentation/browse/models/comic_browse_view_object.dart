@@ -1,4 +1,7 @@
-import 'package:hentai_library/features/comic/domain/comic_browse_list_item.dart';
-
-/// 库页漫画 Tab 卡面用 ViewObject（领域 [ComicBrowseListItem] 的展示别名）。
-typedef ComicBrowseViewObject = ComicBrowseListItem;
+/// 库页漫画 Tab 卡面用只读投影（与 owner repository 签名内的 record 形状镜像）。
+typedef ComicBrowseViewObject = ({
+  String comicId,
+  String title,
+  int pageCount,
+  String path,
+});

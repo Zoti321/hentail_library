@@ -105,9 +105,7 @@ class _Md3eLibraryBrowsePageState extends State<LibraryBrowseLayout> {
   @override
   Widget build(BuildContext context) {
     final double viewportWidth = MediaQuery.sizeOf(context).width;
-    final WindowSizeClass sizeClass = WindowSizeClass.fromWidth(
-      viewportWidth,
-    );
+    final WindowSizeClass sizeClass = WindowSizeClass.fromWidth(viewportWidth);
     final PageLayoutSpec layout = PageLayoutSpec.of(context);
     final double horizontal = layout.horizontalInset;
 
@@ -186,9 +184,7 @@ class _Md3eLibraryBrowsePageState extends State<LibraryBrowseLayout> {
             SliverPadding(
               padding: EdgeInsets.fromLTRB(
                 horizontal,
-                LibraryBrowsePageMetrics.paginationVerticalSpacing(
-                  sizeClass,
-                ),
+                LibraryBrowsePageMetrics.paginationVerticalSpacing(sizeClass),
                 horizontal,
                 LibraryBrowsePageMetrics.scrollBottomInset(sizeClass),
               ),
@@ -211,11 +207,7 @@ class _Md3eLibraryBrowsePageState extends State<LibraryBrowseLayout> {
     );
   }
 
-  Widget _buildGridCard(
-    BuildContext context,
-    int index,
-    CatalogGridLayout _,
-  ) {
+  Widget _buildGridCard(BuildContext context, int index, CatalogGridLayout _) {
     final ColorScheme scheme = Theme.of(context).colorScheme;
     final double? readProgress =
         widget.displayTarget == LibraryDisplayTarget.comics && index.isEven

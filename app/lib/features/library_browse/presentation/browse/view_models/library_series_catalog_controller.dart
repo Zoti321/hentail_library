@@ -1,22 +1,22 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/features/series/domain/series_browse_list_item.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/models/series_browse_view_object.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_jump.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_revision_coordinator.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_state.dart';
-import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_page_snapshot.dart';
+import 'package:hentai_library/shared/domain/catalog/pagination/library_pagination.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_query_intent.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_query_intent_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_series_filters_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_tab_filter_sort_providers.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_tab_page_size_providers.dart';
-import 'package:hentai_library/features/library_browse/presentation/catalog/view_models/catalog_pagination_engine.dart';
+import 'package:hentai_library/shared/domain/catalog/pagination/catalog_pagination_engine.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
-import 'package:hentai_library/features/library_browse/presentation/integrations/series_presentation_bridge.dart';
+import 'package:hentai_library/features/series/public.dart';
 
 part 'library_series_catalog_controller.g.dart';
 
@@ -62,7 +62,7 @@ class LibrarySeriesCatalogController extends _$LibrarySeriesCatalogController {
     );
 
     final String keyword = ref.read(libraryQueryIntentProvider).keyword;
-    final PagedResult<SeriesBrowseListItem> page = await _fetchPage();
+    final PagedResult<SeriesBrowseViewObject> page = await _fetchPage();
     final int tableTotalCount = await ref.read(seriesRepoProvider).countAll();
 
     return LibrarySeriesCatalogState(
@@ -79,7 +79,7 @@ class LibrarySeriesCatalogController extends _$LibrarySeriesCatalogController {
     );
   }
 
-  Future<PagedResult<SeriesBrowseListItem>> _fetchPage() async {
+  Future<PagedResult<SeriesBrowseViewObject>> _fetchPage() async {
     final LibrarySeriesFilter filter = ref.read(
       librarySeriesFiltersQueryProvider,
     );
@@ -90,7 +90,7 @@ class LibrarySeriesCatalogController extends _$LibrarySeriesCatalogController {
       librarySeriesTabGroupingProvider,
     );
     final int pageSize = ref.read(librarySeriesTabPageSizeProvider);
-    return _pagination.fetchPage<SeriesBrowseListItem>(
+    return _pagination.fetchPage<SeriesBrowseViewObject>(
       pageSize: pageSize,
       fetch: (request) => ref
           .read(seriesRepoProvider)

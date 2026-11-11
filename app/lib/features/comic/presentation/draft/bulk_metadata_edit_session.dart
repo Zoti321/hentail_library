@@ -1,6 +1,6 @@
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/features/library_admin/public.dart';
+import 'package:hentai_library/shared/domain/library/comic_metadata_bulk_patch.dart';
 
 enum BulkMetadataEditFieldKind {
   description,

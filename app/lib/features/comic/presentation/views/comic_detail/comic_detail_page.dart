@@ -13,9 +13,7 @@ import 'package:hentai_library/features/comic/presentation/views/comic_detail/co
 import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_layout.dart';
 import 'package:hentai_library/shared/ui/motion/catalog_detail_page.dart';
 import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
-import 'package:hentai_library/shared/di/comic_detail_providers.dart';
 import 'package:hentai_library/shared/di/library_command_providers.dart';
-import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/shared/di/reader_launch_providers.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
@@ -23,7 +21,13 @@ import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
-import 'package:hentai_library/features/library_browse/public/catalog/for_comic_and_series.dart';
+import 'package:hentai_library/features/comic/di/comic_detail_providers.dart';
+import 'package:hentai_library/features/comic/public/ui/comic_detail_back_location.dart';
+import 'package:hentai_library/features/comic/public/ui/comic_metadata_edit_presenters.dart';
+import 'package:hentai_library/shared/di/author_detail_providers.dart';
+import 'package:hentai_library/shared/ui/catalog/detail/detail_back_header.dart';
+import 'package:hentai_library/shared/ui/catalog/detail/detail_status_scaffold.dart';
+import 'package:hentai_library/shared/ui/navigation/library_browse_navigation.dart';
 
 export 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_layout.dart';
 export 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_view_object.dart';
@@ -37,7 +41,7 @@ class ComicDetailPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AsyncValue<Comic?> comicAsync = ref.watch(
-      libraryComicDetailProvider(comicId),
+      comicDetailProvider(comicId),
     );
 
     return PopScope(
@@ -46,7 +50,10 @@ class ComicDetailPage extends ConsumerWidget {
         if (didPop) {
           return;
         }
-        DetailBackHeader.popOrGoLibrary(context);
+        DetailBackHeader.popOrGoLibrary(
+          context,
+          locationResolver: resolveComicDetailBackLocationFromContext,
+        );
       },
       child: M3ETheme(
         data: withAppFontFamily(M3ETheme.of(context)),
@@ -66,7 +73,7 @@ class ComicDetailPage extends ConsumerWidget {
             loading: () => const DetailLoadingStatus(),
             error: (Object error, StackTrace stackTrace) => DetailErrorStatus(
               label: context.l10n.comicDetailLoadFailedRetry,
-              onRetry: ref.read(libraryRefreshActionProvider),
+              onRetry: () => ref.invalidate(comicDetailProvider(comicId)),
             ),
             skipLoadingOnReload: true,
             skipLoadingOnRefresh: true,
@@ -116,7 +123,10 @@ class _ComicDetailContent extends ConsumerWidget {
     final ColorScheme scheme = Theme.of(context).colorScheme;
     return ComicDetailLayout(
       entry: entry,
-      onBack: () => DetailBackHeader.popOrGoLibrary(context),
+      onBack: () => DetailBackHeader.popOrGoLibrary(
+        context,
+        locationResolver: resolveComicDetailBackLocationFromContext,
+      ),
       onEdit: () => showComicMetadataEdit(context: context, comic: comic),
       moreMenuEntries: <M3EMenuNode>[
         M3EMenuEntry(
@@ -154,12 +164,8 @@ class _ComicDetailContent extends ConsumerWidget {
       onRead: () => _openReader(ref, incognito: false),
       onReadIncognito: () => _openReader(ref, incognito: true),
       onAuthorTap: (AuthorRef author) => author.hasIdentity
-          ? openAuthorDetailById(context: context, authorId: author.id!)
-          : openAuthorDetailByName(
-              context: context,
-              ref: ref,
-              name: author.name,
-            ),
+          ? ref.read(authorDetailPortProvider).showById(context, author.id!)
+          : ref.read(authorDetailPortProvider).showByName(context, author.name),
       onSeriesSelect: (int index) {
         final List<ComicDetailSeriesNavItem>? items = seriesNav?.items;
         if (items == null || index < 0 || index >= items.length) {

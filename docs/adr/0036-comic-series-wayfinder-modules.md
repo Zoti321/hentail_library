@@ -23,8 +23,15 @@ Accepted
 ### 2. Cross-feature public 依赖（无环）
 
 - 允许：`library_browse` → `comic` / `series` public；`series` → `comic` public（封面/展示）；`reader` / `home` / `reading_history` / `comic_trash` → `comic` public；`bootstrap` → 各 module public。
-- **禁止**：`comic` → `series` public；reading context 经 **`shared/di` + `SeriesReadingContextPort`**（series 实现）。
-- Gate：`kImportBoundaryModules` 含 `comic`、`series`；**R5** 扩展至 `comic` / `series`（禁止 import `reader`）。
+- **禁止**：`comic` → `library_browse` / `series` / `reader`；`series` → `library_browse`；`reader` → `comic`（存量三条 public 读取边 shrink-only，见 `test/architecture/module_boundary_test.dart`）。reading context 经 **`shared/di` + `SeriesReadingContextPort`**（series 实现）。
+- Gate：`kImportBoundaryModules` 含 `comic`、`series`；**R5** 扩展至 `comic` / `series`（禁止 import `reader`）。2026-11-11 起由 `test/architecture` 执行**显式禁止边表**（`import` + `export`）。
+
+### 2.1 跨模块只读投影（2026-11-11，#488）
+
+- 壳（`library_browse`）持查询态，模块持查询规则与能力；跨模块只走三条通道：**Port（命令）**、**领域事件（事实）**、**只读投影 record**。
+- 库页列表行使用**匿名 record**（comic：`({String comicId, String title, int pageCount, String path})`；series：`({String id, String name, int volumeCount})`），由 owner 仓储直接返回，不再定义 `ComicBrowseListItem` / `SeriesBrowseListItem` 具名类。
+- 组装器（`ComicCatalogQueryAssembly` / `SeriesCatalogQueryAssembly`）属壳：`library_browse/presentation/browse/models/`，组合查询意图与 owner `public/library_age_restriction_*` 扩展方法。
+- 具名化后再跨模块导出 record 等价 DTO **禁止**；理由与边界见 **ADR-0040**。
 
 ### 3. Application 层（ADR-0033）
 

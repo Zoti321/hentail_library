@@ -8,9 +8,9 @@ import 'package:hentai_library/features/library_browse/presentation/browse/view_
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_series_filters_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_tab_filter_sort_providers.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/views/library/library_sort_section.dart';
-import 'package:hentai_library/features/library_browse/presentation/integrations/series_presentation_bridge.dart';
+import 'package:hentai_library/features/series/public.dart';
 import 'package:hentai_library/features/library_browse/domain/browse/library_age_restriction_filter.dart';
-import 'package:hentai_library/features/library_browse/domain/browse/library_tri_state_pick.dart';
+import 'package:hentai_library/shared/domain/library/library_tri_state_pick.dart';
 import 'package:hentai_library/shared/di/library_dictionary_providers.dart';
 import 'package:hentai_library/shared/domain/library/library_media_type_filter.dart';
 import 'package:hentai_library/shared/domain/library/library_metadata_filter_selection.dart';
@@ -20,6 +20,8 @@ import 'package:hentai_library/shared/domain/models/value_objects/comic_language
 import 'package:hentai_library/shared/util/name_pinyin_assisted_filter.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:hentai_library/features/library_browse/public/l10n/library_browse_l10n.dart';
+import 'package:hentai_library/features/series/public/l10n/series_l10n.dart';
 
 const Duration _kFilterAccordionDuration = Duration(milliseconds: 200);
 const Curve _kFilterAccordionCurve = Curves.easeOutCubic;

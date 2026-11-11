@@ -7,15 +7,15 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 final Provider<AsyncValue<List<SmartFacetMatchCandidate>>>
-    md3eNamedFacetMultiSelectPreviewProvider =
+md3eNamedFacetMultiSelectPreviewProvider =
     Provider<AsyncValue<List<SmartFacetMatchCandidate>>>(
-      (Ref ref) => const AsyncData<List<SmartFacetMatchCandidate>>(<
-        SmartFacetMatchCandidate
-      >[
-        (name: '深海', attachmentCount: 3, smartMatched: true),
-        (name: '图书馆', attachmentCount: 8, smartMatched: false),
-        (name: 'Python', attachmentCount: 1, smartMatched: false),
-      ]),
+      (Ref ref) => const AsyncData<List<SmartFacetMatchCandidate>>(
+        <SmartFacetMatchCandidate>[
+          (name: '深海', attachmentCount: 3, smartMatched: true),
+          (name: '图书馆', attachmentCount: 8, smartMatched: false),
+          (name: 'Python', attachmentCount: 1, smartMatched: false),
+        ],
+      ),
     );
 
 /// Widgetbook demo with local selection + smart facet candidates.

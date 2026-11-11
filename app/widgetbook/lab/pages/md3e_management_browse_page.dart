@@ -32,8 +32,7 @@ class ManagementBrowsePage extends StatefulWidget {
   final ScrollController? scrollController;
 
   @override
-  State<ManagementBrowsePage> createState() =>
-      _Md3eManagementBrowsePageState();
+  State<ManagementBrowsePage> createState() => _Md3eManagementBrowsePageState();
 }
 
 class _Md3eManagementBrowsePageState extends State<ManagementBrowsePage> {
@@ -91,9 +90,7 @@ class _Md3eManagementBrowsePageState extends State<ManagementBrowsePage> {
   @override
   Widget build(BuildContext context) {
     final double viewportWidth = MediaQuery.sizeOf(context).width;
-    final WindowSizeClass sizeClass = WindowSizeClass.fromWidth(
-      viewportWidth,
-    );
+    final WindowSizeClass sizeClass = WindowSizeClass.fromWidth(viewportWidth);
     final PageLayoutSpec layout = PageLayoutSpec.of(context);
     final double horizontal = layout.horizontalInset;
 

@@ -3,12 +3,12 @@ import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart'
 import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/series/domain/library_series_grouping.dart';
-import 'package:hentai_library/features/series/domain/library_series_projection.dart';
+import 'package:hentai_library/features/series/domain/library_series_filter.dart';
 import 'package:hentai_library/features/series/domain/library_series_sort_option.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
-import 'package:hentai_library/features/series/domain/series_browse_list_item.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/models/series_browse_view_object.dart';
 import 'package:hentai_library/features/series/domain/series_repository.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_series_catalog_controller.dart';
@@ -55,15 +55,15 @@ class _CountingSeriesRepo implements SeriesRepository {
   }
 
   @override
-  Future<PagedResult<SeriesBrowseListItem>> fetchBrowsePage({
+  Future<PagedResult<SeriesBrowseViewObject>> fetchBrowsePage({
     required PageRequest request,
     required LibrarySeriesFilter filter,
     required LibrarySeriesGrouping grouping,
     required LibrarySeriesSortOption sortOption,
   }) async {
     fetchCount++;
-    return PagedResult<SeriesBrowseListItem>(
-      items: const <SeriesBrowseListItem>[],
+    return PagedResult<SeriesBrowseViewObject>(
+      items: const <SeriesBrowseViewObject>[],
       page: request.page,
       pageSize: request.pageSize,
       totalCount: 0,

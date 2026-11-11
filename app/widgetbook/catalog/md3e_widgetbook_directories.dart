@@ -28,7 +28,6 @@ import 'package:hentai_library/features/comic/presentation/views/comic_detail/co
 import '../hosts/md3e_reader_page_lab_host.dart';
 import '../preview/md3e_reader_page_preview_data.dart';
 
-
 import '../hosts/md3e_comic_metadata_edit_page_lab_host.dart';
 
 import 'package:hentai_library/features/library_admin/presentation/views/library/library_edit_page.dart';
@@ -36,7 +35,11 @@ import 'package:hentai_library/features/library_admin/presentation/views/library
 import '../hosts/md3e_library_edit_page_lab_host.dart';
 
 import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_page_lab_host.dart';
-import 'package:hentai_library/features/library_browse/presentation/catalog/patterns/metadata_edit/metadata_edit_navigation.dart';
+import 'package:hentai_library/features/comic/public/ui/comic_metadata_edit_draft.dart';
+import 'package:hentai_library/features/comic/public/ui/comic_metadata_edit_layout.dart';
+import 'package:hentai_library/features/comic/public/ui/comic_metadata_edit_present.dart';
+import 'package:hentai_library/features/series/public/ui/series_metadata_edit_layout.dart';
+import 'package:hentai_library/features/series/public/ui/series_metadata_edit_present.dart';
 
 import '../lab/navigation/md3e_lab_catalog_navigation.dart';
 
@@ -46,7 +49,9 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/widgets/selection/segmented_capsule_bar.dart';
 import 'package:hentai_library/shared/ui/widgets/inputs/tag_input_field.dart';
+
 import '../preview/md3e_named_facet_multi_select_preview.dart';
+
 import 'package:hentai_library/shared/ui/widgets/desktop/desktop_title_bar.dart';
 import 'package:hentai_library/shared/ui/widgets/desktop/navigation_rail.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
@@ -204,9 +209,8 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
                   name: 'Default',
-                  builder: (BuildContext context) => const Md3eWidgetbookScope(
-                    child: TagInputFieldPreview(),
-                  ),
+                  builder: (BuildContext context) =>
+                      const Md3eWidgetbookScope(child: TagInputFieldPreview()),
                 ),
               ],
             ),
@@ -372,9 +376,8 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
                   name: 'Responsive · viewport addon',
-                  builder: (BuildContext context) => const Md3eWidgetbookScope(
-                    child: SettingsPageLabHost(),
-                  ),
+                  builder: (BuildContext context) =>
+                      const Md3eWidgetbookScope(child: SettingsPageLabHost()),
                 ),
               ],
             ),

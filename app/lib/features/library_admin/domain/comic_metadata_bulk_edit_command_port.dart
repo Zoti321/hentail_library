@@ -1,4 +1,4 @@
-import 'package:hentai_library/features/library_admin/domain/comic_metadata_bulk_patch_types.dart';
+import 'package:hentai_library/shared/domain/library/comic_metadata_bulk_patch.dart';
 
 /// 批量元数据编辑的命令端口（#261c）。
 ///

@@ -8,11 +8,11 @@
 | --- | --- | --- |
 | **契约** | `shared/domain/ports/`、owner `public/` | 跨 feature 读类型 / UI 命令 |
 | **事件** | `shared/domain/events/`（sealed `DomainEvent` + 子类） | 任意 feature 发布 / 消费 |
-| **Token** | `shared/di/*_providers.dart` | 任意 feature / shared 需要 `ref.read` 时 |
+| **Token** | 能力所有者 `features/<owner>/public/di/**`；`shared/di` 仅跨模块命令 / 全局状态 | 消费方直接 watch owner public token（ADR-0034 §3，#488） |
 | **实现** | owner `features/<id>/di/`（含 codegen 封面图）、`shared/data/events/` | 仅同 feature 或 **bootstrap** overrides |
 | **接线** | `features/bootstrap/di/overrides/` | 仅 bootstrap |
 
-Consumer **不要** deep import 邻居的 `features/<other>/di/`，除非 baseline 已记录的遗留 M1（应逐步删掉）。
+Consumer **不要** deep import 邻居的 `features/<other>/di/`；模块私有 token 也不再抄到 `shared/di` 转发（ADR-0034 §3）。
 
 ## 命令 vs 事件
 

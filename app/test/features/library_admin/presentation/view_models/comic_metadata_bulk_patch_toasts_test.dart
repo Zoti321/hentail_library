@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/core/l10n/app_localizations_zh.dart';
-import 'package:hentai_library/features/library_admin/domain/comic_metadata_bulk_patch_types.dart';
+import 'package:hentai_library/shared/domain/library/comic_metadata_bulk_patch.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/comic_metadata_bulk_patch_toasts.dart';
 
 void main() {

@@ -5,12 +5,12 @@ import 'package:riverpod/misc.dart' show FutureProviderFamily;
 import 'package:hentai_library/features/library_admin/domain/libraries_port.dart';
 import 'package:hentai_library/features/library_admin/domain/comic_metadata_bulk_edit_command_port.dart';
 import 'package:hentai_library/shared/domain/library/comic_detail_return_series_port.dart';
-import 'package:hentai_library/features/library_admin/domain/libraries_state.dart';
+import 'package:hentai_library/shared/domain/library/libraries_state.dart';
 import 'package:hentai_library/features/library_admin/domain/library_scan_command_port.dart';
 import 'package:hentai_library/features/library_admin/domain/library_reorder_mode_port.dart';
-import 'package:hentai_library/features/library_admin/domain/library_revision_state.dart';
+import 'package:hentai_library/shared/domain/library/library_revision_state.dart';
 import 'package:hentai_library/shared/domain/library/library_age_restriction_filter.dart';
-import 'package:hentai_library/features/library_admin/domain/library_scan_activity_state.dart';
+import 'package:hentai_library/shared/domain/library/library_scan_activity_state.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 
 /// 跨 feature 共享的库状态与端口 Provider 声明（#261a）。

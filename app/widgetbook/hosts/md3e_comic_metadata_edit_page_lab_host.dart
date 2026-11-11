@@ -31,9 +31,7 @@ class ComicMetadataEditPageLabHost extends StatelessWidget {
     return ComicMetadataEditLayout(
       initialDraft:
           initialDraft ??
-          ComicMetadataEditDraft.fromEntry(
-            ComicDetailPagePreviewData.sample(),
-          ),
+          ComicMetadataEditDraft.fromEntry(ComicDetailPagePreviewData.sample()),
       initialLocks:
           initialLocks ?? Md3eComicMetadataEditPreviewData.sampleLocks,
       presentation: presentation,

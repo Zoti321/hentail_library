@@ -30,16 +30,19 @@ Comics/Series Tab **筛选/排序/投影规则类型** 分别 @ `comic/domain`�
 - **外置**：Series 成员与排序（`series`）、Comic trash 生命周期（`comic_trash`）、阅读历史、跨本 bulk / sync（`library_admin` + 库级写锁）。
 - Catalog 实体 DTO 仍 @ Shared Kernel（ADR-0035）；勿为目录整齐迁入 `comic/domain`。
 
-## browse ↔ comic/series 壳接缝（阶段 2）
+## browse ↔ comic/series 壳接缝（2026-11-11 终态，#488）
 
-- **已删除** `comic/public/shell` 与 `series/public/shell`；browse 经本地 `presentation/integrations/{comic,series}_presentation_bridge.dart` 消费 presentation / 窄 public。
-- **`library_browse/public/catalog/for_comic_and_series.dart`**：仅保留 comic/series 实际使用的壳原子（详情状态、锁 UI、metadata mappers/presenters、catalog selection/pagination、page size、breadcrumb、comic card actions、`openAuthorDetailByName`、bulkEditComicsByIdsProvider 等）；已去掉未消费的 `library_page_header`、`library_search_query_parser` re-export。
-- **R12**：`public/` 对自身 `presentation/` 的 `export` 纳入门禁；既有 `public/ui` 与本 catalog barrel 等见 `app/test/gate/public_presentation_export_allowlist.txt`（只缩不扩）。
+- **已删除** `presentation/integrations/{comic,series}_presentation_bridge.dart` 与 `public/catalog/for_comic_and_series.dart`。bridge 用 `export` 转发跨模块 presentation，旧门禁只扫 `import` 因此隐形；现由 `app/test/architecture/module_boundary_test.dart` 同时扫 `import` + `export`。
+- **壳持查询态**：搜索/筛选/排序/分组状态与分页组装留在 `library_browse`；`ComicCatalogQueryAssembly` / `SeriesCatalogQueryAssembly` 在 `presentation/browse/models/`。
+- **模块持规则与能力**：`comic` / `series` 的筛选/排序/分组/年龄限制规则通过 owner `public/library_*_browse_rules.dart` 与 `public/library_age_restriction_*.dart` 暴露；列表行是匿名 record（见 ADR-0040）。
+- **browse 单向 watch**：`ref.watch` owner `public/di` 的 token（`comicDetailProvider`、`comicReadPageIndexByIdProvider` 等）；模块不反向读壳。
+- **R12**：`public/` 对自身 `presentation/` 的 `import`/`export` 见 `app/test/gate/public_presentation_export_allowlist.txt`（条目数棘轮只减不增）。
 
 ## Cross-feature
 
 - 允许：`library_browse` → `comic` / `series` public；`series` → `comic` public（封面）。
-- 禁止：`comic` → `series` public（连读上下文经 `SeriesReadingContextPort` @ shared/di）。
+- 禁止：`comic` → `library_browse` / `series` / `reader`；`series` → `library_browse`（连读上下文经 `SeriesReadingContextPort` @ shared/di）。
+- 门禁：`module_boundary_test.dart` 的显式禁止边表；`reader → comic` 存量 public 边 shrink-only。
 
 ## 参考
 

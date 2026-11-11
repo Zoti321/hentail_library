@@ -72,12 +72,7 @@ class Md3eDynamicTheme extends StatelessWidget {
             );
             return M3ETheme(
               data: light.m3e,
-              child: builder(
-                context,
-                light.m3e,
-                light.material,
-                dark.material,
-              ),
+              child: builder(context, light.m3e, light.material, dark.material),
             );
           },
     );

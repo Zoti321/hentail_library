@@ -74,19 +74,13 @@ class _Md3eHomePageLabHostState extends State<HomePageLabHost> {
     super.didUpdateWidget(oldWidget);
     if (widget.initialLibraries != null &&
         widget.initialLibraries != oldWidget.initialLibraries) {
-      _libraries = List<HomeLibraryDashboardRow>.of(
-        widget.initialLibraries!,
-      );
+      _libraries = List<HomeLibraryDashboardRow>.of(widget.initialLibraries!);
     }
   }
 
   void _handleReorder(int oldIndex, int newIndex) {
     setState(() {
-      _libraries = applyHomeLibraryListReorder(
-        _libraries,
-        oldIndex,
-        newIndex,
-      );
+      _libraries = applyHomeLibraryListReorder(_libraries, oldIndex, newIndex);
     });
   }
 
@@ -107,8 +101,7 @@ class _Md3eHomePageLabHostState extends State<HomePageLabHost> {
       return;
     }
     setState(() {
-      _libraries = List<HomeLibraryDashboardRow>.of(_libraries)
-        ..[index] = next;
+      _libraries = List<HomeLibraryDashboardRow>.of(_libraries)..[index] = next;
     });
   }
 
@@ -152,8 +145,7 @@ class _Md3eHomePageLabHostState extends State<HomePageLabHost> {
 
     switch (action) {
       case HomeLibraryManagementAction.edit:
-        final LibraryEditPageIntent intent =
-            row.kind == HomeLibraryKind.remote
+        final LibraryEditPageIntent intent = row.kind == HomeLibraryKind.remote
             ? LibraryEditPageIntent.editRemote
             : LibraryEditPageIntent.editLocal;
         await _openLibraryEdit(intent);
@@ -164,9 +156,7 @@ class _Md3eHomePageLabHostState extends State<HomePageLabHost> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text(
-                _HomePageLabPreviewCopy.scanPreviewSnackBar,
-              ),
+              content: Text(_HomePageLabPreviewCopy.scanPreviewSnackBar),
             ),
           );
         }
@@ -193,8 +183,7 @@ class _Md3eHomePageLabHostState extends State<HomePageLabHost> {
         setState(() {
           _libraries = _libraries
               .where(
-                (HomeLibraryDashboardRow item) =>
-                    item.libraryId != libraryId,
+                (HomeLibraryDashboardRow item) => item.libraryId != libraryId,
               )
               .toList(growable: false);
         });
@@ -246,9 +235,8 @@ class _Md3eHomePageLabHostState extends State<HomePageLabHost> {
         unawaited(
           Navigator.of(context).push<void>(
             MaterialPageRoute<void>(
-              builder: (BuildContext context) => Scaffold(
-                body: Center(child: Text(context.l10n.navTrash)),
-              ),
+              builder: (BuildContext context) =>
+                  Scaffold(body: Center(child: Text(context.l10n.navTrash))),
             ),
           ),
         );
@@ -261,8 +249,7 @@ class _Md3eHomePageLabHostState extends State<HomePageLabHost> {
         libraries: _libraries,
         onLibraryOpen: widget.onLibraryOpen,
         onLibraryAction: _handleLibraryAction,
-        onAddLocalLibrary:
-            widget.onAddLocalLibrary ?? _defaultAddLocalLibrary,
+        onAddLocalLibrary: widget.onAddLocalLibrary ?? _defaultAddLocalLibrary,
         onAddRemoteLibrary:
             widget.onAddRemoteLibrary ?? _defaultAddRemoteLibrary,
         onLibrariesReorder: widget.enableReorder ? _handleReorder : null,

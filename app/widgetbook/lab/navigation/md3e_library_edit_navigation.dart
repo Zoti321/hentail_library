@@ -87,10 +87,8 @@ class _Md3eLibraryEditDialog extends StatefulWidget {
     LibraryEditPageIntent intent,
   ) {
     return switch (intent) {
-      LibraryEditPageIntent.createLocal =>
-        l10n.dialogCreateLocalLibraryTitle,
-      LibraryEditPageIntent.createRemote =>
-        l10n.dialogCreateRemoteLibraryTitle,
+      LibraryEditPageIntent.createLocal => l10n.dialogCreateLocalLibraryTitle,
+      LibraryEditPageIntent.createRemote => l10n.dialogCreateRemoteLibraryTitle,
       LibraryEditPageIntent.editLocal ||
       LibraryEditPageIntent.editRemote => l10n.dialogEditLibraryTitle,
     };
@@ -114,8 +112,7 @@ class _Md3eLibraryEditDialogState extends State<_Md3eLibraryEditDialog> {
 
   static LibraryForm _formForIntent(LibraryEditPageIntent intent) {
     return switch (intent) {
-      LibraryEditPageIntent.editLocal =>
-        LibraryEditPreviewData.editLocalForm(),
+      LibraryEditPageIntent.editLocal => LibraryEditPreviewData.editLocalForm(),
       LibraryEditPageIntent.editRemote =>
         LibraryEditPreviewData.editRemoteForm(),
       LibraryEditPageIntent.createLocal => LibraryForm.createLocal(),
@@ -168,8 +165,7 @@ class _Md3eLibraryEditDialogState extends State<_Md3eLibraryEditDialog> {
     }
 
     final AppLocalizations l10n = context.l10n;
-    final double horizontalInset = PageLayoutSpec.of(context)
-        .horizontalInset;
+    final double horizontalInset = PageLayoutSpec.of(context).horizontalInset;
 
     return M3EDialog(
       title: _Md3eLibraryEditDialog._titleForIntent(l10n, widget.intent),

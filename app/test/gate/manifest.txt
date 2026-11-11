@@ -4,6 +4,9 @@
 # Gate 自检（import_boundary、shared_ui/domain feature-import L3、strangler_shims）
 test/gate
 
+# 新架构门禁（跨模块 import+export、禁止边、public 环、DI 倒置；ADR-0040）
+test/architecture
+
 # Dart 薄边缝：domain / core / data（FRB mapper · guard · adapter）
 test/shared/domain
 test/core

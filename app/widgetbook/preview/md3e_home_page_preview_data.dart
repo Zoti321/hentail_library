@@ -8,9 +8,8 @@ abstract final class HomePagePreviewData {
     DateTime? referenceNow,
   }) => libraries(referenceNow: referenceNow);
 
-  static List<HomeLibraryDashboardRow> libraries({
-    DateTime? referenceNow,
-  }) => LabLibraryCatalog.libraries(referenceNow: referenceNow);
+  static List<HomeLibraryDashboardRow> libraries({DateTime? referenceNow}) =>
+      LabLibraryCatalog.libraries(referenceNow: referenceNow);
 
   static HomeAggregateCounts sampleAggregateCounts() =>
       LabLibraryCatalog.aggregateCounts();

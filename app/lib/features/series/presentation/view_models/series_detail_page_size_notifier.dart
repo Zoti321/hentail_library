@@ -1,7 +1,7 @@
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:hentai_library/features/library_browse/public/catalog/for_comic_and_series.dart';
+import 'package:hentai_library/shared/domain/catalog/page_size/library_tab_page_size_settings.dart';
 
 part 'series_detail_page_size_notifier.g.dart';
 

@@ -1,6 +1,6 @@
 import 'package:hentai_library/features/comic/presentation/draft/bulk_metadata_edit_session.dart';
-import 'package:hentai_library/features/library_admin/public.dart';
-import 'package:hentai_library/features/library_browse/public/catalog/for_comic_and_series.dart';
+import 'package:hentai_library/shared/domain/library/comic_metadata_bulk_patch.dart';
+import 'package:hentai_library/features/comic/di/comic_detail_providers.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

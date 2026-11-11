@@ -6,7 +6,7 @@ import 'package:hentai_library/shared/domain/models/entity/comic/author_detail.d
 import 'package:hentai_library/shared/ui/patterns/comic_detail/comic_detail_meta_chip_row.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/content_section.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
-import 'package:hentai_library/features/library_browse/presentation/integrations/comic_presentation_bridge.dart';
+import 'package:hentai_library/features/comic/public.dart';
 
 const double kAuthorDetailComicCardWidth = 96;
 const double kAuthorDetailComicCardHeight = 144;

@@ -8,14 +8,8 @@ export 'browse/view_models/library_distinct_metadata_providers.dart';
 export 'browse/view_models/library_page_comics_providers.dart';
 export 'browse/view_models/library_page_facade_notifier.dart';
 export 'browse/view_models/library_page_series_providers.dart';
-export 'browse/view_models/library_page_snapshot.dart';
 export 'browse/view_models/library_series_filters_notifier.dart';
 export 'browse/view_models/library_series_catalog_controller.dart';
 export 'browse/view_models/library_tab_filter_sort_providers.dart';
 export 'browse/view_models/library_tab_page_size_notifier.dart';
 export 'browse/view_models/library_tab_page_size_providers.dart';
-export 'browse/view_models/library_tab_page_size_settings.dart';
-export 'catalog/view_models/catalog_selection_notifier.dart';
-
-export 'package:hentai_library/features/library_browse/presentation/integrations/comic_presentation_bridge.dart'
-    show comicDetailReturnSeriesProvider, comicDetailSeriesNavProvider;

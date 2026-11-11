@@ -1,7 +1,6 @@
 import 'package:hentai_library/features/series/domain/library_series_grouping.dart';
-import 'package:hentai_library/features/series/domain/library_series_projection.dart';
+import 'package:hentai_library/features/series/domain/library_series_filter.dart';
 import 'package:hentai_library/features/series/domain/library_series_sort_option.dart';
-import 'package:hentai_library/features/series/domain/series_browse_list_item.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
@@ -23,7 +22,10 @@ abstract class SeriesRepository {
   });
 
   /// 库浏览列表瘦投影（不传成员 items）。
-  Future<PagedResult<SeriesBrowseListItem>> fetchBrowsePage({
+  ///
+  /// record 形状被壳的 `SeriesBrowseViewObject` typedef 镜像（ADR-0040）。
+  Future<PagedResult<({String id, String name, int volumeCount})>>
+  fetchBrowsePage({
     required PageRequest request,
     required LibrarySeriesFilter filter,
     required LibrarySeriesGrouping grouping,

@@ -28,8 +28,7 @@ class LibraryEditPageLabHost extends StatefulWidget {
       _Md3eLibraryEditPageLabHostState();
 }
 
-class _Md3eLibraryEditPageLabHostState
-    extends State<LibraryEditPageLabHost> {
+class _Md3eLibraryEditPageLabHostState extends State<LibraryEditPageLabHost> {
   LibraryForm? _previewFormAfterSave;
 
   LibraryForm _resolveInitialForm() {
@@ -40,8 +39,7 @@ class _Md3eLibraryEditPageLabHostState
       return _previewFormAfterSave!;
     }
     return switch (widget.intent) {
-      LibraryEditPageIntent.editLocal =>
-        LibraryEditPreviewData.editLocalForm(),
+      LibraryEditPageIntent.editLocal => LibraryEditPreviewData.editLocalForm(),
       LibraryEditPageIntent.editRemote =>
         LibraryEditPreviewData.editRemoteForm(),
       LibraryEditPageIntent.createLocal => LibraryForm.createLocal(),

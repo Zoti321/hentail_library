@@ -17,10 +17,10 @@ Future<void> openLabReader(
   BuildContext context, {
   ReaderPagePreviewData? preview,
 }) {
-  final ReaderPagePreviewData data =
-      preview ?? ReaderPagePreviewData.sample();
-  final OverlayRouteScopeSnapshot scope =
-      OverlayRouteScopeSnapshot.capture(context);
+  final ReaderPagePreviewData data = preview ?? ReaderPagePreviewData.sample();
+  final OverlayRouteScopeSnapshot scope = OverlayRouteScopeSnapshot.capture(
+    context,
+  );
 
   return Navigator.of(context, rootNavigator: false).push<void>(
     sharedAxisRoute<void>(

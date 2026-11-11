@@ -4,7 +4,7 @@ import 'package:hentai_library/features/library_browse/domain/browse/library_age
 import 'package:hentai_library/shared/domain/library/library_media_type_filter.dart';
 import 'package:hentai_library/shared/domain/library/library_metadata_filter_selection.dart';
 import 'package:hentai_library/features/library_browse/domain/browse/library_needs_metadata_only.dart';
-import 'package:hentai_library/features/library_browse/domain/browse/library_tri_state_pick.dart';
+import 'package:hentai_library/shared/domain/library/library_tri_state_pick.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_query_intent.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_query_intent_notifier.dart';
@@ -13,7 +13,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/shared/di/browse_library_scope_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:hentai_library/features/library_browse/presentation/integrations/comic_presentation_bridge.dart';
+import 'package:hentai_library/features/comic/public.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/models/comic_catalog_query_assembly.dart';
 
 part 'library_comic_filters_notifier.g.dart';
 part 'library_comic_filters_persistence.dart';
@@ -185,7 +186,7 @@ Future<void> migrateLegacyLibraryAgeRestriction(SharedPreferences prefs) async {
   }
 }
 
-const LibraryComicProjection _comicProjection = LibraryComicProjection();
+const ComicCatalogQueryAssembly _comicProjection = ComicCatalogQueryAssembly();
 
 /// Comics Tab 筛选偏好的 SharedPreferences 键（#308 持久化侧，供主类与 mixin 共用）。
 const String _ageStorageKey = kLibraryComicsAgeRestrictionStorageKey;

@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 
-import 'package:hentai_library/features/library_browse/presentation/integrations/comic_presentation_bridge.dart';
+import 'package:hentai_library/features/comic/public.dart';
 
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
@@ -14,6 +14,8 @@ import 'package:hentai_library/features/library_browse/domain/browse/library_age
 import 'package:hentai_library/shared/domain/library/library_media_type_filter.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:hentai_library/features/library_browse/public/l10n/library_browse_l10n.dart';
+import 'package:hentai_library/features/comic/public/l10n/comic_l10n.dart';
 
 /// 筛选排序抽屉的本地状态（Widgetbook / 测试用，不绑 Riverpod）。
 ///

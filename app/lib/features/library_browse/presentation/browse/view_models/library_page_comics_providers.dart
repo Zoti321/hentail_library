@@ -1,13 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/features/library_browse/presentation/library.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
-import 'package:hentai_library/shared/di/library_state_providers.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:hentai_library/features/library_admin/public.dart';
 
-part 'library_page_comics_providers.g.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_comics_catalog_controller.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_series_catalog_controller.dart';
 
 /// Action 门面：刷新变更通知并重置到第一页。
 final Provider<VoidCallback> libraryRefreshActionProvider =
@@ -17,19 +12,3 @@ final Provider<VoidCallback> libraryRefreshActionProvider =
         ref.read(librarySeriesCatalogControllerProvider.notifier).refresh();
       };
     });
-
-@Riverpod(keepAlive: true)
-Future<Comic?> libraryComicDetail(Ref ref, String comicId) {
-  ref.watch(
-    libraryRevisionStateProvider.select((LibraryRevisionState s) => s.revision),
-  );
-  return ref.read(comicLookupRepositoryProvider).findById(comicId);
-}
-
-@Riverpod(keepAlive: true)
-Future<List<Comic>> bulkEditComicsByIds(Ref ref, List<String> comicIds) {
-  ref.watch(
-    libraryRevisionStateProvider.select((LibraryRevisionState s) => s.revision),
-  );
-  return ref.read(comicLookupRepositoryProvider).findByIds(comicIds);
-}

@@ -3,5 +3,4 @@ library;
 
 export 'package:hentai_library/features/comic/domain/library_comic_filter.dart';
 export 'package:hentai_library/features/comic/domain/library_comic_grouping.dart';
-export 'package:hentai_library/features/comic/domain/library_comic_projection.dart';
 export 'package:hentai_library/features/comic/domain/library_comic_sort_option.dart';

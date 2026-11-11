@@ -190,8 +190,7 @@ class _Md3eReaderPageLabHostState extends State<ReaderPageLabHost> {
       currentVolumeId: _volumeId,
       useRootNavigator: widget.useRootNavigator,
       onVolumeSelected: (String id) {
-        for (final ReaderSeriesVolume volume
-            in widget.preview.seriesVolumes) {
+        for (final ReaderSeriesVolume volume in widget.preview.seriesVolumes) {
           if (volume.id != id) {
             continue;
           }

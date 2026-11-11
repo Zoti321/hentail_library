@@ -1,4 +1,4 @@
-import 'package:hentai_library/features/library_admin/domain/libraries_state.dart';
+import 'package:hentai_library/shared/domain/library/libraries_state.dart';
 import 'package:hentai_library/features/library_admin/domain/resource_format_category.dart';
 import 'package:hentai_library/features/library_admin/domain/library_sidebar_layout.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
@@ -9,7 +9,7 @@ import 'package:hentai_library/features/library_admin/di/library_write.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-export 'package:hentai_library/features/library_admin/domain/libraries_state.dart';
+export 'package:hentai_library/shared/domain/library/libraries_state.dart';
 
 part 'libraries_notifier.g.dart';
 

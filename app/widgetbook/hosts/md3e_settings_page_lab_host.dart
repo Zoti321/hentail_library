@@ -16,8 +16,7 @@ class SettingsPageLabHost extends StatefulWidget {
   final VoidCallback? onBack;
 
   @override
-  State<SettingsPageLabHost> createState() =>
-      _Md3eSettingsPageLabHostState();
+  State<SettingsPageLabHost> createState() => _Md3eSettingsPageLabHostState();
 }
 
 class _Md3eSettingsPageLabHostState extends State<SettingsPageLabHost> {

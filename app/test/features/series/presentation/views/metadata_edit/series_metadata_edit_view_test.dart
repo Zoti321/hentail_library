@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/series/presentation/views/metadata_edit/series_metadata_edit_page.dart';
 import 'package:hentai_library/features/series/presentation/view_models/series_metadata_editor_notifier.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
-import 'package:hentai_library/features/library_browse/presentation/catalog/patterns/metadata_edit/metadata_field_locks_kv_list.dart';
+import 'package:hentai_library/shared/ui/catalog/metadata_edit/metadata_field_locks_kv_list.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/series_metadata_form.dart';
 import 'package:riverpod/misc.dart' show Override;
 

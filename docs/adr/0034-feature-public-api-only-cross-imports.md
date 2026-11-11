@@ -34,8 +34,9 @@ Epic [#425](https://github.com/Zoti321/hentail_library/issues/425) 与 implement
 
 ### 3. Riverpod 与 DI
 
-- Consumer 仍 `ref.read` **`shared/di`** 声明的 Provider token（#426）。
+- **Token 归属（2026-11-11 修订，#488）**：能力所有者把自家 Provider token 声明在 `features/<owner>/public/di/**`，消费方直接 `ref.watch/read` owner 的 public token；`shared/di` **只保留跨模块命令 Port 与全局状态** token。
 - 工厂经 owner **`public/di`** 暴露；bootstrap 在 `features/bootstrap/di/overrides/` 按 owner 拆分 override（#435）。
+- 禁止把模块私有 token 再抄到 `shared/di` 转发；`shared/di` 声明仍必须被 override 覆盖（`app/test/architecture/di_inversion_test.dart`）。
 
 > **实现修订（2026-11-09）**：`shared/di` 的占位 token 统一用 `app/lib/shared/di/injected_di.dart` 的 `injectedDi` / `injectedFutureDi` / `injectedFutureDiFamily` 声明，保留显式类型标注；不再手写 `throw UnimplementedError`。组合根收敛为 `features/bootstrap/di/bootstrap_overrides.dart` 的 `bootstrapDiOverrides()`（data → shared state → composition），`main.dart` 只调用它。**新增 token 必须补齐 override**，由 `app/test/gate/shared_di_override_coverage_test.dart` 静态校验「`shared/di` 声明 ⊆ 应用内 override」。
 
@@ -49,7 +50,7 @@ Epic [#425](https://github.com/Zoti321/hentail_library/issues/425) 与 implement
 - **M2**：presentation cross-feature 规则 **不变**。
 - **M3**：product→bootstrap **不变**。
 - **R11**：`shared` → `features/*/public/**`，L1 零 tolerance。
-- **public 依赖环**：仅 public 边构成有向图；**禁止环**（零 tolerance，见 `import_boundary_test`）。
+- **public 依赖环**：仅 public 边构成有向图；**禁止环**（零 tolerance）。2026-11-11 起由 `app/test/architecture/module_boundary_test.dart` 同时扫描 `import` 与 `export`（bridge 式 `export` 后门不再隐形）。
 
 ### 6. `public/` 宪章（Spec 2 / #430）
 
@@ -83,6 +84,12 @@ Epic [#425](https://github.com/Zoti321/hentail_library/issues/425) 与 implement
 ### Negative
 
 - 每个对外能力需维护 public barrel；部分契约真值仍在 shared/domain（UI 命令 + kernel），与 public re-export 需同步 review。
+
+### 实现修订（2026-11-11，#488）
+
+- 删除 `library_browse/presentation/integrations/{comic,series}_presentation_bridge.dart` 与 `public/catalog/for_comic_and_series.dart`：bridge 用 `export` 绕过旧门禁，已在 `test/architecture` 中补 `export` 扫描后清零。
+- 消费方向固定为 `library_browse → comic/series`；`comic` 不 import `library_browse` / `series` / `reader`，`series` 不 import `library_browse`。禁止边表由测试执行，不靠文档约定。
+- 新增 owner `public/ui`（comic/series 的 card host、metadata edit draft/present/layout）与 owner `public/l10n`、`public/di`；R12 allowlist 只登记确实需要转发自身 `presentation/` 的 public UI 入口。
 
 ## References
 

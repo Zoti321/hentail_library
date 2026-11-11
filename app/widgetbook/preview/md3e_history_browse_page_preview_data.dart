@@ -17,10 +17,7 @@ abstract final class Md3eHistoryBrowsePagePreviewData {
     VoidCallback? onDeleteRecord,
   }) {
     return <ReadingHistoryMoreMenuEntry>[
-      ReadingHistoryMoreMenuEntry(
-        label: '删除记录',
-        onSelected: onDeleteRecord,
-      ),
+      ReadingHistoryMoreMenuEntry(label: '删除记录', onSelected: onDeleteRecord),
       const ReadingHistoryMoreMenuEntry(label: '在资源管理器中显示'),
     ];
   }

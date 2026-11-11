@@ -10,11 +10,7 @@ import '../preview/md3e_reader_page_preview_data.dart';
 
 /// Lab / Widgetbook：preview 阅读历史 + 清空全部（M3E 确认 → 清内存列表，不写 FRB）。
 class HistoryBrowsePageLabHost extends StatefulWidget {
-  const HistoryBrowsePageLabHost({
-    super.key,
-    this.initialItems,
-    this.clock,
-  });
+  const HistoryBrowsePageLabHost({super.key, this.initialItems, this.clock});
 
   final List<HistoryCardItem>? initialItems;
   final DateTime? clock;
@@ -38,9 +34,7 @@ class _Md3eHistoryBrowsePageLabHostState
   }
 
   void _deletePreviewEntry(HistoryCardItem item) {
-    setState(
-      () => _items = List<HistoryCardItem>.of(_items)..remove(item),
-    );
+    setState(() => _items = List<HistoryCardItem>.of(_items)..remove(item));
   }
 
   void _openReader(BuildContext context, HistoryCardItem item) {

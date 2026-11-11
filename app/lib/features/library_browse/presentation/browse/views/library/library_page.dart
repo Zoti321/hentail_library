@@ -3,22 +3,26 @@ import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/features/library_browse/presentation/catalog/content_breadcrumb_labels.dart';
-import 'package:hentai_library/features/library_browse/presentation/integrations/comic_presentation_bridge.dart';
+import 'package:hentai_library/shared/ui/catalog/detail/content_breadcrumb_labels.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/models/comic_browse_view_object.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/models/series_browse_view_object.dart';
+import 'package:hentai_library/features/series/public/ui/series_cover_content.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_inactive_subscription.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_state.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_comics_catalog_controller.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_page_facade_notifier.dart';
-import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_page_snapshot.dart';
+import 'package:hentai_library/shared/domain/catalog/pagination/library_pagination.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_series_catalog_controller.dart';
-import 'package:hentai_library/features/library_browse/presentation/catalog/view_models/catalog_selection_notifier.dart';
+import 'package:hentai_library/shared/domain/catalog/selection/catalog_selection_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/views/library/library_filter_sort_sheet.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/views/library/library_overflow_entries.dart';
-import 'package:hentai_library/features/library_browse/presentation/browse/views/library/library_selection_header.dart';
-import 'package:hentai_library/features/library_browse/presentation/browse/views/widgets/comic_card_actions.dart';
+import 'package:hentai_library/shared/ui/catalog/selection/library_selection_header.dart';
+import 'package:hentai_library/features/comic/public/di/comic_cover_providers.dart';
+import 'package:hentai_library/features/comic/public/di/comic_detail_providers.dart';
+import 'package:hentai_library/features/comic/public/ui/comic_card_actions.dart';
+import 'package:hentai_library/features/comic/public/ui/comic_cover_content.dart';
+import 'package:hentai_library/features/comic/public/ui/comic_catalog_selection_actions.dart';
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:hentai_library/shared/ui/layout/catalog_grid.dart';
 import 'package:hentai_library/shared/ui/layout/catalog_grid_metrics.dart';
@@ -43,7 +47,6 @@ import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/ui/widgets/navigation/library_scroll_to_top_button.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
-import 'package:hentai_library/features/library_browse/presentation/integrations/series_presentation_bridge.dart';
 
 /// 库页（MD3E 生产实现）：页头 + 漫画 / 系列 Tab + 真 Sliver 网格 + 分页。
 ///
@@ -299,6 +302,14 @@ class _LibraryModeHeader extends ConsumerWidget {
 
     final Widget modeHeader = librarySelection
         ? LibrarySelectionHeader(
+            onEditMetadata:
+                (BuildContext context, WidgetRef ref, List<String> ids) =>
+                    openComicMetadataEditorForIds(
+                      context,
+                      ref,
+                      ids,
+                      exitSelectionOnDone: true,
+                    ),
             pageComicIds: ref.watch(
               libraryComicsCatalogControllerProvider.select((
                 AsyncValue<LibraryComicsCatalogState> async,

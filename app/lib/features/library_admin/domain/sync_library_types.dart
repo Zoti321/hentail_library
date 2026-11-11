@@ -1,7 +1,6 @@
 // 同步漫画库任务专用进度快照（typedef record，不单独建 class）。
 
-/// 增量扫描（跳过未变更资源解析）/ 全量解析（强制重读元数据）。
-enum ScanMode { incremental, full }
+export 'package:hentai_library/shared/domain/library/library_scan_mode.dart';
 
 /// 扫描 / 清空 / 写库 / 生成缩略图 / 结束 / 失败
 enum SyncLibraryPhase {

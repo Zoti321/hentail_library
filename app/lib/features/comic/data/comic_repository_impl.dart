@@ -1,7 +1,6 @@
 import 'package:hentai_library/shared/data/frb/comic_entity_mapper.dart';
 import 'package:hentai_library/shared/data/frb/frb_call_guard.dart';
 import 'package:hentai_library/features/comic/data/comic_frb_mapper.dart';
-import 'package:hentai_library/features/comic/domain/comic_browse_list_item.dart';
 import 'package:hentai_library/features/comic/domain/comic_catalog_repository.dart';
 import 'package:hentai_library/features/comic/domain/library_comic_grouping.dart';
 import 'package:hentai_library/features/comic/domain/comic_user_metadata_repository.dart';
@@ -52,7 +51,10 @@ class ComicRepositoryImpl
   }
 
   @override
-  Future<PagedResult<ComicBrowseListItem>> fetchComicsBrowsePage({
+  Future<
+    PagedResult<({String comicId, String title, int pageCount, String path})>
+  >
+  fetchComicsBrowsePage({
     required PageRequest request,
     required LibraryComicFilter filter,
     required LibraryComicGrouping grouping,
@@ -67,10 +69,12 @@ class ComicRepositoryImpl
       ),
       fallbackMessage: '读取漫画浏览分页失败',
     );
-    return PagedResult<ComicBrowseListItem>(
-      items: <ComicBrowseListItem>[
+    return PagedResult<
+      ({String comicId, String title, int pageCount, String path})
+    >(
+      items: <({String comicId, String title, int pageCount, String path})>[
         for (final rust.ComicBrowseItemDto item in page.items)
-          ComicBrowseListItem(
+          (
             comicId: item.comicId,
             title: item.title,
             pageCount: item.pageCount,

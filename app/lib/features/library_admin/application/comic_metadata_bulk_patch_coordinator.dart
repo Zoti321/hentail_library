@@ -1,5 +1,5 @@
 import 'package:hentai_library/features/library_admin/domain/comic_metadata_bulk_patch_port.dart';
-import 'package:hentai_library/features/library_admin/domain/comic_metadata_bulk_patch_types.dart';
+import 'package:hentai_library/shared/domain/library/comic_metadata_bulk_patch.dart';
 import 'package:hentai_library/shared/domain/events/events.dart';
 
 /// 批量 patch 编排：FRB bulk patch → 发布领域事件（ADR-0039）。

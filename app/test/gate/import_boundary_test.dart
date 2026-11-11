@@ -79,7 +79,7 @@ void main() {
     );
     expect(
       isPublicPresentationExportAllowlisted(
-        'features/library_browse/public/catalog/for_comic_and_series.dart',
+        'features/library_browse/public/ui/library_page.dart',
       ),
       isTrue,
     );

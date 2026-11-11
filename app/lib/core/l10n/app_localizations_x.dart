@@ -6,15 +6,7 @@ import 'package:hentai_library/features/library_admin/domain/resource_format_cat
 
 import 'package:hentai_library/shared/domain/library/scan_interval.dart';
 
-import 'package:hentai_library/features/library_browse/domain/browse/library_age_restriction_filter.dart';
-
-import 'package:hentai_library/features/comic/domain/library_comic_sort_option.dart';
-
 import 'package:hentai_library/shared/domain/library/library_media_type_filter.dart';
-
-import 'package:hentai_library/features/series/domain/library_series_sort_option.dart';
-
-import 'package:hentai_library/features/series/domain/library_serialization_status_filter.dart';
 
 import 'package:hentai_library/features/library_admin/domain/sync_library_types.dart';
 
@@ -160,24 +152,6 @@ extension AppLocalizationsLabelsX on AppLocalizations {
     }
   }
 
-  String libraryComicSortFieldLabel(LibraryComicSortField field) {
-    return switch (field) {
-      LibraryComicSortField.title => libraryComicSortTitle,
-
-      LibraryComicSortField.createdAt => libraryComicSortCreatedAt,
-
-      LibraryComicSortField.lastUpdatedAt => libraryComicSortLastUpdatedAt,
-
-      LibraryComicSortField.publishedAt => libraryComicSortPublishedAt,
-
-      LibraryComicSortField.readAt => libraryComicSortReadAt,
-
-      LibraryComicSortField.fileSize => libraryComicSortFileSize,
-
-      LibraryComicSortField.pageCount => libraryComicSortPageCount,
-    };
-  }
-
   String libraryDisplayTargetTabLabel(LibraryDisplayTarget target) {
     return switch (target) {
       LibraryDisplayTarget.comics => libraryTabComics,
@@ -194,26 +168,6 @@ extension AppLocalizationsLabelsX on AppLocalizations {
     };
   }
 
-  String librarySeriesSortFieldLabel(LibrarySeriesSortField field) {
-    return switch (field) {
-      LibrarySeriesSortField.name => librarySeriesSortName,
-
-      LibrarySeriesSortField.comicCount => librarySeriesSortComicCount,
-
-      LibrarySeriesSortField.random => librarySeriesSortRandom,
-    };
-  }
-
-  String libraryAgeRestrictionFilterLabel(LibraryAgeRestrictionFilter filter) {
-    return switch (filter) {
-      LibraryAgeRestrictionFilter.unrestricted => filterAgeUnrestricted,
-
-      LibraryAgeRestrictionFilter.allAges => filterAgeAllAges,
-
-      LibraryAgeRestrictionFilter.r18Only => filterAgeR18Only,
-    };
-  }
-
   String libraryMediaTypeFilterLabel(LibraryMediaTypeFilterOption option) {
     return switch (option) {
       LibraryMediaTypeFilterOption.pdf => filterMediaTypePdf,
@@ -221,18 +175,6 @@ extension AppLocalizationsLabelsX on AppLocalizations {
       LibraryMediaTypeFilterOption.epub => filterMediaTypeEpub,
 
       LibraryMediaTypeFilterOption.archive => filterMediaTypeArchive,
-    };
-  }
-
-  String librarySerializationStatusFilterLabel(
-    LibrarySerializationStatusFilter option,
-  ) {
-    return switch (option) {
-      LibrarySerializationStatusFilter.unrestricted => filterAgeUnrestricted,
-      LibrarySerializationStatusFilter.ongoing => serializationStatusOngoing,
-      LibrarySerializationStatusFilter.ended => serializationStatusEnded,
-      LibrarySerializationStatusFilter.hiatus => serializationStatusHiatus,
-      LibrarySerializationStatusFilter.unknown => serializationStatusUnknown,
     };
   }
 
