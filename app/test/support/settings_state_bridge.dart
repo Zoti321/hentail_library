@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/app_settings/public.dart';
-import 'package:hentai_library/shared/di/app_settings_providers.dart';
 import 'package:riverpod/misc.dart' show Override;
+import 'package:hentai_library/shared/di/app_settings_providers.dart';
 
 /// 测试桥接：`appSettingsStateProvider`（shared token）→ owner `settingsProvider`。
 ///

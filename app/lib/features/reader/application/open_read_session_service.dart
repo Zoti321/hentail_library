@@ -5,7 +5,7 @@ import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/reader/domain/comic_page_source_port.dart';
 import 'package:hentai_library/features/reader/domain/native_reader_port.dart';
-import 'package:hentai_library/features/comic/public/comic_lookup_repository.dart';
+import 'package:hentai_library/shared/domain/ports/comic_read_lookup_port.dart';
 import 'package:hentai_library/features/reading_history/public.dart';
 import 'package:hentai_library/features/reader/application/read_session_page_load_exception.dart';
 import 'package:hentai_library/features/reader/domain/read_session_page.dart';
@@ -17,7 +17,7 @@ import 'package:hentai_library/features/reader/domain/opened_read_session.dart';
 /// 同一 comicId 在 close 前复用页列表，避免 open 与 loadPages 双次列页。
 class OpenReadSessionService {
   OpenReadSessionService({
-    required this._comicRepo,
+    required this._comicLookup,
     required this._pageSource,
     required this._readingHistoryCommands,
     required this._sessionPort,
@@ -27,7 +27,7 @@ class OpenReadSessionService {
   /// Resource access / reader open 的默认有界时限（Local + Remote）。
   static const Duration defaultOpenTimeout = Duration(seconds: 30);
 
-  final ComicLookupRepository _comicRepo;
+  final ComicReadLookupPort _comicLookup;
   final ComicPageSourcePort _pageSource;
   final ReadingHistoryCommandPort _readingHistoryCommands;
   final NativeReaderPort _sessionPort;
@@ -147,7 +147,7 @@ class OpenReadSessionService {
     if (opened != null) {
       return opened.comic;
     }
-    final found = await _comicRepo.findById(comicId);
+    final found = await _comicLookup.findById(comicId);
     return found == null
         ? null
         : ReaderComicRef(
@@ -171,7 +171,7 @@ class OpenReadSessionService {
     if (cached != null) {
       return cached;
     }
-    final found = await _comicRepo.findById(comicId);
+    final found = await _comicLookup.findById(comicId);
     if (found == null) {
       throw ReadSessionPageLoadException.comicNotFound(comicId);
     }

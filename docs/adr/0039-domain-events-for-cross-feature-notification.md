@@ -44,6 +44,8 @@ ADR-0034（public only）解决了「谁能 import 谁」，但**同一次写入
 
 事件全部经 `shared/domain`，**不产生 public cross-feature 边**，因此不扩大 ADR-0034 的 public 有向图（也不会引入环）。`shared` 仍不得 import `features/*/public/**`（R11 不变）。
 
+> **实现修订（2026-11-11，#503 / ADR-0045）**：上表「命令 / 查询 Port 一律放 `shared/domain/ports/**` + `shared/di` token」改为**按可达性判定**：只有命中「禁止边 / public 环 / `shared/**`·`core/**` 消费方」任一否决条件时才留 shared，其余按生产者拥有迁入 owner `domain/` 与 owner `public/di/**`。本文档 §1 的判定表不变——仍是「要它做事 = Port，发生了某事 = DomainEvent」。
+
 ### 3. 发布与订阅规则
 
 - **发布点**：`features/*/application/**`（首选）或 `features/*/data/**`，且必须在写入**提交成功之后**；禁止在 FRB 调用 / 事务内部发布。

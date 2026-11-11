@@ -11,6 +11,8 @@ import 'package:hentai_library/features/reader/presentation/view_models/series_r
 import 'package:riverpod/misc.dart' show Override;
 import 'package:test/test.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/features/comic/public/di/comic_repository_providers.dart';
+import 'package:hentai_library/features/comic/public/di/comic_read_lookup_adapter.dart';
 
 class _FakeComicRepo implements ComicLookupRepository {
   _FakeComicRepo(this._titles);
@@ -92,6 +94,9 @@ List<Override> _overrides({
 }) {
   return <Override>[
     comicLookupRepositoryProvider.overrideWith((Ref ref) => comicRepo),
+    comicReadLookupPortProvider.overrideWith(
+      (Ref ref) => createComicReadLookupPort(comicRepo),
+    ),
     seriesReadingContextPortProvider.overrideWithValue(
       _FakeSeriesReadingContextPort(seriesContext),
     ),

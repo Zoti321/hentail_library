@@ -9,7 +9,7 @@ import 'package:hentai_library/features/comic/domain/thumbnail/thumbnail_event.d
 import 'package:hentai_library/shared/ui/models/comic_cover_source.dart';
 import 'package:hentai_library/shared/ui/models/comic_cover_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/features/comic/di/comic_repository_providers.dart';
 
 part 'comic_cover_providers.g.dart';
 

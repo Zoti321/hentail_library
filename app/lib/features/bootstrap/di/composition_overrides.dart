@@ -9,8 +9,8 @@ import 'package:hentai_library/shared/di/comic_detail_providers.dart';
 import 'package:hentai_library/shared/di/app_navigator_provider.dart';
 import 'package:hentai_library/shared/di/app_shell_providers.dart';
 import 'package:hentai_library/features/comic/public/comic.dart';
+import 'package:hentai_library/features/comic/public/di/comic_repository_providers.dart';
 import 'package:riverpod/misc.dart' show Override;
-import 'package:hentai_library/shared/di/data_providers.dart';
 
 List<Override> bootstrapCompositionOverrides() => <Override>[
   ...bootstrapShellSlotOverrides(),

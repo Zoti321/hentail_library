@@ -21,6 +21,10 @@ List<Override> dataProviderOverrides() => <Override>[
   comicLookupRepositoryProvider.overrideWith(
     (Ref ref) => createComicRepository(),
   ),
+  comicReadLookupPortProvider.overrideWith(
+    (Ref ref) =>
+        createComicReadLookupPort(ref.read(comicLookupRepositoryProvider)),
+  ),
   comicTrashRepositoryProvider.overrideWith(
     (Ref ref) => createComicTrashRepository(),
   ),

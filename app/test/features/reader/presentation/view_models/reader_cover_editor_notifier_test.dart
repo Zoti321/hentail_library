@@ -9,7 +9,7 @@ import 'package:hentai_library/shared/di/series_slot_providers.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:riverpod/riverpod.dart';
 import 'package:test/test.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/features/comic/public/di/comic_repository_providers.dart';
 
 class _RecordingThumbnailRepository implements ComicThumbnailRepository {
   final List<String> calls = <String>[];

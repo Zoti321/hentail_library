@@ -35,9 +35,7 @@ const int _kR12AllowlistRatchet = 41;
 /// 禁止边存量（只减不增）：reader → comic 的 public 读取面在 #488 前已存在，
 /// 归 reader 模块收敛 PR 处理；新边一律失败。
 const Set<String> _kForbiddenBaseline = <String>{
-  'X1|reader|comic|features/reader/application/open_read_session_service.dart|package:hentai_library/features/comic/public/comic_lookup_repository.dart',
   'X1|reader|comic|features/reader/presentation/view_models/reader_cover_editor_notifier.dart|package:hentai_library/features/comic/public.dart',
-  'X1|reader|comic|features/reader/presentation/view_models/series_reader_provider.dart|package:hentai_library/features/comic/public/comic_display_title.dart',
 };
 
 final RegExp _edgeUriRe = RegExp(

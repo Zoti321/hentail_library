@@ -11,6 +11,7 @@
 | **Token** | 能力所有者 `features/<owner>/public/di/**`；`shared/di` 仅跨模块命令 / 全局状态 | 消费方直接 watch owner public token（ADR-0034 §3，#488） |
 | **实现** | owner `features/<id>/di/`（含 codegen 封面图）、`shared/data/events/` | 仅同 feature 或 **bootstrap** overrides |
 | **接线** | `features/bootstrap/di/overrides/` | 仅 bootstrap |
+| **Port 归属判定** | 先判可达性（ADR-0045）：命中禁止边 / public 环 / `shared`·`core` 消费方 → 契约留 `shared/domain/ports/**`、token 留 `shared/di/**`；否则归 owner `domain/` + owner `public/di/**` | 判定顺序先于「谁消费得多」 |
 | **Design System** | `lib/design-system/**`（ADR-0044） | `shared/ui`、任意 feature、`widgetbook` |
 
 新增通用控件先问一句：**是否被 ≥2 个产品模块消费**？否 → 放消费方 `presentation/`；是且业务无关 → `design-system/components/`；是但含业务语义 → 留 `shared/ui/`。`design-system` 只允许依赖 `core/**` 与 `shared/util/**`（门禁 `test/design-system/design_system_boundary_test.dart`，零 allowlist）。
@@ -33,14 +34,14 @@ Consumer **不要** deep import 邻居的 `features/<other>/di/`；模块私有 
 ## 典型用法
 
 - 打开作者详情：`import shared/di/author_detail_providers.dart` → `ref.read(authorDetailPortProvider)`.
-- 库管理 / 删进回收站 / 元数据刷新：`shared/di/library_management_providers.dart`、`library_command_providers.dart`；回收站列表与 purge 持久化经 `shared/di/data_providers.dart` → `comicTrashRepositoryProvider`（bootstrap `createComicTrashRepository()`，FRB `src/rust/api/comic_trash.dart`，仅 owner `features/comic_trash/data/` import）。
-- 应用设置态：`shared/di/app_settings_providers.dart`.
-- 阅读进度写入/恢复（reader）：`shared/di/reading_history_providers.dart` → `readingHistoryCommandPortProvider`；库浏览封面进度 → `readingHistoryProgressPortProvider`；历史页分页/删除仍 `readingHistoryRepoProvider`。
+- 库管理 / 元数据刷新：`shared/di/library_management_providers.dart` → `libraryManagementPortProvider`；元数据刷新命令 token 见 `features/library_admin/public/di/library_admin_state_providers.dart`。删进回收站经 `shared/di/data_providers.dart` → `comicTrashCommandPortProvider`（按 public 环豁免留 shared）；回收站列表与 purge 持久化 token 见 `features/comic_trash/public/di/comic_trash_providers.dart`（FRB `src/rust/api/comic_trash.dart`，仅 owner `features/comic_trash/data/` import）。
+- 应用设置态：`shared/di/app_settings_providers.dart`（ADR-0045 环豁免：app_settings 的 settings page 渲染 reader 偏好控件，token 不能迁回 owner）。
+- 阅读进度写入/恢复（reader）：`features/reading_history/public.dart` → `readingHistoryCommandPortProvider`；库浏览封面进度 → `shared/di/reading_history_providers.dart` 的 `readingHistoryProgressPortProvider`（禁止边豁免）；历史页分页/删除仍 `readingHistoryRepoProvider`（`features/reading_history/public/di/reading_history_repository_providers.dart`）。
 - 元数据备份槽（设置板块 / 库页导出 / 最近备份时间）：`shared/di/settings_slot_providers.dart`、`library_state_providers.dart` → owner `features/metadata_backup/public.dart` + `metadata_backup/di/metadata_backup_shared_state_overrides.dart`（bootstrap）。
 - **MD3E App shell 槽**（ADR-0027）：`shared/di/app_shell_providers.dart` → `appShellFeedbackBelowTitleBarFactoryProvider`、`md3eAppShellNavigationSlotAssemblyProvider`；bootstrap `di/overrides/app_shell_slot_overrides.dart` 注入 owner `library_admin/public.dart`（`app_shell_slot`）与 `app_settings` 诊断横幅。
 - 标签/作者字典投影：`shared/di/library_dictionary_providers.dart` → bootstrap 经 `named_metadata/public.dart` 的 `allTagsProvider` / `allAuthorsProvider`（`metadata_dictionary_shared_state_overrides.dart`）。
-- **Named metadata 仓储 / 表单候选**：`shared/di/data_providers.dart` 的 `authorRepoProvider`、`tagRepoProvider`、`namedFacetManagementRepoProvider`、`parodyRepoProvider` / `characterRepoProvider` → bootstrap `createAuthorRepository()` 等（`features/named_metadata/public.dart`）；Comic 元数据编辑器 / Smart facet 的 facet 候选经窄面 **`features/named_metadata/public/named_metadata_form.dart`**（`NamedFacetFormListing` @ domain + `listNamedFacetForMetadataForm` 便捷函数；实现 `NamedFacetFormListingImpl`）。FRB：`src/rust/api/named_facet/{types,management,form}.dart`、`named_facet_dictionary.dart`（Rust `api/named_facet/` + `named_facet_dictionary.rs`）。
-- 漫画页数（bootstrap 注入）：`shared/di/comic_detail_providers.dart`.
+- **Named metadata 仓储 / 表单候选**：`features/named_metadata/public/di/named_metadata_repository_providers.dart` 的 `authorRepoProvider`、`tagRepoProvider`、`namedFacetManagementRepoProvider`、`parodyRepoProvider` / `characterRepoProvider` → bootstrap `createAuthorRepository()` 等（`features/named_metadata/public.dart`）；Comic 元数据编辑器 / Smart facet 的 facet 候选经窄面 **`features/named_metadata/public/named_metadata_form.dart`**（`NamedFacetFormListing` @ domain + `listNamedFacetForMetadataForm` 便捷函数；实现 `NamedFacetFormListingImpl`）。FRB：`src/rust/api/named_facet/{types,management,form}.dart`、`named_facet_dictionary.dart`（Rust `api/named_facet/` + `named_facet_dictionary.rs`）。
+- 漫画页数（bootstrap 注入）：`shared/di/comic_detail_providers.dart`；漫画 Repository token 见 `features/comic/public/di/comic_repository_providers.dart`；阅读器只经 `shared/di/data_providers.dart` 的 `comicReadLookupPortProvider`（`ComicReadLookupPort`，reader ↛ comic 禁止边豁免）。
 - 封面 **Widget**：`import features/library_browse/public.dart` → `ComicCoverContent` / `seriesCoverSourceProvider`（public export owner `di/` 中的 codegen）.
 - 无 `WidgetRef` 回库浏览：`import features/library_admin/public.dart` → `goCurrentLibraryBrowseFromContext`.
 

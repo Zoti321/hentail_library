@@ -65,10 +65,9 @@ Feature 内代码应 **import owner `domain/`**（`library_browse` 内按 [`libr
 
 - `models/entity/**`（Author / AuthorDetail / Tag 等；**`Comic` 已于 #489 迁出**（ADR-0041），**`Series` 已于 #490 迁出**（ADR-0042））、`models/enums.dart`
 - `models/value_objects/page_request.dart`、`paged_result.dart`、`page_jump.dart`
-- 与 catalog 强绑定的 form / pick / meta VO：`models/value_objects/form/library_form.dart`、`library_author_pick.dart`、`library_tag_pick.dart`、`comic_language.dart`
+- 与 catalog 强绑定的 pick / meta VO：`models/value_objects/form/library_author_pick.dart`、`library_tag_pick.dart`、`comic_language.dart`；`library_form.dart` 已按生产者拥有归 `features/library_admin/domain/value_objects/`（#504）
 - `reading/series_reading_context.dart`（类型；读口 `SeriesReadingContextPort` @ shared/di，实现 @ series）
-- `library/scan_interval.dart`、`library/metadata_refresh_types.dart`、`library/comic_metadata_bulk_patch_result.dart`（库扫描/批量结果；shared UI toast 与 `LocalLibrary` 共用）
-- `models/managed_named_facet_kind.dart`（metadata 管理 Tab 枚举）
+- `library/scan_interval.dart`、`library/metadata_refresh_types.dart`（库扫描 / 元数据刷新类型；shared UI toast 与 `LocalLibrary` 共用——ADR-0045 shared 消费方豁免）；批量补丁类型已归 `features/library_admin/domain/`（#513）
 - `thumbnail/**`
 
 ## 契约仍定义在 `shared/domain`（未 owner 化）
@@ -83,6 +82,9 @@ UI / 编排命令类型；发现面经 owner `public/` re-export（ADR-0034）�
 - `ports/series_item_sort_port.dart`（ADR-0042）
 - `ports/reader_launch_port.dart`（旧名 `read_session_launch_port`；ADR-0038）
 - `library/comic_detail_return_series_port.dart`（实现 @ `comic`）
+- `ports/reading_history_progress_port.dart`（禁止边豁免）
+- `ports/comic_read_lookup_port.dart`（reader ↛ comic 禁止边豁免；实现 @ comic 适配器）
+- `ports/library_reorder_mode_port.dart`（shared 消费方豁免：`shared/domain/catalog/selection/`）
 
 ## 领域事件（ADR-0039）
 

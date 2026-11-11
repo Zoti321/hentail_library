@@ -10,7 +10,7 @@ import 'package:hentai_library/shared/domain/reading/series_reading_context.dart
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:test/test.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/features/comic/public/di/comic_repository_providers.dart';
 
 class _FakeLibraryRevision extends LibraryRevisionNotifier {
   @override

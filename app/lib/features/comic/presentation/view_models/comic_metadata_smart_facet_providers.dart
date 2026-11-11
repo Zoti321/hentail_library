@@ -8,7 +8,7 @@ import 'package:hentai_library/shared/di/series_reading_context_providers.dart';
 import 'package:hentai_library/shared/domain/reading/series_reading_context.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/features/comic/di/comic_repository_providers.dart';
 
 /// Scope for Smart facet match on Comic metadata form.
 typedef ComicMetadataSmartFacetScope = ({

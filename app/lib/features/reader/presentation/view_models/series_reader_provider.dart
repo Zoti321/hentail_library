@@ -2,7 +2,6 @@ import 'package:hentai_library/shared/domain/reading/series_reading_context.dart
 import 'package:hentai_library/features/reader/presentation/routing/reader_route_context.dart';
 import 'package:hentai_library/features/reading_history/public.dart';
 import 'package:hentai_library/shared/di/series_reading_context_providers.dart';
-import 'package:hentai_library/features/comic/public/comic_display_title.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 
@@ -37,10 +36,9 @@ Future<List<ReaderComicListItem>> _buildNavItemsFromContext(
   SeriesReadingContext context,
 ) async {
   final List<String> orderedIds = context.orderedComicIds;
-  final Map<String, String> titlesById = await resolveComicTitlesForDisplay(
-    ref.read(comicLookupRepositoryProvider),
-    orderedIds,
-  );
+  final Map<String, String> titlesById = await ref
+      .read(comicReadLookupPortProvider)
+      .displayTitlesByIds(orderedIds);
   return <ReaderComicListItem>[
     for (int index = 0; index < orderedIds.length; index++)
       ReaderComicListItem(
@@ -70,13 +68,9 @@ Future<ReadSessionContextData> readSessionContextForReader(
         );
 
   if (seriesContext == null) {
-    final comic = await ref
-        .read(comicLookupRepositoryProvider)
-        .findById(normalizedComicId);
-    final String fallbackTitle = comicTitleFallbackForDisplay(
-      normalizedComicId,
-    );
-    final String title = comic?.title ?? fallbackTitle;
+    final String title = await ref
+        .read(comicReadLookupPortProvider)
+        .displayTitleById(normalizedComicId);
     return ReadSessionContextData(
       seriesId: null,
       navContext: buildReaderNavContextData(

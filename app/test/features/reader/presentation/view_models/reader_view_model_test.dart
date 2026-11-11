@@ -30,6 +30,7 @@ import 'package:riverpod/misc.dart' show Override;
 
 import '../../../../support/fakes/settings_test_fakes.dart';
 
+import 'package:hentai_library/features/comic/public/di/comic_read_lookup_adapter.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 
 const String _comicId = 'reader-controller-comic';
@@ -149,7 +150,7 @@ Override _stubCoordinatorOverride() {
   return readSessionApplicationServiceProvider.overrideWithValue(
     ReadSessionApplicationService(
       sessionService: OpenReadSessionService(
-        comicRepo: _UnusedComicLookup(),
+        comicLookup: createComicReadLookupPort(_UnusedComicLookup()),
         pageSource: _UnusedPageSource(),
         readingHistoryCommands: history,
         sessionPort: _UnusedSessionPort(),

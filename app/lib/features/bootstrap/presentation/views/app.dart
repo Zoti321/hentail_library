@@ -3,11 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/util/app_locale.dart';
-import 'package:hentai_library/core/util/app_theme_mode.dart';
 import 'package:hentai_library/core/util/app_window_title.dart';
 import 'package:hentai_library/design-system/design_system.dart';
-import 'package:hentai_library/shared/di/app_settings_providers.dart';
 import 'package:hentai_library/shared/di/domain_event_revisions.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_ui/material_ui.dart' as material_ui;
@@ -17,6 +14,7 @@ import 'package:hentai_library/features/metadata_backup/public.dart';
 import 'package:hentai_library/features/bootstrap/presentation/view_models/app_startup_coordinator_notifier.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/routing/app_router.dart';
 import 'package:riverpod/misc.dart' show Override;
+import 'package:hentai_library/shared/di/app_settings_providers.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key, this.overrides = const <Override>[]});

@@ -71,6 +71,8 @@ Rust `core/` 仍为扫描、sync 与 catalog 谓词真值（ADR-0002）；Dart �
 
 未满足上述条件时，**禁止**仅为目录整齐而批量移动内核文件（Epic #446 收尾时亦不得默认迁移内核）。
 
+> **书面判定（2026-11-11，#503 / ADR-0045）**：四条触发条件中只有第 1 条（消费者收缩）已满足，第 2–4 条均不满足，故 **不启动**「内核整体迁出 shared」专项。`metadata_refresh_types.dart` 与 `library_management_port.dart` 保留 shared 属 ADR-0045 的「shared 消费方豁免」，**不是遗留**；series 的 Slot / Port 终态经核查只跨 comic / series、且 ADR-0036 禁止边已定案，**保持现状**，不另立票。
+
 ### 5. Gate 与工程影响
 
 | 机制 | 内核保留 shared 时的预期 |

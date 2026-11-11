@@ -12,10 +12,8 @@ import 'package:hentai_library/features/bootstrap/presentation/views/application
 import 'package:hentai_library/features/bootstrap/presentation/views/routing/shared_content_routes.dart';
 import 'package:hentai_library/features/comic_trash/public.dart';
 import 'package:hentai_library/shared/di/browse_library_scope_providers.dart';
+import 'package:hentai_library/shared/ui/navigation/app_root_navigator_key.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-
-final GlobalKey<NavigatorState> appRootNavigatorKey =
-    GlobalKey<NavigatorState>();
 
 String? _librariesRedirect(BuildContext context, GoRouterState state) {
   return AppRoutes.legacyRedirectPath(state.uri.path);

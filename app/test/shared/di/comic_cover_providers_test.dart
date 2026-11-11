@@ -11,7 +11,7 @@ import 'package:hentai_library/shared/ui/models/comic_cover_state.dart';
 import 'package:logging/logging.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:test/test.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/features/comic/public/di/comic_repository_providers.dart';
 
 void main() {
   late _FakeThumbnailRepo thumbnailRepo;
