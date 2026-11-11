@@ -1,4 +1,4 @@
-export 'package:hentai_library/shared/domain/library/comic_metadata_bulk_patch_result.dart';
+export 'package:hentai_library/features/library_admin/domain/comic_metadata_bulk_patch_result.dart';
 
 /// 批量元数据 patch 命令 DTO（跨 Port 边界；实现仍在 library_admin）。
 

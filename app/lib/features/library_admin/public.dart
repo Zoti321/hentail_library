@@ -1,6 +1,7 @@
 /// library_admin 模块 public API（Nest exports 面，ADR-0034）。
 library;
 
+export 'public/di/library_admin_state_providers.dart';
 export 'public/di/library_management_port_factory.dart';
 export 'public/di/library_data_factories.dart';
 export 'public/di/library_admin_shared_state_overrides.dart';

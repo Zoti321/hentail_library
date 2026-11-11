@@ -5,11 +5,10 @@ import 'package:hentai_library/shared/domain/models/entity/library/local_library
 import 'package:hentai_library/features/comic/domain/repositories/comic_lookup_repository.dart';
 import 'package:hentai_library/features/comic/presentation/view_models/smart_facet_match_preference_notifier.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
-import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/shared/di/series_reading_context_providers.dart';
 import 'package:hentai_library/shared/domain/reading/series_reading_context.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:hentai_library/shared/domain/library/libraries_state.dart';
+import 'package:hentai_library/features/library_admin/public.dart';
 
 /// Scope for Smart facet match on Comic metadata form.
 typedef ComicMetadataSmartFacetScope = ({

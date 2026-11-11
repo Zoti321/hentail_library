@@ -14,7 +14,6 @@
   "R13|shared|home|shared/di/home_library_stats_providers.dart|package:hentai_library/features/home/di/home_library_stats_stream.dart",
   "R13|shared|library_admin|shared/di/data_providers.dart|package:hentai_library/features/library_admin/domain/library_repository.dart",
   "R13|shared|library_admin|shared/di/library_command_providers.dart|package:hentai_library/features/library_admin/domain/library_metadata_refresh_command_port.dart",
-  "R13|shared|library_admin|shared/di/library_state_providers.dart|package:hentai_library/features/library_admin/domain/comic_metadata_bulk_edit_command_port.dart",
   "R13|shared|library_admin|shared/di/library_state_providers.dart|package:hentai_library/features/library_admin/domain/libraries_port.dart",
   "R13|shared|library_admin|shared/di/library_state_providers.dart|package:hentai_library/features/library_admin/domain/library_reorder_mode_port.dart",
   "R13|shared|library_admin|shared/di/library_state_providers.dart|package:hentai_library/features/library_admin/domain/library_scan_command_port.dart",

@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/domain/library/comic_metadata_bulk_patch.dart';
+import 'package:hentai_library/features/library_admin/domain/comic_metadata_bulk_patch.dart';
 
 /// Domain port for bulk metadata patch (FRB implementation lives in `data/`).
 abstract class ComicMetadataBulkPatchPort {

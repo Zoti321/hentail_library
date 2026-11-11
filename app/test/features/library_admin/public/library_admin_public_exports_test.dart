@@ -1,6 +1,6 @@
 import 'package:test/test.dart';
 import 'package:hentai_library/features/library_admin/domain/libraries_port.dart';
-import 'package:hentai_library/shared/domain/library/libraries_state.dart';
+import 'package:hentai_library/features/library_admin/domain/libraries_state.dart';
 
 void main() {
   test('library_admin domain libraries types exist', () {
