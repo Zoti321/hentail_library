@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/reader/presentation/input/reader_tap_zone.dart';
 import 'package:hentai_library/features/reader/presentation/reader_input.dart';
@@ -28,6 +27,7 @@ import 'package:hentai_library/features/reader/presentation/patterns/reader/read
 import 'package:hentai_library/features/reader/domain/auto_play_interval.dart';
 import 'package:hentai_library/features/reader/domain/reading_mode.dart';
 import 'package:hentai_library/shared/di/app_settings_providers.dart';
+import 'package:hentai_library/shared/ui/navigation/app_navigator_context.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -211,7 +211,7 @@ class ReaderPage extends HookConsumerWidget {
     Future<void> exitReader() async {
       final ReaderExitIntent intent = await viewModel.prepareExitReader(
         routeContext: routeContext,
-        canPop: GoRouter.of(context).canPop(),
+        canPop: appNavigatorOf(context).canPop(),
       );
       applyReaderExitIntent(context, intent);
     }

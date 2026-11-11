@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/ui/navigation/app_navigator_context.dart';
 import 'package:hentai_library/shared/ui/navigation/library_browse_navigation.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/ui/widgets/actions/ghost_button.dart';
@@ -12,7 +12,7 @@ typedef DetailBackLocationResolver = String? Function(BuildContext context);
 
 /// 漫画与系列详情共用的返回顶栏（含边缘状态页）。
 ///
-/// 只依赖路由 + [DetailBackLocationResolver]；owner 私有导航语义不经 shared。
+/// 只下达导航意图 + [DetailBackLocationResolver]；owner 私有导航语义不经 shared。
 class DetailBackHeader extends StatelessWidget {
   const DetailBackHeader({super.key, this.locationResolver});
 
@@ -67,13 +67,14 @@ class DetailBackHeader extends StatelessWidget {
     BuildContext context, {
     DetailBackLocationResolver? locationResolver,
   }) {
-    if (context.canPop()) {
-      context.pop();
+    final navigator = appNavigatorOf(context);
+    if (navigator.canPop()) {
+      navigator.pop();
       return;
     }
     final String? resolved = locationResolver?.call(context);
     if (resolved != null && resolved.isNotEmpty) {
-      context.go(resolved);
+      navigator.goLocation(resolved);
       return;
     }
     goDefaultLibraryBrowseFromContext(context);

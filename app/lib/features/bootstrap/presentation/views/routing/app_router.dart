@@ -6,7 +6,7 @@ import 'package:hentai_library/features/library_browse/public.dart';
 import 'package:hentai_library/features/app_settings/public.dart';
 import 'package:hentai_library/features/home/public.dart';
 import 'package:hentai_library/features/reading_history/public.dart';
-import 'package:hentai_library/core/constants/libraries_routes.dart';
+import 'package:hentai_library/core/constants/app_routes.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/application_shell.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/routing/shared_content_routes.dart';
 import 'package:hentai_library/features/comic_trash/public.dart';
@@ -17,12 +17,12 @@ final GlobalKey<NavigatorState> appRootNavigatorKey =
     GlobalKey<NavigatorState>();
 
 String? _librariesRedirect(BuildContext context, GoRouterState state) {
-  return LibrariesRoutes.redirectPath(locationPath: state.uri.path);
+  return AppRoutes.legacyRedirectPath(state.uri.path);
 }
 
 final GoRouter appRouter = GoRouter(
   navigatorKey: appRootNavigatorKey,
-  initialLocation: '/home',
+  initialLocation: AppRoutes.home,
   routes: <RouteBase>[
     ShellRoute(
       builder: (BuildContext context, GoRouterState state, Widget child) {
@@ -30,23 +30,24 @@ final GoRouter appRouter = GoRouter(
       },
       routes: <RouteBase>[
         GoRoute(
-          path: '/home',
-          name: '主页',
+          path: AppRoutes.home,
+          name: AppRoutes.homeName,
           pageBuilder: (BuildContext context, GoRouterState state) =>
               buildShellNavPage(state: state, child: const HomePage()),
         ),
         GoRoute(
-          path: LibrariesRoutes.root,
+          path: AppRoutes.libraries,
           redirect: _librariesRedirect,
           routes: <RouteBase>[
             // Legacy bookmark: never treat `all` as a library id.
             GoRoute(
-              path: LibrariesRoutes.legacyAllSegment,
-              redirect: (BuildContext context, GoRouterState state) => '/home',
+              path: AppRoutes.legacyAllSegment,
+              redirect: (BuildContext context, GoRouterState state) =>
+                  AppRoutes.home,
             ),
             GoRoute(
               path: ':libraryId',
-              name: '漫画库',
+              name: AppRoutes.libraryName,
               pageBuilder: (BuildContext context, GoRouterState state) {
                 final String libraryId =
                     state.pathParameters['libraryId'] ?? '';
@@ -59,25 +60,26 @@ final GoRouter appRouter = GoRouter(
           ],
         ),
         GoRoute(
-          path: '/local',
-          name: '本地漫画',
-          redirect: (BuildContext context, GoRouterState state) => '/home',
+          path: AppRoutes.local,
+          name: AppRoutes.localName,
+          redirect: (BuildContext context, GoRouterState state) =>
+              AppRoutes.home,
         ),
         GoRoute(
-          path: '/history',
-          name: '历史记录',
+          path: AppRoutes.history,
+          name: AppRoutes.historyName,
           pageBuilder: (BuildContext context, GoRouterState state) =>
               buildShellNavPage(state: state, child: const HistoryPage()),
         ),
         GoRoute(
-          path: '/trash',
-          name: '已删除',
+          path: AppRoutes.trash,
+          name: AppRoutes.trashName,
           pageBuilder: (BuildContext context, GoRouterState state) =>
               buildShellNavPage(state: state, child: const TrashPage()),
         ),
         GoRoute(
-          path: '/settings',
-          name: '设置',
+          path: AppRoutes.settings,
+          name: AppRoutes.settingsName,
           pageBuilder: (BuildContext context, GoRouterState state) =>
               buildShellNavPage(state: state, child: const SettingsPage()),
         ),

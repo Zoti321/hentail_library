@@ -1,3 +1,4 @@
+import 'package:hentai_library/core/constants/app_routes.dart';
 import 'package:hentai_library/features/reader/application/open_reader_args.dart';
 import 'package:hentai_library/features/reader/application/read_session_application_service.dart';
 import 'package:hentai_library/features/reader/di/session_providers.dart';
@@ -64,11 +65,9 @@ class ReaderSeriesNavigation extends _$ReaderSeriesNavigation {
       // warm-open 失败不阻断切卷导航。
     }
     return ReaderReplaceReaderRouteIntent(
-      Uri(
-        path: '/reader',
-        queryParameters: ReaderRouteArgs.fromSession(plan.nextSession)
-            .toQueryParameters(),
-      ).toString(),
+      AppRoutes.readerLocation(
+        ReaderRouteArgs.fromSession(plan.nextSession).toQueryParameters(),
+      ),
     );
   }
 }

@@ -6,7 +6,7 @@ import 'package:hentai_library/shared/domain/library/home_page_counts.dart';
 import 'package:hentai_library/shared/domain/library/reading_activity_stats.dart';
 import 'package:hentai_library/shared/ui/layout/app_shell_navigation.dart';
 import 'package:hentai_library/shared/ui/patterns/home/home_aggregate_counts.dart';
-import 'package:go_router/go_router.dart';
+import 'package:hentai_library/shared/di/app_navigator_provider.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 export 'package:hentai_library/features/home/presentation/views/home/home_layout.dart';
@@ -52,12 +52,16 @@ class HomePage extends ConsumerWidget {
       activityStats: activityStats,
       onOpenNavigation: appShellPageNavigationOpener(context),
       // 与历史 / 垃圾桶同款：push + Shell fade-through，返回可走 reverse。
-      onOpenHistory: () => context.push('/history'),
-      onOpenTrash: () => context.push('/trash'),
-      onOpenAuthors: () => context.push('/metadata?tab=authors'),
-      onOpenParodies: () => context.push('/metadata?tab=parodies'),
-      onOpenCharacters: () => context.push('/metadata?tab=characters'),
-      onOpenTags: () => context.push('/metadata?tab=tags'),
+      onOpenHistory: () => ref.read(appNavigatorProvider).pushHistory(),
+      onOpenTrash: () => ref.read(appNavigatorProvider).pushTrash(),
+      onOpenAuthors: () =>
+          ref.read(appNavigatorProvider).pushMetadata(tab: 'authors'),
+      onOpenParodies: () =>
+          ref.read(appNavigatorProvider).pushMetadata(tab: 'parodies'),
+      onOpenCharacters: () =>
+          ref.read(appNavigatorProvider).pushMetadata(tab: 'characters'),
+      onOpenTags: () =>
+          ref.read(appNavigatorProvider).pushMetadata(tab: 'tags'),
       libraryManagementSection: const HomeLibraryManagementPanel(),
     );
   }

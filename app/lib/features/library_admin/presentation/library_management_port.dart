@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
+import 'package:hentai_library/core/constants/app_routes.dart';
 import 'package:hentai_library/core/constants/libraries_routes.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/home_library_delete_confirm_dialog.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/library/library_form_dialog.dart';
+import 'package:hentai_library/shared/di/app_navigator_provider.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
@@ -64,9 +65,9 @@ class _LibraryManagementAdapter implements LibraryManagementPort {
       return;
     }
     final String deletedId = library.libraryId;
-    final String path = GoRouterState.of(context).uri.path;
+    final String path = _ref.read(appNavigatorProvider).currentPath();
     final bool wasViewing =
-        LibrariesRoutes.libraryIdFromPath(path) == deletedId;
+        AppRoutes.libraryIdFromPath(path) == deletedId;
 
     await _ref.read(librariesPortProvider).deleteLibrary(deletedId);
     if (!context.mounted) {
@@ -92,7 +93,7 @@ class _LibraryManagementAdapter implements LibraryManagementPort {
           .map((LocalLibrary library) => library.libraryId)
           .toList(),
     );
-    context.go(nav.goPath);
+    _ref.read(appNavigatorProvider).goLocation(nav.goPath);
   }
 
   @override
@@ -101,13 +102,13 @@ class _LibraryManagementAdapter implements LibraryManagementPort {
     if (!context.mounted) {
       return;
     }
-    context.go(LibrariesRoutes.library(libraryId));
+    _ref.read(appNavigatorProvider).goLibrary(libraryId);
   }
 
   @override
   void goDefaultLibraryBrowse(BuildContext context) {
     _ref.read(comicDetailReturnSeriesPortProvider).clear();
-    context.go('/home');
+    _ref.read(appNavigatorProvider).goHome();
   }
 
   @override
@@ -118,7 +119,7 @@ class _LibraryManagementAdapter implements LibraryManagementPort {
     bool navigate = false,
   }) async {
     if (navigate && context.mounted) {
-      context.go(LibrariesRoutes.library(libraryId));
+      _ref.read(appNavigatorProvider).goLibrary(libraryId);
     }
     await _ref
         .read(libraryScanCommandPortProvider)

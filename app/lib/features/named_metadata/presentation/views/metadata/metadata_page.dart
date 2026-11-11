@@ -6,7 +6,7 @@ import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
+import 'package:hentai_library/core/constants/app_routes.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/named_metadata/presentation/view_models/named_facet_management_view_model.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata/metadata_dialogs.dart';
@@ -24,6 +24,7 @@ import 'package:hentai_library/shared/ui/layout/app_shell_navigation.dart';
 import 'package:hentai_library/shared/ui/motion/peer_content_transition.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/page_header_back_button.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
+import 'package:hentai_library/shared/di/app_navigator_provider.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -66,9 +67,9 @@ class _MetadataManagementPageState
 
   @override
   Widget build(BuildContext context) {
-    final String? tabParam = GoRouterState.of(context)
-        .uri
-        .queryParameters['tab'];
+    final String? tabParam = ref
+        .read(appNavigatorProvider)
+        .queryParameter(AppRoutes.metadataTabQueryKey);
     final int queryIndex = _tabIndexFromQuery(tabParam);
     // 首页统计卡等深链改 query 时，同步本地 tab（保留切换方向）。
     if (_selectedTabIndex != queryIndex) {
@@ -271,7 +272,7 @@ class _MetadataManagementPageState
     });
     _syncSearchFieldToKind(metadataTabKind(index));
     // replace：仅改 query，保留首页 push 进来的栈，返回仍可 pop。
-    context.replace('/metadata?tab=${_tabQueryForIndex(index)}');
+    ref.read(appNavigatorProvider).replaceMetadataTab(_tabQueryForIndex(index));
     _scrollToContentTop();
   }
 

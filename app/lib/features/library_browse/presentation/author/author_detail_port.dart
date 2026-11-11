@@ -1,8 +1,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hentai_library/features/library_browse/presentation/author/view_models/author_detail_notifier.dart';
 import 'package:hentai_library/features/library_browse/public.dart';
+import 'package:hentai_library/shared/ui/navigation/app_navigator_context.dart';
 
 /// library_browse 对 [AuthorDetailPort] 的实现（#292）。
 ///
@@ -17,7 +17,7 @@ class _AuthorDetailAdapter implements AuthorDetailPort {
     if (!context.mounted) {
       return;
     }
-    GoRouter.of(context).push('/author/$authorId');
+    appNavigatorOf(context).pushAuthorDetail(authorId);
   }
 
   @override
@@ -28,7 +28,7 @@ class _AuthorDetailAdapter implements AuthorDetailPort {
     if (authorId == null || !context.mounted) {
       return;
     }
-    GoRouter.of(context).push('/author/$authorId');
+    appNavigatorOf(context).pushAuthorDetail(authorId);
   }
 }
 

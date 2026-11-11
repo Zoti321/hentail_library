@@ -1,11 +1,11 @@
 import 'package:hentai_library/shared/di/library_management_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
+import 'package:hentai_library/core/constants/app_routes.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/navigation/app_navigator_context.dart';
 import 'package:hentai_library/shared/ui/shell/shell_nav_item.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
-import 'package:hentai_library/core/constants/libraries_routes.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 abstract final class AppNavigation {
@@ -30,15 +30,15 @@ abstract final class AppNavigation {
 
   /// 与 MD3E rail 导航 id 对应；库 flyout 选库不经此函数。
   static String activeNavIdForPath(String path) {
-    if (LibrariesRoutes.libraryIdFromPath(path) != null) {
+    if (AppRoutes.libraryIdFromPath(path) != null) {
       return '';
     }
     switch (path) {
-      case '/home':
+      case AppRoutes.home:
         return navIdHome;
-      case '/local':
+      case AppRoutes.local:
         return '';
-      case '/metadata':
+      case AppRoutes.metadata:
       case '/tags':
       case '/authors':
       case '/parodies':
@@ -46,14 +46,14 @@ abstract final class AppNavigation {
         return navIdMetadata;
       case '/series':
         return '';
-      case '/history':
+      case AppRoutes.history:
         return navIdHistory;
-      case '/trash':
+      case AppRoutes.trash:
         return navIdTrash;
-      case '/settings':
+      case AppRoutes.settings:
         return navIdSettings;
       default:
-        if (path.startsWith('/comic/') || path.startsWith('/series/')) {
+        if (AppRoutes.isCatalogDetailPath(path)) {
           return '';
         }
         return navIdHome;
@@ -62,9 +62,10 @@ abstract final class AppNavigation {
 
   static void goToNavId(BuildContext context, String id, {WidgetRef? ref}) {
     _clearComicDetailReturnSeries(context);
+    final navigator = appNavigatorOf(context);
     switch (id) {
       case navIdHome:
-        context.go('/home');
+        navigator.goHome();
         break;
       case navIdLibrary:
         if (ref != null) {
@@ -72,20 +73,20 @@ abstract final class AppNavigation {
               .read(libraryManagementPortProvider)
               .goDefaultLibraryBrowse(context);
         } else {
-          context.go('/home');
+          navigator.goHome();
         }
         break;
       case navIdMetadata:
-        context.go('/metadata');
+        navigator.goMetadata();
         break;
       case navIdHistory:
-        context.go('/history');
+        navigator.goHistory();
         break;
       case navIdTrash:
-        context.go('/trash');
+        navigator.goTrash();
         break;
       case navIdSettings:
-        context.go('/settings');
+        navigator.goSettings();
         break;
       default:
         break;

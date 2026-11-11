@@ -6,6 +6,7 @@ import 'package:hentai_library/shared/ui/motion/desktop_page_transition.dart';
 import 'package:hentai_library/shared/ui/motion/motion.dart';
 import 'package:hentai_library/shared/ui/motion/shared_axis_route.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
+import 'package:hentai_library/core/constants/app_routes.dart';
 import 'package:hentai_library/features/comic/public.dart';
 import 'package:hentai_library/features/library_browse/public.dart';
 import 'package:hentai_library/features/series/public.dart';
@@ -40,8 +41,8 @@ List<RouteBase> buildSharedContentRoutes({
       seriesDetailBuilder ?? buildSharedSeriesDetailPage;
   return <RouteBase>[
     GoRoute(
-      path: '/comic/:id',
-      name: '漫画详情',
+      path: '/${AppRoutes.comicSegment}/:id',
+      name: AppRoutes.comicDetailName,
       pageBuilder: (BuildContext context, GoRouterState state) {
         final String comicId = Uri.decodeComponent(state.pathParameters['id']!);
         return buildCatalogDetailPage(
@@ -53,11 +54,11 @@ List<RouteBase> buildSharedContentRoutes({
     // Saved path / Selected Paths 已退役（ADR-0014）；旧深链回 Home。
     GoRoute(
       path: '/paths',
-      redirect: (BuildContext context, GoRouterState state) => '/home',
+      redirect: (BuildContext context, GoRouterState state) => AppRoutes.home,
     ),
     GoRoute(
-      path: '/metadata',
-      name: '管理',
+      path: AppRoutes.metadata,
+      name: AppRoutes.metadataName,
       pageBuilder: (BuildContext context, GoRouterState state) =>
           buildShellNavPage(
             state: state,
@@ -67,26 +68,26 @@ List<RouteBase> buildSharedContentRoutes({
     GoRoute(
       path: '/tags',
       redirect: (BuildContext context, GoRouterState state) =>
-          '/metadata?tab=tags',
+          AppRoutes.metadataTab('tags'),
     ),
     GoRoute(
       path: '/authors',
       redirect: (BuildContext context, GoRouterState state) =>
-          '/metadata?tab=authors',
+          AppRoutes.metadataTab('authors'),
     ),
     GoRoute(
       path: '/parodies',
       redirect: (BuildContext context, GoRouterState state) =>
-          '/metadata?tab=parodies',
+          AppRoutes.metadataTab('parodies'),
     ),
     GoRoute(
       path: '/characters',
       redirect: (BuildContext context, GoRouterState state) =>
-          '/metadata?tab=characters',
+          AppRoutes.metadataTab('characters'),
     ),
     GoRoute(
-      path: '/author/:id',
-      name: '作者详情',
+      path: '/${AppRoutes.authorSegment}/:id',
+      name: AppRoutes.authorDetailName,
       pageBuilder: (BuildContext context, GoRouterState state) {
         final int? authorId = int.tryParse(state.pathParameters['id'] ?? '');
         return buildDesktopFadeThroughPage(
@@ -98,8 +99,8 @@ List<RouteBase> buildSharedContentRoutes({
       },
     ),
     GoRoute(
-      path: '/series/:id',
-      name: '系列详情',
+      path: '/${AppRoutes.seriesSegment}/:id',
+      name: AppRoutes.seriesDetailName,
       pageBuilder: (BuildContext context, GoRouterState state) {
         final String seriesId = Uri.decodeComponent(
           state.pathParameters['id']!,
@@ -111,8 +112,8 @@ List<RouteBase> buildSharedContentRoutes({
       },
     ),
     GoRoute(
-      path: '/series',
-      name: '页面不存在',
+      path: '/${AppRoutes.seriesSegment}',
+      name: AppRoutes.notFoundName,
       pageBuilder: (BuildContext context, GoRouterState state) =>
           buildDesktopFadeThroughPage(
             state: state,
@@ -120,8 +121,8 @@ List<RouteBase> buildSharedContentRoutes({
           ),
     ),
     GoRoute(
-      path: '/reader',
-      name: ReaderRouteArgs.readerRouteName,
+      path: AppRoutes.reader,
+      name: AppRoutes.readerName,
       pageBuilder: (BuildContext context, GoRouterState state) {
         final ReaderRouteArgs args = ReaderRouteArgs.fromQuery(
           state.uri.queryParameters,

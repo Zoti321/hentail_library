@@ -121,3 +121,4 @@ Accepted | Superseded by ADR-000N | Deprecated
 | [0040](./0040-record-projections-for-cross-module-readonly.md) | 跨模块只读投影使用匿名 record | Accepted |
 | [0041](./0041-comic-entity-ownership.md) | Comic 实体迁入漫画模块（Dart 投影型实体，#489） | Accepted |
 | [0042](./0042-series-entity-ownership-and-cross-module-contracts.md) | Series 实体迁入系列模块与跨模块契约（ACL / Slot / data 映射，#490） | Accepted |
+| [0043](./0043-navigation-routing-decoupling.md) | 导航与路由解耦（抽象导航契约 + 集中式路由表） | Accepted |

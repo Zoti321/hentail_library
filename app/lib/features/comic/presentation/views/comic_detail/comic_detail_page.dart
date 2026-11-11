@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
@@ -11,7 +10,6 @@ import 'package:hentai_library/features/comic/presentation/views/comic_detail/co
 import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_cover.dart';
 import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_entry.dart';
 import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_layout.dart';
-import 'package:hentai_library/shared/ui/motion/catalog_detail_page.dart';
 import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
 import 'package:hentai_library/shared/di/library_command_providers.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
@@ -27,6 +25,7 @@ import 'package:hentai_library/features/comic/public/ui/comic_metadata_edit_pres
 import 'package:hentai_library/shared/di/author_detail_providers.dart';
 import 'package:hentai_library/shared/ui/catalog/detail/detail_back_header.dart';
 import 'package:hentai_library/shared/ui/catalog/detail/detail_status_scaffold.dart';
+import 'package:hentai_library/shared/ui/navigation/app_navigator_context.dart';
 import 'package:hentai_library/shared/ui/navigation/library_browse_navigation.dart';
 
 export 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_layout.dart';
@@ -45,7 +44,7 @@ class ComicDetailPage extends ConsumerWidget {
     );
 
     return PopScope(
-      canPop: context.canPop(),
+      canPop: appNavigatorOf(context).canPop(),
       onPopInvokedWithResult: (bool didPop, Object? result) {
         if (didPop) {
           return;
@@ -152,8 +151,9 @@ class _ComicDetailContent extends ConsumerWidget {
               if (!context.mounted) {
                 return;
               }
-              if (context.canPop()) {
-                context.pop();
+              final navigator = appNavigatorOf(context);
+              if (navigator.canPop()) {
+                navigator.pop();
               } else {
                 goDefaultLibraryBrowseFromContext(context);
               }
@@ -174,9 +174,9 @@ class _ComicDetailContent extends ConsumerWidget {
         final int current = seriesNav?.currentIndex ?? 0;
         // 同级切卷：只替换当前漫画详情，保留库浏览 → 系列详情 栈。
         // 勿用 go：会清空底层路由，系列返回只能落到 /home。
-        context.pushReplacement(
-          '/comic/${Uri.encodeComponent(items[index].comicId)}',
-          extra: CatalogSeriesNavExtra(reverse: index < current),
+        appNavigatorOf(context).replaceComicDetail(
+          items[index].comicId,
+          reverse: index < current,
         );
       },
     );

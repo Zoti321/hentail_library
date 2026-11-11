@@ -5,7 +5,7 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/comic/public.dart';
 import 'package:hentai_library/features/reading_history/presentation/models/history_card_item.dart';
 import 'package:hentai_library/features/reading_history/presentation/widgets/history_list_progress.dart';
-import 'package:hentai_library/shared/di/app_router_provider.dart';
+import 'package:hentai_library/shared/di/app_navigator_provider.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/shared/di/reader_launch_providers.dart';
 import 'package:hentai_library/shared/ui/widgets/history/reading_history_list_item.dart';
@@ -27,9 +27,7 @@ class HistoryListItem extends ConsumerWidget {
 
   void _openComicDetail(WidgetRef ref) {
     ref.read(comicDetailReturnSeriesPortProvider).clear();
-    ref
-        .read(appRouterProvider)
-        .push('/comic/${Uri.encodeComponent(item.comicId)}');
+    ref.read(appNavigatorProvider).pushComicDetail(item.comicId);
   }
 
   @override

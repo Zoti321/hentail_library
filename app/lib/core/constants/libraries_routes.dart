@@ -1,37 +1,26 @@
+import 'package:hentai_library/core/constants/app_routes.dart';
+
 /// Library browse routes (Komga-like `/libraries/:id`).
+///
+/// 路径真源在 [AppRoutes]；本类保留 library 语义的便捷入口。
 abstract final class LibrariesRoutes {
-  static const String root = '/libraries';
+  static const String root = AppRoutes.libraries;
 
   /// Legacy aggregate-browse path; always redirect away (not a real Library).
-  static const String legacyAll = '/libraries/all';
-  static const String legacyAllSegment = 'all';
+  static const String legacyAll = AppRoutes.legacyAll;
+  static const String legacyAllSegment = AppRoutes.legacyAllSegment;
 
-  static String library(String libraryId) => '$root/$libraryId';
+  static String library(String libraryId) => AppRoutes.library(libraryId);
 
   /// Redirect target for legacy `/local`, bare `/libraries`, and `/libraries/all`.
-  static String? redirectPath({required String locationPath}) {
-    if (locationPath == '/local' ||
-        locationPath == root ||
-        locationPath == legacyAll) {
-      return '/home';
-    }
-    return null;
-  }
+  static String? redirectPath({required String locationPath}) =>
+      AppRoutes.legacyRedirectPath(locationPath);
 
-  static bool isLibraryBrowsePath(String path) {
-    return libraryIdFromPath(path) != null;
-  }
+  static bool isLibraryBrowsePath(String path) =>
+      AppRoutes.libraryIdFromPath(path) != null;
 
-  static String? libraryIdFromPath(String path) {
-    if (!path.startsWith('$root/')) {
-      return null;
-    }
-    final String id = path.substring(root.length + 1);
-    if (id.isEmpty || id.contains('/') || id == legacyAllSegment) {
-      return null;
-    }
-    return id;
-  }
+  static String? libraryIdFromPath(String path) =>
+      AppRoutes.libraryIdFromPath(path);
 }
 
 /// Sidebar selection derived from location only.
@@ -43,7 +32,7 @@ bool librariesRailIconActive(LibrariesSidebarSelection selection) {
 }
 
 LibrariesSidebarSelection librariesSidebarSelection({required String path}) {
-  return (activeLibraryId: LibrariesRoutes.libraryIdFromPath(path));
+  return (activeLibraryId: AppRoutes.libraryIdFromPath(path));
 }
 
 /// 二级库列表高亮：仅当路由为 `/libraries/:id` 时返回该 id，否则为空。
@@ -62,7 +51,7 @@ AfterLibraryDeleteNavigation afterLibraryDeleteNavigation({
   required List<String> remainingLibraryIds,
 }) {
   if (remainingLibraryIds.isEmpty) {
-    return (goPath: '/home');
+    return (goPath: AppRoutes.home);
   }
-  return (goPath: LibrariesRoutes.library(remainingLibraryIds.first));
+  return (goPath: AppRoutes.library(remainingLibraryIds.first));
 }

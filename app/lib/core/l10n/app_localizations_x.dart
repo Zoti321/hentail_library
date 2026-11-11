@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import 'package:hentai_library/core/constants/app_routes.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 
 import 'package:hentai_library/features/library_admin/domain/resource_format_category.dart';
@@ -104,33 +105,33 @@ extension AppLocalizationsLabelsX on AppLocalizations {
   }
 
   String pageTitleForPath(String path) {
-    if (path.startsWith('/reader')) {
+    if (AppRoutes.isReaderPath(path)) {
       return pageTitleReader;
     }
 
-    if (path.startsWith('/libraries/')) {
+    if (path.startsWith('${AppRoutes.libraries}/')) {
       return libraryTitle;
     }
 
-    if (path.startsWith('/comic/')) {
+    if (AppRoutes.isComicDetailPath(path)) {
       return pageTitleComicDetail;
     }
 
-    if (path.startsWith('/series/')) {
+    if (AppRoutes.isSeriesDetailPath(path)) {
       return pageTitleSeriesDetail;
     }
 
     switch (path) {
-      case '/home':
+      case AppRoutes.home:
         return navHome;
 
-      case '/local':
+      case AppRoutes.local:
         return libraryTitle;
 
       case '/searched':
         return pageTitleSearchResults;
 
-      case '/metadata':
+      case AppRoutes.metadata:
       case '/tags':
       case '/authors':
         return navMetadata;
@@ -138,13 +139,13 @@ extension AppLocalizationsLabelsX on AppLocalizations {
       case '/series':
         return pageTitleNotFound;
 
-      case '/history':
+      case AppRoutes.history:
         return navHistory;
 
-      case '/trash':
+      case AppRoutes.trash:
         return navTrash;
 
-      case '/settings':
+      case AppRoutes.settings:
         return navSettings;
 
       default:

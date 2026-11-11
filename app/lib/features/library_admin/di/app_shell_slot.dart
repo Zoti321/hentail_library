@@ -3,7 +3,6 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/comic_metadata_bulk_patch_shell_feedback.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/library_scan_shell_feedback.dart';
@@ -17,6 +16,7 @@ import 'package:hentai_library/shared/domain/models/entity/library/local_library
 import 'package:hentai_library/shared/ui/patterns/home/home_library_dashboard_models.dart';
 import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
 import 'package:hentai_library/shared/ui/shell/app_shell_slot.dart';
+import 'package:hentai_library/shared/ui/navigation/app_navigator_context.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 List<Widget> libraryAdminShellFeedbackBelowTitleBar() {
@@ -30,7 +30,7 @@ AppShellNavigationSlot buildLibraryAdminAppShellNavigationSlot(
   BuildContext context,
   WidgetRef ref,
 ) {
-  final String path = GoRouterState.of(context).uri.path;
+  final String path = appNavigatorOf(context).currentPath();
   final List<LocalLibrary> libraries = ref
       .watch(librariesStateProvider)
       .maybeWhen(

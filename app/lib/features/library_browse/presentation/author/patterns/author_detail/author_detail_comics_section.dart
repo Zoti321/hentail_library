@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/author_detail.dart';
+import 'package:hentai_library/shared/ui/navigation/app_navigator_context.dart';
 import 'package:hentai_library/shared/ui/patterns/comic_detail/comic_detail_meta_chip_row.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/content_section.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
@@ -92,8 +92,7 @@ class _AuthorComicCoverCard extends StatelessWidget {
               type: MaterialType.transparency,
               child: InkWell(
                 onTap: () {
-                  GoRouter.of(context)
-                      .push('/comic/${Uri.encodeComponent(comic.comicId)}');
+                  appNavigatorOf(context).pushComicDetail(comic.comicId);
                 },
                 child: ComicCoverContent(comicId: comic.comicId),
               ),

@@ -1,3 +1,4 @@
+import 'package:hentai_library/core/constants/app_routes.dart';
 import 'package:hentai_library/core/constants/libraries_routes.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/home_library_row_health.dart';
@@ -78,10 +79,10 @@ String productionSelectedNavId({required String path}) {
   if (flatNavId.isNotEmpty) {
     return flatNavId;
   }
-  if (LibrariesRoutes.libraryIdFromPath(path) != null) {
+  if (AppRoutes.libraryIdFromPath(path) != null) {
     return AppNavigation.navIdLibrary;
   }
-  if (path.startsWith('/comic/') || path.startsWith('/series/')) {
+  if (AppRoutes.isCatalogDetailPath(path)) {
     return AppNavigation.navIdLibrary;
   }
   return AppNavigation.navIdHome;

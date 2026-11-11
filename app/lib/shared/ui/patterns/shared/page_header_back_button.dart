@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/ui/navigation/app_navigator_context.dart';
 import 'package:hentai_library/shared/ui/patterns/library/library_page_header_metrics.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-/// 首页下钻的二级页（阅读历史、垃圾桶、管理等）：能 pop 则 pop，否则回 `/home`。
+/// 首页下钻的二级页（阅读历史、垃圾桶、管理等）：能 pop 则 pop，否则回 Home。
 void popOrGoHome(BuildContext context) {
-  if (context.canPop()) {
-    context.pop();
+  final navigator = appNavigatorOf(context);
+  if (navigator.canPop()) {
+    navigator.pop();
     return;
   }
-  context.go('/home');
+  navigator.goHome();
 }
 
 /// MD3E 页头工具行左侧返回（与 [SettingsPageHeader] 一致）。

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/library_browse/presentation/author/view_models/author_detail_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/author/views/author_detail/author_detail_layout.dart';
+import 'package:hentai_library/shared/di/app_navigator_provider.dart';
 import 'package:hentai_library/shared/ui/catalog/detail/detail_back_header.dart';
 import 'package:hentai_library/shared/ui/catalog/detail/detail_status_scaffold.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/author_detail.dart';
+import 'package:hentai_library/shared/ui/navigation/app_navigator_context.dart';
 import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -24,7 +25,7 @@ class AuthorDetailPage extends ConsumerWidget {
     );
 
     return PopScope(
-      canPop: context.canPop(),
+      canPop: appNavigatorOf(context).canPop(),
       onPopInvokedWithResult: (bool didPop, Object? result) {
         if (didPop) {
           return;
@@ -65,7 +66,7 @@ void openAuthorDetailById({
   required BuildContext context,
   required int authorId,
 }) {
-  context.push('/author/$authorId');
+  appNavigatorOf(context).pushAuthorDetail(authorId);
 }
 
 /// 按作者名跳转到作者资料页；名称不存在时静默忽略。
@@ -80,5 +81,5 @@ Future<void> openAuthorDetailByName({
   if (authorId == null || !context.mounted) {
     return;
   }
-  context.push('/author/$authorId');
+  ref.read(appNavigatorProvider).pushAuthorDetail(authorId);
 }

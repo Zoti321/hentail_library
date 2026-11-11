@@ -3,7 +3,6 @@ import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/ui/catalog/detail/content_breadcrumb_labels.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/models/comic_browse_view_object.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/models/series_browse_view_object.dart';
 import 'package:hentai_library/features/series/public/ui/series_cover_content.dart';
@@ -39,7 +38,7 @@ import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
 import 'package:hentai_library/shared/ui/widgets/catalog/comic_card.dart';
 import 'package:hentai_library/shared/ui/widgets/navigation/expressive_library_scroll_to_top_button.dart';
 import 'package:hentai_library/shared/ui/widgets/pagination/pagination.dart';
-import 'package:hentai_library/shared/di/app_router_provider.dart';
+import 'package:hentai_library/shared/di/app_navigator_provider.dart';
 import 'package:hentai_library/shared/di/browse_library_scope_providers.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
@@ -498,18 +497,11 @@ abstract final class _LibraryCatalogSlivers {
 
   static void _openComicDetail(WidgetRef ref, String comicId) {
     ref.read(comicDetailReturnSeriesProvider.notifier).clear();
-    ref
-        .read(appRouterProvider)
-        .pushNamed(
-          ContentBreadcrumbLabels.comicDetail,
-          pathParameters: <String, String>{'id': comicId},
-        );
+    ref.read(appNavigatorProvider).pushComicDetail(comicId);
   }
 
   static void _openSeriesDetail(WidgetRef ref, String seriesId) {
-    ref
-        .read(appRouterProvider)
-        .push('/series/${Uri.encodeComponent(seriesId)}');
+    ref.read(appNavigatorProvider).pushSeriesDetail(seriesId);
   }
 
   static List<Widget> _catalogBodySlivers(

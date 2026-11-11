@@ -16,7 +16,7 @@ import 'package:hentai_library/features/series/presentation/views/series_detail/
 import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_entry.dart';
 import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_layout.dart';
 import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
-import 'package:hentai_library/shared/di/app_router_provider.dart';
+import 'package:hentai_library/shared/di/app_navigator_provider.dart';
 import 'package:hentai_library/shared/di/library_command_providers.dart';
 import 'package:hentai_library/features/series/domain/series.dart';
 import 'package:hentai_library/features/series/domain/series_comic_page_item.dart';
@@ -30,7 +30,6 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:hentai_library/features/series/public/ui/series_metadata_edit_presenters.dart';
 import 'package:hentai_library/shared/di/author_detail_providers.dart';
 import 'package:hentai_library/shared/domain/catalog/selection/catalog_selection_notifier.dart';
-import 'package:hentai_library/shared/ui/catalog/detail/content_breadcrumb_labels.dart';
 import 'package:hentai_library/shared/ui/catalog/detail/detail_back_header.dart';
 import 'package:hentai_library/shared/ui/catalog/detail/detail_status_scaffold.dart';
 
@@ -200,14 +199,9 @@ class _SeriesDetailCatalogLayout extends ConsumerWidget {
           return;
         }
         ref.read(comicDetailReturnSeriesPortProvider).remember(seriesId);
-        ref
-            .read(appRouterProvider)
-            .pushNamed(
-              ContentBreadcrumbLabels.comicDetail,
-              pathParameters: <String, String>{
-                'id': items[localIndex].comic.comicId,
-              },
-            );
+        ref.read(appNavigatorProvider).pushComicDetail(
+          items[localIndex].comic.comicId,
+        );
       },
     );
   }
