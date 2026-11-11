@@ -9,7 +9,7 @@ import 'package:hentai_library/shared/domain/catalog/selection/catalog_selection
 import 'package:hentai_library/shared/domain/library/comic_metadata_bulk_patch.dart';
 import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
-import 'package:hentai_library/shared/ui/widgets/feedback/comic_metadata_bulk_patch_toasts.dart';
+import 'package:hentai_library/features/comic/presentation/widgets/comic_metadata_bulk_patch_toasts.dart';
 
 /// 多选批量编辑：读当前选择，逐条或批量走 owner 命令。
 Future<void> openComicSelectionMetadataEditor(

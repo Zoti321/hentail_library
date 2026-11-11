@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/core/l10n/app_localizations_zh.dart';
-import 'package:hentai_library/shared/ui/patterns/home/reading_duration_format.dart';
+import 'package:hentai_library/features/home/presentation/patterns/home/reading_duration_format.dart';
 
 void main() {
   final AppLocalizationsZh l10n = AppLocalizationsZh();

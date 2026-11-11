@@ -4,7 +4,7 @@ import 'package:hentai_library/features/comic/public/ui/comic_card_actions.dart'
 import 'package:hentai_library/features/comic/public/ui/comic_catalog_selection_actions.dart';
 import 'package:hentai_library/features/comic/public/ui/comic_cover_content.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/shared/ui/widgets/element/image/comic_cover_renderer.dart';
+import 'package:hentai_library/features/comic/presentation/widgets/comic_cover_renderer.dart';
 import 'package:hentai_library/shared/ui/slots/series_slots.dart';
 
 /// comic 侧的系列 UI 槽位默认实现（bootstrap 通过 shared/di token 注入）。

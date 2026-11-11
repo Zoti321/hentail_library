@@ -39,3 +39,4 @@ features/comic/public/di/comic_detail_providers.dart
 features/comic/public/ui/bulk_edit_metadata_presenter.dart
 features/library_admin/public/di/library_management_port_factory.dart
 features/library_browse/public/di/author_detail_port_factory.dart
+features/comic/public/ui/comic_catalog_selection_actions.dart

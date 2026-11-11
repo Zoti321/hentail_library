@@ -6,7 +6,7 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/features/library_admin/data/local_library_root_access.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/library/library_confirm_dialog.dart';
-import 'package:hentai_library/shared/ui/layout/library_edit_form_metrics.dart';
+import 'package:hentai_library/features/library_admin/presentation/widgets/library_edit_form_metrics.dart';
 import 'package:hentai_library/shared/ui/patterns/dialog/adaptive_form_dialog.dart';
 import 'package:hentai_library/features/library_admin/presentation/patterns/library_edit_form.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';

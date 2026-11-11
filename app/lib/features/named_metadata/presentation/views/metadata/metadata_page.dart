@@ -18,7 +18,7 @@ import 'package:hentai_library/features/named_metadata/presentation/views/metada
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata/patterns/management_create_interaction.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata/patterns/management_draft_entity_chip.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata/patterns/management_facet_search_bar.dart';
-import 'package:hentai_library/shared/ui/widgets/navigation/management_create_entity_fab.dart';
+import 'package:hentai_library/features/named_metadata/presentation/widgets/management_create_entity_fab.dart';
 import 'package:hentai_library/features/named_metadata/domain/named_facet_management_repository.dart';
 import 'package:hentai_library/shared/ui/layout/app_shell_navigation.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/page_header_back_button.dart';
