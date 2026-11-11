@@ -48,12 +48,23 @@ run_codegen_drift() {
     flutter_rust_bridge_codegen generate
     dart run build_runner build --delete-conflicting-outputs
     bash "$REPO_ROOT/scripts/patch-freezed-dart313.sh"
+    # FRB 生成末尾的 `dart format` 是 warn_only（失败只 warning），失败时
+    # frb_generated.dart 会以未格式化模板落盘并造成假漂移；这里显式兜底。
+    dart format lib/src/rust >/dev/null
   )
   local drift
-  drift="$(git -C "$REPO_ROOT" status --porcelain -- app core)"
+  # 按内容判定，不用 `git status --porcelain`：本机 core.autocrlf=true 时，
+  # 生成器写出的 LF 文件会被 status 标成 M，但 blob 与 HEAD 完全相同（diff 为空），
+  # 属于 EOL 假阳性。这里只看真实内容差异 + 未跟踪文件。
+  drift="$(git -C "$REPO_ROOT" diff HEAD --name-only -- app core)"
+  local untracked
+  untracked="$(git -C "$REPO_ROOT" ls-files --others --exclude-standard -- app core)"
+  if [[ -n "$untracked" ]]; then
+    drift="${drift}${drift:+$'\n'}${untracked}"
+  fi
   if [[ -n "$drift" ]]; then
     echo "$drift"
-    git -C "$REPO_ROOT" --no-pager diff --stat -- app core
+    git -C "$REPO_ROOT" --no-pager diff HEAD --stat -- app core
     echo "::error::Codegen drift: 重新运行 FRB generate / build_runner 并提交产物。" >&2
     return 1
   fi
