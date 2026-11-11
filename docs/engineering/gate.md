@@ -2,7 +2,7 @@
 
 **决策**：ADR-0018（三层缝、CI tier 词汇）、ADR-0002（业务真值在 Rust）、**ADR-0033**（feature `application/`）、**ADR-0034**（cross-feature `public/`）、**ADR-0041**（Comic 实体归属）、**ADR-0042**（Series 实体归属 + 槽位契约）、**ADR-0043**（导航与路由解耦）。**Job 列表以** `.github/workflows/gate.yml` **为准**；本地与 CI 同源：`./scripts/run-gate.sh`。
 
-**Wayfinder `lib/` 顶层目录**（Phase A/B）：`app/test/gate/lib_layout_scan_helpers.dart` · `project_layout_test.dart`。产品 feature 之间 **仅允许** import `features/<owner>/public/**` 或 `features/<owner>/public.dart`（M1）；`shared/**` **禁止** import feature public（R11），且 **不得** import `features/**`（R13，ratchet：`shared/di`、`shared/domain`、`core/**` 等既有边只许减不许增）。
+**Wayfinder `lib/` 顶层目录**（Phase A/B）：`core/`、`design-system/`、`features/`、`shared/`、`src/`；由 `app/test/gate/lib_layout_scan_helpers.dart` · `project_layout_test.dart` 断言。`design-system/**` 归类为 `shared`（ADR-0044），因此**继承** R13 且受独立出边白名单约束。产品 feature 之间 **仅允许** import `features/<owner>/public/**` 或 `features/<owner>/public.dart`（M1）；`shared/**` **禁止** import feature public（R11），且 **不得** import `features/**`（R13，ratchet：`shared/di`、`shared/domain`、`core/**` 等既有边只许减不许增）。
 
 **工具链**：CI 固定 **Flutter 3.47.8**（`gate.yml` → `FLUTTER_VERSION`）。本地请用同 major/minor 的 stable；`flutter analyze` 在 GitHub Actions（`CI=true`）下会将 info 级 lint 也计为失败。`riverpod_lint` 为可选 dev 依赖（不依赖 `custom_lint`）；**Gate 的 `flutter analyze` 暂未挂 `plugins: riverpod_lint`**，避免未偿还的 Riverpod 风格债挡合并。本地可在 `analysis_options.yaml` 临时启用做增量清理。SDK 升级记录见 `docs/engineering/flutter-3.47-migration.md`。
 
@@ -172,9 +172,10 @@ Epic [#447](https://github.com/Zoti321/hentail_library/issues/447) 清理 Flutte
 | public 图无环 | `import_boundary_test.dart`（`collectPublicCrossFeatureAdjacency`） |
 | bootstrap shared 注入 | `features/bootstrap/di/overrides/*` + `shared_state_overrides.dart`（#435） |
 | L3a shared/ui → features | `shared_ui_no_feature_import_test.dart` |
+| L3a design-system → features / shared domain·di·data·ui | `test/design-system/design_system_boundary_test.dart`（ADR-0044；零 allowlist） |
 | L3b shared/domain → features ratchet | `shared_domain_no_feature_import_test.dart` + baseline 生成器；归属见 [`shared-domain-ownership.md`](./shared-domain-ownership.md) |
 | FRB allowlist | `import_boundary_rules.dart`、`shared_feature_import_rules.dart` |
-| `lib/` 顶层目录、public barrel、presentation/state | `project_layout_test.dart`、`lib_layout_scan_helpers.dart` |
+| `lib/` 顶层目录（含 `design-system/`）、public barrel、presentation/state | `project_layout_test.dart`、`lib_layout_scan_helpers.dart` |
 | Strangler export shim | `strangler_shims.txt` + `strangler_shims_test.dart` |
 
 启发式模块边（非门禁）：`python scripts/research/cross_feature_import_audit.py`。

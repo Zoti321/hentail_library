@@ -2,7 +2,7 @@
 
 **决策**：ADR-0034（#426/#435）public only、ADR-0039（命令走 Port，事实走领域事件）、[`gate.md`](gate.md) import 门禁。
 
-## 心智模型（五段）
+## 心智模型（六段）
 
 | 段 | 位置 | 谁 import |
 | --- | --- | --- |
@@ -11,6 +11,9 @@
 | **Token** | 能力所有者 `features/<owner>/public/di/**`；`shared/di` 仅跨模块命令 / 全局状态 | 消费方直接 watch owner public token（ADR-0034 §3，#488） |
 | **实现** | owner `features/<id>/di/`（含 codegen 封面图）、`shared/data/events/` | 仅同 feature 或 **bootstrap** overrides |
 | **接线** | `features/bootstrap/di/overrides/` | 仅 bootstrap |
+| **Design System** | `lib/design-system/**`（ADR-0044） | `shared/ui`、任意 feature、`widgetbook` |
+
+新增通用控件先问一句：**是否被 ≥2 个产品模块消费**？否 → 放消费方 `presentation/`；是且业务无关 → `design-system/components/`；是但含业务语义 → 留 `shared/ui/`。`design-system` 只允许依赖 `core/**` 与 `shared/util/**`（门禁 `test/design-system/design_system_boundary_test.dart`，零 allowlist）。
 
 Consumer **不要** deep import 邻居的 `features/<other>/di/`；模块私有 token 也不再抄到 `shared/di` 转发（ADR-0034 §3）。
 

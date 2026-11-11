@@ -11,6 +11,7 @@ const bool kEnforceWayfinderPhaseBLayout = true;
 /// `md3e/` was removed at MD3E Cutover shell终态 (#414 / ADR-0031).
 const Set<String> kWayfinderPhaseATopLevelLibDirs = <String>{
   'core',
+  'design-system',
   'features',
   'shared',
   'src',
@@ -18,6 +19,7 @@ const Set<String> kWayfinderPhaseATopLevelLibDirs = <String>{
 
 const Set<String> kWayfinderPhaseBTopLevelLibDirs = <String>{
   'core',
+  'design-system',
   'features',
   'shared',
   'src',
@@ -29,7 +31,8 @@ bool isCanonicalLibRelativePath(String rel) {
   final String path = rel.replaceAll(r'\', '/');
   return path.startsWith('features/') ||
       path.startsWith('shared/') ||
-      path.startsWith('src/');
+      path.startsWith('src/') ||
+      path.startsWith('design-system/');
 }
 
 List<String> readStranglerShimAllowlist(File manifest) {

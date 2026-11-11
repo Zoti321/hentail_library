@@ -117,7 +117,7 @@ String classifyLibPath(String relativePosix) {
       return parts[1];
     }
   }
-  if (path.startsWith('shared/')) {
+  if (path.startsWith('shared/') || path.startsWith('design-system/')) {
     return 'shared';
   }
   if (path.startsWith('src/rust/')) {

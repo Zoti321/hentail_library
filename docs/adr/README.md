@@ -122,3 +122,4 @@ Accepted | Superseded by ADR-000N | Deprecated
 | [0041](./0041-comic-entity-ownership.md) | Comic 实体迁入漫画模块（Dart 投影型实体，#489） | Accepted |
 | [0042](./0042-series-entity-ownership-and-cross-module-contracts.md) | Series 实体迁入系列模块与跨模块契约（ACL / Slot / data 映射，#490） | Accepted |
 | [0043](./0043-navigation-routing-decoupling.md) | 导航与路由解耦（抽象导航契约 + 集中式路由表） | Accepted |
+| [0044](./0044-shared-ui-ownership-and-design-system-lane.md) | shared/ui 模块所有权判据与 Design System 层（#495） | Accepted |

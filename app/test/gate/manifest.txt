@@ -20,6 +20,9 @@ test/frb_wire
 # MD3E Lab (gate + widget smokes)
 test/md3e
 
+# Design System 层出边门禁（ADR-0044）
+test/design-system
+
 # Monorepo layout
 test/project_layout_test.dart
 

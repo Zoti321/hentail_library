@@ -174,10 +174,8 @@ class _ComicDetailContent extends ConsumerWidget {
         final int current = seriesNav?.currentIndex ?? 0;
         // 同级切卷：只替换当前漫画详情，保留库浏览 → 系列详情 栈。
         // 勿用 go：会清空底层路由，系列返回只能落到 /home。
-        appNavigatorOf(context).replaceComicDetail(
-          items[index].comicId,
-          reverse: index < current,
-        );
+        appNavigatorOf(context)
+            .replaceComicDetail(items[index].comicId, reverse: index < current);
       },
     );
   }

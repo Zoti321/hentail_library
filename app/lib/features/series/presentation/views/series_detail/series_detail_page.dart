@@ -199,9 +199,9 @@ class _SeriesDetailCatalogLayout extends ConsumerWidget {
           return;
         }
         ref.read(comicDetailReturnSeriesPortProvider).remember(seriesId);
-        ref.read(appNavigatorProvider).pushComicDetail(
-          items[localIndex].comic.comicId,
-        );
+        ref
+            .read(appNavigatorProvider)
+            .pushComicDetail(items[localIndex].comic.comicId);
       },
     );
   }

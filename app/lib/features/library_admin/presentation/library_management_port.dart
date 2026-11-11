@@ -66,8 +66,7 @@ class _LibraryManagementAdapter implements LibraryManagementPort {
     }
     final String deletedId = library.libraryId;
     final String path = _ref.read(appNavigatorProvider).currentPath();
-    final bool wasViewing =
-        AppRoutes.libraryIdFromPath(path) == deletedId;
+    final bool wasViewing = AppRoutes.libraryIdFromPath(path) == deletedId;
 
     await _ref.read(librariesPortProvider).deleteLibrary(deletedId);
     if (!context.mounted) {

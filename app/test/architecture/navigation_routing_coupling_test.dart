@@ -130,6 +130,4 @@ final RegExp _inlineLocationRe = RegExp(
 );
 
 /// `Provider<GoRouter>` / `GoRouter` 作为 shared/di 契约类型。
-final RegExp _routerTypeTokenRe = RegExp(
-  r'''GoRouter''',
-);
+final RegExp _routerTypeTokenRe = RegExp(r'''GoRouter''');
