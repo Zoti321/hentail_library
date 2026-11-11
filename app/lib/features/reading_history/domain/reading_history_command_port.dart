@@ -1,6 +1,6 @@
 /// 阅读进度写入与恢复（read_session 等跨 feature 消费）。
 ///
-/// Token：[readingHistoryCommandPortProvider]（`shared/di/reading_history_providers.dart`）。
+/// Token：[readingHistoryCommandPortProvider]（`features/reading_history/public/di/reading_history_command_providers.dart`）。
 abstract class ReadingHistoryCommandPort {
   Future<void> recordReading({
     required String comicId,

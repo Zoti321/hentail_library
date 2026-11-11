@@ -4,7 +4,9 @@
 library;
 
 export 'domain/reading_history.dart';
+export 'domain/reading_history_command_port.dart';
 export 'public/di/reading_history_command_port_factory.dart';
+export 'public/di/reading_history_command_providers.dart';
 export 'public/di/reading_history_progress_port_factory.dart';
 export 'public/di/reading_history_repository_factory.dart';
 export 'public/ui/history_page.dart';

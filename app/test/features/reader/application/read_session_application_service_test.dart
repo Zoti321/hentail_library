@@ -1,6 +1,6 @@
 import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/shared/domain/ports/reading_history_command_port.dart';
+import 'package:hentai_library/features/reading_history/public.dart';
 import 'package:hentai_library/features/reading_stats/public.dart';
 import 'package:hentai_library/features/reader/application/open_reader_args.dart';
 import 'package:hentai_library/features/reader/application/read_session_application_service.dart';
