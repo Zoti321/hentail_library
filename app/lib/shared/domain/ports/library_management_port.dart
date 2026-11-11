@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:hentai_library/features/library_admin/domain/sync_library_types.dart';
+import 'package:hentai_library/shared/domain/library/library_scan_mode.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 
 /// 库管理 UI 命令契约（#292）。

@@ -1,7 +1,7 @@
 import 'package:hentai_library/features/library_admin/domain/resource_format_category.dart';
 import 'package:hentai_library/features/library_admin/domain/scan_interval.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/form/library_form.dart';
+import 'package:hentai_library/features/library_admin/domain/value_objects/library_form.dart';
 
 /// Widgetbook / Lab 用的 Library 编辑样例。
 abstract final class LibraryEditPreviewData {

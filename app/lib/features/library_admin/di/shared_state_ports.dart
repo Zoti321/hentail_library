@@ -13,7 +13,7 @@ import 'package:hentai_library/shared/domain/library/comic_metadata_bulk_patch.d
 import 'package:hentai_library/features/library_admin/domain/libraries_port.dart';
 import 'package:hentai_library/features/library_admin/domain/library_reorder_mode_port.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/form/library_form.dart';
+import 'package:hentai_library/features/library_admin/domain/value_objects/library_form.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class _LibrariesAdapter implements LibrariesPort {

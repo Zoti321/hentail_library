@@ -1,0 +1,5 @@
+# `lib/shared/**` 中允许 export-only 转发到 `features/**` 的一次性清单（#504）。
+# 现行规则见 test/gate/strangler_shims_test.dart。
+# 只减不增；条目必须仍存在且仍是转发文件（ghost 校验）。
+# P3l（#515）删除 home_library_stats_providers.dart 时同步删除本行。
+shared/di/home_library_stats_providers.dart

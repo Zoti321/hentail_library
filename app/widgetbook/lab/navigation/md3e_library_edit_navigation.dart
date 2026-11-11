@@ -10,7 +10,7 @@ import 'package:hentai_library/features/library_admin/presentation/patterns/libr
 import '../../preview/md3e_library_edit_preview_data.dart';
 
 import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_actions.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/form/library_form.dart';
+import 'package:hentai_library/features/library_admin/domain/value_objects/library_form.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 打开 Library 创建/编辑：compact / medium M3E 全屏；expanded+ M3E basic dialog。

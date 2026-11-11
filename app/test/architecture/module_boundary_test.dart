@@ -191,6 +191,23 @@ void main() {
     );
   });
 
+  test('R13 baseline 无 stale 条目', () {
+    final Set<String> produced = <String>{
+      for (final _Edge edge in edges)
+        if (edge.source == 'shared' && isProductModule(edge.target))
+          _key('R13', edge),
+    };
+    final List<String> stale = <String>[
+      ...baseline.where((String k) => k.startsWith('R13|')),
+      ..._architectureBaseline.where((String k) => k.startsWith('R13|')),
+    ].where((String k) => !produced.contains(k)).toList()..sort();
+    expect(
+      stale,
+      isEmpty,
+      reason: 'R13 baseline 存在失效条目（当前扫描已产不出该边，请删除）：\n${stale.join('\n')}',
+    );
+  });
+
   test('R12：public 面 export 自己的 presentation 必须显式登记且只减不增', () {
     final Set<String> allowlist = _loadR12Allowlist();
     expect(

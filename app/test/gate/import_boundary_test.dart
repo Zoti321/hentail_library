@@ -108,18 +108,30 @@ void main() {
     }
   });
 
-  test('R13 shared→features edges only shrink', () {
-    final List<ImportViolation> all = collectImportViolations(libDir);
+  test(
+    'R13 只由 test/architecture/module_boundary_test.dart 实现（扫 import+export）',
+    () {
+      final List<ImportViolation> all = collectImportViolations(libDir);
+      final List<ImportViolation> r13 = all
+          .where((ImportViolation v) => v.ruleId == 'R13')
+          .toList();
+      expect(r13, isEmpty, reason: 'import_boundary_rules 不得再产出 R13（#504）。');
+    },
+  );
+
+  test('baseline has no stale entries', () {
+    final Set<String> currentKeys = violationKeySet(
+      ratchetViolations(collectImportViolations(libDir)),
+    );
     final Set<String> baselineKeys = _readBaselineKeys(baselineFile);
-    final Set<String> added = all
-        .where((ImportViolation v) => v.ruleId == 'R13')
-        .map(violationKey)
-        .toSet()
-        .difference(baselineKeys);
+    final Set<String> stale = baselineKeys.difference(currentKeys);
+    final List<String> sorted = stale.toList()..sort();
     expect(
-      added,
+      stale,
       isEmpty,
-      reason: 'New shared→features imports:\n${added.join('\n')}',
+      reason:
+          'baseline 存在失效条目（当前扫描已产不出该边，请删除）：\n'
+          '${sorted.join('\n')}',
     );
   });
 

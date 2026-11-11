@@ -491,20 +491,9 @@ void _checkStructuralRules({
     );
   }
 
-  // R13 (ratchet): `shared/**` must not import `features/**` at all
-  // (ADR-0035 Catalog Shared Kernel). Existing edges live in the baseline and
-  // must only shrink.
-  if (sourceModule == 'shared' && importPath.startsWith('features/')) {
-    found.add(
-      violation(
-        ruleId: 'R13',
-        sourceModule: sourceModule,
-        targetModule: targetModule,
-        sourceFile: sourceRel,
-        importUri: importUri,
-      ),
-    );
-  }
+  // R13（`shared/**` 不得 import/export `features/**`）只由
+  // `test/architecture/module_boundary_test.dart` 实现（扫 import + export），
+  // 本文件不再产出该规则（#504）。
 
   if (isFeaturePublicLayerPath(sourceRel) &&
       isProductModule(sourceModule) &&
@@ -591,7 +580,7 @@ void _checkModuleGraphRules({
 }
 
 /// Rules enforced with a shrink-only baseline instead of zero tolerance.
-const Set<String> kRatchetRuleIds = <String>{'M1', 'M2', 'M3', 'R13'};
+const Set<String> kRatchetRuleIds = <String>{'M1', 'M2', 'M3'};
 
 List<ImportViolation> structuralViolations(List<ImportViolation> all) {
   return all

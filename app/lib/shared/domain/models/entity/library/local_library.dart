@@ -1,4 +1,4 @@
-import 'package:hentai_library/features/library_admin/domain/resource_format_category.dart';
+import 'package:hentai_library/shared/domain/models/resource_format_category.dart';
 import 'package:hentai_library/shared/domain/library/scan_interval.dart';
 
 /// Library 轻量快照（FRB LibraryDto → domain）。含 Local 与 Remote。

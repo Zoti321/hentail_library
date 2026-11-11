@@ -4,7 +4,7 @@ import 'package:hentai_library/features/library_admin/presentation/views/library
 
 import '../../../widgetbook/preview/md3e_library_edit_preview_data.dart';
 
-import 'package:hentai_library/shared/domain/models/value_objects/form/library_form.dart';
+import 'package:hentai_library/features/library_admin/domain/value_objects/library_form.dart';
 
 import '../../support/pump_app.dart';
 
