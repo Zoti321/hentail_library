@@ -2,7 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:hentai_library/shared/ui/widgets/history/reading_history_list_item_metrics.dart';
+import 'package:hentai_library/features/reading_history/presentation/widgets/reading_history_list_item_metrics.dart';
 
 /// 默认与 [RenderViewport.defaultCacheExtent] 对齐的预构建边距。
 const double _kHistoryGridCacheExtent = 250;

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/features/reading_history/presentation/models/history_card_item.dart';
 import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_browse_page.dart';
-import 'package:hentai_library/shared/ui/widgets/history/reading_history_list_item.dart';
+import 'package:hentai_library/features/reading_history/presentation/widgets/reading_history_list_item.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 import '../preview/md3e_history_browse_page_preview_data.dart';

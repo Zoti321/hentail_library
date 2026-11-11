@@ -8,7 +8,7 @@ import 'package:hentai_library/features/reading_history/presentation/widgets/his
 import 'package:hentai_library/shared/di/app_navigator_provider.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/shared/di/reader_launch_providers.dart';
-import 'package:hentai_library/shared/ui/widgets/history/reading_history_list_item.dart';
+import 'package:hentai_library/features/reading_history/presentation/widgets/reading_history_list_item.dart';
 
 /// 生产 `/history` 列表行：打开阅读器 + 删除记录。
 class HistoryListItem extends ConsumerWidget {

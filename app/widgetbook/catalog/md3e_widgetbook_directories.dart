@@ -7,8 +7,8 @@ import 'package:hentai_library/features/reader/presentation/patterns/reader/read
 import 'package:hentai_library/shared/ui/widgets/actions/catalog_view_mode_button_group.dart';
 import 'package:hentai_library/shared/ui/widgets/catalog/comic_card.dart';
 import 'package:hentai_library/shared/ui/widgets/catalog/comic_list_item.dart';
-import 'package:hentai_library/shared/ui/layout/reading_history_list_layout.dart';
-import 'package:hentai_library/shared/ui/widgets/history/reading_history_list_item.dart';
+import 'package:hentai_library/features/reading_history/presentation/patterns/history/reading_history_list_layout.dart';
+import 'package:hentai_library/features/reading_history/presentation/widgets/reading_history_list_item.dart';
 import 'package:hentai_library/features/comic/presentation/patterns/comic_detail/comic_detail_metadata_tags_section.dart';
 import 'package:hentai_library/shared/ui/shell/desktop_shell.dart';
 import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';

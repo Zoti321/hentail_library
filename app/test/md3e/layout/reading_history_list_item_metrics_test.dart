@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
-import 'package:hentai_library/shared/ui/widgets/history/reading_history_list_item_metrics.dart';
+import 'package:hentai_library/features/reading_history/presentation/widgets/reading_history_list_item_metrics.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 void main() {

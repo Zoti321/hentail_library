@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/shared/ui/widgets/history/reading_history_list_item.dart';
+import 'package:hentai_library/features/reading_history/presentation/widgets/reading_history_list_item.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 import '../../support/pump_app.dart';
