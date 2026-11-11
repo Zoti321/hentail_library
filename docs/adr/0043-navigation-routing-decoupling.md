@@ -27,7 +27,7 @@ go_router 是实现细节，但迁 Wayfinder 后大量 feature 仍直接：
 
 - 路径统一经 `AppRoutes.comic(id)` / `series(id)` / `library(id)` / `metadataTab(tab)` / `readerLocation(query)` 构造；
 - `LibrariesRoutes` 保留 library 语义入口，内部委托 `AppRoutes`（旧 API 不破坏）；
-- `ContentBreadcrumbLabels`、`pageTitleForPath`、`AppNavigation.activeNavIdForPath` 与路由表同源。
+- 面包屑文案直接取 `AppRoutes.comicDetailName` / `seriesDetailName`；`pageTitleForPath`、`AppNavigation.activeNavIdForPath` 与路由表同源（`ContentBreadcrumbLabels` 已于 #495 删除）。
 
 ### 2. 导航契约：`shared/domain/ports/app_navigator.dart`
 

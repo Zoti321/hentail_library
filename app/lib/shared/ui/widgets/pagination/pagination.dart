@@ -5,7 +5,7 @@ import 'package:hentai_library/shared/ui/widgets/pagination/pagination_metrics.d
 import 'package:hentai_library/shared/ui/widgets/pagination/pagination_standard.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// Responsive MD3E pagination (Lab only; production uses [LibraryPaginationBar]).
+/// Responsive MD3E pagination (Lab only; production uses [Pagination]).
 ///
 /// Compact vs standard follows **window** width ([MediaQuery.sizeOf]), same as
 /// [LibraryPageHeader] breakpoints—not the parent’s shrink-wrapped width.
