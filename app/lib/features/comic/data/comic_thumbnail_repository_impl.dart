@@ -6,7 +6,7 @@ import 'package:hentai_library/shared/data/frb/frb_call_guard.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/ports/remote_library_credentials_port.dart';
 import 'package:hentai_library/shared/domain/thumbnail/series_cover_source.dart';
-import 'package:hentai_library/shared/domain/thumbnail/thumbnail_event.dart';
+import 'package:hentai_library/features/comic/domain/thumbnail/thumbnail_event.dart';
 import 'package:hentai_library/src/rust/api/thumbnail.dart' as rust;
 
 class ComicThumbnailRepositoryImpl implements ComicThumbnailRepository {

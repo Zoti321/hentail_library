@@ -6,7 +6,7 @@ import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/features/comic/di/comic_cover_load_gate.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/shared/domain/thumbnail/thumbnail_event.dart';
+import 'package:hentai_library/features/comic/domain/thumbnail/thumbnail_event.dart';
 import 'package:hentai_library/shared/ui/models/comic_cover_source.dart';
 import 'package:hentai_library/shared/ui/models/comic_cover_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';

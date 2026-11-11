@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/shared/domain/thumbnail/thumbnail_event.dart';
+import 'package:hentai_library/features/comic/domain/thumbnail/thumbnail_event.dart';
 import 'package:hentai_library/src/rust/api/thumbnail.dart' as rust;
 
 rust.ThumbnailPriorityDto mapThumbnailPriority(ThumbnailPriority priority) {
