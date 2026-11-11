@@ -1,8 +1,8 @@
 /// Design System 层：业务无关的主题、动效、布局常量与通用控件（ADR-0044）。
 ///
-/// 本文件是**唯一对外入口**。层内不得 import `features/**`、`shared/ui/**`、
-/// `shared/domain/**`、`shared/di/**`、`shared/data/**`；只允许依赖
-/// `core/**`、`shared/util/**`、层内相对路径与第三方包。
+/// 本文件是**唯一对外入口**。层内不得依赖产品 feature、`shared` 的业务层
+/// （ui / domain / di / data）；只允许 `core`、`shared/util`、层内路径与第三方包。
+/// 门禁：`app/test/design-system/design_system_boundary_test.dart`（零 allowlist）。
 library;
 
 // theme
@@ -30,10 +30,12 @@ export 'package:hentai_library/design-system/motion/spring_value.dart';
 export 'package:hentai_library/design-system/layout/app_layout_breakpoints.dart';
 export 'package:hentai_library/design-system/layout/breakpoints.dart';
 export 'package:hentai_library/design-system/layout/fab_sizing.dart';
+export 'package:hentai_library/design-system/layout/list_detail_adaptive_layout.dart';
 export 'package:hentai_library/design-system/layout/page_layout_spec.dart';
 export 'package:hentai_library/design-system/layout/spacing.dart';
 
 // components
+export 'package:hentai_library/design-system/components/actions/catalog_view_mode_button_group.dart';
 export 'package:hentai_library/design-system/components/calendar/anchored_calendar_date_picker.dart';
 export 'package:hentai_library/design-system/components/calendar/calendar_day_cell.dart';
 export 'package:hentai_library/design-system/components/calendar/calendar_day_picker.dart';
@@ -41,25 +43,21 @@ export 'package:hentai_library/design-system/components/calendar/calendar_month_
 export 'package:hentai_library/design-system/components/calendar/calendar_year_picker.dart';
 export 'package:hentai_library/design-system/components/calendar/docked_calendar_date_picker.dart';
 export 'package:hentai_library/design-system/components/calendar/embeddable_calendar_date_picker.dart';
+export 'package:hentai_library/design-system/components/chips/outlined_meta_chip.dart';
+export 'package:hentai_library/design-system/components/chips/suggestion_chip_surface.dart';
 export 'package:hentai_library/design-system/components/inputs/input_chip_field_layout.dart';
+export 'package:hentai_library/design-system/components/inputs/management_entity_name_field.dart';
+export 'package:hentai_library/design-system/components/inputs/named_facet_multi_select_copy.dart';
+export 'package:hentai_library/design-system/components/inputs/named_facet_multi_select_field.dart';
 export 'package:hentai_library/design-system/components/inputs/outlined_text_field.dart';
 export 'package:hentai_library/design-system/components/inputs/outlined_text_field_selection_scope.dart';
 export 'package:hentai_library/design-system/components/inputs/outlined_text_field_shell.dart';
+export 'package:hentai_library/design-system/components/inputs/published_date_text_field.dart';
+export 'package:hentai_library/design-system/components/inputs/tag_input_field.dart';
 export 'package:hentai_library/design-system/components/lists/reorder_exclude.dart';
 export 'package:hentai_library/design-system/components/lists/reorderable_split_list_group.dart';
 export 'package:hentai_library/design-system/components/lists/split_list_group.dart';
 export 'package:hentai_library/design-system/components/surfaces/tonal_surface.dart';
-export 'package:hentai_library/design-system/components/actions/catalog_view_mode_button_group.dart';
-export 'package:hentai_library/design-system/components/chips/outlined_meta_chip.dart';
-export 'package:hentai_library/design-system/components/chips/suggestion_chip_surface.dart';
-export 'package:hentai_library/design-system/components/inputs/management_entity_name_field.dart';
-export 'package:hentai_library/design-system/components/inputs/named_facet_multi_select_copy.dart';
-export 'package:hentai_library/design-system/components/inputs/named_facet_multi_select_field.dart';
-export 'package:hentai_library/design-system/components/inputs/published_date_text_field.dart';
-export 'package:hentai_library/design-system/components/inputs/tag_input_field.dart';
-
-// layout (page-level composites)
-export 'package:hentai_library/design-system/layout/list_detail_adaptive_layout.dart';
 
 // util
 export 'package:hentai_library/design-system/util/reorder_index.dart';
