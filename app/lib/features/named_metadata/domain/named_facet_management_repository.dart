@@ -1,6 +1,6 @@
 import 'package:hentai_library/features/named_metadata/domain/named_facet_form_candidate.dart';
-import 'package:hentai_library/shared/domain/models/managed_named_facet_kind.dart';
-export 'package:hentai_library/shared/domain/models/managed_named_facet_kind.dart';
+import 'package:hentai_library/features/named_metadata/domain/managed_named_facet_kind.dart';
+export 'package:hentai_library/features/named_metadata/domain/managed_named_facet_kind.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
 

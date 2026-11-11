@@ -4,7 +4,7 @@
 /// 组件；本 barrel 供 Lab / Widgetbook 引用，**不是**独立生产路由面。
 library;
 
-export 'package:hentai_library/shared/domain/models/managed_named_facet_kind.dart';
+export 'package:hentai_library/features/named_metadata/domain/managed_named_facet_kind.dart';
 export 'package:hentai_library/features/named_metadata/presentation/views/metadata/patterns/managed_named_facet_ui.dart';
 export 'package:hentai_library/features/named_metadata/presentation/views/metadata/patterns/management_catalog_toolbar.dart';
 export 'package:hentai_library/features/named_metadata/presentation/views/metadata/patterns/management_create_entity_dialog.dart';

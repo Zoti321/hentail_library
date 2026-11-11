@@ -1,5 +1,5 @@
 import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/shared/domain/models/managed_named_facet_kind.dart';
+import 'package:hentai_library/features/named_metadata/domain/managed_named_facet_kind.dart';
 
 /// named_metadata 领域枚举 → 展示文案（owner extension；ARB 源仍在 `core/l10n`）。
 extension NamedMetadataL10nX on AppLocalizations {
