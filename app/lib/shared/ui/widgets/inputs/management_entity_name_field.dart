@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/widgets/inputs/outlined_text_field.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 
 /// 管理页新建实体：单行 outlined 输入（Dialog 与桌面内联共用）。
 class ManagementEntityNameField extends StatelessWidget {

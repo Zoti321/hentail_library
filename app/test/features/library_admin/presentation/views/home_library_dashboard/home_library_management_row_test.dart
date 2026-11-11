@@ -3,8 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/shared/ui/patterns/home/home_library_dashboard_models.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/home_library_management_section.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/reorderable_split_list_group.dart';
-import 'package:hentai_library/shared/ui/widgets/settings/split_list_group.dart';
-import 'package:hentai_library/shared/ui/widgets/settings/tonal_surface.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 
 import '../../../../../support/pump_app.dart';
 

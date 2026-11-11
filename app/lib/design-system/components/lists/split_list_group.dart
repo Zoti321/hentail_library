@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/design-system/design_system.dart';
-import 'package:hentai_library/shared/ui/widgets/lists/reorder_exclude.dart';
-import 'package:hentai_library/shared/ui/widgets/settings/tonal_surface.dart';
+import 'package:hentai_library/design-system/components/lists/reorder_exclude.dart';
+import 'package:hentai_library/design-system/components/surfaces/tonal_surface.dart';
+import 'package:hentai_library/design-system/motion/effects_decorated_box.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 const double kSplitListInnerRadius = 4;

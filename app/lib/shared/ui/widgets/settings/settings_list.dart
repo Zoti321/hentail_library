@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/settings_section_header.dart';
-import 'package:hentai_library/shared/ui/widgets/settings/split_list_group.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Scrollable detail column with optional max width (Kazumi-style ~1000dp).

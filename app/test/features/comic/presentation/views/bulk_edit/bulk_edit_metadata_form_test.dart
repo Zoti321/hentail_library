@@ -6,7 +6,7 @@ import 'package:hentai_library/features/comic/presentation/views/bulk_edit/bulk_
 import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_field_label_row.dart';
-import 'package:hentai_library/shared/ui/widgets/inputs/outlined_text_field.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/shared/ui/widgets/inputs/tag_input_field.dart';
 import 'package:hentai_library/shared/ui/widgets/selection/segmented_capsule_bar.dart';
 import 'package:riverpod/misc.dart' show Override;

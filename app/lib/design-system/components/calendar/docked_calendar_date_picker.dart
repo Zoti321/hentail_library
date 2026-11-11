@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/widgets/inputs/embeddable_calendar_date_picker.dart';
+import 'package:hentai_library/design-system/components/calendar/embeddable_calendar_date_picker.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 漫画元数据发布日期默认可选范围（与 Lab 预览一致）。

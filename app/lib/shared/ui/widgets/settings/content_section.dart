@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/settings_section_header.dart';
-import 'package:hentai_library/shared/ui/widgets/settings/split_list_group.dart';
-import 'package:hentai_library/shared/ui/widgets/settings/tonal_surface.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 
 /// Titled block: header + tonal card or split list group.
 class ContentSection extends StatelessWidget {

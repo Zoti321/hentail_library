@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/shared/ui/widgets/inputs/anchored_calendar_date_picker.dart';
-import 'package:hentai_library/shared/ui/widgets/inputs/docked_calendar_date_picker.dart';
-import 'package:hentai_library/shared/ui/widgets/inputs/embeddable_calendar_date_picker.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 void main() {

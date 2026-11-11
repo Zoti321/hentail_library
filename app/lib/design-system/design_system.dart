@@ -33,4 +33,20 @@ export 'package:hentai_library/design-system/layout/fab_sizing.dart';
 export 'package:hentai_library/design-system/layout/page_layout_spec.dart';
 export 'package:hentai_library/design-system/layout/spacing.dart';
 
+// components
+export 'package:hentai_library/design-system/components/calendar/anchored_calendar_date_picker.dart';
+export 'package:hentai_library/design-system/components/calendar/calendar_day_cell.dart';
+export 'package:hentai_library/design-system/components/calendar/calendar_day_picker.dart';
+export 'package:hentai_library/design-system/components/calendar/calendar_month_picker.dart';
+export 'package:hentai_library/design-system/components/calendar/calendar_year_picker.dart';
+export 'package:hentai_library/design-system/components/calendar/docked_calendar_date_picker.dart';
+export 'package:hentai_library/design-system/components/calendar/embeddable_calendar_date_picker.dart';
+export 'package:hentai_library/design-system/components/inputs/input_chip_field_layout.dart';
+export 'package:hentai_library/design-system/components/inputs/outlined_text_field.dart';
+export 'package:hentai_library/design-system/components/inputs/outlined_text_field_selection_scope.dart';
+export 'package:hentai_library/design-system/components/inputs/outlined_text_field_shell.dart';
+export 'package:hentai_library/design-system/components/lists/reorder_exclude.dart';
+export 'package:hentai_library/design-system/components/lists/split_list_group.dart';
+export 'package:hentai_library/design-system/components/surfaces/tonal_surface.dart';
+
 // l10n（直接路径暴露，不经 barrel：`design-system/l10n/m3e_material_localizations.dart`）

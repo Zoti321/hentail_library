@@ -1,7 +1,7 @@
 import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/widgets/inputs/outlined_text_field_selection_scope.dart';
+import 'package:hentai_library/design-system/components/inputs/outlined_text_field_selection_scope.dart';
 import 'package:material_3_expressive/components/text_fields/components/m3e_text_field_container_painter.dart';
 import 'package:material_3_expressive/components/text_fields/components/m3e_text_field_label.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';

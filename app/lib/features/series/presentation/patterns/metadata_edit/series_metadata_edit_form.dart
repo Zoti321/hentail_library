@@ -8,7 +8,6 @@ import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_fo
 import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_field_label_row.dart';
 import 'package:hentai_library/features/series/presentation/patterns/metadata_edit/series_metadata_edit_draft.dart';
 import 'package:hentai_library/features/series/presentation/patterns/metadata_edit/series_metadata_locks_pane.dart';
-import 'package:hentai_library/shared/ui/widgets/inputs/outlined_text_field.dart';
 import 'package:hentai_library/features/series/presentation/patterns/metadata_edit/series_serialization_dropdown.dart';
 import 'package:hentai_library/shared/ui/widgets/list_detail/list_detail_detail_transition.dart';
 import 'package:hentai_library/shared/ui/widgets/list_detail/list_detail_nav_item.dart';
