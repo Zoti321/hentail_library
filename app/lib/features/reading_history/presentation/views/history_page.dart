@@ -11,7 +11,7 @@ import 'package:hentai_library/features/comic/public/di/comic_cover_providers.da
 import 'package:hentai_library/features/reading_history/presentation/widgets/history_list_item.dart';
 import 'package:hentai_library/shared/ui/layout/app_shell_navigation.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/page_header_back_button.dart';
-import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/shared/ui/widgets/inputs/app_dense_search_bar.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 

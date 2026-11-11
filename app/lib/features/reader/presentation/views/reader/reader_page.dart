@@ -28,7 +28,7 @@ import 'package:hentai_library/features/reader/domain/auto_play_interval.dart';
 import 'package:hentai_library/features/reader/domain/reading_mode.dart';
 import 'package:hentai_library/shared/di/app_settings_providers.dart';
 import 'package:hentai_library/shared/ui/navigation/app_navigator_context.dart';
-import 'package:hentai_library/shared/ui/theme/theme.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';

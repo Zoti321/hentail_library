@@ -10,7 +10,7 @@ import 'package:hentai_library/features/comic/presentation/views/comic_detail/co
 import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_cover.dart';
 import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_entry.dart';
 import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_layout.dart';
-import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/shared/di/library_command_providers.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/shared/di/reader_launch_providers.dart';

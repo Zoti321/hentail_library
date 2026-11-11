@@ -6,7 +6,7 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/util/app_locale.dart';
 import 'package:hentai_library/core/util/app_theme_mode.dart';
 import 'package:hentai_library/core/util/app_window_title.dart';
-import 'package:hentai_library/shared/ui/theme/theme.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/shared/di/app_settings_providers.dart';
 import 'package:hentai_library/shared/di/domain_event_revisions.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';

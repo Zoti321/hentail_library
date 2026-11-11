@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/ui/motion/effects_decorated_box.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/shared/ui/widgets/pagination/pagination_metrics.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 

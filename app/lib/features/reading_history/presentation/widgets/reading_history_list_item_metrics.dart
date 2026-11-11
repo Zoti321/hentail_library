@@ -1,9 +1,8 @@
 import 'dart:math' as math;
 
-import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 
 import 'package:hentai_library/core/util/platform_desktop.dart';
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Resolved geometry for one [ReadingHistoryListItem] at a window class.

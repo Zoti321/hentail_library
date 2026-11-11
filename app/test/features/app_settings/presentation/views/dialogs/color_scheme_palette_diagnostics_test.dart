@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_color_utilities/material_color_utilities.dart';
 

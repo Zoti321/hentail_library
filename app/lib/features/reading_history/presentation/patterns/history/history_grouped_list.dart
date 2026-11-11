@@ -6,7 +6,7 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_time_grouping.dart';
 import 'package:hentai_library/features/reading_history/presentation/patterns/history/reading_history_list_layout.dart';
 import 'package:hentai_library/features/reading_history/presentation/widgets/spring_expand_panel.dart';
-import 'package:hentai_library/shared/ui/motion/spring_value.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 

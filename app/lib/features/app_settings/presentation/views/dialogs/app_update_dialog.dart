@@ -8,8 +8,7 @@ import 'package:hentai_library/features/app_settings/presentation/view_models/se
 import 'package:hentai_library/features/app_settings/presentation/views/dialogs/app_update_download_dialog.dart';
 import 'package:hentai_library/features/app_settings/domain/app_release_info.dart';
 import 'package:hentai_library/shared/ui/patterns/dialog/lab_dialog_presenter.dart';
-import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
-import 'package:hentai_library/shared/ui/theme/lab_text.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:intl/intl.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';

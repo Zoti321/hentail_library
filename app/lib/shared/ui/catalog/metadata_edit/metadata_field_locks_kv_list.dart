@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/shared/ui/widgets/inputs/metadata_field_lock_button.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/split_list_group.dart';

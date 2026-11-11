@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 详情主标题（漫画 / 系列共用，最多两行，可选 tooltip）。

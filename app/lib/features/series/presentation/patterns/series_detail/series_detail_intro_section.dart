@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/features/series/presentation/patterns/series_detail/series_detail_page_metrics.dart';
 import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_view_object.dart';
 import 'package:hentai_library/features/series/presentation/patterns/series_detail/series_detail_metadata_section.dart';

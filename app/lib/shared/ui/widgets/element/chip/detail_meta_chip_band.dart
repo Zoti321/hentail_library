@@ -3,7 +3,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/shared/ui/layout/detail_meta_chip_band_layout.dart';
 import 'package:hentai_library/shared/ui/layout/detail_meta_chip_row_layout.dart';
-import 'package:hentai_library/shared/ui/theme/theme.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/shared/ui/widgets/foundation/horizontal_wheel_scroll_listener.dart';
 
 /// Shared detail facet chip band: wrap up to [maxRows], then horizontal scroll.

@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/theme/theme.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/shared/ui/widgets/overlays/dialog/dialog_actions_bar.dart';
 
 class HentaiDialog extends StatelessWidget {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/motion/motion.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:motor/motor.dart';
 
 /// 列表 / 分组内容展开：对齐 M3E [M3EExpandableSublist] 的运动语义。

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/features/named_metadata/domain/named_facet_management_repository.dart';
 import 'package:hentai_library/features/named_metadata/presentation/view_models/named_facet_management_view_model.dart';
-import 'package:hentai_library/shared/ui/motion/peer_content_transition.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// Near-bottom / fill-viewport threshold shared with scroll-driven load-more.

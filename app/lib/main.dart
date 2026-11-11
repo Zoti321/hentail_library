@@ -13,7 +13,7 @@ import 'package:hentai_library/shared/data/frb/frb_zone_guard.dart';
 import 'package:hentai_library/src/rust/api/comic.dart';
 import 'package:hentai_library/src/rust/api/logging.dart';
 import 'package:hentai_library/src/rust/frb_generated.dart';
-import 'package:hentai_library/shared/ui/layout/app_layout_breakpoints.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/features/bootstrap/di/bootstrap_overrides.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/app.dart';
 import 'package:path_provider/path_provider.dart';

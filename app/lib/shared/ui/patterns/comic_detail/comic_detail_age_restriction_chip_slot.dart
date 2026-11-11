@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/ui/patterns/comic_detail/comic_detail_age_restriction_chip.dart';
-import 'package:hentai_library/shared/ui/motion/spring_size.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 
 /// 关闭 [visible] 后延迟收起，避免 knob / 状态切换时摘要行瞬间跳动。
 const Duration kComicDetailAgeRestrictionChipHideDebounce = Duration(

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/motion/spring_value.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 
 /// Height of catalog cover read-progress strips (card + list leading).
 const double kCoverReadProgressHeight = 2;

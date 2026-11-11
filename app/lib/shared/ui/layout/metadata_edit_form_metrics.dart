@@ -1,8 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
-import 'package:hentai_library/shared/ui/layout/spacing.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 漫画 / 系列元数据编辑表单布局 token（Lab）。

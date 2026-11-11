@@ -7,7 +7,7 @@ import 'package:hentai_library/features/library_browse/presentation/browse/views
 import 'package:hentai_library/features/library_browse/presentation/browse/views/library/library_grouping_section.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/views/library/library_sort_section.dart';
 import 'package:hentai_library/shared/ui/patterns/library/library_filter_sort_metrics.dart';
-import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/shared/ui/widgets/sheets/overlay_route_scope.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';

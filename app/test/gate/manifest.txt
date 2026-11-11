@@ -45,11 +45,11 @@ test/features/library_admin/presentation/views/library/library_form_dialog_test.
 test/features/series/presentation/views/metadata_edit/series_metadata_edit_view_test.dart
 
 # Dart hard-manifest UI — 纯逻辑 ViewModel / policy / codec
-test/shared/ui/motion/app_motion_test.dart
-test/shared/ui/motion/desktop_page_transition_test.dart
+test/design-system/motion/app_motion_test.dart
+test/design-system/motion/desktop_page_transition_test.dart
 test/shared/ui/widgets/foundation/pointer_target_test.dart
 test/features/reader/presentation/reader_input_test.dart
-test/shared/ui/theme/reader_color_scheme_contract_test.dart
+test/design-system/theme/reader_color_scheme_contract_test.dart
 test/features/library_browse/presentation/browse/view_models/stable_page_count_test.dart
 test/features/library_browse/presentation/catalog/view_models/catalog_pagination_engine_test.dart
 test/features/comic/presentation/view_models/comic_detail_return_series_notifier_test.dart
@@ -69,8 +69,8 @@ test/features/app_settings/presentation/view_models/reading_mode_persist_test.da
 test/features/reading_history/presentation/view_models/history_load_more_throttle_test.dart
 test/features/reading_history/presentation/view_models/history_paged_feed_controller_test.dart
 test/features/home/presentation/view_models/home_alert_dismiss_notifier_test.dart
-test/shared/ui/layout/page_layout_spec_test.dart
-test/shared/ui/layout/page_viewport_test.dart
+test/design-system/layout/page_layout_spec_test.dart
+test/design-system/layout/page_viewport_test.dart
 test/features/reading_history/presentation/views/history_page_test.dart
 test/features/home/presentation/views/home/home_page_test.dart
 test/features/library_admin/presentation/views/home_library_dashboard/home_library_management_row_test.dart

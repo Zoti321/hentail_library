@@ -3,7 +3,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 管理/列表页 dense 搜索：compact 近全宽；其余断点左对齐并限制最大宽度。

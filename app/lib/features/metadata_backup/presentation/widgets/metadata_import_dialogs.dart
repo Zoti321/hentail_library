@@ -5,7 +5,7 @@ import 'package:hentai_library/features/metadata_backup/domain/metadata_backup_m
 import 'package:hentai_library/features/metadata_backup/domain/metadata_import_match_tier.dart';
 import 'package:hentai_library/features/metadata_backup/domain/metadata_import_preview.dart';
 import 'package:hentai_library/features/metadata_backup/domain/metadata_import_result.dart';
-import 'package:hentai_library/shared/ui/theme/theme.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/shared/ui/widgets/overlays/dialog/hentai_dialog.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 

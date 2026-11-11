@@ -4,7 +4,7 @@ import 'package:hentai_library/features/comic/presentation/views/comic_detail/co
 
 import '../../hosts/md3e_reader_page_lab_host.dart';
 
-import 'package:hentai_library/shared/ui/motion/shared_axis_route.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 
 import '../../preview/md3e_reader_page_preview_data.dart';
 

@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/ui/l10n/m3e_material_localizations.dart';
+import 'package:hentai_library/design-system/l10n/m3e_material_localizations.dart';
 import 'package:hentai_library/shared/ui/widgets/inputs/calendar_day_cell.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:flutter/material.dart' hide MaterialLocalizations;

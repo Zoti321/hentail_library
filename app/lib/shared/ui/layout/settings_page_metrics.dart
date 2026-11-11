@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 
 /// Layout tokens for [SettingsLayout] (Kazumi-inspired list–detail).
 /// 页面留白与标题见 PageLayoutSpec。

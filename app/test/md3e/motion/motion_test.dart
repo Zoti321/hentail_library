@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/shared/ui/motion/motion.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 
 void main() {
   test('Motion exposes non-zero standard durations', () {

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/shared/ui/layout/pinned_toolbar_chrome_metrics.dart';
-import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 页头画布与内边距（水平留白、上下内边距由 [PageLayoutSpec] 决定）。

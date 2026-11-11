@@ -1,6 +1,5 @@
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/shared/ui/layout/comic_detail_page_metrics.dart';
-import 'package:hentai_library/shared/ui/layout/spacing.dart';
 
 /// Layout tokens for [SeriesDetailLayout].
 abstract final class SeriesDetailPageMetrics {

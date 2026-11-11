@@ -1,6 +1,5 @@
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/shared/ui/layout/pinned_toolbar_chrome_metrics.dart';
-import 'package:hentai_library/shared/ui/layout/spacing.dart';
 
 /// Layout tokens for [ComicDetailLayout] (Lab; spacing tuned for sticky header + scroll body).
 abstract final class ComicDetailPageMetrics {

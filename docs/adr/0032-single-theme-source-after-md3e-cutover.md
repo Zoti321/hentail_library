@@ -4,6 +4,8 @@
 
 Accepted
 
+> **实现修订（2026-11-11，#495 / ADR-0044）**：主题仍单源，仍由 `buildAppTheme` 装配；物理位置从 `shared/ui/theme` 迁到 `design-system/theme`（`lib/design-system/`）。下文 `shared/ui/theme/` 路径按此阅读。
+
 ## Context
 
 ADR-0028 将生产主题装配收敛到 `shared/ui/theme/` 的 `buildAppTheme`。MD3E Lab 另有一套 `md3e/theme/`（`M3EThemeData`、`buildMd3eMaterialTheme` 等），目前仅服务 Lab 与 Widgetbook。

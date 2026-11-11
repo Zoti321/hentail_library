@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
-import 'package:hentai_library/shared/ui/layout/fab_sizing.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/shared/ui/layout/library_browse_page_metrics.dart';
-import 'package:hentai_library/shared/ui/motion/spring_reveal.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 

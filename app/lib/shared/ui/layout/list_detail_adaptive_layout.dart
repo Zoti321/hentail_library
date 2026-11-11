@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 
 /// List+detail side-by-side at [WindowSizeClass.expanded] and wider (≥840dp).
 const double kListDetailExpandedBreakpoint = Breakpoints.expanded;

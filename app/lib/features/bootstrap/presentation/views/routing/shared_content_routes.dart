@@ -1,11 +1,7 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hentai_library/shared/ui/motion/catalog_detail_page.dart';
-import 'package:hentai_library/shared/ui/motion/desktop_page_transition.dart';
-import 'package:hentai_library/shared/ui/motion/motion.dart';
-import 'package:hentai_library/shared/ui/motion/shared_axis_route.dart';
-import 'package:hentai_library/shared/ui/theme/theme.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/core/constants/app_routes.dart';
 import 'package:hentai_library/features/comic/public.dart';
 import 'package:hentai_library/features/library_browse/public.dart';

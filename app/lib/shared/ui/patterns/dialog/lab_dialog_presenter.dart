@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/shared/ui/patterns/dialog/lab_dialog_route.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 

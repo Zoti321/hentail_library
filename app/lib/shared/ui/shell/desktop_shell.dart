@@ -1,10 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
-import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
 import 'package:hentai_library/shared/ui/lab/lab_library_catalog.dart';
 import 'package:hentai_library/shared/ui/shell/shell_library_picker_sheet.dart';
 import 'package:hentai_library/shared/ui/shell/shell_library_secondary_column.dart';
@@ -12,7 +10,6 @@ import 'package:hentai_library/shared/ui/shell/shell_library_secondary_layout.da
 import 'package:hentai_library/shared/ui/shell/shell_navigation.dart';
 import 'package:hentai_library/shared/ui/shell/shell_rail_library_hover_metrics.dart';
 import 'package:hentai_library/shared/ui/patterns/home/home_library_dashboard_models.dart';
-import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
 import 'package:hentai_library/shared/ui/widgets/desktop/desktop_title_bar.dart';
 import 'package:hentai_library/shared/ui/widgets/desktop/navigation_bar.dart';
 import 'package:hentai_library/shared/ui/widgets/desktop/navigation_rail.dart';

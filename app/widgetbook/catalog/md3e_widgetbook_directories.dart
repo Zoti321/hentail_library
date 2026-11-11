@@ -11,7 +11,7 @@ import 'package:hentai_library/features/reading_history/presentation/patterns/hi
 import 'package:hentai_library/features/reading_history/presentation/widgets/reading_history_list_item.dart';
 import 'package:hentai_library/features/comic/presentation/patterns/comic_detail/comic_detail_metadata_tags_section.dart';
 import 'package:hentai_library/shared/ui/shell/desktop_shell.dart';
-import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 
 import '../hosts/md3e_home_page_lab_host.dart';
 

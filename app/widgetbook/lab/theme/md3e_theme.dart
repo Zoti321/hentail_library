@@ -1,10 +1,10 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/theme/theme.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:material_3_expressive/foundations/foundations.dart';
 import 'package:material_ui/material_ui.dart' as material_ui;
 
-export 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart'
+export 'package:hentai_library/design-system/design_system.dart'
     show
         buildAppM3eThemeData,
         flutterColorSchemeFromM3e,

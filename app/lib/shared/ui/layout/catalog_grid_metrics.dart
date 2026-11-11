@@ -1,10 +1,8 @@
 import 'dart:math' as math;
 
-import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/shared/ui/widgets/catalog/comic_card.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
-
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 
 /// Resolved grid geometry for a viewport width (cell width matches delegate).
 class CatalogGridLayout {

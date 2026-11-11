@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/features/reader/presentation/patterns/reader/reader_page_copy.dart';
-import 'package:hentai_library/shared/ui/theme/lab_text.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Lab 阅读画布：打开中（静态）。

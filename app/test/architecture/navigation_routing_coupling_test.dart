@@ -104,9 +104,9 @@ const Set<String> _routerIntegrationAllowlist = <String>{
   'features/bootstrap/presentation/views/routing/app_router.dart',
   'features/bootstrap/presentation/views/routing/go_router_app_navigator.dart',
   'features/bootstrap/presentation/views/routing/shared_content_routes.dart',
-  'shared/ui/motion/catalog_detail_page.dart',
-  'shared/ui/motion/desktop_page_transition.dart',
-  'shared/ui/motion/shared_axis_route.dart',
+  'design-system/motion/catalog_detail_page.dart',
+  'design-system/motion/desktop_page_transition.dart',
+  'design-system/motion/shared_axis_route.dart',
 };
 
 String _libRelative(Directory libDir, File file) {

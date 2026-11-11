@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/l10n/m3e_material_localizations.dart';
-import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
+import 'package:hentai_library/design-system/l10n/m3e_material_localizations.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 路由 / overlay 所需的主题与本地化快照。

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/theme/theme.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 
 /// Shared dialog / adaptive-form footer: end-aligned [Wrap], fixed spacing,
 /// and unified 4px button corners for Text / Outlined / Filled (independent of

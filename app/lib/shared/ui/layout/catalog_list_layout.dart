@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/util/platform_desktop.dart';
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
-import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 
 /// List column count for catalog browse, from window size class and platform.
 ///

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/page_title.dart';
 
 /// Lab / Widgetbook 管理页粘滞头：仅左侧标题（间距与字阶来自 [PageLayoutSpec]）。

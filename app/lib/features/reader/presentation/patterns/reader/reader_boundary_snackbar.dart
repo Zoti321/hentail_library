@@ -1,8 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/motion/motion.dart';
-import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 阅读页系列边界提示：与 [M3ESnackbarHost] 同一套动效（自下方滑入 emphasized、

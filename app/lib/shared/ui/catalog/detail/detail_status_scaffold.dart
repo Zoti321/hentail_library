@@ -4,7 +4,7 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/catalog/detail/detail_back_header.dart';
 import 'package:hentai_library/shared/ui/navigation/library_browse_navigation.dart';
-import 'package:hentai_library/shared/ui/theme/theme.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// 漫画详情与系列详情共用的边缘状态外壳（返回头 + 居中的图标 / 文案 / 操作）。

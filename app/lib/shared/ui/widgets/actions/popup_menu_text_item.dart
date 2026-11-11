@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hentai_library/shared/ui/theme/theme.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 
 /// 菜单面板内的文本菜单项：hover 高亮，支持禁用与危险样式（由侧栏与元数据菜单共用）。
 class PopupMenuTextItem extends HookWidget {

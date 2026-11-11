@@ -9,7 +9,7 @@ import 'package:hentai_library/features/reader/presentation/routing/reader_route
 import 'package:hentai_library/shared/di/app_settings_providers.dart';
 import 'package:hentai_library/features/reader/domain/auto_play_mode.dart';
 import 'package:hentai_library/features/reader/domain/reading_mode.dart';
-import 'package:hentai_library/shared/ui/motion/app_motion.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// Isolates autoplay timer subscriptions so index ticks don't rebuild the page shell.

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/shared/ui/layout/library_edit_form_metrics.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/ui/motion/motion.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/library/library_edit_page.dart';
 import 'package:hentai_library/shared/ui/patterns/dialog/lab_dialog_presenter.dart';
 import 'package:hentai_library/features/library_admin/presentation/patterns/library_edit_form.dart';

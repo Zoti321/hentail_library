@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_page.dart';
 import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_page_lab_host.dart';
-import 'package:hentai_library/shared/ui/motion/shared_axis_route.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 
 import '../data/md3e_lab_catalog_detail_preview_data.dart';
 

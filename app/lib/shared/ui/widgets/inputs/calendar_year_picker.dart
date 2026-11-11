@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 
-import 'package:hentai_library/shared/ui/l10n/m3e_material_localizations.dart';
+import 'package:hentai_library/design-system/l10n/m3e_material_localizations.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:flutter/material.dart' hide MaterialLocalizations;
 

@@ -1,6 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:hentai_library/shared/ui/layout/app_layout_breakpoints.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 
 /// iOS HIG minimum; used on compact (phone-width) layouts.
 const double kCompactMinInteractiveSize = 44;

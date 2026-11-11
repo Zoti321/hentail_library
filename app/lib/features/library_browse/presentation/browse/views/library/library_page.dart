@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
@@ -22,19 +22,15 @@ import 'package:hentai_library/features/comic/public/di/comic_detail_providers.d
 import 'package:hentai_library/features/comic/public/ui/comic_card_actions.dart';
 import 'package:hentai_library/features/comic/public/ui/comic_cover_content.dart';
 import 'package:hentai_library/features/comic/public/ui/comic_catalog_selection_actions.dart';
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:hentai_library/shared/ui/layout/catalog_grid.dart';
 import 'package:hentai_library/shared/ui/layout/catalog_grid_metrics.dart';
 import 'package:hentai_library/shared/ui/layout/catalog_list_layout.dart';
 import 'package:hentai_library/shared/ui/widgets/actions/catalog_view_mode_button_group.dart';
 import 'package:hentai_library/shared/ui/widgets/catalog/comic_list_item.dart';
 import 'package:hentai_library/shared/ui/layout/library_browse_page_metrics.dart';
-import 'package:hentai_library/shared/ui/layout/spacing.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/patterns/library/library_catalog_toolbar.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/patterns/library/library_page_header.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/page_header.dart';
-import 'package:hentai_library/shared/ui/motion/mode_chrome_transition.dart';
-import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
 import 'package:hentai_library/shared/ui/widgets/catalog/comic_card.dart';
 import 'package:hentai_library/shared/ui/widgets/navigation/expressive_library_scroll_to_top_button.dart';
 import 'package:hentai_library/shared/ui/widgets/pagination/pagination.dart';

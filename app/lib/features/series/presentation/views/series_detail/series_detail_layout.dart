@@ -3,13 +3,11 @@ import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dar
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/shared/domain/catalog/selection/catalog_selection_notifier.dart';
 import 'package:hentai_library/shared/ui/catalog/selection/library_selection_header.dart';
-import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_view_object.dart';
 import 'package:hentai_library/shared/di/series_slot_providers.dart';
-import 'package:hentai_library/shared/ui/motion/mode_chrome_transition.dart';
-import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/page_header.dart';
 import 'package:hentai_library/features/series/presentation/patterns/series_detail/series_detail_comics_section.dart';
 import 'package:hentai_library/features/series/presentation/patterns/series_detail/series_detail_intro_section.dart';

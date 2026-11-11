@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/layout/settings_page_metrics.dart';
-import 'package:hentai_library/shared/ui/layout/spacing.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/page_title.dart';
 import 'package:hentai_library/features/app_settings/presentation/patterns/settings/metadata_backup_import_lab_flow.dart';
 import 'package:hentai_library/features/app_settings/presentation/patterns/settings/settings_catalog.dart';

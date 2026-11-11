@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 
 /// Lab 阅读器顶/底 chrome 尺寸（沉浸 letterbox + 全宽 scrim）。
 ///

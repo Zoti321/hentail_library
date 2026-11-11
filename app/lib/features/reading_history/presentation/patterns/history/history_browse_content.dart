@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_empty_body.dart';
 import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_record_summary.dart';
 import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_time_grouping.dart';

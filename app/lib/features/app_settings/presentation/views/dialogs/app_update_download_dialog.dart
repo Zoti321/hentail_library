@@ -11,8 +11,7 @@ import 'package:hentai_library/core/util/utils.dart';
 import 'package:hentai_library/features/app_settings/di/app_update_providers.dart';
 import 'package:hentai_library/features/app_settings/domain/app_release_info.dart';
 import 'package:hentai_library/shared/ui/patterns/dialog/lab_dialog_presenter.dart';
-import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
-import 'package:hentai_library/shared/ui/theme/lab_text.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 

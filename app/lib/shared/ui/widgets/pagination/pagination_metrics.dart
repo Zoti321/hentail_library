@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/shared/ui/widgets/pagination/pagination_page_window.dart';
 
 /// Layout constants for [Pagination].
