@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/shared/di/injected_di.dart';
-import 'package:hentai_library/shared/domain/ports/comic_trash_reader_session_port.dart';
 import 'package:hentai_library/features/comic/domain/repositories/comic_lookup_repository.dart';
 import 'package:hentai_library/features/comic/domain/repositories/comic_thumbnail_repository.dart';
 import 'package:hentai_library/shared/domain/ports/remote_library_credentials_port.dart';
@@ -69,9 +68,6 @@ final Provider<HomePageRepository> homePageRepoProvider = injectedDi(
 final Provider<NativeReaderPort> nativeReaderPortProvider = injectedDi(
   'nativeReaderPortProvider',
 );
-
-final Provider<ComicTrashNativeReaderPort> comicTrashNativeReaderPortProvider =
-    injectedDi('comicTrashNativeReaderPortProvider');
 
 final Provider<ComicPageSourcePort> comicPageSourcePortProvider = injectedDi(
   'comicPageSourcePortProvider',

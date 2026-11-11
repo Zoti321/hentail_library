@@ -1,8 +1,6 @@
 import 'package:hentai_library/features/comic_trash/application/comic_trash_service.dart';
-import 'package:hentai_library/features/comic_trash/domain/trashed_comic.dart';
 import 'package:hentai_library/shared/domain/events/events.dart';
-import 'package:hentai_library/shared/domain/ports/comic_trash_reader_session_port.dart';
-import 'package:hentai_library/features/comic_trash/domain/comic_trash_repository.dart';
+import 'package:hentai_library/features/comic_trash/public.dart';
 import 'package:test/test.dart';
 
 class _RecordingEventPublisher implements DomainEventPublisher {
