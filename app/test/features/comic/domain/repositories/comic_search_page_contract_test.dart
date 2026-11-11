@@ -2,7 +2,7 @@ import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
-import 'package:hentai_library/features/comic/domain/comic_catalog_repository.dart';
+import 'package:hentai_library/features/comic/domain/repositories/comic_catalog_repository.dart';
 import 'package:test/test.dart';
 
 class _RecordingComicRepo implements ComicCatalogRepository {

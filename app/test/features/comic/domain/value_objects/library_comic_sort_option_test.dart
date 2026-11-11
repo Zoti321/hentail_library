@@ -1,4 +1,4 @@
-import 'package:hentai_library/features/comic/domain/library_comic_sort_option.dart';
+import 'package:hentai_library/features/comic/domain/value_objects/library_comic_sort_option.dart';
 import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:test/test.dart';

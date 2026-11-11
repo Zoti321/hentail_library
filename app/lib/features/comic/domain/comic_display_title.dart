@@ -1,5 +1,5 @@
 import 'package:hentai_library/features/comic/domain/comic.dart';
-import 'package:hentai_library/features/comic/domain/comic_lookup_repository.dart';
+import 'package:hentai_library/features/comic/domain/repositories/comic_lookup_repository.dart';
 
 String comicTitleFallbackForDisplay(String comicId) {
   return comicId.length > 12 ? '${comicId.substring(0, 12)}…' : comicId;

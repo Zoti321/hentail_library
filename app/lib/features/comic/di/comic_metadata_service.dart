@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/comic/application/comic_metadata_service.dart';
 import 'package:hentai_library/shared/di/domain_event_bus_providers.dart';
 import 'package:hentai_library/features/comic/domain/comic.dart';
-import 'package:hentai_library/features/comic/domain/comic_metadata_form.dart';
+import 'package:hentai_library/features/comic/domain/value_objects/comic_metadata_form.dart';
 import 'package:hentai_library/features/comic/di/comic_repository_providers.dart';
 
 /// 元数据保存用例的命令签名（presentation 只依赖本 typedef，不接触总线）。

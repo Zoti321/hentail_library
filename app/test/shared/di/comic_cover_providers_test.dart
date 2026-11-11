@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/comic/di/comic_cover_load_gate.dart';
 import 'package:hentai_library/features/comic/di/comic_cover_providers.dart';
-import 'package:hentai_library/features/comic/domain/comic_thumbnail_repository.dart';
+import 'package:hentai_library/features/comic/domain/repositories/comic_thumbnail_repository.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/thumbnail/thumbnail_event.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';

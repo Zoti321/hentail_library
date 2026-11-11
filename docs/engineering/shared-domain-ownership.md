@@ -12,7 +12,7 @@
 | `comic_trash/*`、`TrashedComic` read model | `features/comic_trash/domain/` |
 | `reading/*`（Read session 域类型） | `features/reader/domain/`（ADR-0038；旧 `read_session`） |
 | 库 browse 壳（跨 Tab 偏好、作者、catalog 壳） | `features/library_browse/domain/browse/`（**不含** comic/series Tab 规则） |
-| Comic 仓储、Comics Tab 规则、展示标题、smart facet | `features/comic/domain/` |
+| Comic 仓储、Comics Tab 规则、展示标题、smart facet | `features/comic/domain/`（见下方分层） |
 | **`Comic` 实体、`ComicMetaLocks`、`ComicMetadataForm`、`Comic` FRB 映射** | `features/comic/domain/`、`features/comic/data/comic_entity_mapper.dart`（ADR-0041；跨模块经 `features/comic/public/**`） |
 | Series 仓储、Series Tab 规则 | `features/series/domain/` |
 | 库 admin（扫描、revision、current library 等） | `features/library_admin/domain/` |
@@ -25,6 +25,18 @@
 | named metadata 表单/字典 | `features/named_metadata/domain/`；跨 feature **`features/named_metadata/public.dart`**（仓储契约、字典 Riverpod、生产页）；Comic 表单窄面 **`public/named_metadata_form.dart`**；Lab patterns **`public/ui/metadata_lab_patterns.dart`** |
 
 Feature 内代码应 **import owner `domain/`**（`library_browse` 内按 [`library-browse-zones.md`](library-browse-zones.md) 分子目录）；跨 feature 经 **`features/<owner>/public/**`**（ADR-0034）。**勿**再新增对已删除 shared shim 路径的依赖。
+
+### `features/comic/domain/` 分层（2026-11-11）
+
+| 路径 | 内容 |
+| --- | --- |
+| `comic.dart` | `Comic` 投影型实体（构造不变式、草稿应用、元数据 diff；ADR-0041） |
+| `comic_display_title.dart`、`comic_metadata_normalization.dart` | 展示标题投影、元数据规范化内部辅助 |
+| `smart_facet_match.dart`、`smart_facet_match_preference.dart` | Smart facet match 规约与偏好键 |
+| `value_objects/` | `ComicMetaLocks`、`ComicMetadataForm`、`LibraryComicFilter` / `Grouping` / `SortOption` |
+| `repositories/` | `ComicCatalogRepository`、`ComicLookupRepository`、`ComicThumbnailRepository`、`ComicUserMetadataRepository` |
+
+新域文件按上述职责入对应子目录；实体本身留在 `domain/` 根（DDD 命名：`{aggregate}.dart`）。
 
 `shared/domain/models/models.dart` barrel 已于 #489 删除（零消费者）；需要 `reading_history` / `app_settings` 类型请直接 import 对应 feature 的 `public/**`（ADR-0034）。
 

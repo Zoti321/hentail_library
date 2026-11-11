@@ -57,4 +57,4 @@ Accepted
 
 - ADR-0034（public only / token 归属）、ADR-0036（comic/series 模块与禁止边表）、ADR-0039（命令走 Port、事实走事件）
 - GitHub #488
-- `app/lib/features/comic/domain/comic_catalog_repository.dart`、`app/lib/features/series/domain/series_repository.dart`
+- `app/lib/features/comic/domain/repositories/comic_catalog_repository.dart`、`app/lib/features/series/domain/series_repository.dart`

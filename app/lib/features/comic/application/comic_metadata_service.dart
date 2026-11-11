@@ -1,8 +1,8 @@
 import 'package:hentai_library/shared/domain/events/events.dart';
 import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
-import 'package:hentai_library/features/comic/domain/comic_metadata_form.dart';
-import 'package:hentai_library/features/comic/domain/comic_user_metadata_repository.dart';
+import 'package:hentai_library/features/comic/domain/value_objects/comic_metadata_form.dart';
+import 'package:hentai_library/features/comic/domain/repositories/comic_user_metadata_repository.dart';
 
 /// 浏览侧保存 Comic 元数据草稿的结果。仓储异常仍向上抛，由 UI toast。
 sealed class ComicMetadataApplyResult {

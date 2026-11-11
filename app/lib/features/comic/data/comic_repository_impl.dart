@@ -1,17 +1,17 @@
 import 'package:hentai_library/features/comic/data/comic_entity_mapper.dart';
 import 'package:hentai_library/shared/data/frb/frb_call_guard.dart';
 import 'package:hentai_library/features/comic/data/comic_frb_mapper.dart';
-import 'package:hentai_library/features/comic/domain/comic_catalog_repository.dart';
-import 'package:hentai_library/features/comic/domain/library_comic_grouping.dart';
-import 'package:hentai_library/features/comic/domain/comic_user_metadata_repository.dart';
-import 'package:hentai_library/features/comic/domain/library_comic_filter.dart';
-import 'package:hentai_library/features/comic/domain/library_comic_sort_option.dart';
+import 'package:hentai_library/features/comic/domain/repositories/comic_catalog_repository.dart';
+import 'package:hentai_library/features/comic/domain/value_objects/library_comic_grouping.dart';
+import 'package:hentai_library/features/comic/domain/repositories/comic_user_metadata_repository.dart';
+import 'package:hentai_library/features/comic/domain/value_objects/library_comic_filter.dart';
+import 'package:hentai_library/features/comic/domain/value_objects/library_comic_sort_option.dart';
 import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
-import 'package:hentai_library/features/comic/domain/comic_lookup_repository.dart';
+import 'package:hentai_library/features/comic/domain/repositories/comic_lookup_repository.dart';
 import 'package:hentai_library/src/rust/api/comic.dart' as rust;
 
 /// Sentinel passed to Rust when the user clears published date.

@@ -3,9 +3,9 @@ import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart
 import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
 import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/features/comic/domain/comic_metadata_form.dart';
+import 'package:hentai_library/features/comic/domain/value_objects/comic_metadata_form.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/series_item_membership.dart';
-import 'package:hentai_library/features/comic/domain/comic_user_metadata_repository.dart';
+import 'package:hentai_library/features/comic/domain/repositories/comic_user_metadata_repository.dart';
 import 'package:hentai_library/features/comic/di/comic_repository_providers.dart';
 import 'package:hentai_library/features/series/domain/series_repository.dart';
 import 'package:hentai_library/features/comic/application/comic_metadata_service.dart';

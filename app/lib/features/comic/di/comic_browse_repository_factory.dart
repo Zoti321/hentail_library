@@ -1,7 +1,7 @@
 import 'package:hentai_library/features/comic/data/comic_repository_impl.dart';
-import 'package:hentai_library/features/comic/domain/comic_catalog_repository.dart';
-import 'package:hentai_library/features/comic/domain/comic_lookup_repository.dart';
-import 'package:hentai_library/features/comic/domain/comic_user_metadata_repository.dart';
+import 'package:hentai_library/features/comic/domain/repositories/comic_catalog_repository.dart';
+import 'package:hentai_library/features/comic/domain/repositories/comic_lookup_repository.dart';
+import 'package:hentai_library/features/comic/domain/repositories/comic_user_metadata_repository.dart';
 
 /// Bootstrap / 测试注入用工厂（lookup / catalog / user metadata 共用 impl）。
 ComicLookupRepository createComicRepository() => const ComicRepositoryImpl();
