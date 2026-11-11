@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/features/named_metadata/public/di/named_metadata_repository_providers.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:hentai_library/shared/di/domain_event_revisions.dart';
 

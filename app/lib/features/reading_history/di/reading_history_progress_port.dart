@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/reading_history/domain/reading_history_repository.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/features/reading_history/public/di/reading_history_repository_providers.dart';
 import 'package:hentai_library/shared/domain/ports/reading_history_progress_port.dart';
 
 class _ReadingHistoryProgressAdapter implements ReadingHistoryProgressPort {

@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/features/named_metadata/public/di/named_metadata_repository_providers.dart';
 import 'package:hentai_library/shared/di/domain_event_revisions.dart';
 
 /// 全部作者列表。浏览筛选和已验证作者标记读这份完整字典。

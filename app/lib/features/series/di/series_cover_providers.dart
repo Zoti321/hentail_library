@@ -1,6 +1,6 @@
 import 'package:hentai_library/shared/domain/thumbnail/series_cover_source.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:hentai_library/shared/di/data_providers.dart';
 
 part 'series_cover_providers.g.dart';
 

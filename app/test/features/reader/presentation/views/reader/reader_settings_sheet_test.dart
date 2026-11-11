@@ -3,12 +3,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
 import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
 import 'package:hentai_library/features/reader/presentation/views/reader/reader_settings_sheet.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 import '../../../../../support/fakes/settings_test_fakes.dart';
 import '../../../../../support/pump_localized_app.dart';
+
+import 'package:hentai_library/shared/di/data_providers.dart';
 
 /// 打开阅读设置面板（使用真实的设置写入链路 + 内存仓库）。
 Future<void> _pumpSheet(WidgetTester tester) async {

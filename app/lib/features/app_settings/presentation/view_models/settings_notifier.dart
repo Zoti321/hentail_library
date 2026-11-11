@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 import 'package:hentai_library/features/app_settings/domain/reader_session_preference_types.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:hentai_library/shared/di/data_providers.dart';
 
 part 'settings_notifier.g.dart';
 

@@ -5,11 +5,11 @@ import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/comic/domain/repositories/comic_thumbnail_repository.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/reader_cover_editor_notifier.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/di/series_slot_providers.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:riverpod/riverpod.dart';
 import 'package:test/test.dart';
+import 'package:hentai_library/shared/di/data_providers.dart';
 
 class _RecordingThumbnailRepository implements ComicThumbnailRepository {
   final List<String> calls = <String>[];

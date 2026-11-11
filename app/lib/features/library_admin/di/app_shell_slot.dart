@@ -8,7 +8,6 @@ import 'package:hentai_library/features/library_admin/presentation/views/comic_m
 import 'package:hentai_library/features/library_admin/presentation/views/library_scan_shell_feedback.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/navigation/app_navigation.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/navigation/production_shell_adapters.dart';
-import 'package:hentai_library/shared/di/home_library_stats_providers.dart';
 import 'package:hentai_library/shared/di/library_management_providers.dart';
 import 'package:hentai_library/features/library_admin/public/di/library_admin_state_providers.dart';
 import 'package:hentai_library/features/home/public/home_library_stat.dart';
@@ -18,6 +17,7 @@ import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/shared/ui/shell/app_shell_slot.dart';
 import 'package:hentai_library/shared/ui/navigation/app_navigator_context.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:hentai_library/features/home/public/di/home_library_stats_stream.dart';
 
 List<Widget> libraryAdminShellFeedbackBelowTitleBar() {
   return const <Widget>[

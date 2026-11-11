@@ -9,7 +9,7 @@ import 'package:hentai_library/features/library_admin/presentation/views/library
 import 'package:hentai_library/features/library_admin/presentation/widgets/library_edit_form_metrics.dart';
 import 'package:hentai_library/shared/ui/patterns/dialog/adaptive_form_dialog.dart';
 import 'package:hentai_library/features/library_admin/presentation/patterns/library_edit_form.dart';
-import 'package:hentai_library/shared/di/library_state_providers.dart';
+import 'package:hentai_library/features/library_admin/public/di/library_admin_state_providers.dart';
 import 'package:hentai_library/features/library_admin/domain/resource_format_category.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/features/library_admin/domain/value_objects/library_form.dart';

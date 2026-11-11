@@ -2,7 +2,7 @@ import 'package:hentai_library/features/library_admin/application/sync_library_u
 import 'package:hentai_library/features/library_admin/data/adapters/sync_library_frb_adapter.dart';
 import 'package:hentai_library/features/library_admin/data/local_library_root_access.dart';
 import 'package:hentai_library/features/library_admin/domain/sync_library_port.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/features/library_admin/public/di/library_admin_state_providers.dart';
 import 'package:hentai_library/shared/di/domain_event_bus_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

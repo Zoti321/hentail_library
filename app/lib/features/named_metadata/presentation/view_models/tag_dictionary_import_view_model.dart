@@ -6,7 +6,7 @@ import 'package:hentai_library/shared/data/frb/frb_error_mapper.dart';
 import 'package:hentai_library/features/named_metadata/domain/tag_dictionary_import_result.dart';
 import 'package:hentai_library/features/named_metadata/di/download_providers.dart';
 import 'package:hentai_library/features/named_metadata/presentation/view_models/named_facet_management_view_model.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/features/named_metadata/public/di/named_metadata_repository_providers.dart';
 import 'package:hentai_library/features/named_metadata/domain/named_facet_management_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

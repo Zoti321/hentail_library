@@ -1,8 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/features/library_admin/domain/libraries_port.dart';
 import 'package:hentai_library/features/library_admin/domain/library_reorder_mode_port.dart';
-import 'package:hentai_library/features/library_admin/domain/library_scan_command_port.dart';
 import 'package:hentai_library/shared/di/injected_di.dart';
 import 'package:hentai_library/shared/domain/library/comic_detail_return_series_port.dart';
 import 'package:hentai_library/shared/domain/library/library_age_restriction_filter.dart';
@@ -13,10 +11,6 @@ import 'package:hentai_library/shared/domain/library/library_revision_state.dart
 /// 实现与 `createX…Port` 工厂见 owner
 /// `features/library_admin/public.dart`（bootstrap override 注入）。
 /// library_admin 自己的状态投影见 `features/library_admin/public/di/library_admin_state_providers.dart`。
-
-final Provider<LibrariesPort> librariesPortProvider = injectedDi(
-  'librariesPortProvider',
-);
 
 final Provider<LibraryReorderModePort> libraryReorderModePortProvider =
     injectedDi('libraryReorderModePortProvider');
@@ -30,9 +24,6 @@ final Provider<Future<void> Function(BuildContext context, String libraryId)>
 libraryMetadataExportActionProvider = injectedDi(
   'libraryMetadataExportActionProvider',
 );
-
-final Provider<LibraryScanCommandPort> libraryScanCommandPortProvider =
-    injectedDi('libraryScanCommandPortProvider');
 
 final Provider<ComicDetailReturnSeriesPort>
 comicDetailReturnSeriesPortProvider = injectedDi(

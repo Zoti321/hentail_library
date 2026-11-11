@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/comic/di/comic_cover_providers.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/features/comic/public/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';

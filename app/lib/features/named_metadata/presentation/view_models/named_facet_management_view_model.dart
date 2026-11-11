@@ -6,7 +6,7 @@ import 'package:hentai_library/features/named_metadata/presentation/view_models/
 import 'package:hentai_library/shared/util/name_pinyin_assisted_filter.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/features/named_metadata/domain/named_facet_management_repository.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/features/named_metadata/public/di/named_metadata_repository_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'named_facet_management_view_model.g.dart';

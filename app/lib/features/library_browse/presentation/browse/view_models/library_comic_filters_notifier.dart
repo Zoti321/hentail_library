@@ -8,13 +8,13 @@ import 'package:hentai_library/features/library_browse/domain/browse/library_tri
 import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_query_intent.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_query_intent_notifier.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/shared/di/browse_library_scope_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hentai_library/features/comic/public.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/models/comic_catalog_query_assembly.dart';
+import 'package:hentai_library/features/named_metadata/public/di/named_metadata_repository_providers.dart';
 
 part 'library_comic_filters_notifier.g.dart';
 part 'library_comic_filters_persistence.dart';

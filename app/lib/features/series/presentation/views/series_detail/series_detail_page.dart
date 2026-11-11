@@ -5,6 +5,7 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/core/util/utils.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
+import 'package:hentai_library/features/library_admin/public/di/library_admin_state_providers.dart';
 import 'package:hentai_library/shared/di/series_slot_providers.dart';
 import 'package:hentai_library/shared/ui/slots/series_slots.dart';
 import 'package:hentai_library/features/series/di/series_by_id_provider.dart';
@@ -17,7 +18,6 @@ import 'package:hentai_library/features/series/presentation/views/series_detail/
 import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_layout.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/shared/di/app_navigator_provider.dart';
-import 'package:hentai_library/shared/di/library_command_providers.dart';
 import 'package:hentai_library/features/series/domain/series.dart';
 import 'package:hentai_library/features/series/domain/series_comic_page_item.dart';
 import 'package:hentai_library/features/series/domain/value_objects/series_comics_metadata.dart';

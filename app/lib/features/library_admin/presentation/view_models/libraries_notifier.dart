@@ -4,10 +4,11 @@ import 'package:hentai_library/features/library_admin/domain/library_sidebar_lay
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/features/library_admin/domain/value_objects/library_form.dart';
 import 'package:hentai_library/features/library_admin/domain/library_repository.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/features/library_admin/public/di/library_admin_state_providers.dart';
 import 'package:hentai_library/features/library_admin/di/library_write.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hentai_library/shared/di/data_providers.dart';
 
 export 'package:hentai_library/features/library_admin/domain/libraries_state.dart';
 

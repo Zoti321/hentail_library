@@ -1,7 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/library_admin/domain/comic_metadata_bulk_edit_command_port.dart';
+import 'package:hentai_library/features/library_admin/domain/libraries_port.dart';
 import 'package:hentai_library/features/library_admin/domain/libraries_state.dart';
+import 'package:hentai_library/features/library_admin/domain/library_metadata_refresh_command_port.dart';
+import 'package:hentai_library/features/library_admin/domain/library_repository.dart';
 import 'package:hentai_library/features/library_admin/domain/library_scan_activity_state.dart';
+import 'package:hentai_library/features/library_admin/domain/library_scan_command_port.dart';
 import 'package:hentai_library/shared/di/injected_di.dart';
 
 /// library_admin 拥有的库状态投影 token（#513，ADR-0045）。
@@ -37,4 +41,21 @@ final Provider<bool> libraryMutationBusyStateProvider = injectedDi(
 final Provider<ComicMetadataBulkEditCommandPort>
 comicMetadataBulkEditCommandPortProvider = injectedDi(
   'comicMetadataBulkEditCommandPortProvider',
+);
+
+final Provider<LibraryRepository> libraryRepoProvider = injectedDi(
+  'libraryRepoProvider',
+);
+
+final Provider<LibrariesPort> librariesPortProvider = injectedDi(
+  'librariesPortProvider',
+);
+
+final Provider<LibraryScanCommandPort> libraryScanCommandPortProvider =
+    injectedDi('libraryScanCommandPortProvider');
+
+/// 单库 / 全库元数据刷新命令口 token。
+final Provider<LibraryMetadataRefreshCommandPort>
+libraryMetadataRefreshCommandPortProvider = injectedDi(
+  'libraryMetadataRefreshCommandPortProvider',
 );

@@ -8,7 +8,6 @@ import 'package:hentai_library/features/reading_history/public.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/features/reading_history/domain/reading_history_repository.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';

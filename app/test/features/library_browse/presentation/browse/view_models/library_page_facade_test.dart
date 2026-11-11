@@ -28,7 +28,7 @@ import 'package:hentai_library/shared/domain/catalog/pagination/library_paginati
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_series_catalog_controller.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_tab_page_size_notifier.dart';
 import 'package:hentai_library/features/series/public/di/series_repository_providers.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/features/named_metadata/public/di/named_metadata_repository_providers.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;

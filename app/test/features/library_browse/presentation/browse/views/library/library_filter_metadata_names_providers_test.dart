@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/bootstrap/di/overrides/domain_event_bus_overrides.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_filter_metadata_names_providers.dart';
 import 'package:hentai_library/features/named_metadata/domain/named_facet_dictionary_repository.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/features/named_metadata/public/di/named_metadata_repository_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;
 

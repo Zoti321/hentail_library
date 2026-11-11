@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/reading_history/domain/reading_history.dart';
 import 'package:hentai_library/features/reading_history/domain/reading_history_repository.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/features/reading_history/public/di/reading_history_repository_providers.dart';
 import 'package:hentai_library/features/reading_history/domain/reading_history_command_port.dart';
 
 class _ReadingHistoryCommandAdapter implements ReadingHistoryCommandPort {

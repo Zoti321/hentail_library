@@ -7,11 +7,8 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/home_library_list_order.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/home_library_management_section.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/home_library_row_health.dart';
-import 'package:hentai_library/shared/di/home_library_stats_providers.dart';
-import 'package:hentai_library/shared/di/library_command_providers.dart';
 import 'package:hentai_library/shared/domain/ports/library_management_port.dart';
 import 'package:hentai_library/features/library_admin/public/di/library_admin_state_providers.dart';
-import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/features/library_admin/domain/libraries_state.dart';
 import 'package:hentai_library/features/library_admin/domain/library_scan_activity_state.dart';
 import 'package:hentai_library/features/library_admin/domain/library_sidebar_layout.dart';
@@ -24,6 +21,7 @@ import 'package:hentai_library/shared/ui/patterns/home/home_library_dashboard_mo
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/metadata_refresh_toasts.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:hentai_library/features/home/public/di/home_library_stats_stream.dart';
 
 /// 生产首页「我的漫画库」区块：库列表 UI + 扫描/编辑/排序等编排。
 class HomeLibraryManagementPanel extends HookConsumerWidget {
