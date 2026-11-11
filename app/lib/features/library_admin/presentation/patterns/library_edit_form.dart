@@ -14,6 +14,7 @@ import 'package:hentai_library/features/library_admin/domain/resource_format_cat
 import 'package:hentai_library/features/library_admin/domain/scan_interval.dart';
 import 'package:hentai_library/features/library_admin/domain/value_objects/library_form.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:hentai_library/features/library_admin/public/ui/l10n/library_admin_l10n.dart';
 
 enum _LibraryEditTab { general, webDav, scanner }
 

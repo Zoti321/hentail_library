@@ -1,5 +1,4 @@
 import 'package:hentai_library/features/comic/di/series_slot_impls.dart';
-import 'package:hentai_library/features/comic/di/thumbnail_activity_port.dart';
 import 'package:hentai_library/features/comic/public.dart';
 import 'package:hentai_library/features/series/public.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
@@ -15,7 +14,9 @@ List<Override> comicSeriesSharedStateOverrides() => <Override>[
   comicDetailReturnSeriesPortProvider.overrideWith(
     createComicDetailReturnSeriesPort,
   ),
-  thumbnailActivityPortProvider.overrideWith(createThumbnailActivityPort),
+  thumbnailBackgroundActiveStateProvider.overrideWith(
+    (ref) => ref.watch(thumbnailEventCoordinatorProvider).isActive,
+  ),
   seriesReadingContextPortProvider.overrideWith(createSeriesReadingContextPort),
   seriesItemSortPortProvider.overrideWith(createSeriesItemSortPort),
   seriesItemMembershipPortProvider.overrideWith(createSeriesItemMembershipPort),

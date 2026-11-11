@@ -19,6 +19,7 @@ import 'package:intl/intl.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:hentai_library/shared/domain/library/comic_metadata_bulk_patch.dart';
+import 'package:hentai_library/features/comic/public/l10n/comic_l10n.dart';
 
 /// 批量编辑表单（MD3E）：expanded+ 为 list-detail（常规 / 作者&标签 + 详情区滚动），
 /// 较窄宽度为顶部分段 + 纵向滚动。

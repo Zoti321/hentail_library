@@ -13,6 +13,7 @@ import 'package:hentai_library/features/named_metadata/presentation/views/metada
 import 'package:hentai_library/features/named_metadata/domain/tag_dictionary_import_result.dart';
 import 'package:hentai_library/features/named_metadata/domain/named_facet_management_repository.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
+import 'package:hentai_library/features/named_metadata/public/ui/l10n/named_metadata_l10n.dart';
 
 /// 重命名（M3E dialog + [ManagementEntityNameField]）。
 Future<void> renameNamedFacet(

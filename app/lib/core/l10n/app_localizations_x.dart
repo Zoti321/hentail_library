@@ -3,79 +3,14 @@ import 'package:flutter/widgets.dart';
 import 'package:hentai_library/core/constants/app_routes.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 
-import 'package:hentai_library/shared/domain/models/resource_format_category.dart';
-
-import 'package:hentai_library/shared/domain/library/scan_interval.dart';
-
-import 'package:hentai_library/shared/domain/library/library_media_type_filter.dart';
-
-import 'package:hentai_library/features/library_admin/domain/sync_library_types.dart';
-
-import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
-
 import 'package:hentai_library/shared/domain/models/enums.dart';
-
-import 'package:hentai_library/shared/domain/models/managed_named_facet_kind.dart';
-
-import 'package:hentai_library/shared/domain/models/value_objects/comic_language.dart';
 
 extension AppLocalizationsContextX on BuildContext {
   AppLocalizations get l10n => AppLocalizations.of(this);
 }
 
+/// 与 feature 无关的通用文案（领域枚举标签由各 owner 的 l10n extension 提供）。
 extension AppLocalizationsLabelsX on AppLocalizations {
-  String themePreferenceLabel(AppThemePreference preference) {
-    switch (preference) {
-      case AppThemePreference.system:
-        return themePreferenceSystem;
-
-      case AppThemePreference.light:
-        return themePreferenceLight;
-
-      case AppThemePreference.dark:
-        return themePreferenceDark;
-    }
-  }
-
-  String colorSchemePreferenceLabel(AppColorSchemePreference preference) {
-    return switch (preference) {
-      // brand 文案已定稿为紫罗兰色；遗留 violet 偏好显示同一标签。
-      AppColorSchemePreference.brand ||
-      AppColorSchemePreference.violet => colorSchemePreferenceBrand,
-      AppColorSchemePreference.teal => colorSchemePreferenceTeal,
-      AppColorSchemePreference.cyan => colorSchemePreferenceCyan,
-      AppColorSchemePreference.blue => colorSchemePreferenceBlue,
-      AppColorSchemePreference.indigo => colorSchemePreferenceIndigo,
-      AppColorSchemePreference.deepPurple => colorSchemePreferenceDeepPurple,
-      AppColorSchemePreference.pink => colorSchemePreferencePink,
-      AppColorSchemePreference.sakura => colorSchemePreferenceSakura,
-      AppColorSchemePreference.yellow => colorSchemePreferenceYellow,
-      AppColorSchemePreference.orange => colorSchemePreferenceOrange,
-      AppColorSchemePreference.deepOrange => colorSchemePreferenceDeepOrange,
-      AppColorSchemePreference.green => colorSchemePreferenceGreen,
-    };
-  }
-
-  String localePreferenceLabel(AppLocalePreference preference) {
-    switch (preference) {
-      case AppLocalePreference.system:
-        return localePreferenceSystem;
-
-      case AppLocalePreference.zhCn:
-        return localePreferenceZhCn;
-
-      case AppLocalePreference.en:
-        return localePreferenceEn;
-    }
-  }
-
-  String fontPreferenceLabel(AppFontPreference preference) {
-    return switch (preference) {
-      AppFontPreference.miSans => fontPreferenceMiSans,
-      AppFontPreference.notoSans => fontPreferenceNotoSans,
-    };
-  }
-
   String homeGreetingPhraseForHour(int hour) {
     if (hour < 5) {
       return homeGreetingLateNight;
@@ -153,69 +88,10 @@ extension AppLocalizationsLabelsX on AppLocalizations {
     }
   }
 
-  String libraryDisplayTargetTabLabel(LibraryDisplayTarget target) {
-    return switch (target) {
-      LibraryDisplayTarget.comics => libraryTabComics,
-      LibraryDisplayTarget.series => libraryTabSeries,
-    };
-  }
-
-  String managedNamedFacetCountLabel(ManagedNamedFacetKind kind, int count) {
-    return switch (kind) {
-      ManagedNamedFacetKind.author => metadataAuthorCount(count),
-      ManagedNamedFacetKind.tag => metadataTagCount(count),
-      ManagedNamedFacetKind.parody => metadataParodyCount(count),
-      ManagedNamedFacetKind.character => metadataCharacterCount(count),
-    };
-  }
-
-  String libraryMediaTypeFilterLabel(LibraryMediaTypeFilterOption option) {
-    return switch (option) {
-      LibraryMediaTypeFilterOption.pdf => filterMediaTypePdf,
-
-      LibraryMediaTypeFilterOption.epub => filterMediaTypeEpub,
-
-      LibraryMediaTypeFilterOption.archive => filterMediaTypeArchive,
-    };
-  }
-
-  String resourceFormatCategoryLabel(ResourceFormatCategory group) {
-    return switch (group) {
-      ResourceFormatCategory.folder => settingsFormatGroupFolder,
-      ResourceFormatCategory.pdf => settingsFormatGroupPdf,
-      ResourceFormatCategory.epub => settingsFormatGroupEpub,
-      ResourceFormatCategory.archive => settingsFormatGroupArchive,
-    };
-  }
-
-  String scanIntervalLabel(ScanInterval interval) {
-    return switch (interval) {
-      ScanInterval.disabled => scanIntervalDisabled,
-      ScanInterval.hourly => scanIntervalHourly,
-      ScanInterval.every6Hours => scanIntervalEvery6Hours,
-      ScanInterval.every12Hours => scanIntervalEvery12Hours,
-      ScanInterval.daily => scanIntervalDaily,
-      ScanInterval.weekly => scanIntervalWeekly,
-    };
-  }
-
-  String serializationStatusLabel(SerializationStatus status) {
-    return switch (status) {
-      SerializationStatus.unknown => serializationStatusUnknown,
-
-      SerializationStatus.ongoing => serializationStatusOngoing,
-
-      SerializationStatus.ended => serializationStatusEnded,
-
-      SerializationStatus.hiatus => serializationStatusHiatus,
-    };
-  }
-
   String seriesVolumeCountLabel(int count) => seriesDetailVolumeCount(count);
 
   String? seriesVolumeProgressLabel({
     required int current,
-
     required int? total,
   }) {
     if (total == null || total <= 0) {
@@ -223,153 +99,6 @@ extension AppLocalizationsLabelsX on AppLocalizations {
     }
 
     return seriesDetailVolumeProgress(current, total);
-  }
-
-  String libraryScanSuccessToast({
-    required ScanMode mode,
-    required SyncLibraryProgress? progress,
-    bool fromStartup = false,
-  }) {
-    final bool isDeepScan = mode == ScanMode.full;
-
-    if (progress == null) {
-      return isDeepScan ? libraryDeepScanComplete : libraryScanComplete;
-    }
-
-    return switch (progress.route) {
-      SyncLibraryRoute.noRootsNoop =>
-        isDeepScan
-            ? libraryDeepScanCompleteNoRoots
-            : libraryScanCompleteNoRoots,
-
-      SyncLibraryRoute.noRootsCleared =>
-        isDeepScan
-            ? libraryDeepScanCompleteCleared(progress.removedCount ?? 0)
-            : libraryScanCompleteCleared(progress.removedCount ?? 0),
-
-      SyncLibraryRoute.withRoots =>
-        fromStartup
-            ? libraryStartupScanCompleteStats(
-                progress.addedCount ?? 0,
-                progress.removedCount ?? 0,
-                progress.migratedCount ?? 0,
-              )
-            : isDeepScan
-            ? libraryDeepScanCompleteStats(
-                progress.addedCount ?? 0,
-                progress.removedCount ?? 0,
-                progress.migratedCount ?? 0,
-              )
-            : libraryScanCompleteStats(
-                progress.addedCount ?? 0,
-                progress.removedCount ?? 0,
-                progress.migratedCount ?? 0,
-              ),
-    };
-  }
-
-  String metadataAddEntityTooltip(int tabIndex) {
-    return switch (tabIndex) {
-      0 => metadataAddAuthor,
-
-      1 => metadataAddTag,
-
-      2 => metadataAddParody,
-
-      3 => metadataAddCharacter,
-
-      _ => metadataAdd,
-    };
-  }
-
-  String metadataTabLabel(ManagedNamedFacetKind kind) {
-    return switch (kind) {
-      ManagedNamedFacetKind.author => metadataTabAuthors,
-      ManagedNamedFacetKind.tag => metadataTabTags,
-      ManagedNamedFacetKind.parody => metadataTabParodies,
-      ManagedNamedFacetKind.character => metadataTabCharacters,
-    };
-  }
-
-  String metadataListTitle(ManagedNamedFacetKind kind) {
-    return switch (kind) {
-      ManagedNamedFacetKind.author => metadataAllAuthors,
-      ManagedNamedFacetKind.tag => metadataAllTags,
-      ManagedNamedFacetKind.parody => metadataAllParodies,
-      ManagedNamedFacetKind.character => metadataAllCharacters,
-    };
-  }
-
-  String metadataAddLabel(ManagedNamedFacetKind kind) {
-    return switch (kind) {
-      ManagedNamedFacetKind.author => metadataAddAuthor,
-      ManagedNamedFacetKind.tag => metadataAddTag,
-      ManagedNamedFacetKind.parody => metadataAddParody,
-      ManagedNamedFacetKind.character => metadataAddCharacter,
-    };
-  }
-
-  String metadataRenameTitle(ManagedNamedFacetKind kind) {
-    return switch (kind) {
-      ManagedNamedFacetKind.author => metadataRenameAuthor,
-      ManagedNamedFacetKind.tag => metadataRenameTag,
-      ManagedNamedFacetKind.parody => metadataRenameParody,
-      ManagedNamedFacetKind.character => metadataRenameCharacter,
-    };
-  }
-
-  String metadataAddHint(ManagedNamedFacetKind kind) {
-    return switch (kind) {
-      ManagedNamedFacetKind.author => metadataAddAuthorHint,
-      ManagedNamedFacetKind.tag => metadataAddTagHint,
-      ManagedNamedFacetKind.parody => metadataAddParodyHint,
-      ManagedNamedFacetKind.character => metadataAddCharacterHint,
-    };
-  }
-
-  String metadataRenameHint(ManagedNamedFacetKind kind) {
-    return switch (kind) {
-      ManagedNamedFacetKind.author => metadataRenameAuthorHint,
-      ManagedNamedFacetKind.tag => metadataRenameTagHint,
-      ManagedNamedFacetKind.parody => metadataRenameParodyHint,
-      ManagedNamedFacetKind.character => metadataRenameCharacterHint,
-    };
-  }
-
-  String metadataEmptyTitle(ManagedNamedFacetKind kind) {
-    return switch (kind) {
-      ManagedNamedFacetKind.author => metadataAuthorsEmptyTitle,
-      ManagedNamedFacetKind.tag => metadataTagsEmptyTitle,
-      ManagedNamedFacetKind.parody => metadataParodiesEmptyTitle,
-      ManagedNamedFacetKind.character => metadataCharactersEmptyTitle,
-    };
-  }
-
-  String metadataEmptyHint(ManagedNamedFacetKind kind) {
-    return switch (kind) {
-      ManagedNamedFacetKind.author => metadataAuthorsEmptyHint,
-      ManagedNamedFacetKind.tag => metadataTagsEmptyHint,
-      ManagedNamedFacetKind.parody => metadataParodiesEmptyHint,
-      ManagedNamedFacetKind.character => metadataCharactersEmptyHint,
-    };
-  }
-
-  String metadataNoMatchTitle(ManagedNamedFacetKind kind) {
-    return switch (kind) {
-      ManagedNamedFacetKind.author => metadataAuthorsNoMatchTitle,
-      ManagedNamedFacetKind.tag => metadataTagsNoMatchTitle,
-      ManagedNamedFacetKind.parody => metadataParodiesNoMatchTitle,
-      ManagedNamedFacetKind.character => metadataCharactersNoMatchTitle,
-    };
-  }
-
-  String metadataDeletedToast(ManagedNamedFacetKind kind) {
-    return switch (kind) {
-      ManagedNamedFacetKind.author => metadataAuthorDeletedToast,
-      ManagedNamedFacetKind.tag => metadataTagDeletedToast,
-      ManagedNamedFacetKind.parody => metadataParodyDeletedToast,
-      ManagedNamedFacetKind.character => metadataCharacterDeletedToast,
-    };
   }
 
   String contentRatingLabel(ContentRating rating) {
@@ -381,27 +110,6 @@ extension AppLocalizationsLabelsX on AppLocalizations {
       ContentRating.r18 => contentRatingR18,
     };
   }
-
-  /// Comic Language 闭集规范名 → 本地展示文案。
-  Map<String, String> get comicLanguageClosedLabels => <String, String>{
-    ComicLanguageNames.chinese: comicLanguageChinese,
-    ComicLanguageNames.japanese: comicLanguageJapanese,
-    ComicLanguageNames.english: comicLanguageEnglish,
-    ComicLanguageNames.korean: comicLanguageKorean,
-    ComicLanguageNames.spanish: comicLanguageSpanish,
-    ComicLanguageNames.other: comicLanguageOther,
-  };
-
-  String comicLanguageLabel(String canonical) => comicLanguageDisplayLabel(
-    canonical,
-    closedLabels: comicLanguageClosedLabels,
-  );
-
-  String formatComicLanguages(Iterable<String> canonical) =>
-      formatComicLanguagesDisplay(
-        canonical,
-        closedLabels: comicLanguageClosedLabels,
-      );
 
   String relativeTimeAgo(DateTime time) {
     final DateTime now = DateTime.now();
@@ -427,91 +135,5 @@ extension AppLocalizationsLabelsX on AppLocalizations {
     final DateTime local = time.toLocal();
 
     return '${local.month}/${local.day}';
-  }
-
-  String scanDialogRunningPhaseLabel(SyncLibraryProgress progress) {
-    switch (progress.route) {
-      case SyncLibraryRoute.noRootsNoop:
-        return scanSyncing;
-
-      case SyncLibraryRoute.noRootsCleared:
-        return progress.phase == SyncLibraryPhase.writingDb
-            ? scanWritingDb
-            : scanClearingLibrary;
-
-      case SyncLibraryRoute.withRoots:
-        return switch (progress.phase) {
-          SyncLibraryPhase.clearingLibrary => scanClearingLibrary,
-
-          SyncLibraryPhase.scanning => scanScanningFiles,
-
-          SyncLibraryPhase.writingDb => scanWritingDb,
-
-          SyncLibraryPhase.generatingThumbnails => scanGeneratingThumbnails,
-
-          SyncLibraryPhase.done => scanComplete,
-
-          SyncLibraryPhase.failed => scanFailed,
-        };
-    }
-  }
-
-  String scanDialogProgressCount({
-    required int done,
-
-    required int total,
-
-    required int failed,
-  }) {
-    if (failed > 0) {
-      return scanProgressWithFailed(done, total, failed);
-    }
-
-    return scanProgressSimple(done, total);
-  }
-
-  String scanDialogThumbnailFailedSuffix(int count) {
-    if (count <= 0) {
-      return '';
-    }
-
-    return scanThumbnailFailedSuffix(count);
-  }
-
-  String scanDialogDoneSummaryLabel(SyncLibraryProgress? progress) {
-    if (progress == null) {
-      return scanComplete;
-    }
-
-    switch (progress.route) {
-      case SyncLibraryRoute.noRootsNoop:
-        return scanDoneNoRoots;
-
-      case SyncLibraryRoute.noRootsCleared:
-        return scanDoneCleared;
-
-      case SyncLibraryRoute.withRoots:
-        final int? removed = progress.removedCount;
-
-        final int? added = progress.addedCount;
-
-        final int? kept = progress.keptCount;
-
-        final int? thumbFailed = progress.thumbnailFailedCount;
-
-        if (removed != null && added != null && kept != null) {
-          return scanDoneStats(
-            removed,
-
-            added,
-
-            kept,
-
-            scanDialogThumbnailFailedSuffix(thumbFailed ?? 0),
-          );
-        }
-
-        return scanComplete;
-    }
   }
 }

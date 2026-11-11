@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hentai_library/features/app_settings/presentation/views/settings_page/settings_page.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
@@ -11,6 +10,9 @@ import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
 
 import '../../../../../support/pump_localized_app.dart';
+
+import 'package:hentai_library/features/app_settings/public/ui/l10n/app_settings_l10n.dart';
+import 'package:hentai_library/features/library_browse/public/l10n/library_browse_l10n.dart';
 
 class _RecordingSettingsNotifier extends SettingsNotifier {
   _RecordingSettingsNotifier({AppSetting? initial})

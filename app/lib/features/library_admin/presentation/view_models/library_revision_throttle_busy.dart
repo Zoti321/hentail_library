@@ -10,20 +10,16 @@ bool isLibraryRevisionThrottleBusy({
   required bool thumbnailBackgroundActive,
 }) => librarySyncRunning || thumbnailBackgroundActive;
 
-final StreamProvider<bool> _thumbnailBackgroundActiveProvider =
-    StreamProvider<bool>(
-      (Ref ref) =>
-          ref.watch(thumbnailActivityPortProvider).watchBackgroundActive(),
-    );
-
 /// Catalog / Home 应对 revision 降频的 busy 信号。
-final libraryRevisionThrottleBusyProvider = Provider<bool>((Ref ref) {
+final Provider<bool> libraryRevisionThrottleBusyProvider = Provider<bool>((
+  Ref ref,
+) {
   final bool librarySyncRunning = ref.watch(
     scanLibraryControllerProvider.select((ScanLibraryState s) => s.running),
   );
-  final bool thumbnailBackgroundActive = ref
-      .watch(_thumbnailBackgroundActiveProvider)
-      .maybeWhen(data: (bool active) => active, orElse: () => false);
+  final bool thumbnailBackgroundActive = ref.watch(
+    thumbnailBackgroundActiveStateProvider,
+  );
   return isLibraryRevisionThrottleBusy(
     librarySyncRunning: librarySyncRunning,
     thumbnailBackgroundActive: thumbnailBackgroundActive,

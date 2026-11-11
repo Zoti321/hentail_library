@@ -6,6 +6,8 @@ import 'package:hentai_library/features/library_admin/domain/sync_library_types.
 
 import '../../../support/pump_localized_app.dart';
 
+import 'package:hentai_library/features/library_admin/public/ui/l10n/library_admin_l10n.dart';
+
 SyncLibraryProgress _doneWithRoots({
   required int added,
   required int removed,

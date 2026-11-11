@@ -5,6 +5,7 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/domain/models/managed_named_facet_kind.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:hentai_library/features/named_metadata/public/ui/l10n/named_metadata_l10n.dart';
 
 /// 管理页右下角新建 FAB（移动端打开 Dialog，桌面端由 [onPressed] 触发内联字段）。
 class ManagementCreateEntityFab extends StatelessWidget {

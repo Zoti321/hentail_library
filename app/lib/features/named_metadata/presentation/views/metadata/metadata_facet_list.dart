@@ -9,6 +9,7 @@ import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/features/named_metadata/domain/named_facet_management_repository.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:hentai_library/features/named_metadata/public/ui/l10n/named_metadata_l10n.dart';
 
 /// 当前维度的名称列表（chip 流）：加载 / 错误 / 空 / 列表 / 底部状态。
 ///

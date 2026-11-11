@@ -21,6 +21,7 @@ import 'package:hentai_library/shared/util/name_pinyin_assisted_filter.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:hentai_library/features/library_browse/public/l10n/library_browse_l10n.dart';
+import 'package:hentai_library/features/comic/public/l10n/comic_l10n.dart';
 import 'package:hentai_library/features/series/public/l10n/series_l10n.dart';
 
 const Duration _kFilterAccordionDuration = Duration(milliseconds: 200);

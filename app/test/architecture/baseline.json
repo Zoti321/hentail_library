@@ -1,5 +1,4 @@
 [
-  "R13|shared|app_settings|core/l10n/app_localizations_x.dart|package:hentai_library/features/app_settings/domain/app_setting.dart",
   "R13|shared|app_settings|core/logging/diagnostic_logging.dart|package:hentai_library/features/app_settings/data/adapters/diagnostic_logging_frb_adapter.dart",
   "R13|shared|app_settings|core/util/app_locale.dart|package:hentai_library/features/app_settings/domain/app_setting.dart",
   "R13|shared|app_settings|core/util/app_theme_mode.dart|package:hentai_library/features/app_settings/domain/app_setting.dart",
@@ -13,7 +12,6 @@
   "R13|shared|comic|shared/di/data_providers.dart|package:hentai_library/features/comic/domain/repositories/comic_thumbnail_repository.dart",
   "R13|shared|home|shared/di/data_providers.dart|package:hentai_library/features/home/domain/home_page_repository.dart",
   "R13|shared|home|shared/di/home_library_stats_providers.dart|package:hentai_library/features/home/di/home_library_stats_stream.dart",
-  "R13|shared|library_admin|core/l10n/app_localizations_x.dart|package:hentai_library/features/library_admin/domain/sync_library_types.dart",
   "R13|shared|library_admin|shared/di/data_providers.dart|package:hentai_library/features/library_admin/domain/library_repository.dart",
   "R13|shared|library_admin|shared/di/library_command_providers.dart|package:hentai_library/features/library_admin/domain/library_metadata_refresh_command_port.dart",
   "R13|shared|library_admin|shared/di/library_state_providers.dart|package:hentai_library/features/library_admin/domain/comic_metadata_bulk_edit_command_port.dart",
