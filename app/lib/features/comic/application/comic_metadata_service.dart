@@ -1,7 +1,7 @@
 import 'package:hentai_library/shared/domain/events/events.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/form/comic_metadata_form.dart';
+import 'package:hentai_library/features/comic/domain/comic_metadata_form.dart';
 import 'package:hentai_library/features/comic/domain/comic_user_metadata_repository.dart';
 
 /// 浏览侧保存 Comic 元数据草稿的结果。仓储异常仍向上抛，由 UI toast。
@@ -43,7 +43,7 @@ Future<ComicMetadataApplyResult> applyComicMetadataForm(
   Comic original, {
   required DomainEventPublisher events,
 }) async {
-  switch (form.diffAgainst(original)) {
+  switch (original.metadataDiffAgainst(form)) {
     case ComicMetadataDraftInvalid(:final validation):
       return ComicMetadataApplyInvalid(validation);
     case ComicMetadataDraftUnchanged():

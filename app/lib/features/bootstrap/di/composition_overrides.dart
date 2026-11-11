@@ -8,7 +8,7 @@ import 'package:hentai_library/shared/di/reader_launch_providers.dart';
 import 'package:hentai_library/shared/di/comic_detail_providers.dart';
 import 'package:hentai_library/shared/di/app_router_provider.dart';
 import 'package:hentai_library/shared/di/app_shell_providers.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/comic/public/comic.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 List<Override> bootstrapCompositionOverrides() => <Override>[

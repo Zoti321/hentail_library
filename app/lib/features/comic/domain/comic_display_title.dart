@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/features/comic/domain/comic_lookup_repository.dart';
 
 String comicTitleFallbackForDisplay(String comicId) {

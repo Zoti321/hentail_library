@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_jump.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/series_comic_page_item.dart';
+import 'package:hentai_library/features/series/domain/series_comic_page_item.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/series_comics_metadata.dart';
 import 'package:hentai_library/features/series/presentation/view_models/series_detail_comics_catalog_state.dart';
 import 'package:hentai_library/features/series/presentation/view_models/series_detail_page_size_providers.dart';

@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/comic/data/comic_frb_mapper.dart';
 import 'package:hentai_library/features/comic/domain/library_comic_filter.dart';
 import 'package:hentai_library/features/comic/domain/library_comic_sort_option.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/src/rust/api/comic.dart' as rust;
 

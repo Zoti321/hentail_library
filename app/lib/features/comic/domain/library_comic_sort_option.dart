@@ -1,5 +1,5 @@
 ﻿import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/comic/domain/comic.dart';
 
 part 'library_comic_sort_option.freezed.dart';
 

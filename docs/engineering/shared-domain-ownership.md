@@ -1,6 +1,6 @@
 # `shared/domain` 归属表（Epic #436 收尾）
 
-**决策索引**：ADR-0033（Application 层）、ADR-0034（public only）、**ADR-0035**（Catalog Shared Kernel）、**ADR-0039**（领域事件）。  
+**决策索引**：ADR-0033（Application 层）、ADR-0034（public only）、**ADR-0035**（Catalog Shared Kernel）、**ADR-0039**（领域事件）、**ADR-0041**（Comic 实体归属）。  
 **门禁**：L3b `shared_domain_feature_import_baseline.json`（当前应为 `[]`）；**2026-11-02** 起 owner 域 strangler re-export 已全部移除（`strangler_shims.txt` 为空），请直接 import **`features/<owner>/domain/...`**。
 
 ## 真源在 owner feature（已从 shared 移除 strangler）
@@ -13,6 +13,7 @@
 | `reading/*`（Read session 域类型） | `features/reader/domain/`（ADR-0038；旧 `read_session`） |
 | 库 browse 壳（跨 Tab 偏好、作者、catalog 壳） | `features/library_browse/domain/browse/`（**不含** comic/series Tab 规则） |
 | Comic 仓储、Comics Tab 规则、展示标题、smart facet | `features/comic/domain/` |
+| **`Comic` 实体、`ComicMetaLocks`、`ComicMetadataForm`、`Comic` FRB 映射** | `features/comic/domain/`、`features/comic/data/comic_entity_mapper.dart`（ADR-0041；跨模块经 `features/comic/public/**`） |
 | Series 仓储、Series Tab 规则 | `features/series/domain/` |
 | 库 admin（扫描、revision、current library 等） | `features/library_admin/domain/` |
 | `comic_display_title` 等 | `features/comic/domain/` |
@@ -25,21 +26,21 @@
 
 Feature 内代码应 **import owner `domain/`**（`library_browse` 内按 [`library-browse-zones.md`](library-browse-zones.md) 分子目录）；跨 feature 经 **`features/<owner>/public/**`**（ADR-0034）。**勿**再新增对已删除 shared shim 路径的依赖。
 
-`models/models.dart` 仍 re-export `reading_history` 与 `app_setting` 的 **feature URI**（便捷 barrel，非 strangler 文件）。
+`shared/domain/models/models.dart` barrel 已于 #489 删除（零消费者）；需要 `reading_history` / `app_settings` 类型请直接 import 对应 feature 的 `public/**`（ADR-0034）。
 
 ## Comic 聚合 vs feature 边界（ADR-0002 / 0026 / 0036）
 
 - **聚合写集在 Rust**：以 `comicId` 为根，同事务提交 `comics` + `comic_meta` + facet junction + Metadata field lock。单本用户写不持库级写锁；跨本 bulk / sync / trash 等走库级写接缝。
-- **`features/comic` 是 feature，不是 Dart Aggregate Root**：契约与 Comics Tab 规则、展示标题、smart facet、单本元数据 application 在此；**勿**在 Dart 侧再建 `ComicAggregate` 或把 Kernel DTO 迁入本 feature（ADR-0035）。
+- **`features/comic` 是 feature，不是 Dart Aggregate Root**：契约与 Comics Tab 规则、展示标题、smart facet、单本元数据 application 在此；Dart `Comic` 是**投影型实体**（构造不变式 + 草稿迁移 + 元数据 diff），事务**写集**仍在 Rust（ADR-0041）。**勿**在 Dart 侧再建 `ComicAggregate` 或把 Rust 事务边界搬进 Dart。
 - **对照归属**：Series 成员/排序 → `features/series`；trash 生命周期 → `features/comic_trash`；库级 bulk patch 编排 → `features/library_admin`（与 comic 单本 form 草稿路径不同，无需合并）；浏览壳 → `features/library_browse`。分区协作与 public 收窄见 [`library-browse-zones.md`](library-browse-zones.md)。
 
 ## Catalog Shared Kernel（真源 @ shared，ADR-0035）
 
 不在 #436 批量迁出；consumer 继续 `import shared/domain/...`：
 
-- `models/entity/comic/**`、`models/enums.dart`
+- `models/entity/**`（Series / Author / AuthorDetail / Tag 等；**`Comic` 已于 #489 迁出**，见 ADR-0041）、`models/enums.dart`
 - `models/value_objects/page_request.dart`、`paged_result.dart`、`page_jump.dart`
-- 与 catalog 强绑定的 form / pick / meta VO（见 `models/models.dart` barrel）
+- 与 catalog 强绑定的 form / pick / meta VO：`models/value_objects/form/{series_metadata_form,library_form}.dart`、`library_author_pick.dart`、`library_tag_pick.dart`、`comic_language.dart`、`series_meta_locks.dart`、`series_comics_metadata.dart`
 - `reading/series_reading_context.dart`（类型；读口 `SeriesReadingContextPort` @ shared/di，实现 @ series）
 - `library/scan_interval.dart`、`library/metadata_refresh_types.dart`、`library/comic_metadata_bulk_patch_result.dart`（库扫描/批量结果；shared UI toast 与 `LocalLibrary` 共用）
 - `models/managed_named_facet_kind.dart`（metadata 管理 Tab 枚举）
@@ -65,4 +66,5 @@ UI / 编排命令类型；发现面经 owner `public/` re-export（ADR-0034）�
 ## 测试目录约定
 
 - Owner 域行为单测：`app/test/features/<owner>/domain/**`
-- Shared Kernel / 跨库契约：`app/test/shared/domain/**`（entity、VO、repository 契约等）
+- Shared Kernel / 跨库契约：`app/test/shared/domain/**`（Series/Author/Tag 等 entity、VO、repository 契约）
+- Comic 实体/Catalog 归属门禁：`app/test/features/comic/**` + `app/test/architecture/comic_entity_ownership_test.dart`

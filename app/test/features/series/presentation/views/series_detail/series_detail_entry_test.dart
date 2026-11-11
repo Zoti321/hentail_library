@@ -3,14 +3,14 @@ import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dar
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_entry.dart';
 import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_view_object.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/comic/public/comic.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/series_comic_page_item.dart';
+import 'package:hentai_library/features/series/domain/series_comic_page_item.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/series_comics_metadata.dart';
 
 Comic _comic(String id, String title) {
-  return Comic(
+  return Comic.restore(
     comicId: id,
     path: '/lib/$id.zip',
     resourceType: ResourceType.zip,

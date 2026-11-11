@@ -19,7 +19,7 @@ import 'package:hentai_library/features/library_browse/presentation/browse/patte
 import 'package:hentai_library/shared/ui/widgets/catalog/comic_card.dart';
 import 'package:hentai_library/features/comic/di/comic_cover_providers.dart';
 import 'package:hentai_library/features/series/di/series_cover_providers.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/comic/public/comic.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
@@ -34,7 +34,7 @@ import '../../../../../../support/settings_state_bridge.dart';
 
 Comic _comic(String id, String title) {
   final DateTime now = DateTime.utc(2026, 1, 1);
-  return Comic(
+  return Comic.restore(
     comicId: id,
     path: '/$id',
     resourceType: ResourceType.zip,

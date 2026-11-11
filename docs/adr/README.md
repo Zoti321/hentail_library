@@ -113,8 +113,10 @@ Accepted | Superseded by ADR-000N | Deprecated
 | [0032](./0032-single-theme-source-after-md3e-cutover.md) | MD3E Cutover 后 `shared/ui/theme` 只保留一套主题 | Accepted |
 | [0033](./0033-flutter-feature-application-layer.md) | Flutter feature Application 层（Wayfinder） | Accepted |
 | [0034](./0034-feature-public-api-only-cross-imports.md) | Cross-feature 协作 — public API only | Accepted |
-| [0035](./0035-catalog-shared-kernel.md) | Catalog Shared Kernel 保留于 `shared/domain` | Accepted |
+| [0035](./0035-catalog-shared-kernel.md) | Catalog Shared Kernel 保留于 `shared/domain`（Comic 部分由 ADR-0041 取代） | Accepted |
 | [0036](./0036-comic-series-wayfinder-modules.md) | Comic / Series Wayfinder 模块切分（#457） | Accepted |
 | [0037](./0037-tone-based-color-system-m3e-roles.md) | Tone-based color system 与 M3E roles 为主（#470） | Accepted |
 | [0038](./0038-reader-module-rename.md) | Product module `read_session` 更名为 `reader` | Accepted |
 | [0039](./0039-domain-events-for-cross-feature-notification.md) | 跨 feature 协作 — 命令走 Port，事实走领域事件 | Accepted |
+| [0040](./0040-record-projections-for-cross-module-readonly.md) | 跨模块只读投影使用匿名 record | Accepted |
+| [0041](./0041-comic-entity-ownership.md) | Comic 实体迁入漫画模块（Dart 投影型实体，#489） | Accepted |

@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
@@ -19,7 +19,7 @@ class _RecordingComicRepo implements ComicCatalogRepository {
     keywordPageRequests.add(request);
     final DateTime now = DateTime.utc(2026);
     final List<Comic> all = List<Comic>.generate(5, (int i) {
-      return Comic(
+      return Comic.restore(
         comicId: 'c$i',
         path: '/c$i',
         resourceType: ResourceType.zip,

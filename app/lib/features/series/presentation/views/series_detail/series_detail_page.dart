@@ -19,7 +19,7 @@ import 'package:hentai_library/features/comic/public/ui/comic_cover_content.dart
 import 'package:hentai_library/shared/di/library_command_providers.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/series_comic_page_item.dart';
+import 'package:hentai_library/features/series/domain/series_comic_page_item.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/series_comics_metadata.dart';
 import 'package:hentai_library/shared/domain/library/metadata_refresh_types.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';

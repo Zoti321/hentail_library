@@ -1,5 +1,4 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/series_meta_locks.dart';
@@ -38,15 +37,5 @@ abstract class Series with _$Series {
       }
     }
     return best;
-  }
-
-  bool hasR18Comic({required Map<String, Comic> comicsById}) {
-    for (final SeriesItem item in items) {
-      final Comic? comic = comicsById[item.comicId];
-      if (comic != null && comic.contentRating == ContentRating.r18) {
-        return true;
-      }
-    }
-    return false;
   }
 }

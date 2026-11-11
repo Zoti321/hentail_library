@@ -1,12 +1,16 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/comic/domain/comic.dart';
+import 'package:hentai_library/features/comic/domain/comic_metadata_normalization.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
 
 part 'comic_metadata_form.freezed.dart';
 
-/// Comic 用户元数据编辑草稿。
+/// Comic 用户元数据编辑草稿（UI 编辑态）。
+///
+/// 语义迁移（应用到实体、与实体求差异）在 [Comic] 上（ADR-0041）；
+/// 本类型只保留草稿编辑操作（增删 facet、规范化、去重）。
 @freezed
 abstract class ComicMetadataForm with _$ComicMetadataForm {
   factory ComicMetadataForm({
@@ -106,10 +110,10 @@ extension ComicMetadataFormOps on ComicMetadataForm {
   ComicMetadataForm get normalized {
     return copyWith(
       title: title.trim(),
-      description: _normalizeOptionalText(description),
-      languages: _normalizeOrderedNames(languages),
-      parodies: _normalizeOrderedNames(parodies),
-      characters: _normalizeOrderedNames(characters),
+      description: normalizeOptionalMetadataText(description),
+      languages: normalizeOrderedFacetNames(languages),
+      parodies: normalizeOrderedFacetNames(parodies),
+      characters: normalizeOrderedFacetNames(characters),
     );
   }
 
@@ -200,125 +204,4 @@ extension ComicMetadataFormOps on ComicMetadataForm {
       characters: characters.where((String n) => n != name).toList(),
     );
   }
-
-  /// 相对 [original] 的同步差异：校验失败、无变化，或仅含待提交字段。
-  ComicMetadataDraftDiff diffAgainst(Comic original) {
-    final ComicMetadataForm ready = normalized;
-    final ComicMetadataFormValidation validation = ready.validate();
-    if (!validation.isValid) {
-      return ComicMetadataDraftInvalid(validation);
-    }
-
-    final String? title = ready.title != original.title ? ready.title : null;
-    final String? description = ready.description != original.description
-        ? (ready.description ?? '')
-        : null;
-
-    final DateTime? publishedAt;
-    final bool clearPublishedAt;
-    if (ready.publishedAt == original.publishedAt) {
-      publishedAt = null;
-      clearPublishedAt = false;
-    } else if (ready.publishedAt == null) {
-      publishedAt = null;
-      clearPublishedAt = true;
-    } else {
-      publishedAt = ready.publishedAt;
-      clearPublishedAt = false;
-    }
-
-    final bool originalIsR18 = original.contentRating == ContentRating.r18;
-    final ContentRating? contentRating = ready.isR18 != originalIsR18
-        ? (ready.isR18 ? ContentRating.r18 : ContentRating.safe)
-        : null;
-
-    final List<AuthorRef>? authors =
-        !_sameOrderedNames(
-          ready.authors.map((AuthorRef a) => a.name),
-          original.authors.map((AuthorRef a) => a.name),
-        )
-        ? ready.authors
-        : null;
-    final List<Tag>? tags =
-        !_sameOrderedNames(
-          ready.tags.map((Tag t) => t.name),
-          original.tags.map((Tag t) => t.name),
-        )
-        ? ready.tags
-        : null;
-    final List<String>? languages =
-        !_sameOrderedNames(ready.languages, original.languages)
-        ? ready.languages
-        : null;
-    final List<String>? parodies =
-        !_sameOrderedNames(ready.parodies, original.parodies)
-        ? ready.parodies
-        : null;
-    final List<String>? characters =
-        !_sameOrderedNames(ready.characters, original.characters)
-        ? ready.characters
-        : null;
-
-    final bool hasChanges =
-        title != null ||
-        description != null ||
-        publishedAt != null ||
-        clearPublishedAt ||
-        contentRating != null ||
-        authors != null ||
-        tags != null ||
-        languages != null ||
-        parodies != null ||
-        characters != null;
-    if (!hasChanges) {
-      return const ComicMetadataDraftUnchanged();
-    }
-
-    return ComicMetadataDraftChanges(
-      title: title,
-      description: description,
-      publishedAt: publishedAt,
-      clearPublishedAt: clearPublishedAt,
-      contentRating: contentRating,
-      authors: authors,
-      tags: tags,
-      languages: languages,
-      parodies: parodies,
-      characters: characters,
-    );
-  }
-}
-
-String? _normalizeOptionalText(String? value) {
-  if (value == null) {
-    return null;
-  }
-  final String trimmed = value.trim();
-  return trimmed.isEmpty ? null : trimmed;
-}
-
-List<String> _normalizeOrderedNames(Iterable<String> source) {
-  final List<String> out = <String>[];
-  for (final String raw in source) {
-    final String trimmed = raw.trim();
-    if (trimmed.isEmpty || out.contains(trimmed)) {
-      continue;
-    }
-    out.add(trimmed);
-  }
-  return out;
-}
-
-bool _sameOrderedNames(Iterable<String> a, Iterable<String> b) {
-  final List<String> left = a.toList();
-  final List<String> right = b.toList();
-  if (left.length != right.length) {
-    return false;
-  }
-  for (int i = 0; i < left.length; i++) {
-    if (left[i] != right[i]) {
-      return false;
-    }
-  }
-  return true;
 }

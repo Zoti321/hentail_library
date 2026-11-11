@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/comic/di/comic_detail_providers.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/comic/presentation/views/bulk_edit/bulk_edit_metadata_form.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_field_label_row.dart';
 import 'package:hentai_library/shared/ui/widgets/inputs/outlined_text_field.dart';
@@ -14,7 +14,7 @@ import 'package:riverpod/misc.dart' show Override;
 import '../../../../../support/pump_app.dart';
 
 Comic _comic(String id) {
-  return Comic(
+  return Comic.restore(
     comicId: id,
     path: '/comics/$id',
     resourceType: ResourceType.dir,

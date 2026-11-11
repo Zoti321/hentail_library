@@ -1,6 +1,6 @@
 import 'package:hentai_library/features/comic/domain/smart_facet_match.dart';
 import 'package:hentai_library/features/comic/presentation/view_models/comic_metadata_smart_facet_providers.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/comic/domain/comic.dart';
 
 /// Builds [ComicMetadataSmartFacetScope] for metadata edit UI.
 ComicMetadataSmartFacetScope comicMetadataSmartFacetScopeForComic(

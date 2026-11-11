@@ -18,7 +18,7 @@ Accepted
 | **`series`** | Series 仓储、库 Series Tab 规则类型、详情与 metadata UI、Series metadata application、`SeriesReadingContextPort` 实现 |
 | **`library_browse`** | 当前库双 Tab 壳、搜索、作者详情、`presentation/catalog` 共用基础设施；跨 Tab 年龄限制等壳层偏好 public |
 
-**Catalog 实体 DTO**（`Comic`/`Series` 等）、分页 VO、`thumbnail/**`、`SeriesReadingContext` **类型** 仍 @ `shared/domain`（**ADR-0035 不变**）。
+**Catalog 实体 DTO**（`Series` 等）、分页 VO、`thumbnail/**`、`SeriesReadingContext` **类型** 仍 @ `shared/domain`（**ADR-0035**）。**Comic 例外（2026-11-11，#489 / ADR-0041）**：`Comic` 实体、字段锁、元数据草稿与 FRB 映射已迁 `features/comic/`，跨模块经 `features/comic/public/**` thin re-export；reader 自持窄读模型。
 
 ### 2. Cross-feature public 依赖（无环）
 

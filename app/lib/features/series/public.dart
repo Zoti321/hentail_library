@@ -10,6 +10,7 @@ export 'public/di/series_repository_factory.dart';
 export 'public/library_age_restriction_series.dart';
 export 'public/library_series_browse_rules.dart';
 export 'public/series_item_sort_persist.dart';
+export 'public/series_comic_page_item.dart';
 export 'public/ui/series_cover_content.dart';
 export 'public/ui/series_detail_page.dart';
 export 'public/ui/series_detail_view_object.dart';

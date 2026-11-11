@@ -1,18 +1,14 @@
 import 'package:hentai_library/features/reader/domain/read_session.dart';
 import 'package:hentai_library/features/reader/domain/read_session_exceptions.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:test/test.dart';
 
-Comic _comic({int pageCount = 10}) {
-  final DateTime now = DateTime.utc(2026, 1, 1);
-  return Comic(
+ReaderComicRef _comic({int pageCount = 10}) {
+  return ReaderComicRef(
     comicId: 'c1',
     path: '/tmp/c1',
     resourceType: ResourceType.zip,
-    resourceSize: 1024,
-    createdAt: now,
-    lastUpdatedAt: now,
     title: 'T',
     pageCount: pageCount,
   );

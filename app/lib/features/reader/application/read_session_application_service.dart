@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
 import 'package:hentai_library/features/reader/application/open_reader_args.dart';
 import 'package:hentai_library/features/reader/application/open_read_session_service.dart';
 import 'package:hentai_library/features/reader/domain/read_session.dart';
@@ -32,7 +32,7 @@ class ReadSessionApplicationService {
   bool get hasActiveSession => _session != null;
 
   Future<void> beginReadSession({
-    required Comic comic,
+    required ReaderComicRef comic,
     bool incognito = false,
     int initialPageIndex = 1,
   }) async {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/comic/presentation/views/metadata_edit/comic_metadata_edit_page.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 
 import '../../../../../support/pump_localized_app.dart';
@@ -21,7 +21,7 @@ void main() {
       wrapProviderScope: true,
       home: Scaffold(
         body: ComicMetadataEditFormLayout(
-          comic: Comic(
+          comic: Comic.restore(
             comicId: 'c1',
             path: '/tmp/c1.cbz',
             resourceType: ResourceType.cbz,

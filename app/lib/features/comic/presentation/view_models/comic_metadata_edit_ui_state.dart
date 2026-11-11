@@ -1,6 +1,6 @@
 import 'package:hentai_library/features/comic/presentation/patterns/metadata_edit/comic_metadata_edit_draft.dart';
 import 'package:hentai_library/features/comic/presentation/view_models/comic_metadata_smart_facet_providers.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/comic_meta_locks.dart';
+import 'package:hentai_library/features/comic/domain/comic_meta_locks.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/series_item_membership.dart';
 
 /// [ComicMetadataEditSession.save] 结果。

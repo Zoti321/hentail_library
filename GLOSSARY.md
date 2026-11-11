@@ -65,7 +65,7 @@ Local library 的 Library root 之旧称。UI 与 FRB 的 Path 面已按 ADR-001
 _Avoid_: 在新设计中把 Saved path 扩成远程 URI；选中路径页、Selected Paths、路径管理页
 
 **Comic**:
-某个 Library 中一条可阅读的独立作品，对应一个 Resource（本地文件/目录，或远程 WebDAV 上的文件）。身份由规范化后的资源位置键派生（`comicId`）；同一位置键始终是同一 Comic。
+某个 Library 中一条可阅读的独立作品，对应一个 Resource（本地文件/目录，或远程 WebDAV 上的文件）。身份由规范化后的资源位置键派生（`comicId`）；同一位置键始终是同一 Comic。Dart 侧为 `features/comic/domain/` 的**投影型实体**（构造不变式 + 元数据草稿迁移 + 字段 diff），事务写集仍在 Rust；详见 ADR-0041。
 _Avoid_: 本子、作品、条目（口语可用，文档与 issue 中用 Comic）
 
 **Comic identity**:
@@ -259,6 +259,10 @@ _Avoid_: 分级、年龄限制、路径自动标 r18
 **Comic metadata form**:
 编辑 Comic 用户元数据（标题、概要、发布日期、Content rating、Author、Tag、Parody、Character、Language）时的可提交草稿；校验与 normalize、多值名增减与落库规则集中在此，非法结果以字段级返回由 UI 展示。保存时只提交相对打开时**值变化**的字段，这些字段会自动加上 Metadata field lock；无变化则不写库。表单旁可单独切换锁而不改值。
 _Avoid_: 漫画表单、元数据 DTO
+
+**Comic aggregate write set**:
+以 `comicId` 为根、在同一次 Rust 事务中提交的数据集合：`comics` 行、`comic_meta`（含 Metadata field lock）与 Tag / Parody / Character / Author junction。事务边界、字段锁合并与部分更新语义由 core 持有；Dart `Comic` 只投影当前值并计算草稿 diff，不自行定义提交顺序或回滚。不是 Dart Aggregate Root，也不是 Comic metadata form。详见 ADR-0002、ADR-0026、ADR-0041。
+_Avoid_: ComicAggregate、Dart 聚合写集、前端事务
 
 **Needs metadata**:
 Comic 当前除标题外没有任何用户元数据的状态：无 Tag、Author、Parody、Character，Language 为空，无概要、无发布日期，Content rating 为 `unknown`。由现值派生，不是编辑历史；元数据来自用户还是扫描都不区分，Metadata field lock 不参与判定。库页 Comics Tab 用它筛出待整理的 Comic。

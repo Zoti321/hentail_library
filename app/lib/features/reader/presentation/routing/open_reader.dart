@@ -1,5 +1,5 @@
 import 'package:hentai_library/shared/di/reader_launch_providers.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 Future<void> openReader(
@@ -21,7 +21,7 @@ Future<void> openReader(
 
 Future<void> openComicInReader(
   WidgetRef ref, {
-  required Comic comic,
+  required ReaderComicRef comic,
   bool incognito = false,
 }) {
   return openReader(ref, comicId: comic.comicId, incognito: incognito);

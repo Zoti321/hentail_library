@@ -1,5 +1,5 @@
 import 'package:hentai_library/features/comic/presentation/draft/bulk_metadata_edit_session.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:test/test.dart';
@@ -10,7 +10,7 @@ Comic _comic({
   List<String> tags = const <String>['t1'],
   String description = 'd',
 }) {
-  return Comic(
+  return Comic.restore(
     comicId: id,
     path: '/$id',
     resourceType: ResourceType.zip,

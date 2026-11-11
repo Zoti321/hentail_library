@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/comic/di/comic_cover_providers.dart';
 import 'package:hentai_library/features/comic_trash/presentation/views/trash/trash_page.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/comic/public/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/comic_trash/domain/trashed_comic.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
@@ -58,7 +58,7 @@ class _NoCoverComicCover extends ComicCover {
 TrashedComic _trashed(String id, {bool remote = false}) {
   final DateTime t = DateTime.utc(2026, 10, 2, 8);
   return (
-    comic: Comic(
+    comic: Comic.restore(
       comicId: id,
       path: '/$id.cbz',
       resourceType: ResourceType.cbz,

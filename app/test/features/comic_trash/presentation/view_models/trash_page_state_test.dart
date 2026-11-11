@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/comic_trash/domain/comic_purge_strategy.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/comic/public/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/comic_trash/domain/trashed_comic.dart';
 import 'package:hentai_library/features/comic_trash/presentation/view_models/trash_page_state.dart';
@@ -8,7 +8,7 @@ import 'package:hentai_library/features/comic_trash/presentation/view_models/tra
 TrashedComic _trashed(String id, {bool remote = false}) {
   final DateTime t = DateTime.utc(2026, 10, 2);
   return (
-    comic: Comic(
+    comic: Comic.restore(
       comicId: id,
       path: '/lib/$id.cbz',
       resourceType: ResourceType.cbz,

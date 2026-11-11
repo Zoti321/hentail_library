@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/comic/public/comic.dart';
+import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
 import 'package:hentai_library/features/comic/public/comic_lookup_repository.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/reader/domain/comic_page_source_port.dart';
@@ -57,7 +58,7 @@ class _FakeComicPageSourcePort implements ComicPageSourcePort {
   int loadPagesCallCount;
 
   @override
-  Future<List<ReadSessionPage>> loadPages(Comic comic) async {
+  Future<List<ReadSessionPage>> loadPages(ReaderComicRef comic) async {
     loadPagesCallCount += 1;
     if (error != null) {
       throw error!;
@@ -107,7 +108,7 @@ class _FakeNativeReaderPort implements NativeReaderPort {
   final List<String> closedComicIds = <String>[];
 
   @override
-  Future<void> openComic(Comic comic) async {
+  Future<void> openComic(ReaderComicRef comic) async {
     openedComicIds.add(comic.comicId);
     final Future<void>? hang = openHang;
     if (hang != null) {
@@ -126,7 +127,7 @@ class _FakeNativeReaderPort implements NativeReaderPort {
 
 Comic _inputComic() {
   final DateTime now = DateTime.utc(2026, 1, 1);
-  return Comic(
+  return Comic.restore(
     comicId: 'c1',
     path: '/tmp/comic',
     resourceType: ResourceType.zip,

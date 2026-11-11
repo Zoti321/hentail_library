@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
 import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
@@ -30,7 +30,7 @@ class _FakeComicRepo implements ComicLookupRepository {
   int findByIdCalls = 0;
 
   Comic _comic(String comicId, String title) {
-    return Comic(
+    return Comic.restore(
       comicId: comicId,
       path: '/comics/$comicId',
       resourceType: ResourceType.dir,

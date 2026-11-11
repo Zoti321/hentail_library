@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:hentai_library/shared/domain/models/resource_type_frb_wire.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
 import 'package:hentai_library/features/comic/public.dart';
 import 'package:hentai_library/features/series/public/di/series_cover_providers.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
@@ -15,7 +15,10 @@ class ReaderCoverEditorNotifier extends _$ReaderCoverEditorNotifier {
   @override
   void build() {}
 
-  Future<void> setComicCover(Comic comic, {required int pageIndex}) async {
+  Future<void> setComicCover(
+    ReaderComicRef comic, {
+    required int pageIndex,
+  }) async {
     final repo = ref.read(comicThumbnailRepoProvider);
     await repo.setComicCoverFromPage(
       comicId: comic.comicId,
@@ -34,7 +37,7 @@ class ReaderCoverEditorNotifier extends _$ReaderCoverEditorNotifier {
 
   Future<void> setSeriesCover(
     String seriesId,
-    Comic comic, {
+    ReaderComicRef comic, {
     required int pageIndex,
   }) async {
     await ref

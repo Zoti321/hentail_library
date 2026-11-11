@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
 import 'package:hentai_library/features/reader/presentation/widgets/viewport/reader_page_crossfade_policy.dart';
 import 'package:hentai_library/features/reader/presentation/widgets/viewport/reader_prefetch_hook.dart';
 import 'package:hentai_library/features/reader/presentation/widgets/viewport/reader_viewport_constants.dart';
@@ -59,7 +59,7 @@ class DualPageViewport extends HookConsumerWidget {
             value.asData?.value.readingMode ?? readingMode,
       ),
     );
-    final Comic? comic = ref.watch(
+    final ReaderComicRef? comic = ref.watch(
       readerViewModelProvider(
         viewKey,
       ).select((AsyncValue<ReaderUiState> value) => value.asData?.value.comic),
@@ -380,7 +380,7 @@ class _DualSpreadPage extends StatelessWidget {
     required this.imageList,
   });
 
-  final Comic comic;
+  final ReaderComicRef comic;
   final List<int> pages;
   final List<ReaderPageImageData> imageList;
 

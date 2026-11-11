@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/comic/domain/comic.dart';
 
 /// 按 comicId 读取 Comic。目录查询与用户元数据写入不在此接口。
 abstract class ComicLookupRepository {

@@ -3,7 +3,7 @@ import 'package:hentai_library/features/series/presentation/views/series_detail/
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/series_comic_page_item.dart';
+import 'package:hentai_library/features/series/domain/series_comic_page_item.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/series_comics_metadata.dart';
 
 /// 将领域 [Series] 与当前页漫画映射为 MD3E 系列详情数据（纯函数，便于测试）。

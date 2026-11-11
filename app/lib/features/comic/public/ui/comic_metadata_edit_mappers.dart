@@ -1,9 +1,9 @@
 import 'package:hentai_library/features/comic/presentation/patterns/metadata_edit/comic_metadata_edit_draft.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/form/comic_metadata_form.dart';
+import 'package:hentai_library/features/comic/domain/comic_metadata_form.dart';
 import 'package:intl/intl.dart';
 
 /// 发布日在 Lab 草稿中以 `yyyy-MM-dd` 文本保存（与 [PublishedDateTextField] 一致）。

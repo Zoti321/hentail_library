@@ -1,9 +1,9 @@
 import 'package:hentai_library/features/bootstrap/di/overrides/domain_event_bus_overrides.dart';
 import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
 import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/form/comic_metadata_form.dart';
+import 'package:hentai_library/features/comic/domain/comic_metadata_form.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/series_item_membership.dart';
 import 'package:hentai_library/features/comic/domain/comic_user_metadata_repository.dart';
 import 'package:hentai_library/features/comic/di/comic_repository_providers.dart';
@@ -81,7 +81,7 @@ class _RecordingSeriesRepository implements SeriesRepository {
 
 Comic _comic() {
   final DateTime now = DateTime.utc(2024, 1, 1);
-  return Comic(
+  return Comic.restore(
     comicId: 'comic-1',
     path: '/library/comic-1',
     resourceType: ResourceType.dir,

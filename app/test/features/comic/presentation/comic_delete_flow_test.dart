@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/features/comic/presentation/comic_delete_flow.dart';
 import 'package:hentai_library/shared/di/library_command_providers.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/ports/comic_trash_command_port.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
@@ -23,7 +23,7 @@ class _RecordingComicTrashCommandPort implements ComicTrashCommandPort {
 
 Comic _comic() {
   final DateTime now = DateTime.utc(2024, 1, 1);
-  return Comic(
+  return Comic.restore(
     comicId: 'comic-1',
     path: '/library/comic-1',
     resourceType: ResourceType.dir,

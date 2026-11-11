@@ -1,5 +1,5 @@
 import 'package:hentai_library/features/comic/domain/library_comic_sort_option.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:test/test.dart';
 
@@ -9,7 +9,7 @@ Comic _comic({
   DateTime? lastReadTime,
 }) {
   final DateTime now = DateTime.utc(2026, 1, 1);
-  return Comic(
+  return Comic.restore(
     comicId: id,
     path: '/tmp/$id',
     resourceType: ResourceType.zip,

@@ -1,7 +1,7 @@
 import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/comic/public/comic_lookup_repository.dart';
 import 'package:hentai_library/features/reader/application/read_session_application_service.dart';
@@ -43,22 +43,18 @@ const ReaderViewModelKey _incognitoKey = (
   startFromFirstPage: false,
 );
 
-Comic _comic({int pageCount = 10}) {
-  final DateTime now = DateTime.utc(2026, 1, 1);
-  return Comic(
+ReaderComicRef _comic({int pageCount = 10}) {
+  return ReaderComicRef(
     comicId: _comicId,
     path: '/tmp/$_comicId.cbz',
     resourceType: ResourceType.cbz,
-    resourceSize: 1,
-    createdAt: now,
-    lastUpdatedAt: now,
     title: 'Controller Test',
     pageCount: pageCount,
   );
 }
 
 OpenedReadSession _snapshot({int pageCount = 10, int resumePage = 1}) {
-  final Comic comic = _comic(pageCount: pageCount);
+  final ReaderComicRef comic = _comic(pageCount: pageCount);
   return OpenedReadSession(
     comic: comic,
     pages: List<ReadSessionPage>.generate(
@@ -126,7 +122,7 @@ class _UnusedPageSource implements ComicPageSourcePort {
 
 class _UnusedSessionPort implements NativeReaderPort {
   @override
-  Future<void> openComic(Comic comic) async {}
+  Future<void> openComic(ReaderComicRef comic) async {}
 
   @override
   Future<void> closeComic(String comicId) async {}
@@ -274,13 +270,10 @@ void main() {
         startFromFirstPage: false,
       );
       final OpenedReadSession otherSnapshot = OpenedReadSession(
-        comic: Comic(
+        comic: ReaderComicRef(
           comicId: otherKey.comicId,
           path: '/tmp/${otherKey.comicId}.cbz',
           resourceType: ResourceType.cbz,
-          resourceSize: 1,
-          createdAt: DateTime.utc(2026, 1, 1),
-          lastUpdatedAt: DateTime.utc(2026, 1, 1),
           title: 'Other Comic',
           pageCount: 5,
         ),
@@ -348,13 +341,10 @@ void main() {
         startFromFirstPage: true,
       );
       final OpenedReadSession otherSnapshot = OpenedReadSession(
-        comic: Comic(
+        comic: ReaderComicRef(
           comicId: otherKey.comicId,
           path: '/tmp/${otherKey.comicId}.cbz',
           resourceType: ResourceType.cbz,
-          resourceSize: 1,
-          createdAt: DateTime.utc(2026, 1, 1),
-          lastUpdatedAt: DateTime.utc(2026, 1, 1),
           title: 'Carry Comic',
           pageCount: 5,
         ),

@@ -1,8 +1,8 @@
 import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/form/comic_metadata_form.dart';
+import 'package:hentai_library/features/comic/domain/comic_metadata_form.dart';
 import 'package:test/test.dart';
 
 Comic _comic({
@@ -17,7 +17,7 @@ Comic _comic({
   List<String> characters = const <String>[],
 }) {
   final DateTime now = DateTime.utc(2024, 1, 1);
-  return Comic(
+  return Comic.restore(
     comicId: 'comic-1',
     path: '/library/comic-1',
     resourceType: ResourceType.dir,
@@ -35,11 +35,6 @@ Comic _comic({
     characters: characters,
     pageCount: 1,
   );
-}
-
-ComicMetadataDraftChanges _changedFields(ComicMetadataDraftDiff diff) {
-  expect(diff, isA<ComicMetadataDraftChanges>());
-  return diff as ComicMetadataDraftChanges;
 }
 
 void main() {
@@ -114,193 +109,6 @@ void main() {
       form = form.removeAuthor('A').addTag('Y').removeTag('X');
       expect(form.authors.single.name, 'B');
       expect(form.tags.single.name, 'Y');
-    });
-  });
-
-  group('ComicMetadataForm.diffAgainst', () {
-    test('blank title is invalid', () {
-      final ComicMetadataDraftDiff diff = ComicMetadataForm(title: '  ')
-          .diffAgainst(_comic());
-
-      expect(diff, isA<ComicMetadataDraftInvalid>());
-      expect(
-        (diff as ComicMetadataDraftInvalid).validation.titleError,
-        '漫画标题不能为空',
-      );
-    });
-
-    test('submits only the changed title', () {
-      final Comic original = _comic(title: '原标题', description: '简介');
-      final ComicMetadataDraftChanges changes = _changedFields(
-        ComicMetadataForm.fromComic(original)
-            .copyWith(title: '新标题')
-            .diffAgainst(original),
-      );
-
-      expect(changes.title, '新标题');
-      expect(changes.description, isNull);
-      expect(changes.publishedAt, isNull);
-      expect(changes.clearPublishedAt, isFalse);
-      expect(changes.contentRating, isNull);
-      expect(changes.authors, isNull);
-      expect(changes.tags, isNull);
-      expect(changes.languages, isNull);
-      expect(changes.parodies, isNull);
-      expect(changes.characters, isNull);
-    });
-
-    test('is unchanged when the draft matches the comic', () {
-      final Comic original = _comic(description: '简介');
-      expect(
-        ComicMetadataForm.fromComic(original).diffAgainst(original),
-        isA<ComicMetadataDraftUnchanged>(),
-      );
-    });
-
-    test('clearing the published date is a separate flag', () {
-      final DateTime published = DateTime.utc(2020, 5, 1);
-      final Comic original = _comic(publishedAt: published);
-      final ComicMetadataDraftChanges changes = _changedFields(
-        ComicMetadataForm.fromComic(original)
-            .copyWith(publishedAt: null)
-            .diffAgainst(original),
-      );
-
-      expect(changes.publishedAt, isNull);
-      expect(changes.clearPublishedAt, isTrue);
-      expect(changes.title, isNull);
-    });
-
-    test('submits authors when their order changes', () {
-      final Comic original = _comic(
-        authors: <AuthorRef>[AuthorRef.byName('A'), AuthorRef.byName('B')],
-      );
-      final ComicMetadataDraftChanges changes = _changedFields(
-        ComicMetadataForm.fromComic(original)
-            .copyWith(
-              authors: <AuthorRef>[
-                AuthorRef.byName('B'),
-                AuthorRef.byName('A'),
-              ],
-            )
-            .diffAgainst(original),
-      );
-
-      expect(changes.authors?.map((AuthorRef a) => a.name).toList(), <String>[
-        'B',
-        'A',
-      ]);
-      expect(changes.title, isNull);
-      expect(changes.tags, isNull);
-    });
-
-    test('submits languages when their order changes', () {
-      final Comic original = _comic(languages: <String>['Chinese', 'Japanese']);
-      final ComicMetadataDraftChanges changes = _changedFields(
-        ComicMetadataForm.fromComic(original)
-            .copyWith(languages: <String>['Japanese', 'Chinese'])
-            .diffAgainst(original),
-      );
-
-      expect(changes.languages, <String>['Japanese', 'Chinese']);
-      expect(changes.title, isNull);
-    });
-
-    test('submits parodies when their order changes', () {
-      final Comic original = _comic(parodies: <String>['Fate', '原创']);
-      final ComicMetadataDraftChanges changes = _changedFields(
-        ComicMetadataForm.fromComic(original)
-            .copyWith(parodies: <String>['原创', 'Fate'])
-            .diffAgainst(original),
-      );
-
-      expect(changes.parodies, <String>['原创', 'Fate']);
-      expect(changes.title, isNull);
-      expect(changes.languages, isNull);
-    });
-
-    test('submits characters when their order changes', () {
-      final Comic original = _comic(characters: <String>['Saber', 'Rider']);
-      final ComicMetadataDraftChanges changes = _changedFields(
-        ComicMetadataForm.fromComic(original)
-            .copyWith(characters: <String>['Rider', 'Saber'])
-            .diffAgainst(original),
-      );
-
-      expect(changes.characters, <String>['Rider', 'Saber']);
-      expect(changes.title, isNull);
-      expect(changes.parodies, isNull);
-    });
-
-    test('submits every field that differs from the original comic', () {
-      final DateTime published = DateTime.utc(2020, 5, 1);
-      final Comic original = _comic();
-      final ComicMetadataDraftChanges changes = _changedFields(
-        ComicMetadataForm(
-          title: ' 新标题 ',
-          description: ' 概要 ',
-          publishedAt: published,
-          isR18: true,
-          authors: <AuthorRef>[AuthorRef.byName('A')],
-          tags: <Tag>[Tag(name: 'T')],
-          languages: <String>['Chinese'],
-          parodies: <String>['Fate'],
-          characters: <String>['Saber'],
-        ).diffAgainst(original),
-      );
-
-      expect(changes.title, '新标题');
-      expect(changes.description, '概要');
-      expect(changes.publishedAt, published);
-      expect(changes.clearPublishedAt, isFalse);
-      expect(changes.contentRating, ContentRating.r18);
-      expect(changes.authors, <AuthorRef>[AuthorRef.byName('A')]);
-      expect(changes.tags, <Tag>[Tag(name: 'T')]);
-      expect(changes.languages, <String>['Chinese']);
-      expect(changes.parodies, <String>['Fate']);
-      expect(changes.characters, <String>['Saber']);
-    });
-
-    test('maps isR18 false back to safe content rating', () {
-      final Comic original = _comic(contentRating: ContentRating.r18);
-      final ComicMetadataDraftChanges changes = _changedFields(
-        ComicMetadataForm.fromComic(original)
-            .copyWith(isR18: false)
-            .diffAgainst(original),
-      );
-      expect(changes.contentRating, ContentRating.safe);
-    });
-
-    test('includes a list only when that list changed', () {
-      final Comic original = _comic();
-      final ComicMetadataDraftChanges tagsOnly = _changedFields(
-        ComicMetadataForm.fromComic(original)
-            .addTag('new-tag')
-            .diffAgainst(original),
-      );
-      expect(tagsOnly.tags, <Tag>[Tag(name: 'new-tag')]);
-      expect(tagsOnly.parodies, isNull);
-      expect(tagsOnly.characters, isNull);
-
-      final ComicMetadataDraftChanges titleOnly = _changedFields(
-        ComicMetadataForm.fromComic(original)
-            .copyWith(title: '仅改标题')
-            .diffAgainst(original),
-      );
-      expect(titleOnly.title, '仅改标题');
-      expect(titleOnly.tags, isNull);
-      expect(titleOnly.parodies, isNull);
-      expect(titleOnly.characters, isNull);
-
-      final ComicMetadataDraftChanges parodyAndCharacter = _changedFields(
-        ComicMetadataForm.fromComic(original)
-            .addParody('Fate')
-            .addCharacter('Saber')
-            .diffAgainst(original),
-      );
-      expect(parodyAndCharacter.tags, isNull);
-      expect(parodyAndCharacter.parodies, <String>['Fate']);
-      expect(parodyAndCharacter.characters, <String>['Saber']);
     });
   });
 }

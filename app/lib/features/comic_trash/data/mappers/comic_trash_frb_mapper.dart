@@ -1,5 +1,5 @@
 import 'package:hentai_library/features/comic_trash/domain/trashed_comic.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/comic/public/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/src/rust/api/comic.dart' as comic_rust;
@@ -16,7 +16,7 @@ comic_rust.PageRequestDto mapTrashPageRequest({
 
 /// Summary FRB 行 → 域 [Comic]（列表所需字段；facet 保持默认空）。
 Comic _comicFromTrashedSummary(rust.TrashedComicFrbDto dto) {
-  return Comic(
+  return Comic.restore(
     comicId: dto.comicId,
     path: dto.path,
     resourceType: ResourceType.values.byName(dto.resourceType),

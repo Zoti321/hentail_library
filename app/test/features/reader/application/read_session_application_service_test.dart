@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/ports/reading_history_command_port.dart';
 import 'package:hentai_library/shared/domain/ports/record_read_session_activity_port.dart';
@@ -79,15 +79,11 @@ class _RecordingOpenReadSessionService implements OpenReadSessionService {
   }
 }
 
-Comic _comic({String id = 'c1', String title = 'Test Comic'}) {
-  final DateTime now = DateTime.utc(2026, 1, 1);
-  return Comic(
+ReaderComicRef _comic({String id = 'c1', String title = 'Test Comic'}) {
+  return ReaderComicRef(
     comicId: id,
     path: '/tmp/$id',
     resourceType: ResourceType.zip,
-    resourceSize: 1024,
-    createdAt: now,
-    lastUpdatedAt: now,
     title: title,
     pageCount: 10,
   );

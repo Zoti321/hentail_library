@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/features/comic/presentation/comic_delete_flow.dart';
 import 'package:hentai_library/shared/di/reader_launch_providers.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// Feature-side host for [ComicCard] context-menu commands (keeps shared card pure).

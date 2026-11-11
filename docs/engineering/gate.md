@@ -16,6 +16,7 @@
 | Import 边界 | `cd app && flutter test test/gate/import_boundary_test.dart` |
 | DI token 覆盖 | `cd app && flutter test test/gate/shared_di_override_coverage_test.dart`（`shared/di` 声明 ⊆ override，漏注入即红） |
 | 领域事件门禁 | `cd app && flutter test test/gate/domain_event_rules_test.dart`（ADR-0039） |
+| Comic 实体归属 | `cd app && flutter test test/architecture/comic_entity_ownership_test.dart`（ADR-0041；shared 内不得再出现 `Comic`） |
 | Shared UI 无 feature import | `cd app && flutter test test/gate/shared_ui_no_feature_import_test.dart` |
 | Dart 测试盘存（inventory + rubric） | `python scripts/audit_dart_tests.py`（可选 `--summary-json` / `--json`；见下节） |
 

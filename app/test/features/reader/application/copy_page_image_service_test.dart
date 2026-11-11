@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/reader/domain/clipboard_image_port.dart';
 import 'package:hentai_library/features/reader/domain/comic_page_source_port.dart';
@@ -45,15 +45,11 @@ class _FakeClipboardImagePort implements ClipboardImagePort {
   }
 }
 
-Comic _comic() {
-  final DateTime now = DateTime.utc(2026, 1, 1);
-  return Comic(
+ReaderComicRef _comic() {
+  return const ReaderComicRef(
     comicId: 'c1',
     path: '/tmp/comic',
     resourceType: ResourceType.zip,
-    resourceSize: 1024,
-    createdAt: now,
-    lastUpdatedAt: now,
     title: 'Test',
     pageCount: 5,
   );

@@ -1,6 +1,6 @@
 import 'package:hentai_library/features/reader/data/mappers/reader_frb_mapper.dart';
 import 'package:hentai_library/shared/domain/models/resource_type_frb_wire.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
 import 'package:hentai_library/features/reader/domain/native_reader_port.dart';
 import 'package:hentai_library/shared/domain/ports/remote_library_credentials_port.dart';
 import 'package:hentai_library/src/rust/api/init.dart';
@@ -13,7 +13,7 @@ class NativeReaderFrbAdapter implements NativeReaderPort {
   final RemoteLibraryCredentialsPort _remoteCredentials;
 
   @override
-  Future<void> openComic(Comic comic) async {
+  Future<void> openComic(ReaderComicRef comic) async {
     await _remoteCredentials.pushStoredRemoteCredentialsToRust();
     try {
       await rust.openReaderFrb(

@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/domain/models/value_objects/comic_meta_locks.dart';
+import 'package:hentai_library/features/comic/domain/comic_meta_locks.dart';
 
 /// Widgetbook / Lab 漫画元数据编辑 preview 样例。
 abstract final class Md3eComicMetadataEditPreviewData {

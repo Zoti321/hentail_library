@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:hentai_library/features/comic/di/comic_cover_providers.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/comic/domain/comic_thumbnail_repository.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/reader_cover_editor_notifier.dart';
@@ -44,22 +44,12 @@ class _RecordingThumbnailRepository implements ComicThumbnailRepository {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-Comic _comic() {
-  final DateTime now = DateTime.utc(2024, 1, 1);
-  return Comic(
+ReaderComicRef _comic() {
+  return const ReaderComicRef(
     comicId: 'comic-1',
     path: '/library/comic-1.zip',
     resourceType: ResourceType.zip,
-    resourceSize: 0,
-    createdAt: now,
-    lastUpdatedAt: now,
     title: 'Comic',
-    contentRating: ContentRating.safe,
-    authors: const [],
-    tags: const [],
-    languages: const [],
-    parodies: const [],
-    characters: const [],
     pageCount: 10,
   );
 }

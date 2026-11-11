@@ -1,13 +1,13 @@
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/comic/domain/comic.dart';
+import 'package:hentai_library/features/comic/domain/comic_meta_locks.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/comic_meta_locks.dart';
 import 'package:hentai_library/src/rust/api/comic.dart' as rust;
 
-/// FRB `ComicDto` → shared [Comic]（Catalog kernel，ADR-0035）。
+/// FRB `ComicDto` → comic 领域 [Comic]（ADR-0041 恢复入口）。
 Comic mapRustComic(rust.ComicDto dto) {
-  return Comic(
+  return Comic.restore(
     comicId: dto.comicId,
     path: dto.path,
     resourceType: ResourceType.values.byName(dto.resourceType),

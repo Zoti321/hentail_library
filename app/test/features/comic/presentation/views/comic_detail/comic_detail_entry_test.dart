@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_entry.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 
@@ -10,7 +10,7 @@ Comic _comic({
   ContentRating contentRating = ContentRating.safe,
   int pageCount = 24,
 }) {
-  return Comic(
+  return Comic.restore(
     comicId: 'c1',
     path: r'D:\lib\c1.zip',
     resourceType: ResourceType.zip,

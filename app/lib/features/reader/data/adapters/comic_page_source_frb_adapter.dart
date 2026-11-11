@@ -2,7 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:hentai_library/features/reader/data/mappers/reader_frb_mapper.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/reader/domain/comic_page_source_port.dart';
 import 'package:hentai_library/features/reader/domain/read_session_page.dart';
@@ -15,7 +15,7 @@ class ComicPageSourceFrbAdapter implements ComicPageSourcePort {
   const ComicPageSourceFrbAdapter();
 
   @override
-  Future<List<ReadSessionPage>> loadPages(Comic comic) async {
+  Future<List<ReadSessionPage>> loadPages(ReaderComicRef comic) async {
     try {
       // 会话须已 open；列表从 session 取 path/type。
       final rust.ReaderPageListDto pageList = await rust.loadPageListFrb(

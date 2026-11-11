@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
 import 'package:hentai_library/features/reader/domain/value_objects/read_session_page_index.dart';
 
 /// 非无痕 Read session 实体：当前页与前台阅读时长（ADR-0005 / ADR-0038）。
@@ -21,7 +21,7 @@ final class ReadSession {
     return pageIndex < 1 ? 1 : pageIndex;
   }
 
-  final Comic comic;
+  final ReaderComicRef comic;
   ReadSessionPageIndex _pageIndex;
   DateTime? _foregroundStartedAt;
   Duration _accruedForeground = Duration.zero;

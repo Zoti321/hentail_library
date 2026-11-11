@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
 import 'package:hentai_library/features/reader/domain/auto_play_boundary_policy.dart';
 import 'package:hentai_library/features/reader/application/open_reader_args.dart';
 import 'package:hentai_library/features/reader/domain/spread_navigation.dart';
@@ -47,7 +47,7 @@ ReaderViewModelKey readerViewModelKey(
 @freezed
 abstract class ReaderUiState with _$ReaderUiState {
   factory ReaderUiState({
-    required Comic comic,
+    required ReaderComicRef comic,
     @Default(ReadingMode.paged) ReadingMode readingMode,
     @Default(false) bool showControls,
     @Default(1) int currentIndex,

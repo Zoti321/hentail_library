@@ -6,7 +6,7 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/core/util/shell_file_explorer.dart';
 import 'package:hentai_library/features/comic/public/ui/comic_card_host.dart';
 import 'package:hentai_library/features/comic/public/ui/comic_metadata_edit_presenters.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hentai_library/shared/ui/widgets/menu/anchored_menu.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';

@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/reader/domain/reading_mode.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/reader_chrome_notifier.dart';
@@ -17,15 +17,11 @@ const ReaderViewModelKey _viewKey = (
   startFromFirstPage: false,
 );
 
-Comic _comic({String title = 'Shell'}) {
-  final DateTime now = DateTime.utc(2026, 1, 1);
-  return Comic(
+ReaderComicRef _comic({String title = 'Shell'}) {
+  return ReaderComicRef(
     comicId: _comicId,
     path: '/tmp/shell.cbz',
     resourceType: ResourceType.cbz,
-    resourceSize: 1,
-    createdAt: now,
-    lastUpdatedAt: now,
     title: title,
     pageCount: 10,
   );

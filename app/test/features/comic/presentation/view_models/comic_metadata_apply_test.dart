@@ -1,9 +1,9 @@
 import 'package:hentai_library/features/comic/application/comic_metadata_service.dart';
 import 'package:hentai_library/shared/domain/events/events.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/form/comic_metadata_form.dart';
+import 'package:hentai_library/features/comic/domain/comic_metadata_form.dart';
 import 'package:hentai_library/features/comic/domain/comic_user_metadata_repository.dart';
 import 'package:test/test.dart';
 
@@ -40,7 +40,7 @@ class _RecordingComicRepository implements ComicUserMetadataRepository {
 
 Comic _comic({List<Tag> tags = const <Tag>[]}) {
   final DateTime now = DateTime.utc(2024, 1, 1);
-  return Comic(
+  return Comic.restore(
     comicId: 'comic-1',
     path: '/library/comic-1',
     resourceType: ResourceType.dir,

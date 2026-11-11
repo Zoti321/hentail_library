@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:hentai_library/core/errors/app_exception.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
 import 'package:hentai_library/features/reader/domain/clipboard_image_port.dart';
 import 'package:hentai_library/features/reader/domain/comic_page_source_port.dart';
 
@@ -22,7 +22,7 @@ class CopyPageImageService {
   final PageImagePngEncoder _encodePng;
 
   Future<void> execute({
-    required Comic comic,
+    required ReaderComicRef comic,
     required int archivePageIndex,
   }) async {
     final Uint8List? sourceBytes;

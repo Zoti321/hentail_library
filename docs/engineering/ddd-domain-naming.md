@@ -14,7 +14,7 @@
 | 聚合 / 实体 | 领域名词 | `{aggregate}.dart` |
 | 仓储接口 | `{Name}Repository` | `{name}_repository.dart` |
 
-Shared Kernel（ADR-0035）中 FRB 映射 DTO 保持现有 `models/entity` 与 `value_objects/form` 布局；新增纯 Dart 规约优先放在 owner feature 的 `domain/`。
+Shared Kernel（ADR-0035）中 FRB 映射 DTO 保持 `models/entity` 与 `value_objects/form` 布局；**例外**：`Comic` 实体、字段锁与元数据草稿已迁 `features/comic/domain/`，其 FRB 映射 @ `features/comic/data/comic_entity_mapper.dart`（ADR-0041；构造用 `Comic.restore` 绕过校验，新实体走 `Comic.createMetadata`）。新增纯 Dart 规约优先放在 owner feature 的 `domain/`。
 
 应用层异常（`core/errors/app_exception.dart`）与 `DomainException` 分离：domain 抛出规则违反，data/presentation 映射为用户可见错误。
 
