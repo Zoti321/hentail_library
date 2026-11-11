@@ -1,4 +1,4 @@
-export 'package:hentai_library/shared/domain/library/home_library_stat.dart';
+export 'package:hentai_library/features/home/domain/home_library_stat.dart';
 
 enum HomeLibraryAlertKind { remoteUnreachable, syncFailed, staleSync }
 

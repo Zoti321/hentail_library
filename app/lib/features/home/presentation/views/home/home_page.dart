@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/features/home/presentation/view_models/home_page_dashboard_notifier.dart';
 import 'package:hentai_library/features/home/presentation/views/home/home_layout.dart';
-import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:hentai_library/shared/domain/library/home_page_counts.dart';
 import 'package:hentai_library/shared/domain/library/reading_activity_stats.dart';
 import 'package:hentai_library/shared/ui/layout/app_shell_navigation.dart';
@@ -13,7 +12,10 @@ export 'package:hentai_library/features/home/presentation/views/home/home_layout
 
 /// 生产首页入口：把 provider 数据组装为 [HomeLayout]。
 class HomePage extends ConsumerWidget {
-  const HomePage({super.key});
+  const HomePage({super.key, this.libraryManagementSection});
+
+  /// 由 bootstrap 注入的库管理面板（避免 home → library_admin，ADR-0045）。
+  final Widget? libraryManagementSection;
 
   static const HomePageCounts _emptyCounts = HomePageCounts(
     comicCount: 0,
@@ -62,7 +64,8 @@ class HomePage extends ConsumerWidget {
           ref.read(appNavigatorProvider).pushMetadata(tab: 'characters'),
       onOpenTags: () =>
           ref.read(appNavigatorProvider).pushMetadata(tab: 'tags'),
-      libraryManagementSection: const HomeLibraryManagementPanel(),
+      libraryManagementSection:
+          libraryManagementSection ?? const SizedBox.shrink(),
     );
   }
 }

@@ -5,6 +5,7 @@ import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/features/library_browse/public.dart';
 import 'package:hentai_library/features/app_settings/public.dart';
 import 'package:hentai_library/features/home/public.dart';
+import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:hentai_library/features/reading_history/public.dart';
 import 'package:hentai_library/core/constants/app_routes.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/application_shell.dart';
@@ -33,7 +34,12 @@ final GoRouter appRouter = GoRouter(
           path: AppRoutes.home,
           name: AppRoutes.homeName,
           pageBuilder: (BuildContext context, GoRouterState state) =>
-              buildShellNavPage(state: state, child: const HomePage()),
+              buildShellNavPage(
+                state: state,
+                child: HomePage(
+                  libraryManagementSection: const HomeLibraryManagementPanel(),
+                ),
+              ),
         ),
         GoRoute(
           path: AppRoutes.libraries,
