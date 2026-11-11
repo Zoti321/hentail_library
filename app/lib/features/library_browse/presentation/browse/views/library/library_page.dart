@@ -25,7 +25,6 @@ import 'package:hentai_library/features/comic/public/ui/comic_catalog_selection_
 import 'package:hentai_library/shared/ui/layout/catalog_grid.dart';
 import 'package:hentai_library/shared/ui/layout/catalog_grid_metrics.dart';
 import 'package:hentai_library/shared/ui/layout/catalog_list_layout.dart';
-import 'package:hentai_library/shared/ui/widgets/actions/catalog_view_mode_button_group.dart';
 import 'package:hentai_library/shared/ui/widgets/catalog/comic_list_item.dart';
 import 'package:hentai_library/shared/ui/layout/library_browse_page_metrics.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/patterns/library/library_catalog_toolbar.dart';

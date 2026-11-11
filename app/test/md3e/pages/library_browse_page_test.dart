@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../../widgetbook/lab/pages/library_browse_page.dart';
 
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/shared/ui/widgets/actions/catalog_view_mode_button_group.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 
 import '../../support/pump_app.dart';
 

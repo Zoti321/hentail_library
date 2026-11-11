@@ -10,8 +10,6 @@ import 'package:hentai_library/shared/ui/patterns/dialog/confirm_dialog.dart';
 import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_form_scroll.dart';
 import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_field_label_row.dart';
 import 'package:hentai_library/shared/ui/widgets/inputs/comic_language_quick_pick.dart';
-import 'package:hentai_library/shared/ui/widgets/inputs/published_date_text_field.dart';
-import 'package:hentai_library/shared/ui/widgets/inputs/tag_input_field.dart';
 import 'package:hentai_library/shared/ui/widgets/list_detail/list_detail_detail_transition.dart';
 import 'package:hentai_library/shared/ui/widgets/list_detail/list_detail_nav_item.dart';
 import 'package:hentai_library/shared/ui/widgets/selection/segmented_capsule_bar.dart';

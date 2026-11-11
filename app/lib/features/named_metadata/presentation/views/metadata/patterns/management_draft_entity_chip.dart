@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/patterns/shared/suggestion_chip_surface.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:material_3_expressive/components/text_fields/utils/m3e_text_field_selection_controls.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 

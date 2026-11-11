@@ -7,8 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/design-system/design_system.dart';
-import 'package:hentai_library/shared/ui/widgets/inputs/named_facet_multi_select_copy.dart';
+import 'package:hentai_library/design-system/components/inputs/named_facet_multi_select_copy.dart';
 import 'package:hentai_library/shared/util/name_pinyin_assisted_filter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_3_expressive/components/text_fields/components/m3e_text_field_affordance.dart';
@@ -17,6 +16,9 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:motor/motor.dart';
 import 'package:riverpod/misc.dart' show ProviderListenable;
+import 'package:hentai_library/design-system/components/inputs/input_chip_field_layout.dart';
+import 'package:hentai_library/design-system/components/inputs/outlined_text_field_shell.dart';
+import 'package:hentai_library/design-system/motion/motion.dart';
 
 part 'named_facet_multi_select_menu.dart';
 

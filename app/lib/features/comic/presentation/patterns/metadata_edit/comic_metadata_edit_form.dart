@@ -11,7 +11,6 @@ import 'package:hentai_library/shared/ui/widgets/list_detail/list_detail_detail_
 import 'package:hentai_library/shared/ui/widgets/list_detail/list_detail_nav_item.dart';
 import 'package:hentai_library/shared/ui/widgets/inputs/comic_language_quick_pick.dart';
 import 'package:hentai_library/features/comic/domain/value_objects/comic_meta_locks.dart';
-import 'package:hentai_library/shared/ui/widgets/inputs/published_date_text_field.dart';
 import 'package:hentai_library/features/comic/presentation/view_models/comic_metadata_smart_facet_providers.dart';
 import 'package:hentai_library/features/comic/presentation/views/widgets/form/author_library_multi_select_field.dart';
 import 'package:hentai_library/features/comic/presentation/views/widgets/form/character_library_multi_select_field.dart';
@@ -20,7 +19,6 @@ import 'package:hentai_library/features/comic/presentation/views/widgets/form/ta
 import 'package:hentai_library/shared/ui/widgets/selection/segmented_capsule_bar.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/content_section.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
-import 'package:hentai_library/shared/ui/widgets/inputs/tag_input_field.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/shared/ui/widgets/actions/catalog_view_mode_button_group.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-import '../../support/pump_app.dart';
+import '../../../support/pump_app.dart';
 
 void main() {
   testWidgets('toggles between grid and list modes', (

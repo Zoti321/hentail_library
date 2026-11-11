@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/ui/widgets/inputs/named_facet_multi_select_copy.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/features/comic/presentation/views/widgets/form/named_facet_multi_select_field.dart';
 import 'package:hentai_library/features/comic/presentation/view_models/comic_metadata_smart_facet_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

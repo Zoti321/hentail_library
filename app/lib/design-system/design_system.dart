@@ -46,7 +46,22 @@ export 'package:hentai_library/design-system/components/inputs/outlined_text_fie
 export 'package:hentai_library/design-system/components/inputs/outlined_text_field_selection_scope.dart';
 export 'package:hentai_library/design-system/components/inputs/outlined_text_field_shell.dart';
 export 'package:hentai_library/design-system/components/lists/reorder_exclude.dart';
+export 'package:hentai_library/design-system/components/lists/reorderable_split_list_group.dart';
 export 'package:hentai_library/design-system/components/lists/split_list_group.dart';
 export 'package:hentai_library/design-system/components/surfaces/tonal_surface.dart';
+export 'package:hentai_library/design-system/components/actions/catalog_view_mode_button_group.dart';
+export 'package:hentai_library/design-system/components/chips/outlined_meta_chip.dart';
+export 'package:hentai_library/design-system/components/chips/suggestion_chip_surface.dart';
+export 'package:hentai_library/design-system/components/inputs/management_entity_name_field.dart';
+export 'package:hentai_library/design-system/components/inputs/named_facet_multi_select_copy.dart';
+export 'package:hentai_library/design-system/components/inputs/named_facet_multi_select_field.dart';
+export 'package:hentai_library/design-system/components/inputs/published_date_text_field.dart';
+export 'package:hentai_library/design-system/components/inputs/tag_input_field.dart';
+
+// layout (page-level composites)
+export 'package:hentai_library/design-system/layout/list_detail_adaptive_layout.dart';
+
+// util
+export 'package:hentai_library/design-system/util/reorder_index.dart';
 
 // l10n（直接路径暴露，不经 barrel：`design-system/l10n/m3e_material_localizations.dart`）

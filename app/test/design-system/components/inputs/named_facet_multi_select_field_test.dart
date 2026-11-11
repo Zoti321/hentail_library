@@ -2,13 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/comic/domain/smart_facet_match.dart';
-import 'package:hentai_library/shared/ui/widgets/inputs/named_facet_multi_select_copy.dart';
-import 'package:hentai_library/shared/ui/widgets/inputs/named_facet_multi_select_field.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:riverpod/misc.dart' show Override;
 
-import '../../../../support/pump_app.dart';
+import '../../../support/pump_app.dart';
 
 final _testItemsProvider = Provider<AsyncValue<List<SmartFacetMatchCandidate>>>(
   (Ref ref) => const AsyncData<List<SmartFacetMatchCandidate>>(

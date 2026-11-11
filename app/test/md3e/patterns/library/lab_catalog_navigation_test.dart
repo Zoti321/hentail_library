@@ -10,7 +10,7 @@ import '../../../../widgetbook/hosts/md3e_reader_page_lab_host.dart';
 import '../../../../widgetbook/lab/navigation/md3e_lab_catalog_navigation.dart';
 
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/shared/ui/widgets/actions/catalog_view_mode_button_group.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 
 import '../../../support/pump_app.dart';
 

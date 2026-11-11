@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/design-system/design_system.dart';
-import 'package:hentai_library/shared/ui/widgets/lists/reorder_index.dart';
-import 'package:hentai_library/shared/ui/widgets/settings/reorderable_split_list_group.dart';
 
-import '../../support/pump_app.dart';
+import '../../../support/pump_app.dart';
 
 const List<String> _items = <String>['A', 'B', 'C'];
 
