@@ -29,6 +29,7 @@ dependencies:
   material_symbols_icons: ^4.2960.0
   motor: ^1.1.0
   material_ui: ^1.8.0
+  material_3_expressive: ^1.2.0
   scrollable_positioned_list: ^0.3.8
 
   # --- 基础工具库（共 7）---
@@ -80,7 +81,6 @@ dependencies:
   pinyin_pro_flutter: ^1.0.3
   shared_preferences: ^2.5.3
   super_clipboard: 0.9.1
-  material_3_expressive: ^1.2.0
 dev_dependencies:
   # --- Flutter SDK 测试 ---
   flutter_test:
