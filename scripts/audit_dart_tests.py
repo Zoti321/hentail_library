@@ -67,7 +67,11 @@ def collect_all_test_files(
 def classify_rubric(relative_path: str, in_manifest: bool) -> Rubric:
     p = relative_path.replace("\\", "/")
 
-    if p.startswith(("test/gate/", "test/architecture/")) or p == "test/project_layout_test.dart":
+    if p.startswith(("test/gate/", "test/architecture/")) or p in {
+        "test/project_layout_test.dart",
+        "test/design-system/design_system_boundary_test.dart",
+        "test/design-system/design_system_dependency_policy_test.dart",
+    }:
         return "architecture-guard"
 
     if p.startswith(THIN_EDGE_PREFIXES):
