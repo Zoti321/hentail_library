@@ -25,6 +25,10 @@
 | --- | --- |
 | `infrastructure/frb/` | `frb_call_guard`、`frb_error_mapper`、`frb_zone_guard`（全 app） |
 | `infrastructure/events/` | `StreamDomainEventBus`；纯 Dart 事件契约仍在 shared/domain |
+| `infrastructure/logging/` | 日志文件写入/轮换、Flutter 控制台输出与 Rust 诊断级别；初始化由 `composition/logging_composition.dart` 负责（ADR-0052） |
+| `infrastructure/platform/` | 跨 feature 的系统文件浏览；UI 经 shared/application 签名与 required Provider 使用 |
+
+更新包打开、日志文件枚举/manifest/zip 导出属于 `app_settings/infrastructure`，脱敏算法属于该 owner 的 `application/diagnostics`，不放顶层技术实现桶。presentation 不创建这些实现；平台绑定集中在 `composition/platform_overrides.dart`。`app/lib/core` 仅容纳产品无关的纯 Dart 能力。
 
 新 FRB 映射 **默认进 owner `features/<id>/infrastructure/mappers/`**；跨 feature 协作经 owner **`public/` + port**（如 [RemoteLibraryCredentialsPort]），勿再在 `infrastructure/` 新增 mapper/adapter 目录。
 

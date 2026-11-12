@@ -130,3 +130,4 @@ Accepted | Superseded by ADR-000N | Deprecated
 | [0049](./0049-remaining-model-and-port-cohesion.md) | 剩余 models / ports 按 owner 与可达性内聚 | Accepted |
 | [0050](./0050-riverpod-module-communication-and-use-case-cohesion.md) | Riverpod 模块通信与具体应用用例内聚 | Accepted |
 | [0051](./0051-clean-architecture-composition-and-infrastructure.md) | 整洁架构组合根、基础设施与内层依赖 | Accepted |
+| [0052](./0052-pure-dart-core-and-platform-boundaries.md) | 纯 Dart core、共享协作与平台实现边界 | Accepted |

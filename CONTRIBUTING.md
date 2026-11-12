@@ -16,6 +16,7 @@
 | 领域词汇 | `GLOSSARY.md` |
 | 架构决策 | `docs/adr/` |
 | Feature 用例层 / public API | ADR-0033、ADR-0034、ADR-0051；public contracts/providers/widgets；应用接线见 `composition/` |
+| core / shared / infrastructure | ADR-0052；core 仅纯 Dart 通用能力，产品协作按层归 shared，外部实现按 owner 归 infrastructure，composition 负责绑定和初始化 |
 | UI 规范与规划 | `design-system/` 已清空（仅保留占位与示例参考图，2026-11-01）；现行 UI 真源见 `AGENTS.md` 与 ADR-0027/0028/0030 |
 | Gate、测试缝 | `docs/engineering/gate.md` |
 | Feature `data/`、FRB 薄层、cross-feature 注入 | `docs/engineering/feature-data-layout.md`、`cross-feature-collaboration.md` |

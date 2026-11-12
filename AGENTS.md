@@ -20,6 +20,8 @@ Setup: `./scripts/setup-dev.sh` · PR gate: `./scripts/run-gate.sh` · Human onb
 
 **Rust** (sync, read, DB) → `core/`; see `docs/adr/README.md` (ADR-0002 and related).
 
+**Dart core / shared / infrastructure** → **ADR-0052**：core 仅纯 Dart 通用能力；产品协作按层归 shared，外部实现按 owner 归 infrastructure，初始化与绑定归 composition。移动 l10n / 日志 / 平台能力时同时检查生成配置与递归依赖门禁。
+
 **Tests & CI** → `docs/engineering/gate.md`; tier names ADR-0018; workflows `.github/workflows/gate.yml`.
 
 **Issues** · **logs export** · **tag dictionary JSON** → `docs/engineering/maintainer.md`.

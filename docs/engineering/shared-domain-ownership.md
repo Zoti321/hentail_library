@@ -85,6 +85,8 @@ Feature 内代码应 **import owner `domain/`**（`library_browse` 内按 [`libr
 
 共享协作契约保留的理由仍按 ADR-0045 的实际消费者和模块可达性判定。新增业务默认进入 owner，不能用 shared 绕过禁止边。纯签名放 shared/application，领域词汇与事实放 shared/domain，平台/FRB 实现放 infrastructure，框架状态与视图分别放 presentation/providers 与 ui。
 
+ADR-0052 进一步区分通用 core 与产品共享层：取消令牌归 `core/async`；应用错误包络、日志命名与路由 location 词汇归 `shared/application`；领域异常仍独立。文件浏览仅在 shared 保留纯函数签名及 Riverpod token，系统实现由 composition 绑定；更新打开和日志导出属于 app_settings。`reader → comic`、`comic → series` 的既有禁止边使阅读查询/系列协作仍经 shared，具体消费者、装配位置与后续收回建议见 ADR-0052；本轮不修改这些禁止边。
+
 ## 测试目录约定
 
 - Owner 域行为单测：`app/test/features/<owner>/domain/**`

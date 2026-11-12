@@ -106,7 +106,9 @@ cd app && dart run dart_code_linter:metrics analyze lib \
 | UI 快轨 | 列入 `app/test/gate/manifest.txt` 的 UI/逻辑（含 `test/design-system`，ADR-0044 层门禁与迁入组件测试） |
 | UI 慢轨 | `test/shared/ui`、`test/features` 未进 manifest 部分 → `nightly-dart-ui`（`test/design-system` 整体走快轨） |
 
-**整洁架构目录与内层递归依赖**：ADR-0051；`test/architecture/clean_architecture_dependency_test.dart` 同时检查 import/export 链和组合根调用方向。
+**整洁架构目录与内层递归依赖**：ADR-0051、ADR-0052；`test/architecture/clean_architecture_dependency_test.dart` 解析完整 import/export/part 与条件分支，检查 core 仅依赖自身和纯 Dart SDK/包，domain/application/contracts 不能间接到达外层；第三方包检查完整运行时依赖声明和库源码。另检查 presentation / infrastructure / shared 与组合根方向。扫描器绕过回归用例在 `dart_dependency_graph_test.dart`，缺失文件或未解析包直接失败。原禁止边、public-only、无环与 required Provider 覆盖不变。
+
+`app/lib/core` 不含 Flutter、平台或产品语义；文件浏览、日志落盘在顶层 infrastructure，更新打开与日志导出在 app_settings 的 infrastructure，由 composition 注入。UI 生成文案位于 `design-system/l10n`（`flutter gen-l10n`），共享 BuildContext 适配在 `shared/ui/l10n`，业务展示扩展归各 owner。本轮移动的日志/平台/路由/图像/标题测试均同步列入 manifest，未降级至慢轨；无生产消费者的 Dart 自然排序副本和其四个测试随代码退役。
 
 业务 sync/read/DB：**信任 `cargo test`**。Dart **不要**对真 FRB / `*_repository_impl` 写全流程集成测。
 
@@ -144,7 +146,7 @@ Epic [#447](https://github.com/Zoti321/hentail_library/issues/447) 清理 Flutte
 | **gate-fast** | 路径落在 `manifest.txt` 展开集合内 | `gate-dart-test` |
 | **slow-track** | `app/test/**/*_test.dart` 中未进 manifest 的文件 | `nightly-dart-ui` 扫描 `test/shared/ui` + `test/features`（与 manifest 互补；盘存脚本的慢轨计数 = 全树减 manifest） |
 
-**Epic #447 清理后基线（2026-11-03，`python scripts/audit_dart_tests.py`）**：共 **253** 个 `*_test.dart`；manifest 展开 **175**；慢轨 **78**。典型慢轨分桶：`library_browse` 26、`reader` 11（旧名 `read_session`）、`shared/ui` 2（主题装配契约）、其余 feature 见盘存 JSON。
+**当前盘存（2026-11-12，`python scripts/audit_dart_tests.py --summary-json`）**：共 **320** 个 `*_test.dart`；manifest 展开 **220**；慢轨 **100**。rubric：architecture-guard 27、thin-edge 100、ui-contract 150、candidate-retire 43。慢轨分桶以工具 JSON 为准；本轮迁移未将任何保留测试移出快轨。
 
 ### nightly-dart-ui（`.github/workflows/nightly.yml`）
 
@@ -162,7 +164,7 @@ Epic [#447](https://github.com/Zoti321/hentail_library/issues/447) 清理 Flutte
 
 | rubric | 典型路径 | 清理 epic 中的含义 |
 |--------|----------|-------------------|
-| **architecture-guard** | `test/gate/**`、`project_layout_test.dart` | **禁止**批量删除；仅随 ADR/规则 drift 修改 |
+| **architecture-guard** | `test/gate/**`、`test/architecture/**`、`project_layout_test.dart` | **禁止**批量删除；仅随 ADR/规则 drift 修改 |
 | **thin-edge** | `frb_wire`、`shared/data|domain|di`、`core`、feature `data/` / `domain/` / `application/`、`test/support/` | 保留并加强；业务真值仍在 Rust |
 | **ui-contract** | manifest 内其余项（MD3E entry、confirm 对话框、ViewModel persist/policy、motion/theme 等） | manifest 反向审计 (#450)；不合格则降级 |
 | **candidate-retire** | 慢轨下的 `shared/ui`、feature `presentation/` 等 | 优先删/改 (#451–#454)；与 #447 决策一致：MD3E entry + 可观察结果为主缝 |
