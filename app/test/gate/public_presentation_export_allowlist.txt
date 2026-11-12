@@ -13,8 +13,8 @@ features/library_admin/public/ui/home_library_management_panel.dart
 features/library_browse/public/presentation/library_browse_bootstrap_exports.dart
 features/library_browse/public/ui/author_detail_page.dart
 features/library_browse/public/ui/library_page.dart
-features/named_metadata/public/ui/metadata_lab_patterns.dart
-features/named_metadata/public/ui/metadata_page.dart
+features/comic_metadata/public/ui/metadata_lab_patterns.dart
+features/comic_metadata/public/ui/metadata_page.dart
 features/reader/public/presentation/open_reader.dart
 features/reader/public/presentation/reader_route_args.dart
 features/reader/public/presentation/reader_shell_exports.dart

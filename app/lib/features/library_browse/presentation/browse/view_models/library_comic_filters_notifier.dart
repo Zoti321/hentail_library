@@ -14,7 +14,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hentai_library/features/comic/public.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/models/comic_catalog_query_assembly.dart';
-import 'package:hentai_library/features/named_metadata/public/di/named_metadata_repository_providers.dart';
+import 'package:hentai_library/features/comic_metadata/public/di/comic_metadata_repository_providers.dart';
 
 part 'library_comic_filters_notifier.g.dart';
 part 'library_comic_filters_persistence.dart';

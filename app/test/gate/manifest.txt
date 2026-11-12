@@ -31,7 +31,7 @@ test/widget_test.dart
 
 # Dart hard-manifest UI（已晋升快轨）
 test/design-system/components/inputs/named_facet_multi_select_field_test.dart
-test/features/named_metadata/presentation/views/metadata/named_facet_fill_viewport_test.dart
+test/features/comic_metadata/presentation/views/metadata/named_facet_fill_viewport_test.dart
 test/features/series/presentation/views/series_detail/series_detail_entry_test.dart
 test/features/comic/presentation/views/comic_detail/comic_detail_entry_test.dart
 test/features/library_browse/presentation/author/views/author_detail/author_detail_body_test.dart

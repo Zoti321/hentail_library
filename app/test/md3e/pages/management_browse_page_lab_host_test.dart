@@ -3,13 +3,13 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 
 import '../../../widgetbook/hosts/md3e_management_browse_page_lab_host.dart';
 
-import 'package:hentai_library/features/named_metadata/presentation/views/metadata/patterns/management_create_interaction.dart';
-import 'package:hentai_library/features/named_metadata/domain/named_facet_management_repository.dart';
+import 'package:hentai_library/features/comic_metadata/presentation/views/metadata/patterns/management_create_interaction.dart';
+import 'package:hentai_library/features/comic_metadata/domain/named_facet_management_repository.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 import '../../support/pump_app.dart';
 
-import 'package:hentai_library/features/named_metadata/public/ui/l10n/named_metadata_l10n.dart';
+import 'package:hentai_library/features/comic_metadata/public/ui/l10n/comic_metadata_l10n.dart';
 
 void main() {
   testWidgets('LabHost Dialog 创建实体后 chip 出现在 preview 列表', (

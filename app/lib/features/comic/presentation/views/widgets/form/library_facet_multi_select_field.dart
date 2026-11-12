@@ -4,7 +4,7 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/features/comic/presentation/view_models/comic_metadata_smart_facet_providers.dart';
 import 'package:hentai_library/features/comic/presentation/views/widgets/form/named_facet_multi_select_field.dart';
-import 'package:hentai_library/features/named_metadata/public/named_metadata_form.dart';
+import 'package:hentai_library/features/comic_metadata/public/comic_metadata_form.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// 全库 facet 多选（作者 / 角色 / 原作 / 标签）：字段内 chip + 内联输入。

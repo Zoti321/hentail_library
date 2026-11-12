@@ -1,5 +1,5 @@
 import 'package:hentai_library/features/comic/domain/smart_facet_match.dart';
-import 'package:hentai_library/features/named_metadata/domain/named_facet_form_candidate.dart';
+import 'package:hentai_library/features/comic_metadata/domain/named_facet_form_candidate.dart';
 import 'package:test/test.dart';
 
 void main() {

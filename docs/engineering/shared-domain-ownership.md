@@ -24,7 +24,7 @@
 | **reading_history** | `features/reading_history/domain/` |
 | `app_setting*` | `features/app_settings/domain/`（阅读偏好**只**存 `String` id / `int` schema，枚举语义归 `features/reader/domain/`，两侧经 ACL 通信——ADR-0046） |
 | home read models | `features/home/domain/` |
-| named metadata 表单/字典 | `features/named_metadata/domain/`；跨 feature **`features/named_metadata/public.dart`**（仓储契约、字典 Riverpod、生产页）；Comic 表单窄面 **`public/named_metadata_form.dart`**；Lab patterns **`public/ui/metadata_lab_patterns.dart`** |
+| named metadata 表单/字典 | `features/comic_metadata/domain/`；跨 feature **`features/comic_metadata/public.dart`**（仓储契约、字典 Riverpod、生产页）；Comic 表单窄面 **`public/comic_metadata_form.dart`**；Lab patterns **`public/ui/metadata_lab_patterns.dart`** |
 
 Feature 内代码应 **import owner `domain/`**（`library_browse` 内按 [`library-browse-zones.md`](library-browse-zones.md) 分子目录）；跨 feature 经 **`features/<owner>/public/**`**（ADR-0034）。**勿**再新增对已删除 shared shim 路径的依赖。
 

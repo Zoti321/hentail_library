@@ -12,7 +12,7 @@ import 'package:hentai_library/features/library_admin/presentation/views/home_li
 import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/home_library_delete_confirm_dialog.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/home_library_list_order.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/features/named_metadata/public/ui/metadata_lab_patterns.dart';
+import 'package:hentai_library/features/comic_metadata/public/ui/metadata_lab_patterns.dart';
 
 import '../preview/md3e_home_page_preview_data.dart';
 import 'md3e_history_browse_page_lab_host.dart';

@@ -44,7 +44,7 @@ import 'package:hentai_library/features/series/public/ui/series_metadata_edit_pr
 import '../lab/navigation/md3e_lab_catalog_navigation.dart';
 
 import 'package:hentai_library/features/library_browse/presentation/browse/patterns/library/library_filter_sort_side_sheet.dart';
-import 'package:hentai_library/features/named_metadata/public/ui/metadata_lab_patterns.dart';
+import 'package:hentai_library/features/comic_metadata/public/ui/metadata_lab_patterns.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 

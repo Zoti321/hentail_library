@@ -3,9 +3,9 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../../../widgetbook/lab/pages/md3e_management_browse_page.dart';
 
-import 'package:hentai_library/features/named_metadata/presentation/views/metadata/patterns/management_create_interaction.dart';
-import 'package:hentai_library/features/named_metadata/presentation/views/metadata/patterns/management_draft_entity_chip.dart';
-import 'package:hentai_library/features/named_metadata/domain/named_facet_management_repository.dart';
+import 'package:hentai_library/features/comic_metadata/presentation/views/metadata/patterns/management_create_interaction.dart';
+import 'package:hentai_library/features/comic_metadata/presentation/views/metadata/patterns/management_draft_entity_chip.dart';
+import 'package:hentai_library/features/comic_metadata/domain/named_facet_management_repository.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 import '../../support/pump_app.dart';

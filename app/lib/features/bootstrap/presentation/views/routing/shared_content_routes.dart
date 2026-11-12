@@ -6,7 +6,7 @@ import 'package:hentai_library/core/constants/app_routes.dart';
 import 'package:hentai_library/features/comic/public.dart';
 import 'package:hentai_library/features/library_browse/public.dart';
 import 'package:hentai_library/features/series/public.dart';
-import 'package:hentai_library/features/named_metadata/public.dart';
+import 'package:hentai_library/features/comic_metadata/public.dart';
 import 'package:hentai_library/features/reader/public.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/routing/route_not_found_page.dart';
 

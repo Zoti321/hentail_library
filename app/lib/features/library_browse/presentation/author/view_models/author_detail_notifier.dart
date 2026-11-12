@@ -4,7 +4,7 @@ import 'package:hentai_library/features/comic/public.dart';
 
 import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/author_detail.dart';
-import 'package:hentai_library/features/named_metadata/public.dart';
+import 'package:hentai_library/features/comic_metadata/public.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_comic_filters_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hentai_library/features/library_admin/public.dart';

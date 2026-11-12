@@ -227,7 +227,7 @@ Epic [#447](https://github.com/Zoti321/hentail_library/issues/447) 清理 Flutte
 | reading_history | `history_list_progress_test` | `data/mappers`；快轨 `history_page_test` |
 | library_admin | `libraries_sidebar_navigation`、`library_management_port_delete`（大壳路由） | `data/`、`di/` 契约、`domain/`、`public/**`；快轨 dashboard/dialog |
 | app_settings | `app_update_check`、`theme_preference_l10n` | `domain/**`、`data/`、`public/**`；快轨 settings MD3E / persist VM |
-| named_metadata | `metadata_md3e_page_test` | mappers、controller、`public/**`；快轨 `named_facet_fill_viewport` |
+| comic_metadata | `metadata_md3e_page_test` | mappers、controller、`public/**`；快轨 `named_facet_fill_viewport` |
 | comic_trash / metadata_backup | — | 慢轨全保留（application / data / flow 薄边） |
 
 ## Import / 布局（规范在测试里）

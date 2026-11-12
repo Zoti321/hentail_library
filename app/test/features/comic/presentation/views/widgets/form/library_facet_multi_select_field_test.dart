@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/comic/domain/smart_facet_match.dart';
 import 'package:hentai_library/features/comic/presentation/view_models/comic_metadata_smart_facet_providers.dart';
 import 'package:hentai_library/features/comic/presentation/views/widgets/form/library_facet_multi_select_field.dart';
-import 'package:hentai_library/features/named_metadata/public/named_metadata_form.dart';
+import 'package:hentai_library/features/comic_metadata/public/comic_metadata_form.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;
 

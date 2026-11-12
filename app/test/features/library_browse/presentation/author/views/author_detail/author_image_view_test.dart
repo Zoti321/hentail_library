@@ -12,7 +12,7 @@ import 'package:hentai_library/shared/ui/widgets/catalog/catalog_cover_hero.dart
 import 'package:hentai_library/shared/ui/widgets/element/image/card_letterboxed_cover_image.dart';
 import 'package:hentai_library/features/library_browse/presentation/author/view_models/author_detail_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/author/views/author_detail/author_image_view.dart';
-import 'package:hentai_library/features/named_metadata/public/di/named_metadata_repository_providers.dart';
+import 'package:hentai_library/features/comic_metadata/public/di/comic_metadata_repository_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart' show ProviderScope, Ref;
 import 'package:riverpod/misc.dart' show Override;
 import 'package:shared_preferences/shared_preferences.dart';

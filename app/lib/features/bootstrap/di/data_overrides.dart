@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/bootstrap/di/adapters/comic_trash_reader_session_adapter.dart';
 import 'package:hentai_library/features/reader/public.dart';
 import 'package:hentai_library/features/comic_trash/public.dart';
-import 'package:hentai_library/features/named_metadata/public.dart';
+import 'package:hentai_library/features/comic_metadata/public.dart';
 import 'package:hentai_library/features/comic/public.dart';
 import 'package:hentai_library/features/series/public.dart';
 import 'package:hentai_library/features/library_admin/public.dart';

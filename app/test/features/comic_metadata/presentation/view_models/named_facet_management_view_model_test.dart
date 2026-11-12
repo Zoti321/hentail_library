@@ -1,0 +1,200 @@
+import 'dart:typed_data';
+
+import 'package:flutter_test/flutter_test.dart';
+import 'package:hentai_library/features/bootstrap/di/overrides/domain_event_bus_overrides.dart';
+import 'package:hentai_library/features/comic_metadata/domain/named_facet_form_candidate.dart';
+import 'package:hentai_library/features/comic_metadata/presentation/view_models/named_facet_management_view_model.dart';
+import 'package:hentai_library/features/comic_metadata/presentation/view_models/tag_dictionary_import_view_model.dart';
+import 'package:hentai_library/features/comic_metadata/presentation/view_models/tag_management_notifier.dart';
+import 'package:hentai_library/features/comic_metadata/public/di/comic_metadata_repository_providers.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
+import 'package:hentai_library/features/comic_metadata/domain/tag_dictionary_import_result.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
+import 'package:hentai_library/features/comic_metadata/domain/named_facet_management_repository.dart';
+import 'package:hentai_library/features/comic_metadata/domain/tag_repository.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:riverpod/misc.dart' show Override;
+
+class _SharedTagNames {
+  _SharedTagNames(this.names);
+
+  final List<String> names;
+  int countAttachmentsCalls = 0;
+  int countAttachmentsBatchCalls = 0;
+}
+
+class _FakeNamedFacetManagementRepository
+    implements NamedFacetManagementRepository {
+  _FakeNamedFacetManagementRepository(this._tags);
+
+  final _SharedTagNames _tags;
+
+  @override
+  Future<List<String>> listAll(ManagedNamedFacetKind kind) async {
+    return List<String>.of(_tags.names);
+  }
+
+  @override
+  Future<PagedResult<NamedFacetFormCandidate>> fetchPage(
+    ManagedNamedFacetKind kind,
+    PageRequest request,
+  ) async {
+    return PagedResult<NamedFacetFormCandidate>(
+      items: <NamedFacetFormCandidate>[
+        for (final String name in _tags.names)
+          namedFacetFormCandidate(name: name, attachmentCount: 3),
+      ],
+      totalCount: _tags.names.length,
+      page: request.page,
+      pageSize: request.pageSize,
+    );
+  }
+
+  @override
+  Future<void> deleteByNames(
+    ManagedNamedFacetKind kind,
+    List<String> names,
+  ) async {
+    _tags.names.removeWhere(names.contains);
+  }
+
+  @override
+  Future<void> add(ManagedNamedFacetKind kind, String name) async {}
+
+  @override
+  Future<void> rename(
+    ManagedNamedFacetKind kind,
+    String oldName,
+    String newName,
+  ) async {}
+
+  @override
+  Future<void> merge(
+    ManagedNamedFacetKind kind,
+    String sourceName,
+    String targetName,
+  ) async {}
+
+  @override
+  Future<int> countAttachments(ManagedNamedFacetKind kind, String name) async {
+    _tags.countAttachmentsCalls += 1;
+    return 0;
+  }
+
+  @override
+  Future<Map<String, int>> countAttachmentsBatch(
+    ManagedNamedFacetKind kind,
+    List<String> names,
+  ) async {
+    _tags.countAttachmentsBatchCalls += 1;
+    return <String, int>{for (final String name in names) name: 7};
+  }
+}
+
+class _FakeTagRepository implements TagRepository {
+  _FakeTagRepository(this._tags);
+
+  final _SharedTagNames _tags;
+
+  @override
+  Future<List<Tag>> listAll() async {
+    return _tags.names.map((String name) => Tag(name: name)).toList();
+  }
+
+  @override
+  Future<TagDictionaryImportResult> importTagDictionary(
+    List<int> jsonBytes,
+  ) async {
+    _tags.names.add('gamma');
+    return const TagDictionaryImportResult(
+      added: 1,
+      skippedExisting: 0,
+      skippedFilteredOrEmptyOrDedupe: 0,
+    );
+  }
+}
+
+ProviderContainer _container(_SharedTagNames tags) {
+  final ProviderContainer container = ProviderContainer(
+    overrides: <Override>[
+      ...domainEventBusOverrides(),
+      namedFacetManagementRepoProvider.overrideWithValue(
+        _FakeNamedFacetManagementRepository(tags),
+      ),
+      tagRepoProvider.overrideWithValue(_FakeTagRepository(tags)),
+    ],
+  );
+  addTearDown(container.dispose);
+  return container;
+}
+
+void main() {
+  test(
+    'importing a tag dictionary refreshes the tag page and allTagsProvider',
+    () async {
+      final _SharedTagNames tags = _SharedTagNames(<String>['alpha']);
+      final ProviderContainer container = _container(tags);
+      container.read(
+        namedFacetManagementViewModelProvider(ManagedNamedFacetKind.tag),
+      );
+      await pumpEventQueue();
+
+      final TagDictionaryImportResult? result = await container
+          .read(tagDictionaryImportViewModelProvider.notifier)
+          .importFromBytes(Uint8List(0));
+
+      expect(result?.added, 1);
+      final NamedFacetManagementState page = container.read(
+        namedFacetManagementViewModelProvider(ManagedNamedFacetKind.tag),
+      );
+      expect(page.items, <String>['alpha', 'gamma']);
+      expect(page.totalCount, 2);
+      expect(
+        (await container.read(allTagsProvider.future))
+            .map((Tag tag) => tag.name),
+        <String>['alpha', 'gamma'],
+      );
+    },
+  );
+
+  test(
+    'refresh loads attachment counts from page without N+1 prefetch',
+    () async {
+      final _SharedTagNames tags = _SharedTagNames(<String>['alpha', 'beta']);
+      final ProviderContainer container = _container(tags);
+      container.read(
+        namedFacetManagementViewModelProvider(ManagedNamedFacetKind.tag),
+      );
+      await pumpEventQueue();
+
+      final NamedFacetManagementState page = container.read(
+        namedFacetManagementViewModelProvider(ManagedNamedFacetKind.tag),
+      );
+      expect(page.attachmentCounts, <String, int>{'alpha': 3, 'beta': 3});
+      expect(tags.countAttachmentsCalls, 0);
+      expect(tags.countAttachmentsBatchCalls, 0);
+    },
+  );
+
+  test('search uses batch counts and caches pinyin snapshot', () async {
+    final _SharedTagNames tags = _SharedTagNames(<String>['alpha', 'beta']);
+    final ProviderContainer container = _container(tags);
+    final NamedFacetManagementViewModel vm = container.read(
+      namedFacetManagementViewModelProvider(ManagedNamedFacetKind.tag).notifier,
+    );
+    await pumpEventQueue();
+
+    await vm.setQuery('alp');
+    final NamedFacetManagementState page = container.read(
+      namedFacetManagementViewModelProvider(ManagedNamedFacetKind.tag),
+    );
+    expect(page.items, <String>['alpha']);
+    expect(page.attachmentCounts, <String, int>{'alpha': 7});
+    expect(tags.countAttachmentsBatchCalls, 1);
+    expect(tags.countAttachmentsCalls, 0);
+
+    await vm.setQuery('bet');
+    expect(tags.countAttachmentsBatchCalls, 2);
+  });
+}

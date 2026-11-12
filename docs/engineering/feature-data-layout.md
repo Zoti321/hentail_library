@@ -22,10 +22,10 @@
 | 子目录 | 内容 |
 | --- | --- |
 | `shared/data/frb/` | `frb_call_guard`、`frb_error_mapper`、`frb_zone_guard`（全 app） |
-| `shared/data/repositories/` | 仅横切、无 owner 的遗留（**2026-11-03** 起 `named_facet_form_listing` 已迁回 `named_metadata/data/`；勿再新增 feature 域接缝） |
+| `shared/data/repositories/` | 仅横切、无 owner 的遗留（**2026-11-03** 起 `named_facet_form_listing` 已迁回 `comic_metadata/data/`；勿再新增 feature 域接缝） |
 
 新 FRB 映射 **默认进 owner `features/<id>/data/mappers/`**；跨 feature 协作经 owner **`public/` + port**（如 [RemoteLibraryCredentialsPort]），勿再在 `shared/data/` 新增 mapper/adapter 目录。
 
 ## 迁移 backlog（FRB 深模块）
 
-**已完成**：第一～三批（单域 mapper/adapter、`series`/`reader` 迁出 shared、`remote_credentials` @ library_admin + [RemoteLibraryCredentialsPort]、缩略图 FRB @ `library_browse/data/comic/`）。**named_metadata（2026-11-03）**：`public/` + 仓储工厂、`*_frb_adapter`、form listing 自 `shared/data/repositories/` 回迁；Rust FRB `named_facet` 拆 `management`/`form`/`types`，`parody`/`character` 并入 `named_facet_dictionary`（无单独 `named_metadata_data_layer_plan.md`，约定见 [`cross-feature-collaboration.md`](cross-feature-collaboration.md)）。
+**已完成**：第一～三批（单域 mapper/adapter、`series`/`reader` 迁出 shared、`remote_credentials` @ library_admin + [RemoteLibraryCredentialsPort]、缩略图 FRB @ `library_browse/data/comic/`）。**comic_metadata（2026-11-03）**：`public/` + 仓储工厂、`*_frb_adapter`、form listing 自 `shared/data/repositories/` 回迁；Rust FRB `named_facet` 拆 `management`/`form`/`types`，`parody`/`character` 并入 `named_facet_dictionary`（无单独 `comic_metadata_data_layer_plan.md`，约定见 [`cross-feature-collaboration.md`](cross-feature-collaboration.md)）。

@@ -1,4 +1,4 @@
-import 'package:hentai_library/features/named_metadata/public.dart';
+import 'package:hentai_library/features/comic_metadata/public.dart';
 import 'package:hentai_library/features/reading_stats/domain/home_page_counts_repository.dart';
 import 'package:hentai_library/shared/data/frb/frb_call_guard.dart';
 import 'package:hentai_library/features/reading_stats/domain/home_page_counts.dart';

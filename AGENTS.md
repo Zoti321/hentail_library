@@ -16,7 +16,7 @@ Setup: `./scripts/setup-dev.sh` · PR gate: `./scripts/run-gate.sh` · Human onb
 
 **Dart layout & imports** (features/shared/core, MVVM) → ADR-0017、ADR-0027、**ADR-0033**（feature `application/`）、**ADR-0034**（cross-feature 仅 `features/*/public/**`）、**ADR-0035**（Catalog Shared Kernel 留 `shared/domain`）、**ADR-0036**（`comic` / `series` / `library_browse` 三 module）、**ADR-0039**（命令走 Port，事实走领域事件 `shared/domain/events/`）、**ADR-0043**（导航走 `AppNavigator`，路径走 `AppRoutes`，feature 不 import go_router）；领域层 DDD 文件/类型命名 → `docs/engineering/ddd-domain-naming.md`；Wayfinder 终态以 `app/test/gate/` 为准，并由 `project_layout_test.dart` 等门禁强制执行。
 
-**Wayfinder product modules**（`app/lib/features/`）：`bootstrap`、`home`、`library_admin`、`library_browse`、`comic`、`series`、`reader`、`reading_history`、`reading_stats`、`comic_trash`、`named_metadata`、`app_settings`、`metadata_backup`。（旧名 `read_session` → ADR-0038）
+**Wayfinder product modules**（`app/lib/features/`）：`bootstrap`、`home`、`library_admin`、`library_browse`、`comic`、`series`、`reader`、`reading_history`、`reading_stats`、`comic_trash`、`comic_metadata`、`app_settings`、`metadata_backup`。（旧名 `read_session` → ADR-0038）
 
 **Rust** (sync, read, DB) → `core/`; see `docs/adr/README.md` (ADR-0002 and related).
 
