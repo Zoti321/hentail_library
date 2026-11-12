@@ -1,30 +1,18 @@
+import 'app_font.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:material_3_expressive/foundations/foundations.dart';
-import 'package:hentai_library/design-system/motion/desktop_page_transition.dart';
-import 'package:hentai_library/design-system/theme/color/app_shadow_palette.dart';
-import 'package:hentai_library/design-system/theme/color/reader_color_scheme.dart';
-import 'package:hentai_library/design-system/theme/tokens/app_motion_tokens.dart';
-import 'package:hentai_library/design-system/theme/tokens/app_shadow_tokens.dart';
-import 'package:hentai_library/design-system/theme/app_m3e_theme.dart';
-import 'package:hentai_library/design-system/theme/color/app_color_scheme_seeds.dart';
-import 'package:hentai_library/design-system/theme/tokens/app_theme_tokens.dart';
 
-export 'package:hentai_library/design-system/theme/app_font.dart';
-export 'package:hentai_library/design-system/theme/app_m3e_theme.dart';
-export 'package:hentai_library/design-system/theme/color/app_color_scheme_seeds.dart';
-export 'package:hentai_library/design-system/theme/color/app_shadow_palette.dart';
-export 'package:hentai_library/design-system/theme/color/desktop_shell_surfaces.dart';
-export 'package:hentai_library/design-system/theme/color/reader_color_scheme.dart';
-export 'package:hentai_library/design-system/theme/extensions/theme_context_extensions.dart';
-export 'package:hentai_library/design-system/theme/tokens/app_layout_tokens.dart';
-export 'package:hentai_library/design-system/theme/tokens/app_motion_tokens.dart';
-export 'package:hentai_library/design-system/theme/tokens/app_radius_tokens.dart';
-export 'package:hentai_library/design-system/theme/tokens/app_shadow_tokens.dart';
-export 'package:hentai_library/design-system/theme/tokens/app_spacing_tokens.dart';
-export 'package:hentai_library/design-system/theme/tokens/app_text_tokens.dart';
-export 'package:hentai_library/design-system/theme/tokens/app_theme_tokens.dart';
+import '../motion/desktop_page_transition.dart';
+import 'color/app_shadow_palette.dart';
+import 'color/reader_color_scheme.dart';
+import 'tokens/app_motion_tokens.dart';
+import 'tokens/app_shadow_tokens.dart';
+import 'app_m3e_theme.dart';
+import 'color/app_color_scheme_seeds.dart';
+import 'tokens/app_theme_tokens.dart';
 
 /// One seed → fidelity M3E + production [ThemeData]（ADR-0037 单次装配）。
 final class AssembledAppTheme {

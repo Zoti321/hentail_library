@@ -1,8 +1,10 @@
+import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:flutter/material.dart';
-import 'package:hentai_library/design-system/l10n/app_localizations.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/reader_view_model.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/reader_cover_editor_notifier.dart';
-import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
+
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// 以当前阅读页为封面的页码（0 基）。

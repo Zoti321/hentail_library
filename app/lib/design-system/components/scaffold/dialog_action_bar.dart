@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/design-system/theme/lab_text.dart';
+
+import '../../theme/lab_text.dart';
+
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 对话框动作行：取消 + 确认，支持危险态、禁用态与保存中行内进度。

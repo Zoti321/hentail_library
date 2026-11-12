@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/design-system/l10n/app_localizations.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
 
 import '../../../widgetbook/hosts/md3e_comic_metadata_edit_page_lab_host.dart';
 
-import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/features/comic/domain/value_objects/comic_meta_locks.dart';
 import 'package:material_symbols_icons/symbols.dart';
 

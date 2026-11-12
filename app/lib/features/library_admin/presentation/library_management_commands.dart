@@ -9,7 +9,7 @@ import 'package:hentai_library/features/library_admin/presentation/views/library
 import 'package:hentai_library/shared/presentation/providers/app_navigator_provider.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:hentai_library/shared/ui/contracts/library_browse_fallback_command.dart';
-import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 
 /// 库管理 UI 流程，负责确认、反馈和导航。
 ///

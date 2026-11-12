@@ -17,12 +17,9 @@ class NamedFacetMultiSelectField extends ConsumerWidget {
     required this.itemsProvider,
     required this.onRetry,
     required this.copy,
-    this.labelTrailing,
-    this.compactTrigger = false,
   });
 
   final String label;
-  final Widget? labelTrailing;
   final List<String> selectedNames;
   final ValueChanged<String> onAdd;
   final ValueChanged<String> onRemove;
@@ -31,18 +28,34 @@ class NamedFacetMultiSelectField extends ConsumerWidget {
   itemsProvider;
   final VoidCallback onRetry;
   final NamedFacetMultiSelectCopy copy;
-  final bool compactTrigger;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final String tooltip = context.l10n.smartFacetMatchHintTooltip;
+    final candidates = ref
+        .watch(itemsProvider)
+        .when(
+          data: (items) => (items: items, loading: false, error: false),
+          loading: () => (
+            items: <SmartFacetMatchCandidate>[],
+            loading: true,
+            error: false,
+          ),
+          error: (_, _) => (
+            items: <SmartFacetMatchCandidate>[],
+            loading: false,
+            error: true,
+          ),
+        );
     return FacetMultiSelectField<SmartFacetMatchCandidate>(
       label: label,
       selectedNames: selectedNames,
       onAdd: onAdd,
       onRemove: onRemove,
       onClearAll: onClearAll,
-      itemsProvider: itemsProvider,
+      items: candidates.items,
+      isLoading: candidates.loading,
+      hasLoadError: candidates.error,
       onRetry: onRetry,
       resolveName: (SmartFacetMatchCandidate item) => item.name,
       resolveSmartMatched: (SmartFacetMatchCandidate item) => item.smartMatched,

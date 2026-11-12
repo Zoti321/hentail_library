@@ -2,9 +2,10 @@ import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:material_3_expressive/components/text_fields/utils/m3e_text_field_selection_controls.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
-import 'package:hentai_library/design-system/components/inputs/compact_input_chip.dart';
-import 'package:hentai_library/design-system/components/inputs/input_chip_field_layout.dart';
-import 'package:hentai_library/design-system/components/inputs/outlined_text_field_shell.dart';
+
+import 'compact_input_chip.dart';
+import 'input_chip_field_layout.dart';
+import 'outlined_text_field_shell.dart';
 
 /// Default min width for tag input previews (lab text fields).
 const double kTagInputFieldMinWidth = 280;

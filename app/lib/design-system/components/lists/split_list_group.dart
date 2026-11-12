@@ -1,8 +1,9 @@
-import 'package:flutter/material.dart';
-import 'package:hentai_library/design-system/components/lists/split_list_row.dart';
-import 'package:hentai_library/design-system/components/surfaces/tonal_surface.dart';
+import 'split_drag_scope.dart';
+import 'split_list_row.dart';
 
-export 'package:hentai_library/design-system/components/lists/split_list_row.dart';
+import 'package:flutter/material.dart';
+
+import '../surfaces/tonal_surface.dart';
 
 /// Stacked settings rows with outer 24dp radius and 4dp gutters.
 class SplitListGroup extends StatelessWidget {

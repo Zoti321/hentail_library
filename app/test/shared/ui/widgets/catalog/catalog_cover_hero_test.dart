@@ -1,3 +1,4 @@
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/shared/ui/widgets/catalog/catalog_cover_hero.dart';
@@ -17,7 +18,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: CatalogCoverHero.wrap(
+            body: CoverHero.wrap(
               tag: CatalogCoverHero.comicTag('c1'),
               child: const SizedBox(width: 40, height: 60),
             ),
@@ -34,7 +35,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: CatalogCoverHero.wrap(
+            body: CoverHero.wrap(
               tag: CatalogCoverHero.comicTag('c1'),
               enabled: false,
               child: const SizedBox(width: 40, height: 60),

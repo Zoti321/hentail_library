@@ -1,4 +1,4 @@
-import 'package:hentai_library/design-system/l10n/app_localizations.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
 
 extension HomeL10nX on AppLocalizations {
   String homeGreetingPhraseForHour(int hour) {

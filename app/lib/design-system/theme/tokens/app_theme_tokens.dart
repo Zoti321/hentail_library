@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/design-system/theme/tokens/app_layout_tokens.dart';
-import 'package:hentai_library/design-system/theme/tokens/app_radius_tokens.dart';
-import 'package:hentai_library/design-system/theme/tokens/app_spacing_tokens.dart';
-import 'package:hentai_library/design-system/theme/tokens/app_text_tokens.dart';
+
+import 'app_layout_tokens.dart';
+import 'app_radius_tokens.dart';
+import 'app_spacing_tokens.dart';
+import 'app_text_tokens.dart';
+
 import 'package:theme_tailor_annotation/theme_tailor_annotation.dart';
 
 part 'app_theme_tokens.tailor.dart';

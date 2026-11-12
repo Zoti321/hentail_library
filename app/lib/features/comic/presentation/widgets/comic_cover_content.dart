@@ -1,3 +1,4 @@
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/features/comic/presentation/widgets/cover_viewport_sensor.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/features/comic/presentation/providers/comic_cover_providers.dart';
@@ -61,7 +62,7 @@ class ComicCoverContent extends ConsumerWidget {
     }
     final ComicCoverState state = ref.watch(comicCoverProvider(comicId));
 
-    Widget result = CatalogCoverHero.wrap(
+    Widget result = CoverHero.wrap(
       tag: CatalogCoverHero.comicTag(comicId),
       enabled: enableHero,
       child: ComicCoverRenderer(

@@ -1,7 +1,8 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:hentai_library/design-system/theme/color/desktop_shell_surfaces.dart';
+
+import '../theme/color/desktop_shell_surfaces.dart';
+
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Desktop / shell top-level fade-through（对齐官方 animations FadeThrough）。
@@ -92,39 +93,4 @@ class DesktopFadeThroughPageTransitionsBuilder extends PageTransitionsBuilder {
       child: child,
     );
   }
-}
-
-/// Shared [go_router] page with desktop fade-through.
-CustomTransitionPage<void> buildDesktopFadeThroughPage({
-  required GoRouterState state,
-  required Widget child,
-}) {
-  return CustomTransitionPage<void>(
-    key: state.pageKey,
-    name: state.name,
-    transitionDuration: kDesktopPageTransitionDuration,
-    reverseTransitionDuration: kDesktopPageTransitionDuration,
-    transitionsBuilder:
-        (
-          BuildContext context,
-          Animation<double> animation,
-          Animation<double> secondaryAnimation,
-          Widget child,
-        ) {
-          return DesktopFadeThroughTransitionWrapper(
-            animation: animation,
-            secondaryAnimation: secondaryAnimation,
-            child: child,
-          );
-        },
-    child: child,
-  );
-}
-
-/// Shell 顶层导航（Rail / drawer / 首页→历史·垃圾桶·管理等）：MD3 Top level fade-through。
-Page<void> buildShellNavPage({
-  required GoRouterState state,
-  required Widget child,
-}) {
-  return buildDesktopFadeThroughPage(state: state, child: child);
 }

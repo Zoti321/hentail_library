@@ -1,9 +1,10 @@
+import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/design-system/l10n/app_localizations.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/reading_history/presentation/view_models/history_paged_feed_controller.dart';
-import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 
 Future<void> clearAllReadingHistory(BuildContext context, WidgetRef ref) async {
   final AppLocalizations l10n = context.l10n;

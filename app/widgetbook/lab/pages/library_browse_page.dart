@@ -1,16 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/design-system/design_system.dart';
-import 'package:hentai_library/shared/ui/layout/catalog_grid.dart';
-import 'package:hentai_library/shared/ui/layout/catalog_grid_metrics.dart';
-import 'package:hentai_library/shared/ui/layout/catalog_list_layout.dart';
-import 'package:hentai_library/shared/ui/layout/library_browse_page_metrics.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/patterns/library/library_catalog_toolbar.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/patterns/library/lab_catalog_item_preview.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/patterns/library/library_page_header.dart';
-import 'package:hentai_library/shared/ui/widgets/catalog/comic_card.dart';
-import 'package:hentai_library/shared/ui/widgets/catalog/comic_list_item.dart';
-import 'package:hentai_library/shared/ui/widgets/navigation/expressive_library_scroll_to_top_button.dart';
-import 'package:hentai_library/shared/ui/widgets/pagination/pagination.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 

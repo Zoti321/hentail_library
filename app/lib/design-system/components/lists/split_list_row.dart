@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/design-system/components/lists/reorder_exclude.dart';
-import 'package:hentai_library/design-system/components/lists/split_drag_scope.dart';
-import 'package:hentai_library/design-system/components/surfaces/tonal_surface.dart';
-import 'package:hentai_library/design-system/motion/effects_decorated_box.dart';
-import 'package:material_3_expressive/material_3_expressive.dart';
 
-export 'package:hentai_library/design-system/components/lists/split_drag_scope.dart';
+import 'reorder_exclude.dart';
+import 'split_drag_scope.dart';
+import '../surfaces/tonal_surface.dart';
+import '../../motion/effects_decorated_box.dart';
+
+import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// One row inside [SplitListGroup]; animates corner radius on press.
 class SplitListRow extends StatefulWidget {

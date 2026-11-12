@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/design-system/l10n/app_localizations_zh.dart';
+import 'package:hentai_library/l10n/app_localizations_zh.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/home_library_delete_confirm_dialog.dart';
 
 import '../../../../../../widgetbook/lab/theme/md3e_theme.dart';

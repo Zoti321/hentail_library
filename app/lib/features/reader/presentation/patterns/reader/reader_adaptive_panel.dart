@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/design-system/design_system.dart';
-import 'package:hentai_library/shared/ui/patterns/library/library_filter_sort_metrics.dart';
-import 'package:hentai_library/shared/ui/widgets/sheets/overlay_route_scope.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Lab 阅读器 secondary 面板：compact/medium 用 bottom sheet，expanded+ 用 side sheet。

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
-import 'package:hentai_library/design-system/components/scaffold/pinned_toolbar_chrome.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 

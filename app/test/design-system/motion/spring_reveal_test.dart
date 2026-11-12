@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 import 'package:motor/motor.dart';
 
-import '../../support/pump_app.dart';
+import '../../support/pump_design_system_app.dart';
 
 const Offset _hidden = Offset(120, 0);
 
@@ -32,8 +32,8 @@ Future<List<double>> _sampleFirstFrames(
     ),
   );
 
-  await pumpApp(tester, home: build(visible: false));
-  await pumpApp(tester, home: build(visible: true));
+  await pumpDesignSystemApp(tester, home: build(visible: false));
+  await pumpDesignSystemApp(tester, home: build(visible: true));
 
   final List<double> samples = <double>[];
   for (int i = 0; i < 6; i++) {
@@ -59,7 +59,7 @@ void main() {
   });
 
   testWidgets('隐藏后不接收指针，显示后归位', (WidgetTester tester) async {
-    await pumpApp(
+    await pumpDesignSystemApp(
       tester,
       home: const SizedBox(
         width: 400,
@@ -87,7 +87,7 @@ void main() {
     );
     expect(_dx(tester), closeTo(_hidden.dx, 0.01));
 
-    await pumpApp(
+    await pumpDesignSystemApp(
       tester,
       home: const SizedBox(
         width: 400,
@@ -105,7 +105,7 @@ void main() {
   });
 
   testWidgets('reduce motion 下直接到位', (WidgetTester tester) async {
-    await pumpApp(
+    await pumpDesignSystemApp(
       tester,
       home: const MediaQuery(
         data: MediaQueryData(disableAnimations: true),

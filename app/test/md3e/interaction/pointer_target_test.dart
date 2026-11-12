@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/shared/ui/widgets/foundation/expressive_pointer_target.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 
 import '../../support/pump_app.dart';
 

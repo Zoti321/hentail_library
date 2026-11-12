@@ -3,7 +3,6 @@ import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/features/series/presentation/patterns/series_detail/series_detail_page_metrics.dart';
 import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_view_object.dart';
 import 'package:hentai_library/features/series/presentation/patterns/series_detail/series_detail_summary_meta_row.dart';
-import 'package:hentai_library/shared/ui/layout/comic_detail_title.dart';
 
 /// 系列封面右侧：标题 + 摘要元信息。
 class SeriesDetailPrimaryColumn extends StatelessWidget {

@@ -1,4 +1,5 @@
-import 'package:hentai_library/design-system/layout/breakpoints.dart';
+import 'breakpoints.dart';
+
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 全应用 [M3EFab] 尺寸（管理页新建、书库/漫画/系列详情回到顶部等）。

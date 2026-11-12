@@ -1,23 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/features/comic/domain/smart_facet_match.dart';
 import 'package:hentai_library/design-system/design_system.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:riverpod/misc.dart' show Override;
 
-import '../../../support/pump_app.dart';
+import '../../../support/pump_design_system_app.dart';
 
-final _testItemsProvider = Provider<AsyncValue<List<SmartFacetMatchCandidate>>>(
-  (Ref ref) => const AsyncData<List<SmartFacetMatchCandidate>>(
-    <SmartFacetMatchCandidate>[
-      (name: '深海', attachmentCount: 2, smartMatched: true),
-      (name: '图书馆', attachmentCount: 5, smartMatched: false),
-      (name: 'Python', attachmentCount: 1, smartMatched: false),
-    ],
-  ),
-);
+typedef _Candidate = ({String name, int attachmentCount, bool smartMatched});
+
+const _testItems = <_Candidate>[
+  (name: '深海', attachmentCount: 2, smartMatched: true),
+  (name: '图书馆', attachmentCount: 5, smartMatched: false),
+  (name: 'Python', attachmentCount: 1, smartMatched: false),
+];
 
 void main() {
   testWidgets('opens menu on focus and adds chip from candidate', (
@@ -25,31 +20,20 @@ void main() {
   ) async {
     final List<String> selected = <String>[];
 
-    await pumpApp(
+    await pumpDesignSystemApp(
       tester,
-      overrides: <Override>[
-        _testItemsProvider.overrideWith(
-          (Ref ref) => const AsyncData<List<SmartFacetMatchCandidate>>(
-            <SmartFacetMatchCandidate>[
-              (name: '深海', attachmentCount: 2, smartMatched: true),
-              (name: '图书馆', attachmentCount: 5, smartMatched: false),
-              (name: 'Python', attachmentCount: 1, smartMatched: false),
-            ],
-          ),
-        ),
-      ],
       home: Center(
         child: SizedBox(
           width: 360,
-          child: FacetMultiSelectField<SmartFacetMatchCandidate>(
+          child: FacetMultiSelectField<_Candidate>(
             label: '作者',
             selectedNames: selected,
             onAdd: selected.add,
             onRemove: selected.remove,
-            itemsProvider: _testItemsProvider,
+            items: _testItems,
             onRetry: () {},
-            resolveName: (SmartFacetMatchCandidate c) => c.name,
-            resolveSmartMatched: (SmartFacetMatchCandidate c) => c.smartMatched,
+            resolveName: (_Candidate c) => c.name,
+            resolveSmartMatched: (_Candidate c) => c.smartMatched,
             smartMatchedTooltip: '由智能匹配推荐',
             copy: const NamedFacetMultiSelectCopy(
               listLoadFailed: '加载失败',
@@ -80,17 +64,8 @@ void main() {
   testWidgets('clear all trailing button removes every chip', (
     WidgetTester tester,
   ) async {
-    await pumpApp(
+    await pumpDesignSystemApp(
       tester,
-      overrides: <Override>[
-        _testItemsProvider.overrideWith(
-          (Ref ref) => const AsyncData<List<SmartFacetMatchCandidate>>(
-            <SmartFacetMatchCandidate>[
-              (name: '深海', attachmentCount: 2, smartMatched: true),
-            ],
-          ),
-        ),
-      ],
       home: Center(
         child: SizedBox(
           width: 360,
@@ -113,30 +88,19 @@ void main() {
   testWidgets('Enter commits free-text name', (WidgetTester tester) async {
     final List<String> selected = <String>[];
 
-    await pumpApp(
+    await pumpDesignSystemApp(
       tester,
-      overrides: <Override>[
-        _testItemsProvider.overrideWith(
-          (Ref ref) => const AsyncData<List<SmartFacetMatchCandidate>>(
-            <SmartFacetMatchCandidate>[
-              (name: '深海', attachmentCount: 2, smartMatched: true),
-              (name: '图书馆', attachmentCount: 5, smartMatched: false),
-              (name: 'Python', attachmentCount: 1, smartMatched: false),
-            ],
-          ),
-        ),
-      ],
       home: Center(
         child: SizedBox(
           width: 360,
-          child: FacetMultiSelectField<SmartFacetMatchCandidate>(
+          child: FacetMultiSelectField<_Candidate>(
             label: '标签',
             selectedNames: selected,
             onAdd: selected.add,
             onRemove: selected.remove,
-            itemsProvider: _testItemsProvider,
+            items: _testItems,
             onRetry: () {},
-            resolveName: (SmartFacetMatchCandidate c) => c.name,
+            resolveName: (_Candidate c) => c.name,
             copy: const NamedFacetMultiSelectCopy(
               listLoadFailed: '加载失败',
               emptyCatalog: '目录为空',
@@ -162,19 +126,19 @@ void main() {
   ) async {
     final List<String> selected = <String>[];
 
-    await pumpApp(
+    await pumpDesignSystemApp(
       tester,
       home: Center(
         child: SizedBox(
           width: 360,
-          child: FacetMultiSelectField<SmartFacetMatchCandidate>(
+          child: FacetMultiSelectField<_Candidate>(
             label: '作者',
             selectedNames: selected,
             onAdd: selected.add,
             onRemove: selected.remove,
-            itemsProvider: _testItemsProvider,
+            items: _testItems,
             onRetry: () {},
-            resolveName: (SmartFacetMatchCandidate c) => c.name,
+            resolveName: (_Candidate c) => c.name,
             copy: const NamedFacetMultiSelectCopy(
               listLoadFailed: '加载失败',
               emptyCatalog: '目录为空',
@@ -200,19 +164,19 @@ void main() {
   });
 
   testWidgets('Escape closes menu overlay', (WidgetTester tester) async {
-    await pumpApp(
+    await pumpDesignSystemApp(
       tester,
       home: Center(
         child: SizedBox(
           width: 360,
-          child: FacetMultiSelectField<SmartFacetMatchCandidate>(
+          child: FacetMultiSelectField<_Candidate>(
             label: '作者',
             selectedNames: const <String>[],
             onAdd: (_) {},
             onRemove: (_) {},
-            itemsProvider: _testItemsProvider,
+            items: _testItems,
             onRetry: () {},
-            resolveName: (SmartFacetMatchCandidate c) => c.name,
+            resolveName: (_Candidate c) => c.name,
             copy: const NamedFacetMultiSelectCopy(
               listLoadFailed: '加载失败',
               emptyCatalog: '目录为空',
@@ -240,19 +204,19 @@ void main() {
   ) async {
     final List<String> selected = <String>['第一个', '第二个'];
 
-    await pumpApp(
+    await pumpDesignSystemApp(
       tester,
       home: Center(
         child: SizedBox(
           width: 360,
-          child: FacetMultiSelectField<SmartFacetMatchCandidate>(
+          child: FacetMultiSelectField<_Candidate>(
             label: '标签',
             selectedNames: selected,
             onAdd: selected.add,
             onRemove: selected.remove,
-            itemsProvider: _testItemsProvider,
+            items: _testItems,
             onRetry: () {},
-            resolveName: (SmartFacetMatchCandidate c) => c.name,
+            resolveName: (_Candidate c) => c.name,
             copy: const NamedFacetMultiSelectCopy(
               listLoadFailed: '加载失败',
               emptyCatalog: '目录为空',
@@ -297,15 +261,15 @@ class _NamedFacetMultiSelectTestHarnessState
 
   @override
   Widget build(BuildContext context) {
-    return FacetMultiSelectField<SmartFacetMatchCandidate>(
+    return FacetMultiSelectField<_Candidate>(
       label: '标签',
       selectedNames: _selected,
       onAdd: (String name) => setState(() => _selected.add(name)),
       onRemove: (String name) => setState(() => _selected.remove(name)),
       onClearAll: () => setState(() => _selected.clear()),
-      itemsProvider: _testItemsProvider,
+      items: _testItems,
       onRetry: () {},
-      resolveName: (SmartFacetMatchCandidate c) => c.name,
+      resolveName: (_Candidate c) => c.name,
       copy: const NamedFacetMultiSelectCopy(
         listLoadFailed: '加载失败',
         emptyCatalog: '目录为空',

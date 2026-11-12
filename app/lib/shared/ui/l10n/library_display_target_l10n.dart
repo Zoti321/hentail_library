@@ -1,4 +1,4 @@
-import 'package:hentai_library/design-system/l10n/app_localizations.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 
 /// [LibraryDisplayTarget] 展示文案（枚举所有权在 shared，ADR-0046 §6）。

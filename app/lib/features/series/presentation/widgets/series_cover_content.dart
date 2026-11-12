@@ -9,7 +9,7 @@ import 'package:hentai_library/shared/domain/thumbnail/series_cover_source.dart'
 import 'package:hentai_library/shared/ui/models/comic_cover_source.dart';
 import 'package:hentai_library/shared/ui/widgets/catalog/catalog_cover_hero.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/card_letterboxed_cover_image.dart';
-import 'package:hentai_library/shared/ui/widgets/element/image/comic_cover_placeholder.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// 系列封面：优先自定义系列缩略图，否则回退到成员漫画封面。
@@ -70,7 +70,7 @@ class SeriesCoverContent extends ConsumerWidget {
       },
     );
 
-    return CatalogCoverHero.wrap(
+    return CoverHero.wrap(
       tag: CatalogCoverHero.seriesTag(seriesId),
       enabled: enableHero,
       child: cover,

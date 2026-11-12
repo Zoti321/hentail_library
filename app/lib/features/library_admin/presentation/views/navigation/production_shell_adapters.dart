@@ -1,6 +1,6 @@
 import 'package:hentai_library/shared/application/navigation/app_routes.dart';
 import 'package:hentai_library/shared/ui/navigation/libraries_routes.dart';
-import 'package:hentai_library/design-system/l10n/app_localizations.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/home_library_dashboard_rows.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/navigation/app_navigation.dart';
 import 'package:hentai_library/features/library_admin/domain/local_library.dart';

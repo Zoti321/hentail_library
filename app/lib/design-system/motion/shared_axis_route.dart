@@ -1,8 +1,9 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:hentai_library/design-system/motion/motion.dart';
-import 'package:hentai_library/design-system/theme/color/desktop_shell_surfaces.dart';
+
+import 'motion.dart';
+import '../theme/color/desktop_shell_surfaces.dart';
+
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Material Shared Axis 默认时长（与 `animations` 包 PageTransitions 一致）。
@@ -48,43 +49,6 @@ PageRoute<T> sharedAxisRoute<T>(
             child: child,
           );
         },
-  );
-}
-
-/// go_router：[SharedAxisTransition] 页面（详情 → 阅读等层级下钻）。
-///
-/// 对齐 Lab [sharedAxisRoute]；勿用于 Shell 顶层切换（顶层用 fade-through）。
-CustomTransitionPage<void> buildSharedAxisPage({
-  required GoRouterState state,
-  required Widget child,
-  SharedAxisTransitionType transitionType = SharedAxisTransitionType.horizontal,
-  Color? fillColor,
-  Duration? transitionDuration,
-  bool reverse = false,
-}) {
-  final Duration duration = transitionDuration ?? kSharedAxisRouteDuration;
-  return CustomTransitionPage<void>(
-    key: state.pageKey,
-    name: state.name,
-    transitionDuration: duration,
-    reverseTransitionDuration: duration,
-    transitionsBuilder:
-        (
-          BuildContext context,
-          Animation<double> animation,
-          Animation<double> secondaryAnimation,
-          Widget child,
-        ) {
-          return SharedAxisTransitionWrapper(
-            animation: animation,
-            secondaryAnimation: secondaryAnimation,
-            transitionType: transitionType,
-            fillColor: fillColor,
-            reverse: reverse,
-            child: child,
-          );
-        },
-    child: child,
   );
 }
 

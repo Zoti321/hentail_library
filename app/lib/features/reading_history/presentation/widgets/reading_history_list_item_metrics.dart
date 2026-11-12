@@ -2,7 +2,6 @@ import 'dart:math' as math;
 
 import 'package:hentai_library/design-system/design_system.dart';
 
-import 'package:hentai_library/design-system/platform/platform_desktop.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Resolved geometry for one [ReadingHistoryListItem] at a window class.

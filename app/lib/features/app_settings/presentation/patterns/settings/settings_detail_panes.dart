@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/design-system/l10n/app_localizations.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/ui/layout/settings_page_metrics.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/features/app_settings/presentation/patterns/settings/metadata_backup_import_lab_flow.dart';
 import 'package:hentai_library/features/app_settings/presentation/patterns/settings/settings_catalog.dart';
-import 'package:hentai_library/shared/ui/widgets/settings/settings_list.dart';
-import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 /// 生产或 Lab 注入某分类的 section 列表（每项为 [SettingsSection] 等组件）。

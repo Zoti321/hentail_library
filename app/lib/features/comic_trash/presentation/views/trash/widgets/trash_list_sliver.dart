@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/design-system/design_system.dart';
-import 'package:hentai_library/shared/ui/layout/catalog_list_layout.dart';
 
 /// 已删除列表 sliver：列数与库页列表视图一致（expanded 桌面端 3 列）。
 class TrashListSliver extends StatelessWidget {

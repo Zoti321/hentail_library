@@ -1,12 +1,13 @@
+import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/design-system/l10n/app_localizations.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/comic_trash/presentation/view_models/trash_page_controller.dart';
 import 'package:hentai_library/features/comic_trash/presentation/views/trash/trash_purge_dialog.dart';
 import 'package:hentai_library/features/comic_trash/domain/comic_purge_strategy.dart';
 import 'package:hentai_library/features/comic_trash/domain/trashed_comic.dart';
-import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 
 /// 「已删除」页的恢复 / 永久删除入口（MD3E 页面共用，业务经 [trashPageControllerProvider]）。
 Future<void> restoreTrashedComics(

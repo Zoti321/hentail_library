@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/design-system/motion/motion.dart';
+
+import 'motion.dart';
+
 import 'package:motor/motor.dart';
 
 /// 背景 / 形状变化：[BoxDecoration] 的过渡由 M3E 效果弹簧驱动（无位移，仅颜色与圆角）。

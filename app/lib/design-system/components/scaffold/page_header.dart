@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/design-system/design_system.dart';
+
+import 'page_header_chrome.dart';
+import 'pinned_toolbar_chrome.dart';
+import '../../layout/page_layout_spec.dart';
 
 /// 粘滞页头 [SliverPersistentHeader] 的 delegate（由 [PageHeaderSliver] 在 [pinned] 为 true 时使用）。
 class PageHeaderDelegate extends SliverPersistentHeaderDelegate {

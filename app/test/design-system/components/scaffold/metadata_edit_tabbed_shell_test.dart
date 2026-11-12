@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 
-import '../../../support/pump_app.dart';
+import '../../../support/pump_design_system_app.dart';
 
 List<MetadataEditTab> _tabs() {
   return <MetadataEditTab>[
@@ -24,7 +24,7 @@ Future<void> _pumpShell(
   addTearDown(tester.view.resetDevicePixelRatio);
 
   int index = initialIndex;
-  await pumpApp(
+  await pumpDesignSystemApp(
     tester,
     home: Scaffold(
       body: StatefulBuilder(

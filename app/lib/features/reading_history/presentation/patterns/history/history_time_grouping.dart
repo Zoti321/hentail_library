@@ -1,4 +1,4 @@
-import 'package:hentai_library/design-system/l10n/app_localizations.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
 
 /// 阅读历史五档时间分桶（对齐最长保留 1 年；纯逻辑 + 分桶标题文案）。
 ///

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/design-system/theme/color/reader_color_scheme.dart';
-import 'package:hentai_library/design-system/theme/tokens/app_motion_tokens.dart';
-import 'package:hentai_library/design-system/theme/tokens/app_shadow_tokens.dart';
-import 'package:hentai_library/design-system/theme/tokens/app_theme_tokens.dart';
+
+import '../color/reader_color_scheme.dart';
+import '../tokens/app_motion_tokens.dart';
+import '../tokens/app_shadow_tokens.dart';
+import '../tokens/app_theme_tokens.dart';
 
 extension ThemeDesignX on ThemeData {
   AppThemeTokens get tokens => extension<AppThemeTokens>()!;

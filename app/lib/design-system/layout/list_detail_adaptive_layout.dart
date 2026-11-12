@@ -1,4 +1,5 @@
-import 'package:hentai_library/design-system/layout/breakpoints.dart';
+import 'breakpoints.dart';
+
 import 'package:flutter/material.dart';
 
 /// List+detail side-by-side at [WindowSizeClass.expanded] and wider (≥840dp).

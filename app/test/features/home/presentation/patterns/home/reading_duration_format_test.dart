@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/design-system/l10n/app_localizations_zh.dart';
+import 'package:hentai_library/l10n/app_localizations_zh.dart';
 import 'package:hentai_library/features/home/presentation/patterns/home/reading_duration_format.dart';
 
 void main() {

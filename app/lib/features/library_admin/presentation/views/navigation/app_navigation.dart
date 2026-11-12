@@ -3,9 +3,9 @@ import 'package:hentai_library/features/library_admin/public/providers/library_a
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/shared/application/navigation/app_routes.dart';
-import 'package:hentai_library/design-system/l10n/app_localizations.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/ui/navigation/app_navigator_context.dart';
-import 'package:hentai_library/shared/ui/shell/shell_nav_item.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 abstract final class AppNavigation {

@@ -12,7 +12,6 @@ import 'package:hentai_library/features/reading_history/presentation/widgets/his
 import 'package:hentai_library/shared/ui/layout/app_shell_navigation.dart';
 import 'package:hentai_library/shared/ui/navigation/pop_or_go_home.dart';
 import 'package:hentai_library/design-system/design_system.dart';
-import 'package:hentai_library/shared/ui/widgets/inputs/app_dense_search_bar.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 const double _kHistoryLoadMoreThreshold = 400;

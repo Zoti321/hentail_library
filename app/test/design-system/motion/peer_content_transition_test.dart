@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 
-import '../../support/pump_app.dart';
+import '../../support/pump_design_system_app.dart';
 
 void main() {
   group('PeerContentTransition', () {
     testWidgets('uses PageTransitionSwitcher with overlapping peer axis', (
       WidgetTester tester,
     ) async {
-      await pumpApp(
+      await pumpDesignSystemApp(
         tester,
         home: const Scaffold(
           body: PeerContentTransition(switchKey: 0, child: Text('peer')),
@@ -26,7 +26,7 @@ void main() {
       WidgetTester tester,
     ) async {
       int key = 0;
-      await pumpApp(
+      await pumpDesignSystemApp(
         tester,
         home: Scaffold(
           body: StatefulBuilder(
@@ -66,7 +66,7 @@ void main() {
     testWidgets('reduce motion skips PageTransitionSwitcher', (
       WidgetTester tester,
     ) async {
-      await pumpApp(
+      await pumpDesignSystemApp(
         tester,
         home: const MediaQuery(
           data: MediaQueryData(disableAnimations: true),

@@ -1,4 +1,5 @@
-import 'package:hentai_library/design-system/design_system.dart';
+import 'page_layout_spec.dart';
+
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 粘滞顶栏的共享 chrome 常量（工具行高度、抬起阴影、内嵌水平内边距）。

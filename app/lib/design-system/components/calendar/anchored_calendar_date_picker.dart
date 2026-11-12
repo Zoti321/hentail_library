@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:hentai_library/design-system/l10n/m3e_material_localizations.dart';
-import 'package:hentai_library/design-system/components/calendar/embeddable_calendar_date_picker.dart';
+
+import '../../l10n/m3e_material_localizations.dart';
+import 'embeddable_calendar_date_picker.dart';
+
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 const double _kAnchoredCalendarGap = 4;

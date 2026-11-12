@@ -1,7 +1,8 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
-import 'package:hentai_library/design-system/motion/desktop_page_transition.dart';
-import 'package:hentai_library/design-system/motion/motion.dart';
+
+import 'desktop_page_transition.dart';
+import 'motion.dart';
 
 /// 同级内容切换：水平 Shared Axis 位移 + **重叠淡化**（漫画↔系列、管理维度等）。
 ///

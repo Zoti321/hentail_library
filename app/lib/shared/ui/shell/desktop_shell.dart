@@ -4,21 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/lab/lab_library_catalog.dart';
-import 'package:hentai_library/shared/ui/shell/desktop_shell_metrics.dart';
-import 'package:hentai_library/shared/ui/shell/desktop_shell_pane.dart';
 import 'package:hentai_library/shared/ui/shell/shell_library_picker_sheet.dart';
 import 'package:hentai_library/shared/ui/shell/shell_library_secondary_column.dart';
-import 'package:hentai_library/shared/ui/shell/shell_library_secondary_layout.dart';
 import 'package:hentai_library/shared/ui/shell/shell_navigation.dart';
 import 'package:hentai_library/shared/ui/shell/shell_rail_library_hover_metrics.dart';
 import 'package:hentai_library/shared/ui/patterns/home/home_library_dashboard_models.dart';
-import 'package:hentai_library/shared/ui/widgets/desktop/desktop_title_bar.dart';
-import 'package:hentai_library/shared/ui/widgets/desktop/navigation_bar.dart';
-import 'package:hentai_library/shared/ui/widgets/desktop/navigation_rail.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-export 'package:hentai_library/shared/ui/shell/desktop_shell_metrics.dart';
-export 'package:hentai_library/shared/ui/shell/desktop_shell_pane.dart';
 export 'package:hentai_library/shared/ui/shell/shell_navigation.dart';
 
 /// Lab shell: navigation + content pane.
@@ -503,20 +495,17 @@ class _CompactContentColumn extends StatelessWidget {
         : null;
     return ColoredBox(
       color: surfaces.contentPaneBackground,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          ?topBar,
-          ...state.widget.belowTitleBar,
-          Expanded(child: paneWithChrome),
-          ExpressiveNavigationBar(
-            destinations: destinations,
-            selectedIndex: state._effectiveSelectedIndex(context),
-            onDestinationSelected: (int index) =>
-                state._onBottomNavDestinationSelected(context, specs, index),
-            backgroundColor: surfaces.navigationRailBackground,
-          ),
-        ],
+      child: ShellContentLayout(
+        titleBar: topBar,
+        feedback: state.widget.belowTitleBar,
+        pane: paneWithChrome,
+        bottomNavigation: ExpressiveNavigationBar(
+          destinations: destinations,
+          selectedIndex: state._effectiveSelectedIndex(context),
+          onDestinationSelected: (int index) =>
+              state._onBottomNavDestinationSelected(context, specs, index),
+          backgroundColor: surfaces.navigationRailBackground,
+        ),
       ),
     );
   }
@@ -541,20 +530,15 @@ class _DesktopContentColumn extends StatelessWidget {
       borderRadius: DesktopShellMetrics.contentCardLeadingRadius(cornerRadius),
       child: ColoredBox(
         color: surfaces.contentPaneBackground,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            DesktopTitleBar(
-              showWindowControls: true,
-              backgroundColor: Colors.transparent,
-              showNavigationMenu: state.widget.showNavigationMenu,
-              onNavigationMenuPressed: state.widget.onNavigationMenuPressed,
-            ),
-            ...state.widget.belowTitleBar,
-            Expanded(
-              child: DesktopShellPane(showDecoration: false, child: pane),
-            ),
-          ],
+        child: ShellContentLayout(
+          titleBar: DesktopTitleBar(
+            showWindowControls: true,
+            backgroundColor: Colors.transparent,
+            showNavigationMenu: state.widget.showNavigationMenu,
+            onNavigationMenuPressed: state.widget.onNavigationMenuPressed,
+          ),
+          feedback: state.widget.belowTitleBar,
+          pane: DesktopShellPane(showDecoration: false, child: pane),
         ),
       ),
     );

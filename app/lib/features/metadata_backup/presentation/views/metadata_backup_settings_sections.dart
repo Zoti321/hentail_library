@@ -1,8 +1,9 @@
+import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/design-system/l10n/app_localizations.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
-import 'package:hentai_library/design-system/platform/platform_desktop.dart';
 import 'package:hentai_library/shared/presentation/providers/file_explorer_providers.dart';
 import 'package:hentai_library/features/metadata_backup/presentation/providers/metadata_backup_use_case_providers.dart';
 import 'package:hentai_library/features/metadata_backup/domain/metadata_export_options.dart';
@@ -11,9 +12,7 @@ import 'package:hentai_library/features/metadata_backup/presentation/metadata_im
 import 'package:hentai_library/features/metadata_backup/presentation/view_models/metadata_auto_backup_coordinator_notifier.dart';
 import 'package:hentai_library/features/metadata_backup/presentation/view_models/metadata_auto_backup_notifier.dart';
 import 'package:hentai_library/features/metadata_backup/presentation/view_models/metadata_last_auto_backup_notifier.dart';
-import 'package:hentai_library/shared/ui/widgets/settings/settings_list.dart';
-import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
-import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
+
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 

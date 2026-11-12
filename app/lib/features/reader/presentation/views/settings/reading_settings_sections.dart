@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/design-system/l10n/app_localizations.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/app_settings/public/providers/app_settings_providers.dart';
 import 'package:hentai_library/features/app_settings/public/reading_preferences_schema.dart';
@@ -11,9 +11,7 @@ import 'package:hentai_library/features/reader/domain/reading_preferences.dart';
 import 'package:hentai_library/features/reader/presentation/l10n/reading_preference_l10n.dart';
 import 'package:hentai_library/features/reader/application/reading_preferences_acl.dart';
 import 'package:hentai_library/features/reader/presentation/providers/reading_preferences_providers.dart';
-import 'package:hentai_library/design-system/components/menu/anchored_option_picker.dart';
-import 'package:hentai_library/shared/ui/widgets/settings/settings_list.dart';
-import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 /// 设置页「阅读」分类的分区（owner = `reader`，ADR-0046 §6）。

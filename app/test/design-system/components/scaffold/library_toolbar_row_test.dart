@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-import '../../../support/pump_app.dart';
+import '../../../support/pump_design_system_app.dart';
 
 Future<void> _pumpRow(
   WidgetTester tester, {
@@ -17,7 +17,7 @@ Future<void> _pumpRow(
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.resetPhysicalSize);
   addTearDown(tester.view.resetDevicePixelRatio);
-  await pumpApp(
+  await pumpDesignSystemApp(
     tester,
     home: Scaffold(
       body: LibraryToolbarRow(

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/ui/patterns/home/home_library_dashboard_models.dart';
 import 'package:hentai_library/shared/ui/shell/shell_library_picker_row.dart';
 import 'package:hentai_library/design-system/design_system.dart';
-import 'package:hentai_library/shared/ui/widgets/sheets/overlay_route_scope.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// medium- 底部导航「漫画库」：用 bottom sheet 选择当前库。

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/design-system/theme/app_m3e_theme.dart';
+
+import '../app_m3e_theme.dart';
 
 /// 已知固定配色 id（与 `AppColorSchemePreference` JSON 值对齐）。
 const Set<String> kKnownColorSchemeIds = <String>{

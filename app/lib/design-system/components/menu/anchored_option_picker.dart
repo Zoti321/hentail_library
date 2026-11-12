@@ -1,5 +1,7 @@
 import 'package:flutter/widgets.dart';
-import 'package:hentai_library/design-system/components/menu/anchored_menu.dart';
+
+import 'anchored_menu.dart';
+
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 弹出 M3E 选择菜单（锚定在触发行上），选中项回传给 [onSelected]。

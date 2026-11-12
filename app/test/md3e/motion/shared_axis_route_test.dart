@@ -55,24 +55,12 @@ void main() {
   testWidgets('reduce motion switches route without SharedAxis', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        builder: (BuildContext context, Widget? child) {
-          return MediaQuery(
-            data: MediaQuery.of(context).copyWith(disableAnimations: true),
-            child: child!,
-          );
-        },
-        home: Builder(
-          builder: (BuildContext context) {
-            return TextButton(
-              onPressed: () => openLabReader(context),
-              child: const Text('open'),
-            );
-          },
-        ),
-      ),
+    tester.binding.platformDispatcher.accessibilityFeaturesTestValue =
+        FakeAccessibilityFeatures(disableAnimations: true);
+    addTearDown(
+      tester.binding.platformDispatcher.clearAccessibilityFeaturesTestValue,
     );
+    await _pumpLauncher(tester);
     await tester.tap(find.text('open'));
     await tester.pump();
 

@@ -5,11 +5,9 @@ import 'package:hentai_library/features/series/presentation/views/series_detail/
 import 'package:hentai_library/shared/presentation/providers/series_slot_providers.dart';
 import 'package:hentai_library/shared/ui/slots/series_slots.dart';
 import 'package:hentai_library/features/comic/public/comic.dart';
-import 'package:hentai_library/shared/ui/layout/catalog_grid.dart';
-import 'package:hentai_library/shared/ui/layout/catalog_grid_metrics.dart';
-import 'package:hentai_library/design-system/l10n/app_localizations.dart';
+import 'package:hentai_library/design-system/design_system.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/ui/widgets/catalog/comic_card.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 系列内漫画网格（复用书库 [CatalogGridSliver] 布局）。

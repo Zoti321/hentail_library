@@ -1,5 +1,7 @@
+import 'app_font.dart';
+
 import 'package:flutter/widgets.dart';
-import 'package:hentai_library/design-system/theme/app_m3e_theme.dart';
+
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 TextStyle labTextStyle(M3EThemeData theme, TextStyle base) {

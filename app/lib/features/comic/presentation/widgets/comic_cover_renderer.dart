@@ -3,7 +3,7 @@ import 'package:hentai_library/shared/ui/models/comic_cover_source.dart';
 import 'package:hentai_library/shared/ui/models/comic_cover_state.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/adaptive_comic_cover.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/card_letterboxed_cover_image.dart';
-import 'package:hentai_library/shared/ui/widgets/element/image/comic_cover_placeholder.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 
 /// Shared cover paint for catalog card vs detail chrome.
 enum ComicCoverPaintVariant { card, detail }

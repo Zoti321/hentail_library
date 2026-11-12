@@ -1,3 +1,5 @@
+import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/shared/presentation/providers/trash_comics_command_provider.dart';
 
 import 'dart:async';
@@ -5,8 +7,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/comic/domain/comic.dart';
-import 'package:hentai_library/shared/ui/patterns/dialog/confirm_dialog.dart';
-import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
+
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 

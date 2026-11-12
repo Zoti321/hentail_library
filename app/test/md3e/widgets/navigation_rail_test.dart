@@ -1,10 +1,12 @@
+import 'package:hentai_library/shared/ui/shell/shell_navigation.dart'
+    show defaultNavigationRailDestinations;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 
 import '../../../widgetbook/lab/theme/md3e_theme.dart';
 
-import 'package:hentai_library/shared/ui/widgets/desktop/navigation_rail.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 import '../../support/pump_app.dart';

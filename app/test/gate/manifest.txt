@@ -47,7 +47,6 @@ test/core/util/list_edit_test.dart
 
 # Dart hard-manifest UI — 纯逻辑 ViewModel / policy / codec
 test/design-system/motion/app_motion_test.dart
-test/design-system/motion/desktop_page_transition_test.dart
 test/shared/ui/widgets/foundation/pointer_target_test.dart
 test/features/reader/presentation/reader_input_test.dart
 test/design-system/theme/reader_color_scheme_contract_test.dart
@@ -119,3 +118,8 @@ test/features/app_settings/application/diagnostics/log_redactor_test.dart
 test/features/app_settings/infrastructure/diagnostics/log_export_service_test.dart
 
 test/infrastructure/logging/diagnostic_logging_test.dart
+
+# ADR-0053: host adapters retain their existing fast-track coverage.
+test/features/bootstrap/presentation/routing/shared_axis_route_page_test.dart
+test/features/bootstrap/presentation/routing/desktop_page_transition_test.dart
+test/features/app_settings/presentation/mappers/app_font_spec_test.dart

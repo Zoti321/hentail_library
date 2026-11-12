@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 
-import '../../../support/pump_app.dart';
+import '../../../support/pump_design_system_app.dart';
 
 class _PickerTrigger extends StatelessWidget {
   const _PickerTrigger({required this.onSelected});
@@ -58,7 +58,7 @@ class _AnchorlessProbeState extends State<_AnchorlessProbe> {
 void main() {
   testWidgets('锚点为空时不触发回调', (WidgetTester tester) async {
     int calls = 0;
-    await pumpApp(
+    await pumpDesignSystemApp(
       tester,
       home: Scaffold(body: _AnchorlessProbe(onSelected: (_) => calls++)),
     );
@@ -69,7 +69,7 @@ void main() {
 
   testWidgets('选中项按类型回传', (WidgetTester tester) async {
     int? picked;
-    await pumpApp(
+    await pumpDesignSystemApp(
       tester,
       home: Scaffold(body: _PickerTrigger(onSelected: (int v) => picked = v)),
     );

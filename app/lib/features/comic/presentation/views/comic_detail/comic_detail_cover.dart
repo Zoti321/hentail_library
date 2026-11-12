@@ -1,3 +1,4 @@
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/features/comic/presentation/providers/comic_cover_providers.dart';
 import 'package:hentai_library/features/comic/presentation/widgets/comic_cover_renderer.dart';
@@ -18,7 +19,7 @@ class ComicDetailCover extends ConsumerWidget {
     notifier.ensureLoaded(priority: ThumbnailPriority.critical);
     final ComicCoverState state = ref.watch(comicCoverProvider(comicId));
 
-    return CatalogCoverHero.wrap(
+    return CoverHero.wrap(
       tag: CatalogCoverHero.comicTag(comicId),
       child: ComicCoverRenderer(
         state: state,

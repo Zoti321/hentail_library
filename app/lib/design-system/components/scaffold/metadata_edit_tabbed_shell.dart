@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/design-system/components/list_detail/list_detail_detail_transition.dart';
-import 'package:hentai_library/design-system/components/list_detail/list_detail_nav_item.dart';
-import 'package:hentai_library/design-system/components/scaffold/metadata_edit_form_scroll.dart';
-import 'package:hentai_library/design-system/components/selection/segmented_capsule_bar.dart';
-import 'package:hentai_library/design-system/layout/metadata_edit_form_metrics.dart';
-import 'package:hentai_library/design-system/layout/breakpoints.dart';
+
+import '../list_detail/list_detail_detail_transition.dart';
+import '../list_detail/list_detail_nav_item.dart';
+import 'metadata_edit_form_scroll.dart';
+import '../selection/segmented_capsule_bar.dart';
+import '../../layout/metadata_edit_form_metrics.dart';
+import '../../layout/breakpoints.dart';
 
 /// 元数据编辑 Tab：label 由调用方从 l10n 取，本壳不取任何业务文案。
 typedef MetadataEditTab = ({String label, Widget body});

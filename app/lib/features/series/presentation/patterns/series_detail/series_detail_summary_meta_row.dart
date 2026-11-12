@@ -1,9 +1,9 @@
 import 'package:hentai_library/features/series/presentation/l10n/series_l10n.dart';
 import 'package:flutter/material.dart';
-import 'package:hentai_library/design-system/l10n/app_localizations.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_view_object.dart';
-import 'package:hentai_library/shared/ui/patterns/shared/age_restriction_chip_mount.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/features/series/presentation/patterns/series_detail/series_detail_language_row.dart';
 import 'package:hentai_library/features/series/presentation/patterns/series_detail/series_detail_serialization_chip.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';

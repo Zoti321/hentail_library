@@ -1,5 +1,7 @@
 import 'package:flutter/widgets.dart';
-import 'package:hentai_library/design-system/layout/breakpoints.dart';
+
+import 'breakpoints.dart';
+
 import 'package:material_3_expressive/foundations/foundations.dart';
 
 /// MD3E Lab 间距：组件内用 [of]（主题 [M3ESpacing]）；布局 metrics 用 [M3EDimensions] 常量。

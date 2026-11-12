@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/design-system/l10n/app_localizations_en.dart';
+import 'package:hentai_library/l10n/app_localizations_en.dart';
 import 'package:hentai_library/features/reader/application/read_session_page_load_exception.dart';
 import 'package:hentai_library/features/reader/presentation/widgets/reader_open_error_message.dart';
 

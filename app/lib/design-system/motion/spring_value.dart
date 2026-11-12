@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/design-system/motion/motion.dart';
+
+import 'motion.dart';
+
 import 'package:motor/motor.dart';
 
 /// 数值补间：目标值变化时，从当前显示值向新目标值的过渡由 M3E 效果弹簧驱动（非线性）。

@@ -11,6 +11,6 @@ class NamedFacetMultiSelectCopy {
   final String emptyCatalog;
   final String emptyRemaining;
 
-  /// 浮层 error 态重试按钮（须在字段树内 resolve，overlay 内无 [AppLocalizations]）。
+  /// 浮层 error 态重试按钮（须在字段树内 resolve，overlay 使用调用方传入的文案）。
   final String retryLabel;
 }

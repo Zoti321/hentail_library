@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/design-system/layout/page_layout_scope.dart';
-import 'package:hentai_library/design-system/layout/page_layout_spec.dart';
+
+import 'page_layout_scope.dart';
+import 'page_layout_spec.dart';
 
 /// 页面视口：用 [LayoutBuilder] 量出 [child] 实际可用宽度（shell 内容区，已扣除侧栏），
 /// 并把解析好的 [PageLayoutSpec] 通过 [PageLayoutScope] 下发给子树。

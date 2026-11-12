@@ -1,6 +1,10 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
-import 'package:hentai_library/design-system/design_system.dart';
+
+import '../../motion/desktop_page_transition.dart';
+import '../../motion/motion.dart';
+import '../../theme/color/desktop_shell_surfaces.dart';
+
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// List-detail **详情区**切换：水平 Shared Axis（对齐 Kazumi 设置内嵌水平过渡）。

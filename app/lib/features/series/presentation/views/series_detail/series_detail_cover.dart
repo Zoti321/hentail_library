@@ -7,7 +7,7 @@ import 'package:hentai_library/shared/presentation/providers/series_slot_provide
 import 'package:hentai_library/shared/ui/slots/series_slots.dart';
 import 'package:hentai_library/shared/ui/widgets/catalog/catalog_cover_hero.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/adaptive_comic_cover.dart';
-import 'package:hentai_library/shared/ui/widgets/element/image/comic_cover_placeholder.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// MD3E 系列详情封面：沿用系列封面来源（[seriesCoverSourceProvider]），填充到 MD3E 封面容器内。
@@ -43,7 +43,7 @@ class SeriesDetailCover extends ConsumerWidget {
       },
     );
 
-    return CatalogCoverHero.wrap(
+    return CoverHero.wrap(
       tag: CatalogCoverHero.seriesTag(seriesId),
       child: cover,
     );

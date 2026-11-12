@@ -1,7 +1,9 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
-import 'package:hentai_library/design-system/motion/motion.dart';
-import 'package:hentai_library/design-system/theme/color/desktop_shell_surfaces.dart';
+
+import 'motion.dart';
+import '../theme/color/desktop_shell_surfaces.dart';
+
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 浏览/多选等页头 chrome 切换：垂直 Shared Axis。

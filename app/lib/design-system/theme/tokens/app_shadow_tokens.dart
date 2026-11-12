@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/design-system/theme/color/app_shadow_palette.dart';
+
+import '../color/app_shadow_palette.dart';
+
 import 'package:theme_tailor_annotation/theme_tailor_annotation.dart';
 
 part 'app_shadow_tokens.tailor.dart';

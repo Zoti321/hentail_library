@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-import '../../../support/pump_app.dart';
+import '../../../support/pump_design_system_app.dart';
 
 Future<void> _pumpBar(
   WidgetTester tester, {
@@ -13,7 +13,7 @@ Future<void> _pumpBar(
   VoidCallback? onCancel,
   VoidCallback? onConfirm,
 }) async {
-  await pumpApp(
+  await pumpDesignSystemApp(
     tester,
     home: Scaffold(
       body: Center(

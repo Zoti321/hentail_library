@@ -1,3 +1,5 @@
+import 'package:hentai_library/design-system/design_system.dart';
+
 import 'dart:async';
 import 'dart:typed_data';
 
@@ -176,7 +178,7 @@ void main() {
                         MaterialPageRoute<void>(
                           builder: (BuildContext context) {
                             return Scaffold(
-                              body: CatalogCoverHero.wrap(
+                              body: CoverHero.wrap(
                                 tag: CatalogCoverHero.comicTag(comicId),
                                 child: const SizedBox(width: 200, height: 300),
                               ),

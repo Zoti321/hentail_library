@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 
-import '../../support/pump_app.dart';
+import '../../support/pump_design_system_app.dart';
 
 void main() {
   testWidgets('expanded width shows list and detail panes', (
     WidgetTester tester,
   ) async {
     await tester.binding.setSurfaceSize(const Size(1280, 800));
-    await pumpApp(
+    await pumpDesignSystemApp(
       tester,
       home: Center(
         child: SizedBox(
@@ -32,7 +32,7 @@ void main() {
   testWidgets('compact width shows list only by default', (
     WidgetTester tester,
   ) async {
-    await pumpApp(
+    await pumpDesignSystemApp(
       tester,
       home: Center(
         child: SizedBox(

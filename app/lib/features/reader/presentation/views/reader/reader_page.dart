@@ -19,7 +19,7 @@ import 'package:hentai_library/features/reader/presentation/routing/reader_route
 import 'package:hentai_library/features/reader/presentation/views/reader/reader_cover_actions.dart';
 import 'package:hentai_library/features/reader/presentation/views/reader/reader_settings_sheet.dart';
 import 'package:hentai_library/features/reader/presentation/widgets/reader_auto_play_binder.dart';
-import 'package:hentai_library/design-system/l10n/app_localizations.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/features/reader/presentation/views/reader/reader_layout.dart';
 import 'package:hentai_library/features/reader/presentation/patterns/reader/reader_series_catalog_sheet.dart';
 import 'package:hentai_library/features/reader/presentation/patterns/reader/reader_series_volume.dart';
@@ -29,7 +29,6 @@ import 'package:hentai_library/features/reader/domain/reading_preferences.dart';
 import 'package:hentai_library/features/reader/presentation/providers/reading_preferences_providers.dart';
 import 'package:hentai_library/shared/ui/navigation/app_navigator_context.dart';
 import 'package:hentai_library/design-system/design_system.dart';
-import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/design-system/l10n/app_localizations.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/series/presentation/views/metadata_edit/series_metadata_edit_page.dart';
 import 'package:hentai_library/features/series/domain/series.dart';
-import 'package:hentai_library/shared/ui/patterns/dialog/adaptive_form_dialog.dart';
-import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_surface.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 
 /// 打开系列元数据编辑：[M3EDialog.showAdaptive]（宽 < 840 全屏，否则基础弹窗）。
 Future<void> showSeriesMetadataEdit({

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/design-system/l10n/app_localizations.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/catalog/selection/catalog_selection_notifier.dart';
-import 'package:hentai_library/design-system/components/scaffold/pinned_toolbar_chrome.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 
 /// 多选批量编辑命令（owner 注入；壳不持业务规则）。
 typedef CatalogSelectionEditMetadataAction = Future<void> Function(

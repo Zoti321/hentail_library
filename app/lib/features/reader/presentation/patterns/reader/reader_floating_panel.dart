@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/layout/reader_chrome_metrics.dart';
+import 'package:hentai_library/features/reader/presentation/layout/reader_chrome_metrics.dart';
 
 /// 旧名兼容：宽度算法已迁至 [ReaderChromeMetrics.chromeContentMaxWidth]。
 abstract final class ReaderFloatingPanel {

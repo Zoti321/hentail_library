@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/design-system/components/inputs/input_chip_field_layout.dart';
+
+import 'input_chip_field_layout.dart';
+
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 class CompactInputChip extends StatelessWidget {

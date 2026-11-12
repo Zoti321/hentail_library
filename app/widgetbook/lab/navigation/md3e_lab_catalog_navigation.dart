@@ -14,7 +14,6 @@ import 'package:hentai_library/features/series/public/ui/series_metadata_edit_pr
 
 import 'md3e_lab_reader_navigation.dart';
 
-import 'package:hentai_library/shared/ui/widgets/sheets/overlay_route_scope.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 

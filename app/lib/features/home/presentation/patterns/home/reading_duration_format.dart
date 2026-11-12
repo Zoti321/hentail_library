@@ -1,4 +1,4 @@
-import 'package:hentai_library/design-system/l10n/app_localizations.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
 
 /// Home / 摘要卡用的 Reading duration 展示文案。
 String formatReadingDurationForDisplay(

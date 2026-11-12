@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/design-system/l10n/app_localizations_zh.dart';
+import 'package:hentai_library/l10n/app_localizations_zh.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:hentai_library/features/comic/presentation/widgets/comic_metadata_bulk_patch_toasts.dart';
 

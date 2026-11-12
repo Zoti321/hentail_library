@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/design-system/design_system.dart';
-import 'package:hentai_library/shared/ui/layout/reader_chrome_metrics.dart';
+import 'package:hentai_library/features/reader/presentation/layout/reader_chrome_metrics.dart';
 
 /// 顶/底 chrome 显隐：复用 [SpringReveal]，仅切换弹簧与滑动方向。
 class ReaderChromeReveal extends StatelessWidget {

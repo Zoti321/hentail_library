@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/design-system/components/scaffold/library_page_header_metrics.dart';
-import 'package:hentai_library/design-system/components/scaffold/page_header_back_button.dart';
-import 'package:hentai_library/design-system/layout/page_layout_spec.dart';
+
+import 'library_page_header_metrics.dart';
+import 'page_header_back_button.dart';
+import '../../layout/page_layout_spec.dart';
+
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 

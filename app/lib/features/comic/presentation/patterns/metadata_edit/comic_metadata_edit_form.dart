@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/design-system/design_system.dart';
-import 'package:hentai_library/design-system/l10n/app_localizations.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/comic/presentation/patterns/metadata_edit/comic_metadata_edit_draft.dart';
 import 'package:hentai_library/features/comic/presentation/patterns/metadata_edit/comic_metadata_locks_pane.dart';
@@ -9,8 +9,6 @@ import 'package:hentai_library/features/comic/domain/value_objects/comic_meta_lo
 import 'package:hentai_library/features/comic/presentation/view_models/comic_metadata_smart_facet_providers.dart';
 import 'package:hentai_library/features/comic/presentation/views/widgets/form/library_facet_multi_select_field.dart';
 import 'package:hentai_library/features/comic_metadata/public/comic_metadata_form.dart';
-import 'package:hentai_library/shared/ui/widgets/settings/content_section.dart';
-import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';

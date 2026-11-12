@@ -13,6 +13,7 @@ const Set<String> kWayfinderPhaseATopLevelLibDirs = <String>{
   'infrastructure',
   'core',
   'design-system',
+  'l10n',
   'features',
   'shared',
   'src',
@@ -23,6 +24,7 @@ const Set<String> kWayfinderPhaseBTopLevelLibDirs = <String>{
   'infrastructure',
   'core',
   'design-system',
+  'l10n',
   'features',
   'shared',
   'src',
@@ -37,7 +39,8 @@ bool isCanonicalLibRelativePath(String rel) {
       path.startsWith('features/') ||
       path.startsWith('shared/') ||
       path.startsWith('src/') ||
-      path.startsWith('design-system/');
+      path.startsWith('design-system/') ||
+      path.startsWith('l10n/');
 }
 
 List<String> readStranglerShimAllowlist(File manifest) {

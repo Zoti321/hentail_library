@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/design-system/motion/motion.dart';
+
+import 'motion.dart';
+
 import 'package:motor/motor.dart';
 
 /// 位移 + 透明度显隐：由 M3E 空间弹簧驱动。

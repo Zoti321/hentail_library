@@ -1,4 +1,4 @@
-import 'package:hentai_library/design-system/l10n/app_localizations.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
 
 extension ReadingHistoryL10nX on AppLocalizations {
   String relativeTimeAgo(DateTime time) {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/layout/reader_chrome_metrics.dart';
+import 'package:hentai_library/features/reader/presentation/layout/reader_chrome_metrics.dart';
 import 'package:hentai_library/features/reader/presentation/patterns/reader/reader_page_copy.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 

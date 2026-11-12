@@ -1,5 +1,5 @@
 import 'package:hentai_library/features/series/domain/value_objects/serialization_status.dart';
-import 'package:hentai_library/design-system/l10n/app_localizations.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/features/series/domain/library_serialization_status_filter.dart';
 import 'package:hentai_library/features/series/domain/library_series_sort_option.dart';
 

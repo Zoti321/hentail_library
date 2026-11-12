@@ -1,15 +1,17 @@
+import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
+import 'package:hentai_library/design-system/design_system.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:hentai_library/design-system/l10n/app_localizations.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/application/logging/app_log.dart';
 import 'package:hentai_library/features/series/presentation/patterns/metadata_edit/series_metadata_edit_form.dart';
 import 'package:hentai_library/features/series/presentation/view_models/series_metadata_edit_session_notifier.dart';
 import 'package:hentai_library/features/series/presentation/view_models/series_metadata_edit_ui_state.dart';
-import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_surface.dart';
 import 'package:hentai_library/features/series/domain/series.dart';
-import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
+
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 export 'package:hentai_library/features/series/presentation/views/metadata_edit/series_metadata_edit_layout.dart';

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/design-system/motion/motion.dart';
+
+import 'motion.dart';
+
 import 'package:motor/motor.dart';
 
 /// 尺寸展开 / 收起：高度因子由 M3E 空间弹簧驱动，展开时允许越过终点回弹。

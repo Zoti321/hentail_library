@@ -1,6 +1,5 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:hentai_library/design-system/l10n/app_localizations.dart';
 import 'package:material_ui/material_ui.dart'
     show DefaultMaterialLocalizations, MaterialLocalizations;
 
@@ -13,14 +12,12 @@ export 'package:material_ui/material_ui.dart' show MaterialLocalizations;
 /// `package:flutter/material.dart` 里的 [MaterialLocalizations]。
 ///
 /// **作用域**
-/// - 应用 ARB（`AppLocalizations.of(context)`）：由 [MaterialApp] 或 [materialLocalizationsDelegates] 提供。
 /// - 日历整棵子树：根节点包 [materialUiLocalizationsScope]（`en` + material_ui delegate）。
-/// - Overlay / Lab 对话框：单层 [materialLocalizationsDelegates]（ARB + material_ui + Flutter Material，供 legacy 控件）。
+/// - Overlay / Lab 对话框：单层 [materialLocalizationsDelegates]（material_ui + Flutter Material，供 legacy 控件）。
 ///
 /// material_ui [DefaultMaterialLocalizations] 仅完整支持 `en`；日历子树固定 `en` locale。
 List<LocalizationsDelegate<dynamic>> get materialLocalizationsDelegates =>
     <LocalizationsDelegate<dynamic>>[
-      AppLocalizations.delegate,
       DefaultMaterialLocalizations.delegate,
       GlobalMaterialLocalizations.delegate,
       GlobalWidgetsLocalizations.delegate,

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/design-system/design_system.dart';
-import 'package:hentai_library/shared/ui/layout/library_browse_page_metrics.dart';
 import 'package:hentai_library/features/comic_metadata/public/ui/metadata_lab_patterns.dart';
 import 'package:hentai_library/features/comic_metadata/presentation/widgets/management_create_entity_fab.dart';
 

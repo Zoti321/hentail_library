@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/design-system/l10n/app_localizations.dart';
-import 'package:hentai_library/shared/ui/widgets/desktop/navigation_rail.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 /// Shell [ExpressiveNavigationRail] 主目的地图标（Material Symbols；选中态由 fill=1 呈现）。

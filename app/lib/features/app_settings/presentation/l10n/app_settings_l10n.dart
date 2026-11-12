@@ -1,4 +1,4 @@
-import 'package:hentai_library/design-system/l10n/app_localizations.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 
 /// app_settings 偏好枚举 → 展示文案（owner extension；ARB 源在 `app/l10n`，生成文案在 `design-system/l10n`）。

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/design-system/motion/motion.dart';
+
+import 'motion.dart';
+
 import 'package:motor/motor.dart';
 
 /// 在 [Stack] 中定位的矩形（位置 + 尺寸）由 M3E 空间弹簧驱动，允许越过终点回弹。

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/design-system/l10n/app_localizations.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/app_settings/presentation/log_export_flow.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/app_update_controller.dart';
@@ -8,9 +8,7 @@ import 'package:hentai_library/features/app_settings/presentation/view_models/di
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hentai_library/features/app_settings/presentation/patterns/settings/settings_catalog.dart';
 import 'package:hentai_library/features/app_settings/presentation/views/dialogs/color_scheme_picker_dialog.dart';
-import 'package:hentai_library/design-system/components/menu/anchored_option_picker.dart';
-import 'package:hentai_library/shared/ui/widgets/settings/settings_list.dart';
-import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/shared/ui/l10n/library_display_target_l10n.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';

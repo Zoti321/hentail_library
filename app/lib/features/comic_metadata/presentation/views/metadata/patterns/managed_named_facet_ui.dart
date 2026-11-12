@@ -1,5 +1,5 @@
-import 'package:hentai_library/design-system/l10n/app_localizations.dart';
-import 'package:hentai_library/design-system/components/selection/segmented_capsule_bar.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/features/comic_metadata/domain/named_facet_management_repository.dart';
 import 'package:hentai_library/features/comic_metadata/presentation/l10n/comic_metadata_l10n.dart';
 

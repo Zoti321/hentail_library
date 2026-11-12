@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:hentai_library/design-system/l10n/app_localizations.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/application/logging/app_log.dart';
 import 'package:hentai_library/features/metadata_backup/application/prepare_metadata_import_use_case.dart';
@@ -13,7 +13,7 @@ import 'package:hentai_library/features/metadata_backup/domain/metadata_backup_f
 import 'package:hentai_library/features/metadata_backup/domain/metadata_import_result.dart';
 import 'package:hentai_library/features/metadata_backup/presentation/widgets/metadata_import_dialogs.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
-import 'package:hentai_library/shared/ui/patterns/dialog/lab_dialog_presenter.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 export 'widgets/metadata_import_dialogs.dart';

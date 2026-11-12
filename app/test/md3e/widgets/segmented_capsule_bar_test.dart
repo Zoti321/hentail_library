@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/comic_metadata/presentation/views/metadata/patterns/managed_named_facet_ui.dart';
 import 'package:hentai_library/features/comic_metadata/domain/named_facet_management_repository.dart';
-import 'package:hentai_library/design-system/components/selection/segmented_capsule_bar.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 
 import '../../support/pump_app.dart';
 

@@ -1,4 +1,4 @@
-import 'package:hentai_library/design-system/l10n/app_localizations_zh.dart';
+import 'package:hentai_library/l10n/app_localizations_zh.dart';
 import 'package:hentai_library/features/library_admin/public/ui/metadata_refresh_toasts.dart';
 import 'package:test/test.dart';
 

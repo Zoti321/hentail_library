@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/design-system/l10n/app_localizations_zh.dart';
+import 'package:hentai_library/l10n/app_localizations_zh.dart';
 import 'package:hentai_library/features/comic_metadata/presentation/views/metadata/metadata_dialogs.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 

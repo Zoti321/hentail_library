@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/design-system/layout/breakpoints.dart';
-import 'package:hentai_library/design-system/theme/app_font.dart';
+
+import '../layout/breakpoints.dart';
+import 'app_font.dart';
+
 import 'package:material_3_expressive/foundations/foundations.dart';
 import 'package:material_ui/material_ui.dart' as material_ui;
-
-export 'package:hentai_library/design-system/theme/app_font.dart';
 
 /// 产品品牌 seed：配色方案「紫罗兰色」(`violet` / Kazumi `0xFF6750A4`)。
 ///

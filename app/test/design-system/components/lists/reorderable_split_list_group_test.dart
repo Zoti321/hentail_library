@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 
-import '../../../support/pump_app.dart';
+import '../../../support/pump_design_system_app.dart';
 
 const List<String> _items = <String>['A', 'B', 'C'];
 
@@ -11,7 +11,7 @@ Future<void> _pumpGroup(
   required void Function(int oldIndex, int newIndex) onReorder,
   List<String> items = _items,
 }) {
-  return pumpApp(
+  return pumpDesignSystemApp(
     tester,
     home: Scaffold(
       body: SingleChildScrollView(
@@ -68,7 +68,7 @@ void main() {
       Widget child(int index) =>
           SizedBox(height: 56, child: Center(child: Text(_items[index])));
 
-      await pumpApp(
+      await pumpDesignSystemApp(
         tester,
         home: Scaffold(
           body: SplitListGroup(
@@ -86,7 +86,7 @@ void main() {
           (r.topRadius, r.bottomRadius, tester.getSize(find.byWidget(r))),
       ];
 
-      await pumpApp(
+      await pumpDesignSystemApp(
         tester,
         home: Scaffold(
           body: ReorderableSplitListGroup(
@@ -131,7 +131,7 @@ void main() {
     testWidgets('行高不同时拖动仍按各行真实位置判定目标（不因高度错位）', (WidgetTester tester) async {
       const List<double> heights = <double>[56, 120, 56];
       final List<(int, int)> calls = <(int, int)>[];
-      await pumpApp(
+      await pumpDesignSystemApp(
         tester,
         home: Scaffold(
           body: SingleChildScrollView(
@@ -174,7 +174,7 @@ void main() {
 
     testWidgets('拖拽松手后被拖的行圆角恢复为其槽位圆角（不残留按压圆角）', (WidgetTester tester) async {
       List<String> items = List<String>.of(_items);
-      await pumpApp(
+      await pumpDesignSystemApp(
         tester,
         home: Scaffold(
           body: SingleChildScrollView(
@@ -226,7 +226,7 @@ void main() {
       WidgetTester tester,
     ) async {
       final List<int> taps = <int>[];
-      await pumpApp(
+      await pumpDesignSystemApp(
         tester,
         home: Scaffold(
           body: SingleChildScrollView(
@@ -265,7 +265,7 @@ void main() {
 
     testWidgets('长按 ReorderExclude 区域不会开始拖拽', (WidgetTester tester) async {
       final List<(int, int)> calls = <(int, int)>[];
-      await pumpApp(
+      await pumpDesignSystemApp(
         tester,
         home: Scaffold(
           body: SingleChildScrollView(

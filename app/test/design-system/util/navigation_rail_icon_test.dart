@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/design-system/util/navigation_rail_icon.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 Widget _wrap(Widget child) =>

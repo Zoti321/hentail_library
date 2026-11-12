@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/shared/ui/widgets/pagination/pagination_page_window.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 
 void main() {
   group('buildPaginationPageWindow (MUI usePagination)', () {

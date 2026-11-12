@@ -1,10 +1,13 @@
+import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
+import 'package:hentai_library/design-system/design_system.dart';
+
 import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/design-system/l10n/app_localizations.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/comic_metadata/presentation/view_models/named_facet_management_view_model.dart';
 import 'package:hentai_library/features/comic_metadata/presentation/view_models/tag_dictionary_import_view_model.dart';
@@ -12,7 +15,7 @@ import 'package:hentai_library/features/comic_metadata/presentation/views/metada
 import 'package:hentai_library/features/comic_metadata/presentation/views/metadata/patterns/management_rename_entity_dialog.dart';
 import 'package:hentai_library/features/comic_metadata/domain/tag_dictionary_import_result.dart';
 import 'package:hentai_library/features/comic_metadata/domain/named_facet_management_repository.dart';
-import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
+
 import 'package:hentai_library/features/comic_metadata/presentation/l10n/comic_metadata_l10n.dart';
 
 /// 重命名（M3E dialog + [ManagementEntityNameField]）。

@@ -1,23 +1,20 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_acrylic/flutter_acrylic.dart';
+import 'package:hentai_library/composition/window_composition.dart';
 import 'package:hentai_library/shared/ui/image/image_cache_config.dart';
-import 'package:hentai_library/design-system/l10n/app_localizations.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/application/logging/app_log.dart';
 import 'package:hentai_library/composition/logging_composition.dart';
-import 'package:hentai_library/shared/ui/window/app_window_title.dart';
-import 'package:hentai_library/design-system/platform/platform_desktop.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/infrastructure/frb/frb_call_guard.dart';
 import 'package:hentai_library/infrastructure/frb/frb_zone_guard.dart';
 import 'package:hentai_library/src/rust/api/comic.dart';
 import 'package:hentai_library/src/rust/api/logging.dart';
 import 'package:hentai_library/src/rust/frb_generated.dart';
-import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/composition/app_composition.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/app.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:window_manager/window_manager.dart';
 
 void main() {
   runZonedGuarded(() {
@@ -25,7 +22,7 @@ void main() {
     // Paint a first frame immediately so Android splash is not stuck while
     // loading the Rust cdylib (can be large / slow on emulators).
     final Future<void> prepare = _prepareApp();
-    runApp(_BootstrapApp(prepare: prepare));
+    runApp(AppWindowHost(child: _BootstrapApp(prepare: prepare)));
   }, handleUncaughtFrbZoneError);
 }
 
@@ -33,7 +30,7 @@ Future<void> _prepareApp() async {
   // Window chrome first: it must not wait for the (slow) Rust/DB init, or the
   // user sees an unconfigured window during startup.
   if (supportsDesktopWindowChrome) {
-    await _initWindow();
+    await configureAppWindow();
   }
 
   try {
@@ -110,32 +107,4 @@ class _BootstrapApp extends StatelessWidget {
       },
     );
   }
-}
-
-Future<void> _initWindow() async {
-  await WindowManager.instance.ensureInitialized();
-
-  await windowManager.waitUntilReadyToShow();
-  await windowManager.setTitle(appWindowTitle());
-  await windowManager.setTitleBarStyle(
-    TitleBarStyle.hidden,
-    windowButtonVisibility: true,
-  );
-  await windowManager.setMinimumSize(
-    const Size(
-      AppLayoutBreakpoints.minWindowWidth,
-      AppLayoutBreakpoints.minWindowHeight,
-    ),
-  );
-  await windowManager.center();
-  await windowManager.show();
-  await windowManager.setPreventClose(true);
-  await windowManager.setSkipTaskbar(false);
-
-  await Window.initialize();
-  await Window.setEffect(
-    effect: WindowEffect.solid,
-    color: Colors.white,
-    dark: false,
-  );
 }

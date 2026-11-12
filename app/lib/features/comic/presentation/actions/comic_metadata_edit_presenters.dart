@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/design-system/l10n/app_localizations.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/comic/presentation/providers/comic_detail_providers.dart';
 import 'package:hentai_library/features/comic/presentation/views/metadata_edit/comic_metadata_edit_page.dart';
 import 'package:hentai_library/features/comic/domain/comic.dart';
-import 'package:hentai_library/design-system/layout/metadata_edit_form_metrics.dart';
-import 'package:hentai_library/shared/ui/patterns/dialog/adaptive_form_dialog.dart';
-import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_surface.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 
 /// 打开漫画元数据编辑：[M3EDialog.showAdaptive]（宽 < 840 全屏，否则基础弹窗）。

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/design-system/platform/platform_desktop.dart';
-import 'package:hentai_library/design-system/layout/breakpoints.dart';
-import 'package:hentai_library/design-system/layout/page_layout_scope.dart';
+
+import '../platform/platform_desktop.dart';
+import 'breakpoints.dart';
+import 'page_layout_scope.dart';
+
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 输入形态：鼠标（指针）精度高，同一窗口档位下可比触控更紧凑。

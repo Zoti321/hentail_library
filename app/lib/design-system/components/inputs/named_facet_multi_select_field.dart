@@ -5,20 +5,21 @@ import 'package:flutter/foundation.dart'
     show ValueListenable, defaultTargetPlatform, listEquals;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:hentai_library/design-system/l10n/app_localizations.dart';
-import 'package:hentai_library/design-system/components/inputs/named_facet_multi_select_copy.dart';
-import 'package:hentai_library/design-system/filtering/name_pinyin_assisted_filter.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+import '../../l10n/design_system_localizations.dart';
+import 'named_facet_multi_select_copy.dart';
+import '../../filtering/name_pinyin_assisted_filter.dart';
+
 import 'package:material_3_expressive/components/text_fields/components/m3e_text_field_affordance.dart';
 import 'package:material_3_expressive/components/text_fields/utils/m3e_text_field_selection_controls.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:motor/motor.dart';
-import 'package:riverpod/misc.dart' show ProviderListenable;
-import 'package:hentai_library/design-system/components/inputs/compact_input_chip.dart';
-import 'package:hentai_library/design-system/components/inputs/input_chip_field_layout.dart';
-import 'package:hentai_library/design-system/components/inputs/outlined_text_field_shell.dart';
-import 'package:hentai_library/design-system/motion/motion.dart';
+
+import 'compact_input_chip.dart';
+import 'input_chip_field_layout.dart';
+import 'outlined_text_field_shell.dart';
+import '../../motion/motion.dart';
 
 part 'named_facet_multi_select_menu.dart';
 
@@ -26,14 +27,16 @@ const double _kNamedFacetMultiSelectMenuMaxHeight = 240;
 const double _kNamedFacetMultiSelectMenuEmptyMinHeight = 160;
 
 /// MD3E Named facet 多选：chip + 内联输入 + 自绘候选浮层（非 [M3EDropdownMenu] 底座）。
-class FacetMultiSelectField<T> extends ConsumerStatefulWidget {
+class FacetMultiSelectField<T> extends StatefulWidget {
   const FacetMultiSelectField({
     super.key,
     required this.label,
     required this.selectedNames,
     required this.onAdd,
     required this.onRemove,
-    required this.itemsProvider,
+    required this.items,
+    this.isLoading = false,
+    this.hasLoadError = false,
     required this.onRetry,
     required this.resolveName,
     required this.copy,
@@ -59,7 +62,9 @@ class FacetMultiSelectField<T> extends ConsumerStatefulWidget {
   final List<String> selectedNames;
   final ValueChanged<String> onAdd;
   final ValueChanged<String> onRemove;
-  final ProviderListenable<AsyncValue<List<T>>> itemsProvider;
+  final List<T> items;
+  final bool isLoading;
+  final bool hasLoadError;
   final VoidCallback onRetry;
   final String Function(T item) resolveName;
   final NamedFacetMultiSelectCopy copy;
@@ -70,12 +75,12 @@ class FacetMultiSelectField<T> extends ConsumerStatefulWidget {
   final String? clearAllTooltip;
 
   @override
-  ConsumerState<FacetMultiSelectField<T>> createState() =>
+  State<FacetMultiSelectField<T>> createState() =>
       _NamedFacetMultiSelectFieldState<T>();
 }
 
 class _NamedFacetMultiSelectFieldState<T>
-    extends ConsumerState<FacetMultiSelectField<T>>
+    extends State<FacetMultiSelectField<T>>
     with TickerProviderStateMixin {
   final LayerLink _layerLink = LayerLink();
   final GlobalKey _fieldAnchorKey = GlobalKey();
@@ -127,6 +132,9 @@ class _NamedFacetMultiSelectFieldState<T>
   void didUpdateWidget(covariant FacetMultiSelectField<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
     _syncSelectedNamesNotifier();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _markOverlayNeedsBuild();
+    });
   }
 
   void _syncSelectedNamesNotifier() {
@@ -372,8 +380,10 @@ class _NamedFacetMultiSelectFieldState<T>
                                                 T
                                               >(
                                                 width: _fieldWidth,
-                                                itemsProvider:
-                                                    widget.itemsProvider,
+                                                items: widget.items,
+                                                isLoading: widget.isLoading,
+                                                hasLoadError:
+                                                    widget.hasLoadError,
                                                 selectedNames: selectedNames,
                                                 filterQuery: filterQuery,
                                                 scrollController:
@@ -625,7 +635,9 @@ class _NamedFacetMultiSelectFieldState<T>
 
   @override
   Widget build(BuildContext context) {
-    final AppLocalizations l10n = AppLocalizations.of(context);
+    final DesignSystemLocalizations l10n = DesignSystemLocalizations.of(
+      context,
+    );
     final bool hasSelectedTags = widget.selectedNames.isNotEmpty;
     final bool showClearAll = hasSelectedTags && widget.onClearAll != null;
 
@@ -668,14 +680,14 @@ class _NamedFacetMultiSelectFieldState<T>
                               M3ETextFieldTheme fieldTheme,
                             ) => M3ETooltip(
                               message:
-                                  widget.clearAllTooltip ?? l10n.commonClear,
+                                  widget.clearAllTooltip ?? l10n.clearLabel,
                               child: M3ETextFieldAffordance(
                                 key: FacetMultiSelectField.clearAllButtonKey,
                                 icon: M3EIcons.cancel,
                                 color: colors.trailingIcon,
                                 iconSize: fieldTheme.iconSize,
                                 semanticLabel:
-                                    widget.clearAllTooltip ?? l10n.commonClear,
+                                    widget.clearAllTooltip ?? l10n.clearLabel,
                                 onPressed: _clearAllSelected,
                               ),
                             )

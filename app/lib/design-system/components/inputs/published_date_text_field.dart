@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/design-system/l10n/app_localizations.dart';
+
+import '../../l10n/design_system_localizations.dart';
+
 import 'package:intl/intl.dart';
 import 'package:material_3_expressive/components/text_fields/components/m3e_text_field_affordance.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:hentai_library/design-system/components/calendar/anchored_calendar_date_picker.dart';
-import 'package:hentai_library/design-system/components/calendar/docked_calendar_date_picker.dart';
-import 'package:hentai_library/design-system/components/inputs/outlined_text_field.dart';
+
+import '../calendar/anchored_calendar_date_picker.dart';
+import '../calendar/docked_calendar_date_picker.dart';
+import 'outlined_text_field.dart';
 
 /// 发布日期：可编辑文本 + M3E trailing 日历 + clear。
 class PublishedDateTextField extends StatefulWidget {
@@ -93,7 +96,9 @@ class _PublishedDateTextFieldState extends State<PublishedDateTextField> {
 
   @override
   Widget build(BuildContext context) {
-    final AppLocalizations l10n = AppLocalizations.of(context);
+    final DesignSystemLocalizations l10n = DesignSystemLocalizations.of(
+      context,
+    );
     final M3EThemeData theme = M3ETheme.of(context);
     final M3EColorScheme scheme = theme.colorScheme;
     final M3ETextFieldTheme fieldTheme = theme.textFieldTheme;
@@ -107,14 +112,14 @@ class _PublishedDateTextFieldState extends State<PublishedDateTextField> {
         keyboardType: TextInputType.datetime,
         onChanged: widget.onChanged,
         showClearButton: true,
-        clearButtonSemanticsLabel: l10n.formDateClearTooltip,
+        clearButtonSemanticsLabel: l10n.clearDateTooltip,
         trailing: M3ETextFieldAffordance(
           icon: _pickerOpen ? Symbols.calendar_month : Symbols.calendar_today,
           color: _pickerOpen
               ? scheme.onSecondaryContainer
               : scheme.onSurfaceVariant,
           iconSize: iconSize,
-          semanticLabel: l10n.formDatePickerHint,
+          semanticLabel: l10n.datePickerHint,
           onPressed: _openPicker,
         ),
       ),

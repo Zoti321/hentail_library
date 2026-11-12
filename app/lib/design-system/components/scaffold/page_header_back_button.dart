@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/design-system/l10n/app_localizations.dart';
-import 'package:hentai_library/design-system/components/scaffold/library_page_header_metrics.dart';
+
+import '../../l10n/design_system_localizations.dart';
+import 'library_page_header_metrics.dart';
+
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -12,7 +14,9 @@ class PageHeaderBackButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final AppLocalizations l10n = AppLocalizations.of(context);
+    final DesignSystemLocalizations l10n = DesignSystemLocalizations.of(
+      context,
+    );
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
 
     return M3EIconButton(
@@ -23,8 +27,8 @@ class PageHeaderBackButton extends StatelessWidget {
       ),
       variant: M3EIconButtonVariant.standard,
       size: M3EIconButtonSize.sm,
-      tooltip: l10n.shellBack,
-      semanticLabel: l10n.shellBack,
+      tooltip: l10n.backLabel,
+      semanticLabel: l10n.backLabel,
       onPressed: onPressed,
     );
   }
