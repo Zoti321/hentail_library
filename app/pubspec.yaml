@@ -92,7 +92,8 @@ dev_dependencies:
   mocktail: ^1.0.4
   test: ^1.26.3
 
-  # --- 静态分析 / Lint（共 2）---
+  # --- 静态分析 / Lint（共 3）---
+  dart_code_linter: ^4.4.5
   flutter_lints: ^6.0.0
   riverpod_lint: ^3.1.9
 

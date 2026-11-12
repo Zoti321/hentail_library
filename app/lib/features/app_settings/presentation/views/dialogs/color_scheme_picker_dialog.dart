@@ -134,7 +134,7 @@ class _ColorSchemeOption extends StatelessWidget {
       label: label,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: const BorderRadius.all(Radius.circular(16)),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[

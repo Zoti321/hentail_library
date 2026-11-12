@@ -34,7 +34,7 @@ double libraryFilterSortDrawerWidth(
       math.min(viewportWidth - 16, 400),
     ),
     LibraryFilterSortLayoutTier.medium => math.min(360, viewportWidth * 0.35),
-    LibraryFilterSortLayoutTier.expanded => math.min(360, viewportWidth * 0.30),
+    LibraryFilterSortLayoutTier.expanded => math.min(360, viewportWidth * 0.3),
   };
 }
 

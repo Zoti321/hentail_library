@@ -77,7 +77,7 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
         return;
       }
       final HistoryPagedFeedState? latest = state.asData?.value;
-      if (latest == null || latest.isLoadingMore != true) {
+      if (latest == null || !latest.isLoadingMore) {
         return;
       }
       final HistoryPagedFeedState merged = _mergePage(

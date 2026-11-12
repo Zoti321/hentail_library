@@ -100,6 +100,24 @@ jobs:
       - name: Check Dart formatting and analysis
         run: bash scripts/run-gate.sh dart-static
 
+  gate-dart-lint:
+    name: gate · dart linter (dart_code_linter)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Flutter FRB toolchain
+        uses: ./.github/actions/setup-flutter-frb
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
+          run-build-runner: "false"
+
+      - name: Run dart_code_linter rules
+        run: bash scripts/run-gate.sh dart-lint
+
   gate-dart-test:
     name: gate · dart test (hard manifest)
     runs-on: ubuntu-latest

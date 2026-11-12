@@ -56,7 +56,7 @@ class HomeActivityStatsCapsule extends StatelessWidget {
       excludeSemantics: true,
       child: Material(
         color: bg,
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: const BorderRadius.all(Radius.circular(999)),
         clipBehavior: Clip.antiAlias,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 18),

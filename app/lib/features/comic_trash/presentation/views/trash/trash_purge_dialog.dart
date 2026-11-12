@@ -60,7 +60,7 @@ class _TrashPurgeConfirmDialogState extends State<TrashPurgeConfirmDialog> {
           if (needsAcknowledgement) ...<Widget>[
             const SizedBox(height: 12),
             InkWell(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: const BorderRadius.all(Radius.circular(12)),
               onTap: () => setState(() => _acknowledged = !_acknowledged),
               child: Row(
                 children: <Widget>[

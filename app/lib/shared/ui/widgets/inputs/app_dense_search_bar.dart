@@ -210,7 +210,7 @@ class _AppDenseSearchBarState extends State<AppDenseSearchBar> {
           final String? matchLabel = widget.matchCountLabel;
           final bool showMatch = matchLabel != null && matchLabel.isNotEmpty;
           const double matchGap = 12;
-          final double matchReserve = showMatch ? 96 + matchGap : 0;
+          final double matchReserve = showMatch ? matchGap + 96 : 0;
           final double available = constraints.maxWidth;
           final double barWidth = compact
               ? math.max(0, available - matchReserve)

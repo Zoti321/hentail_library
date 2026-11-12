@@ -96,7 +96,7 @@ class HomeAggregateStatsSection extends StatelessWidget {
         icon: Symbols.collections_bookmark,
         backgroundColor: palette.seriesBackground,
         onBackgroundColor: palette.seriesForeground,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: const BorderRadius.all(Radius.circular(20)),
         minHeight: 104,
       );
     }
@@ -142,7 +142,7 @@ class HomeAggregateStatsSection extends StatelessWidget {
         icon: Symbols.face_3,
         backgroundColor: palette.charactersBackground,
         onBackgroundColor: palette.charactersForeground,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: const BorderRadius.all(Radius.circular(16)),
         emphasis: HomeBentoStatEmphasis.compact,
         layout: HomeBentoStatLayout.shortcut,
         onPressed: onOpenCharacters,
@@ -158,7 +158,7 @@ class HomeAggregateStatsSection extends StatelessWidget {
         onBackgroundColor: palette.tagsForeground,
         borderRadius: wide
             ? const BorderRadius.horizontal(left: Radius.circular(40))
-            : BorderRadius.circular(40),
+            : const BorderRadius.all(Radius.circular(40)),
         minHeight: wide ? 88 : 96,
         emphasis: HomeBentoStatEmphasis.compact,
         layout: HomeBentoStatLayout.shortcut,

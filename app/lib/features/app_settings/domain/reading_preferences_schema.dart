@@ -74,11 +74,9 @@ abstract final class ReadingPreferenceSchema {
   /// 边距归一化：clamp 到 `[0, max]` 后按步长取整。
   static int normalizeWebtoonMarginPercent(int value) {
     final int clamped = value.clamp(0, maxWebtoonMarginPercent);
-    final int stepped =
-        ((clamped / webtoonMarginPercentStep).round() *
-                webtoonMarginPercentStep)
-            .clamp(0, maxWebtoonMarginPercent);
-    return stepped;
+    return ((clamped / webtoonMarginPercentStep).round() *
+            webtoonMarginPercentStep)
+        .clamp(0, maxWebtoonMarginPercent);
   }
 
   /// 自动播放间隔归一化：clamp 到 `[min, max]`。

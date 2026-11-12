@@ -47,11 +47,11 @@ Size? peekCoverImageSize(Uint8List? bytes) {
   if (bytes == null || bytes.length < 10) {
     return null;
   }
-  if (bytes[0] == 0xFF && bytes[1] == 0xD8) {
+  if (bytes.first == 0xFF && bytes[1] == 0xD8) {
     return _peekJpegSize(bytes);
   }
   if (bytes.length >= 24 &&
-      bytes[0] == 0x89 &&
+      bytes.first == 0x89 &&
       bytes[1] == 0x50 &&
       bytes[2] == 0x4E &&
       bytes[3] == 0x47) {

@@ -9,7 +9,9 @@ const double kCalendarYearPickerRowHeight = 56;
 
 const double _kYearChipHeight = 40;
 const double _kYearChipHorizontalPadding = 12;
-final BorderRadius _kYearChipRadius = BorderRadius.circular(20);
+final BorderRadius _kYearChipRadius = const BorderRadius.all(
+  Radius.circular(20),
+);
 
 /// Lab 年份视图高度（对齐 [M3EDatePickerUtils.calendarYearViewHeight]，使用 [kCalendarYearPickerRowHeight]）。
 double calendarYearViewHeight(

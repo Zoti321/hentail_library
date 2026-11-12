@@ -21,7 +21,7 @@ const double kComicListItemVerticalPadding = 10;
 
 /// Minimum row height (cover + vertical insets).
 double get kComicListItemMinHeight =>
-    kComicListItemCoverHeight + 2 * kComicListItemVerticalPadding;
+    kComicListItemCoverHeight + kComicListItemVerticalPadding * 2;
 
 /// Max width of the read-progress bar when shown under meta (list-only layout).
 const double kComicListItemProgressMaxWidth = 160;
@@ -133,7 +133,7 @@ class ComicListItem extends StatelessWidget {
     final bool showListProgress = showsReadProgressStrip(readProgress);
 
     final Widget coverLayer = ClipRRect(
-      borderRadius: BorderRadius.circular(kComicCardRadius),
+      borderRadius: const BorderRadius.all(Radius.circular(kComicCardRadius)),
       child: SizedBox(
         width: kComicListItemCoverWidth,
         height: kComicListItemCoverHeight,

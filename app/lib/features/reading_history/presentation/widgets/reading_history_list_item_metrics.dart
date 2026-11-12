@@ -31,7 +31,7 @@ class ReadingHistoryListItemSpec {
   final double actionGap;
   final double infoHorizontalGap;
 
-  double get rowHeight => coverHeight + 2 * verticalPadding;
+  double get rowHeight => coverHeight + verticalPadding * 2;
 }
 
 /// Responsive grid for reading-history rows.

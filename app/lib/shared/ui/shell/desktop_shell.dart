@@ -663,7 +663,9 @@ class DesktopShellPane extends StatelessWidget {
     final Color fill = backgroundColor ?? scheme.surfaceContainerLowest;
     final BorderRadius radius =
         borderRadius ??
-        BorderRadius.circular(DesktopShellMetrics.paneCornerRadius);
+        const BorderRadius.all(
+          Radius.circular(DesktopShellMetrics.paneCornerRadius),
+        );
 
     return DecoratedBox(
       decoration: BoxDecoration(color: fill, borderRadius: radius),

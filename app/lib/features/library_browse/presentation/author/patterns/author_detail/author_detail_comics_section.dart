@@ -76,7 +76,7 @@ class _AuthorComicCoverCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final BorderRadius radius = BorderRadius.circular(12);
+    final BorderRadius radius = const BorderRadius.all(Radius.circular(12));
     return Tooltip(
       message: comic.title,
       waitDuration: const Duration(milliseconds: 600),

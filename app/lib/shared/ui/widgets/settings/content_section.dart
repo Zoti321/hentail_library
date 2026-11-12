@@ -40,7 +40,7 @@ class ContentSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+          padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
           child: SettingsSectionHeader(
             title: Text(title),
             description: description == null ? null : Text(description!),

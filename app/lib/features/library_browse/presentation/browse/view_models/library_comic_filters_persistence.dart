@@ -78,7 +78,7 @@ LibraryComicSortOption _decodeComicSortOption(String? raw) {
     return kLibraryDefaultSortOption;
   }
   final LibraryComicSortField? field = LibraryComicSortField.values
-      .asNameMap()[parts[0]];
+      .asNameMap()[parts.first];
   if (field == null) {
     return kLibraryDefaultSortOption;
   }

@@ -34,7 +34,7 @@ class ListDetailNavItem extends StatelessWidget {
       color: selected ? scheme.secondaryContainer : Colors.transparent,
       elevation: 0,
       shadowColor: Colors.transparent,
-      borderRadius: BorderRadius.circular(28),
+      borderRadius: const BorderRadius.all(Radius.circular(28)),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,

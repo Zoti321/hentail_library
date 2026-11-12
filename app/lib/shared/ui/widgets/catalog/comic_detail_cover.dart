@@ -18,8 +18,8 @@ class AppComicDetailCover extends StatelessWidget {
         width ?? ComicDetailPageMetrics.coverWidth(windowSizeClassOf(context));
     final double height =
         resolvedWidth / ComicDetailPageMetrics.coverAspectRatio;
-    final BorderRadius radius = BorderRadius.circular(
-      ComicDetailPageMetrics.coverCornerRadius,
+    final BorderRadius radius = const BorderRadius.all(
+      Radius.circular(ComicDetailPageMetrics.coverCornerRadius),
     );
 
     // 与卡片 letterbox token 一致，避免 Hero 落地时底色跳变。

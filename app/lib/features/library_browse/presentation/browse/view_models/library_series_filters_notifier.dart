@@ -76,7 +76,7 @@ LibrarySeriesSortOption decodeLibrarySeriesSortOption(String? raw) {
   if (parts.length != 2) {
     return kLibraryDefaultSeriesSortOption;
   }
-  final String fieldName = parts[0] == 'title' ? 'name' : parts[0];
+  final String fieldName = parts.first == 'title' ? 'name' : parts.first;
   final LibrarySeriesSortField? field = LibrarySeriesSortField.values
       .asNameMap()[fieldName];
   if (field == null) {

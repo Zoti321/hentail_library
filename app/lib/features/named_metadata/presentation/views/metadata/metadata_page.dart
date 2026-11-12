@@ -152,7 +152,7 @@ class _MetadataManagementPageState
     final bool showInlineCreate =
         !useMobileCreateDialog && _showInlineCreateField;
 
-    final Widget body = Stack(
+    return Stack(
       children: <Widget>[
         CustomScrollView(
           controller: _scrollController,
@@ -183,7 +183,6 @@ class _MetadataManagementPageState
               sliver: SliverToBoxAdapter(
                 child: ManagementCatalogToolbar(
                   facet: kind,
-                  // 始终为维度总数；过滤命中数改挂搜索行右侧。
                   facetCount: totalCount,
                   onFacetChanged: (ManagedNamedFacetKind value) =>
                       _handleTabSelected(
@@ -203,7 +202,6 @@ class _MetadataManagementPageState
                     ? context.l10n.filterResultCount(itemCount)
                     : null,
                 onChanged: (String value) {
-                  // 清空立即生效（clear 按钮不经 debounce）；输入仍防抖。
                   if (value.trim().isEmpty) {
                     unawaited(viewModel.setQuery(''));
                     return;
@@ -250,8 +248,6 @@ class _MetadataManagementPageState
         ),
       ],
     );
-
-    return body;
   }
 
   void _handleTabSelected(int index) {

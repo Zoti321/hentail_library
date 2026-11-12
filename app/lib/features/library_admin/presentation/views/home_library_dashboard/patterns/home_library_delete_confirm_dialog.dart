@@ -102,7 +102,7 @@ class _HomeLibraryDeleteConfirmBody extends StatelessWidget {
         Text(l10n.homeLibraryDeleteConfirmBody, style: descriptionStyle),
         SizedBox(height: spacing.md),
         InkWell(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: const BorderRadius.all(Radius.circular(12)),
           onTap: toggleAcknowledgement,
           child: Row(
             children: <Widget>[

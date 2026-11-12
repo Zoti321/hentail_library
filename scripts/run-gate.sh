@@ -17,6 +17,7 @@ usage() {
   rust-test       cargo test（core/ workspace）
   codegen-drift   FRB generate + build_runner，随后检查 git 工作区无漂移
   dart-static     dart format --set-exit-if-changed + flutter analyze
+  dart-lint       dart_code_linter 规则门禁（app/lib，硬失败）
   dart-test       cargo build hentai_flutter（FRB 线缝用）+ flutter test ← app/test/gate/manifest.txt
   all             以上全部
 
@@ -79,6 +80,18 @@ run_dart_static() {
   )
 }
 
+run_dart_lint() {
+  echo "==> gate-dart-lint"
+  # 规则集与棘轮见 app/analysis_options.yaml -> dart_code_linter。
+  # 任何级别（style / performance / warning / error）都硬失败。
+  (cd "$APP_DIR" &&
+    dart run dart_code_linter:metrics analyze lib \
+      --no-congratulate \
+      --fatal-style \
+      --fatal-performance \
+      --exclude="{/**.g.dart,/**.freezed.dart,/**/src/rust/**}")
+}
+
 run_dart_test() {
   echo "==> gate-dart-test"
   local entries=()
@@ -97,12 +110,14 @@ run_step() {
     rust-test) run_rust_test ;;
     codegen-drift) run_codegen_drift ;;
     dart-static) run_dart_static ;;
+    dart-lint) run_dart_lint ;;
     dart-test) run_dart_test ;;
     all)
       run_rust_lint
       run_rust_test
       run_codegen_drift
       run_dart_static
+      run_dart_lint
       run_dart_test
       ;;
     -h | --help)

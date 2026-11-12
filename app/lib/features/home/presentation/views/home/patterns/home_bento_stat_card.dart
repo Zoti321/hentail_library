@@ -53,7 +53,7 @@ class _HomeBentoStatCardState extends State<HomeBentoStatCard> {
   bool _pressed = false;
 
   BorderRadius get _motionRadius => _pressed
-      ? BorderRadius.circular(kTonalSurfaceRadius)
+      ? const BorderRadius.all(Radius.circular(kTonalSurfaceRadius))
       : widget.borderRadius;
 
   @override

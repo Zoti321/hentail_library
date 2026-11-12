@@ -53,8 +53,8 @@ class SettingsMasterMenu extends StatelessWidget {
       behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
       child: ListView(
         padding: wide
-            ? const EdgeInsets.fromLTRB(4, 0, 0, 12)
-            : const EdgeInsets.fromLTRB(0, 8, 0, 24),
+            ? const EdgeInsets.only(left: 4, bottom: 12)
+            : const EdgeInsets.only(top: 8, bottom: 24),
         children: <Widget>[
           if (wide)
             for (final entry in groups) ...<Widget>[

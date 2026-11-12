@@ -114,7 +114,7 @@ class _PaginationSelectionStripState extends State<_PaginationSelectionStrip> {
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   color: scheme.primaryContainer,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: const BorderRadius.all(Radius.circular(8)),
                 ),
               ),
             ),

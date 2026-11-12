@@ -47,7 +47,7 @@ class TrashListItem extends StatelessWidget {
     );
 
     final Widget cover = ClipRRect(
-      borderRadius: BorderRadius.circular(kComicCardRadius),
+      borderRadius: const BorderRadius.all(Radius.circular(kComicCardRadius)),
       child: SizedBox(
         width: kComicListItemCoverWidth,
         height: kComicListItemCoverHeight,

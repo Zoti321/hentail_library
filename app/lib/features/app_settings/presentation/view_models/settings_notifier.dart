@@ -20,11 +20,9 @@ class SettingsNotifier extends _$SettingsNotifier {
     try {
       await ref.read(appSettingRepositoryProvider).save(newSetting);
     } catch (error, stackTrace) {
-      if (rollback != null) {
-        state = AsyncData<AppSetting>(rollback);
-      } else {
-        state = AsyncError<AppSetting>(error, stackTrace);
-      }
+      state = rollback != null
+          ? AsyncData<AppSetting>(rollback)
+          : AsyncError<AppSetting>(error, stackTrace);
     }
   }
 

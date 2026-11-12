@@ -29,8 +29,11 @@ abstract final class HomePageMetrics {
       };
     }
     return switch (sizeClass) {
-      WindowSizeClass.compact => const EdgeInsets.fromLTRB(20, 16, 20, 16),
-      _ => const EdgeInsets.fromLTRB(22, 18, 22, 18),
+      WindowSizeClass.compact => const EdgeInsets.symmetric(
+        horizontal: 20,
+        vertical: 16,
+      ),
+      _ => const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
     };
   }
 

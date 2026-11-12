@@ -157,17 +157,15 @@ extension LibraryFormOps on LibraryForm {
     }
 
     final LocalLibrary created;
-    if (ready.isRemote) {
-      created = await repository.createRemote(
-        rootUrl: ready.rootPath,
-        username: ready.username,
-        password: ready.password,
-        allowHttp: ready.allowHttp,
-        name: ready.name,
-      );
-    } else {
-      created = await repository.createLocal(ready.rootPath, name: ready.name);
-    }
+    created = ready.isRemote
+        ? await repository.createRemote(
+            rootUrl: ready.rootPath,
+            username: ready.username,
+            password: ready.password,
+            allowHttp: ready.allowHttp,
+            name: ready.name,
+          )
+        : await repository.createLocal(ready.rootPath, name: ready.name);
 
     await _writeSettingsIfNeeded(repository, created, ready);
     return const LibraryFormApplySucceeded();

@@ -46,7 +46,9 @@ class ComicCatalogCardShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
-    final BorderRadius radius = BorderRadius.circular(kComicCardRadius);
+    final BorderRadius radius = const BorderRadius.all(
+      Radius.circular(kComicCardRadius),
+    );
 
     // 遮罩层常驻于树中，使 0 ↔ 非 0 的变化能走弹簧补间（而不是重新挂载直接出现）。
     // 圆角由 M3ECard 的 clipBehavior 统一裁剪。

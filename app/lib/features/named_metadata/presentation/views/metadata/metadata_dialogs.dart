@@ -61,7 +61,7 @@ class _MergeConfirmDialogState extends State<_MergeConfirmDialog> {
             ),
           ),
           InkWell(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: const BorderRadius.all(Radius.circular(12)),
             onTap: () => _setSkip(!_skip),
             child: Row(
               children: <Widget>[

@@ -29,9 +29,9 @@ class ShellLibraryPickerRow extends StatelessWidget {
         cursor: ShellNavigationCursor.interactive,
         child: Material(
           color: selected ? scheme.secondaryContainer : Colors.transparent,
-          borderRadius: BorderRadius.circular(28),
+          borderRadius: const BorderRadius.all(Radius.circular(28)),
           child: InkWell(
-            borderRadius: BorderRadius.circular(28),
+            borderRadius: const BorderRadius.all(Radius.circular(28)),
             onTap: onTap,
             child: Padding(
               padding: EdgeInsets.symmetric(

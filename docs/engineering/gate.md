@@ -4,14 +4,15 @@
 
 **Wayfinder `lib/` 顶层目录**（Phase A/B）：`core/`、`design-system/`、`features/`、`shared/`、`src/`；由 `app/test/gate/lib_layout_scan_helpers.dart` · `project_layout_test.dart` 断言。`design-system/**` 归类为 `shared`（ADR-0044），因此**继承** R13 且受独立出边白名单约束。产品 feature 之间 **仅允许** import `features/<owner>/public/**` 或 `features/<owner>/public.dart`（M1）；`shared/**` **禁止** import feature public（R11），且 **不得** import `features/**`（R13，ratchet：`shared/di`、`shared/domain`、`core/**` 等既有边只许减不许增）。
 
-**工具链**：CI 固定 **Flutter 3.47.8**（`gate.yml` → `FLUTTER_VERSION`）。本地请用同 major/minor 的 stable；`flutter analyze` 在 GitHub Actions（`CI=true`）下会将 info 级 lint 也计为失败。`riverpod_lint` 为可选 dev 依赖（不依赖 `custom_lint`）；**Gate 的 `flutter analyze` 暂未挂 `plugins: riverpod_lint`**，避免未偿还的 Riverpod 风格债挡合并。本地可在 `analysis_options.yaml` 临时启用做增量清理。SDK 升级记录见 `docs/engineering/flutter-3.47-migration.md`。
+**工具链**：CI 固定 **Flutter 3.47.8**（`gate.yml` → `FLUTTER_VERSION`）。本地请用同 major/minor 的 stable；`flutter analyze` 在 GitHub Actions（`CI=true`）下会将 info 级 lint 也计为失败。Dart 侧另设 **`dart_code_linter`** 硬门禁（`gate-dart-lint`，见下文 DCL 节）。`riverpod_lint` 为可选 dev 依赖（不依赖 `custom_lint`）；**Gate 的 `flutter analyze` 暂未挂 `plugins: riverpod_lint`**，避免未偿还的 Riverpod 风格债挡合并。本地可在 `analysis_options.yaml` 临时启用做增量清理。SDK 升级记录见 `docs/engineering/flutter-3.47-migration.md`。
 
 ## 命令
 
 | 场景 | 命令 |
 |------|------|
 | PR 硬门禁（全量） | `./scripts/run-gate.sh` |
-| 子集 | `./scripts/run-gate.sh rust-test dart-static dart-test` |
+| 子集 | `./scripts/run-gate.sh rust-test dart-static dart-lint dart-test` |
+| DCL 规则门禁 | `./scripts/run-gate.sh dart-lint`（见下节） |
 | 合并前 UI 怀疑回归 | 再跑 `cd app && flutter test`（含慢轨，**不进 Gate**） |
 | Import 边界 | `cd app && flutter test test/gate/import_boundary_test.dart` |
 | DI token 覆盖 | `cd app && flutter test test/gate/shared_di_override_coverage_test.dart`（`shared/di` 声明 ⊆ override，漏注入即红） |
@@ -24,6 +25,43 @@
 | Dart 测试盘存（inventory + rubric） | `python scripts/audit_dart_tests.py`（可选 `--summary-json` / `--json`；见下节） |
 
 `codegen-drift` 会就地重生成；跑前请先提交或 stash。
+
+## dart_code_linter（DCL）
+
+`app/` 的 `dev_dependencies` 引入 **`dart_code_linter` ^4.4.5**（`gate-dart-lint` job → `run-gate.sh dart-lint`），只扫 `app/lib`：
+
+```sh
+cd app && dart run dart_code_linter:metrics analyze lib \
+  --no-congratulate --fatal-style --fatal-performance \
+  --exclude="{/**.g.dart,/**.freezed.dart,/**/src/rust/**}"
+```
+
+- **任一严重级（style / performance / warning / error）都硬失败**，没有 baseline：改一个文件就删一行豁免（见下）。
+- 规则集、`rules-exclude` 棘轮表都在 `app/analysis_options.yaml` → `dart_code_linter`。
+- **不要加顶层 `plugins: dart_code_linter`**：`flutter analyze` 在 `CI=true` 下会把这些诊断算 fatal，等同双份门禁且无法按文件棘轮。
+- 规则与 `flutter_lints` / `dart format` 不重叠：DCL 只管 **Flutter 组件规范**（一文件一 Widget、抽回调、不返回 Widget）、反模式与 Dart 结构问题。
+- DCL 4.4.5 实现的规则是其 `presets/*.yaml` 的**子集**（约 87 条）；未实现的名字会以 `unknown-config` 警告出现，加规则前先用 `dart run dart_code_linter:metrics analyze lib -c` 验证。
+
+### 当前状态（2026-11-12）
+
+| 项 | 数量 | 说明 |
+|----|------|------|
+| 启用规则 | 31 | 存量违规为 0 的规则 + 已清理的规则 |
+| 组件规则 | 3 | `prefer-single-widget-per-file`、`prefer-extracting-callbacks`、`avoid-returning-widgets` |
+| `rules-exclude` 棘轮 | 129 | 仍违反上述三条组件规则的历史文件（**只许删，不许加**） |
+| 存量清理 | 41 文件 | `metrics fix` + `dart format` 修掉 `prefer-const-border-radius`、`prefer-correct-edge-insets-constructor`、`prefer-first` 等 |
+
+### 未启用（存量债，清理后再加）
+
+按 2026-11-12 实测违规数排序（`lib/`）：`prefer-dot-shorthands` 1953、`format-comment` 1562、`member-ordering` 1163、`newline-before-return` 1028、`prefer-static-class` 993、`arguments-ordering` 783、`no-magic-number` 525、`avoid-non-ascii-symbols` 361（与中文注释冲突，**不要启用**）、`prefer-moving-to-variable` 279、`avoid-ignoring-return-values` 244、`prefer-match-file-name` 202、`avoid-non-null-assertion` 174、`no-equal-arguments` 151、`prefer-correct-identifier-length` 115、`avoid-late-keyword` 73、`no-empty-block` 37、`avoid-nested-conditional-expressions` 34、`prefer-iterable-of` 34、`prefer-named-record-fields` 28、`avoid-passing-async-when-sync-expected` 26、`prefer-trailing-comma` 24（与 `dart format` 冲突）、`avoid-substring` 20、`avoid-unused-parameters` 19、`no-object-declaration` 16、`avoid-redundant-async` 12、`avoid-throw-in-catch-block` 11、`avoid-dynamic` 6、`avoid-non-exhaustive-switch-on-sealed-classes` 5、`avoid-unnecessary-setstate` 4、`prefer-async-await` 3、`use-setstate-synchronously` 2、`avoid-global-state` 2、`avoid-missing-enum-constant-in-map` 1、`prefer-correct-type-name` 1。
+
+**指标（metrics）暂不进门禁**：`maintainability-index` 320、`number-of-parameters` 89、`maximum-nesting-level` 15、`cyclomatic-complexity` 10 处超阈，无 baseline 机制，清偿前保持关闭。
+
+### 棘轮维护
+
+1. 修好一个豁免文件 → 删 `rules-exclude` 对应行；`dart-lint` 变红则说明还有残留。
+2. 新增规则 → 先本地跑通全绿（`dart-lint`），再单独提交。
+3. 新增文件**不要**随手加豁免；`rules-exclude` 只减不增。
 
 ## 三层缝（测什么）
 

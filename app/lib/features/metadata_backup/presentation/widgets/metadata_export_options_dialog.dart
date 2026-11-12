@@ -130,7 +130,7 @@ class _ExportSwitchRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: const BorderRadius.all(Radius.circular(12)),
       onTap: () => onChanged(!value),
       child: Padding(
         padding: EdgeInsets.symmetric(vertical: spacing.xs),

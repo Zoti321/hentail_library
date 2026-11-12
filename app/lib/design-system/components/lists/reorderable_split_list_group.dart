@@ -246,7 +246,7 @@ class _ReorderableSplitListGroupState extends State<ReorderableSplitListGroup>
         if (i != from) i,
     ]..insert(to, from);
     final List<double> tops = List<double>.filled(widget.itemCount, 0);
-    double cursor = _slotOrigins.isEmpty ? 0 : _slotOrigins[0].dy;
+    double cursor = _slotOrigins.isEmpty ? 0 : _slotOrigins.first.dy;
     for (final int index in order) {
       tops[index] = cursor;
       cursor += _slotHeights[index] + kSplitListRowGap;
@@ -516,7 +516,7 @@ class _ReorderableSplitListGroupState extends State<ReorderableSplitListGroup>
       child: fill,
       builder: (BuildContext context, Widget? child) {
         return Positioned(
-          left: _slotOrigins[0].dx,
+          left: _slotOrigins.first.dx,
           top: _placeholder.value,
           width: _dragSize.width,
           height: _dragSize.height,

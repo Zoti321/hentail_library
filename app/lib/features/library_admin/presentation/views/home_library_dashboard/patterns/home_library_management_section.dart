@@ -191,7 +191,7 @@ class HomeLibraryDashboardTile extends StatelessWidget {
           children: <Widget>[
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 0, 12),
+                padding: const EdgeInsets.only(left: 16, top: 12, bottom: 12),
                 // 内容区点击穿透到底层点按层；只有「更多」参与命中。
                 child: IgnorePointer(child: _HomeLibraryRowContent(row: row)),
               ),

@@ -60,7 +60,7 @@ class PaginationPageButton extends StatelessWidget {
             child: EffectsDecoratedBox(
               decoration: BoxDecoration(
                 color: fill,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: const BorderRadius.all(Radius.circular(8)),
               ),
               child: SizedBox(
                 width: PaginationMetrics.pageButtonVisualSize,

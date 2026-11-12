@@ -55,7 +55,7 @@ class NamedFacetManagementState {
   bool get isEmpty => !isLoading && items.isEmpty;
   bool get isMergeMode => mergeTarget != null;
   int get mergeSelectionCount =>
-      mergeTarget == null ? 0 : 1 + mergeSources.length;
+      mergeTarget == null ? 0 : mergeSources.length + 1;
 
   NamedFacetManagementState copyWith({
     String? query,

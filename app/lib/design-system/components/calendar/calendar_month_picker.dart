@@ -364,7 +364,7 @@ Widget _navLabelWithState({
   final Color stateColor = theme.colorScheme.onSurface;
   return DecoratedBox(
     decoration: BoxDecoration(
-      borderRadius: borderRadius ?? BorderRadius.circular(8),
+      borderRadius: borderRadius ?? const BorderRadius.all(Radius.circular(8)),
       color: stateAlpha > 0 ? stateColor.withValues(alpha: stateAlpha) : null,
     ),
     child: child,
