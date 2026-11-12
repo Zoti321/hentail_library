@@ -1,5 +1,9 @@
 part of 'library_comic_filters_notifier.dart';
 
+/// 旧版单键年龄限制偏好（#308 迁移源）；已废弃，仅一次性迁移读取。
+const String kLegacyLibraryAgeRestrictionStorageKey =
+    'library_age_restriction_filter';
+
 /// 元数据（标签 / 作者）筛选在 SharedPreferences 中的三个键，成组使用。
 class _MetadataStorageKeys {
   const _MetadataStorageKeys({

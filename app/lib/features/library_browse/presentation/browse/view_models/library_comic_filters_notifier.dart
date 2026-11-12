@@ -167,10 +167,10 @@ Future<void> migrateLegacyLibraryComicGrouping(SharedPreferences prefs) async {
 Future<void> migrateLegacyLibraryAgeRestriction(SharedPreferences prefs) async {
   if (!prefs.containsKey(kLibraryComicsAgeRestrictionStorageKey) &&
       !prefs.containsKey(kLibrarySeriesAgeRestrictionStorageKey) &&
-      prefs.containsKey(LibraryAgeRestrictionFilter.storageKey)) {
+      prefs.containsKey(kLegacyLibraryAgeRestrictionStorageKey)) {
     final LibraryAgeRestrictionFilter legacy =
         LibraryAgeRestrictionFilter.fromStorage(
-          prefs.getString(LibraryAgeRestrictionFilter.storageKey),
+          prefs.getString(kLegacyLibraryAgeRestrictionStorageKey),
         );
     if (legacy != LibraryAgeRestrictionFilter.unrestricted) {
       await prefs.setString(
@@ -182,7 +182,7 @@ Future<void> migrateLegacyLibraryAgeRestriction(SharedPreferences prefs) async {
         legacy.name,
       );
     }
-    await prefs.remove(LibraryAgeRestrictionFilter.storageKey);
+    await prefs.remove(kLegacyLibraryAgeRestrictionStorageKey);
   }
 }
 

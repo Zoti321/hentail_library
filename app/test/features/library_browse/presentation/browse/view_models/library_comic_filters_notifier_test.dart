@@ -228,4 +228,70 @@ void main() {
     expect(state.parodyFilter.isActive, isFalse);
     expect(state.characterFilter.isActive, isFalse);
   });
+
+  group('migrateLegacyLibraryAgeRestriction', () {
+    Future<SharedPreferences> prefsWith(Map<String, Object> values) async {
+      SharedPreferences.setMockInitialValues(values);
+      return SharedPreferences.getInstance();
+    }
+
+    test('旧键存在、双键皆无：写入双键并删除旧键', () async {
+      final SharedPreferences prefs = await prefsWith(<String, Object>{
+        kLegacyLibraryAgeRestrictionStorageKey:
+            LibraryAgeRestrictionFilter.r18Only.name,
+      });
+
+      await migrateLegacyLibraryAgeRestriction(prefs);
+
+      expect(
+        prefs.getString(kLibraryComicsAgeRestrictionStorageKey),
+        LibraryAgeRestrictionFilter.r18Only.name,
+      );
+      expect(
+        prefs.getString(kLibrarySeriesAgeRestrictionStorageKey),
+        LibraryAgeRestrictionFilter.r18Only.name,
+      );
+      expect(
+        prefs.containsKey(kLegacyLibraryAgeRestrictionStorageKey),
+        isFalse,
+      );
+    });
+
+    test('双键已存在：不迁移、不覆盖、旧键保留', () async {
+      final SharedPreferences prefs = await prefsWith(<String, Object>{
+        kLegacyLibraryAgeRestrictionStorageKey:
+            LibraryAgeRestrictionFilter.r18Only.name,
+        kLibraryComicsAgeRestrictionStorageKey:
+            LibraryAgeRestrictionFilter.allAges.name,
+      });
+
+      await migrateLegacyLibraryAgeRestriction(prefs);
+
+      expect(
+        prefs.getString(kLibraryComicsAgeRestrictionStorageKey),
+        LibraryAgeRestrictionFilter.allAges.name,
+      );
+      expect(prefs.getString(kLibrarySeriesAgeRestrictionStorageKey), isNull);
+      expect(
+        prefs.getString(kLegacyLibraryAgeRestrictionStorageKey),
+        LibraryAgeRestrictionFilter.r18Only.name,
+      );
+    });
+
+    test('旧值为 unrestricted：不写双键，仅删除旧键', () async {
+      final SharedPreferences prefs = await prefsWith(<String, Object>{
+        kLegacyLibraryAgeRestrictionStorageKey:
+            LibraryAgeRestrictionFilter.unrestricted.name,
+      });
+
+      await migrateLegacyLibraryAgeRestriction(prefs);
+
+      expect(prefs.getString(kLibraryComicsAgeRestrictionStorageKey), isNull);
+      expect(prefs.getString(kLibrarySeriesAgeRestrictionStorageKey), isNull);
+      expect(
+        prefs.containsKey(kLegacyLibraryAgeRestrictionStorageKey),
+        isFalse,
+      );
+    });
+  });
 }
