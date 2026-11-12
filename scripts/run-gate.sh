@@ -48,7 +48,6 @@ run_codegen_drift() {
     cd "$APP_DIR"
     flutter_rust_bridge_codegen generate
     dart run build_runner build --delete-conflicting-outputs
-    bash "$REPO_ROOT/scripts/patch-freezed-dart313.sh"
     # FRB 生成末尾的 `dart format` 是 warn_only（失败只 warning），失败时
     # frb_generated.dart 会以未格式化模板落盘并造成假漂移；这里显式兜底。
     dart format lib/src/rust >/dev/null

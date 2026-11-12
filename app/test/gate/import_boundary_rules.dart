@@ -5,8 +5,6 @@ import 'package:path/path.dart' as p;
 import 'lib_layout_scan_helpers.dart';
 
 /// Feature / module ids for import-boundary Gate (#220).
-///
-/// Keep in sync with `scripts/research/cross_feature_import_audit.py` (`classify`).
 const Set<String> kImportBoundaryModules = <String>{
   'bootstrap',
   'home',
