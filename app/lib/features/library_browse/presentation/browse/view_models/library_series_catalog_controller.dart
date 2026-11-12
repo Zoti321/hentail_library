@@ -12,7 +12,6 @@ import 'package:hentai_library/features/library_browse/presentation/browse/view_
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_tab_filter_sort_providers.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_tab_page_size_providers.dart';
 import 'package:hentai_library/shared/domain/catalog/pagination/catalog_pagination_engine.dart';
-import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:hentai_library/features/series/public.dart';

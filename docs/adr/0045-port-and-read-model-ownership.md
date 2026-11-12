@@ -60,8 +60,13 @@ Accepted（2026-11-11，#503）
 | `ComicTrashCommandPort` + token | comic 消费 / comic_trash 实现（互引成环） | public 环 |
 | `RemoteLibraryCredentialsPort` + token | library_admin / comic / reader 三方，无单一生产者 | 无单一 owner |
 | `ComicReadLookupPort` + token | reader 消费 / comic 实现（reader ↛ comic 为禁止边） | 禁止边 |
-| `metadata_refresh_types.dart` | `shared/ui` 元数据刷新 toast（series 与 library_admin 双消费） | shared 消费方 |
+| `metadata_refresh_types.dart` | ~~`shared/ui` 元数据刷新 toast（series 与 library_admin 双消费）~~ | **2026-11-12 已消除**：真源迁 `library_admin/domain/`，toast 迁 `library_admin/public/ui/metadata_refresh_toasts.dart`，`shared` 不再消费 |
+| `library/library_age_restriction_filter.dart` | comic / series / home / library_browse 四方 | 禁止边（`comic ↛ library_browse`、`series ↛ library_browse`）+ `library_admin → home` 已存在（迁 admin 会成环）；跨 Tab 壳词汇，无单一可达 owner |
+| `library/library_revision_state.dart` + token | —（原 admin 生产者 + 6 模块只读） | **2026-11-12 已归位** `library_admin/domain/` 与 `library_admin/public/di/` |
+| `library/library_media_type_filter.dart` | —（仅 library_browse） | **2026-11-12 已归位** `library_browse/domain/browse/`（筛选态，与同目录其它 browse filter 同址） |
 | `appNavigatorProvider`、`domainEventBusProvider` / `domainEventRevisions` | 全局 | 基础设施 |
+
+> **实现修订（2026-11-12，`shared/domain/library/` 收敛 P0–P2）**：`library_media_type_filter.dart` → `library_browse/domain/browse/`（筛选态，零新边）；`library_revision_state.dart` + `libraryRevisionStateProvider` → `library_admin/domain/` 与 `library_admin/public/di/`（token 与类型同址）；`metadata_refresh_types.dart` 真源 → `library_admin/domain/`，`metadata_refresh_toasts.dart` → `library_admin/public/ui/`（消除 `shared/ui → admin` 唯一 R13 边）。`shared/domain/library/` 由 7 文件降为 4 文件（`library_age_restriction_filter` / `library_scan_mode` / `scan_interval` / `comic_detail_return_series_port`：前两者为已登记豁免，后两者待 P4 与本模块 Port / `LocalLibrary` 联动迁移）。
 
 ### 5. 实现修订（2026-11-11，P3m 收口；2026-11-12 由 ADR-0046 收口）
 

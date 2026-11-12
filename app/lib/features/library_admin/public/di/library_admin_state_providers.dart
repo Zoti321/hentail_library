@@ -5,6 +5,7 @@ import 'package:hentai_library/features/library_admin/domain/libraries_state.dar
 import 'package:hentai_library/features/library_admin/domain/library_metadata_refresh_command_port.dart';
 import 'package:hentai_library/features/library_admin/domain/library_repository.dart';
 import 'package:hentai_library/features/library_admin/domain/library_scan_activity_state.dart';
+import 'package:hentai_library/features/library_admin/domain/library_revision_state.dart';
 import 'package:hentai_library/features/library_admin/domain/library_scan_command_port.dart';
 import 'package:hentai_library/shared/di/injected_di.dart';
 
@@ -15,6 +16,11 @@ import 'package:hentai_library/shared/di/injected_di.dart';
 
 final Provider<AsyncValue<LibrariesState>> librariesStateProvider = injectedDi(
   'librariesStateProvider',
+);
+
+/// Catalog 刷新计数投影（生产者 owner，ADR-0045；原 @ `shared/di`）。
+final Provider<LibraryRevisionState> libraryRevisionStateProvider = injectedDi(
+  'libraryRevisionStateProvider',
 );
 
 final Provider<LibraryScanActivityState> libraryScanActivityStateProvider =

@@ -4,7 +4,6 @@ import 'package:hentai_library/shared/domain/ports/library_reorder_mode_port.dar
 import 'package:hentai_library/shared/di/injected_di.dart';
 import 'package:hentai_library/shared/domain/library/comic_detail_return_series_port.dart';
 import 'package:hentai_library/shared/domain/library/library_age_restriction_filter.dart';
-import 'package:hentai_library/shared/domain/library/library_revision_state.dart';
 
 /// 跨 feature 共享的库状态与端口 Provider 声明（#261a）。
 ///
@@ -28,10 +27,6 @@ libraryMetadataExportActionProvider = injectedDi(
 final Provider<ComicDetailReturnSeriesPort>
 comicDetailReturnSeriesPortProvider = injectedDi(
   'comicDetailReturnSeriesPortProvider',
-);
-
-final Provider<LibraryRevisionState> libraryRevisionStateProvider = injectedDi(
-  'libraryRevisionStateProvider',
 );
 
 /// Catalog / Home 应对 revision 降频的 busy 信号（原 `libraryRevisionThrottleBusyProvider`）。

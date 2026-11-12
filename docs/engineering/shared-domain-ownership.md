@@ -67,7 +67,7 @@ Feature 内代码应 **import owner `domain/`**（`library_browse` 内按 [`libr
 - `models/value_objects/page_request.dart`、`paged_result.dart`、`page_jump.dart`
 - 与 catalog 强绑定的 pick / meta VO：`models/value_objects/form/library_author_pick.dart`、`library_tag_pick.dart`、`comic_language.dart`；`library_form.dart` 已按生产者拥有归 `features/library_admin/domain/value_objects/`（#504）
 - `reading/series_reading_context.dart`（类型；读口 `SeriesReadingContextPort` @ shared/di，实现 @ series）
-- `library/scan_interval.dart`、`library/metadata_refresh_types.dart`（库扫描 / 元数据刷新类型；shared UI toast 与 `LocalLibrary` 共用——ADR-0045 shared 消费方豁免）；批量补丁类型已归 `features/library_admin/domain/`（#513）
+- `library/scan_interval.dart`（库扫描间隔；shared 侧仅 `LocalLibrary` 字段使用，待与 `LocalLibrary` 同批迁 `library_admin`）；`library/library_age_restriction_filter.dart`（跨 Tab 年龄限制词汇：comic / series 禁止边 + home 消费，无可达 owner——ADR-0045 可达性否决，**不是遗留**）；批量补丁类型已归 `features/library_admin/domain/`（#513）；`library/metadata_refresh_types.dart` 与 `library/library_revision_state.dart` 已于 2026-11-12 归 `library_admin`
 - `thumbnail/**`
 
 ## 契约仍定义在 `shared/domain`（未 owner 化）
@@ -81,7 +81,7 @@ UI / 编排命令类型；发现面经 owner `public/` re-export（ADR-0034）�
 - `ports/series_item_membership_port.dart`（ADR-0042）
 - `ports/series_item_sort_port.dart`（ADR-0042）
 - `ports/reader_launch_port.dart`（旧名 `read_session_launch_port`；ADR-0038）
-- `library/comic_detail_return_series_port.dart`（实现 @ `comic`）
+- `library/comic_detail_return_series_port.dart`（实现 @ `comic`；admin / reading_history 均调用，迁 comic 会与 `comic → library_admin` 成 public 环——留 shared）
 - `ports/reading_history_progress_port.dart`（禁止边豁免）
 - `ports/comic_read_lookup_port.dart`（reader ↛ comic 禁止边豁免；实现 @ comic 适配器）
 - `ports/library_reorder_mode_port.dart`（shared 消费方豁免：`shared/domain/catalog/selection/`）

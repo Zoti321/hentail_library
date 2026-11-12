@@ -80,7 +80,7 @@ test/features/library_admin/presentation/views/home_library_dashboard/home_libra
 test/features/library_admin/presentation/views/home_library_dashboard/home_library_list_order_test.dart
 test/features/library_admin/presentation/view_models/library_revision_throttle_busy_test.dart
 test/features/library_admin/presentation/view_models/library_scan_toasts_test.dart
-test/features/library_admin/presentation/view_models/metadata_refresh_toasts_test.dart
+test/features/library_admin/public/ui/metadata_refresh_toasts_test.dart
 test/features/library_admin/domain/library_scan_domain_service_test.dart
 test/features/library_admin/domain/library_sidebar_layout_test.dart
 test/features/library_admin/domain/resource_format_category_setting_test.dart
