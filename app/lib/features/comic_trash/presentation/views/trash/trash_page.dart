@@ -227,83 +227,81 @@ class _TrashHeader extends ConsumerWidget {
       menuSemanticLabel: l10n.shellOpenNavMenu,
       trailing: <Widget>[
         if (hasSelection)
-            Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: Text(
-                l10n.trashSelectedCount(selectedCount),
-                style: Theme.of(context).textTheme.bodyMedium
-                    ?.copyWith(color: scheme.onSurfaceVariant),
-              ),
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: Text(
+              l10n.trashSelectedCount(selectedCount),
+              style: Theme.of(context).textTheme.bodyMedium
+                  ?.copyWith(color: scheme.onSurfaceVariant),
             ),
-          M3EIconButton(
-            icon: Icon(
-              Symbols.restore,
-              size: LibraryPageHeaderMetrics.actionIconSize,
-              color: scheme.onSurfaceVariant,
-            ),
-            variant: M3EIconButtonVariant.standard,
-            size: M3EIconButtonSize.sm,
-            tooltip: hasSelection
-                ? l10n.trashRestoreSelected
-                : l10n.trashRestoreAll,
-            semanticLabel: hasSelection
-                ? l10n.trashRestoreSelected
-                : l10n.trashRestoreAll,
-            onPressed: hasItems
-                ? hasSelection
-                      ? () {
-                          final TrashPageState? state = readState();
-                          if (state == null) {
-                            return;
-                          }
-                          restoreTrashedComics(
-                            context,
-                            ref,
-                            state.selectedItems
-                                .map((TrashedComic item) => item.comic.comicId)
-                                .toList(),
-                          );
-                        }
-                      : () => restoreAllTrashedComics(context, ref)
-                : null,
           ),
-          const SizedBox(width: 4),
-          M3EIconButton(
-            icon: Icon(
-              Symbols.delete_forever,
-              size: LibraryPageHeaderMetrics.actionIconSize,
-              color: hasItems ? scheme.error : scheme.onSurfaceVariant,
-            ),
-            variant: M3EIconButtonVariant.standard,
-            size: M3EIconButtonSize.sm,
-            tooltip: hasSelection
-                ? l10n.trashPurgeSelected
-                : l10n.trashPurgeAll,
-            semanticLabel: hasSelection
-                ? l10n.trashPurgeSelected
-                : l10n.trashPurgeAll,
-            onPressed: hasItems
-                ? hasSelection
-                      ? () {
-                          final TrashPageState? state = readState();
-                          if (state == null) {
-                            return;
-                          }
-                          purgeTrashedComics(context, ref, state.selectedItems);
-                        }
-                      : () {
-                          final TrashPageState? state = readState();
-                          if (state == null) {
-                            return;
-                          }
-                          purgeAllTrashedComics(
-                            context,
-                            ref,
-                            state.allPurgeCounts,
-                          );
-                        }
-                : null,
+        M3EIconButton(
+          icon: Icon(
+            Symbols.restore,
+            size: LibraryPageHeaderMetrics.actionIconSize,
+            color: scheme.onSurfaceVariant,
           ),
+          variant: M3EIconButtonVariant.standard,
+          size: M3EIconButtonSize.sm,
+          tooltip: hasSelection
+              ? l10n.trashRestoreSelected
+              : l10n.trashRestoreAll,
+          semanticLabel: hasSelection
+              ? l10n.trashRestoreSelected
+              : l10n.trashRestoreAll,
+          onPressed: hasItems
+              ? hasSelection
+                    ? () {
+                        final TrashPageState? state = readState();
+                        if (state == null) {
+                          return;
+                        }
+                        restoreTrashedComics(
+                          context,
+                          ref,
+                          state.selectedItems
+                              .map((TrashedComic item) => item.comic.comicId)
+                              .toList(),
+                        );
+                      }
+                    : () => restoreAllTrashedComics(context, ref)
+              : null,
+        ),
+        const SizedBox(width: 4),
+        M3EIconButton(
+          icon: Icon(
+            Symbols.delete_forever,
+            size: LibraryPageHeaderMetrics.actionIconSize,
+            color: hasItems ? scheme.error : scheme.onSurfaceVariant,
+          ),
+          variant: M3EIconButtonVariant.standard,
+          size: M3EIconButtonSize.sm,
+          tooltip: hasSelection ? l10n.trashPurgeSelected : l10n.trashPurgeAll,
+          semanticLabel: hasSelection
+              ? l10n.trashPurgeSelected
+              : l10n.trashPurgeAll,
+          onPressed: hasItems
+              ? hasSelection
+                    ? () {
+                        final TrashPageState? state = readState();
+                        if (state == null) {
+                          return;
+                        }
+                        purgeTrashedComics(context, ref, state.selectedItems);
+                      }
+                    : () {
+                        final TrashPageState? state = readState();
+                        if (state == null) {
+                          return;
+                        }
+                        purgeAllTrashedComics(
+                          context,
+                          ref,
+                          state.allPurgeCounts,
+                        );
+                      }
+              : null,
+        ),
       ],
     );
   }

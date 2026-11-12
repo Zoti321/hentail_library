@@ -16,14 +16,13 @@ typedef ReaderViewportItemIndexForPage = int Function(int pageOneBased);
 /// PageView item 索引 → 该 item 的首个页（1-based）。
 typedef ReaderViewportPageForItemIndex = int Function(int itemIndex);
 
-typedef ReaderViewportItemBuilder =
-    Widget Function(
-      BuildContext context,
-      int itemIndex,
-      ReaderComicRef comic,
-      List<ReaderPageImageData> imageList,
-      double slotLogicalWidth,
-    );
+typedef ReaderViewportItemBuilder = Widget Function(
+  BuildContext context,
+  int itemIndex,
+  ReaderComicRef comic,
+  List<ReaderPageImageData> imageList,
+  double slotLogicalWidth,
+);
 
 /// 单页 / 双页视口共用的翻页 kernel。
 ///

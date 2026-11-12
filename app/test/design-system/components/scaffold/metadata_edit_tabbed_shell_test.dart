@@ -82,11 +82,7 @@ void main() {
   });
 
   testWidgets('向前切换时详情过渡标记为反向', (WidgetTester tester) async {
-    await _pumpShell(
-      tester,
-      size: const Size(1200, 900),
-      initialIndex: 2,
-    );
+    await _pumpShell(tester, size: const Size(1200, 900), initialIndex: 2);
 
     expect(
       tester

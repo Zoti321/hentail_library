@@ -26,7 +26,8 @@ class MetadataEditTabbedShell extends StatefulWidget {
   final ValueChanged<int> onSelected;
 
   @override
-  State<MetadataEditTabbedShell> createState() => _MetadataEditTabbedShellState();
+  State<MetadataEditTabbedShell> createState() =>
+      _MetadataEditTabbedShellState();
 }
 
 class _MetadataEditTabbedShellState extends State<MetadataEditTabbedShell> {

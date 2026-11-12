@@ -47,7 +47,10 @@ void main() {
 
   test('stats 缺项时该库漫画数回落 0，有统计的库取实际值', () {
     final List<HomeLibraryDashboardRow> rows = buildHomeLibraryDashboardRows(
-      libraries: <LocalLibrary>[_library(id: 'a'), _library(id: 'b')],
+      libraries: <LocalLibrary>[
+        _library(id: 'a'),
+        _library(id: 'b'),
+      ],
       stats: const <HomeLibraryStat>[
         HomeLibraryStat(libraryId: 'b', comicCount: 7, seriesCount: 3),
       ],
@@ -89,7 +92,10 @@ void main() {
 
   test('扫描中与元数据刷新进度只作用于匹配库', () {
     final List<HomeLibraryDashboardRow> rows = buildHomeLibraryDashboardRows(
-      libraries: <LocalLibrary>[_library(id: 'a'), _library(id: 'b')],
+      libraries: <LocalLibrary>[
+        _library(id: 'a'),
+        _library(id: 'b'),
+      ],
       stats: const <HomeLibraryStat>[],
       now: _now,
       scanInProgress: true,

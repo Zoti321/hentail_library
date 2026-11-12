@@ -24,9 +24,8 @@ const List<SmartFacetMatchCandidate> _candidates = <SmartFacetMatchCandidate>[
 
 List<Override> _overrides() {
   return <Override>[
-    authorsSmartForComicMetadataFormProvider(
-      _scope,
-    ).overrideWith((Ref ref) async => _candidates),
+    authorsSmartForComicMetadataFormProvider(_scope)
+        .overrideWith((Ref ref) async => _candidates),
   ];
 }
 

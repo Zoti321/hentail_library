@@ -93,11 +93,12 @@ class DualPageViewport extends HookConsumerWidget {
       initialItemIndex: initialSpread,
       preferredPageIndex: preferredPageIndex,
       itemCount: spreadCount,
-      itemIndexForPage: (int pageOneBased) => SpreadNavigation.spreadIndexForPage(
-        mode: activeMode,
-        totalPages: safeTotalPages,
-        pageIndex: pageOneBased,
-      ),
+      itemIndexForPage: (int pageOneBased) =>
+          SpreadNavigation.spreadIndexForPage(
+            mode: activeMode,
+            totalPages: safeTotalPages,
+            pageIndex: pageOneBased,
+          ),
       pageForItemIndex: (int itemIndex) =>
           SpreadNavigation.primaryPageForSpread(
             mode: activeMode,

@@ -57,17 +57,12 @@ class AuthorRepositoryImpl implements AuthorRepository {
   }
 
   @override
-  Future<void> deleteByNames(List<String> names) => namedFacets.deleteByNames(
-    ManagedNamedFacetKind.author,
-    names,
-  );
+  Future<void> deleteByNames(List<String> names) =>
+      namedFacets.deleteByNames(ManagedNamedFacetKind.author, names);
 
   @override
-  Future<void> rename(String oldName, String newName) => namedFacets.rename(
-    ManagedNamedFacetKind.author,
-    oldName,
-    newName,
-  );
+  Future<void> rename(String oldName, String newName) =>
+      namedFacets.rename(ManagedNamedFacetKind.author, oldName, newName);
 
   @override
   Future<AuthorDetail?> getDetail({

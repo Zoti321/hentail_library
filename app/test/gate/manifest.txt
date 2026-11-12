@@ -41,6 +41,10 @@ test/features/reader/presentation/reader_open_error_message_test.dart
 test/features/reader/presentation/views/reader
 test/features/library_admin/presentation/views/library/library_form_dialog_test.dart
 test/features/series/presentation/views/metadata_edit/series_metadata_edit_view_test.dart
+test/features/comic/presentation/views/widgets/form/library_facet_multi_select_field_test.dart
+test/features/home/presentation/views/home/patterns/home_bento_stat_card_test.dart
+test/features/library_admin/presentation/views/home_library_dashboard/home_library_dashboard_rows_test.dart
+test/shared/util/list_edit_test.dart
 
 # Dart hard-manifest UI — 纯逻辑 ViewModel / policy / codec
 test/design-system/motion/app_motion_test.dart

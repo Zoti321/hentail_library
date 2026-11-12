@@ -74,8 +74,7 @@ class _ComicMetadataEditFormState extends State<ComicMetadataEditForm> {
               (d) => d.copyWith(languages: listWithAdded(d.languages, v)),
             ),
             onLanguageRemoved: (String v) => _update(
-              (d) =>
-                  d.copyWith(languages: listWithRemoved(d.languages, v)),
+              (d) => d.copyWith(languages: listWithRemoved(d.languages, v)),
             ),
             onSortOrderChanged: (String v) =>
                 _update((d) => d.copyWith(seriesSortOrderText: v)),
@@ -279,8 +278,7 @@ class _AuthorsTagsFields extends ConsumerWidget {
           scope: scope,
           selectedNames: draft.tags,
           onAdd: (String v) => onTagsChanged(listWithAdded(draft.tags, v)),
-          onRemove: (String v) =>
-              onTagsChanged(listWithRemoved(draft.tags, v)),
+          onRemove: (String v) => onTagsChanged(listWithRemoved(draft.tags, v)),
           onClearAll: () => onTagsChanged(const <String>[]),
         ),
       ],

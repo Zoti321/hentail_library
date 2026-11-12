@@ -33,10 +33,7 @@ Future<void> _pumpBar(
 
 M3EButton _buttonWithLabel(WidgetTester tester, String label) {
   return tester.widget<M3EButton>(
-    find.ancestor(
-      of: find.text(label),
-      matching: find.byType(M3EButton),
-    ).first,
+    find.ancestor(of: find.text(label), matching: find.byType(M3EButton)).first,
   );
 }
 
