@@ -9,3 +9,12 @@ abstract final class LegacyLibraryPreferLibraryRootSeries {
 
   static bool fromStorage(bool? raw) => raw ?? defaultValue;
 }
+
+/// 旧版「智能匹配」独立 SharedPreferences 键（已并入 AppSetting，ADR-0046）。
+abstract final class LegacySmartFacetMatchPreference {
+  static const String storageKey = 'smart_facet_match_enabled';
+
+  static const bool defaultValue = true;
+
+  static bool fromStorage(bool? raw) => raw ?? defaultValue;
+}

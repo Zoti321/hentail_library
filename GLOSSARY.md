@@ -173,7 +173,9 @@ App preference：进入库浏览时默认打开的 Library display target（Comi
 _Avoid_: 默认库 Tab（口语可用；领域与 issue 用本词）、默认界面、homepage tab
 
 **App preference**:
-应用级偏好，跨所有 Library 生效；由设置页与阅读器设置对话框读写。包括主题、语言、阅读模式、Webtoon 参数、自动播放、桌面侧栏展开、应用更新偏好、Healthy mode、**Prefer library root series**（Series 浏览列表置顶库根系列，默认开启）、Smart facet match（Comic metadata form 候选排序，默认开启）、**Default library display target** 等。持久化在 Dart 侧（SharedPreferences）；不进入 Rust SQLite。与 Library browse preference、Library property 区分。
+应用级偏好，跨所有 Library 生效；由设置页与阅读器设置对话框读写。包括主题、语言、阅读模式、Webtoon 参数、自动播放、桌面侧栏展开、应用更新偏好、Healthy mode、**Prefer library root series**（Series 浏览列表置顶库根系列，默认开启）、**Smart facet match**（Comic metadata form 候选排序，默认开启；现为 `AppSetting.smartFacetMatchEnabled`，旧 SharedPreferences 键 `smart_facet_match_enabled` 在加载时单向迁移）、**Default library display target** 等。持久化在 Dart 侧（SharedPreferences）；不进入 Rust SQLite。与 Library browse preference、Library property 区分。
+
+**所有权（ADR-0046）**：偏好 **schema**（字段、`String` id 白名单、默认值、clamp）由 `app_settings` 拥有（`reading_preferences_schema.dart`）；阅读偏好的**语义**（`ReadingMode` / `WebtoonZoomMode` / `AutoPlayMode` 枚举与 `ReadingPreferences` 值对象）由 `reader` 拥有。两侧只经 `ReadingPreferencesRecord`（全原语匿名 record）通信：`reader` 侧 ACL `decode` 是全函数（未知 id 回退默认值并上报），`encode` 是穷尽 switch。写入只有一个入口 `readingPreferencesControllerProvider`（五个按字段写入的方法）。
 _Avoid_: 全局设置、settings.json（实现用语）、AppSetting DTO（实现用语）
 
 **Library browse preference**:

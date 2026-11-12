@@ -14,7 +14,6 @@ import 'package:hentai_library/features/metadata_backup/public.dart';
 import 'package:hentai_library/features/bootstrap/presentation/view_models/app_startup_coordinator_notifier.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/routing/app_router.dart';
 import 'package:riverpod/misc.dart' show Override;
-import 'package:hentai_library/shared/di/app_settings_providers.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key, this.overrides = const <Override>[]});
@@ -43,8 +42,25 @@ class _AppRootState extends ConsumerState<_AppRoot> {
     ref.watch(metadataAutoBackupCoordinatorProvider);
     ref.watch(appUpdateCoordinatorProvider);
 
-    final AppThemePreferencesPort themePrefs = ref.watch(
-      appThemePreferencesPortProvider,
+    // 主题偏好直接从 owner 设置态读取（原 AppThemePreferencesPort 是冗余层，ADR-0046）。
+    final ({
+      AppThemePreference themePreference,
+      AppColorSchemePreference colorSchemePreference,
+      bool useDynamicColor,
+      AppFontPreference fontPreference,
+    })
+    themePrefs = ref.watch(
+      appSettingsProvider.select((AsyncValue<AppSetting> async) {
+        final AppSetting? setting = async.asData?.value;
+        return (
+          themePreference:
+              setting?.themePreference ?? AppThemePreference.system,
+          colorSchemePreference:
+              setting?.colorSchemePreference ?? AppColorSchemePreference.brand,
+          useDynamicColor: setting?.useDynamicColor ?? false,
+          fontPreference: setting?.fontPreference ?? AppFontPreference.miSans,
+        );
+      }),
     );
     final ThemeMode themeMode = themeModeFromPreference(
       themePrefs.themePreference,

@@ -1,7 +1,1 @@
-[
-  "R13|shared|app_settings|shared/di/app_settings_providers.dart|package:hentai_library/features/app_settings/domain/app_theme_preferences_port.dart",
-  "R13|shared|app_settings|shared/di/app_settings_providers.dart|package:hentai_library/features/app_settings/domain/app_setting.dart",
-  "R13|shared|app_settings|shared/di/app_settings_providers.dart|package:hentai_library/features/app_settings/domain/reader_display_preferences_port.dart",
-  "R13|shared|app_settings|shared/di/app_settings_providers.dart|package:hentai_library/features/app_settings/domain/reader_settings_command_port.dart",
-  "R13|shared|app_settings|shared/di/data_providers.dart|package:hentai_library/features/app_settings/domain/app_setting_repository.dart"
-]
+[]

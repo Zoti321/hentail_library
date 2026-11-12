@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/bootstrap/di/adapters/comic_trash_reader_session_adapter.dart';
 import 'package:hentai_library/features/reader/public.dart';
-import 'package:hentai_library/features/app_settings/public.dart';
 import 'package:hentai_library/features/comic_trash/public.dart';
 import 'package:hentai_library/features/named_metadata/public.dart';
 import 'package:hentai_library/features/comic/public.dart';
@@ -53,9 +52,6 @@ List<Override> dataProviderOverrides() => <Override>[
   libraryRepoProvider.overrideWith((Ref ref) => createLibraryRepository()),
   readingHistoryRepoProvider.overrideWith(
     (Ref ref) => createReadingHistoryRepository(),
-  ),
-  appSettingRepoProvider.overrideWith(
-    (Ref ref) => createAppSettingRepository(),
   ),
   homePageRepoProvider.overrideWith((Ref ref) => createHomePageRepository()),
   nativeReaderPortProvider.overrideWith(createNativeReaderPort),

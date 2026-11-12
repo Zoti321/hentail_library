@@ -3,20 +3,22 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/features/reader/public/reading_preference_l10n.dart';
-import 'package:hentai_library/features/reader/presentation/patterns/reader/reader_adaptive_panel.dart';
-import 'package:hentai_library/shared/ui/widgets/settings/content_section.dart';
-import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
-import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
-import 'package:hentai_library/features/app_settings/domain/reader_settings_command_port.dart';
-import 'package:hentai_library/shared/di/app_settings_providers.dart';
+import 'package:hentai_library/features/app_settings/public/di/app_settings_providers.dart';
 import 'package:hentai_library/features/reader/domain/auto_play_interval.dart';
 import 'package:hentai_library/features/reader/domain/auto_play_mode.dart';
 import 'package:hentai_library/features/reader/domain/reading_mode.dart';
+import 'package:hentai_library/features/reader/domain/reading_preferences.dart';
+import 'package:hentai_library/features/reader/presentation/patterns/reader/reader_adaptive_panel.dart';
+import 'package:hentai_library/features/reader/public/reading_preference_l10n.dart';
+import 'package:hentai_library/features/reader/public/reading_preferences_acl.dart';
+import 'package:hentai_library/features/reader/public/reading_preferences_providers.dart';
+import 'package:hentai_library/shared/ui/widgets/settings/content_section.dart';
+import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-/// 阅读设置面板（MD3E，#393 第三批）：绑定真实应用设置，写入经 [ReaderSettingsCommandPort]。
+/// 阅读设置面板（MD3E，#393 第三批）：与设置页「阅读」分类共用唯一写入口
+/// [readingPreferencesControllerProvider]（ADR-0046）。
 abstract final class ReaderSettingsSheet {
   ReaderSettingsSheet._();
 
@@ -41,27 +43,23 @@ class _ReaderSettingsBody extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
-    final AppSetting? settings = ref
-        .watch(appSettingsStateProvider)
-        .asData
-        ?.value;
-    if (settings == null) {
-      return const SizedBox(
-        height: 120,
-        child: Center(child: CircularProgressIndicator()),
-      );
-    }
-
-    final ReaderSettingsCommandPort port = ref.read(
-      readerSettingsCommandPortProvider,
+    final ReadingPreferences prefs = ref.watch(readingPreferencesProvider);
+    final ReadingPreferencesController controller = ref.read(
+      readingPreferencesControllerProvider,
     );
-    final ReadingMode mode = settings.readingMode;
+
+    final ReadingMode mode = prefs.readingMode;
     final ReaderModeCategory category = mode.category;
     final PagedLayout pagedLayout = mode.pagedLayout ?? PagedLayout.single;
-    final int interval = settings.readerAutoPlayIntervalSeconds;
+    final int interval = prefs.autoPlayIntervalSeconds;
 
     void applyReadingMode(ReadingMode value) {
-      unawaited(port.setReadingMode(value));
+      unawaited(
+        controller.setReadingModeId(
+          ReadingPreferencesAcl.encode(prefs.copyWith(readingMode: value))
+              .readingModeId,
+        ),
+      );
     }
 
     return Column(
@@ -96,15 +94,21 @@ class _ReaderSettingsBody extends ConsumerWidget {
             SettingsNavigationTile(
               leading: Symbols.repeat,
               title: Text(l10n.readerSettingsAutoPlayMode),
-              value: Text(l10n.autoPlayModeLabel(settings.autoPlayMode)),
+              value: Text(l10n.autoPlayModeLabel(prefs.autoPlayMode)),
               onTap: () => _pickOption<AutoPlayMode>(
                 context,
                 title: l10n.readerSettingsAutoPlayMode,
                 options: AutoPlayMode.values,
-                current: settings.autoPlayMode,
+                current: prefs.autoPlayMode,
                 labelOf: l10n.autoPlayModeLabel,
                 onSelected: (AutoPlayMode value) {
-                  unawaited(port.setAutoPlayMode(value));
+                  unawaited(
+                    controller.setAutoPlayModeId(
+                      ReadingPreferencesAcl.encode(
+                        prefs.copyWith(autoPlayMode: value),
+                      ).autoPlayModeId,
+                    ),
+                  );
                 },
               ),
             ),
@@ -119,9 +123,7 @@ class _ReaderSettingsBody extends ConsumerWidget {
                     onPressed: interval <= kReaderAutoPlayIntervalMin
                         ? null
                         : () => unawaited(
-                            port.setReaderAutoPlayIntervalSeconds(
-                              clampReaderAutoPlayInterval(interval - 1),
-                            ),
+                            controller.setAutoPlayIntervalSeconds(interval - 1),
                           ),
                   ),
                   Text('$interval ${l10n.readerSettingsSecondsSuffix}'),
@@ -130,9 +132,7 @@ class _ReaderSettingsBody extends ConsumerWidget {
                     onPressed: interval >= kReaderAutoPlayIntervalMax
                         ? null
                         : () => unawaited(
-                            port.setReaderAutoPlayIntervalSeconds(
-                              clampReaderAutoPlayInterval(interval + 1),
-                            ),
+                            controller.setAutoPlayIntervalSeconds(interval + 1),
                           ),
                   ),
                 ],
@@ -166,33 +166,39 @@ class _ReaderSettingsBody extends ConsumerWidget {
             SettingsNavigationTile(
               leading: Symbols.width_normal,
               title: Text(l10n.readerSettingsHorizontalMargin),
-              enabled: settings.webtoonZoomMode == WebtoonZoomMode.fitWidth,
+              enabled: prefs.webtoonZoomMode == WebtoonZoomMode.fitWidth,
               value: Text(
-                l10n.readerWebtoonMarginLabel(settings.webtoonMarginPercent),
+                l10n.readerWebtoonMarginLabel(prefs.webtoonMarginPercent),
               ),
               onTap: () => _pickOption<int>(
                 context,
                 title: l10n.readerSettingsHorizontalMargin,
                 options: _kWebtoonMarginOptions,
-                current: settings.webtoonMarginPercent,
+                current: prefs.webtoonMarginPercent,
                 labelOf: l10n.readerWebtoonMarginLabel,
                 onSelected: (int value) {
-                  unawaited(port.setWebtoonMarginPercent(value));
+                  unawaited(controller.setWebtoonMarginPercent(value));
                 },
               ),
             ),
             SettingsNavigationTile(
               leading: Symbols.zoom_in,
               title: Text(l10n.readerSettingsZoomMode),
-              value: Text(l10n.webtoonZoomModeLabel(settings.webtoonZoomMode)),
+              value: Text(l10n.webtoonZoomModeLabel(prefs.webtoonZoomMode)),
               onTap: () => _pickOption<WebtoonZoomMode>(
                 context,
                 title: l10n.readerSettingsZoomMode,
                 options: WebtoonZoomMode.values,
-                current: settings.webtoonZoomMode,
+                current: prefs.webtoonZoomMode,
                 labelOf: l10n.webtoonZoomModeLabel,
                 onSelected: (WebtoonZoomMode value) {
-                  unawaited(port.setWebtoonZoomMode(value));
+                  unawaited(
+                    controller.setWebtoonZoomModeId(
+                      ReadingPreferencesAcl.encode(
+                        prefs.copyWith(webtoonZoomMode: value),
+                      ).webtoonZoomModeId,
+                    ),
+                  );
                 },
               ),
             ),

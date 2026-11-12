@@ -1,13 +1,20 @@
-/// 阅读器自动播放间隔（秒）的取值范围，设置存储与设置面板共用。
-const int kReaderAutoPlayIntervalMin = 1;
-const int kReaderAutoPlayIntervalMax = 60;
+import 'package:hentai_library/features/app_settings/public/reading_preferences_schema.dart';
 
-/// 默认间隔（秒）；与 [AppSetting.readerAutoPlayIntervalSeconds] 默认值对齐。
-const int kReaderAutoPlayIntervalDefault = 5;
+/// 阅读器自动播放间隔（秒）的取值范围。
+///
+/// 真源是持久化 schema（`app_settings`，ADR-0046）；此处只做本模块别名。
+const int kReaderAutoPlayIntervalMin =
+    ReadingPreferenceSchema.minAutoPlayIntervalSeconds;
+const int kReaderAutoPlayIntervalMax =
+    ReadingPreferenceSchema.maxAutoPlayIntervalSeconds;
+
+/// 默认间隔（秒）。
+const int kReaderAutoPlayIntervalDefault =
+    ReadingPreferenceSchema.defaultAutoPlayIntervalSeconds;
 
 /// 将间隔限制在 [kReaderAutoPlayIntervalMin, kReaderAutoPlayIntervalMax] 内。
 int clampReaderAutoPlayInterval(int seconds) =>
-    seconds.clamp(kReaderAutoPlayIntervalMin, kReaderAutoPlayIntervalMax);
+    ReadingPreferenceSchema.clampAutoPlayIntervalSeconds(seconds);
 
 /// 自动翻页开启时底栏 wavy slider 的波长（逻辑像素）。
 ///

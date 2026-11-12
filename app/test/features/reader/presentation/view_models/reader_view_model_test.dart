@@ -12,7 +12,6 @@ import 'package:hentai_library/features/reader/application/open_reader_args.dart
 import 'package:hentai_library/features/reader/domain/read_session_page.dart';
 import 'package:hentai_library/features/reader/domain/native_reader_port.dart';
 import 'package:hentai_library/features/reader/domain/opened_read_session.dart';
-import 'package:hentai_library/features/reader/domain/auto_play_mode.dart';
 import 'package:hentai_library/features/reader/domain/reading_mode.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/reader_auto_play_carry.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/reader_view_model.dart';
@@ -21,7 +20,6 @@ import 'package:hentai_library/features/reader/presentation/view_models/reader_s
 import 'package:hentai_library/features/reader/presentation/view_models/reader_navigation_intent.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/read_session_providers.dart';
 import 'package:hentai_library/features/reader/presentation/routing/reader_route_context.dart';
-import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hentai_library/features/reading_history/public.dart';
 import 'package:hentai_library/features/reading_stats/public.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -31,7 +29,8 @@ import 'package:riverpod/misc.dart' show Override;
 import '../../../../support/fakes/settings_test_fakes.dart';
 
 import 'package:hentai_library/features/comic/public/di/comic_read_lookup_adapter.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/features/app_settings/domain/reading_preferences_schema.dart';
+import 'package:hentai_library/features/app_settings/public/di/app_settings_providers.dart';
 
 const String _comicId = 'reader-controller-comic';
 const ReaderViewModelKey _key = (
@@ -212,7 +211,7 @@ ProviderContainer _createContainer({
       ...sharedLibraryStateOverrides(),
       ...bootstrapCompositionOverrides(),
       _stubCoordinatorOverride(),
-      appSettingRepoProvider.overrideWithValue(
+      appSettingRepositoryProvider.overrideWithValue(
         MemoryAppSettingRepository(initial: initialSetting),
       ),
       readerSessionOpenProvider(
@@ -239,7 +238,7 @@ void main() {
   group('auto-play session state', () {
     test('opens with autoPlayEnabled false', () async {
       final ProviderContainer container = _createContainer(
-        initialSetting: AppSetting(readingMode: ReadingMode.paged),
+        initialSetting: AppSetting(readingModeId: 'paged'),
       );
       addTearDown(container.dispose);
 
@@ -254,7 +253,7 @@ void main() {
       'setAutoPlayEnabled(true) keeps auto-play on for same comic',
       () async {
         final ProviderContainer container = _createContainer(
-          initialSetting: AppSetting(readingMode: ReadingMode.paged),
+          initialSetting: AppSetting(readingModeId: 'paged'),
         );
         addTearDown(container.dispose);
 
@@ -293,9 +292,9 @@ void main() {
           ...sharedLibraryStateOverrides(),
           ...bootstrapCompositionOverrides(),
           _stubCoordinatorOverride(),
-          appSettingRepoProvider.overrideWithValue(
+          appSettingRepositoryProvider.overrideWithValue(
             MemoryAppSettingRepository(
-              initial: AppSetting(readingMode: ReadingMode.paged),
+              initial: AppSetting(readingModeId: 'paged'),
             ),
           ),
           readerSessionOpenProvider(
@@ -323,7 +322,7 @@ void main() {
 
     test('setReadingMode(webtoon) turns auto-play off', () async {
       final ProviderContainer container = _createContainer(
-        initialSetting: AppSetting(readingMode: ReadingMode.paged),
+        initialSetting: AppSetting(readingModeId: 'paged'),
       );
       addTearDown(container.dispose);
 
@@ -364,9 +363,9 @@ void main() {
           ...sharedLibraryStateOverrides(),
           ...bootstrapCompositionOverrides(),
           _stubCoordinatorOverride(),
-          appSettingRepoProvider.overrideWithValue(
+          appSettingRepositoryProvider.overrideWithValue(
             MemoryAppSettingRepository(
-              initial: AppSetting(readingMode: ReadingMode.paged),
+              initial: AppSetting(readingModeId: 'paged'),
             ),
           ),
           readerSessionOpenProvider(
@@ -393,7 +392,7 @@ void main() {
       'opens with readingMode from AppSetting (not default paged)',
       () async {
         final ProviderContainer container = _createContainer(
-          initialSetting: AppSetting(readingMode: ReadingMode.webtoon),
+          initialSetting: AppSetting(readingModeId: 'webtoon'),
         );
         addTearDown(container.dispose);
 
@@ -407,14 +406,14 @@ void main() {
 
     test('syncs readingMode when AppSetting changes', () async {
       final ProviderContainer container = _createContainer(
-        initialSetting: AppSetting(readingMode: ReadingMode.paged),
+        initialSetting: AppSetting(readingModeId: 'paged'),
       );
       addTearDown(container.dispose);
 
       await container.read(readerViewModelProvider(_key).future);
       await container
-          .read(settingsProvider.notifier)
-          .setReadingMode(ReadingMode.webtoon);
+          .read(readingPreferencesControllerProvider)
+          .setReadingModeId(ReadingPreferenceSchema.readingModeWebtoonId);
 
       expect(_state(container, _key)?.readingMode, ReadingMode.webtoon);
     });
@@ -424,7 +423,7 @@ void main() {
     test('paged to webtoon keeps currentIndex', () async {
       final ProviderContainer container = _createContainer(
         key: _incognitoKey,
-        initialSetting: AppSetting(readingMode: ReadingMode.paged),
+        initialSetting: AppSetting(readingModeId: 'paged'),
         snapshot: _snapshot(pageCount: 20, resumePage: 7),
       );
       addTearDown(container.dispose);
@@ -440,7 +439,7 @@ void main() {
     test('dualPage to webtoon remaps to last page in spread', () async {
       final ProviderContainer container = _createContainer(
         key: _incognitoKey,
-        initialSetting: AppSetting(readingMode: ReadingMode.dualPage),
+        initialSetting: AppSetting(readingModeId: 'dualPage'),
         snapshot: _snapshot(pageCount: 10, resumePage: 3),
       );
       addTearDown(container.dispose);
@@ -454,7 +453,7 @@ void main() {
     test('nextPage and prevPage move within bounds', () async {
       final ProviderContainer container = _createContainer(
         key: _incognitoKey,
-        initialSetting: AppSetting(readingMode: ReadingMode.paged),
+        initialSetting: AppSetting(readingModeId: 'paged'),
         snapshot: _snapshot(pageCount: 5, resumePage: 1),
       );
       addTearDown(container.dispose);
@@ -476,7 +475,7 @@ void main() {
     test('setIndex ignores out-of-range and accepts valid page', () async {
       final ProviderContainer container = _createContainer(
         key: _incognitoKey,
-        initialSetting: AppSetting(readingMode: ReadingMode.paged),
+        initialSetting: AppSetting(readingModeId: 'paged'),
         snapshot: _snapshot(pageCount: 5, resumePage: 2),
       );
       addTearDown(container.dispose);
@@ -510,7 +509,7 @@ void main() {
         final _FakePrefetchController prefetch = _FakePrefetchController();
         final ProviderContainer container = _createContainer(
           key: _incognitoKey,
-          initialSetting: AppSetting(readingMode: ReadingMode.paged),
+          initialSetting: AppSetting(readingModeId: 'paged'),
           snapshot: _snapshot(pageCount: 5, resumePage: 1),
           seriesNavigation: navigation,
           prefetch: prefetch,
@@ -544,7 +543,7 @@ void main() {
       final _FakePrefetchController prefetch = _FakePrefetchController();
       final ProviderContainer container = _createContainer(
         key: _incognitoKey,
-        initialSetting: AppSetting(readingMode: ReadingMode.paged),
+        initialSetting: AppSetting(readingModeId: 'paged'),
         snapshot: _snapshot(pageCount: 5, resumePage: 1),
         seriesNavigation: navigation,
         prefetch: prefetch,
@@ -572,7 +571,7 @@ void main() {
           _RecordingSeriesNavigation();
       final ProviderContainer container = _createContainer(
         key: _incognitoKey,
-        initialSetting: AppSetting(readingMode: ReadingMode.paged),
+        initialSetting: AppSetting(readingModeId: 'paged'),
         snapshot: _snapshot(pageCount: 5, resumePage: 1),
         seriesNavigation: navigation,
         prefetch: _FakePrefetchController(),
@@ -598,7 +597,7 @@ void main() {
     test('leaving first spread clears retreat prompt', () async {
       final ProviderContainer container = _createContainer(
         key: _incognitoKey,
-        initialSetting: AppSetting(readingMode: ReadingMode.paged),
+        initialSetting: AppSetting(readingModeId: 'paged'),
         snapshot: _snapshot(pageCount: 5, resumePage: 1),
         seriesNavigation: _RecordingSeriesNavigation(),
         prefetch: _FakePrefetchController(),
@@ -640,8 +639,8 @@ void main() {
       final ProviderContainer container = _createContainer(
         key: _incognitoKey,
         initialSetting: AppSetting(
-          readingMode: ReadingMode.paged,
-          autoPlayMode: AutoPlayMode.seriesLoop,
+          readingModeId: 'paged',
+          autoPlayModeId: 'seriesLoop',
         ),
         snapshot: _snapshot(pageCount: 5, resumePage: 5),
         seriesNavigation: navigation,
@@ -674,8 +673,8 @@ void main() {
       final ProviderContainer container = _createContainer(
         key: _incognitoKey,
         initialSetting: AppSetting(
-          readingMode: ReadingMode.paged,
-          autoPlayMode: AutoPlayMode.seriesLoop,
+          readingModeId: 'paged',
+          autoPlayModeId: 'seriesLoop',
         ),
         snapshot: _snapshot(pageCount: 5, resumePage: 1),
         seriesNavigation: navigation,
@@ -703,8 +702,8 @@ void main() {
       final ProviderContainer container = _createContainer(
         key: _incognitoKey,
         initialSetting: AppSetting(
-          readingMode: ReadingMode.paged,
-          autoPlayMode: AutoPlayMode.comicOnce,
+          readingModeId: 'paged',
+          autoPlayModeId: 'comicOnce',
         ),
         snapshot: _snapshot(pageCount: 5, resumePage: 5),
         seriesNavigation: navigation,
@@ -731,8 +730,8 @@ void main() {
       final ProviderContainer container = _createContainer(
         key: _incognitoKey,
         initialSetting: AppSetting(
-          readingMode: ReadingMode.paged,
-          autoPlayMode: AutoPlayMode.comicLoop,
+          readingModeId: 'paged',
+          autoPlayModeId: 'comicLoop',
         ),
         snapshot: _snapshot(pageCount: 5, resumePage: 5),
         seriesNavigation: _RecordingSeriesNavigation(),

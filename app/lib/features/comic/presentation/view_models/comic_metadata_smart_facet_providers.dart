@@ -3,7 +3,7 @@ import 'package:hentai_library/features/comic/domain/smart_facet_match.dart';
 import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/features/comic/domain/repositories/comic_lookup_repository.dart';
-import 'package:hentai_library/features/comic/presentation/view_models/smart_facet_match_preference_notifier.dart';
+import 'package:hentai_library/features/app_settings/public/di/app_settings_providers.dart';
 import 'package:hentai_library/shared/di/series_reading_context_providers.dart';
 import 'package:hentai_library/shared/domain/reading/series_reading_context.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -73,9 +73,9 @@ Future<List<SmartFacetMatchCandidate>> _rankFacet({
 }) async {
   final List<NamedFacetFormCandidate> catalog =
       await listNamedFacetForMetadataForm(kind);
-  final bool enabled = await ref.watch(
-    smartFacetMatchPreferenceProvider.future,
-  );
+  // 智能匹配开关已并入 AppSetting（ADR-0046）；未加载/失败时按默认开启处理。
+  final bool enabled = (await ref.watch(appSettingsProvider.future))
+      .smartFacetMatchEnabled;
 
   if (!enabled) {
     return applySmartFacetMatch(

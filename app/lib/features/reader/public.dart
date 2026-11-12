@@ -12,4 +12,7 @@ export 'public/reader_launch_port.dart';
 export 'public/native_reader_port.dart';
 export 'public/reading_preference_l10n.dart';
 export 'public/reading_preference_types.dart';
+export 'public/reading_preferences_acl.dart';
+export 'public/reading_preferences_providers.dart';
 export 'public/ui/reader_page.dart';
+export 'public/ui/reading_settings_sections.dart';

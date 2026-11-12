@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting_migration.dart';
-import 'package:hentai_library/features/app_settings/domain/reader_session_preference_types.dart';
+import 'package:hentai_library/features/app_settings/domain/reading_preferences_schema.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 
 part 'app_setting.freezed.dart';
@@ -32,14 +32,25 @@ abstract class AppSetting with _$AppSetting {
     @Default(false) bool useDynamicColor,
     @Default(AppLocalePreference.system) AppLocalePreference localePreference,
     @Default(AppFontPreference.miSans) AppFontPreference fontPreference,
-    @Default(kDefaultReadingMode) ReadingMode readingMode,
-    @Default(kDefaultWebtoonMarginPercent) int webtoonMarginPercent,
-    @Default(kDefaultWebtoonZoomMode) WebtoonZoomMode webtoonZoomMode,
-    @Default(5) int readerAutoPlayIntervalSeconds,
-    @Default(kDefaultAutoPlayMode)
-    // ignore: invalid_annotation_target
-    @JsonKey(fromJson: autoPlayModeFromJson, toJson: autoPlayModeToJson)
-    AutoPlayMode autoPlayMode,
+
+    /// 阅读模式持久化 id（`reader` 的 `ReadingMode` 值域，见 [ReadingPreferenceSchema]）。
+    @JsonKey(name: 'readingMode')
+    @Default(ReadingPreferenceSchema.defaultReadingModeId)
+    String readingModeId,
+    @Default(ReadingPreferenceSchema.defaultWebtoonMarginPercent)
+    int webtoonMarginPercent,
+
+    /// Webtoon 缩放持久化 id（`reader` 的 `WebtoonZoomMode` 值域）。
+    @JsonKey(name: 'webtoonZoomMode')
+    @Default(ReadingPreferenceSchema.defaultWebtoonZoomModeId)
+    String webtoonZoomModeId,
+    @Default(ReadingPreferenceSchema.defaultAutoPlayIntervalSeconds)
+    int readerAutoPlayIntervalSeconds,
+
+    /// 自动播放模式持久化 id（`reader` 的 `AutoPlayMode` 值域）。
+    @Default(ReadingPreferenceSchema.defaultAutoPlayModeId)
+    @JsonKey(name: 'autoPlayMode')
+    String autoPlayModeId,
     @Default(true) bool desktopSidebarExpanded,
 
     /// 启动时是否自动检查应用更新。
@@ -47,6 +58,9 @@ abstract class AppSetting with _$AppSetting {
 
     /// 用户选择「稍后提醒」所忽略的远程版本号；空字符串表示未忽略。
     @Default('') String dismissedUpdateVersion,
+
+    /// 智能匹配：Comic 元数据表单是否按历史共现排序候选（默认开启）。
+    @Default(true) bool smartFacetMatchEnabled,
 
     /// Healthy mode：库、搜索与历史中隐藏 R18 Comic（不修改分级）。
     @Default(false) bool healthyMode,
@@ -73,20 +87,28 @@ abstract class AppSetting with _$AppSetting {
   /// 阅读器相关数值字段归一化（边距步进、自动播放间隔 clamp）。
   AppSetting withNormalizedReaderPreferences() {
     return copyWith(
-      webtoonMarginPercent: normalizeWebtoonMarginPercent(webtoonMarginPercent),
-      readerAutoPlayIntervalSeconds: clampReaderAutoPlayInterval(
-        readerAutoPlayIntervalSeconds,
-      ),
+      webtoonMarginPercent:
+          ReadingPreferenceSchema.normalizeWebtoonMarginPercent(
+            webtoonMarginPercent,
+          ),
+      readerAutoPlayIntervalSeconds:
+          ReadingPreferenceSchema.clampAutoPlayIntervalSeconds(
+            readerAutoPlayIntervalSeconds,
+          ),
     );
   }
 
   AppSetting withWebtoonMarginPercent(int value) {
-    return copyWith(webtoonMarginPercent: normalizeWebtoonMarginPercent(value));
+    return copyWith(
+      webtoonMarginPercent:
+          ReadingPreferenceSchema.normalizeWebtoonMarginPercent(value),
+    );
   }
 
   AppSetting withReaderAutoPlayIntervalSeconds(int value) {
     return copyWith(
-      readerAutoPlayIntervalSeconds: clampReaderAutoPlayInterval(value),
+      readerAutoPlayIntervalSeconds:
+          ReadingPreferenceSchema.clampAutoPlayIntervalSeconds(value),
     );
   }
 

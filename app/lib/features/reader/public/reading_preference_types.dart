@@ -4,3 +4,4 @@ library;
 export '../domain/auto_play_interval.dart';
 export '../domain/auto_play_mode.dart';
 export '../domain/reading_mode.dart';
+export '../domain/reading_preferences.dart';

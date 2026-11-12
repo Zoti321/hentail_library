@@ -8,7 +8,7 @@ import 'package:hentai_library/features/library_admin/public/di/library_admin_st
 import 'package:hentai_library/features/library_admin/di/library_write.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/features/app_settings/public/di/app_settings_providers.dart';
 
 export 'package:hentai_library/features/library_admin/domain/libraries_state.dart';
 
@@ -62,7 +62,7 @@ class LibrariesNotifier extends _$LibrariesNotifier {
     await _migrateResourceFormatCategoriesFromLegacyIfNeeded();
     await _migrateAutoScanFromLegacyIfNeeded();
     try {
-      await ref.read(appSettingRepoProvider).clearLegacyImportPayload();
+      await ref.read(appSettingRepositoryProvider).clearLegacyImportPayload();
     } catch (_) {
       // Best-effort cleanup of staged legacy import keys.
     }
@@ -82,7 +82,7 @@ class LibrariesNotifier extends _$LibrariesNotifier {
         return;
       }
       final List<ResourceFormatCategory>? legacyGroups = await ref
-          .read(appSettingRepoProvider)
+          .read(appSettingRepositoryProvider)
           .peekLegacyEnabledResourceFormatCategories();
       final List<ResourceFormatCategory> groups =
           legacyGroups ??
@@ -106,7 +106,7 @@ class LibrariesNotifier extends _$LibrariesNotifier {
         return;
       }
       final bool? legacy = await ref
-          .read(appSettingRepoProvider)
+          .read(appSettingRepositoryProvider)
           .peekLegacyAutoScan();
       if (legacy == true) {
         await _repo.setAllScanOnStartup(true);

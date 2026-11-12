@@ -1,3 +1,4 @@
+import 'package:hentai_library/features/app_settings/public/reading_preferences_schema.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 /// 全局阅读模式（v1 仅 LTR）。
@@ -23,18 +24,17 @@ enum WebtoonZoomMode { fitWidth, originalSize }
 const WebtoonZoomMode kDefaultWebtoonZoomMode = WebtoonZoomMode.fitWidth;
 
 /// 左右边距占视口宽度的百分比（两侧合计）；仅 [WebtoonZoomMode.fitWidth] 生效。
-const int kDefaultWebtoonMarginPercent = 20;
-const int kWebtoonMarginPercentMax = 40;
-const int kWebtoonMarginPercentStep = 5;
+///
+/// 取值范围与归一化的真源在持久化 schema（`app_settings`，ADR-0046）。
+const int kDefaultWebtoonMarginPercent =
+    ReadingPreferenceSchema.defaultWebtoonMarginPercent;
+const int kWebtoonMarginPercentMax =
+    ReadingPreferenceSchema.maxWebtoonMarginPercent;
+const int kWebtoonMarginPercentStep =
+    ReadingPreferenceSchema.webtoonMarginPercentStep;
 
-int normalizeWebtoonMarginPercent(int value) {
-  final int clamped = value.clamp(0, kWebtoonMarginPercentMax);
-  final int stepped =
-      ((clamped / kWebtoonMarginPercentStep).round() *
-              kWebtoonMarginPercentStep)
-          .clamp(0, kWebtoonMarginPercentMax);
-  return stepped;
-}
+int normalizeWebtoonMarginPercent(int value) =>
+    ReadingPreferenceSchema.normalizeWebtoonMarginPercent(value);
 
 extension PagedLayoutX on PagedLayout {
   ReadingMode toReadingMode() => switch (this) {

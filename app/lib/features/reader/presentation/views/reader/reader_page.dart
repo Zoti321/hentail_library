@@ -24,9 +24,9 @@ import 'package:hentai_library/features/reader/presentation/views/reader/reader_
 import 'package:hentai_library/features/reader/presentation/patterns/reader/reader_series_catalog_sheet.dart';
 import 'package:hentai_library/features/reader/presentation/patterns/reader/reader_series_volume.dart';
 import 'package:hentai_library/features/reader/presentation/patterns/reader/reader_viewport_status.dart';
-import 'package:hentai_library/features/reader/domain/auto_play_interval.dart';
 import 'package:hentai_library/features/reader/domain/reading_mode.dart';
-import 'package:hentai_library/shared/di/app_settings_providers.dart';
+import 'package:hentai_library/features/reader/domain/reading_preferences.dart';
+import 'package:hentai_library/features/reader/public/reading_preferences_providers.dart';
 import 'package:hentai_library/shared/ui/navigation/app_navigator_context.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
@@ -339,10 +339,8 @@ class _ReaderReadyBody extends ConsumerWidget {
 
     final bool supportsAutoPlay = chrome.readingMode.supportsAutoPlay;
     final int autoPlayIntervalSeconds = ref.watch(
-      appSettingsStateProvider.select(
-        (value) =>
-            value.asData?.value.readerAutoPlayIntervalSeconds ??
-            kReaderAutoPlayIntervalDefault,
+      readingPreferencesProvider.select(
+        (ReadingPreferences prefs) => prefs.autoPlayIntervalSeconds,
       ),
     );
     final String? seriesId = shell.sessionContext.seriesId;

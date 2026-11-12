@@ -5,6 +5,8 @@ import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/features/library_browse/public.dart';
 import 'package:hentai_library/features/app_settings/public.dart';
 import 'package:hentai_library/features/home/public.dart';
+import 'package:hentai_library/features/metadata_backup/public.dart';
+import 'package:hentai_library/features/reader/public.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:hentai_library/features/reading_history/public.dart';
 import 'package:hentai_library/core/constants/app_routes.dart';
@@ -14,6 +16,23 @@ import 'package:hentai_library/features/comic_trash/public.dart';
 import 'package:hentai_library/shared/di/browse_library_scope_providers.dart';
 import 'package:hentai_library/shared/ui/navigation/app_root_navigator_key.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+/// 设置页分区组合根（ADR-0046 §6）：`app_settings` 自有分类 + owner 分区。
+///
+/// 「阅读」由 `reader`、「元数据备份」由 `metadata_backup` 提供；
+/// 未注入的 owner 分类渲染为空列表，不抛异常。
+List<Widget> _settingsSections(
+  BuildContext context,
+  SettingsCategory category,
+) {
+  return switch (category) {
+    SettingsCategory.reading => readerSettingsSections(context),
+    SettingsCategory.metadataBackup => const <Widget>[
+      MetadataBackupSettingsSections(),
+    ],
+    _ => settingsSectionsFor(category, context),
+  };
+}
 
 String? _librariesRedirect(BuildContext context, GoRouterState state) {
   return AppRoutes.legacyRedirectPath(state.uri.path);
@@ -85,7 +104,10 @@ final GoRouter appRouter = GoRouter(
           path: AppRoutes.settings,
           name: AppRoutes.settingsName,
           pageBuilder: (BuildContext context, GoRouterState state) =>
-              buildShellNavPage(state: state, child: const SettingsPage()),
+              buildShellNavPage(
+                state: state,
+                child: const SettingsPage(sectionsBuilder: _settingsSections),
+              ),
         ),
         ...buildSharedContentRoutes(),
       ],

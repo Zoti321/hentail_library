@@ -6,9 +6,10 @@ import 'package:hentai_library/features/reader/presentation/navigation/apply_rea
 import 'package:hentai_library/features/reader/presentation/view_models/reader_navigation_intent.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/reader_view_model.dart';
 import 'package:hentai_library/features/reader/presentation/routing/reader_route_context.dart';
-import 'package:hentai_library/shared/di/app_settings_providers.dart';
 import 'package:hentai_library/features/reader/domain/auto_play_mode.dart';
 import 'package:hentai_library/features/reader/domain/reading_mode.dart';
+import 'package:hentai_library/features/reader/domain/reading_preferences.dart';
+import 'package:hentai_library/features/reader/public/reading_preferences_providers.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -36,16 +37,18 @@ class ReaderAutoPlayBinder extends HookConsumerWidget {
             asyncState.asData?.value.autoPlayEnabled ?? false,
       ),
     );
-    final int readerAutoPlayIntervalSeconds = ref.watch(
-      appSettingsStateProvider.select(
-        (value) => value.asData?.value.readerAutoPlayIntervalSeconds ?? 5,
-      ),
-    );
-    final AutoPlayMode autoPlayMode = ref.watch(
-      appSettingsStateProvider.select(
-        (value) => value.asData?.value.autoPlayMode ?? kDefaultAutoPlayMode,
-      ),
-    );
+    final ({int intervalSeconds, AutoPlayMode mode}) autoPlayPreferences = ref
+        .watch(
+          readingPreferencesProvider.select(
+            (ReadingPreferences prefs) => (
+              intervalSeconds: prefs.autoPlayIntervalSeconds,
+              mode: prefs.autoPlayMode,
+            ),
+          ),
+        );
+    final int readerAutoPlayIntervalSeconds =
+        autoPlayPreferences.intervalSeconds;
+    final AutoPlayMode autoPlayMode = autoPlayPreferences.mode;
     final ({int currentIndex, int totalPages, ReadingMode readingMode})?
     autoPlayState = ref.watch(
       readerViewModelProvider(viewKey)

@@ -22,7 +22,7 @@
 | reader / app_settings 端口实现类型 | 各 owner `domain/` |
 | `repositories/*` 契约 | 各 owner `features/*/domain/` |
 | **reading_history** | `features/reading_history/domain/` |
-| `app_setting*` | `features/app_settings/domain/` |
+| `app_setting*` | `features/app_settings/domain/`（阅读偏好**只**存 `String` id / `int` schema，枚举语义归 `features/reader/domain/`，两侧经 ACL 通信——ADR-0046） |
 | home read models | `features/home/domain/` |
 | named metadata 表单/字典 | `features/named_metadata/domain/`；跨 feature **`features/named_metadata/public.dart`**（仓储契约、字典 Riverpod、生产页）；Comic 表单窄面 **`public/named_metadata_form.dart`**；Lab patterns **`public/ui/metadata_lab_patterns.dart`** |
 

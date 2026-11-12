@@ -23,10 +23,20 @@ const Set<String> _kInScopeModules = <String>{
 };
 
 /// 显式禁止边：任何 import/export 都算违规（不看是否 public）。
+///
+/// `app_settings ↛ {reader, library_browse, comic, series, metadata_backup}`
+/// 由 ADR-0046 引入：设置模块只认识持久化原语，偏好语义归 owner 模块。
 const Map<String, Set<String>> _kForbiddenEdges = <String, Set<String>>{
   'comic': <String>{'library_browse', 'series', 'reader'},
   'series': <String>{'library_browse', 'reader'},
   'reader': <String>{'comic'},
+  'app_settings': <String>{
+    'reader',
+    'library_browse',
+    'comic',
+    'series',
+    'metadata_backup',
+  },
 };
 
 /// R12 白名单条目数上限：只允许缩小。

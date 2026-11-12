@@ -10,7 +10,11 @@ import 'package:hentai_library/features/reader/presentation/view_models/reader_a
 import 'package:hentai_library/features/reader/presentation/reader_exit_location.dart';
 import 'package:hentai_library/features/reader/presentation/routing/reader_route_context.dart';
 import 'package:hentai_library/features/reader/application/read_session_application_service.dart';
-import 'package:hentai_library/shared/di/app_settings_providers.dart';
+import 'package:hentai_library/features/app_settings/public/di/app_settings_providers.dart';
+import 'package:hentai_library/features/app_settings/public/app_settings_cross_feature_types.dart';
+import 'package:hentai_library/features/reader/domain/reading_preferences.dart';
+import 'package:hentai_library/features/reader/public/reading_preferences_acl.dart';
+import 'package:hentai_library/features/reader/public/reading_preferences_providers.dart';
 import 'package:hentai_library/features/reader/di/session_providers.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/reader_chrome_notifier.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/reader_navigation_intent.dart';
@@ -77,13 +81,10 @@ class ReaderViewModel extends _$ReaderViewModel
         startFromFirstPage: startFromFirstPage,
       ).future,
     );
-    final ReadingMode initialMode = await _resolveInitialReadingMode();
-    ref.listen(appSettingsStateProvider, (previous, next) {
-      final ReadingMode? mode = next.asData?.value.readingMode;
-      if (mode == null) {
-        return;
-      }
-      setReadingMode(mode);
+    final ReadingMode initialMode =
+        (await _resolveInitialReadingPreferences()).readingMode;
+    ref.listen(readingPreferencesProvider, (previous, next) {
+      setReadingMode(next.readingMode);
     });
     final bool carryAutoPlay = ref
         .read(readerAutoPlayCarryProvider.notifier)
@@ -104,15 +105,17 @@ class ReaderViewModel extends _$ReaderViewModel
     );
   }
 
-  Future<ReadingMode> _resolveInitialReadingMode() async {
-    final ready = ref.read(appSettingsStateProvider).asData?.value;
-    if (ready != null) {
-      return ready.readingMode;
+  /// 首帧偏好：已加载则直接解码；未加载时等待一次，避免阅读器先用默认档位打开。
+  Future<ReadingPreferences> _resolveInitialReadingPreferences() async {
+    if (ref.read(readingPreferencesRecordProvider) != null) {
+      return ref.read(readingPreferencesProvider);
     }
     try {
-      return (await ref.read(appSettingsFutureProvider.future)).readingMode;
+      final AppSetting setting = await ref.read(appSettingsProvider.future);
+      return ReadingPreferencesAcl.decode(readingPreferencesRecordOf(setting))
+          .value;
     } catch (_) {
-      return kDefaultReadingMode;
+      return const ReadingPreferences.defaults();
     }
   }
 

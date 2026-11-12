@@ -1,33 +1,34 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
-import 'package:hentai_library/features/reader/public/reading_preference_types.dart';
+import 'package:hentai_library/features/app_settings/domain/reading_preferences_schema.dart';
+import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
+import 'package:hentai_library/features/app_settings/public/di/app_settings_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 import '../../../../support/fakes/settings_test_fakes.dart';
 
-import 'package:hentai_library/shared/di/data_providers.dart';
-
 void main() {
-  test('setReadingMode persists and reloads as webtoon', () async {
+  test('setReadingModeId persists and reloads as webtoon', () async {
     final MemoryAppSettingRepository repo = MemoryAppSettingRepository();
-    final ProviderContainer container = ProviderContainer(
-      overrides: <Override>[appSettingRepoProvider.overrideWithValue(repo)],
+    ProviderContainer create() => ProviderContainer(
+      overrides: <Override>[
+        appSettingRepositoryProvider.overrideWithValue(repo),
+      ],
     );
+
+    final ProviderContainer container = create();
     addTearDown(container.dispose);
 
     await container.read(settingsProvider.future);
     await container
-        .read(settingsProvider.notifier)
-        .setReadingMode(ReadingMode.webtoon);
+        .read(readingPreferencesControllerProvider)
+        .setReadingModeId(ReadingPreferenceSchema.readingModeWebtoonId);
 
-    final ProviderContainer reloaded = ProviderContainer(
-      overrides: <Override>[appSettingRepoProvider.overrideWithValue(repo)],
-    );
+    final ProviderContainer reloaded = create();
     addTearDown(reloaded.dispose);
 
     final AppSetting loaded = await reloaded.read(settingsProvider.future);
-    expect(loaded.readingMode, ReadingMode.webtoon);
+    expect(loaded.readingModeId, ReadingPreferenceSchema.readingModeWebtoonId);
   });
 }

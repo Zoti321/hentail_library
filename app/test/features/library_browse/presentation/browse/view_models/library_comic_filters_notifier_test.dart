@@ -14,13 +14,11 @@ import 'package:riverpod/misc.dart' show Override;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../../support/fakes/author_repository_test_fakes.dart';
-import '../../../../../support/settings_state_bridge.dart';
 
 ProviderContainer createContainer() {
   final ProviderContainer container = ProviderContainer(
     overrides: <Override>[
       authorRepoProvider.overrideWithValue(const EmptyAuthorRepository()),
-      settingsStateBridge(),
     ],
   );
   addTearDown(container.dispose);

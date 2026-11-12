@@ -31,9 +31,7 @@ mixin _ReaderViewModelAutoPlay
       nextPage();
       return (keepTicking: true, replace: null);
     }
-    final AutoPlayMode mode =
-        ref.read(appSettingsStateProvider).asData?.value.autoPlayMode ??
-        kDefaultAutoPlayMode;
+    final AutoPlayMode mode = ref.read(readingPreferencesProvider).autoPlayMode;
     final List<ReaderComicListItem>? items = navContext?.items;
     final String? firstComicId = items != null && items.isNotEmpty
         ? items.first.comicId

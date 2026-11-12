@@ -65,15 +65,19 @@ class AppSettingRepositoryImpl implements AppSettingRepository {
         await _importLegacySettingsJsonIfPresent(prefs);
       }
       final String? raw = prefs.getString(AppSettingStorageKeys.aggregateJson);
+      AppSetting setting;
       if (raw == null || raw.isEmpty) {
-        return defaultSettings();
+        setting = defaultSettings();
+      } else {
+        final Map<String, dynamic> json =
+            jsonDecode(raw) as Map<String, dynamic>;
+        setting = AppSetting.fromJson(json);
       }
-      final Map<String, dynamic> json = jsonDecode(raw) as Map<String, dynamic>;
-      AppSetting setting = AppSetting.fromJson(json);
       setting = await _migratePreferLibraryRootSeriesFromBrowsePrefs(
         prefs,
         setting,
       );
+      setting = await _migrateSmartFacetMatchFromLegacyKey(prefs, setting);
       return setting;
     } catch (e, st) {
       logError(AppLog.dataRepo('app_setting'), '加载设置失败，已回退默认值', e, st);
@@ -202,6 +206,25 @@ class AppSettingRepositoryImpl implements AppSettingRepository {
     );
     await save(migrated);
     await prefs.remove(LegacyLibraryPreferLibraryRootSeries.storageKey);
+    return migrated;
+  }
+
+  /// 智能匹配旧键只在**存在**时迁入并删除；旧键缺失时不写盘（避免把默认值落地）。
+  Future<AppSetting> _migrateSmartFacetMatchFromLegacyKey(
+    SharedPreferences prefs,
+    AppSetting setting,
+  ) async {
+    if (!prefs.containsKey(LegacySmartFacetMatchPreference.storageKey)) {
+      return setting;
+    }
+    final bool legacy = LegacySmartFacetMatchPreference.fromStorage(
+      prefs.getBool(LegacySmartFacetMatchPreference.storageKey),
+    );
+    final AppSetting migrated = setting.copyWith(
+      smartFacetMatchEnabled: legacy,
+    );
+    await save(migrated);
+    await prefs.remove(LegacySmartFacetMatchPreference.storageKey);
     return migrated;
   }
 }

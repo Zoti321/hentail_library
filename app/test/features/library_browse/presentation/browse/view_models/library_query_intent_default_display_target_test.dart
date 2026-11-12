@@ -5,8 +5,6 @@ import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;
 
-import '../../../../../support/settings_state_bridge.dart';
-
 class _FixedSettingsNotifier extends SettingsNotifier {
   _FixedSettingsNotifier(this._initial);
 
@@ -26,7 +24,6 @@ void main() {
   test('LibraryQueryIntent seeds displayTarget from Default library display target', () async {
     final ProviderContainer container = ProviderContainer(
       overrides: <Override>[
-        settingsStateBridge(),
         settingsProvider.overrideWith(
           () => _FixedSettingsNotifier(
             AppSetting(
@@ -50,7 +47,6 @@ void main() {
     () async {
       final ProviderContainer container = ProviderContainer(
         overrides: <Override>[
-          settingsStateBridge(),
           settingsProvider.overrideWith(
             () => _FixedSettingsNotifier(AppSetting()),
           ),
@@ -75,7 +71,6 @@ void main() {
   test('resetFilter restores Default library display target', () async {
     final ProviderContainer container = ProviderContainer(
       overrides: <Override>[
-        settingsStateBridge(),
         settingsProvider.overrideWith(
           () => _FixedSettingsNotifier(
             AppSetting(

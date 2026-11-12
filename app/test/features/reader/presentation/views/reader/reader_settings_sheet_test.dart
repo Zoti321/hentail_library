@@ -9,7 +9,7 @@ import 'package:riverpod/misc.dart' show Override;
 import '../../../../../support/fakes/settings_test_fakes.dart';
 import '../../../../../support/pump_localized_app.dart';
 
-import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/features/app_settings/public/di/app_settings_providers.dart';
 
 /// 打开阅读设置面板（使用真实的设置写入链路 + 内存仓库）。
 Future<void> _pumpSheet(WidgetTester tester) async {
@@ -20,7 +20,9 @@ Future<void> _pumpSheet(WidgetTester tester) async {
     overrides: <Override>[
       ...sharedLibraryStateOverrides(),
       ...bootstrapCompositionOverrides(),
-      appSettingRepoProvider.overrideWithValue(MemoryAppSettingRepository()),
+      appSettingRepositoryProvider.overrideWithValue(
+        MemoryAppSettingRepository(),
+      ),
     ],
     home: Builder(
       builder: (BuildContext context) {

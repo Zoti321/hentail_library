@@ -28,7 +28,6 @@ import 'package:riverpod/misc.dart' show Override;
 import 'package:hentai_library/features/library_admin/public.dart';
 
 import '../../../../../../support/pump_localized_app.dart';
-import '../../../../../../support/settings_state_bridge.dart';
 
 Comic _comic(String id, String title) {
   final DateTime now = DateTime.utc(2026, 1, 1);
@@ -151,7 +150,6 @@ Future<void> _pumpLibraryPage(
     tester,
     home: const Scaffold(body: LibraryPage()),
     overrides: <Override>[
-      settingsStateBridge(),
       libraryPageFacadeProvider.overrideWith(
         () => _FakeFacade(_facade(target)),
       ),

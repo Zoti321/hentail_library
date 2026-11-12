@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting_migration.dart';
-import 'package:hentai_library/features/reader/domain/reading_mode.dart';
+import 'package:hentai_library/features/app_settings/domain/reading_preferences_schema.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 
@@ -12,7 +12,10 @@ void main() {
         'readerIsVertical': true,
       });
 
-      expect(setting.readingMode, ReadingMode.webtoon);
+      expect(
+        setting.readingModeId,
+        ReadingPreferenceSchema.readingModeWebtoonId,
+      );
       expect(setting.toJson().containsKey('readerIsVertical'), isFalse);
     });
 
@@ -21,7 +24,10 @@ void main() {
         'readingMode': 'dualPageNoCover',
       });
 
-      expect(setting.readingMode, ReadingMode.dualPage);
+      expect(
+        setting.readingModeId,
+        ReadingPreferenceSchema.readingModeDualPageId,
+      );
       expect(setting.toJson()['readingMode'], 'dualPage');
     });
 

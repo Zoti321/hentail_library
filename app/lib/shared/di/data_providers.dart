@@ -1,24 +1,16 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/shared/di/injected_di.dart';
-import 'package:hentai_library/features/app_settings/domain/app_setting_repository.dart';
 import 'package:hentai_library/shared/domain/ports/comic_read_lookup_port.dart';
 import 'package:hentai_library/shared/domain/ports/comic_trash_command_port.dart';
 import 'package:hentai_library/shared/domain/ports/remote_library_credentials_port.dart';
 
 /// 跨模块共享的 Repository / Port token 声明；实现由 bootstrap 经 owner `public/di` 注入。
 ///
-/// 单归属 token 已按 ADR-0045 迁到各 owner `public/di`（#515）。
+/// 单归属 token 已按 ADR-0045 / ADR-0046 迁到各 owner `public/di`。
 
 final Provider<RemoteLibraryCredentialsPort>
 remoteLibraryCredentialsPortProvider = injectedDi(
   'remoteLibraryCredentialsPortProvider',
-);
-
-/// AppSetting Repository：app_settings / library_admin / reader 三方消费；
-/// 归位 app_settings 会让 library_admin → app_settings 与
-/// `app_settings → comic → library_admin` 成环（ADR-0045 可达性豁免）。
-final Provider<AppSettingRepository> appSettingRepoProvider = injectedDi(
-  'appSettingRepoProvider',
 );
 
 /// 回收站命令口：comic 消费、comic_trash 实现，两侧互引会成环，故 token 留 shared。

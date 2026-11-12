@@ -1,66 +1,80 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
-import 'package:hentai_library/features/reader/domain/reading_mode.dart';
+import 'package:hentai_library/features/app_settings/domain/reading_preferences_schema.dart';
+import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
+import 'package:hentai_library/features/app_settings/public/di/app_settings_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 import '../../../support/fakes/settings_test_fakes.dart';
 
-import 'package:hentai_library/shared/di/data_providers.dart';
-
 void main() {
   group('Scroll layout display settings persistence', () {
-    test('missing json keys default to 20% margin and fitWidth', () {
+    test('missing json keys fall back to schema defaults', () {
       final AppSetting setting = AppSetting.fromJson(<String, dynamic>{});
-      expect(setting.webtoonMarginPercent, 20);
-      expect(setting.webtoonZoomMode, WebtoonZoomMode.fitWidth);
+      expect(
+        setting.webtoonMarginPercent,
+        ReadingPreferenceSchema.defaultWebtoonMarginPercent,
+      );
+      expect(
+        setting.webtoonZoomModeId,
+        ReadingPreferenceSchema.defaultWebtoonZoomModeId,
+      );
     });
 
     test('setWebtoonMarginPercent persists and reloads', () async {
       final MemoryAppSettingRepository repo = MemoryAppSettingRepository(
         roundTripJsonOnSave: true,
       );
-      final ProviderContainer container = ProviderContainer(
-        overrides: <Override>[appSettingRepoProvider.overrideWithValue(repo)],
+      ProviderContainer create() => ProviderContainer(
+        overrides: <Override>[
+          appSettingRepositoryProvider.overrideWithValue(repo),
+        ],
       );
+
+      final ProviderContainer container = create();
       addTearDown(container.dispose);
 
       await container.read(settingsProvider.future);
       await container
-          .read(settingsProvider.notifier)
+          .read(readingPreferencesControllerProvider)
           .setWebtoonMarginPercent(35);
 
-      final ProviderContainer reloaded = ProviderContainer(
-        overrides: <Override>[appSettingRepoProvider.overrideWithValue(repo)],
-      );
+      final ProviderContainer reloaded = create();
       addTearDown(reloaded.dispose);
 
       final AppSetting loaded = await reloaded.read(settingsProvider.future);
       expect(loaded.webtoonMarginPercent, 35);
     });
 
-    test('setWebtoonZoomMode persists and reloads', () async {
+    test('setWebtoonZoomModeId persists and reloads', () async {
       final MemoryAppSettingRepository repo = MemoryAppSettingRepository(
         roundTripJsonOnSave: true,
       );
-      final ProviderContainer container = ProviderContainer(
-        overrides: <Override>[appSettingRepoProvider.overrideWithValue(repo)],
+      ProviderContainer create() => ProviderContainer(
+        overrides: <Override>[
+          appSettingRepositoryProvider.overrideWithValue(repo),
+        ],
       );
+
+      final ProviderContainer container = create();
       addTearDown(container.dispose);
 
       await container.read(settingsProvider.future);
       await container
-          .read(settingsProvider.notifier)
-          .setWebtoonZoomMode(WebtoonZoomMode.originalSize);
+          .read(readingPreferencesControllerProvider)
+          .setWebtoonZoomModeId(
+            ReadingPreferenceSchema.webtoonZoomOriginalSizeId,
+          );
 
-      final ProviderContainer reloaded = ProviderContainer(
-        overrides: <Override>[appSettingRepoProvider.overrideWithValue(repo)],
-      );
+      final ProviderContainer reloaded = create();
       addTearDown(reloaded.dispose);
 
       final AppSetting loaded = await reloaded.read(settingsProvider.future);
-      expect(loaded.webtoonZoomMode, WebtoonZoomMode.originalSize);
+      expect(
+        loaded.webtoonZoomModeId,
+        ReadingPreferenceSchema.webtoonZoomOriginalSizeId,
+      );
     });
   });
 }

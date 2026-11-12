@@ -18,7 +18,6 @@ export 'public/di/comic_thumbnail_repository_factory.dart';
 export 'public/library_comic_browse_rules.dart';
 export 'public/library_age_restriction_comic.dart';
 export 'public/data/comic_entity_mapper.dart';
-export 'public/smart_facet_match_preference.dart';
 export 'public/ui/bulk_edit_metadata_presenter.dart';
 export 'public/ui/comic_card_actions.dart';
 export 'public/ui/comic_card_host.dart';

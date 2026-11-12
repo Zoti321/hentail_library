@@ -4,7 +4,7 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/ui/widgets/selection/segmented_capsule_bar.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
-import 'package:hentai_library/features/library_browse/public/l10n/library_browse_l10n.dart';
+import 'package:hentai_library/shared/ui/l10n/library_display_target_l10n.dart';
 
 /// Body-top catalog row: 漫画 / 系列 胶囊切换（与管理页同款 [SegmentedCapsuleBar]）+ 当前数量（末端）。
 ///

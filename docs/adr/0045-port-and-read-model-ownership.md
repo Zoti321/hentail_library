@@ -62,17 +62,18 @@ Accepted（2026-11-11，#503）
 | `ComicReadLookupPort` + token | reader 消费 / comic 实现（reader ↛ comic 为禁止边） | 禁止边 |
 | `metadata_refresh_types.dart` | `shared/ui` 元数据刷新 toast（series 与 library_admin 双消费） | shared 消费方 |
 | `appNavigatorProvider`、`domainEventBusProvider` / `domainEventRevisions` | 全局 | 基础设施 |
-| `appSettingsStateProvider` / `appSettingsFutureProvider` / `appThemePreferencesPortProvider` / `readerSettingsCommandPortProvider` / `readerDisplayPreferencesPortProvider`、`appSettingRepoProvider` | reader / library_browse / library_admin / bootstrap 与 app_settings 自身 | public 环（见 §5 实现修订） |
 
-### 5. 实现修订（2026-11-11，P3m 收口）
+### 5. 实现修订（2026-11-11，P3m 收口；2026-11-12 由 ADR-0046 收口）
 
-`app_settings` 的 5 个 token **无法**按「生产者拥有」归位，原因是双向依赖而非惰性：
+> **实现修订（2026-11-12，#517）**：本节的 5 条 `R13|shared|app_settings` 豁免**已全部消除**。ADR-0046 用「持久化 schema / 领域值对象 + ACL」替换了 `app_settings ↛ reader` 的 import 与三个只为打破环而存在的 Port，`app_settings` 不再认识阅读枚举，`baseline.json` 归零。以下内容保留为当时的决策语境。
+
+当时 `app_settings` 的 5 个 token **无法**按「生产者拥有」归位，原因是双向依赖而非惰性：
 
 - `app_settings` 的 settings page 渲染 reader 偏好控件（`settings_sections.dart` → `features/reader/public/reading_preference_l10n.dart`，`app_settings/domain/reader_session_preference_types.dart` → `features/reader/public/reading_preference_types.dart`），即 **`app_settings → reader` 已存在**；
 - 因此 reader 反向 import `features/app_settings/public/**`（拿 `appSettingsStateProvider` 等）会立刻构成 public 环；
 - 把这些类型搬进 `shared/domain` 只能把 R13 换个方向（`shared → features/reader`、`shared → features/app_settings`），因为 `AppSetting` 实体同时引用 reader 的阅读偏好枚举与 app_settings 的外观枚举。
 
-结论：这 5 条 `R13|shared|app_settings|...` 按「shared 消费方 / public 环」豁免**显式登记**在 `app/test/architecture/baseline.json`，并在文件头注释说明；`#515` 的「分类存疑留 shared 并登记，不要猜」原则优先于「baseline 归零」的字面目标。真正需要归零的是 `shared_domain_feature_import_baseline.json`（已 `[]`）与 `core/**` → features（已归零）。
+当时的结论是：这 5 条 `R13|shared|app_settings|...` 按「shared 消费方 / public 环」豁免**显式登记**在 `app/test/architecture/baseline.json`，并在文件头注释说明；`#515` 的「分类存疑留 shared 并登记，不要猜」原则优先于「baseline 归零」的字面目标。真正需要归零的是 `shared_domain_feature_import_baseline.json`（已 `[]`）与 `core/**` → features（已归零）。
 
 同一轮里已按本文档完成归位的（R13 从 11 条降到 5 条）：
 
@@ -105,7 +106,7 @@ Accepted（2026-11-11，#503）
 
 ### Negative
 
-- 5 条 `R13|shared|app_settings` 边保留并登记；只要 `app_settings` 的 settings page 还渲染 reader 偏好控件，就不能消除。
+- ~~5 条 `R13|shared|app_settings` 边保留并登记~~（已由 ADR-0046 消除，`baseline.json` 为 `[]`）。
 - 为绕开禁止边新增了两个窄 Port（`ComicReadLookupPort`、缩略图活动读模型），跨模块协作路径比「直接 import Repository」多一跳。
 - `shared/domain/ports/` 现在同时承载「真正的跨模块契约」与「按可达性豁免的单归属契约」，需要靠本文档表格区分。
 
