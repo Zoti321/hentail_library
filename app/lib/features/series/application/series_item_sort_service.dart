@@ -1,9 +1,8 @@
 import 'package:hentai_library/shared/domain/events/events.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/series_item_membership.dart';
-import 'package:hentai_library/shared/domain/ports/series_item_sort_port.dart';
 import 'package:hentai_library/features/series/domain/series_repository.dart';
 
-/// Comic 元数据保存路径写入 Series 成员排序 / 锁的 Port 实现（#457）。
+/// Comic 元数据保存路径写入 Series 成员排序 / 锁用例（#457）。
 
 /// 在 Comic 元数据保存路径中，按草稿与种子差异写入 Series 成员排序 / 锁。
 ///
@@ -43,7 +42,7 @@ Future<bool> persistSeriesItemSortIfChanged({
   return true;
 }
 
-class SeriesItemSortService implements SeriesItemSortPort {
+class SeriesItemSortService {
   const SeriesItemSortService({
     required this._repository,
     required this._events,
@@ -52,7 +51,6 @@ class SeriesItemSortService implements SeriesItemSortPort {
   final SeriesRepository _repository;
   final DomainEventPublisher _events;
 
-  @override
   Future<bool> persistIfChanged({
     required String comicId,
     required SeriesItemMembership seed,

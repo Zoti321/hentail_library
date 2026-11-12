@@ -1,3 +1,4 @@
+import 'package:hentai_library/features/comic/public/comic_metadata_types.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -6,16 +7,14 @@ import 'package:hentai_library/features/comic/presentation/comic_delete_flow.dar
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/shared/domain/ports/comic_trash_command_port.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 import '../../../support/pump_localized_app.dart';
 
-class _RecordingComicTrashCommandPort implements ComicTrashCommandPort {
+class _RecordingTrashComicsCommand {
   final List<List<String>> trashed = <List<String>>[];
 
-  @override
   Future<void> trash(List<String> comicIds) async {
     trashed.add(List<String>.of(comicIds));
   }
@@ -61,10 +60,10 @@ class _DeleteTrigger extends ConsumerWidget {
 
 Future<void> _pump(
   WidgetTester tester,
-  _RecordingComicTrashCommandPort port,
+  _RecordingTrashComicsCommand port,
 ) async {
   final List<Override> overrides = <Override>[
-    comicTrashCommandPortProvider.overrideWithValue(port),
+    trashComicsCommandProvider.overrideWithValue(port.trash),
   ];
   await pumpLocalizedApp(
     tester,
@@ -86,8 +85,7 @@ void main() {
   testWidgets('trash confirm uses M3EDialog without destructive styling', (
     WidgetTester tester,
   ) async {
-    final _RecordingComicTrashCommandPort port =
-        _RecordingComicTrashCommandPort();
+    final _RecordingTrashComicsCommand port = _RecordingTrashComicsCommand();
     final AppLocalizations l10n = await _pumpAndL10n(tester, port);
 
     expect(find.byType(M3EDialog), findsOneWidget);
@@ -102,8 +100,7 @@ void main() {
   testWidgets('confirming the dialog trashes the comic through the port', (
     WidgetTester tester,
   ) async {
-    final _RecordingComicTrashCommandPort port =
-        _RecordingComicTrashCommandPort();
+    final _RecordingTrashComicsCommand port = _RecordingTrashComicsCommand();
     final AppLocalizations l10n = await _pumpAndL10n(tester, port);
 
     await tester.tap(_dialogAction(l10n, l10n.commonDelete));
@@ -119,8 +116,7 @@ void main() {
   testWidgets('cancelling the dialog does not touch the trash port', (
     WidgetTester tester,
   ) async {
-    final _RecordingComicTrashCommandPort port =
-        _RecordingComicTrashCommandPort();
+    final _RecordingTrashComicsCommand port = _RecordingTrashComicsCommand();
     final AppLocalizations l10n = await _pumpAndL10n(tester, port);
 
     await tester.tap(_dialogAction(l10n, l10n.commonCancel));
@@ -132,7 +128,7 @@ void main() {
 
 Future<AppLocalizations> _pumpAndL10n(
   WidgetTester tester,
-  _RecordingComicTrashCommandPort port,
+  _RecordingTrashComicsCommand port,
 ) async {
   await _pump(tester, port);
   return AppLocalizations.of(tester.element(find.byType(M3EDialog)));

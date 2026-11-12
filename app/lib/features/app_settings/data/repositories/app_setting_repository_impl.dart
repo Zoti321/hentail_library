@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/features/app_settings/data/repositories/app_setting_storage.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting_migration.dart';
-import 'package:hentai_library/shared/domain/models/resource_format_category.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting_repository.dart';
 import 'package:hentai_library/features/app_settings/domain/legacy_browse_preferences.dart';
@@ -117,12 +116,12 @@ class AppSettingRepositoryImpl implements AppSettingRepository {
   }
 
   @override
-  Future<List<ResourceFormatCategory>?>
-  peekLegacyEnabledResourceFormatCategories() async {
+  Future<({Object? enabledFormatGroups})?>
+  peekLegacyResourceFormatPayload() async {
     try {
       final Map<String, dynamic>? raw = await _readLegacyJsonMap();
       if (raw != null) {
-        return legacyEnabledResourceFormatCategoriesFromJson(raw);
+        return legacyResourceFormatPayloadFromJson(raw);
       }
       final SharedPreferences prefs = await _prefs();
       final String? staged = prefs.getString(
@@ -132,7 +131,7 @@ class AppSettingRepositoryImpl implements AppSettingRepository {
         return null;
       }
       final Object? decoded = jsonDecode(staged);
-      return resourceFormatCategoriesFromStorage(decoded);
+      return (enabledFormatGroups: decoded);
     } catch (_) {
       return null;
     }
@@ -165,11 +164,11 @@ class AppSettingRepositoryImpl implements AppSettingRepository {
         legacyAutoScan,
       );
     }
-    final List<ResourceFormatCategory> legacyGroups =
-        legacyEnabledResourceFormatCategoriesFromJson(raw);
+    final ({Object? enabledFormatGroups}) legacyGroups =
+        legacyResourceFormatPayloadFromJson(raw);
     await prefs.setString(
       AppSettingStorageKeys.legacyImportResourceFormatCategories,
-      jsonEncode(resourceFormatCategoriesToStorage(legacyGroups)),
+      jsonEncode(legacyGroups.enabledFormatGroups),
     );
 
     final AppSetting setting = AppSetting.fromJson(raw);

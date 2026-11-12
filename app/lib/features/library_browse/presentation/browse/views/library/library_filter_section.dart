@@ -16,7 +16,7 @@ import 'package:hentai_library/features/library_browse/domain/browse/library_med
 import 'package:hentai_library/features/library_browse/domain/browse/library_metadata_filter_selection.dart';
 import 'package:hentai_library/features/comic_metadata/public/comic_metadata_entities.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/comic_language.dart';
+import 'package:hentai_library/features/comic/public/comic_metadata_types.dart';
 import 'package:hentai_library/shared/util/name_pinyin_assisted_filter.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';

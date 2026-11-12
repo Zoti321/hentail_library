@@ -70,7 +70,7 @@ abstract final class AppNavigation {
       case navIdLibrary:
         if (ref != null) {
           ref
-              .read(libraryManagementPortProvider)
+              .read(libraryManagementCommandsProvider)
               .goDefaultLibraryBrowse(context);
         } else {
           navigator.goHome();
@@ -97,7 +97,6 @@ abstract final class AppNavigation {
 void _clearComicDetailReturnSeries(BuildContext context) {
   try {
     ProviderScope.containerOf(context)
-        .read(comicDetailReturnSeriesPortProvider)
-        .clear();
+        .read(clearComicReturnSeriesCommandProvider)();
   } catch (_) {}
 }

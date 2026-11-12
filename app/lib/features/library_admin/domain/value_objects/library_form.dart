@@ -1,5 +1,4 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hentai_library/features/library_admin/domain/library_repository.dart';
 import 'package:hentai_library/features/library_admin/domain/resource_format_category.dart';
 import 'package:hentai_library/features/library_admin/domain/value_objects/scan_interval.dart';
 import 'package:hentai_library/features/library_admin/domain/local_library.dart';
@@ -148,82 +147,8 @@ extension LibraryFormOps on LibraryForm {
     );
   }
 
-  /// Create a new Library then apply scan/settings when they differ from defaults.
-  Future<LibraryFormApplyResult> create(LibraryRepository repository) async {
-    final LibraryForm ready = normalized;
-    final LibraryFormValidation validation = ready.validate(isCreate: true);
-    if (!validation.isValid) {
-      return LibraryFormApplyInvalid(validation);
-    }
-
-    final LocalLibrary created;
-    created = ready.isRemote
-        ? await repository.createRemote(
-            rootUrl: ready.rootPath,
-            username: ready.username,
-            password: ready.password,
-            allowHttp: ready.allowHttp,
-            name: ready.name,
-          )
-        : await repository.createLocal(ready.rootPath, name: ready.name);
-
-    await _writeSettingsIfNeeded(repository, created, ready);
-    return const LibraryFormApplySucceeded();
-  }
-
-  /// Edit existing Library. Empty remote password keeps the stored credential.
-  Future<LibraryFormApplyResult> applyTo(
-    LibraryRepository repository,
-    LocalLibrary original,
-  ) async {
-    final LibraryForm ready = normalized;
-    final LibraryFormValidation validation = ready.validate(isCreate: false);
-    if (!validation.isValid) {
-      return LibraryFormApplyInvalid(validation);
-    }
-
-    final bool rootChanged = ready.rootPath != original.rootPath.trim();
-    final bool settingsChanged = _settingsDiffer(ready, original);
-    final bool remoteConnectionChanged =
-        ready.isRemote &&
-        (ready.rootPath != original.rootPath.trim() ||
-            ready.username != original.username.trim() ||
-            ready.allowHttp != original.allowHttp ||
-            ready.password.isNotEmpty);
-
-    if (!rootChanged && !settingsChanged && !remoteConnectionChanged) {
-      return const LibraryFormApplySucceeded();
-    }
-
-    if (ready.isRemote) {
-      if (remoteConnectionChanged) {
-        await repository.updateRemote(
-          libraryId: original.libraryId,
-          rootUrl: ready.rootPath,
-          username: ready.username,
-          allowHttp: ready.allowHttp,
-          password: ready.password.isEmpty ? null : ready.password,
-        );
-      }
-    } else if (rootChanged) {
-      await repository.updateLocalRoot(
-        libraryId: original.libraryId,
-        rootPath: ready.rootPath,
-      );
-    }
-
-    if (settingsChanged || ready.name != original.name.trim()) {
-      await repository.updateSettings(
-        libraryId: original.libraryId,
-        name: ready.name,
-        groups: ready.enabledResourceFormatCategories,
-        scanOnStartup: ready.scanOnStartup,
-        scanInterval: ready.scanInterval,
-      );
-    }
-
-    return LibraryFormApplySucceeded(rootChanged: rootChanged);
-  }
+  bool settingsDifferFrom(LocalLibrary original) =>
+      _settingsDiffer(normalized, original);
 }
 
 bool _settingsDiffer(LibraryForm ready, LocalLibrary original) {
@@ -234,23 +159,6 @@ bool _settingsDiffer(LibraryForm ready, LocalLibrary original) {
         ready.enabledResourceFormatCategories,
         original.enabledResourceFormatCategories,
       );
-}
-
-Future<void> _writeSettingsIfNeeded(
-  LibraryRepository repository,
-  LocalLibrary created,
-  LibraryForm ready,
-) async {
-  if (!_settingsDiffer(ready, created)) {
-    return;
-  }
-  await repository.updateSettings(
-    libraryId: created.libraryId,
-    name: ready.name,
-    groups: ready.enabledResourceFormatCategories,
-    scanOnStartup: ready.scanOnStartup,
-    scanInterval: ready.scanInterval,
-  );
 }
 
 bool _sameOrderedGroups(

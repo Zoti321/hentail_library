@@ -5,8 +5,8 @@ void main() {
   test('public barrel exports counts / activity types and port factories', () {
     expect(HomePageCounts, isNotNull);
     expect(ReadingActivityStats, isNotNull);
-    expect(createHomePageCountsPort, isNotNull);
-    expect(createReadingActivityStatsPort, isNotNull);
-    expect(createRecordReadSessionActivityPort, isNotNull);
+    expect(createHomePageCountsRepository, isNotNull);
+    expect(createReadingActivityStatsStream, isNotNull);
+    expect(createRecordReadSessionActivityCommand, isNotNull);
   });
 }

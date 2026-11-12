@@ -4,6 +4,10 @@
 
 Accepted
 
+## ADR-0050 修订（2026-11-12）
+
+应用编排按具体 UseCase 命名；纯 Dart 依赖以构造参数注入 Repository、明确函数或真实系统 Gateway。Library 提交与初始化、Comic 保存与排序、Reader 上下文、备份 prepare/commit 和自动执行已归 application。薄查询不新增空用例。共享纯 Dart 协作契约归 `shared/domain/contracts/`；含 BuildContext 的签名归 `shared/ui/contracts/`。以下旧 Port 目录表达由本修订取代，纯 Dart 与禁止边规则不变。
+
 ## Context
 
 Wayfinder feature 模块已有 `domain` / `data` / `presentation`，但 `*Service`、`*Coordinator` 与交互草稿混在 `domain/`，ViewModel 又承担过多用例编排。ADR-0002 将业务真值放在 Rust；Dart 侧需要一层 **无 Flutter、无 FRB** 的用例编排，且与 glossary 中的 **Application data**（应用数据目录）术语区分。

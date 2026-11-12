@@ -1,3 +1,4 @@
+import 'package:hentai_library/features/comic/public/comic_metadata_types.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/comic/data/comic_entity_mapper.dart';

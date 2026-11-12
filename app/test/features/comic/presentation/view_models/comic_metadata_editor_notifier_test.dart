@@ -1,3 +1,4 @@
+import 'package:hentai_library/features/comic/public/comic_metadata_types.dart';
 import 'package:hentai_library/features/bootstrap/di/overrides/domain_event_bus_overrides.dart';
 import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
 import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';

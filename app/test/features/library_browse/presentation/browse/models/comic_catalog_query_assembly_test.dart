@@ -5,8 +5,7 @@ import 'package:hentai_library/features/library_browse/domain/browse/library_med
 import 'package:hentai_library/features/library_browse/domain/browse/library_metadata_filter_selection.dart';
 import 'package:hentai_library/features/library_browse/domain/browse/library_tri_state_pick.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/library_author_pick.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/library_tag_pick.dart';
+import 'package:hentai_library/features/comic/public/comic_metadata_types.dart';
 import 'package:test/test.dart';
 
 void main() {

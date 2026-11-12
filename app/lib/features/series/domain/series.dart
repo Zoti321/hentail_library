@@ -1,7 +1,7 @@
+import 'package:hentai_library/features/series/domain/value_objects/serialization_status.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hentai_library/features/series/domain/series_item.dart';
 import 'package:hentai_library/features/series/domain/value_objects/series_meta_locks.dart';
-import 'package:hentai_library/shared/domain/models/enums.dart';
 
 part 'series.freezed.dart';
 

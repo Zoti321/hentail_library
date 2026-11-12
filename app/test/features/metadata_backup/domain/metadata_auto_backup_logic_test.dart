@@ -1,3 +1,5 @@
+import 'package:hentai_library/features/metadata_backup/data/metadata_backup_file_gateway.dart';
+
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/comic_language.dart';
+import 'package:hentai_library/features/comic/domain/value_objects/comic_language.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:hentai_library/features/comic/public/l10n/comic_l10n.dart';
 

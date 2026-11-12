@@ -1,10 +1,9 @@
+import 'package:hentai_library/features/series/domain/value_objects/serialization_status.dart';
 import 'package:flutter/widgets.dart';
 import 'package:hentai_library/features/comic/public/comic.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
-import 'package:hentai_library/shared/domain/models/enums.dart';
 
-export 'package:hentai_library/shared/domain/models/enums.dart'
-    show SerializationStatus;
+export 'package:hentai_library/features/series/domain/value_objects/serialization_status.dart';
 
 /// 系列内单册预览项。
 class SeriesDetailComicItem {

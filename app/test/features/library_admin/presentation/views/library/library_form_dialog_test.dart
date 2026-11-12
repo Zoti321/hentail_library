@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/features/library_admin/di/shared_state_ports.dart';
+import 'package:hentai_library/features/library_admin/di/library_commands.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/libraries_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/library/library_confirm_dialog.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/library/library_form_dialog.dart';
@@ -46,7 +46,9 @@ Future<void> _pumpForm(
     tester,
     overrides: <Override>[
       librariesProvider.overrideWith(() => notifier),
-      librariesPortProvider.overrideWith(createLibrariesPort),
+      submitLibraryFormCommandProvider.overrideWith(
+        createSubmitLibraryFormCommand,
+      ),
     ],
     home: Builder(
       builder: (BuildContext context) => Scaffold(

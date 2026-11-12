@@ -7,23 +7,41 @@ import 'package:hentai_library/shared/di/library_browse_fallback_providers.dart'
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:riverpod/misc.dart' show Override;
 
-/// library_admin owner：Port 工厂与库状态投影（#435）。
+/// library_admin owner：命令工厂与库状态投影（#435）。
 List<Override> libraryAdminSharedStateOverrides() => <Override>[
-  librariesPortProvider.overrideWith(createLibrariesPort),
-  libraryReorderModePortProvider.overrideWith(createLibraryReorderModePort),
+  deleteLibraryCommandProvider.overrideWith(createDeleteLibraryCommand),
+  updateLibrarySidebarCommandProvider.overrideWith(
+    createUpdateLibrarySidebarCommand,
+  ),
+  submitLibraryFormCommandProvider.overrideWith(createSubmitLibraryFormCommand),
+  exitLibraryReorderCommandProvider.overrideWith(
+    createExitLibraryReorderCommand,
+  ),
   libraryReorderActiveStateProvider.overrideWith(
     (Ref ref) => ref.watch(libraryReorderModeProvider),
   ),
-  comicMetadataBulkEditCommandPortProvider.overrideWith(
-    createComicMetadataBulkEditCommandPort,
+  bulkEditComicMetadataCommandProvider.overrideWith(
+    createBulkEditComicMetadataCommand,
   ),
-  libraryScanCommandPortProvider.overrideWith(createLibraryScanCommandPort),
-  libraryMetadataRefreshCommandPortProvider.overrideWith(
-    createLibraryMetadataRefreshCommandPort,
+  startLibraryScanCommandProvider.overrideWith(createStartLibraryScanCommand),
+  cancelLibraryScanCommandProvider.overrideWith(createCancelLibraryScanCommand),
+  refreshComicMetadataCommandProvider.overrideWith(
+    createRefreshComicMetadataCommand,
   ),
-  libraryManagementPortProvider.overrideWith(createLibraryManagementPort),
-  libraryBrowseFallbackPortProvider.overrideWith(
-    createLibraryBrowseFallbackPort,
+  refreshSeriesMetadataCommandProvider.overrideWith(
+    createRefreshSeriesMetadataCommand,
+  ),
+  refreshLibraryMetadataCommandProvider.overrideWith(
+    createRefreshLibraryMetadataCommand,
+  ),
+  cancelMetadataRefreshCommandProvider.overrideWith(
+    createCancelMetadataRefreshCommand,
+  ),
+  libraryManagementCommandsProvider.overrideWith(
+    createLibraryManagementCommands,
+  ),
+  goLibraryBrowseFallbackCommandProvider.overrideWith(
+    createGoLibraryBrowseFallbackCommand,
   ),
   librariesStateProvider.overrideWith(
     (Ref ref) => ref.watch(librariesProvider),

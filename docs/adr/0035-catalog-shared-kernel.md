@@ -12,6 +12,8 @@ Accepted；**Comic 部分被 [ADR-0041](0041-comic-entity-ownership.md) 局部�
 
 ## Context
 
+> **实现修订（2026-11-12，ADR-0049）**：`SerializationStatus` 归 series；`ContentRating`、Comic Language 与两个筛选 pick 归 comic；资源格式类别归 library_admin；资源类型 wire 映射归 shared/data。下文关于完整 `enums.dart` 与这些 VO 留 shared 的历史结论由 ADR-0049 局部取代。分页、资源类型、缩略图优先级、浏览目标及不可达引用协议继续共享。
+
 Epic [#436](https://github.com/Zoti321/hentail_library/issues/436) 将各限界上下文的**规则、端口与 Repository 契约**迁入 owner feature（#437–#444 已落地），但下列 **Catalog 相关类型**仍集中在 `shared/domain`，且在多 feature 与 `shared/ui` 中广泛引用：
 
 | 区域 | 典型路径 | 主要消费者 |

@@ -1,3 +1,4 @@
+import 'package:hentai_library/features/comic/di/comic_metadata_service.dart';
 import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/features/comic/presentation/patterns/metadata_edit/comic_metadata_edit_draft.dart';
 import 'package:hentai_library/features/comic/presentation/patterns/metadata_edit/comic_metadata_smart_facet_scope.dart';
@@ -113,21 +114,17 @@ class ComicMetadataEditSession extends _$ComicMetadataEditSession {
 
     state = state.copyWith(saving: true);
     try {
-      final ComicMetadataEditorNotifier editor = ref.read(
-        comicMetadataEditorProvider.notifier,
-      );
-      await editor.apply(
+      await ref.read(saveComicMetadataUseCaseProvider)(
         comicMetadataFormFromDraft(state.draft, _original).normalized,
         _original,
+        sort: seed != null && sortOrder != null
+            ? (
+                seed: seed,
+                sortOrder: sortOrder,
+                draftLocked: seed.sortOrderLocked,
+              )
+            : null,
       );
-      if (seed != null && sortOrder != null) {
-        await editor.persistSeriesSort(
-          comicId: _original.comicId,
-          seed: seed,
-          sortOrder: sortOrder,
-          draftLocked: seed.sortOrderLocked,
-        );
-      }
       return ComicMetadataEditSaveResult.succeeded;
     } finally {
       state = state.copyWith(saving: false);

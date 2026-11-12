@@ -10,12 +10,78 @@ import 'package:hentai_library/features/reading_stats/public.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 void main() {
+  test(
+    'Home and direct consumer share the source stream and propagate errors',
+    () async {
+      var subscriptions = 0;
+      final source = StreamController<HomePageCounts>(
+        onListen: () {
+          subscriptions++;
+        },
+      );
+      final container = ProviderContainer(
+        overrides: [
+          homePageCountsProvider.overrideWith(
+            (ref, excludeR18) => source.stream,
+          ),
+          libraryComicAgeRestrictionStateProvider.overrideWithValue(
+            LibraryAgeRestrictionFilter.unrestricted,
+          ),
+          libraryRevisionThrottleBusyStateProvider.overrideWithValue(false),
+        ],
+      );
+      final changed = Completer<void>();
+      final failed = Completer<void>();
+      container.listen(homePageCountsStreamProvider, (_, next) {
+        if (next.asData?.value.comicCount == 2 && !changed.isCompleted) {
+          changed.complete();
+        }
+        if (next.hasError && !failed.isCompleted) {
+          failed.complete();
+        }
+      });
+      container.listen(homePageCountsProvider(false), (_, next) {});
+      source.add(
+        const HomePageCounts(
+          comicCount: 1,
+          seriesCount: 0,
+          authorCount: 0,
+          tagCount: 0,
+          parodyCount: 0,
+          characterCount: 0,
+          libraryCount: 1,
+        ),
+      );
+      expect(
+        (await container.read(homePageCountsStreamProvider.future)).comicCount,
+        1,
+      );
+      source.add(
+        const HomePageCounts(
+          comicCount: 2,
+          seriesCount: 0,
+          authorCount: 0,
+          tagCount: 0,
+          parodyCount: 0,
+          characterCount: 0,
+          libraryCount: 1,
+        ),
+      );
+      await changed.future;
+      source.addError(StateError('counts'));
+      await failed.future;
+      expect(subscriptions, 1);
+      container.dispose();
+      await source.close();
+    },
+  );
+
   test('homePageCountsStream exposes one Home page counts seam via reading_stats port', () async {
     final ProviderContainer container = ProviderContainer(
       overrides: <Override>[
         ...domainEventBusOverrides(),
-        homePageCountsPortProvider.overrideWithValue(
-          _FakeHomePageCountsPort(
+        homePageCountsProvider.overrideWith(
+          (ref, excludeR18) => _CountsStream(
             const HomePageCounts(
               comicCount: 10,
               tagCount: 4,
@@ -25,7 +91,7 @@ void main() {
               characterCount: 3,
               libraryCount: 1,
             ),
-          ),
+          ).watchHomePageCounts(excludeR18: excludeR18),
         ),
         libraryComicAgeRestrictionStateProvider.overrideWithValue(
           LibraryAgeRestrictionFilter.unrestricted,
@@ -68,12 +134,11 @@ void main() {
   });
 }
 
-final class _FakeHomePageCountsPort implements HomePageCountsPort {
-  const _FakeHomePageCountsPort(this._counts);
+final class _CountsStream {
+  const _CountsStream(this._counts);
 
   final HomePageCounts _counts;
 
-  @override
   Stream<HomePageCounts> watchHomePageCounts({required bool excludeR18}) {
     return Stream<HomePageCounts>.value(_counts);
   }

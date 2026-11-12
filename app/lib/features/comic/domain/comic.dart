@@ -1,3 +1,4 @@
+import 'package:hentai_library/features/comic/domain/value_objects/content_rating.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hentai_library/features/comic/domain/value_objects/comic_meta_locks.dart';
 import 'package:hentai_library/features/comic/domain/value_objects/comic_metadata_form.dart';

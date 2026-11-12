@@ -61,7 +61,7 @@ void main() {
       reason:
           'Series 实体已迁入 features/series（ADR-0042）；'
           'shared 只保留 SeriesReadingContext / SeriesItemMembership / '
-          'SeriesItemSortPort / SeriesCoverSource 等契约：\n'
+          'PersistSeriesItemSortCommand / SeriesCoverSource 等契约：\n'
           '${offenders.join('\n')}',
     );
   });

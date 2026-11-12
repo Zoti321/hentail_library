@@ -136,7 +136,7 @@ class _SeriesDetailCatalogLayout extends ConsumerWidget {
     if (localIndex < 0 || localIndex >= items.length) {
       return;
     }
-    ref.read(comicDetailReturnSeriesPortProvider).remember(seriesId);
+    ref.read(rememberComicReturnSeriesCommandProvider)(seriesId);
     ref
         .read(appNavigatorProvider)
         .pushComicDetail(items[localIndex].comic.comicId);
@@ -207,8 +207,8 @@ class _SeriesDetailCatalogLayout extends ConsumerWidget {
         ),
       ],
       onAuthorTap: (AuthorRef author) => author.hasIdentity
-          ? ref.read(authorDetailPortProvider).showById(context, author.id!)
-          : ref.read(authorDetailPortProvider).showByName(context, author.name),
+          ? ref.read(openAuthorByIdCommandProvider)(context, author.id!)
+          : ref.read(openAuthorByNameCommandProvider)(context, author.name),
       onComicTap: (int globalIndex) => _handleComicTap(
         ref: ref,
         globalIndex: globalIndex,
@@ -227,9 +227,9 @@ Future<void> _refreshMetadata(
   Series series,
 ) async {
   try {
-    final MetadataRefreshBatchResult result = await ref
-        .read(libraryMetadataRefreshCommandPortProvider)
-        .refreshSeries(seriesId: series.id, name: series.name);
+    final MetadataRefreshBatchResult result = await ref.read(
+      refreshSeriesMetadataCommandProvider,
+    )(seriesId: series.id, name: series.name);
     if (!context.mounted) {
       return;
     }

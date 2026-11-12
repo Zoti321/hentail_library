@@ -2,7 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting_migration.dart';
 import 'package:hentai_library/features/app_settings/domain/reading_preferences_schema.dart';
-import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 
 void main() {
@@ -111,21 +110,28 @@ void main() {
   });
 
   group('legacy import helpers', () {
-    test('legacyEnabledResourceFormatCategoriesFromJson preserves explicit empty list', () {
-      expect(
-        legacyEnabledResourceFormatCategoriesFromJson(<String, dynamic>{
-          'enabledFormatGroups': <String>[],
-        }),
-        isEmpty,
-      );
-    });
+    test(
+      'legacyResourceFormatPayloadFromJson preserves explicit empty list',
+      () {
+        expect(
+          legacyResourceFormatPayloadFromJson(<String, dynamic>{
+            'enabledFormatGroups': <String>[],
+          }).enabledFormatGroups,
+          isEmpty,
+        );
+      },
+    );
 
-    test('legacyEnabledResourceFormatCategoriesFromJson defaults to all groups when absent', () {
-      expect(
-        legacyEnabledResourceFormatCategoriesFromJson(<String, dynamic>{}),
-        ResourceFormatCategory.all,
-      );
-    });
+    test(
+      'legacyResourceFormatPayloadFromJson defaults to all groups when absent',
+      () {
+        expect(
+          legacyResourceFormatPayloadFromJson(<String, dynamic>{})
+              .enabledFormatGroups,
+          isNull,
+        );
+      },
+    );
 
     test('legacyAutoScanFromJson returns null when absent', () {
       expect(legacyAutoScanFromJson(<String, dynamic>{}), isNull);

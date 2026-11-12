@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/di/reader_launch_providers.dart';
+import 'package:hentai_library/shared/di/app_navigator_provider.dart';
 import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -8,16 +8,16 @@ Future<void> openReader(
   bool incognito = false,
   bool keepControlsOpen = false,
   bool startFromFirstPage = false,
-}) {
-  return ref
-      .read(readerLaunchPortProvider)
-      .openComic(
+}) => Future<void>.sync(() {
+  ref
+      .read(appNavigatorProvider)
+      .openReader(
         comicId: comicId,
         incognito: incognito,
         keepControlsOpen: keepControlsOpen,
         startFromFirstPage: startFromFirstPage,
       );
-}
+});
 
 Future<void> openComicInReader(
   WidgetRef ref, {

@@ -1,5 +1,5 @@
+import 'package:hentai_library/features/comic/domain/value_objects/content_rating.dart';
 import 'package:hentai_library/features/comic/domain/comic.dart';
-import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
 
 enum BulkMetadataEditFieldKind {

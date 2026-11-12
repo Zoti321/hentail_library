@@ -2,7 +2,7 @@
 library;
 
 export 'domain/comic_trash_reader_session_port.dart';
-export 'public/comic_trash_command_port.dart';
+export 'public/trash_comics_command.dart';
 export 'public/comic_trash_cross_feature_types.dart';
 export 'public/di/comic_trash_command_factory.dart';
 export 'public/di/comic_trash_providers.dart';

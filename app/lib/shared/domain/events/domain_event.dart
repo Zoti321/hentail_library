@@ -10,7 +10,7 @@ part 'comic_trash_events.dart';
 
 /// 只表达「已经发生的事实」：不可变、无行为、无 Flutter 类型、不持久化。
 ///
-/// 需要返回值或可能失败的模块协作仍走 `shared/domain/ports/**` 命令端口。
+/// 需要返回值或可能失败的模块协作仍走 明确 Command / Query Provider。
 sealed class DomainEvent {
   const DomainEvent();
 }

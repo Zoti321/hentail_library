@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/comic/public/comic.dart';
 import 'package:hentai_library/features/reading_history/public.dart';
-import 'package:hentai_library/shared/domain/ports/series_reading_context_port.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/comic/domain/repositories/comic_lookup_repository.dart';
 import 'package:hentai_library/shared/di/series_reading_context_providers.dart';
@@ -12,7 +11,7 @@ import 'package:riverpod/misc.dart' show Override;
 import 'package:test/test.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/features/comic/public/di/comic_repository_providers.dart';
-import 'package:hentai_library/features/comic/public/di/comic_read_lookup_adapter.dart';
+import 'package:hentai_library/features/comic/public/di/comic_read_query.dart';
 
 class _FakeComicRepo implements ComicLookupRepository {
   _FakeComicRepo(this._titles);
@@ -58,15 +57,15 @@ class _FakeComicRepo implements ComicLookupRepository {
   }
 
   @override
+  @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-class _FakeSeriesReadingContextPort implements SeriesReadingContextPort {
-  _FakeSeriesReadingContextPort(this._context);
+class _FakeFindSeriesReadingContextQuery {
+  _FakeFindSeriesReadingContextQuery(this._context);
 
   final SeriesReadingContext? _context;
 
-  @override
   Future<SeriesReadingContext?> getReadingContextByComicId(
     String comicId,
   ) async {
@@ -80,8 +79,7 @@ class _FakeSeriesReadingContextPort implements SeriesReadingContextPort {
   }
 }
 
-class _FakeHistoryCommands implements ReadingHistoryCommandPort {
-  @override
+class _FakeHistoryCommands {
   Future<int?> readResumePageIndex(String comicId) async => null;
 
   @override
@@ -94,14 +92,15 @@ List<Override> _overrides({
 }) {
   return <Override>[
     comicLookupRepositoryProvider.overrideWith((Ref ref) => comicRepo),
-    comicReadLookupPortProvider.overrideWith(
-      (Ref ref) => createComicReadLookupPort(comicRepo),
+    comicReadQueryProvider.overrideWith(
+      (Ref ref) => createComicReadQuery(comicRepo),
     ),
-    seriesReadingContextPortProvider.overrideWithValue(
-      _FakeSeriesReadingContextPort(seriesContext),
+    findSeriesReadingContextQueryProvider.overrideWithValue(
+      _FakeFindSeriesReadingContextQuery(seriesContext)
+          .getReadingContextByComicId,
     ),
-    readingHistoryCommandPortProvider.overrideWith(
-      (Ref ref) => _FakeHistoryCommands(),
+    readResumePageQueryProvider.overrideWith(
+      (Ref ref) => _FakeHistoryCommands().readResumePageIndex,
     ),
   ];
 }

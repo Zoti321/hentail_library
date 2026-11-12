@@ -55,7 +55,7 @@ class CatalogSelectionNotifier extends Notifier<CatalogSelectionState> {
   }
 
   void enter([CatalogSelectionHost host = CatalogSelectionHost.libraryBrowse]) {
-    ref.read(libraryReorderModePortProvider).exit();
+    ref.read(exitLibraryReorderCommandProvider)();
     state = CatalogSelectionState(
       active: true,
       host: host,

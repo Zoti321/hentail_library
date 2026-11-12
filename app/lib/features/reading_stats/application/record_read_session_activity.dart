@@ -1,15 +1,13 @@
 import 'package:hentai_library/features/reading_stats/domain/finished_comic_policy_domain_service.dart';
 import 'package:hentai_library/features/reading_stats/domain/reading_activity_stats_repository.dart';
 import 'package:hentai_library/features/reading_stats/domain/reading_duration_accrual_domain_service.dart';
-import 'package:hentai_library/features/reading_stats/domain/record_read_session_activity_port.dart';
 
 /// 将 Read session 事实经领域规则写入 Reading activity stats。
-class RecordReadSessionActivity implements RecordReadSessionActivityPort {
+class RecordReadSessionActivity {
   const RecordReadSessionActivity(this._repository);
 
   final ReadingActivityStatsRepository _repository;
 
-  @override
   Future<void> record({
     required String comicId,
     required bool incognito,

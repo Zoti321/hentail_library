@@ -1,5 +1,5 @@
 import 'package:hentai_library/features/library_admin/public/di/library_admin_state_providers.dart';
-import 'package:hentai_library/features/library_admin/public/ui/library_management_port.dart';
+import 'package:hentai_library/features/library_admin/public/ui/library_management_commands.dart';
 
 import 'dart:async';
 
@@ -11,7 +11,6 @@ import 'package:hentai_library/features/library_admin/presentation/views/home_li
 import 'package:hentai_library/features/library_admin/domain/libraries_state.dart';
 import 'package:hentai_library/features/library_admin/domain/library_scan_activity_state.dart';
 import 'package:hentai_library/features/library_admin/domain/library_sidebar_layout.dart';
-import 'package:hentai_library/features/library_admin/domain/library_metadata_refresh_command_port.dart';
 import 'package:hentai_library/features/library_admin/domain/metadata_refresh_types.dart';
 import 'package:hentai_library/features/library_admin/domain/sync_library_types.dart';
 import 'package:hentai_library/features/library_admin/domain/local_library.dart';
@@ -89,8 +88,8 @@ class HomeLibraryManagementPanel extends HookConsumerWidget {
       unawaited(_runLibraryAction(context, ref, library, action));
     }
 
-    final LibraryManagementPort management = ref.read(
-      libraryManagementPortProvider,
+    final LibraryManagementCommands management = ref.read(
+      libraryManagementCommandsProvider,
     );
 
     return HomeLibraryManagementSection(
@@ -130,14 +129,12 @@ Future<void> _persistOrder(
 ) async {
   final LibrarySidebarSections sections = splitLibrarySidebar(next);
   try {
-    await ref
-        .read(librariesPortProvider)
-        .updateSidebarLayout(
-          encodeLibrarySidebarLayout(
-            pinned: sections.pinned,
-            unpinned: sections.unpinned,
-          ),
-        );
+    await ref.read(updateLibrarySidebarCommandProvider)(
+      encodeLibrarySidebarLayout(
+        pinned: sections.pinned,
+        unpinned: sections.unpinned,
+      ),
+    );
   } catch (err) {
     pendingOrder.value = null;
     if (context.mounted) {
@@ -152,8 +149,8 @@ Future<void> _runLibraryAction(
   LocalLibrary library,
   HomeLibraryManagementAction action,
 ) async {
-  final LibraryManagementPort management = ref.read(
-    libraryManagementPortProvider,
+  final LibraryManagementCommands management = ref.read(
+    libraryManagementCommandsProvider,
   );
   final String libraryId = library.libraryId;
   switch (action) {
@@ -162,19 +159,15 @@ Future<void> _runLibraryAction(
     case HomeLibraryManagementAction.deepScan:
       await management.scanLibrary(context, libraryId, mode: ScanMode.full);
     case HomeLibraryManagementAction.refreshMetadata:
-      final LibraryMetadataRefreshCommandPort refresh = ref.read(
-        libraryMetadataRefreshCommandPortProvider,
-      );
       if (ref.read(libraryMetadataRefreshTargetLibraryIdStateProvider) ==
           libraryId) {
-        refresh.cancel();
+        ref.read(cancelMetadataRefreshCommandProvider)();
         return;
       }
       try {
-        final MetadataRefreshBatchResult result = await refresh.refreshLibrary(
-          libraryId: libraryId,
-          name: localLibraryDisplayName(library),
-        );
+        final MetadataRefreshBatchResult result = await ref.read(
+          refreshLibraryMetadataCommandProvider,
+        )(libraryId: libraryId, name: localLibraryDisplayName(library));
         if (context.mounted) {
           showMetadataRefreshBatchToast(context, result);
         }

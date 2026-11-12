@@ -5,8 +5,8 @@ void main() {
   test(
     'public barrel exports command port, cross-feature types, and trash page',
     () {
-      expect(ComicTrashCommandPort, isNotNull);
-      expect(createComicTrashCommandPort, isNotNull);
+      expect(TrashComicsCommand, isNotNull);
+      expect(createTrashComicsCommand, isNotNull);
       expect(createComicTrashRepository, isNotNull);
       expect(TrashedComic, isNotNull);
       expect(ComicTrashRepository, isNotNull);

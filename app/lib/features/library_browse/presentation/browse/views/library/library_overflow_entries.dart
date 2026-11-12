@@ -20,7 +20,7 @@ List<M3EMenuNode> buildLibraryOverflowEntries({
       M3EMenuEntry(
         label: l10n.libraryCancelScan,
         leading: const Icon(Icons.close),
-        onPressed: () => ref.read(libraryScanCommandPortProvider).cancel(),
+        onPressed: () => ref.read(cancelLibraryScanCommandProvider)(),
       ),
     ];
   }
@@ -40,20 +40,19 @@ List<M3EMenuNode> buildLibraryOverflowEntries({
     M3EMenuEntry(
       label: l10n.libraryScan,
       leading: const Icon(Icons.manage_search),
-      onPressed: () => ref
-          .read(libraryScanCommandPortProvider)
-          .start(silent: true, targetLibraryId: browseLibraryId),
+      onPressed: () => ref.read(startLibraryScanCommandProvider)(
+        silent: true,
+        targetLibraryId: browseLibraryId,
+      ),
     ),
     M3EMenuEntry(
       label: l10n.libraryDeepScan,
       leading: const Icon(Icons.travel_explore),
-      onPressed: () => ref
-          .read(libraryScanCommandPortProvider)
-          .start(
-            mode: ScanMode.full,
-            silent: true,
-            targetLibraryId: browseLibraryId,
-          ),
+      onPressed: () => ref.read(startLibraryScanCommandProvider)(
+        mode: ScanMode.full,
+        silent: true,
+        targetLibraryId: browseLibraryId,
+      ),
     ),
   ];
 }

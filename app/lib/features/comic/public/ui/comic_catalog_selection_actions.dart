@@ -74,9 +74,9 @@ Future<void> applyComicMetadataBulkPatchForComicIds(
   bool exitSelectionOnDone = false,
 }) async {
   try {
-    final ComicMetadataBulkPatchResult result = await ref
-        .read(comicMetadataBulkEditCommandPortProvider)
-        .apply(comicIds: comicIds, patch: patch);
+    final ComicMetadataBulkPatchResult result = await ref.read(
+      bulkEditComicMetadataCommandProvider,
+    )(comicIds: comicIds, patch: patch);
     if (!context.mounted) {
       return;
     }

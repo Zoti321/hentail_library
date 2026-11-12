@@ -60,7 +60,9 @@ AppShellNavigationSlot buildLibraryAdminAppShellNavigationSlot(
       AppNavigation.goToNavId(context, navId, ref: ref);
     },
     onLibrarySelected: (String libraryId) {
-      ref.read(libraryManagementPortProvider).openLibrary(context, libraryId);
+      ref
+          .read(libraryManagementCommandsProvider)
+          .openLibrary(context, libraryId);
     },
     surfaceRoles: DesktopShellSurfaceRoles.toneBased(scheme),
   );

@@ -20,15 +20,13 @@ import 'package:hentai_library/features/reader/presentation/view_models/reader_s
 import 'package:hentai_library/features/reader/presentation/view_models/reader_navigation_intent.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/read_session_providers.dart';
 import 'package:hentai_library/features/reader/presentation/routing/reader_route_context.dart';
-import 'package:hentai_library/features/reading_history/public.dart';
-import 'package:hentai_library/features/reading_stats/public.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 import '../../../../support/fakes/settings_test_fakes.dart';
 
-import 'package:hentai_library/features/comic/public/di/comic_read_lookup_adapter.dart';
+import 'package:hentai_library/features/comic/public/di/comic_read_query.dart';
 import 'package:hentai_library/features/app_settings/domain/reading_preferences_schema.dart';
 import 'package:hentai_library/features/app_settings/public/di/app_settings_providers.dart';
 
@@ -98,8 +96,7 @@ class _FakePrefetchController extends ReaderPrefetchNotifier {
   }
 }
 
-class _NoOpHistoryCommands implements ReadingHistoryCommandPort {
-  @override
+class _NoOpHistoryCommands {
   Future<void> recordReading({
     required String comicId,
     required String title,
@@ -107,7 +104,6 @@ class _NoOpHistoryCommands implements ReadingHistoryCommandPort {
     required int pageIndex,
   }) async {}
 
-  @override
   Future<int?> readResumePageIndex(String comicId) async => null;
 }
 
@@ -132,8 +128,7 @@ class _UnusedSessionPort implements NativeReaderPort {
   Future<void> clear() async {}
 }
 
-class _NoOpActivityCommands implements RecordReadSessionActivityPort {
-  @override
+class _NoOpActivityCommands {
   Future<void> record({
     required String comicId,
     required bool incognito,
@@ -149,13 +144,13 @@ Override _stubCoordinatorOverride() {
   return readSessionApplicationServiceProvider.overrideWithValue(
     ReadSessionApplicationService(
       sessionService: OpenReadSessionService(
-        comicLookup: createComicReadLookupPort(_UnusedComicLookup()),
+        comicLookup: createComicReadQuery(_UnusedComicLookup()),
         pageSource: _UnusedPageSource(),
-        readingHistoryCommands: history,
+        readResumePage: history.readResumePageIndex,
         sessionPort: _UnusedSessionPort(),
       ),
-      readingHistoryCommands: history,
-      activityCommands: _NoOpActivityCommands(),
+      recordProgress: history.recordReading,
+      recordActivity: _NoOpActivityCommands().record,
     ),
   );
 }

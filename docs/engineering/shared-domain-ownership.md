@@ -1,6 +1,6 @@
 # `shared/domain` 归属表（Epic #436 收尾）
 
-**决策索引**：ADR-0033（Application 层）、ADR-0034（public only）、**ADR-0035**（Catalog Shared Kernel）、**ADR-0039**（领域事件）、**ADR-0041**（Comic 实体归属）、**ADR-0042**（Series 实体归属 + 跨模块契约）、**ADR-0048**（Comic metadata 模块与 Author / Tag 归属）。
+**决策索引**：ADR-0033（Application 层）、ADR-0034（public only）、**ADR-0035**（Catalog Shared Kernel）、**ADR-0039**（领域事件）、**ADR-0041**（Comic 实体归属）、**ADR-0042**（Series 实体归属 + 跨模块契约）、**ADR-0048**（Comic metadata 模块与 Author / Tag 归属）、**ADR-0049**（剩余 models / ports 内聚）。
 **门禁**：L3b `shared_domain_feature_import_baseline.json`（当前应为 `[]`）；**2026-11-02** 起 owner 域 strangler re-export 已全部移除（`strangler_shims.txt` 为空），请直接 import **`features/<owner>/domain/...`**。
 
 ## 真源在 owner feature（已从 shared 移除 strangler）
@@ -24,6 +24,9 @@
 | **reading_history** | `features/reading_history/domain/` |
 | `app_setting*` | `features/app_settings/domain/`（阅读偏好**只**存 `String` id / `int` schema，枚举语义归 `features/reader/domain/`，两侧经 ACL 通信——ADR-0046） |
 | home read models | `features/home/domain/` |
+| Content rating、Comic Language、作者/标签筛选 pick | `features/comic/domain/value_objects/`；跨模块经 `comic/public/comic_metadata_types.dart`（ADR-0049） |
+| Serialization status | `features/series/domain/value_objects/serialization_status.dart`（ADR-0049） |
+| Resource format category、远程凭据同步 Port 与 token | `features/library_admin/domain/`、`public/di/remote_library_credentials_providers.dart`；app_settings 仅传递旧设置载荷，bootstrap 注入凭据实现（ADR-0049） |
 | named metadata 表单/字典 | `features/comic_metadata/domain/`；跨 feature **`features/comic_metadata/public.dart`**（仓储契约、字典 Riverpod、生产页）；Comic 表单窄面 **`public/comic_metadata_form.dart`**；Lab patterns **`public/ui/metadata_lab_patterns.dart`** |
 
 Feature 内代码应 **import owner `domain/`**（`library_browse` 内按 [`library-browse-zones.md`](library-browse-zones.md) 分子目录）；跨 feature 经 **`features/<owner>/public/**`**（ADR-0034）。**勿**再新增对已删除 shared shim 路径的依赖。
@@ -49,7 +52,7 @@ Feature 内代码应 **import owner `domain/`**（`library_browse` 内按 [`libr
 | `value_objects/` | `SeriesMetaLocks`、`SeriesComicsMetadata`、`SeriesMetadataForm` |
 | `library_series_*.dart` | 库 Series Tab 筛选/排序/分组/连载状态规则 |
 
-`features/series/public/` **不**暴露 `Series` 实体；跨模块只经 Port / 只读 record（ADR-0042 §2）。
+`features/series/public/` **不**暴露 `Series` 实体；跨模块只经 Query / 只读 record（ADR-0042 §2）。
 
 `shared/domain/models/models.dart` barrel 已于 #489 删除（零消费者）；需要 `reading_history` / `app_settings` 类型请直接 import 对应 feature 的 `public/**`（ADR-0034）。
 
@@ -63,28 +66,16 @@ Feature 内代码应 **import owner `domain/`**（`library_browse` 内按 [`libr
 
 不在 #436 批量迁出；consumer 继续 `import shared/domain/...`：
 
-- `models/enums.dart`；实体目录已清空：`Comic` 于 #489 迁入 `features/comic/`（ADR-0041），`Series` 于 #490 迁入 `features/series/`（ADR-0042），Author / AuthorDetail / Tag 于 #533 迁入 `features/comic_metadata/`（ADR-0048）
+- `models/enums.dart` 仅保留 `ResourceType`、`LibraryDisplayTarget`、`ThumbnailPriority`（ADR-0049）；实体目录已清空：Comic 归 comic、Series 归 series、Author / AuthorDetail / Tag 归 comic_metadata
 - `models/value_objects/page_request.dart`、`paged_result.dart`、`page_jump.dart`
-- 与 catalog 强绑定的 pick / meta VO：`models/value_objects/form/library_author_pick.dart`、`library_tag_pick.dart`、`comic_language.dart`；`library_form.dart` 已按生产者拥有归 `features/library_admin/domain/value_objects/`（#504）
-- `reading/series_reading_context.dart`（类型；读口 `SeriesReadingContextPort` @ shared/di，实现 @ series）
+- `models/value_objects/author_ref.dart`：shared metadata chip 与 comic / series 共享引用投影；`series_item_membership.dart`：comic ↛ series 的只读成员协议。语言与 pick 已归 comic（ADR-0049），`library_form.dart` 归 library_admin（#504）
+- `reading/series_reading_context.dart`（类型；读口 `FindSeriesReadingContextQuery` @ shared/di，实现 @ series）
 - `library/library_age_restriction_filter.dart`（跨 Tab 年龄限制词汇：comic / series 禁止边 + home 消费，无可达 owner——ADR-0045 可达性否决，**不是遗留**；2026-11-12 起只承载语义与 `fromStorage`，存储键已下放 browse 持久化）；批量补丁类型已归 `features/library_admin/domain/`（#513）；`library/metadata_refresh_types.dart` 与 `library/library_revision_state.dart` 已于 2026-11-12 归 `library_admin`；`LocalLibrary` / `ScanInterval` / `ScanMode` 已于 2026-11-12 归 `library_admin/domain/`（#531）
 - `thumbnail/**`
 
-## 契约仍定义在 `shared/domain`（未 owner 化）
+## 共享协作契约（ADR-0050）
 
-UI / 编排命令类型；发现面经 owner `public/` re-export（ADR-0034）：
-
-- `ports/author_detail_port.dart`
-- `ports/comic_trash_command_port.dart`
-- `ports/library_browse_fallback_port.dart`（窄口，仅 `goDefaultLibraryBrowse(BuildContext)`；实现 @ `library_admin`；全量 `LibraryManagementPort` 已归 `features/library_admin/public/ui/`）
-- `ports/series_reading_context_port.dart`
-- `ports/series_item_membership_port.dart`（ADR-0042）
-- `ports/series_item_sort_port.dart`（ADR-0042）
-- `ports/reader_launch_port.dart`（旧名 `read_session_launch_port`；ADR-0038）
-- `library/comic_detail_return_series_port.dart`（实现 @ `comic`；admin / reading_history 均调用，迁 comic 会与 `comic → library_admin` 成 public 环——留 shared）
-- `ports/reading_history_progress_port.dart`（禁止边豁免）
-- `ports/comic_read_lookup_port.dart`（reader ↛ comic 禁止边豁免；实现 @ comic 适配器）
-- `ports/library_reorder_mode_port.dart`（shared 消费方豁免：`shared/domain/catalog/selection/`）
+纯 Dart 契约在 `shared/domain/contracts/`：AppNavigator、ComicReadQuery、Series 查询/排序、TrashComicsCommand、退出重排和详情返回记忆命令。含 BuildContext 的作者详情与默认返回签名在 `shared/ui/contracts/`。读取进度直接订阅 `shared/di/reading_history_providers.dart` 的 StreamProvider；原 ReaderLaunch 纯转发链已合并至 AppNavigator。owner 与 shared 的落点仍按禁止边、public 环、shared/core 消费者决定，具体调用示例见 [跨模块协作](cross-feature-collaboration.md)。
 
 ## 领域事件（ADR-0039）
 

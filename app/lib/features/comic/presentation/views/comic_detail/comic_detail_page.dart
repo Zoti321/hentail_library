@@ -12,7 +12,7 @@ import 'package:hentai_library/features/comic/presentation/views/comic_detail/co
 import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_layout.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/features/library_admin/public/di/library_admin_state_providers.dart';
-import 'package:hentai_library/shared/di/reader_launch_providers.dart';
+import 'package:hentai_library/shared/di/app_navigator_provider.dart';
 import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -166,8 +166,8 @@ class _ComicDetailContent extends ConsumerWidget {
       onRead: () => _openReader(ref, incognito: false),
       onReadIncognito: () => _openReader(ref, incognito: true),
       onAuthorTap: (AuthorRef author) => author.hasIdentity
-          ? ref.read(authorDetailPortProvider).showById(context, author.id!)
-          : ref.read(authorDetailPortProvider).showByName(context, author.name),
+          ? ref.read(openAuthorByIdCommandProvider)(context, author.id!)
+          : ref.read(openAuthorByNameCommandProvider)(context, author.name),
       onSeriesSelect: (int index) =>
           _handleSeriesSelect(context, seriesNav, index),
     );
@@ -189,18 +189,20 @@ class _ComicDetailContent extends ConsumerWidget {
         .replaceComicDetail(items[index].comicId, reverse: index < current);
   }
 
-  Future<void> _openReader(WidgetRef ref, {required bool incognito}) async {
-    await ref
-        .read(readerLaunchPortProvider)
-        .openComic(comicId: comic.comicId, incognito: incognito);
-  }
+  Future<void> _openReader(WidgetRef ref, {required bool incognito}) =>
+      Future<void>.sync(
+        () => ref
+            .read(appNavigatorProvider)
+            .openReader(comicId: comic.comicId, incognito: incognito),
+      );
 
   Future<void> _refreshMetadata(BuildContext context, WidgetRef ref) async {
     final AppLocalizations l10n = context.l10n;
     try {
-      await ref
-          .read(libraryMetadataRefreshCommandPortProvider)
-          .refreshComic(comicId: comic.comicId, title: comic.title);
+      await ref.read(refreshComicMetadataCommandProvider)(
+        comicId: comic.comicId,
+        title: comic.title,
+      );
       if (!context.mounted) {
         return;
       }

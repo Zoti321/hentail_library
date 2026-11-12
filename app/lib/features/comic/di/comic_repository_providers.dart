@@ -17,7 +17,7 @@ comicUserMetadataRepositoryProvider = Provider<ComicUserMetadataRepository>(
   (Ref ref) => _unimplemented('comicUserMetadataRepositoryProvider'),
 );
 
-/// 漫画 lookup Repository：reader 只经 `ComicReadLookupPort`，本 token 归 comic（ADR-0045）。
+/// 漫画 lookup Repository：reader 只经 `ComicReadQuery`，本 token 归 comic（ADR-0045）。
 final Provider<ComicLookupRepository> comicLookupRepositoryProvider =
     Provider<ComicLookupRepository>(
       (Ref ref) => _unimplemented('comicLookupRepositoryProvider'),

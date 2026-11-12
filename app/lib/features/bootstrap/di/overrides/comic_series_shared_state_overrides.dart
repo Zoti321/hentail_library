@@ -9,17 +9,26 @@ import 'package:hentai_library/shared/di/series_slot_providers.dart';
 import 'package:hentai_library/shared/di/thumbnail_activity_providers.dart';
 import 'package:riverpod/misc.dart' show Override;
 
-/// comic / series owner：跨壳层 Port、UI 槽位与 return-series 栈（#457 / #493 / ADR-0042）。
+/// comic / series owner：跨壳层命令/查询、UI 槽位与 return-series 栈（#457 / #493 / ADR-0042）。
 List<Override> comicSeriesSharedStateOverrides() => <Override>[
-  comicDetailReturnSeriesPortProvider.overrideWith(
-    createComicDetailReturnSeriesPort,
+  rememberComicReturnSeriesCommandProvider.overrideWith(
+    createRememberComicReturnSeriesCommand,
+  ),
+  clearComicReturnSeriesCommandProvider.overrideWith(
+    createClearComicReturnSeriesCommand,
   ),
   thumbnailBackgroundActiveStateProvider.overrideWith(
     (ref) => ref.watch(thumbnailEventCoordinatorProvider).isActive,
   ),
-  seriesReadingContextPortProvider.overrideWith(createSeriesReadingContextPort),
-  seriesItemSortPortProvider.overrideWith(createSeriesItemSortPort),
-  seriesItemMembershipPortProvider.overrideWith(createSeriesItemMembershipPort),
+  findSeriesReadingContextQueryProvider.overrideWith(
+    createFindSeriesReadingContextQuery,
+  ),
+  persistSeriesItemSortCommandProvider.overrideWith(
+    createPersistSeriesItemSortCommand,
+  ),
+  findSeriesItemMembershipQueryProvider.overrideWith(
+    createFindSeriesItemMembershipQuery,
+  ),
   seriesCoverSlotProvider.overrideWithValue(buildSeriesCoverSlot),
   seriesMemberCoverSlotProvider.overrideWithValue(buildSeriesMemberCoverSlot),
   seriesMemberCardSlotProvider.overrideWithValue(buildSeriesMemberCardSlot),

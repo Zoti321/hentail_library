@@ -1,3 +1,4 @@
+import 'package:hentai_library/features/series/domain/value_objects/serialization_status.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';

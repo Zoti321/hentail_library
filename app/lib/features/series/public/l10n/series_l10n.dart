@@ -1,7 +1,7 @@
+import 'package:hentai_library/features/series/domain/value_objects/serialization_status.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/features/series/domain/library_serialization_status_filter.dart';
 import 'package:hentai_library/features/series/domain/library_series_sort_option.dart';
-import 'package:hentai_library/shared/domain/models/enums.dart';
 
 /// Series 枚举 → 展示文案（owner extension；ARB 源仍在 `core/l10n`）。
 extension SeriesL10nX on AppLocalizations {

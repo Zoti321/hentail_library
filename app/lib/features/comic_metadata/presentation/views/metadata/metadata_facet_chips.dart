@@ -91,7 +91,7 @@ class MetadataFacetChip extends ConsumerWidget {
       return;
     }
     if (_isAuthor) {
-      unawaited(ref.read(authorDetailPortProvider).showByName(context, name));
+      unawaited(ref.read(openAuthorByNameCommandProvider)(context, name));
     }
   }
 

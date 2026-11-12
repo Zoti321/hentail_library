@@ -8,8 +8,7 @@ import 'package:hentai_library/shared/ui/navigation/app_navigator_context.dart';
 void goDefaultLibraryBrowseFromContext(BuildContext context) {
   try {
     ProviderScope.containerOf(context)
-        .read(libraryBrowseFallbackPortProvider)
-        .goDefaultLibraryBrowse(context);
+        .read(goLibraryBrowseFallbackCommandProvider)(context);
   } catch (_) {
     appNavigatorOf(context).goHome();
   }

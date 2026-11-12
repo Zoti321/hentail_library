@@ -4,8 +4,7 @@ import 'package:hentai_library/shared/domain/library/library_age_restriction_fil
 import 'package:hentai_library/features/library_browse/domain/browse/library_media_type_filter.dart';
 import 'package:hentai_library/features/library_browse/domain/browse/library_metadata_filter_selection.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/library_author_pick.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/library_tag_pick.dart';
+import 'package:hentai_library/features/comic/public/comic_metadata_types.dart';
 
 /// 库页 Comic 列表装配：intent 与年龄限制 → [LibraryComicFilter]。
 class ComicCatalogQueryAssembly {

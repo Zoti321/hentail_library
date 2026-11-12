@@ -3,8 +3,6 @@ import 'package:flutter/widgets.dart';
 import 'package:hentai_library/core/constants/app_routes.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 
-import 'package:hentai_library/shared/domain/models/enums.dart';
-
 extension AppLocalizationsContextX on BuildContext {
   AppLocalizations get l10n => AppLocalizations.of(this);
 }
@@ -99,16 +97,6 @@ extension AppLocalizationsLabelsX on AppLocalizations {
     }
 
     return seriesDetailVolumeProgress(current, total);
-  }
-
-  String contentRatingLabel(ContentRating rating) {
-    return switch (rating) {
-      ContentRating.unknown => contentRatingUnknown,
-
-      ContentRating.safe => contentRatingSafe,
-
-      ContentRating.r18 => contentRatingR18,
-    };
   }
 
   String relativeTimeAgo(DateTime time) {

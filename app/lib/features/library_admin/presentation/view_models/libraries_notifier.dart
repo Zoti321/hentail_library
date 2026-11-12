@@ -1,5 +1,4 @@
 import 'package:hentai_library/features/library_admin/domain/libraries_state.dart';
-import 'package:hentai_library/features/library_admin/domain/resource_format_category.dart';
 import 'package:hentai_library/features/library_admin/domain/library_sidebar_layout.dart';
 import 'package:hentai_library/features/library_admin/domain/local_library.dart';
 import 'package:hentai_library/features/library_admin/domain/value_objects/library_form.dart';
@@ -7,16 +6,11 @@ import 'package:hentai_library/features/library_admin/domain/library_repository.
 import 'package:hentai_library/features/library_admin/public/di/library_admin_state_providers.dart';
 import 'package:hentai_library/features/library_admin/di/library_write.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:hentai_library/features/app_settings/public/di/app_settings_providers.dart';
+import 'package:hentai_library/features/library_admin/di/load_libraries.dart';
 
 export 'package:hentai_library/features/library_admin/domain/libraries_state.dart';
 
 part 'libraries_notifier.g.dart';
-
-const String _kMigratedResourceFormatCategoriesPref =
-    'migrated_enabled_format_groups_to_libraries_v1';
-const String _kMigratedAutoScanPref = 'migrated_auto_scan_to_libraries_v1';
 
 @Riverpod(keepAlive: true)
 class LibrariesNotifier extends _$LibrariesNotifier {
@@ -44,9 +38,9 @@ class LibrariesNotifier extends _$LibrariesNotifier {
     LibraryForm form, {
     LocalLibrary? original,
   }) async {
-    final LibraryFormApplyResult result = await ref
-        .read(libraryWriteServiceProvider)
-        .submitForm(form, original: original);
+    final LibraryFormApplyResult result = await ref.read(
+      submitLibraryFormUseCaseProvider,
+    )(form, original: original);
     if (result is LibraryFormApplySucceeded) {
       await refresh();
     }
@@ -54,66 +48,9 @@ class LibrariesNotifier extends _$LibrariesNotifier {
   }
 
   Future<void> deleteLibrary(String libraryId) async {
-    await ref.read(libraryWriteServiceProvider).deleteLibrary(libraryId);
+    await ref.read(deleteLibraryUseCaseProvider)(libraryId);
     await refresh();
   }
 
-  Future<LibrariesState> _load() async {
-    await _migrateResourceFormatCategoriesFromLegacyIfNeeded();
-    await _migrateAutoScanFromLegacyIfNeeded();
-    try {
-      await ref.read(appSettingRepositoryProvider).clearLegacyImportPayload();
-    } catch (_) {
-      // Best-effort cleanup of staged legacy import keys.
-    }
-    final List<LocalLibrary> libraries = await _repo.list();
-    return LibrariesState(libraries: libraries);
-  }
-
-  Future<void> _migrateResourceFormatCategoriesFromLegacyIfNeeded() async {
-    try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      if (prefs.getBool(_kMigratedResourceFormatCategoriesPref) == true) {
-        return;
-      }
-      final List<LocalLibrary> libraries = await _repo.list();
-      if (libraries.isEmpty) {
-        await prefs.setBool(_kMigratedResourceFormatCategoriesPref, true);
-        return;
-      }
-      final List<ResourceFormatCategory>? legacyGroups = await ref
-          .read(appSettingRepositoryProvider)
-          .peekLegacyEnabledResourceFormatCategories();
-      final List<ResourceFormatCategory> groups =
-          legacyGroups ??
-          List<ResourceFormatCategory>.of(ResourceFormatCategory.all);
-      for (final LocalLibrary library in libraries) {
-        await _repo.updateResourceFormatCategories(
-          libraryId: library.libraryId,
-          groups: groups,
-        );
-      }
-      await prefs.setBool(_kMigratedResourceFormatCategoriesPref, true);
-    } catch (_) {
-      // Best-effort upgrade path; browse still works with DB defaults.
-    }
-  }
-
-  Future<void> _migrateAutoScanFromLegacyIfNeeded() async {
-    try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      if (prefs.getBool(_kMigratedAutoScanPref) == true) {
-        return;
-      }
-      final bool? legacy = await ref
-          .read(appSettingRepositoryProvider)
-          .peekLegacyAutoScan();
-      if (legacy == true) {
-        await _repo.setAllScanOnStartup(true);
-      }
-      await prefs.setBool(_kMigratedAutoScanPref, true);
-    } catch (_) {
-      // Best-effort; libraries keep scan_on_startup defaults.
-    }
-  }
+  Future<LibrariesState> _load() => ref.read(loadLibrariesUseCaseProvider)();
 }

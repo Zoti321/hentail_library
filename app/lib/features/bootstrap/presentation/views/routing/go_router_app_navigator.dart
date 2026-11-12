@@ -1,7 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/constants/app_routes.dart';
 import 'package:hentai_library/features/reader/public.dart';
-import 'package:hentai_library/shared/domain/ports/app_navigator.dart';
+import 'package:hentai_library/shared/domain/contracts/app_navigator.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 
 /// [AppNavigator] 的 go_router 适配器：仅宿主 bootstrap 持有具体路由实现。

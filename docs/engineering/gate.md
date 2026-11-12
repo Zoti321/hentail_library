@@ -238,7 +238,7 @@ Epic [#447](https://github.com/Zoti321/hentail_library/issues/447) 清理 Flutte
 | L1 domain↔data、FRB 面、application 依赖、shared→feature public、public→presentation（含 `export`，R12 allowlist） | `import_boundary_test.dart`（R1–R12）；`public_presentation_export_allowlist.txt`（只缩不扩） |
 | L1b shared→features ratchet（R13） | **单一实现**：`test/architecture/module_boundary_test.dart`（扫 `import` + `export`），baseline `test/gate/import_boundary_baseline.json` + `test/architecture/baseline.json`；两份 baseline 都有 stale 校验（当前扫描产不出的条目必须删）。`import_boundary_test.dart` 只断言「R13 无第二实现」。归属判定见 ADR-0045 |
 | L2 product 图 ratchet（M1 非 public 边、M2/M3） | `import_boundary_baseline.json` → `dart run tool/generate_import_boundary_baseline.dart` |
-| Cross-feature 协作约定 | [`cross-feature-collaboration.md`](cross-feature-collaboration.md)；**新增 Port 前先判定可达性**（ADR-0045） |
+| Cross-feature 协作约定 | [`cross-feature-collaboration.md`](cross-feature-collaboration.md)；**新增协作能力先判定可达性**（ADR-0045 / ADR-0050；Command/Query/流同样受约束） |
 | 领域事件（E1 事件子类位置 / E2 仅 application·data 发布 / E4 实现收敛） | `domain_event_rules_test.dart`（ADR-0039） |
 | public 图无环 | `import_boundary_test.dart`（`collectPublicCrossFeatureAdjacency`） |
 | bootstrap shared 注入 | `features/bootstrap/di/overrides/*` + `shared_state_overrides.dart`（#435） |

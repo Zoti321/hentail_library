@@ -16,14 +16,14 @@ typedef SeriesSwitchPlan = ({
 class ReadSessionApplicationService {
   ReadSessionApplicationService({
     required this.sessionService,
-    required this.readingHistoryCommands,
-    required this.activityCommands,
+    required this.recordProgress,
+    required this.recordActivity,
     DateTime Function()? now,
   }) : _now = now ?? DateTime.now;
 
   final OpenReadSessionService sessionService;
-  final ReadingHistoryCommandPort readingHistoryCommands;
-  final RecordReadSessionActivityPort activityCommands;
+  final RecordReadingProgressCommand recordProgress;
+  final RecordReadSessionActivityCommand recordActivity;
   final DateTime Function() _now;
 
   ReadSession? _session;
@@ -155,7 +155,7 @@ class ReadSessionApplicationService {
 
   Future<void> _persistSession(ReadSession session) async {
     final DateTime now = _now();
-    await readingHistoryCommands.recordReading(
+    await recordProgress(
       comicId: session.comicId,
       title: session.comic.title,
       lastReadTime: now,
@@ -165,7 +165,7 @@ class ReadSessionApplicationService {
 
   Future<void> _reportActivity(ReadSession session) async {
     final Duration elapsed = session.takeForegroundElapsed(_now());
-    await activityCommands.record(
+    await recordActivity(
       comicId: session.comicId,
       incognito: false,
       foregroundElapsed: elapsed,

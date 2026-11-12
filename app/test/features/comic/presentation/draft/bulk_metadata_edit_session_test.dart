@@ -1,3 +1,4 @@
+import 'package:hentai_library/features/comic/public/comic_metadata_types.dart';
 import 'package:hentai_library/features/comic/presentation/draft/bulk_metadata_edit_session.dart';
 import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/features/comic_metadata/public/comic_metadata_entities.dart';

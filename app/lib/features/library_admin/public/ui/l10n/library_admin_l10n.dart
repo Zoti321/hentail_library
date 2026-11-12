@@ -1,7 +1,7 @@
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/features/library_admin/domain/sync_library_types.dart';
 import 'package:hentai_library/features/library_admin/domain/value_objects/scan_interval.dart';
-import 'package:hentai_library/shared/domain/models/resource_format_category.dart';
+import 'package:hentai_library/features/library_admin/domain/resource_format_category.dart';
 
 /// library_admin 领域枚举 → 展示文案（owner extension；ARB 源仍在 `core/l10n`）。
 extension LibraryAdminL10nX on AppLocalizations {

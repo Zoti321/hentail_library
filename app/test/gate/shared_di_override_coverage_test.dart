@@ -25,6 +25,24 @@ void main() {
     featuresDir = Directory(p.join(libDir.path, 'features'));
   });
 
+  test('injection scanner covers function/query/stream declarations and autoDispose families', () {
+    expect(
+      _declaredTokenNames("""
+final Provider<Future<void> Function(String)> saveCommandProvider = injectedDi('saveCommandProvider');
+final Provider<Future<int?> Function(String)> resumeQueryProvider = injectedDi('resumeQueryProvider');
+final StreamProvider<Map<String, int>> progressProvider = StreamProvider((ref) => stream);
+final countsProvider = StreamProvider.autoDispose.family<Counts, bool>((ref, enabled) => stream);
+// final Provider<void> ignoredProvider = injectedDi('ignoredProvider');
+"""),
+      {
+        'saveCommandProvider',
+        'resumeQueryProvider',
+        'progressProvider',
+        'countsProvider',
+      },
+    );
+  });
+
   test('shared/di 每个注入 token 至少有一处 overrideWith', () {
     expect(sharedDiDir.existsSync(), isTrue, reason: 'missing lib/shared/di');
 
@@ -71,17 +89,17 @@ Set<String> _collectDeclaredTokens(Directory sharedDiDir) {
     if (file.path.endsWith('.g.dart')) {
       continue;
     }
-    final String flat = _flatten(_stripComments(file.readAsStringSync()));
-    for (final RegExp pattern in <RegExp>[
-      _typeFirstDeclaration,
-      _nameFirstDeclaration,
-    ]) {
-      for (final RegExpMatch match in pattern.allMatches(flat)) {
-        names.add(match.group(1)!);
-      }
-    }
+    names.addAll(_declaredTokenNames(file.readAsStringSync()));
   }
   return names;
+}
+
+Set<String> _declaredTokenNames(String source) {
+  final flat = _flatten(_stripComments(source));
+  return {
+    for (final pattern in [_typeFirstDeclaration, _nameFirstDeclaration])
+      for (final match in pattern.allMatches(flat)) match.group(1)!,
+  };
 }
 
 Set<String> _collectOverriddenTokens(Directory featuresDir) {

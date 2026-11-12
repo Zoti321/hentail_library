@@ -1,7 +1,7 @@
+import 'package:hentai_library/features/series/domain/value_objects/serialization_status.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 系列连载状态单选（[M3EDropdownMenu]）。

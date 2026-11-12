@@ -1,8 +1,8 @@
+import 'package:hentai_library/features/comic/domain/value_objects/content_rating.dart';
 import 'package:flutter/widgets.dart';
 import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_format.dart';
 import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_view_object.dart';
 import 'package:hentai_library/features/comic/domain/comic.dart';
-import 'package:hentai_library/shared/domain/models/enums.dart';
 
 /// 将领域 [Comic] 映射为 MD3E 漫画详情数据（纯函数，便于测试）。
 ///

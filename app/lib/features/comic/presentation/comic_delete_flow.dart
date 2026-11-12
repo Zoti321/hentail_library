@@ -54,7 +54,7 @@ Future<void> confirmAndTrashComicById(
     return;
   }
   try {
-    await ref.read(comicTrashCommandPortProvider).trash(<String>[comicId]);
+    await ref.read(trashComicsCommandProvider)(<String>[comicId]);
     if (!context.mounted) {
       return;
     }

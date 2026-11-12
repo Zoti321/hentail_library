@@ -1,7 +1,7 @@
 import 'package:hentai_library/features/comic/public.dart';
 import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
 import 'package:hentai_library/shared/di/series_slot_providers.dart';
-import 'package:hentai_library/shared/domain/models/resource_type_frb_wire.dart';
+import 'package:hentai_library/shared/data/frb/resource_type_frb_wire.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'reader_cover_editor_notifier.g.dart';

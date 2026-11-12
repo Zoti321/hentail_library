@@ -50,9 +50,7 @@ class ComicMetadataEditorNotifier extends _$ComicMetadataEditorNotifier {
   }
 
   Future<SeriesItemMembership?> findSeriesMembership(String comicId) {
-    return ref
-        .read(seriesItemMembershipPortProvider)
-        .findMembershipByComicId(comicId);
+    return ref.read(findSeriesItemMembershipQueryProvider)(comicId);
   }
 
   Future<void> persistSeriesSort({
@@ -61,13 +59,11 @@ class ComicMetadataEditorNotifier extends _$ComicMetadataEditorNotifier {
     required double sortOrder,
     required bool draftLocked,
   }) async {
-    await ref
-        .read(seriesItemSortPortProvider)
-        .persistIfChanged(
-          comicId: comicId,
-          seed: seed,
-          sortOrder: sortOrder,
-          draftLocked: draftLocked,
-        );
+    await ref.read(persistSeriesItemSortCommandProvider)(
+      comicId: comicId,
+      seed: seed,
+      sortOrder: sortOrder,
+      draftLocked: draftLocked,
+    );
   }
 }

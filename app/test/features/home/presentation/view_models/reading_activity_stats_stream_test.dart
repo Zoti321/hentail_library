@@ -13,13 +13,13 @@ void main() {
     () async {
       final ProviderContainer container = ProviderContainer(
         overrides: <Override>[
-          readingActivityStatsPortProvider.overrideWithValue(
-            const _FakeReadingActivityStatsPort(
+          readingActivityStatsProvider.overrideWith(
+            (ref) => _ActivityStream(
               ReadingActivityStats(
                 finishedCount: 7,
                 totalDuration: Duration(minutes: 42),
               ),
-            ),
+            ).watchActivityStats(),
           ),
           libraryRevisionThrottleBusyStateProvider.overrideWithValue(false),
         ],
@@ -56,12 +56,11 @@ void main() {
   );
 }
 
-final class _FakeReadingActivityStatsPort implements ReadingActivityStatsPort {
-  const _FakeReadingActivityStatsPort(this._stats);
+final class _ActivityStream {
+  const _ActivityStream(this._stats);
 
   final ReadingActivityStats _stats;
 
-  @override
   Stream<ReadingActivityStats> watchActivityStats() {
     return Stream<ReadingActivityStats>.value(_stats);
   }

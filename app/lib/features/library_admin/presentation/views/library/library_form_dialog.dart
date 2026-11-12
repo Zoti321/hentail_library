@@ -166,12 +166,9 @@ class _LibraryFormState extends ConsumerState<_LibraryFormFields> {
       _saving = true;
     });
     try {
-      final LibraryFormApplyResult result = await ref
-          .read(librariesPortProvider)
-          .submitLibraryForm(
-            _form,
-            original: _isCreate ? null : widget.library!,
-          );
+      final LibraryFormApplyResult result = await ref.read(
+        submitLibraryFormCommandProvider,
+      )(_form, original: _isCreate ? null : widget.library!);
       if (!mounted) {
         return;
       }

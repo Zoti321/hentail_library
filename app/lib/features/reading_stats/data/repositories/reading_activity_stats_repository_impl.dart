@@ -1,11 +1,10 @@
 import 'package:hentai_library/features/reading_stats/domain/reading_activity_stats_repository.dart';
 import 'package:hentai_library/shared/data/frb/frb_call_guard.dart';
 import 'package:hentai_library/features/reading_stats/domain/reading_activity_stats.dart';
-import 'package:hentai_library/features/reading_stats/domain/reading_activity_stats_port.dart';
 import 'package:hentai_library/src/rust/api/reading_activity.dart' as rust;
 
 class ReadingActivityStatsRepositoryImpl
-    implements ReadingActivityStatsRepository, ReadingActivityStatsPort {
+    implements ReadingActivityStatsRepository {
   const ReadingActivityStatsRepositoryImpl();
 
   @override

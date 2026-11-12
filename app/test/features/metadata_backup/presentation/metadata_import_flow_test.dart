@@ -1,5 +1,10 @@
+import 'package:flutter/services.dart';
+import 'package:hentai_library/features/metadata_backup/application/prepare_metadata_import_use_case.dart';
+import 'package:hentai_library/features/metadata_backup/di/metadata_backup_use_case_providers.dart';
+import 'package:hentai_library/features/metadata_backup/data/metadata_backup_file_gateway.dart';
+import 'package:hentai_library/features/metadata_backup/domain/metadata_backup_repository.dart';
+
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -61,6 +66,71 @@ void main() {
       ),
     ],
   );
+
+  for (final confirm in [false, true]) {
+    testWidgets(
+      'actual import flow commits only after confirmation: $confirm',
+      (tester) async {
+        final repo = _FlowRepository(
+          manifest,
+          const MetadataImportPreview(
+            wouldApply: 2,
+            skippedNotFound: 0,
+            skippedAmbiguous: 0,
+            wouldUpsertOrphanFacetCount: 0,
+            samplesWouldApply: [],
+            samplesNotFound: [],
+            samplesAmbiguous: [],
+          ),
+        );
+        const picker = MethodChannel('miguelruivo.flutter.plugins.filepicker');
+        tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+          picker,
+          (_) async => [
+            {
+              'name': 'backup.hlmeta.json',
+              'path': '/isolated/backup.hlmeta.json',
+              'size': 1,
+              'bytes': Uint8List.fromList([9]),
+            },
+          ],
+        );
+        addTearDown(
+          () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+            picker,
+            null,
+          ),
+        );
+        await pumpLocalizedApp(
+          tester,
+          wrapProviderScope: true,
+          overrides: [
+            prepareMetadataImportUseCaseProvider.overrideWithValue(
+              PrepareMetadataImportUseCase(
+                repo,
+                const LocalMetadataBackupFileGateway(),
+              ),
+            ),
+          ],
+          home: Builder(
+            builder: (context) => FilledButton(
+              onPressed: () => runMetadataImportFlow(context),
+              child: const Text('start-import'),
+            ),
+          ),
+        );
+        await tester.tap(find.text('start-import'));
+        await tester.pumpAndSettle();
+        expect(find.byType(MetadataImportConfirmDialog), findsOneWidget);
+        expect(repo.imports, 0);
+        await tester.tap(find.text(confirm ? '导入 2' : '取消').last);
+        await tester.pumpAndSettle();
+        expect(repo.imports, confirm ? 1 : 0);
+        if (confirm) expect(repo.importedBytes, [9]);
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
 
   testWidgets('confirm dialog cancels without calling import', (
     WidgetTester tester,
@@ -253,4 +323,33 @@ void main() {
     );
     expect(decoded, equals(Uint8List.fromList(<int>[123, 125])));
   });
+}
+
+class _FlowRepository implements MetadataBackupRepository {
+  _FlowRepository(this.manifest, this.preview);
+  final MetadataBackupManifest manifest;
+  final MetadataImportPreview preview;
+  var imports = 0;
+  Uint8List? importedBytes;
+  @override
+  MetadataBackupManifest peekManifest(Uint8List bytes) => manifest;
+  @override
+  MetadataImportPreview previewImport(Uint8List bytes) => preview;
+  @override
+  MetadataImportResult importMetadata(Uint8List bytes) {
+    imports++;
+    importedBytes = bytes;
+    return const MetadataImportResult(
+      applied: 1,
+      skippedNotFound: 0,
+      skippedAmbiguous: 0,
+      errors: [],
+    );
+  }
+
+  @override
+  Uint8List exportComicMetadata({
+    String? libraryId,
+    required bool includeOrphanFacets,
+  }) => throw UnimplementedError();
 }

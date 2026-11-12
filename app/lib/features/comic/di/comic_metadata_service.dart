@@ -1,3 +1,5 @@
+import 'package:hentai_library/features/comic/application/save_comic_metadata_use_case.dart';
+import 'package:hentai_library/shared/di/series_item_sort_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/comic/application/comic_metadata_service.dart';
 import 'package:hentai_library/shared/di/domain_event_bus_providers.dart';
@@ -24,3 +26,11 @@ final Provider<ComicMetadataApplyCommand> comicMetadataApplyCommandProvider =
         );
       };
     });
+
+final saveComicMetadataUseCaseProvider = Provider<SaveComicMetadataUseCase>(
+  (ref) => SaveComicMetadataUseCase(
+    apply: (form, original) =>
+        ref.read(comicMetadataApplyCommandProvider)(form, original),
+    persistSort: ref.read(persistSeriesItemSortCommandProvider),
+  ),
+);

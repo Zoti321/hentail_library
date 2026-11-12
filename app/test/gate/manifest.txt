@@ -92,3 +92,19 @@ test/features/library_admin/presentation/views/navigation/libraries_routes_test.
 test/features/comic_trash/presentation/view_models/trash_page_state_test.dart
 test/features/comic_trash/presentation/views/trash
 test/features/reader/application
+
+# Owner-owned language behavior (formerly covered by test/shared/domain)
+test/features/comic/domain/value_objects/comic_language_test.dart
+
+# ADR-0050 communication and concrete application usecases
+test/features/comic/application
+test/features/library_admin/application
+test/features/library_admin/domain/value_objects/library_form_test.dart
+test/features/library_admin/di
+test/features/bootstrap/di
+test/features/metadata_backup/application
+test/features/metadata_backup/presentation
+test/features/home/presentation/view_models/home_page_counts_stream_test.dart
+test/features/home/presentation/view_models/reading_activity_stats_stream_test.dart
+test/features/reader/presentation/view_models/series_reader_provider_test.dart
+test/features/reading_history/di

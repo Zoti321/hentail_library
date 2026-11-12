@@ -3,8 +3,6 @@ import 'package:hentai_library/features/bootstrap/di/overrides/app_shell_slot_ov
 import 'package:hentai_library/features/bootstrap/presentation/views/responsive_app_shell.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/routing/app_router.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/routing/go_router_app_navigator.dart';
-import 'package:hentai_library/features/reader/public.dart';
-import 'package:hentai_library/shared/di/reader_launch_providers.dart';
 import 'package:hentai_library/shared/di/comic_detail_providers.dart';
 import 'package:hentai_library/shared/di/app_navigator_provider.dart';
 import 'package:hentai_library/shared/di/app_shell_providers.dart';
@@ -15,7 +13,6 @@ import 'package:riverpod/misc.dart' show Override;
 List<Override> bootstrapCompositionOverrides() => <Override>[
   ...bootstrapShellSlotOverrides(),
   appNavigatorProvider.overrideWithValue(GoRouterAppNavigator(appRouter)),
-  readerLaunchPortProvider.overrideWith(createReaderLaunchPort),
   appShellOpenNavigationDrawerProvider.overrideWithValue(
     openAppShellNavigationDrawer,
   ),

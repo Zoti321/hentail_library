@@ -8,14 +8,13 @@ import 'package:riverpod/misc.dart' show Override;
 
 import '../../../support/pump_localized_app.dart';
 
-class _RecordingBulkEditPort implements ComicMetadataBulkEditCommandPort {
+class _RecordingBulkEditPort {
   _RecordingBulkEditPort(this.result);
 
   List<String>? lastComicIds;
   ComicMetadataBulkPatch? lastPatch;
   final ComicMetadataBulkPatchResult result;
 
-  @override
   Future<ComicMetadataBulkPatchResult> apply({
     required List<String> comicIds,
     required ComicMetadataBulkPatch patch,
@@ -48,7 +47,7 @@ void main() {
       tester,
       wrapProviderScope: true,
       overrides: <Override>[
-        comicMetadataBulkEditCommandPortProvider.overrideWithValue(port),
+        bulkEditComicMetadataCommandProvider.overrideWithValue(port.apply),
       ],
       home: Consumer(
         builder: (BuildContext context, WidgetRef ref, Widget? _) {
@@ -96,7 +95,7 @@ void main() {
         tester,
         wrapProviderScope: true,
         overrides: <Override>[
-          comicMetadataBulkEditCommandPortProvider.overrideWithValue(port),
+          bulkEditComicMetadataCommandProvider.overrideWithValue(port.apply),
         ],
         home: Consumer(
           builder: (BuildContext context, WidgetRef ref, Widget? _) {

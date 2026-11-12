@@ -1,5 +1,5 @@
+import 'package:hentai_library/features/series/domain/value_objects/serialization_status.dart';
 import 'package:hentai_library/features/series/domain/series.dart';
-import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/series/domain/value_objects/series_metadata_form.dart';
 import 'package:hentai_library/features/series/domain/series_repository.dart';
 

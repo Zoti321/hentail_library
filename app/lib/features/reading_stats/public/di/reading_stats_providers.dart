@@ -1,17 +1,17 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/shared/di/injected_di.dart';
-import 'package:hentai_library/features/reading_stats/domain/home_page_counts_port.dart';
-import 'package:hentai_library/features/reading_stats/domain/reading_activity_stats_port.dart';
-import 'package:hentai_library/features/reading_stats/domain/record_read_session_activity_port.dart';
+import 'package:hentai_library/features/reading_stats/domain/home_page_counts.dart';
+import 'package:hentai_library/features/reading_stats/domain/reading_activity_stats.dart';
+import 'package:hentai_library/features/reading_stats/domain/record_read_session_activity_command.dart';
 
-final Provider<HomePageCountsPort> homePageCountsPortProvider = injectedDi(
-  'homePageCountsPortProvider',
+final homePageCountsProvider = StreamProvider.autoDispose
+    .family<HomePageCounts, bool>(
+      (ref, excludeR18) => throw UnimplementedError('homePageCountsProvider'),
+    );
+final readingActivityStatsProvider = StreamProvider<ReadingActivityStats>(
+  (ref) => throw UnimplementedError('readingActivityStatsProvider'),
 );
-
-final Provider<ReadingActivityStatsPort> readingActivityStatsPortProvider =
-    injectedDi('readingActivityStatsPortProvider');
-
-final Provider<RecordReadSessionActivityPort>
-recordReadSessionActivityPortProvider = injectedDi(
-  'recordReadSessionActivityPortProvider',
+final Provider<RecordReadSessionActivityCommand>
+recordReadSessionActivityCommandProvider = injectedDi(
+  'recordReadSessionActivityCommandProvider',
 );

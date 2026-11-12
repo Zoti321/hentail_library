@@ -1,13 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/features/library_admin/domain/comic_metadata_bulk_edit_command_port.dart';
-import 'package:hentai_library/features/library_admin/domain/libraries_port.dart';
+import 'package:hentai_library/features/library_admin/domain/bulk_edit_comic_metadata_command.dart';
+import 'package:hentai_library/features/library_admin/domain/library_commands.dart';
 import 'package:hentai_library/features/library_admin/domain/libraries_state.dart';
-import 'package:hentai_library/features/library_admin/domain/library_metadata_refresh_command_port.dart';
+import 'package:hentai_library/features/library_admin/domain/library_metadata_refresh_commands.dart';
 import 'package:hentai_library/features/library_admin/domain/library_repository.dart';
 import 'package:hentai_library/features/library_admin/domain/library_scan_activity_state.dart';
 import 'package:hentai_library/features/library_admin/domain/library_revision_state.dart';
-import 'package:hentai_library/features/library_admin/domain/library_scan_command_port.dart';
-import 'package:hentai_library/features/library_admin/public/ui/library_management_port.dart';
+import 'package:hentai_library/features/library_admin/domain/library_scan_commands.dart';
+import 'package:hentai_library/features/library_admin/public/ui/library_management_commands.dart';
 import 'package:hentai_library/shared/di/injected_di.dart';
 
 /// library_admin 拥有的库状态投影 token（#513，ADR-0045）。
@@ -45,31 +45,51 @@ final Provider<bool> libraryMutationBusyStateProvider = injectedDi(
   'libraryMutationBusyStateProvider',
 );
 
-final Provider<ComicMetadataBulkEditCommandPort>
-comicMetadataBulkEditCommandPortProvider = injectedDi(
-  'comicMetadataBulkEditCommandPortProvider',
+final Provider<BulkEditComicMetadataCommand>
+bulkEditComicMetadataCommandProvider = injectedDi(
+  'bulkEditComicMetadataCommandProvider',
 );
 
 final Provider<LibraryRepository> libraryRepoProvider = injectedDi(
   'libraryRepoProvider',
 );
 
-final Provider<LibrariesPort> librariesPortProvider = injectedDi(
-  'librariesPortProvider',
+final Provider<DeleteLibraryCommand> deleteLibraryCommandProvider = injectedDi(
+  'deleteLibraryCommandProvider',
 );
+final Provider<UpdateLibrarySidebarCommand>
+updateLibrarySidebarCommandProvider = injectedDi(
+  'updateLibrarySidebarCommandProvider',
+);
+final Provider<SubmitLibraryFormCommand> submitLibraryFormCommandProvider =
+    injectedDi('submitLibraryFormCommandProvider');
 
-final Provider<LibraryScanCommandPort> libraryScanCommandPortProvider =
-    injectedDi('libraryScanCommandPortProvider');
+final Provider<StartLibraryScanCommand> startLibraryScanCommandProvider =
+    injectedDi('startLibraryScanCommandProvider');
+final Provider<CancelLibraryScanCommand> cancelLibraryScanCommandProvider =
+    injectedDi('cancelLibraryScanCommandProvider');
 
 /// 全量库管理 UI 命令 token（真源 @ library_admin，ADR-0045）。
 ///
 /// `shared/**` 不消费本 token；它只读 `shared/di` 的
-/// `libraryBrowseFallbackPortProvider` 窄口。
-final Provider<LibraryManagementPort> libraryManagementPortProvider =
-    injectedDi('libraryManagementPortProvider');
+/// `goLibraryBrowseFallbackCommandProvider` 窄口。
+final Provider<LibraryManagementCommands> libraryManagementCommandsProvider =
+    injectedDi('libraryManagementCommandsProvider');
 
 /// 单库 / 全库元数据刷新命令口 token。
-final Provider<LibraryMetadataRefreshCommandPort>
-libraryMetadataRefreshCommandPortProvider = injectedDi(
-  'libraryMetadataRefreshCommandPortProvider',
+final Provider<RefreshComicMetadataCommand>
+refreshComicMetadataCommandProvider = injectedDi(
+  'refreshComicMetadataCommandProvider',
+);
+final Provider<RefreshSeriesMetadataCommand>
+refreshSeriesMetadataCommandProvider = injectedDi(
+  'refreshSeriesMetadataCommandProvider',
+);
+final Provider<RefreshLibraryMetadataCommand>
+refreshLibraryMetadataCommandProvider = injectedDi(
+  'refreshLibraryMetadataCommandProvider',
+);
+final Provider<CancelMetadataRefreshCommand>
+cancelMetadataRefreshCommandProvider = injectedDi(
+  'cancelMetadataRefreshCommandProvider',
 );

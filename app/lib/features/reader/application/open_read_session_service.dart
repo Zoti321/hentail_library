@@ -5,7 +5,7 @@ import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/reader/domain/comic_page_source_port.dart';
 import 'package:hentai_library/features/reader/domain/native_reader_port.dart';
-import 'package:hentai_library/shared/domain/ports/comic_read_lookup_port.dart';
+import 'package:hentai_library/shared/domain/contracts/comic_read_query.dart';
 import 'package:hentai_library/features/reading_history/public.dart';
 import 'package:hentai_library/features/reader/application/read_session_page_load_exception.dart';
 import 'package:hentai_library/features/reader/domain/read_session_page.dart';
@@ -19,7 +19,7 @@ class OpenReadSessionService {
   OpenReadSessionService({
     required this._comicLookup,
     required this._pageSource,
-    required this._readingHistoryCommands,
+    required this._readResumePage,
     required this._sessionPort,
     this._openTimeout = defaultOpenTimeout,
   });
@@ -27,9 +27,9 @@ class OpenReadSessionService {
   /// Resource access / reader open 的默认有界时限（Local + Remote）。
   static const Duration defaultOpenTimeout = Duration(seconds: 30);
 
-  final ComicReadLookupPort _comicLookup;
+  final ComicReadQuery _comicLookup;
   final ComicPageSourcePort _pageSource;
-  final ReadingHistoryCommandPort _readingHistoryCommands;
+  final ReadResumePageQuery _readResumePage;
   final NativeReaderPort _sessionPort;
   final Duration _openTimeout;
   final Map<String, ({ReaderComicRef comic, List<ReadSessionPage> pages})>
@@ -61,9 +61,7 @@ class OpenReadSessionService {
     final int resumePageIndex = (incognito || startFromFirstPage)
         ? 1
         : clampOneBasedResumeIndex(
-            storedPageIndex: await _readingHistoryCommands.readResumePageIndex(
-              comicId,
-            ),
+            storedPageIndex: await _readResumePage(comicId),
             totalPages: opened.pages.length,
           );
     return OpenedReadSession(

@@ -3,10 +3,11 @@ import 'package:hentai_library/shared/di/reading_history_providers.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 List<Override> readingHistorySharedStateOverrides() => <Override>[
-  readingHistoryCommandPortProvider.overrideWith(
-    createReadingHistoryCommandPort,
+  recordReadingProgressCommandProvider.overrideWith(
+    createRecordReadingProgressCommand,
   ),
-  readingHistoryProgressPortProvider.overrideWith(
-    createReadingHistoryProgressPort,
+  readResumePageQueryProvider.overrideWith(createReadResumePageQuery),
+  readingHistoryProgressProvider.overrideWith(
+    createReadingHistoryProgressStream,
   ),
 ];

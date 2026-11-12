@@ -11,7 +11,7 @@
 _Avoid_: 开发库、发布库、数据库环境（易与 Library 混淆）
 
 **Application layer**（Dart 应用层）:
-Wayfinder feature 内可选目录 `features/*/application/`：无 Flutter 的用例编排（Service / Coordinator）。与上文 **Application data**（磁盘上的应用数据）无关。Gate L1 R6–R10。详见 ADR-0033。
+Wayfinder feature 内可选目录 `features/*/application/`：纯 Dart 的具体业务用例编排（UseCase）。与上文 **Application data**（磁盘上的应用数据）无关。Gate L1 R6–R10。详见 ADR-0033。
 _Avoid_: 把 Application data 目录称为 Application 层；在 application 层 import presentation / FRB
 
 **Feature public API**:
@@ -139,7 +139,7 @@ Pinned 组内与 Unpinned 组内各自的用户顺序；与 Series 成员的 `or
 _Avoid_: 库排序（太泛）、sortOrder（Series 用语）
 
 **Library reorder mode**:
-历史侧栏「重新排序」全栏模式的领域名；**生产 UI 已退役**（2026-11-03）。Home 库列表支持长按拖拽排序（无需单独模式）。`LibraryReorderModePort` 仍供 browse 多选与排序态互斥（`exit()`）。
+历史侧栏「重新排序」全栏模式的领域名；**生产 UI 已退役**（2026-11-03）。Home 库列表支持长按拖拽排序（无需单独模式）。退出重排命令仍供 browse 多选与排序态互斥。
 _Avoid_: 编辑模式、排序页、固定开关（pin 只能在此模式用拖拽改，没有单独菜单项）
 
 ### Organization & metadata

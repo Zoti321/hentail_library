@@ -5,7 +5,6 @@ import 'package:hentai_library/features/comic/presentation/view_models/comic_det
 import 'package:hentai_library/features/comic/domain/repositories/comic_lookup_repository.dart';
 import 'package:hentai_library/shared/di/series_reading_context_providers.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/shared/domain/ports/series_reading_context_port.dart';
 import 'package:hentai_library/shared/domain/reading/series_reading_context.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
 import 'package:riverpod/misc.dart' show Override;
@@ -19,13 +18,12 @@ class _FakeLibraryRevision extends LibraryRevisionNotifier {
   }
 }
 
-class _FakeReadingContextPort implements SeriesReadingContextPort {
+class _FakeReadingContextPort {
   _FakeReadingContextPort(this.contexts);
 
   final Map<String, SeriesReadingContext> contexts;
   final List<String> requestedComicIds = <String>[];
 
-  @override
   Future<SeriesReadingContext?> getReadingContextByComicId(
     String comicId,
   ) async {
@@ -101,7 +99,9 @@ void main() {
       overrides: <Override>[
         libraryRevisionProvider.overrideWith(_FakeLibraryRevision.new),
         comicLookupRepositoryProvider.overrideWith((Ref ref) => repo),
-        seriesReadingContextPortProvider.overrideWithValue(port),
+        findSeriesReadingContextQueryProvider.overrideWithValue(
+          port.getReadingContextByComicId,
+        ),
       ],
     );
   }

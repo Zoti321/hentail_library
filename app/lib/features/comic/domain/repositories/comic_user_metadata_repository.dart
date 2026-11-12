@@ -1,5 +1,5 @@
+import 'package:hentai_library/features/comic/domain/value_objects/content_rating.dart';
 import 'package:hentai_library/features/comic_metadata/public/comic_metadata_entities.dart';
-import 'package:hentai_library/shared/domain/models/enums.dart';
 
 /// Comic 用户元数据写入与 Metadata field lock。
 abstract class ComicUserMetadataRepository {

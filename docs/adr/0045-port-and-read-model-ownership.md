@@ -4,6 +4,10 @@
 
 Accepted（2026-11-11，#503）
 
+## ADR-0050 修订（2026-11-12）
+
+可达性否决与生产者拥有原则继续有效。下面 Port 清单记录迁移前形态；当前单动作使用 Command/Query 函数，读取流直接公开 StreamProvider。shared 中的纯 Dart 契约统一在 `shared/domain/contracts/`，UI 签名在 `shared/ui/contracts/`。ReaderLaunch 链已收敛到 AppNavigator；进度流仍由 shared token + history owner 实现 + bootstrap 注入。真实外部 IO Port 不做机械替换。当前能力名与实例见 `docs/engineering/cross-feature-collaboration.md`。
+
 ## Context
 
 `app/lib/shared/domain/` 与 `app/lib/shared/di/` 曾同时装着三种互不相同的东西，路径无法表达归属：
@@ -53,12 +57,12 @@ Accepted（2026-11-11，#503）
 |------|--------|----------|
 | `LibraryBrowseFallbackPort` + token（窄口，仅 `goDefaultLibraryBrowse(BuildContext)`） | `shared/ui/navigation/library_browse_navigation.dart` | shared 消费方。全量 `LibraryManagementPort` 已归 `library_admin`（2026-11-12 修订） |
 | `LibraryReorderModePort` + token（真源 `shared/domain/ports/`） | `shared/domain/catalog/selection/catalog_selection_notifier.dart` | shared 消费方 |
-| `ReaderLaunchPort` + token | `shared/**`、comic / library_browse | 禁止边 + shared 消费方 |
+| `ReaderLaunchPort` + token | comic / reader / reading_history | comic ↛ reader 禁止边 |
 | `SeriesReadingContextPort` / `SeriesItemMembershipPort` / `SeriesItemSortPort` + token | comic / series 之外多方；ADR-0035 §4 判定 | 禁止边 |
 | `AuthorDetailPort` + token | comic、series（两者都禁止 import library_browse） | 禁止边 |
-| `ReadingHistoryProgressPort` + token | library_browse、reader | 禁止边 |
+| `ReadingHistoryProgressPort` + token | comic 的进度投影 | reading_history → comic 已存在，迁 owner 会成 public 环（ADR-0049） |
 | `ComicTrashCommandPort` + token | comic 消费 / comic_trash 实现（互引成环） | public 环 |
-| `RemoteLibraryCredentialsPort` + token | library_admin / comic / reader 三方，无单一生产者 | 无单一 owner |
+| `RemoteLibraryCredentialsPort` + token | library_admin 唯一实现，comic / reader 消费 | **ADR-0049 已归 library_admin**：经 public 可达且无环，shared 不再保留 |
 | `ComicReadLookupPort` + token | reader 消费 / comic 实现（reader ↛ comic 为禁止边） | 禁止边 |
 | `metadata_refresh_types.dart` | ~~`shared/ui` 元数据刷新 toast（series 与 library_admin 双消费）~~ | **2026-11-12 已消除**：真源迁 `library_admin/domain/`，toast 迁 `library_admin/public/ui/metadata_refresh_toasts.dart`，`shared` 不再消费 |
 | `library/library_age_restriction_filter.dart` | comic / series / home / library_browse 四方 | 禁止边（`comic ↛ library_browse`、`series ↛ library_browse`）+ `library_admin → home` 已存在（迁 admin 会成环）；跨 Tab 壳词汇，无单一可达 owner |

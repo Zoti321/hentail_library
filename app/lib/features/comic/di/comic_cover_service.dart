@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/comic/application/comic_cover_service.dart';
 import 'package:hentai_library/features/comic/di/comic_cover_providers.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/shared/domain/models/resource_type_frb_wire.dart';
+import 'package:hentai_library/shared/data/frb/resource_type_frb_wire.dart';
 import 'package:hentai_library/features/comic/di/comic_repository_providers.dart';
 
 /// 漫画封面写入命令签名：消费方（reader 等）只依赖本 typedef，不接触仓储与缓存。

@@ -1,7 +1,8 @@
+import 'package:hentai_library/features/comic/domain/value_objects/content_rating.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/library_author_pick.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/library_tag_pick.dart';
+import 'package:hentai_library/features/comic/domain/value_objects/library_author_pick.dart';
+import 'package:hentai_library/features/comic/domain/value_objects/library_tag_pick.dart';
 
 part 'library_comic_filter.freezed.dart';
 

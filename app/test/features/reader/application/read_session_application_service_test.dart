@@ -1,17 +1,14 @@
 import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/features/reading_history/public.dart';
-import 'package:hentai_library/features/reading_stats/public.dart';
 import 'package:hentai_library/features/reader/application/open_reader_args.dart';
 import 'package:hentai_library/features/reader/application/read_session_application_service.dart';
 import 'package:hentai_library/features/reader/application/open_read_session_service.dart';
 import 'package:test/test.dart';
 
-class _RecordingReadingHistoryCommands implements ReadingHistoryCommandPort {
+class _RecordingReadingHistoryCommands {
   final List<({String comicId, String title, int pageIndex})> records =
       <({String comicId, String title, int pageIndex})>[];
 
-  @override
   Future<void> recordReading({
     required String comicId,
     required String title,
@@ -21,11 +18,10 @@ class _RecordingReadingHistoryCommands implements ReadingHistoryCommandPort {
     records.add((comicId: comicId, title: title, pageIndex: pageIndex));
   }
 
-  @override
   Future<int?> readResumePageIndex(String comicId) async => null;
 }
 
-class _RecordingActivityCommands implements RecordReadSessionActivityPort {
+class _RecordingActivityCommands {
   final List<
     ({
       String comicId,
@@ -46,7 +42,6 @@ class _RecordingActivityCommands implements RecordReadSessionActivityPort {
         })
       >[];
 
-  @override
   Future<void> record({
     required String comicId,
     required bool incognito,
@@ -103,8 +98,8 @@ void main() {
     now = DateTime.utc(2026, 1, 1, 12);
     coordinator = ReadSessionApplicationService(
       sessionService: sessionService,
-      readingHistoryCommands: readingCommands,
-      activityCommands: activityCommands,
+      recordProgress: readingCommands.recordReading,
+      recordActivity: activityCommands.record,
       now: () => now,
     );
   });

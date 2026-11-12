@@ -1,3 +1,5 @@
+import 'package:hentai_library/features/metadata_backup/data/metadata_backup_file_gateway.dart';
+
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -19,7 +21,10 @@ void main() {
     final _FakeRepo repo = _FakeRepo(
       onExport: () => Uint8List.fromList(<int>[1, 2]),
     );
-    final MetadataExportUseCase useCase = MetadataExportUseCase(repo);
+    final MetadataExportUseCase useCase = MetadataExportUseCase(
+      repo,
+      const LocalMetadataBackupFileGateway(),
+    );
 
     final String path = await useCase.writeExportToPath(
       options: const MetadataExportOptions(gzip: true),

@@ -165,9 +165,9 @@ Future<Map<String, int>> _siblingMatchedNames({
   }
 
   // 邻居语义归 series：只消费 owner 给出的成员顺序事实（#490）。
-  final SeriesReadingContext? context = await ref
-      .read(seriesReadingContextPortProvider)
-      .getReadingContextByComicId(scope.comicId);
+  final SeriesReadingContext? context = await ref.read(
+    findSeriesReadingContextQueryProvider,
+  )(scope.comicId);
   if (context == null) {
     return const <String, int>{};
   }

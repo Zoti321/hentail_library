@@ -5,7 +5,6 @@ import 'package:hentai_library/features/app_settings/data/repositories/app_setti
 import 'package:hentai_library/features/app_settings/data/repositories/app_setting_storage.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:hentai_library/features/library_admin/public.dart';
 
 class _MemoryLegacySettingsJsonFile implements LegacySettingsJsonFile {
   _MemoryLegacySettingsJsonFile([this._content]);
@@ -117,11 +116,8 @@ void main() {
 
       expect(await repo.peekLegacyAutoScan(), isTrue);
       expect(
-        await repo.peekLegacyEnabledResourceFormatCategories(),
-        <ResourceFormatCategory>[
-          ResourceFormatCategory.epub,
-          ResourceFormatCategory.archive,
-        ],
+        (await repo.peekLegacyResourceFormatPayload())?.enabledFormatGroups,
+        <String>['epub', 'archive'],
       );
     });
   });

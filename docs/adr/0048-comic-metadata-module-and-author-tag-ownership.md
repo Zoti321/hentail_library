@@ -47,7 +47,7 @@ ADR-0035 §4 曾给出「内核迁出」的触发条件，其中第 1 条是 **�
 | --- | --- |
 | `AuthorRef` | comic 与 series 双方消费的跨模块引用投影 |
 | `AuthorDetailPort` + token | `comic ↛ library_browse` 为禁止边，实现方在 `library_browse`（ADR-0045 可达性豁免） |
-| `library_author_pick` / `library_tag_pick` | 库筛选值对象，comic + library_browse 双消费 |
+| `library_author_pick` / `library_tag_pick` | **ADR-0049 已归 comic**：由 Comic 查询契约解释，browse 经 comic public 组装；双消费不是无 owner 的充分条件 |
 | 拼音辅助名称过滤 | `design-system` 亦消费；迁入 feature 会立刻制造 `design-system → features` 违规 |
 | detail metadata chip 行 / chip band 布局 | comic + series 双消费（ADR-0044 ≥2 模块判据） |
 | `metadata_edit` 通用 UI（surface / actions / 锁列表 / 锁按钮） | comic + series + library_admin 三家消费 |

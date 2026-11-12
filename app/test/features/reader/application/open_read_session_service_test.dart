@@ -7,14 +7,13 @@ import 'package:hentai_library/features/comic/public/comic_lookup_repository.dar
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/reader/domain/comic_page_source_port.dart';
 import 'package:hentai_library/features/reader/domain/native_reader_port.dart';
-import 'package:hentai_library/features/reading_history/public.dart';
 import 'package:hentai_library/features/reader/application/read_session_page_load_exception.dart';
 import 'package:hentai_library/features/reader/domain/read_session_page.dart';
 import 'package:hentai_library/features/reader/domain/reader_page_payload.dart';
 import 'package:hentai_library/features/reader/application/open_read_session_service.dart';
 import 'package:hentai_library/features/reader/domain/opened_read_session.dart';
 import 'package:test/test.dart';
-import 'package:hentai_library/features/comic/public/di/comic_read_lookup_adapter.dart';
+import 'package:hentai_library/features/comic/public/di/comic_read_query.dart';
 
 class _FakeComicRepository implements ComicLookupRepository {
   _FakeComicRepository({this.comic});
@@ -25,15 +24,15 @@ class _FakeComicRepository implements ComicLookupRepository {
   Future<Comic?> findById(String comicId) async => comic;
 
   @override
+  @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-class _FakeReadingHistoryCommands implements ReadingHistoryCommandPort {
+class _FakeReadingHistoryCommands {
   _FakeReadingHistoryCommands({this.pageIndex});
 
   final int? pageIndex;
 
-  @override
   Future<int?> readResumePageIndex(String comicId) async => pageIndex;
 
   @override
@@ -148,7 +147,7 @@ OpenReadSessionService _service({
   _FakeComicPageSourcePort? pageSource,
 }) {
   return OpenReadSessionService(
-    comicLookup: createComicReadLookupPort(
+    comicLookup: createComicReadQuery(
       _FakeComicRepository(comic: comic ?? _inputComic()),
     ),
     pageSource:
@@ -157,9 +156,8 @@ OpenReadSessionService _service({
           pages: pages ?? <ReadSessionPage>[],
           error: loadError,
         ),
-    readingHistoryCommands: _FakeReadingHistoryCommands(
-      pageIndex: storedPageIndex,
-    ),
+    readResumePage: _FakeReadingHistoryCommands(pageIndex: storedPageIndex)
+        .readResumePageIndex,
     sessionPort: _FakeNativeReaderPort(),
   );
 }
@@ -187,7 +185,7 @@ void main() {
     test('open returns snapshot with clamped resume index', () async {
       final _FakeNativeReaderPort sessionPort = _FakeNativeReaderPort();
       final OpenReadSessionService service = OpenReadSessionService(
-        comicLookup: createComicReadLookupPort(
+        comicLookup: createComicReadQuery(
           _FakeComicRepository(comic: _inputComic()),
         ),
         pageSource: _FakeComicPageSourcePort(
@@ -197,7 +195,8 @@ void main() {
             ReadSessionArchivePage(comicId: 'c1', pageIndex: 2),
           ],
         ),
-        readingHistoryCommands: _FakeReadingHistoryCommands(pageIndex: 99),
+        readResumePage: _FakeReadingHistoryCommands(pageIndex: 99)
+            .readResumePageIndex,
         sessionPort: sessionPort,
       );
 
@@ -256,7 +255,7 @@ void main() {
         openHang: Completer<void>().future,
       );
       final OpenReadSessionService service = OpenReadSessionService(
-        comicLookup: createComicReadLookupPort(
+        comicLookup: createComicReadQuery(
           _FakeComicRepository(comic: _inputComic()),
         ),
         pageSource: _FakeComicPageSourcePort(
@@ -264,7 +263,7 @@ void main() {
             ReadSessionArchivePage(comicId: 'c1', pageIndex: 0),
           ],
         ),
-        readingHistoryCommands: _FakeReadingHistoryCommands(),
+        readResumePage: _FakeReadingHistoryCommands().readResumePageIndex,
         sessionPort: sessionPort,
         openTimeout: const Duration(milliseconds: 40),
       );
@@ -300,11 +299,9 @@ void main() {
 
     test('open classifies missing comic as resourceNotFound', () async {
       final OpenReadSessionService service = OpenReadSessionService(
-        comicLookup: createComicReadLookupPort(
-          _FakeComicRepository(comic: null),
-        ),
+        comicLookup: createComicReadQuery(_FakeComicRepository(comic: null)),
         pageSource: _FakeComicPageSourcePort(pages: <ReadSessionPage>[]),
-        readingHistoryCommands: _FakeReadingHistoryCommands(),
+        readResumePage: _FakeReadingHistoryCommands().readResumePageIndex,
         sessionPort: _FakeNativeReaderPort(),
       );
       await expectLater(
@@ -322,11 +319,11 @@ void main() {
     test('close delegates to session port', () async {
       final _FakeNativeReaderPort sessionPort = _FakeNativeReaderPort();
       final OpenReadSessionService service = OpenReadSessionService(
-        comicLookup: createComicReadLookupPort(
+        comicLookup: createComicReadQuery(
           _FakeComicRepository(comic: _inputComic()),
         ),
         pageSource: _FakeComicPageSourcePort(pages: <ReadSessionPage>[]),
-        readingHistoryCommands: _FakeReadingHistoryCommands(),
+        readResumePage: _FakeReadingHistoryCommands().readResumePageIndex,
         sessionPort: sessionPort,
       );
 
@@ -344,11 +341,11 @@ void main() {
         ],
       );
       final OpenReadSessionService service = OpenReadSessionService(
-        comicLookup: createComicReadLookupPort(
+        comicLookup: createComicReadQuery(
           _FakeComicRepository(comic: _inputComic()),
         ),
         pageSource: pageSource,
-        readingHistoryCommands: _FakeReadingHistoryCommands(),
+        readResumePage: _FakeReadingHistoryCommands().readResumePageIndex,
         sessionPort: sessionPort,
       );
 
@@ -397,11 +394,9 @@ void main() {
 
     test('loadReaderPage throws when comic is missing', () async {
       final OpenReadSessionService service = OpenReadSessionService(
-        comicLookup: createComicReadLookupPort(
-          _FakeComicRepository(comic: null),
-        ),
+        comicLookup: createComicReadQuery(_FakeComicRepository(comic: null)),
         pageSource: _FakeComicPageSourcePort(pages: <ReadSessionPage>[]),
-        readingHistoryCommands: _FakeReadingHistoryCommands(),
+        readResumePage: _FakeReadingHistoryCommands().readResumePageIndex,
         sessionPort: _FakeNativeReaderPort(),
       );
 
@@ -416,13 +411,13 @@ void main() {
         pages: <ReadSessionPage>[],
       );
       final OpenReadSessionService service = OpenReadSessionService(
-        comicLookup: createComicReadLookupPort(
+        comicLookup: createComicReadQuery(
           _FakeComicRepository(
             comic: _inputComic().copyWith(resourceType: ResourceType.dir),
           ),
         ),
         pageSource: pageSource,
-        readingHistoryCommands: _FakeReadingHistoryCommands(),
+        readResumePage: _FakeReadingHistoryCommands().readResumePageIndex,
         sessionPort: _FakeNativeReaderPort(),
       );
 

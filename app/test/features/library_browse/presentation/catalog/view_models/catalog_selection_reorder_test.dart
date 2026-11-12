@@ -5,17 +5,6 @@ import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:test/test.dart';
 
-class _NoopReorderModePort implements LibraryReorderModePort {
-  @override
-  bool get isActive => false;
-
-  @override
-  void enter() {}
-
-  @override
-  void exit() {}
-}
-
 void main() {
   test('entering reorder mode exits catalog multi-select', () {
     final ProviderContainer container = ProviderContainer(
@@ -25,9 +14,7 @@ void main() {
             LibrariesState(libraries: <LocalLibrary>[]),
           ),
         ),
-        libraryReorderModePortProvider.overrideWithValue(
-          _NoopReorderModePort(),
-        ),
+        exitLibraryReorderCommandProvider.overrideWithValue(() {}),
         libraryReorderActiveStateProvider.overrideWith(
           (Ref ref) => ref.watch(libraryReorderModeProvider),
         ),

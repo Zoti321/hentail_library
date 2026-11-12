@@ -63,15 +63,15 @@ final class ComicDetailSeriesNavReady extends ComicDetailSeriesNavResult {
 ///
 /// 只消费 series owner 的 [SeriesReadingContext] 事实（成员顺序 + 当前下标），
 /// 标题仍由 comic 自有 `ComicLookupRepository` 解析；comic 不持有 Series 类型。
-/// 刷新信号由 `SeriesReadingContextPort` 的实现决定（series 侧随库 revision 重算）。
+/// 刷新信号由 `FindSeriesReadingContextQuery` 的实现决定（series 侧随库 revision 重算）。
 @Riverpod(keepAlive: true)
 Future<ComicDetailSeriesNavResult> comicDetailSeriesNav(
   Ref ref,
   String comicId,
 ) async {
-  final SeriesReadingContext? context = await ref
-      .read(seriesReadingContextPortProvider)
-      .getReadingContextByComicId(comicId);
+  final SeriesReadingContext? context = await ref.read(
+    findSeriesReadingContextQueryProvider,
+  )(comicId);
   if (context == null || context.orderedComicIds.isEmpty) {
     return const ComicDetailSeriesNavNone();
   }

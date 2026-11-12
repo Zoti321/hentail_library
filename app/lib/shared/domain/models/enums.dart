@@ -1,6 +1,3 @@
-/// 内容分级（用户自定义为主）。
-enum ContentRating { unknown, safe, r18 }
-
 /// 通过规则校验后确定的资源类型（用于后续 diff/入库重构）。
 enum ResourceType {
   /// 纯图片目录
@@ -37,22 +34,3 @@ enum LibraryDisplayTarget { comics, series }
 
 /// 缩略图生成优先级（Rust 后台队列调度）。
 enum ThumbnailPriority { critical, high, low }
-
-/// 系列连载状态（用户可编辑；sync 不覆盖）。
-enum SerializationStatus {
-  unknown,
-  ongoing,
-  ended,
-  hiatus;
-
-  static SerializationStatus fromRust(String raw) {
-    return switch (raw) {
-      'ongoing' => SerializationStatus.ongoing,
-      'ended' => SerializationStatus.ended,
-      'hiatus' => SerializationStatus.hiatus,
-      _ => SerializationStatus.unknown,
-    };
-  }
-
-  String toRust() => name;
-}

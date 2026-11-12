@@ -1,4 +1,6 @@
 library;
 
-export 'package:hentai_library/features/comic/di/comic_detail_return_series_ports.dart'
-    show createComicDetailReturnSeriesPort;
+export 'package:hentai_library/features/comic/di/comic_return_series_commands.dart'
+    show
+        createRememberComicReturnSeriesCommand,
+        createClearComicReturnSeriesCommand;
