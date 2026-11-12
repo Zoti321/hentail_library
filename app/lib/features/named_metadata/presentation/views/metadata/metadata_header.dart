@@ -63,38 +63,13 @@ class MetadataHeader extends ConsumerWidget {
         ],
       );
     } else {
-      final bool showMenu =
-          PageLayoutSpec.of(context).sizeClass.isCompact &&
-          onOpenNavigation != null;
-      final M3EColorScheme scheme = theme.colorScheme;
-      content = Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          if (onBack != null) ...<Widget>[
-            PageHeaderBackButton(onPressed: onBack!),
-            const SizedBox(width: 4),
-          ],
-          if (showMenu) ...<Widget>[
-            M3EIconButton(
-              icon: Icon(
-                Symbols.menu,
-                size: LibraryPageHeaderMetrics.actionIconSize,
-                color: scheme.onSurfaceVariant,
-              ),
-              variant: M3EIconButtonVariant.standard,
-              size: M3EIconButtonSize.sm,
-              tooltip: l10n.shellOpenNavMenu,
-              semanticLabel: l10n.shellOpenNavMenu,
-              onPressed: onOpenNavigation,
-            ),
-            const SizedBox(width: 4),
-          ],
-          Expanded(
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: PageTitle(l10n.navMetadata),
-            ),
-          ),
+      content = LibraryToolbarRow(
+        title: PageTitle(l10n.navMetadata),
+        onBack: onBack,
+        onOpenNavigation: onOpenNavigation,
+        menuTooltip: l10n.shellOpenNavMenu,
+        menuSemanticLabel: l10n.shellOpenNavMenu,
+        trailing: <Widget>[
           AnchoredMenu(
             position: M3EMenuAnchorPosition.bottomEnd,
             children: <M3EMenuNode>[

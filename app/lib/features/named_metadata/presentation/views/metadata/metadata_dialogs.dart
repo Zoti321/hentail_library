@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/ui/patterns/dialog/confirm_dialog.dart';
 import 'package:hentai_library/shared/ui/patterns/dialog/lab_dialog_presenter.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/features/named_metadata/domain/tag_dictionary_import_result.dart';
@@ -47,10 +48,6 @@ class _MergeConfirmDialogState extends State<_MergeConfirmDialog> {
     final AppLocalizations l10n = context.l10n;
     final M3EThemeData theme = M3ETheme.of(context);
     final M3EColorScheme scheme = theme.colorScheme;
-    final TextStyle actionLabelStyle = labButtonLabelStyle(
-      theme,
-      M3EButtonSize.sm,
-    );
     return M3EDialog(
       title: l10n.metadataMergeConfirmTitle,
       content: Column(
@@ -88,17 +85,11 @@ class _MergeConfirmDialogState extends State<_MergeConfirmDialog> {
       ),
       bottomDivider: true,
       actions: <Widget>[
-        M3EButton(
-          onPressed: () => Navigator.of(context).pop(false),
-          style: M3EButtonStyle.text,
-          decoration: M3EButtonDecoration(textStyle: actionLabelStyle),
-          label: Text(l10n.commonCancel),
-        ),
-        M3EButton(
-          onPressed: () => Navigator.of(context).pop(true),
-          style: M3EButtonStyle.filled,
-          decoration: M3EButtonDecoration(textStyle: actionLabelStyle),
-          label: Text(l10n.metadataMerge),
+        DialogActionBar(
+          onCancel: () => Navigator.of(context).pop(false),
+          onConfirm: () => Navigator.of(context).pop(true),
+          cancelLabel: l10n.commonCancel,
+          confirmLabel: l10n.metadataMerge,
         ),
       ],
     );
@@ -115,64 +106,21 @@ Future<bool> showMetadataDeleteFacetDialog({
   required BuildContext context,
   required String name,
   required int attachmentCount,
-}) async {
-  final bool? confirmed = await LabDialogPresenter.showBasic<bool>(
+}) {
+  final AppLocalizations l10n = context.l10n;
+  final M3EThemeData theme = M3ETheme.of(context);
+  return showConfirmDialog(
     context,
-    dialog: _DestructiveConfirmDialog(
-      title: context.l10n.confirmDeleteNamedFacetTitle,
-      message: context.l10n.confirmDeleteNamedFacetContent(
-        name,
-        attachmentCount,
+    title: l10n.confirmDeleteNamedFacetTitle,
+    content: Text(
+      l10n.confirmDeleteNamedFacetContent(name, attachmentCount),
+      style: theme.typeScale.bodyMedium.copyWith(
+        color: theme.colorScheme.onSurfaceVariant,
       ),
     ),
+    confirmLabel: l10n.commonDelete,
+    destructive: true,
   );
-  return confirmed ?? false;
-}
-
-class _DestructiveConfirmDialog extends StatelessWidget {
-  const _DestructiveConfirmDialog({required this.title, required this.message});
-
-  final String title;
-  final String message;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppLocalizations l10n = context.l10n;
-    final M3EThemeData theme = M3ETheme.of(context);
-    final M3EColorScheme scheme = theme.colorScheme;
-    final TextStyle actionLabelStyle = labButtonLabelStyle(
-      theme,
-      M3EButtonSize.sm,
-    );
-    return M3EDialog(
-      title: title,
-      content: Text(
-        message,
-        style: theme.typeScale.bodyMedium.copyWith(
-          color: scheme.onSurfaceVariant,
-        ),
-      ),
-      bottomDivider: true,
-      actions: <Widget>[
-        M3EButton(
-          onPressed: () => Navigator.of(context).pop(false),
-          style: M3EButtonStyle.text,
-          decoration: M3EButtonDecoration(textStyle: actionLabelStyle),
-          label: Text(l10n.commonCancel),
-        ),
-        M3EButton(
-          onPressed: () => Navigator.of(context).pop(true),
-          style: M3EButtonStyle.filled,
-          decoration: M3EButtonDecoration.styleFrom(
-            textStyle: actionLabelStyle,
-            backgroundColor: scheme.error,
-            foregroundColor: scheme.onError,
-          ),
-          label: Text(l10n.commonDelete),
-        ),
-      ],
-    );
-  }
 }
 
 /// 标签词典导入进度：下载或本地写入期间展示进度，完成后以结果关闭。

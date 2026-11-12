@@ -6,8 +6,10 @@ import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/core/logging/app_logging.dart';
 import 'package:hentai_library/core/logging/log_export_service.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
-import 'package:hentai_library/shared/ui/widgets/overlays/dialog/hentai_dialog.dart';
+import 'package:hentai_library/shared/ui/patterns/dialog/lab_dialog_presenter.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:intl/intl.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -19,10 +21,11 @@ Future<void> runLogExportFlow(
   BuildContext context, {
   bool diagnosticVerbose = false,
 }) async {
-  final LogRedactionMode? mode = await showDialog<LogRedactionMode>(
-    context: context,
-    builder: (BuildContext context) => const LogExportRedactionDialog(),
-  );
+  final LogRedactionMode? mode =
+      await LabDialogPresenter.showBasic<LogRedactionMode>(
+        context,
+        dialog: const LogExportRedactionDialog(),
+      );
   if (mode == null || !context.mounted) {
     return;
   }
@@ -71,41 +74,36 @@ class LogExportRedactionDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return HentaiDialog(
+    final M3EThemeData theme = M3ETheme.of(context);
+    final TextStyle labelStyle = labButtonLabelStyle(theme, M3EButtonSize.sm);
+    return M3EDialog(
       title: '导出日志',
-      content: const Text(
+      content: Text(
         '默认脱敏路径与漫画 ID，适合发给维护者。\n'
         '若排障需要完整路径，请选择「完整日志」并确认隐私风险。',
+        style: theme.typeScale.bodyMedium.copyWith(
+          color: theme.colorScheme.onSurfaceVariant,
+        ),
       ),
+      bottomDivider: true,
       actions: <Widget>[
-        TextButton(
+        M3EButton(
           onPressed: () => Navigator.of(context).pop(),
-          style: TextButton.styleFrom(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-          child: const Text('取消'),
+          style: M3EButtonStyle.text,
+          decoration: M3EButtonDecoration(textStyle: labelStyle),
+          label: const Text('取消'),
         ),
-        const SizedBox(width: 8),
-        OutlinedButton(
+        M3EButton(
           onPressed: () => Navigator.of(context).pop(LogRedactionMode.full),
-          style: OutlinedButton.styleFrom(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-          child: const Text('完整日志'),
+          style: M3EButtonStyle.tonal,
+          decoration: M3EButtonDecoration(textStyle: labelStyle),
+          label: const Text('完整日志'),
         ),
-        const SizedBox(width: 8),
-        FilledButton(
+        M3EButton(
           onPressed: () => Navigator.of(context).pop(LogRedactionMode.redacted),
-          style: FilledButton.styleFrom(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-          child: const Text('脱敏导出'),
+          style: M3EButtonStyle.filled,
+          decoration: M3EButtonDecoration(textStyle: labelStyle),
+          label: const Text('脱敏导出'),
         ),
       ],
     );

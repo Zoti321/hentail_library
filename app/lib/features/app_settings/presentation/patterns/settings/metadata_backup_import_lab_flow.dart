@@ -94,10 +94,6 @@ class _MetadataImportPickDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     final M3EThemeData theme = M3ETheme.of(context);
-    final TextStyle actionLabelStyle = labButtonLabelStyle(
-      theme,
-      M3EButtonSize.sm,
-    );
 
     return M3EDialog(
       title: l10n.settingsMetadataBackupImportPickDialogTitle,
@@ -109,17 +105,11 @@ class _MetadataImportPickDialog extends StatelessWidget {
       ),
       bottomDivider: true,
       actions: <Widget>[
-        M3EButton(
-          onPressed: () => Navigator.of(context).pop(false),
-          style: M3EButtonStyle.text,
-          decoration: M3EButtonDecoration(textStyle: actionLabelStyle),
-          label: Text(l10n.commonCancel),
-        ),
-        M3EButton(
-          onPressed: () => Navigator.of(context).pop(true),
-          style: M3EButtonStyle.filled,
-          decoration: M3EButtonDecoration(textStyle: actionLabelStyle),
-          label: Text(l10n.commonConfirm),
+        DialogActionBar(
+          onCancel: () => Navigator.of(context).pop(false),
+          onConfirm: () => Navigator.of(context).pop(true),
+          cancelLabel: l10n.commonCancel,
+          confirmLabel: l10n.commonConfirm,
         ),
       ],
     );
@@ -134,11 +124,6 @@ class _MetadataImportConfirmPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
-    final M3EThemeData theme = M3ETheme.of(context);
-    final TextStyle actionLabelStyle = labButtonLabelStyle(
-      theme,
-      M3EButtonSize.sm,
-    );
 
     return M3EDialog(
       title: l10n.settingsMetadataBackupImportConfirmTitle,
@@ -195,20 +180,12 @@ class _MetadataImportConfirmPanel extends StatelessWidget {
       ),
       bottomDivider: true,
       actions: <Widget>[
-        M3EButton(
-          onPressed: () => Navigator.of(context).pop(false),
-          style: M3EButtonStyle.text,
-          decoration: M3EButtonDecoration(textStyle: actionLabelStyle),
-          label: Text(l10n.commonCancel),
-        ),
-        M3EButton(
-          onPressed: () => Navigator.of(context).pop(true),
-          style: M3EButtonStyle.filled,
-          decoration: M3EButtonDecoration(textStyle: actionLabelStyle),
-          label: Text(
-            l10n.settingsMetadataBackupImportConfirmActionWithCount(
-              preview.wouldApply,
-            ),
+        DialogActionBar(
+          onCancel: () => Navigator.of(context).pop(false),
+          onConfirm: () => Navigator.of(context).pop(true),
+          cancelLabel: l10n.commonCancel,
+          confirmLabel: l10n.settingsMetadataBackupImportConfirmActionWithCount(
+            preview.wouldApply,
           ),
         ),
       ],
@@ -225,10 +202,6 @@ class _MetadataImportResultPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     final M3EThemeData theme = M3ETheme.of(context);
-    final TextStyle actionLabelStyle = labButtonLabelStyle(
-      theme,
-      M3EButtonSize.sm,
-    );
 
     return M3EDialog(
       title: l10n.settingsMetadataBackupImportResultTitle,
@@ -259,7 +232,9 @@ class _MetadataImportResultPanel extends StatelessWidget {
         M3EButton(
           onPressed: () => Navigator.of(context).pop(),
           style: M3EButtonStyle.filled,
-          decoration: M3EButtonDecoration(textStyle: actionLabelStyle),
+          decoration: M3EButtonDecoration(
+            textStyle: labButtonLabelStyle(theme, M3EButtonSize.sm),
+          ),
           label: Text(l10n.commonClose),
         ),
       ],

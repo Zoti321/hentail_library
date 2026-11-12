@@ -47,29 +47,18 @@ class _ConfirmDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
-    final M3EThemeData theme = M3ETheme.of(context);
-    final M3EColorScheme scheme = theme.colorScheme;
 
     return M3EDialog(
       title: title,
       content: content,
       bottomDivider: true,
       actions: <Widget>[
-        M3EButton(
-          onPressed: () => Navigator.of(context).pop(false),
-          style: M3EButtonStyle.text,
-          label: Text(l10n.commonCancel),
-        ),
-        M3EButton(
-          onPressed: () => Navigator.of(context).pop(true),
-          style: M3EButtonStyle.filled,
-          decoration: destructive
-              ? M3EButtonDecoration.styleFrom(
-                  backgroundColor: scheme.error,
-                  foregroundColor: scheme.onError,
-                )
-              : null,
-          label: Text(confirmLabel),
+        DialogActionBar(
+          onCancel: () => Navigator.of(context).pop(false),
+          onConfirm: () => Navigator.of(context).pop(true),
+          cancelLabel: l10n.commonCancel,
+          confirmLabel: confirmLabel,
+          destructive: destructive,
         ),
       ],
     );

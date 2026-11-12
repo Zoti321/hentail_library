@@ -6,8 +6,8 @@ import 'package:hentai_library/features/metadata_backup/domain/metadata_import_m
 import 'package:hentai_library/features/metadata_backup/domain/metadata_import_preview.dart';
 import 'package:hentai_library/features/metadata_backup/domain/metadata_import_result.dart';
 import 'package:hentai_library/design-system/design_system.dart';
-import 'package:hentai_library/shared/ui/widgets/overlays/dialog/hentai_dialog.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
 
 class MetadataImportConfirmDialog extends StatefulWidget {
   const MetadataImportConfirmDialog({
@@ -41,9 +41,8 @@ class _MetadataImportConfirmDialogState
     final MetadataImportPreview preview = widget.preview;
     final bool canImport = preview.wouldApply > 0;
 
-    return HentaiDialog(
+    return M3EDialog(
       title: l10n.settingsMetadataBackupImportConfirmTitle,
-      width: 480,
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -128,20 +127,18 @@ class _MetadataImportConfirmDialogState
           ],
         ],
       ),
+      bottomDivider: true,
       actions: <Widget>[
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(false),
-          child: Text(l10n.commonCancel),
-        ),
-        FilledButton(
-          onPressed: canImport ? () => Navigator.of(context).pop(true) : null,
-          child: Text(
-            canImport
-                ? l10n.settingsMetadataBackupImportConfirmActionWithCount(
-                    preview.wouldApply,
-                  )
-                : l10n.settingsMetadataBackupImportConfirmActionDisabled,
-          ),
+        DialogActionBar(
+          onCancel: () => Navigator.of(context).pop(false),
+          onConfirm: () => Navigator.of(context).pop(true),
+          cancelLabel: l10n.commonCancel,
+          confirmEnabled: canImport,
+          confirmLabel: canImport
+              ? l10n.settingsMetadataBackupImportConfirmActionWithCount(
+                  preview.wouldApply,
+                )
+              : l10n.settingsMetadataBackupImportConfirmActionDisabled,
         ),
       ],
     );
@@ -180,7 +177,7 @@ class MetadataImportResultDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
-    return HentaiDialog(
+    return M3EDialog(
       title: l10n.settingsMetadataBackupImportResultTitle,
       content: Column(
         mainAxisSize: MainAxisSize.min,
@@ -212,10 +209,18 @@ class MetadataImportResultDialog extends StatelessWidget {
           ],
         ],
       ),
+      bottomDivider: true,
       actions: <Widget>[
-        FilledButton(
+        M3EButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: Text(l10n.commonOk),
+          style: M3EButtonStyle.filled,
+          decoration: M3EButtonDecoration(
+            textStyle: labButtonLabelStyle(
+              M3ETheme.of(context),
+              M3EButtonSize.sm,
+            ),
+          ),
+          label: Text(l10n.commonOk),
         ),
       ],
     );

@@ -11,10 +11,9 @@ import 'package:hentai_library/features/reader/domain/reading_preferences.dart';
 import 'package:hentai_library/features/reader/public/reading_preference_l10n.dart';
 import 'package:hentai_library/features/reader/public/reading_preferences_acl.dart';
 import 'package:hentai_library/features/reader/public/reading_preferences_providers.dart';
-import 'package:hentai_library/design-system/components/menu/anchored_menu.dart';
+import 'package:hentai_library/design-system/components/menu/anchored_option_picker.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/settings_list.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
-import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 /// 设置页「阅读」分类的分区（owner = `reader`，ADR-0046 §6）。
@@ -49,34 +48,6 @@ final List<int> _kWebtoonMarginOptions = List<int>.generate(
       1,
   (int i) => i * ReadingPreferenceSchema.webtoonMarginPercentStep,
 );
-
-Future<void> _pickOption<T extends Object>(
-  BuildContext context, {
-  required List<T> options,
-  required T selected,
-  required String Function(T option) labelOf,
-  required ValueChanged<T> onSelected,
-}) async {
-  final Rect? anchor = menuAnchorRectFor(context);
-  if (anchor == null) {
-    return;
-  }
-  final Object? picked = await showAnchoredMenu<Object>(
-    context: context,
-    anchor: anchor,
-    children: <M3EMenuNode>[
-      for (final T option in options)
-        M3EMenuSelectable(
-          label: labelOf(option),
-          value: option,
-          selected: option == selected,
-        ),
-    ],
-  );
-  if (picked is T) {
-    onSelected(picked);
-  }
-}
 
 class _ReadingModeSectionTitle extends StatelessWidget {
   const _ReadingModeSectionTitle();
@@ -162,7 +133,7 @@ class _ReadingModeCategoryTile extends ConsumerWidget {
       leading: Symbols.menu_book,
       title: Text(l10n.readerSettingsReadingMode),
       value: Text(l10n.readerModeCategoryLabel(category)),
-      onTap: () => _pickOption<ReaderModeCategory>(
+      onTap: () => pickAnchoredOption<ReaderModeCategory>(
         context,
         options: ReaderModeCategory.values,
         selected: category,
@@ -194,7 +165,7 @@ class _PagedLayoutTile extends ConsumerWidget {
       leading: Symbols.view_day,
       title: Text(l10n.readerSettingsPageLayout),
       value: Text(l10n.pagedLayoutLabel(pagedLayout)),
-      onTap: () => _pickOption<PagedLayout>(
+      onTap: () => pickAnchoredOption<PagedLayout>(
         context,
         options: PagedLayout.values,
         selected: pagedLayout,
@@ -226,7 +197,7 @@ class _WebtoonMarginTile extends ConsumerWidget {
       title: Text(l10n.readerSettingsHorizontalMargin),
       enabled: state.zoomMode == WebtoonZoomMode.fitWidth,
       value: Text(l10n.readerWebtoonMarginLabel(state.marginPercent)),
-      onTap: () => _pickOption<int>(
+      onTap: () => pickAnchoredOption<int>(
         context,
         options: _kWebtoonMarginOptions,
         selected: state.marginPercent,
@@ -254,7 +225,7 @@ class _WebtoonZoomModeTile extends ConsumerWidget {
       leading: Symbols.zoom_in,
       title: Text(l10n.readerSettingsZoomMode),
       value: Text(l10n.webtoonZoomModeLabel(zoomMode)),
-      onTap: () => _pickOption<WebtoonZoomMode>(
+      onTap: () => pickAnchoredOption<WebtoonZoomMode>(
         context,
         options: WebtoonZoomMode.values,
         selected: zoomMode,
@@ -282,7 +253,7 @@ class _AutoPlayModeTile extends ConsumerWidget {
       leading: Symbols.repeat,
       title: Text(l10n.readerSettingsAutoPlayMode),
       value: Text(l10n.autoPlayModeLabel(mode)),
-      onTap: () => _pickOption<AutoPlayMode>(
+      onTap: () => pickAnchoredOption<AutoPlayMode>(
         context,
         options: AutoPlayMode.values,
         selected: mode,

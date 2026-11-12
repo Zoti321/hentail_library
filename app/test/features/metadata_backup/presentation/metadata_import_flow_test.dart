@@ -199,9 +199,9 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('无法导入'), findsOneWidget);
-    final Finder button = find.widgetWithText(FilledButton, '无法导入');
-    final FilledButton filledButton = tester.widget<FilledButton>(button);
-    expect(filledButton.onPressed, isNull);
+    await tester.tap(find.text('无法导入'));
+    await tester.pumpAndSettle();
+    expect(find.text('无法导入'), findsOneWidget);
   });
 
   testWidgets('confirm dialog auto-expands details when skips present', (

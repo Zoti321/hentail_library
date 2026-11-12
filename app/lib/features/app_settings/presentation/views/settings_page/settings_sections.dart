@@ -8,13 +8,12 @@ import 'package:hentai_library/features/app_settings/presentation/view_models/di
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hentai_library/features/app_settings/presentation/patterns/settings/settings_catalog.dart';
 import 'package:hentai_library/features/app_settings/presentation/views/dialogs/color_scheme_picker_dialog.dart';
-import 'package:hentai_library/design-system/components/menu/anchored_menu.dart';
+import 'package:hentai_library/design-system/components/menu/anchored_option_picker.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/settings_list.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
 import 'package:hentai_library/shared/ui/l10n/library_display_target_l10n.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:hentai_library/features/app_settings/public/ui/l10n/app_settings_l10n.dart';
@@ -39,35 +38,6 @@ List<Widget> settingsSectionsFor(
     SettingsCategory.updates => _updatesSections(),
     SettingsCategory.storageAndLogs => _storageAndLogsSections(l10n),
   };
-}
-
-/// 弹出 M3E 选择菜单（锚定在触发行上），选中项回传给 [onSelected]。
-Future<void> _pickSettingOption<T extends Object>(
-  BuildContext context, {
-  required List<T> options,
-  required T selected,
-  required String Function(T option) labelOf,
-  required ValueChanged<T> onSelected,
-}) async {
-  final Rect? anchor = menuAnchorRectFor(context);
-  if (anchor == null) {
-    return;
-  }
-  final Object? picked = await showAnchoredMenu<Object>(
-    context: context,
-    anchor: anchor,
-    children: <M3EMenuNode>[
-      for (final T option in options)
-        M3EMenuSelectable(
-          label: labelOf(option),
-          value: option,
-          selected: option == selected,
-        ),
-    ],
-  );
-  if (picked is T) {
-    onSelected(picked);
-  }
 }
 
 List<Widget> _appearanceSections() {
@@ -158,7 +128,7 @@ class _ThemeTile extends ConsumerWidget {
       leading: Symbols.dark_mode,
       title: Text(l10n.settingsThemeLabel),
       value: Text(l10n.themePreferenceLabel(preference)),
-      onTap: () => _pickSettingOption<AppThemePreference>(
+      onTap: () => pickAnchoredOption<AppThemePreference>(
         context,
         options: AppThemePreference.values,
         selected: preference,
@@ -248,7 +218,7 @@ class _FontTile extends ConsumerWidget {
       leading: Symbols.text_fields,
       title: Text(l10n.settingsFontLabel),
       value: Text(l10n.fontPreferenceLabel(preference)),
-      onTap: () => _pickSettingOption<AppFontPreference>(
+      onTap: () => pickAnchoredOption<AppFontPreference>(
         context,
         options: AppFontPreference.values,
         selected: preference,
@@ -275,7 +245,7 @@ class _LocaleTile extends ConsumerWidget {
       leading: Symbols.language,
       title: Text(l10n.settingsLanguageLabel),
       value: Text(l10n.localePreferenceLabel(preference)),
-      onTap: () => _pickSettingOption<AppLocalePreference>(
+      onTap: () => pickAnchoredOption<AppLocalePreference>(
         context,
         options: AppLocalePreference.values,
         selected: preference,
@@ -304,7 +274,7 @@ class _DefaultLibraryDisplayTargetTile extends ConsumerWidget {
       title: Text(l10n.settingsDefaultLibraryDisplayTargetLabel),
       description: Text(l10n.settingsDefaultLibraryDisplayTargetDescription),
       value: Text(l10n.libraryDisplayTargetTabLabel(preference)),
-      onTap: () => _pickSettingOption<LibraryDisplayTarget>(
+      onTap: () => pickAnchoredOption<LibraryDisplayTarget>(
         context,
         options: LibraryDisplayTarget.values,
         selected: preference,

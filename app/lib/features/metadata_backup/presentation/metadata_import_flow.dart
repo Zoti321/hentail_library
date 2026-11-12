@@ -14,7 +14,8 @@ import 'package:hentai_library/features/metadata_backup/domain/metadata_import_p
 import 'package:hentai_library/features/metadata_backup/domain/metadata_import_result.dart';
 import 'package:hentai_library/features/metadata_backup/presentation/widgets/metadata_import_dialogs.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
-import 'package:hentai_library/shared/ui/widgets/overlays/dialog/hentai_dialog.dart';
+import 'package:hentai_library/shared/ui/patterns/dialog/lab_dialog_presenter.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
 
 export 'widgets/metadata_import_dialogs.dart';
 
@@ -76,9 +77,9 @@ Future<void> runMetadataImportFlow(
       return;
     }
 
-    final bool? confirmed = await showDialog<bool>(
-      context: context,
-      builder: (BuildContext context) => MetadataImportConfirmDialog(
+    final bool? confirmed = await LabDialogPresenter.showBasic<bool>(
+      context,
+      dialog: MetadataImportConfirmDialog(
         manifest: manifest,
         preview: previewResult,
       ),
@@ -107,10 +108,9 @@ Future<void> runMetadataImportFlow(
       return;
     }
 
-    await showDialog<void>(
-      context: context,
-      builder: (BuildContext context) =>
-          MetadataImportResultDialog(result: result),
+    await LabDialogPresenter.showBasic<void>(
+      context,
+      dialog: MetadataImportResultDialog(result: result),
     );
   } catch (e, st) {
     logError(AppLog.core('metadata_backup'), '导入元数据失败', e, st);
@@ -126,12 +126,12 @@ Future<void> _showBlockingProgressDialog(
   required String title,
   required String body,
 }) {
-  return showDialog<void>(
-    context: context,
+  return LabDialogPresenter.showBasic<void>(
+    context,
     barrierDismissible: false,
-    builder: (BuildContext context) => PopScope(
+    dialog: PopScope(
       canPop: false,
-      child: HentaiDialog(
+      child: M3EDialog(
         title: title,
         content: Row(
           children: <Widget>[
@@ -140,9 +140,6 @@ Future<void> _showBlockingProgressDialog(
             Expanded(child: Text(body)),
           ],
         ),
-        actions: const <Widget>[],
-        scrollableContent: false,
-        showFooterDivider: false,
       ),
     ),
   );

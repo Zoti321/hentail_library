@@ -219,26 +219,14 @@ class _TrashHeader extends ConsumerWidget {
     TrashPageState? readState() =>
         ref.read(trashPageControllerProvider).asData?.value;
 
-    return PinnedToolbarChrome(
-      child: Row(
-        children: <Widget>[
-          if (onBack != null) ...<Widget>[
-            PageHeaderBackButton(onPressed: onBack!),
-            const SizedBox(width: 4),
-          ],
-          if (onOpenNavigation != null) ...<Widget>[
-            M3EIconButton(
-              icon: const Icon(Symbols.menu),
-              variant: M3EIconButtonVariant.standard,
-              size: M3EIconButtonSize.sm,
-              tooltip: l10n.shellOpenNavMenu,
-              semanticLabel: l10n.shellOpenNavMenu,
-              onPressed: onOpenNavigation,
-            ),
-            const SizedBox(width: 8),
-          ],
-          Expanded(child: PageTitle(l10n.navTrash)),
-          if (hasSelection)
+    return LibraryToolbarRow(
+      title: PageTitle(l10n.navTrash),
+      onBack: onBack,
+      onOpenNavigation: onOpenNavigation,
+      menuTooltip: l10n.shellOpenNavMenu,
+      menuSemanticLabel: l10n.shellOpenNavMenu,
+      trailing: <Widget>[
+        if (hasSelection)
             Padding(
               padding: const EdgeInsets.only(right: 8),
               child: Text(
@@ -316,8 +304,7 @@ class _TrashHeader extends ConsumerWidget {
                         }
                 : null,
           ),
-        ],
-      ),
+      ],
     );
   }
 }
