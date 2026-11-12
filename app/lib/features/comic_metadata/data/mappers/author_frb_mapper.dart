@@ -1,5 +1,5 @@
-import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/author_detail.dart';
+import 'package:hentai_library/features/comic_metadata/domain/author.dart';
+import 'package:hentai_library/features/comic_metadata/domain/author_detail.dart';
 import 'package:hentai_library/src/rust/api/author.dart' as rust_author;
 
 Author mapAuthorIdentity(rust_author.AuthorIdentityFrbDto dto) {

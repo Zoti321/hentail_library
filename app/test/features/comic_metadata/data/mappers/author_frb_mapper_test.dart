@@ -1,6 +1,6 @@
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:hentai_library/features/comic_metadata/data/mappers/author_frb_mapper.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
+import 'package:hentai_library/features/comic_metadata/domain/author.dart';
 import 'package:hentai_library/src/rust/api/author.dart' as rust_author;
 import 'package:test/test.dart';
 

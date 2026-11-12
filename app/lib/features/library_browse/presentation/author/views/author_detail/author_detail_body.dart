@@ -4,7 +4,7 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/library_browse/presentation/author/view_models/author_detail_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/author/patterns/author_detail/author_detail_comics_section.dart';
 import 'package:hentai_library/features/library_browse/presentation/author/views/author_detail/author_detail_header.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/author_detail.dart';
+import 'package:hentai_library/features/comic_metadata/public/comic_metadata_entities.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// 作者详情正文：头部 + 作品区（无外层滚动，供 Lab 页或测试嵌入）。

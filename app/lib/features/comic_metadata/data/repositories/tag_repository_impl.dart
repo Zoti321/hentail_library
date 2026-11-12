@@ -1,6 +1,6 @@
 import 'package:hentai_library/features/comic_metadata/data/adapters/tag_frb_adapter.dart';
 import 'package:hentai_library/features/comic_metadata/data/mappers/tag_frb_mapper.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
+import 'package:hentai_library/features/comic_metadata/domain/tag.dart';
 import 'package:hentai_library/features/comic_metadata/domain/tag_dictionary_import_result.dart';
 import 'package:hentai_library/features/comic_metadata/domain/named_facet_management_repository.dart';
 import 'package:hentai_library/features/comic_metadata/domain/tag_repository.dart';

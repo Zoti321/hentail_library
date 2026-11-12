@@ -1,6 +1,6 @@
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:hentai_library/shared/data/frb/frb_call_guard.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/author_detail.dart';
+import 'package:hentai_library/features/comic_metadata/domain/author_detail.dart';
 import 'package:hentai_library/src/rust/api/author.dart' as rust_author;
 
 /// Author FRB 薄封装（owner：`src/rust/api/author.dart`）。

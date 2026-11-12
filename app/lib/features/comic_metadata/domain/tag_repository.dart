@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
+import 'package:hentai_library/features/comic_metadata/domain/tag.dart';
 import 'package:hentai_library/features/comic_metadata/domain/tag_dictionary_import_result.dart';
 
 /// Tag 仓储：全量 Tag 字典读取与 Tag dictionary import。

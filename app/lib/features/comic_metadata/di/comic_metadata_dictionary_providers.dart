@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
+import 'package:hentai_library/features/comic_metadata/domain/author.dart';
+import 'package:hentai_library/features/comic_metadata/domain/tag.dart';
 import 'package:hentai_library/features/comic_metadata/public/di/comic_metadata_repository_providers.dart';
 import 'package:hentai_library/shared/di/domain_event_revisions.dart';
 

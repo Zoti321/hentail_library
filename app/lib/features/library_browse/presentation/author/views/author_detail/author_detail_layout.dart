@@ -3,7 +3,7 @@ import 'package:hentai_library/features/library_browse/presentation/author/patte
 import 'package:hentai_library/features/library_browse/presentation/author/patterns/author_detail/author_detail_page_header.dart';
 import 'package:hentai_library/features/library_browse/presentation/author/patterns/author_detail/author_detail_page_metrics.dart';
 import 'package:hentai_library/features/library_browse/presentation/author/views/author_detail/author_detail_header.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/author_detail.dart';
+import 'package:hentai_library/features/comic_metadata/public/comic_metadata_entities.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/shared/ui/widgets/navigation/expressive_library_scroll_to_top_button.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
