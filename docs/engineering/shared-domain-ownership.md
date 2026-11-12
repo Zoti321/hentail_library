@@ -1,6 +1,6 @@
 # `shared/domain` 归属表（Epic #436 收尾）
 
-**决策索引**：ADR-0033（Application 层）、ADR-0034（public only）、**ADR-0035**（Catalog Shared Kernel）、**ADR-0039**（领域事件）、**ADR-0041**（Comic 实体归属）、**ADR-0042**（Series 实体归属 + 跨模块契约）。  
+**决策索引**：ADR-0033（Application 层）、ADR-0034（public only）、**ADR-0035**（Catalog Shared Kernel）、**ADR-0039**（领域事件）、**ADR-0041**（Comic 实体归属）、**ADR-0042**（Series 实体归属 + 跨模块契约）、**ADR-0048**（Comic metadata 模块与 Author / Tag 归属）。
 **门禁**：L3b `shared_domain_feature_import_baseline.json`（当前应为 `[]`）；**2026-11-02** 起 owner 域 strangler re-export 已全部移除（`strangler_shims.txt` 为空），请直接 import **`features/<owner>/domain/...`**。
 
 ## 真源在 owner feature（已从 shared 移除 strangler）
@@ -63,7 +63,7 @@ Feature 内代码应 **import owner `domain/`**（`library_browse` 内按 [`libr
 
 不在 #436 批量迁出；consumer 继续 `import shared/domain/...`：
 
-- `models/entity/**`（Author / AuthorDetail / Tag 等；**`Comic` 已于 #489 迁出**（ADR-0041），**`Series` 已于 #490 迁出**（ADR-0042））、`models/enums.dart`
+- `models/enums.dart`；实体目录已清空：`Comic` 于 #489 迁入 `features/comic/`（ADR-0041），`Series` 于 #490 迁入 `features/series/`（ADR-0042），Author / AuthorDetail / Tag 于 #533 迁入 `features/comic_metadata/`（ADR-0048）
 - `models/value_objects/page_request.dart`、`paged_result.dart`、`page_jump.dart`
 - 与 catalog 强绑定的 pick / meta VO：`models/value_objects/form/library_author_pick.dart`、`library_tag_pick.dart`、`comic_language.dart`；`library_form.dart` 已按生产者拥有归 `features/library_admin/domain/value_objects/`（#504）
 - `reading/series_reading_context.dart`（类型；读口 `SeriesReadingContextPort` @ shared/di，实现 @ series）
@@ -95,6 +95,6 @@ UI / 编排命令类型；发现面经 owner `public/` re-export（ADR-0034）�
 ## 测试目录约定
 
 - Owner 域行为单测：`app/test/features/<owner>/domain/**`
-- Shared Kernel / 跨库契约：`app/test/shared/domain/**`（Author/Tag 等 entity、VO、repository 契约；Series 归属单测在 `test/features/series/domain/`）
-- Comic / Series 实体归属门禁：`app/test/features/comic/**`、`app/test/features/series/**`、`app/test/architecture/{comic,series}_entity_ownership_test.dart`
+- Shared Kernel / 跨库契约：`app/test/shared/domain/**`（分页 VO、枚举、thumbnail 与跨模块 Port；owner 实体测试归各自 `test/features/<owner>/domain/`）
+- Comic / Series / Comic metadata 实体归属门禁：`app/test/features/{comic,series,comic_metadata}/**`、`app/test/architecture/{comic,series,comic_metadata}_entity_ownership_test.dart`
 - 槽位契约门禁：`app/test/architecture/series_slot_contract_test.dart`（`shared/ui/slots/**` 不得 import `features/**`）

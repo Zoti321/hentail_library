@@ -126,3 +126,4 @@ Accepted | Superseded by ADR-000N | Deprecated
 | [0045](./0045-port-and-read-model-ownership.md) | Port 与读模型按可达性归属（生产者拥有，#503） | Accepted |
 | [0046](./0046-reading-preferences-acl-and-schema-partitioning.md) | 偏好 schema 与领域类型的 ACL 分层（#517） | Accepted |
 | [0047](./0047-design-system-owns-presentation-scaffold.md) | Design System 承接纯外观页级 scaffold（修订 ADR-0044 §1 判据） | Accepted |
+| [0048](./0048-comic-metadata-module-and-author-tag-ownership.md) | `comic_metadata` 模块（原 `named_metadata`）与 Author / Tag 归属（收缩 Catalog Shared Kernel，#533） | Accepted |

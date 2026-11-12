@@ -19,6 +19,7 @@
 | 领域事件门禁 | `cd app && flutter test test/gate/domain_event_rules_test.dart`（ADR-0039） |
 | Comic 实体归属 | `cd app && flutter test test/architecture/comic_entity_ownership_test.dart`（ADR-0041；shared 内不得再出现 `Comic`） |
 | Series 实体归属 | `cd app && flutter test test/architecture/series_entity_ownership_test.dart`（ADR-0042；shared 内不得再出现 `Series` 实体/VO 引用） |
+| Comic metadata 实体归属 | `cd app && flutter test test/architecture/comic_metadata_entity_ownership_test.dart`（ADR-0048；Author / AuthorDetail / Tag 归 owner，旧 `named_metadata` 路径不得复活） |
 | 槽位契约 | `cd app && flutter test test/architecture/series_slot_contract_test.dart`（ADR-0042；`shared/ui/slots/**` 不得 import `features/**`） |
 | 导航/路由解耦 | `cd app && flutter test test/architecture/navigation_routing_coupling_test.dart`（ADR-0043；go_router 仅宿主路由层，feature 只下达 `AppNavigator` 意图） |
 | Shared UI 无 feature import | `cd app && flutter test test/gate/shared_ui_no_feature_import_test.dart` |

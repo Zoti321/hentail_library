@@ -4,6 +4,8 @@
 
 Accepted；**Series owner 面与模块边由 [ADR-0042](0042-series-entity-ownership-and-cross-module-contracts.md) 收紧（2026-11-11）**。
 
+> **实现修订（2026-11-12，#533 / ADR-0048）**：元数据字典模块 `named_metadata` 更名为 **`comic_metadata`**（目录、module id、public barrel 文件名）；下文凡称 `named_metadata` 的路径均以 `comic_metadata` 为准。Author / AuthorDetail / Tag 实体随之归 `comic_metadata/domain/`，跨模块经其 `public/**`。
+
 ## Context
 
 `library_browse` 同时承担单本 Comic、Series、库页双 Tab 壳与作者详情，虽已有内部分区文档（`library-browse-zones.md`），但 **Wayfinder module id** 仍为单一 feature，cross-feature public 图、Application 编排与 Gate 模块图可读性不足。Epic [#436](https://github.com/Zoti321/hentail_library/issues/436) 已将多数 Dart 域真源 owner 化；[#457](https://github.com/Zoti321/hentail_library/issues/457) 将 Comic 与 Series **物理模块**从 browse 壳拆出，并与 ADR-0033（Application）、ADR-0034（public only）、ADR-0035（Catalog Shared Kernel 留 shared）对齐。

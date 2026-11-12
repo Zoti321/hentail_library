@@ -7,6 +7,8 @@ Accepted；**Comic 部分被 [ADR-0041](0041-comic-entity-ownership.md) 局部�
 > **实现修订（2026-11-11，#489 / ADR-0041）**：`Comic` 实体、`ComicMetaLocks`、`ComicMetadataForm` 与 FRB 映射已迁入 `features/comic/`；`shared/domain` 不再有 Comic 类型，跨模块经 `features/comic/public/**` thin re-export。
 >
 > **实现修订（2026-11-11，#490 / ADR-0042）**：`Series` / `SeriesItem` / 系列锁、元数据表单与 FRB 映射已迁入 `features/series/`；`shared/domain` 不再有 Series 实体/VO，跨模块只经 Port 与只读 record。下文凡称「Series 等内核 DTO 留在 shared」的表述仅对 Author / AuthorDetail / Tag / 分页 VO / `enums.dart` 成立。
+>
+> **实现修订（2026-11-12，#533 / ADR-0048）**：`Author` / `AuthorDetail` / `Tag` 已迁入 `features/comic_metadata/domain/`（模块原 `named_metadata`），跨模块经 `features/comic_metadata/public/comic_metadata_entities.dart`；`shared/di` 的全局 Author / Tag 字典 token 同迁 owner `public/di`。下文凡称这三个类型「留在 shared」的表述失效；分页 VO、`enums.dart`、`thumbnail/**` 与豁免 Port 结论不变。
 
 ## Context
 

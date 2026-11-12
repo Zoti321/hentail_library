@@ -26,10 +26,14 @@ const Set<String> _kInScopeModules = <String>{
 ///
 /// `app_settings ↛ {reader, library_browse, comic, series, metadata_backup}`
 /// 由 ADR-0046 引入：设置模块只认识持久化原语，偏好语义归 owner 模块。
+///
+/// `comic_metadata ↛ {comic, library_browse, series, reader}`
+/// 由 ADR-0048 引入：元数据字典是 owner，只能被编辑面消费，不得反向依赖。
 const Map<String, Set<String>> _kForbiddenEdges = <String, Set<String>>{
   'comic': <String>{'library_browse', 'series', 'reader'},
   'series': <String>{'library_browse', 'reader'},
   'reader': <String>{'comic'},
+  'comic_metadata': <String>{'comic', 'library_browse', 'series', 'reader'},
   'app_settings': <String>{
     'reader',
     'library_browse',
@@ -160,7 +164,7 @@ void main() {
     );
   });
 
-  test('显式禁止边表（comic/series/reader）', () {
+  test('显式禁止边表（comic/series/reader/comic_metadata）', () {
     final List<String> offenders = <String>[];
     for (final _Edge edge in edges) {
       final Set<String>? forbidden = _kForbiddenEdges[edge.source];
