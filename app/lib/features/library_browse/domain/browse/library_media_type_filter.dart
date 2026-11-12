@@ -56,7 +56,7 @@ class LibraryMediaTypeFilterSelection {
     LibraryMediaTypeFilterOption option,
   ) {
     final Set<LibraryMediaTypeFilterOption> next =
-        Set<LibraryMediaTypeFilterOption>.from(selected);
+        Set<LibraryMediaTypeFilterOption>.of(selected);
     if (next.contains(option)) {
       next.remove(option);
     } else {

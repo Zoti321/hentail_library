@@ -67,7 +67,7 @@ ReaderNavContextData buildReaderNavContextData({
   required int? preferredPageIndex,
 }) {
   final List<ReaderComicListItem> sortedItems =
-      List<ReaderComicListItem>.from(items)..sort(
+      List<ReaderComicListItem>.of(items)..sort(
         (ReaderComicListItem a, ReaderComicListItem b) =>
             a.order.compareTo(b.order),
       );

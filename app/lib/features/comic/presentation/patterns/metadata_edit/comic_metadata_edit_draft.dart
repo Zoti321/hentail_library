@@ -36,10 +36,10 @@ class ComicMetadataEditDraft {
       publishedLabel: entry.publishedLabel ?? '',
       isR18: entry.showAgeRestrictionChip,
       languages: const <String>[],
-      parodies: List<String>.from(entry.parodies),
+      parodies: List<String>.of(entry.parodies),
       authors: <String>[for (final AuthorRef a in entry.authors) a.name],
-      characters: List<String>.from(entry.characters),
-      tags: List<String>.from(entry.tags),
+      characters: List<String>.of(entry.characters),
+      tags: List<String>.of(entry.tags),
     );
   }
 

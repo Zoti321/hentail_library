@@ -67,13 +67,13 @@ class BulkMetadataEditSession {
       comics.map((Comic c) => c.authors.map((a) => a.name).toList()),
     );
     multiFields[BulkMetadataEditFieldKind.languages]!.mixedValues = _isMixed(
-      comics.map((Comic c) => List<String>.from(c.languages)),
+      comics.map((Comic c) => List<String>.of(c.languages)),
     );
     multiFields[BulkMetadataEditFieldKind.parodies]!.mixedValues = _isMixed(
-      comics.map((Comic c) => List<String>.from(c.parodies)),
+      comics.map((Comic c) => List<String>.of(c.parodies)),
     );
     multiFields[BulkMetadataEditFieldKind.characters]!.mixedValues = _isMixed(
-      comics.map((Comic c) => List<String>.from(c.characters)),
+      comics.map((Comic c) => List<String>.of(c.characters)),
     );
     contentRatingField.mixedValues = _isMixed(
       comics.map(
@@ -170,9 +170,9 @@ class BulkMetadataEditSession {
     if (!it.moveNext()) {
       return false;
     }
-    final List<String> first = List<String>.from(it.current)..sort();
+    final List<String> first = List<String>.of(it.current)..sort();
     while (it.moveNext()) {
-      final List<String> next = List<String>.from(it.current)..sort();
+      final List<String> next = List<String>.of(it.current)..sort();
       if (!_listEquals(first, next)) {
         return true;
       }

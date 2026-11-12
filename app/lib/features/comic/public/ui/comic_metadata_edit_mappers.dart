@@ -21,12 +21,12 @@ ComicMetadataEditDraft comicMetadataDraftFromComic(
         ? ''
         : _publishedDateFormat.format(publishedAt),
     isR18: comic.contentRating == ContentRating.r18,
-    languages: List<String>.from(comic.languages),
-    parodies: List<String>.from(comic.parodies),
+    languages: List<String>.of(comic.languages),
+    parodies: List<String>.of(comic.parodies),
     authors: <String>[
       for (final AuthorRef author in comic.authors) author.name,
     ],
-    characters: List<String>.from(comic.characters),
+    characters: List<String>.of(comic.characters),
     tags: <String>[for (final Tag tag in comic.tags) tag.name],
     seriesSortOrderText: seriesSortOrderText,
   );

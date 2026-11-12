@@ -66,7 +66,7 @@ MetadataImportAmbiguousSample mapMetadataImportAmbiguousSampleDto(
     comicId: dto.comicId,
     path: dto.path,
     title: dto.title,
-    candidateComicIds: List<String>.from(dto.candidateComicIds),
+    candidateComicIds: List<String>.of(dto.candidateComicIds),
   );
 }
 
@@ -88,6 +88,6 @@ MetadataImportResult mapMetadataImportResultDto(
     applied: dto.applied,
     skippedNotFound: dto.skippedNotFound,
     skippedAmbiguous: dto.skippedAmbiguous,
-    errors: List<String>.from(dto.errors),
+    errors: List<String>.of(dto.errors),
   );
 }

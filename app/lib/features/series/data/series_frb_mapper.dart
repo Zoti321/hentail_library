@@ -57,7 +57,7 @@ SeriesReadingContext mapRustSeriesReadingContext(
   return (
     seriesId: dto.seriesId,
     seriesName: dto.seriesName,
-    orderedComicIds: List<String>.from(dto.orderedComicIds),
+    orderedComicIds: List<String>.of(dto.orderedComicIds),
     currentIndex: dto.currentIndex,
   );
 }

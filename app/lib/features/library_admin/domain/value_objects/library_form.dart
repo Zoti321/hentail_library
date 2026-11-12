@@ -26,7 +26,7 @@ abstract class LibraryForm with _$LibraryForm {
       isRemote: false,
       name: '',
       rootPath: '',
-      enabledResourceFormatCategories: List<ResourceFormatCategory>.from(
+      enabledResourceFormatCategories: List<ResourceFormatCategory>.of(
         ResourceFormatCategory.all,
       ),
       scanOnStartup: false,
@@ -51,7 +51,7 @@ abstract class LibraryForm with _$LibraryForm {
 
   factory LibraryForm.fromLibrary(LocalLibrary library) {
     final bool remote = isRemoteLibrary(library);
-    List<ResourceFormatCategory> groups = List<ResourceFormatCategory>.from(
+    List<ResourceFormatCategory> groups = List<ResourceFormatCategory>.of(
       library.enabledResourceFormatCategories,
     );
     if (remote) {

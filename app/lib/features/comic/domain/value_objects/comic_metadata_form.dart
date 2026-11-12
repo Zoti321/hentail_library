@@ -31,11 +31,11 @@ abstract class ComicMetadataForm with _$ComicMetadataForm {
       description: comic.description,
       publishedAt: comic.publishedAt,
       isR18: comic.contentRating == ContentRating.r18,
-      tags: List<Tag>.from(comic.tags),
-      authors: List<AuthorRef>.from(comic.authors),
-      languages: List<String>.from(comic.languages),
-      parodies: List<String>.from(comic.parodies),
-      characters: List<String>.from(comic.characters),
+      tags: List<Tag>.of(comic.tags),
+      authors: List<AuthorRef>.of(comic.authors),
+      languages: List<String>.of(comic.languages),
+      parodies: List<String>.of(comic.parodies),
+      characters: List<String>.of(comic.characters),
     );
   }
 }

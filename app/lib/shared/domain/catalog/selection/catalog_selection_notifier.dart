@@ -71,7 +71,7 @@ class CatalogSelectionNotifier extends Notifier<CatalogSelectionState> {
     if (!state.active) {
       return;
     }
-    final Set<String> next = Set<String>.from(state.selectedIds);
+    final Set<String> next = Set<String>.of(state.selectedIds);
     if (next.contains(comicId)) {
       next.remove(comicId);
     } else {
@@ -84,7 +84,7 @@ class CatalogSelectionNotifier extends Notifier<CatalogSelectionState> {
     if (!state.active) {
       return;
     }
-    final Set<String> next = Set<String>.from(state.selectedIds)
+    final Set<String> next = Set<String>.of(state.selectedIds)
       ..addAll(comicIds);
     state = state.copyWith(selectedIds: next);
   }

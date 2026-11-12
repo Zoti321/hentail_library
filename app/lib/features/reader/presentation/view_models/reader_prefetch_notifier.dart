@@ -97,7 +97,7 @@ class ReaderPrefetchNotifier extends _$ReaderPrefetchNotifier {
         comicReaderPageProvider(comicId: comicId, pageIndex: pageOneBased - 1),
       );
     }
-    _lastWarmWindows[comicId] = Set<int>.from(targets);
+    _lastWarmWindows[comicId] = Set<int>.of(targets);
     final int generation = bumpGeneration(comicId);
     // Kick the landing/center page before neighbor prefetch contends on the archive.
     final int centerZeroBased = centerPageOneBased.clamp(1, totalPages) - 1;

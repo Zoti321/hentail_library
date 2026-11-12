@@ -22,9 +22,9 @@ Comic mapRustComic(rust.ComicDto dto) {
         .toList(),
     contentRating: ContentRating.values.byName(dto.contentRating),
     tags: dto.tags.map((String n) => Tag(name: n)).toList(),
-    languages: List<String>.from(dto.languages),
-    parodies: List<String>.from(dto.parodies),
-    characters: List<String>.from(dto.characters),
+    languages: List<String>.of(dto.languages),
+    parodies: List<String>.of(dto.parodies),
+    characters: List<String>.of(dto.characters),
     pageCount: dto.pageCount,
     description: dto.description,
     publishedAt: dto.publishedAt == null

@@ -54,7 +54,7 @@ List<ResourceFormatCategory> legacyEnabledResourceFormatCategoriesFromJson(
   if (json.containsKey('enabledFormatGroups')) {
     return resourceFormatCategoriesFromStorage(json['enabledFormatGroups']);
   }
-  return List<ResourceFormatCategory>.from(ResourceFormatCategory.all);
+  return List<ResourceFormatCategory>.of(ResourceFormatCategory.all);
 }
 
 /// Reads legacy app-level autoScan before it is dropped from AppSetting.
