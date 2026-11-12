@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
-import 'package:hentai_library/shared/domain/library/library_scan_mode.dart';
-import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
+import 'package:hentai_library/features/library_admin/domain/library_scan_mode.dart';
+import 'package:hentai_library/features/library_admin/domain/local_library.dart';
 
 /// 库管理 UI 命令契约（#292，真源 @ library_admin，ADR-0045）。
 ///

@@ -1,5 +1,5 @@
 import 'package:hentai_library/features/library_admin/domain/library_repository.dart';
-import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
+import 'package:hentai_library/features/library_admin/domain/local_library.dart';
 import 'package:hentai_library/shared/domain/ports/remote_library_credentials_port.dart';
 import 'package:hentai_library/src/rust/api/sync.dart' as rust;
 

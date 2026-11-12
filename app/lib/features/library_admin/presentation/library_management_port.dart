@@ -8,7 +8,6 @@ import 'package:hentai_library/features/library_admin/presentation/views/library
 import 'package:hentai_library/shared/di/app_navigator_provider.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
-import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/shared/domain/ports/library_browse_fallback_port.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 

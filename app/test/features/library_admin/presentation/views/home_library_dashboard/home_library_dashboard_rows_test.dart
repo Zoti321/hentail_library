@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/home/public/home_library_stat.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/home_library_dashboard_rows.dart';
-import 'package:hentai_library/shared/domain/library/scan_interval.dart';
-import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
+import 'package:hentai_library/features/library_admin/domain/value_objects/scan_interval.dart';
+import 'package:hentai_library/features/library_admin/domain/local_library.dart';
 import 'package:hentai_library/shared/domain/models/resource_format_category.dart';
 import 'package:hentai_library/shared/ui/patterns/home/home_library_dashboard_models.dart';
 

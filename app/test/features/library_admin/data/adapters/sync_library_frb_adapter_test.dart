@@ -1,9 +1,9 @@
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/features/library_admin/data/adapters/sync_library_frb_adapter.dart';
 import 'package:hentai_library/features/library_admin/domain/resource_format_category.dart';
-import 'package:hentai_library/features/library_admin/domain/scan_interval.dart';
+import 'package:hentai_library/features/library_admin/domain/value_objects/scan_interval.dart';
 import 'package:hentai_library/features/library_admin/domain/sync_library_types.dart';
-import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
+import 'package:hentai_library/features/library_admin/domain/local_library.dart';
 import 'package:hentai_library/features/library_admin/domain/library_repository.dart';
 import 'package:hentai_library/src/rust/api/sync.dart' as rust;
 import 'package:test/test.dart';

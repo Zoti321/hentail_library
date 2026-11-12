@@ -1,7 +1,6 @@
 import 'package:hentai_library/features/named_metadata/public/named_metadata_form.dart';
 import 'package:hentai_library/features/comic/domain/smart_facet_match.dart';
 import 'package:hentai_library/features/comic/domain/comic.dart';
-import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/features/comic/domain/repositories/comic_lookup_repository.dart';
 import 'package:hentai_library/features/app_settings/public/di/app_settings_providers.dart';
 import 'package:hentai_library/shared/di/series_reading_context_providers.dart';

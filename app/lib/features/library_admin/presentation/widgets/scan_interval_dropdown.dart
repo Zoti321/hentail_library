@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/domain/library/scan_interval.dart';
+import 'package:hentai_library/features/library_admin/domain/value_objects/scan_interval.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:hentai_library/features/library_admin/public/ui/l10n/library_admin_l10n.dart';
 

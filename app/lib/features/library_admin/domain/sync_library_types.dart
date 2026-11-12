@@ -1,6 +1,6 @@
 // 同步漫画库任务专用进度快照（typedef record，不单独建 class）。
 
-export 'package:hentai_library/shared/domain/library/library_scan_mode.dart';
+export 'package:hentai_library/features/library_admin/domain/library_scan_mode.dart';
 
 /// 扫描 / 清空 / 写库 / 生成缩略图 / 结束 / 失败
 enum SyncLibraryPhase {

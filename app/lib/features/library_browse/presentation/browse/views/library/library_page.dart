@@ -34,7 +34,6 @@ import 'package:hentai_library/shared/ui/widgets/navigation/expressive_library_s
 import 'package:hentai_library/shared/ui/widgets/pagination/pagination.dart';
 import 'package:hentai_library/shared/di/app_navigator_provider.dart';
 import 'package:hentai_library/shared/di/browse_library_scope_providers.dart';
-import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/ui/widgets/navigation/library_scroll_to_top_button.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';

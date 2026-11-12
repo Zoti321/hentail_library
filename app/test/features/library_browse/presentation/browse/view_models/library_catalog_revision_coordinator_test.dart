@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
 
 import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
-import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_revision_coordinator.dart';
 import 'package:hentai_library/shared/di/domain_event_bus_providers.dart';

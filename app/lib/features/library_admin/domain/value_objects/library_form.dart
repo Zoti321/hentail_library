@@ -1,8 +1,8 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hentai_library/features/library_admin/domain/library_repository.dart';
 import 'package:hentai_library/features/library_admin/domain/resource_format_category.dart';
-import 'package:hentai_library/shared/domain/library/scan_interval.dart';
-import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
+import 'package:hentai_library/features/library_admin/domain/value_objects/scan_interval.dart';
+import 'package:hentai_library/features/library_admin/domain/local_library.dart';
 
 part 'library_form.freezed.dart';
 

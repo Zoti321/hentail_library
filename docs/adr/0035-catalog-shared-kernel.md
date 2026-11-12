@@ -75,6 +75,8 @@ Rust `core/` 仍为扫描、sync 与 catalog 谓词真值（ADR-0002）；Dart �
 >
 > **实现修订（2026-11-12）**：上一段的 `metadata_refresh_types.dart` 豁免**已解除**——真源迁 `library_admin/domain/`，toast 迁 `library_admin/public/ui/`，`shared` 不再消费（详见 ADR-0045 §4 与 §5 修订）。本节 `library/` 相关结论中仅 `library_age_restriction_filter.dart`（跨 Tab 词汇，禁止边 + home 消费）与 `comic_detail_return_series_port.dart`（public 环）继续留 shared。
 
+> **实现修订（2026-11-12，P3/P4 #530 / #531）**：`library_management_port.dart` 的豁免同样**已解除**——全量 Port 真源迁 `library_admin/public/ui/`，shared 只留仅含 `BuildContext` 的 `LibraryBrowseFallbackPort`。`LocalLibrary`（含 `isRemoteLibrary` / `isLocalLibrary` / `localLibraryDisplayName`）、`ScanInterval`、`ScanMode` 迁 `library_admin/domain/`，经 `library_admin/public.dart` 跨模块可见；`shared/domain/models/entity/library/` 目录已删除。`ResourceFormatCategory` 继续留 shared（`app_settings` 消费，搬入 `library_admin` 会构成 public 环）。
+
 ### 5. Gate 与工程影响
 
 | 机制 | 内核保留 shared 时的预期 |

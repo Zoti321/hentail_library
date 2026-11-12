@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/domain/library/scan_interval.dart';
+import 'package:hentai_library/features/library_admin/domain/value_objects/scan_interval.dart';
 import 'package:hentai_library/shared/ui/patterns/home/home_library_dashboard_models.dart';
 
 /// 首页库行健康提示（对齐 core `home::classify_sync_alert` 的 stale 启发式）。

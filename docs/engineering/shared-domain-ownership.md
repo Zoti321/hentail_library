@@ -67,7 +67,7 @@ Feature 内代码应 **import owner `domain/`**（`library_browse` 内按 [`libr
 - `models/value_objects/page_request.dart`、`paged_result.dart`、`page_jump.dart`
 - 与 catalog 强绑定的 pick / meta VO：`models/value_objects/form/library_author_pick.dart`、`library_tag_pick.dart`、`comic_language.dart`；`library_form.dart` 已按生产者拥有归 `features/library_admin/domain/value_objects/`（#504）
 - `reading/series_reading_context.dart`（类型；读口 `SeriesReadingContextPort` @ shared/di，实现 @ series）
-- `library/scan_interval.dart`（库扫描间隔；shared 侧仅 `LocalLibrary` 字段使用，待与 `LocalLibrary` 同批迁 `library_admin`）；`library/library_age_restriction_filter.dart`（跨 Tab 年龄限制词汇：comic / series 禁止边 + home 消费，无可达 owner——ADR-0045 可达性否决，**不是遗留**）；批量补丁类型已归 `features/library_admin/domain/`（#513）；`library/metadata_refresh_types.dart` 与 `library/library_revision_state.dart` 已于 2026-11-12 归 `library_admin`
+- `library/library_age_restriction_filter.dart`（跨 Tab 年龄限制词汇：comic / series 禁止边 + home 消费，无可达 owner——ADR-0045 可达性否决，**不是遗留**；2026-11-12 起只承载语义与 `fromStorage`，存储键已下放 browse 持久化）；批量补丁类型已归 `features/library_admin/domain/`（#513）；`library/metadata_refresh_types.dart` 与 `library/library_revision_state.dart` 已于 2026-11-12 归 `library_admin`；`LocalLibrary` / `ScanInterval` / `ScanMode` 已于 2026-11-12 归 `library_admin/domain/`（#531）
 - `thumbnail/**`
 
 ## 契约仍定义在 `shared/domain`（未 owner 化）

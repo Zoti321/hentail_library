@@ -11,7 +11,7 @@ import 'package:hentai_library/shared/ui/patterns/dialog/adaptive_form_dialog.da
 import 'package:hentai_library/features/library_admin/presentation/patterns/library_edit_form.dart';
 import 'package:hentai_library/features/library_admin/public/di/library_admin_state_providers.dart';
 import 'package:hentai_library/features/library_admin/domain/resource_format_category.dart';
-import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
+import 'package:hentai_library/features/library_admin/domain/local_library.dart';
 import 'package:hentai_library/features/library_admin/domain/value_objects/library_form.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
