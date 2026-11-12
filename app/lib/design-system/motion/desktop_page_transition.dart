@@ -44,25 +44,34 @@ double desktopFadeThroughExitOpacity(double t) {
   return 1.0 - const Cubic(0.4, 0.0, 1.0, 1.0).transform(local.clamp(0.0, 1.0));
 }
 
-Widget desktopFadeThroughTransitionWrapper({
-  required BuildContext context,
-  required Animation<double> animation,
-  required Animation<double> secondaryAnimation,
-  required Widget child,
-}) {
-  if (MediaQuery.disableAnimationsOf(context)) {
-    return child;
-  }
+class DesktopFadeThroughTransitionWrapper extends StatelessWidget {
+  const DesktopFadeThroughTransitionWrapper({
+    super.key,
+    required this.animation,
+    required this.secondaryAnimation,
+    required this.child,
+  });
 
-  // secondary 停住：库浏览被详情 push 盖住时不淡出下方页，避免 pop 中段闪白。
-  // Shell 顶层 go 切换只依赖各页自己的 primary FadeThrough。
-  // fillColor 与壳层画布一致，避免透明页被 Theme.surface 盖成另一套底色。
-  return FadeThroughTransition(
-    animation: animation,
-    secondaryAnimation: const AlwaysStoppedAnimation<double>(0),
-    fillColor: labBrowseCanvasColor(M3ETheme.of(context).colorScheme),
-    child: child,
-  );
+  final Animation<double> animation;
+  final Animation<double> secondaryAnimation;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (MediaQuery.disableAnimationsOf(context)) {
+      return child;
+    }
+
+    // secondary 停住：库浏览被详情 push 盖住时不淡出下方页，避免 pop 中段闪白。
+    // Shell 顶层 go 切换只依赖各页自己的 primary FadeThrough。
+    // fillColor 与壳层画布一致，避免透明页被 Theme.surface 盖成另一套底色。
+    return FadeThroughTransition(
+      animation: animation,
+      secondaryAnimation: const AlwaysStoppedAnimation<double>(0),
+      fillColor: labBrowseCanvasColor(M3ETheme.of(context).colorScheme),
+      child: child,
+    );
+  }
 }
 
 /// [PageTransitionsTheme] builder for desktop OS targets.
@@ -77,8 +86,7 @@ class DesktopFadeThroughPageTransitionsBuilder extends PageTransitionsBuilder {
     Animation<double> secondaryAnimation,
     Widget child,
   ) {
-    return desktopFadeThroughTransitionWrapper(
-      context: context,
+    return DesktopFadeThroughTransitionWrapper(
       animation: animation,
       secondaryAnimation: secondaryAnimation,
       child: child,
@@ -103,8 +111,7 @@ CustomTransitionPage<void> buildDesktopFadeThroughPage({
           Animation<double> secondaryAnimation,
           Widget child,
         ) {
-          return desktopFadeThroughTransitionWrapper(
-            context: context,
+          return DesktopFadeThroughTransitionWrapper(
             animation: animation,
             secondaryAnimation: secondaryAnimation,
             child: child,

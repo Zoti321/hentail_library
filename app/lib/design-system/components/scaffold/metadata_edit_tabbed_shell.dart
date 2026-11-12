@@ -49,26 +49,6 @@ class _MetadataEditTabbedShellState extends State<MetadataEditTabbedShell> {
     widget.onSelected(index);
   }
 
-  Widget _scrollPane(Widget child) {
-    return ScrollConfiguration(
-      behavior: MetadataEditScrollBehavior(),
-      child: SingleChildScrollView(primary: false, child: child),
-    );
-  }
-
-  Widget _detailTransition(Widget child) {
-    return ListDetailDetailTransition(
-      switchKey: widget.selectedIndex,
-      reverse: _reverse,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: MetadataEditFormMetrics.detailContentHorizontalInset,
-        ),
-        child: child,
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final WindowSizeClass sizeClass = windowSizeClassOf(context);
@@ -92,10 +72,22 @@ class _MetadataEditTabbedShellState extends State<MetadataEditTabbedShell> {
               children: <Widget>[
                 SizedBox(
                   width: MetadataEditFormMetrics.sideTabColumnWidth,
-                  child: _scrollPane(_buildSideTabs()),
+                  child: _ScrollPane(
+                    child: _SideTabs(
+                      tabs: widget.tabs,
+                      selectedIndex: widget.selectedIndex,
+                      onSelect: _select,
+                    ),
+                  ),
                 ),
                 SizedBox(width: gap),
-                Expanded(child: _detailTransition(_scrollPane(tabBody))),
+                Expanded(
+                  child: _DetailTransition(
+                    selectedIndex: widget.selectedIndex,
+                    reverse: _reverse,
+                    child: _ScrollPane(child: tabBody),
+                  ),
+                ),
               ],
             ),
           );
@@ -106,39 +98,115 @@ class _MetadataEditTabbedShellState extends State<MetadataEditTabbedShell> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              _buildTopTabs(),
+              _TopTabs(
+                tabs: widget.tabs,
+                selectedIndex: widget.selectedIndex,
+                onSelected: _select,
+              ),
               SizedBox(height: gap),
-              Expanded(child: _detailTransition(_scrollPane(tabBody))),
+              Expanded(
+                child: _DetailTransition(
+                  selectedIndex: widget.selectedIndex,
+                  reverse: _reverse,
+                  child: _ScrollPane(child: tabBody),
+                ),
+              ),
             ],
           ),
         );
       },
     );
   }
+}
 
-  Widget _buildSideTabs() {
+class _ScrollPane extends StatelessWidget {
+  const _ScrollPane({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return ScrollConfiguration(
+      behavior: MetadataEditScrollBehavior(),
+      child: SingleChildScrollView(primary: false, child: child),
+    );
+  }
+}
+
+class _DetailTransition extends StatelessWidget {
+  const _DetailTransition({
+    required this.selectedIndex,
+    required this.reverse,
+    required this.child,
+  });
+
+  final int selectedIndex;
+  final bool reverse;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListDetailDetailTransition(
+      switchKey: selectedIndex,
+      reverse: reverse,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: MetadataEditFormMetrics.detailContentHorizontalInset,
+        ),
+        child: child,
+      ),
+    );
+  }
+}
+
+class _SideTabs extends StatelessWidget {
+  const _SideTabs({
+    required this.tabs,
+    required this.selectedIndex,
+    required this.onSelect,
+  });
+
+  final List<MetadataEditTab> tabs;
+  final int selectedIndex;
+  final ValueChanged<int> onSelect;
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        for (int index = 0; index < widget.tabs.length; index++)
+        for (int index = 0; index < tabs.length; index++)
           ListDetailNavItem(
             key: ValueKey<int>(index),
-            label: widget.tabs[index].label,
-            selected: widget.selectedIndex == index,
-            onTap: () => _select(index),
+            label: tabs[index].label,
+            selected: selectedIndex == index,
+            onTap: () => onSelect(index),
           ),
       ],
     );
   }
+}
 
-  Widget _buildTopTabs() {
+class _TopTabs extends StatelessWidget {
+  const _TopTabs({
+    required this.tabs,
+    required this.selectedIndex,
+    required this.onSelected,
+  });
+
+  final List<MetadataEditTab> tabs;
+  final int selectedIndex;
+  final ValueChanged<int> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
     return SegmentedCapsuleBar(
       segments: <SegmentedCapsuleSegment>[
-        for (final MetadataEditTab tab in widget.tabs)
+        for (final MetadataEditTab tab in tabs)
           SegmentedCapsuleSegment(label: tab.label),
       ],
-      selectedIndex: widget.selectedIndex,
-      onSelected: _select,
+      selectedIndex: selectedIndex,
+      onSelected: onSelected,
     );
   }
 }

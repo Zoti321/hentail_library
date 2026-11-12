@@ -40,6 +40,29 @@ class PeerContentTransition extends StatelessWidget {
       transitionDuration,
     );
 
+    Widget layoutBuilder(List<Widget> entries) {
+      if (entries.isEmpty) {
+        return const SizedBox.shrink();
+      }
+      return Stack(
+        alignment: Alignment.topCenter,
+        clipBehavior: Clip.hardEdge,
+        children: entries,
+      );
+    }
+
+    Widget transitionBuilder(
+      Widget child,
+      Animation<double> primary,
+      Animation<double> secondary,
+    ) {
+      return _PeerSharedAxis(
+        animation: primary,
+        secondaryAnimation: secondary,
+        child: child,
+      );
+    }
+
     return AnimatedSize(
       duration: duration,
       curve: Curves.easeOutCubic,
@@ -48,28 +71,8 @@ class PeerContentTransition extends StatelessWidget {
       child: PageTransitionSwitcher(
         duration: duration,
         reverse: reverse,
-        layoutBuilder: (List<Widget> entries) {
-          if (entries.isEmpty) {
-            return const SizedBox.shrink();
-          }
-          return Stack(
-            alignment: Alignment.topCenter,
-            clipBehavior: Clip.hardEdge,
-            children: entries,
-          );
-        },
-        transitionBuilder:
-            (
-              Widget child,
-              Animation<double> primary,
-              Animation<double> secondary,
-            ) {
-              return _PeerSharedAxis(
-                animation: primary,
-                secondaryAnimation: secondary,
-                child: child,
-              );
-            },
+        layoutBuilder: layoutBuilder,
+        transitionBuilder: transitionBuilder,
         child: KeyedSubtree(key: ValueKey<Object>(switchKey), child: child),
       ),
     );

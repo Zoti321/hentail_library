@@ -133,24 +133,6 @@ resolveInputChipInlineMetrics({
   );
 }
 
-Widget compactInputChip({
-  required BuildContext context,
-  required String label,
-  required VoidCallback? onPressed,
-  required VoidCallback? onDeleted,
-}) {
-  final M3EThemeData theme = M3ETheme.of(context);
-  return M3ETheme(
-    data: theme.copyWith(chipTheme: compactInputChipTheme(theme.chipTheme)),
-    child: M3EChip(
-      label: inputChipDisplayLabel(label),
-      type: M3EChipType.input,
-      onPressed: onPressed,
-      onDeleted: onDeleted,
-    ),
-  );
-}
-
 /// Wrap + chip 行：自管垂直 inset，与 [OutlinedTextFieldShell.chipFirstLineLayout] 配套。
 class InputChipFieldContent extends StatefulWidget {
   const InputChipFieldContent({

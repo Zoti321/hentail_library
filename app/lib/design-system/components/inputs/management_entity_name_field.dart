@@ -26,13 +26,15 @@ class ManagementEntityNameField extends StatelessWidget {
       focusNode: focusNode,
       autofocus: autofocus,
       textInputAction: TextInputAction.done,
-      onSubmitted: (String value) {
-        final String trimmed = value.trim();
-        if (trimmed.isEmpty) {
-          return;
-        }
-        onSubmitted?.call(trimmed);
-      },
+      onSubmitted: _handleSubmitted,
     );
+  }
+
+  void _handleSubmitted(String value) {
+    final String trimmed = value.trim();
+    if (trimmed.isEmpty) {
+      return;
+    }
+    onSubmitted?.call(trimmed);
   }
 }

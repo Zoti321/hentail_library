@@ -319,28 +319,42 @@ class _OutlinedTextFieldShellState extends State<OutlinedTextFieldShell>
                 child: Row(
                   crossAxisAlignment: _crossAxisFor(widget.iconSlotAlignment),
                   children: <Widget>[
-                    ..._leadingSlot(fieldTheme, colors, height),
+                    _LeadingSlot(
+                      fieldTheme: fieldTheme,
+                      colors: colors,
+                      height: height,
+                      leading: widget.leading,
+                    ),
                     Expanded(
-                      child: _buildInputSlot(
-                        theme,
-                        fieldTheme,
-                        colors,
-                        height,
-                        inputStyle,
+                      child: _InputSlot(
+                        fieldTheme: fieldTheme,
+                        colors: colors,
+                        height: height,
+                        inputStyle: inputStyle,
+                        alignment: widget.iconSlotAlignment,
+                        chipFirstLineLayout: widget.chipFirstLineLayout,
+                        inputBuilder: widget.inputBuilder,
                       ),
                     ),
-                    ..._trailingSlot(fieldTheme, colors, height),
+                    _TrailingSlot(
+                      fieldTheme: fieldTheme,
+                      colors: colors,
+                      height: height,
+                      trailing: widget.trailing,
+                      trailingBuilder: widget.trailingBuilder,
+                    ),
                   ],
                 ),
               ),
-              _buildLabel(
-                theme,
-                fieldTheme,
-                colors,
-                height,
-                start,
-                end,
-                progress,
+              _ShellLabel(
+                theme: theme,
+                fieldTheme: fieldTheme,
+                colors: colors,
+                label: widget.label,
+                height: height,
+                start: start,
+                end: end,
+                progress: progress,
               ),
             ],
           ),
@@ -403,17 +417,40 @@ class _OutlinedTextFieldShellState extends State<OutlinedTextFieldShell>
     );
   }
 
-  Widget _buildInputSlot(
-    M3EThemeData theme,
-    M3ETextFieldTheme fieldTheme,
-    M3ETextFieldColors colors,
-    double height,
-    TextStyle inputStyle,
-  ) {
+  static CrossAxisAlignment _crossAxisFor(M3ETextFieldSlotAlignment alignment) {
+    return switch (alignment) {
+      M3ETextFieldSlotAlignment.firstLine => CrossAxisAlignment.start,
+      M3ETextFieldSlotAlignment.center => CrossAxisAlignment.center,
+      M3ETextFieldSlotAlignment.bottom => CrossAxisAlignment.end,
+    };
+  }
+}
+
+class _InputSlot extends StatelessWidget {
+  const _InputSlot({
+    required this.fieldTheme,
+    required this.colors,
+    required this.height,
+    required this.inputStyle,
+    required this.alignment,
+    required this.chipFirstLineLayout,
+    required this.inputBuilder,
+  });
+
+  final M3ETextFieldTheme fieldTheme;
+  final M3ETextFieldColors colors;
+  final double height;
+  final TextStyle inputStyle;
+  final M3ETextFieldSlotAlignment alignment;
+  final bool chipFirstLineLayout;
+  final OutlinedTextFieldInputBuilder inputBuilder;
+
+  @override
+  Widget build(BuildContext context) {
     final double inputLine = M3ETextFieldTheme.lineHeightOf(inputStyle);
     final double centered = (height - inputLine) / 2;
-    final EdgeInsets padding = switch (widget.iconSlotAlignment) {
-      M3ETextFieldSlotAlignment.firstLine when widget.chipFirstLineLayout =>
+    final EdgeInsets padding = switch (alignment) {
+      M3ETextFieldSlotAlignment.firstLine when chipFirstLineLayout =>
         EdgeInsets.zero,
       M3ETextFieldSlotAlignment.firstLine => EdgeInsets.symmetric(
         vertical: centered,
@@ -423,27 +460,34 @@ class _OutlinedTextFieldShellState extends State<OutlinedTextFieldShell>
     };
     return Padding(
       padding: padding,
-      child: widget.inputBuilder(context, colors, fieldTheme, inputStyle),
+      child: inputBuilder(context, colors, fieldTheme, inputStyle),
     );
   }
+}
 
-  static CrossAxisAlignment _crossAxisFor(M3ETextFieldSlotAlignment alignment) {
-    return switch (alignment) {
-      M3ETextFieldSlotAlignment.firstLine => CrossAxisAlignment.start,
-      M3ETextFieldSlotAlignment.center => CrossAxisAlignment.center,
-      M3ETextFieldSlotAlignment.bottom => CrossAxisAlignment.end,
-    };
-  }
+class _ShellLabel extends StatelessWidget {
+  const _ShellLabel({
+    required this.theme,
+    required this.fieldTheme,
+    required this.colors,
+    required this.label,
+    required this.height,
+    required this.start,
+    required this.end,
+    required this.progress,
+  });
 
-  Widget _buildLabel(
-    M3EThemeData theme,
-    M3ETextFieldTheme fieldTheme,
-    M3ETextFieldColors colors,
-    double height,
-    double start,
-    double end,
-    double progress,
-  ) {
+  final M3EThemeData theme;
+  final M3ETextFieldTheme fieldTheme;
+  final M3ETextFieldColors colors;
+  final String label;
+  final double height;
+  final double start;
+  final double end;
+  final double progress;
+
+  @override
+  Widget build(BuildContext context) {
     final TextStyle resting = fieldTheme.resolveLabelStyle(theme.typeScale);
     final TextStyle floating = fieldTheme.resolveFloatingLabelStyle(
       theme.typeScale,
@@ -460,7 +504,7 @@ class _OutlinedTextFieldShellState extends State<OutlinedTextFieldShell>
         heightFactor: 1,
         child: IgnorePointer(
           child: M3ETextFieldLabel(
-            text: widget.label,
+            text: label,
             progress: progress,
             restingStyle: resting,
             floatingStyle: floating,
@@ -470,59 +514,90 @@ class _OutlinedTextFieldShellState extends State<OutlinedTextFieldShell>
       ),
     );
   }
+}
 
-  List<Widget> _leadingSlot(
-    M3ETextFieldTheme fieldTheme,
-    M3ETextFieldColors colors,
-    double height,
-  ) {
-    if (widget.leading == null) {
-      return <Widget>[SizedBox(width: fieldTheme.horizontalPadding)];
+class _LeadingSlot extends StatelessWidget {
+  const _LeadingSlot({
+    required this.fieldTheme,
+    required this.colors,
+    required this.height,
+    required this.leading,
+  });
+
+  final M3ETextFieldTheme fieldTheme;
+  final M3ETextFieldColors colors;
+  final double height;
+  final Widget? leading;
+
+  @override
+  Widget build(BuildContext context) {
+    final Widget? slot = leading;
+    if (slot == null) {
+      return SizedBox(width: fieldTheme.horizontalPadding);
     }
-    return <Widget>[
-      SizedBox(
-        width: fieldTheme.iconSlotWidth,
-        height: height,
-        child: Center(
-          child: IconTheme.merge(
-            data: IconThemeData(
-              color: colors.leadingIcon,
-              size: fieldTheme.iconSize,
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        SizedBox(
+          width: fieldTheme.iconSlotWidth,
+          height: height,
+          child: Center(
+            child: IconTheme.merge(
+              data: IconThemeData(
+                color: colors.leadingIcon,
+                size: fieldTheme.iconSize,
+              ),
+              child: slot,
             ),
-            child: widget.leading!,
           ),
         ),
-      ),
-      SizedBox(width: fieldTheme.iconSlotTextPadding),
-    ];
-  }
-
-  List<Widget> _trailingSlot(
-    M3ETextFieldTheme fieldTheme,
-    M3ETextFieldColors colors,
-    double height,
-  ) {
-    final Widget? slot =
-        widget.trailingBuilder?.call(context, colors, fieldTheme) ??
-        widget.trailing;
-    if (slot == null) {
-      return <Widget>[SizedBox(width: fieldTheme.horizontalPadding)];
-    }
-    final Widget themed = IconTheme.merge(
-      data: IconThemeData(
-        color: colors.trailingIcon,
-        size: fieldTheme.iconSize,
-      ),
-      child: slot,
+        SizedBox(width: fieldTheme.iconSlotTextPadding),
+      ],
     );
-    return <Widget>[
-      SizedBox(width: fieldTheme.iconSlotTextPadding),
-      SizedBox(
-        width: fieldTheme.iconSlotWidth,
-        height: height,
-        child: Center(child: themed),
-      ),
-    ];
+  }
+}
+
+class _TrailingSlot extends StatelessWidget {
+  const _TrailingSlot({
+    required this.fieldTheme,
+    required this.colors,
+    required this.height,
+    required this.trailing,
+    required this.trailingBuilder,
+  });
+
+  final M3ETextFieldTheme fieldTheme;
+  final M3ETextFieldColors colors;
+  final double height;
+  final Widget? trailing;
+  final OutlinedTextFieldTrailingBuilder? trailingBuilder;
+
+  @override
+  Widget build(BuildContext context) {
+    final Widget? slot =
+        trailingBuilder?.call(context, colors, fieldTheme) ?? trailing;
+    if (slot == null) {
+      return SizedBox(width: fieldTheme.horizontalPadding);
+    }
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        SizedBox(width: fieldTheme.iconSlotTextPadding),
+        SizedBox(
+          width: fieldTheme.iconSlotWidth,
+          height: height,
+          child: Center(
+            child: IconTheme.merge(
+              data: IconThemeData(
+                color: colors.trailingIcon,
+                size: fieldTheme.iconSize,
+              ),
+              child: slot,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
 

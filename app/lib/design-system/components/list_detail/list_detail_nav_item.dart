@@ -44,7 +44,7 @@ class ListDetailNavItem extends StatelessWidget {
             children: <Widget>[
               const SizedBox(width: 16),
               if (icon != null) ...<Widget>[
-                navigationRailIconWidget(
+                NavigationRailIcon(
                   icon: icon!,
                   selected: selected,
                   size: 24,

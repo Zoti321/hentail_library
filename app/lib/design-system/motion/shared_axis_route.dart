@@ -40,8 +40,7 @@ PageRoute<T> sharedAxisRoute<T>(
           Animation<double> secondaryAnimation,
           Widget child,
         ) {
-          return sharedAxisTransitionWrapper(
-            context: routeContext,
+          return SharedAxisTransitionWrapper(
             animation: animation,
             secondaryAnimation: secondaryAnimation,
             transitionType: transitionType,
@@ -76,8 +75,7 @@ CustomTransitionPage<void> buildSharedAxisPage({
           Animation<double> secondaryAnimation,
           Widget child,
         ) {
-          return sharedAxisTransitionWrapper(
-            context: context,
+          return SharedAxisTransitionWrapper(
             animation: animation,
             secondaryAnimation: secondaryAnimation,
             transitionType: transitionType,
@@ -93,34 +91,46 @@ CustomTransitionPage<void> buildSharedAxisPage({
 /// Shared-axis 包装：减少动效时直出 child。
 ///
 /// [reverse] 仅对水平轴有效：镜像滑动方向（系列上一卷从左侧进入）。
-Widget sharedAxisTransitionWrapper({
-  required BuildContext context,
-  required Animation<double> animation,
-  required Animation<double> secondaryAnimation,
-  required Widget child,
-  SharedAxisTransitionType transitionType = SharedAxisTransitionType.horizontal,
-  Color? fillColor,
-  bool reverse = false,
-}) {
-  if (LabMotion.reduceMotionOf(context)) {
-    return child;
+class SharedAxisTransitionWrapper extends StatelessWidget {
+  const SharedAxisTransitionWrapper({
+    super.key,
+    required this.animation,
+    required this.secondaryAnimation,
+    required this.child,
+    this.transitionType = SharedAxisTransitionType.horizontal,
+    this.fillColor,
+    this.reverse = false,
+  });
+
+  final Animation<double> animation;
+  final Animation<double> secondaryAnimation;
+  final Widget child;
+  final SharedAxisTransitionType transitionType;
+  final Color? fillColor;
+  final bool reverse;
+
+  @override
+  Widget build(BuildContext context) {
+    if (LabMotion.reduceMotionOf(context)) {
+      return child;
+    }
+    final Color resolvedFill =
+        fillColor ?? labBrowseCanvasColor(M3ETheme.of(context).colorScheme);
+    final bool mirrorHorizontal =
+        reverse && transitionType == SharedAxisTransitionType.horizontal;
+    final Widget axisChild = mirrorHorizontal
+        ? Transform.flip(flipX: true, child: child)
+        : child;
+    final Widget transition = SharedAxisTransition(
+      animation: animation,
+      secondaryAnimation: secondaryAnimation,
+      transitionType: transitionType,
+      fillColor: resolvedFill,
+      child: axisChild,
+    );
+    if (!mirrorHorizontal) {
+      return transition;
+    }
+    return Transform.flip(flipX: true, child: transition);
   }
-  final Color resolvedFill =
-      fillColor ?? labBrowseCanvasColor(M3ETheme.of(context).colorScheme);
-  final bool mirrorHorizontal =
-      reverse && transitionType == SharedAxisTransitionType.horizontal;
-  final Widget axisChild = mirrorHorizontal
-      ? Transform.flip(flipX: true, child: child)
-      : child;
-  final Widget transition = SharedAxisTransition(
-    animation: animation,
-    secondaryAnimation: secondaryAnimation,
-    transitionType: transitionType,
-    fillColor: resolvedFill,
-    child: axisChild,
-  );
-  if (!mirrorHorizontal) {
-    return transition;
-  }
-  return Transform.flip(flipX: true, child: transition);
 }

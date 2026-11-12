@@ -51,7 +51,11 @@ class CalendarDayPicker extends StatelessWidget {
     if (fitHeight) {
       return Column(
         children: <Widget>[
-          _buildWeekdayHeader(theme, dateTheme, localizations),
+          _WeekdayHeader(
+            theme: theme,
+            dateTheme: dateTheme,
+            localizations: localizations,
+          ),
           Expanded(
             child: LayoutBuilder(
               builder: (BuildContext context, BoxConstraints constraints) {
@@ -89,7 +93,11 @@ class CalendarDayPicker extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        _buildWeekdayHeader(theme, dateTheme, localizations),
+        _WeekdayHeader(
+          theme: theme,
+          dateTheme: dateTheme,
+          localizations: localizations,
+        ),
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -109,31 +117,6 @@ class CalendarDayPicker extends StatelessWidget {
             );
           },
         ),
-      ],
-    );
-  }
-
-  Widget _buildWeekdayHeader(
-    M3EThemeData theme,
-    M3EDatePickerTheme dateTheme,
-    MaterialLocalizations localizations,
-  ) {
-    return Row(
-      children: <Widget>[
-        for (int i = 0; i < dateTheme.daysPerWeek; i++)
-          Expanded(
-            child: Center(
-              child: Text(
-                localizations
-                    .narrowWeekdays[(localizations.firstDayOfWeekIndex + i) %
-                    7],
-                style: dateTheme.weekdayStyle(
-                  theme.typeScale,
-                  theme.colorScheme,
-                ),
-              ),
-            ),
-          ),
       ],
     );
   }
@@ -170,6 +153,40 @@ class CalendarDayPicker extends StatelessWidget {
       rangeStart: start != null && M3EDatePickerUtils.isSameDay(date, start),
       rangeEnd: end != null && M3EDatePickerUtils.isSameDay(date, end),
       onTap: enabled ? () => onChanged(date) : null,
+    );
+  }
+}
+
+class _WeekdayHeader extends StatelessWidget {
+  const _WeekdayHeader({
+    required this.theme,
+    required this.dateTheme,
+    required this.localizations,
+  });
+
+  final M3EThemeData theme;
+  final M3EDatePickerTheme dateTheme;
+  final MaterialLocalizations localizations;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: <Widget>[
+        for (int i = 0; i < dateTheme.daysPerWeek; i++)
+          Expanded(
+            child: Center(
+              child: Text(
+                localizations
+                    .narrowWeekdays[(localizations.firstDayOfWeekIndex + i) %
+                    7],
+                style: dateTheme.weekdayStyle(
+                  theme.typeScale,
+                  theme.colorScheme,
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

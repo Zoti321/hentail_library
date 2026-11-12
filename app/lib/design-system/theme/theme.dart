@@ -124,7 +124,12 @@ ThemeData materialThemeFromM3e(
     visualDensity: VisualDensity.adaptivePlatformDensity,
     fontFamily: family,
     fontFamilyFallback: font.fallbacks,
-    appBarTheme: _buildAppBarThemeData(colorScheme),
+    appBarTheme: AppBarTheme(
+      surfaceTintColor: Colors.transparent,
+      backgroundColor: colorScheme.surface,
+      scrolledUnderElevation: 0.0,
+      systemOverlayStyle: appSystemUiOverlayStyle(colorScheme),
+    ),
     navigationRailTheme: _buildNavRailThemeData(colorScheme),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(shape: buttonShape),
@@ -168,15 +173,6 @@ ThemeData buildAppTheme(
     seed: seed,
     font: font,
   ).material;
-}
-
-AppBarTheme _buildAppBarThemeData(ColorScheme colorScheme) {
-  return AppBarTheme(
-    surfaceTintColor: Colors.transparent,
-    backgroundColor: colorScheme.surface,
-    scrolledUnderElevation: 0.0,
-    systemOverlayStyle: appSystemUiOverlayStyle(colorScheme),
-  );
 }
 
 NavigationRailThemeData _buildNavRailThemeData(ColorScheme colorScheme) {

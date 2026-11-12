@@ -16,6 +16,7 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:motor/motor.dart';
 import 'package:riverpod/misc.dart' show ProviderListenable;
+import 'package:hentai_library/design-system/components/inputs/compact_input_chip.dart';
 import 'package:hentai_library/design-system/components/inputs/input_chip_field_layout.dart';
 import 'package:hentai_library/design-system/components/inputs/outlined_text_field_shell.dart';
 import 'package:hentai_library/design-system/motion/motion.dart';
@@ -220,6 +221,15 @@ class _NamedFacetMultiSelectFieldState<T>
     }
   }
 
+  void _handlePointerDown(PointerDownEvent event) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      _closeMenu();
+    });
+  }
+
   void _closeMenu() {
     if (_overlayEntry == null && _panelExpandCtrl.value <= 0.01) {
       return;
@@ -323,14 +333,7 @@ class _NamedFacetMultiSelectFieldState<T>
                 Positioned.fill(
                   child: Listener(
                     behavior: HitTestBehavior.translucent,
-                    onPointerDown: (_) {
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        if (!mounted) {
-                          return;
-                        }
-                        _closeMenu();
-                      });
-                    },
+                    onPointerDown: _handlePointerDown,
                   ),
                 ),
                 CompositedTransformFollower(
@@ -708,8 +711,7 @@ class _NamedFacetMultiSelectFieldState<T>
                               onTap: _focusInput,
                               chips: <Widget>[
                                 for (final String name in widget.selectedNames)
-                                  compactInputChip(
-                                    context: context,
+                                  CompactInputChip(
                                     label: name,
                                     onPressed: _focusInput,
                                     onDeleted: () => _removeSelected(name),

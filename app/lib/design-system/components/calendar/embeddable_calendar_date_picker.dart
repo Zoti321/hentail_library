@@ -133,22 +133,11 @@ class _EmbeddableCalendarDatePickerState
     };
   }
 
-  Widget _yearPicker() {
-    return CalendarYearPicker(
-      selectedDate: _selectedDate,
-      firstDate: _firstDate,
-      lastDate: _lastDate,
-      onChanged: _handleYearChanged,
-      selectableDayPredicate: widget.selectableDayPredicate,
-      displayedMonth: _displayedMonth,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return M3EComponentTheme(
       builder: (BuildContext context) {
-        return materialUiLocalizationsScope(
+        return MaterialUiLocalizationsScope(
           child: Builder(
             builder: (BuildContext scopedContext) {
               final M3EThemeData theme = M3ETheme.of(scopedContext);
@@ -173,7 +162,7 @@ class _EmbeddableCalendarDatePickerState
                     padding: const EdgeInsets.only(
                       top: M3EDatePickerConstants.subHeaderHeight,
                     ),
-                    child: _yearPicker(),
+                    child: _YearPicker(state: this),
                   ),
                 };
                 return Stack(
@@ -228,7 +217,7 @@ class _EmbeddableCalendarDatePickerState
                           onMonthChanged: _handleMonthChanged,
                           selectableDayPredicate: widget.selectableDayPredicate,
                         ),
-                        M3EDatePickerMode.year => _yearPicker(),
+                        M3EDatePickerMode.year => _YearPicker(state: this),
                       },
                     ),
                   ),
@@ -248,6 +237,24 @@ class _EmbeddableCalendarDatePickerState
           ),
         );
       },
+    );
+  }
+}
+
+class _YearPicker extends StatelessWidget {
+  const _YearPicker({required this.state});
+
+  final _EmbeddableCalendarDatePickerState state;
+
+  @override
+  Widget build(BuildContext context) {
+    return CalendarYearPicker(
+      selectedDate: state._selectedDate,
+      firstDate: state._firstDate,
+      lastDate: state._lastDate,
+      onChanged: state._handleYearChanged,
+      selectableDayPredicate: state.widget.selectableDayPredicate,
+      displayedMonth: state._displayedMonth,
     );
   }
 }

@@ -26,6 +26,7 @@ import 'package:hentai_library/features/comic/presentation/views/comic_detail/co
 
 import '../hosts/md3e_reader_page_lab_host.dart';
 import '../preview/md3e_reader_page_preview_data.dart';
+import '../preview/md3e_tag_input_field_preview.dart';
 
 import '../hosts/md3e_comic_metadata_edit_page_lab_host.dart';
 
@@ -207,7 +208,7 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                 WidgetbookUseCase(
                   name: 'Default',
                   builder: (BuildContext context) =>
-                      const Md3eWidgetbookScope(child: TagInputFieldPreview()),
+                      const Md3eWidgetbookScope(child: Md3eTagInputFieldPreview()),
                 ),
               ],
             ),

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:material_3_expressive/components/text_fields/utils/m3e_text_field_selection_controls.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:hentai_library/design-system/components/inputs/compact_input_chip.dart';
 import 'package:hentai_library/design-system/components/inputs/input_chip_field_layout.dart';
 import 'package:hentai_library/design-system/components/inputs/outlined_text_field_shell.dart';
 
@@ -108,8 +109,7 @@ class _TagInputFieldState extends State<TagInputField> {
                     onTap: _focusInput,
                     chips: <Widget>[
                       for (final String tag in widget.tags)
-                        compactInputChip(
-                          context: context,
+                        CompactInputChip(
                           label: tag,
                           onPressed: _focusInput,
                           onDeleted: widget.onTagRemoved == null
@@ -154,43 +154,6 @@ class _TagInputFieldState extends State<TagInputField> {
                 },
           );
         },
-      ),
-    );
-  }
-}
-
-/// Widgetbook demo with local tag list.
-class TagInputFieldPreview extends StatefulWidget {
-  const TagInputFieldPreview({super.key});
-
-  @override
-  State<TagInputFieldPreview> createState() => _TagInputFieldPreviewState();
-}
-
-class _TagInputFieldPreviewState extends State<TagInputFieldPreview> {
-  final List<String> _tags = <String>['深海', '图书馆'];
-
-  @override
-  Widget build(BuildContext context) {
-    final M3ESpacing spacing = M3ETheme.of(context).spacing;
-
-    return Padding(
-      padding: EdgeInsets.all(spacing.lg),
-      child: Align(
-        alignment: Alignment.topCenter,
-        child: TagInputField(
-          label: '标签',
-          tags: _tags,
-          onTagRemoved: (String tag) {
-            setState(() => _tags.remove(tag));
-          },
-          onTagCommitted: (String tag) {
-            if (_tags.contains(tag)) {
-              return;
-            }
-            setState(() => _tags.add(tag));
-          },
-        ),
       ),
     );
   }

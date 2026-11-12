@@ -341,6 +341,12 @@ class _NamedFacetMenuRow extends StatelessWidget {
   final bool smartMatched;
   final String? smartMatchedTooltip;
 
+  void _handleHover(bool hovering) {
+    if (hovering) {
+      onHover();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final M3EThemeData theme = M3ETheme.of(context);
@@ -388,11 +394,7 @@ class _NamedFacetMenuRow extends StatelessWidget {
       borderRadius: optionRadius,
       child: InkWell(
         onTap: onSelect,
-        onHover: (bool hovering) {
-          if (hovering) {
-            onHover();
-          }
-        },
+        onHover: _handleHover,
         borderRadius: optionRadius,
         child: Padding(
           padding: EdgeInsets.symmetric(

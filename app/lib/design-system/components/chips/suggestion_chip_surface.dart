@@ -30,6 +30,13 @@ class _SuggestionChipSurfaceState extends State<SuggestionChipSurface> {
   static const M3EChipType _chipType = M3EChipType.suggestion;
   bool _hovered = false;
 
+  void _handleTapOutside(PointerDownEvent event) {
+    M3EFocusInteraction.instance.notePointerInteraction();
+    if (widget.editingFocusNode.hasFocus) {
+      widget.editingFocusNode.unfocus();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final M3EThemeData theme = M3ETheme.of(context);
@@ -63,12 +70,7 @@ class _SuggestionChipSurfaceState extends State<SuggestionChipSurface> {
           );
 
     final Widget chip = TapRegion(
-      onTapOutside: (_) {
-        M3EFocusInteraction.instance.notePointerInteraction();
-        if (widget.editingFocusNode.hasFocus) {
-          widget.editingFocusNode.unfocus();
-        }
-      },
+      onTapOutside: _handleTapOutside,
       child: M3EComponentTheme(
         builder: (BuildContext context) {
           final Widget surface = _buildSurface(
@@ -175,7 +177,7 @@ class _SuggestionChipSurfaceState extends State<SuggestionChipSurface> {
       ),
       shape: shape,
       clipBehavior: Clip.antiAlias,
-      child: _chipInkWell(
+      child: _ChipInkWell(
         onTap: widget.onPressed,
         shape: shape,
         splash: stateLayer,
@@ -205,14 +207,25 @@ class _SuggestionChipSurfaceState extends State<SuggestionChipSurface> {
       child: framed,
     );
   }
+}
 
-  Widget _chipInkWell({
-    required VoidCallback onTap,
-    required ShapeBorder shape,
-    required Color splash,
-    required double splashOpacity,
-    required Widget child,
-  }) {
+class _ChipInkWell extends StatelessWidget {
+  const _ChipInkWell({
+    required this.onTap,
+    required this.shape,
+    required this.splash,
+    required this.splashOpacity,
+    required this.child,
+  });
+
+  final VoidCallback onTap;
+  final ShapeBorder shape;
+  final Color splash;
+  final double splashOpacity;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
     return Material(
       type: MaterialType.transparency,
       color: Colors.transparent,

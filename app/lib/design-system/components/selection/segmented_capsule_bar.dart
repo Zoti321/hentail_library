@@ -87,6 +87,13 @@ class _SegmentedCapsuleBarState extends State<SegmentedCapsuleBar> {
     });
   }
 
+  void _handleSegmentTap(int index) {
+    if (index == widget.selectedIndex) {
+      return;
+    }
+    widget.onSelected(index);
+  }
+
   @override
   Widget build(BuildContext context) {
     final M3EThemeData theme = M3ETheme.of(context);
@@ -144,12 +151,7 @@ class _SegmentedCapsuleBarState extends State<SegmentedCapsuleBar> {
                         fontWeight: FontWeight.w500,
                         color: scheme.onSurfaceVariant,
                       ),
-                      onTap: () {
-                        if (i == widget.selectedIndex) {
-                          return;
-                        }
-                        widget.onSelected(i);
-                      },
+                      onTap: () => _handleSegmentTap(i),
                     ),
                   ),
               ],

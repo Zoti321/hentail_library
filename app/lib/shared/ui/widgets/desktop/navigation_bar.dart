@@ -29,12 +29,12 @@ class ExpressiveNavigationBar extends StatelessWidget {
         for (final ExpressiveNavigationRailDestination destination
             in destinations)
           M3ENavigationBarDestination(
-            icon: navigationRailIconWidget(
+            icon: NavigationRailIcon(
               icon: destination.icon,
               selectedIcon: destination.selectedIcon,
               selected: false,
             ),
-            selectedIcon: navigationRailIconWidget(
+            selectedIcon: NavigationRailIcon(
               icon: destination.icon,
               selectedIcon: destination.selectedIcon,
               selected: true,

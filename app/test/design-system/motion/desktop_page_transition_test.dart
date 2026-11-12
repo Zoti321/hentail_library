@@ -59,7 +59,7 @@ void main() {
     });
   });
 
-  group('desktopFadeThroughTransitionWrapper', () {
+  group('DesktopFadeThroughTransitionWrapper', () {
     testWidgets('uses FadeThroughTransition with stopped secondary', (
       WidgetTester tester,
     ) async {
@@ -73,8 +73,7 @@ void main() {
         MaterialApp(
           home: Builder(
             builder: (BuildContext context) {
-              return desktopFadeThroughTransitionWrapper(
-                context: context,
+              return DesktopFadeThroughTransitionWrapper(
                 animation: primary,
                 secondaryAnimation: const AlwaysStoppedAnimation<double>(0.5),
                 child: const Text('content'),

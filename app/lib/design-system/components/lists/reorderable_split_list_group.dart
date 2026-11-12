@@ -423,7 +423,7 @@ class _ReorderableSplitListGroupState extends State<ReorderableSplitListGroup>
     final int n = widget.itemCount;
     final bool dragging = _dragIndex != null && _slotOrigins.length == n;
     final List<Widget> slots = <Widget>[
-      for (int i = 0; i < n; i++) _buildSlot(context, i),
+      for (int i = 0; i < n; i++) _Slot(state: this, index: i),
     ];
 
     return Listener(
@@ -434,48 +434,60 @@ class _ReorderableSplitListGroupState extends State<ReorderableSplitListGroup>
         key: _listKey,
         clipBehavior: Clip.none,
         children: <Widget>[
-          if (dragging) _buildPlaceholder(context),
+          if (dragging) _DragPlaceholder(state: this),
           Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: slots,
           ),
-          if (dragging) _buildProxy(context),
+          if (dragging) _DragProxy(state: this),
         ],
       ),
     );
   }
+}
 
-  Widget _buildSlot(BuildContext context, int index) {
-    final int n = widget.itemCount;
-    final Object id = _idOf(index);
+class _Slot extends StatelessWidget {
+  const _Slot({required this.state, required this.index});
+
+  final _ReorderableSplitListGroupState state;
+  final int index;
+
+  @override
+  Widget build(BuildContext context) {
+    final int n = state.widget.itemCount;
+    final Object id = state._idOf(index);
     final bool first = index == 0;
     final bool last = index == n - 1;
 
     final Widget row = KeyedSubtree(
-      key: _rowKey(id),
+      key: state._rowKey(id),
       child: SplitListRow(
-        key: ValueKey<int>(_rowEpoch),
-        topRadius: first ? widget.outerRadius : kSplitListInnerRadius,
-        bottomRadius: last ? widget.outerRadius : kSplitListInnerRadius,
-        pressedRadius: widget.outerRadius,
-        mouseCursor: widget.onItemTap == null ? null : widget.mouseCursor,
-        onTap: widget.onItemTap == null ? null : () => widget.onItemTap!(index),
-        child: widget.itemBuilder(context, index),
+        key: ValueKey<int>(state._rowEpoch),
+        topRadius: first ? state.widget.outerRadius : kSplitListInnerRadius,
+        bottomRadius: last ? state.widget.outerRadius : kSplitListInnerRadius,
+        pressedRadius: state.widget.outerRadius,
+        mouseCursor: state.widget.onItemTap == null
+            ? null
+            : state.widget.mouseCursor,
+        onTap: state.widget.onItemTap == null
+            ? null
+            : () => state.widget.onItemTap!(index),
+        child: state.widget.itemBuilder(context, index),
       ),
     );
 
     final Widget listening = Listener(
       behavior: HitTestBehavior.translucent,
       onPointerDown: (PointerDownEvent event) =>
-          _onSlotPointerDown(index, event),
+          state._onSlotPointerDown(index, event),
       child: row,
     );
 
-    final Widget slot = _dragIndex == index
+    final Widget slot = state._dragIndex == index
         // 源行：保留布局高度但隐藏，浮层负责绘制它。
         ? IgnorePointer(child: Opacity(opacity: 0, child: listening))
-        : _offsetSlot(index, listening);
+        : _OffsetSlot(state: state, index: index, child: listening);
 
     return KeyedSubtree(
       key: ValueKey<Object>(id),
@@ -485,13 +497,26 @@ class _ReorderableSplitListGroupState extends State<ReorderableSplitListGroup>
       ),
     );
   }
+}
 
-  /// 让位偏移：只重绘这一行的 transform，不重建行内容。
-  Widget _offsetSlot(int index, Widget listening) {
-    final AnimationController offset = _offsetCtrl(index);
+/// 让位偏移：只重绘这一行的 transform，不重建行内容。
+class _OffsetSlot extends StatelessWidget {
+  const _OffsetSlot({
+    required this.state,
+    required this.index,
+    required this.child,
+  });
+
+  final _ReorderableSplitListGroupState state;
+  final int index;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final AnimationController offset = state._offsetCtrl(index);
     return AnimatedBuilder(
       animation: offset,
-      child: listening,
+      child: child,
       builder: (BuildContext context, Widget? child) {
         return Transform.translate(
           offset: Offset(0, offset.value),
@@ -500,70 +525,90 @@ class _ReorderableSplitListGroupState extends State<ReorderableSplitListGroup>
       },
     );
   }
+}
 
-  Widget _buildPlaceholder(BuildContext context) {
+class _DragPlaceholder extends StatelessWidget {
+  const _DragPlaceholder({required this.state});
+
+  final _ReorderableSplitListGroupState state;
+
+  @override
+  Widget build(BuildContext context) {
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
     final Widget fill = IgnorePointer(
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: scheme.surfaceContainer,
-          borderRadius: BorderRadius.circular(widget.outerRadius),
+          borderRadius: BorderRadius.circular(state.widget.outerRadius),
         ),
       ),
     );
     return AnimatedBuilder(
-      animation: Listenable.merge(<Listenable>[_placeholder, _lift]),
+      animation: Listenable.merge(<Listenable>[
+        state._placeholder,
+        state._lift,
+      ]),
       child: fill,
       builder: (BuildContext context, Widget? child) {
         return Positioned(
-          left: _slotOrigins.first.dx,
-          top: _placeholder.value,
-          width: _dragSize.width,
-          height: _dragSize.height,
-          child: Opacity(opacity: _lift.value.clamp(0.0, 1.0), child: child),
+          left: state._slotOrigins.first.dx,
+          top: state._placeholder.value,
+          width: state._dragSize.width,
+          height: state._dragSize.height,
+          child: Opacity(
+            opacity: state._lift.value.clamp(0.0, 1.0),
+            child: child,
+          ),
         );
       },
     );
   }
+}
 
-  Widget _buildProxy(BuildContext context) {
-    final int from = _dragIndex!;
+class _DragProxy extends StatelessWidget {
+  const _DragProxy({required this.state});
+
+  final _ReorderableSplitListGroupState state;
+
+  @override
+  Widget build(BuildContext context) {
+    final int from = state._dragIndex!;
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
     // 行内容只在父级重建时构建一次；逐帧移动的只是外层定位。
     final Widget content = IgnorePointer(
       child: PhysicalModel(
         color: scheme.surfaceContainerHigh,
         elevation: _kDragElevation,
-        borderRadius: BorderRadius.circular(widget.outerRadius),
+        borderRadius: BorderRadius.circular(state.widget.outerRadius),
         child: SplitDragScope(
           color: scheme.surfaceContainerHigh,
-          radius: widget.outerRadius,
+          radius: state.widget.outerRadius,
           child: SplitListRow(
-            topRadius: widget.outerRadius,
-            bottomRadius: widget.outerRadius,
-            child: widget.itemBuilder(context, from),
+            topRadius: state.widget.outerRadius,
+            bottomRadius: state.widget.outerRadius,
+            child: state.widget.itemBuilder(context, from),
           ),
         ),
       ),
     );
 
     return AnimatedBuilder(
-      animation: Listenable.merge(<Listenable>[_lift, _settle]),
+      animation: Listenable.merge(<Listenable>[state._lift, state._settle]),
       child: content,
       builder: (BuildContext context, Widget? child) {
-        final double lift = _lift.value.clamp(0.0, 1.0);
-        final Offset offset = _settling
+        final double lift = state._lift.value.clamp(0.0, 1.0);
+        final Offset offset = state._settling
             ? Offset.lerp(
-                _settleFrom,
-                _settleTo,
-                _settle.value.clamp(0.0, 1.0),
+                state._settleFrom,
+                state._settleTo,
+                state._settle.value.clamp(0.0, 1.0),
               )!
-            : _proxyPosition(lift);
+            : state._proxyPosition(lift);
         return Positioned(
           left: offset.dx,
           top: offset.dy,
-          width: _dragSize.width,
-          height: _dragSize.height,
+          width: state._dragSize.width,
+          height: state._dragSize.height,
           child: child!,
         );
       },

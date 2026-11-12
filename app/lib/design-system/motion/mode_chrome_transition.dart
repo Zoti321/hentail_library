@@ -35,23 +35,24 @@ class ModeChromeTransition extends StatelessWidget {
       M3ETheme.of(context).colorScheme,
     );
 
+    Widget transitionBuilder(
+      Widget child,
+      Animation<double> primary,
+      Animation<double> secondary,
+    ) {
+      return SharedAxisTransition(
+        animation: primary,
+        secondaryAnimation: secondary,
+        transitionType: SharedAxisTransitionType.vertical,
+        fillColor: fillColor,
+        child: child,
+      );
+    }
+
     return PageTransitionSwitcher(
       duration: duration,
       reverse: reverse,
-      transitionBuilder:
-          (
-            Widget child,
-            Animation<double> primary,
-            Animation<double> secondary,
-          ) {
-            return SharedAxisTransition(
-              animation: primary,
-              secondaryAnimation: secondary,
-              transitionType: SharedAxisTransitionType.vertical,
-              fillColor: fillColor,
-              child: child,
-            );
-          },
+      transitionBuilder: transitionBuilder,
       child: KeyedSubtree(key: ValueKey<Object>(switchKey), child: child),
     );
   }

@@ -63,7 +63,7 @@ void main() {
     });
   });
 
-  group('sharedAxisTransitionWrapper', () {
+  group('SharedAxisTransitionWrapper', () {
     testWidgets('uses horizontal SharedAxisTransition by default', (
       WidgetTester tester,
     ) async {
@@ -77,8 +77,7 @@ void main() {
         MaterialApp(
           home: Builder(
             builder: (BuildContext context) {
-              return sharedAxisTransitionWrapper(
-                context: context,
+              return SharedAxisTransitionWrapper(
                 animation: primary,
                 secondaryAnimation: const AlwaysStoppedAnimation<double>(0),
                 fillColor: Colors.black,
@@ -109,8 +108,7 @@ void main() {
         MaterialApp(
           home: Builder(
             builder: (BuildContext context) {
-              return sharedAxisTransitionWrapper(
-                context: context,
+              return SharedAxisTransitionWrapper(
                 animation: primary,
                 secondaryAnimation: const AlwaysStoppedAnimation<double>(0),
                 transitionType: SharedAxisTransitionType.scaled,
@@ -142,8 +140,7 @@ void main() {
         MaterialApp(
           home: Builder(
             builder: (BuildContext context) {
-              return sharedAxisTransitionWrapper(
-                context: context,
+              return SharedAxisTransitionWrapper(
                 animation: primary,
                 secondaryAnimation: const AlwaysStoppedAnimation<double>(0),
                 fillColor: Colors.black,
@@ -179,8 +176,7 @@ void main() {
           },
           home: Builder(
             builder: (BuildContext context) {
-              return sharedAxisTransitionWrapper(
-                context: context,
+              return SharedAxisTransitionWrapper(
                 animation: primary,
                 secondaryAnimation: const AlwaysStoppedAnimation<double>(0),
                 fillColor: Colors.black,

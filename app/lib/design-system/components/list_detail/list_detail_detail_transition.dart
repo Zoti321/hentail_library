@@ -41,33 +41,36 @@ class ListDetailDetailTransition extends StatelessWidget {
       M3ETheme.of(context).colorScheme,
     );
 
+    Widget layoutBuilder(List<Widget> entries) {
+      if (entries.isEmpty) {
+        return const SizedBox.shrink();
+      }
+      return Stack(
+        alignment: Alignment.topCenter,
+        clipBehavior: Clip.hardEdge,
+        children: entries,
+      );
+    }
+
+    Widget transitionBuilder(
+      Widget child,
+      Animation<double> primary,
+      Animation<double> secondary,
+    ) {
+      return SharedAxisTransition(
+        animation: primary,
+        secondaryAnimation: secondary,
+        transitionType: SharedAxisTransitionType.horizontal,
+        fillColor: fillColor,
+        child: child,
+      );
+    }
+
     return PageTransitionSwitcher(
       duration: duration,
       reverse: reverse,
-      layoutBuilder: (List<Widget> entries) {
-        if (entries.isEmpty) {
-          return const SizedBox.shrink();
-        }
-        return Stack(
-          alignment: Alignment.topCenter,
-          clipBehavior: Clip.hardEdge,
-          children: entries,
-        );
-      },
-      transitionBuilder:
-          (
-            Widget child,
-            Animation<double> primary,
-            Animation<double> secondary,
-          ) {
-            return SharedAxisTransition(
-              animation: primary,
-              secondaryAnimation: secondary,
-              transitionType: SharedAxisTransitionType.horizontal,
-              fillColor: fillColor,
-              child: child,
-            );
-          },
+      layoutBuilder: layoutBuilder,
+      transitionBuilder: transitionBuilder,
       child: KeyedSubtree(key: ValueKey<Object>(switchKey), child: child),
     );
   }

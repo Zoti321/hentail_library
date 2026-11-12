@@ -33,6 +33,8 @@ export 'package:hentai_library/design-system/layout/fab_sizing.dart';
 export 'package:hentai_library/design-system/layout/list_detail_adaptive_layout.dart';
 export 'package:hentai_library/design-system/layout/metadata_edit_form_metrics.dart';
 export 'package:hentai_library/design-system/layout/page_layout_spec.dart';
+export 'package:hentai_library/design-system/layout/page_layout_scope.dart';
+export 'package:hentai_library/design-system/layout/page_viewport.dart';
 export 'package:hentai_library/design-system/layout/pinned_toolbar_chrome_metrics.dart';
 export 'package:hentai_library/design-system/layout/spacing.dart';
 
@@ -47,6 +49,7 @@ export 'package:hentai_library/design-system/components/calendar/docked_calendar
 export 'package:hentai_library/design-system/components/calendar/embeddable_calendar_date_picker.dart';
 export 'package:hentai_library/design-system/components/chips/outlined_meta_chip.dart';
 export 'package:hentai_library/design-system/components/chips/suggestion_chip_surface.dart';
+export 'package:hentai_library/design-system/components/inputs/compact_input_chip.dart';
 export 'package:hentai_library/design-system/components/inputs/input_chip_field_layout.dart';
 export 'package:hentai_library/design-system/components/inputs/management_entity_name_field.dart';
 export 'package:hentai_library/design-system/components/inputs/named_facet_multi_select_copy.dart';
@@ -61,6 +64,8 @@ export 'package:hentai_library/design-system/components/list_detail/list_detail_
 export 'package:hentai_library/design-system/components/lists/reorder_exclude.dart';
 export 'package:hentai_library/design-system/components/lists/reorderable_split_list_group.dart';
 export 'package:hentai_library/design-system/components/lists/split_list_group.dart';
+export 'package:hentai_library/design-system/components/lists/split_list_row.dart';
+export 'package:hentai_library/design-system/components/lists/split_drag_scope.dart';
 export 'package:hentai_library/design-system/components/menu/anchored_menu.dart';
 export 'package:hentai_library/design-system/components/menu/anchored_option_picker.dart';
 export 'package:hentai_library/design-system/components/scaffold/dialog_action_bar.dart';
@@ -70,6 +75,7 @@ export 'package:hentai_library/design-system/components/scaffold/metadata_edit_f
 export 'package:hentai_library/design-system/components/scaffold/metadata_edit_tabbed_shell.dart';
 export 'package:hentai_library/design-system/components/scaffold/metadata_field_label_row.dart';
 export 'package:hentai_library/design-system/components/scaffold/page_header.dart';
+export 'package:hentai_library/design-system/components/scaffold/page_header_chrome.dart';
 export 'package:hentai_library/design-system/components/scaffold/page_header_back_button.dart';
 export 'package:hentai_library/design-system/components/scaffold/page_title.dart';
 export 'package:hentai_library/design-system/components/scaffold/pinned_toolbar_chrome.dart';

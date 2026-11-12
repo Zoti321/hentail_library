@@ -23,6 +23,15 @@ TextStyle labButtonLabelStyle(M3EThemeData theme, M3EButtonSize size) {
 }
 
 /// M3E 按钮 label 等需显式挂 Lab 字体（M3E typeScale 未必带 fontFamily）。
-Widget labText(M3EThemeData theme, String data, {TextStyle? style}) {
-  return Text(data, style: labTextStyle(theme, style ?? const TextStyle()));
+class LabText extends StatelessWidget {
+  const LabText(this.theme, this.data, {super.key, this.style});
+
+  final M3EThemeData theme;
+  final String data;
+  final TextStyle? style;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(data, style: labTextStyle(theme, style ?? const TextStyle()));
+  }
 }

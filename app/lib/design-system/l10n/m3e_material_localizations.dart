@@ -26,20 +26,27 @@ List<LocalizationsDelegate<dynamic>> get materialLocalizationsDelegates =>
       GlobalWidgetsLocalizations.delegate,
     ];
 
-/// material_ui [MaterialLocalizations.of]；调用方须在 [materialUiLocalizationsScope] 或
+/// material_ui [MaterialLocalizations.of]；调用方须在 [MaterialUiLocalizationsScope] 或
 /// 已注册 [DefaultMaterialLocalizations.delegate] 且 locale 为 `en` 的子树内。
 MaterialLocalizations materialLocalizationsOf(BuildContext context) {
   return MaterialLocalizations.of(context);
 }
 
 /// 日历 / M3E 日期控件子树（整表包一层，勿包整弹窗）。
-Widget materialUiLocalizationsScope({required Widget child}) {
-  return Localizations(
-    locale: const Locale('en'),
-    delegates: const <LocalizationsDelegate<dynamic>>[
-      DefaultMaterialLocalizations.delegate,
-      GlobalWidgetsLocalizations.delegate,
-    ],
-    child: child,
-  );
+class MaterialUiLocalizationsScope extends StatelessWidget {
+  const MaterialUiLocalizationsScope({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Localizations(
+      locale: const Locale('en'),
+      delegates: const <LocalizationsDelegate<dynamic>>[
+        DefaultMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      child: child,
+    );
+  }
 }

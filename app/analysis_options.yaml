@@ -91,39 +91,15 @@ dart_code_linter:
     - prefer-using-list-view
     - tag-name
     # --- Flutter 组件规范：一文件一 Widget / 抽回调 / 不返回 Widget ---
-    - prefer-single-widget-per-file
+    # `ignore-private-widgets`：允许同文件挂内部私有子部件（_Foo），
+    # 只要求「一个文件一个对外 Widget」；避免为纯实现细节扩张 public API。
+    - prefer-single-widget-per-file:
+        ignore-private-widgets: true
     - prefer-extracting-callbacks
     - avoid-returning-widgets
   # 棘轮（只减不增）：下列历史文件仍违反上面三条组件规则，暂按文件豁免 DCL 全部规则。
   # 修好一个文件就从这里删一行；新增/改动的新文件一律受管。
   rules-exclude:
-    - lib/design-system/components/actions/catalog_view_mode_button_group.dart
-    - lib/design-system/components/calendar/anchored_calendar_date_picker.dart
-    - lib/design-system/components/calendar/calendar_day_picker.dart
-    - lib/design-system/components/calendar/calendar_month_picker.dart
-    - lib/design-system/components/chips/outlined_meta_chip_widgets.dart
-    - lib/design-system/components/chips/suggestion_chip_surface.dart
-    - lib/design-system/components/inputs/input_chip_field_layout.dart
-    - lib/design-system/components/inputs/management_entity_name_field.dart
-    - lib/design-system/components/inputs/named_facet_multi_select_field.dart
-    - lib/design-system/components/inputs/named_facet_multi_select_menu.dart
-    - lib/design-system/components/inputs/outlined_text_field_shell.dart
-    - lib/design-system/components/inputs/tag_input_field.dart
-    - lib/design-system/components/list_detail/list_detail_detail_transition.dart
-    - lib/design-system/components/lists/reorderable_split_list_group.dart
-    - lib/design-system/components/lists/split_list_group.dart
-    - lib/design-system/components/scaffold/metadata_edit_tabbed_shell.dart
-    - lib/design-system/components/scaffold/page_header.dart
-    - lib/design-system/components/selection/segmented_capsule_bar.dart
-    - lib/design-system/l10n/m3e_material_localizations.dart
-    - lib/design-system/layout/page_layout_spec.dart
-    - lib/design-system/motion/desktop_page_transition.dart
-    - lib/design-system/motion/mode_chrome_transition.dart
-    - lib/design-system/motion/peer_content_transition.dart
-    - lib/design-system/motion/shared_axis_route.dart
-    - lib/design-system/theme/lab_text.dart
-    - lib/design-system/theme/theme.dart
-    - lib/design-system/util/navigation_rail_icon.dart
     - lib/features/app_settings/presentation/patterns/settings/metadata_backup_import_lab_flow.dart
     - lib/features/app_settings/presentation/patterns/settings/settings_detail_panes.dart
     - lib/features/app_settings/presentation/patterns/settings/settings_page_header.dart

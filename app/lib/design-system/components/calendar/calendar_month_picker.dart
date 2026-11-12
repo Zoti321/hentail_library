@@ -106,6 +106,12 @@ class _CalendarMonthPickerState extends State<CalendarMonthPicker> {
     }
   }
 
+  void _handlePageChanged(int index) {
+    final DateTime month = _monthForPage(index);
+    setState(() => _currentMonth = month);
+    widget.onMonthChanged(month);
+  }
+
   KeyEventResult _handleKey(FocusNode node, KeyEvent event) {
     if (event is! KeyDownEvent) {
       return KeyEventResult.ignored;
@@ -130,11 +136,7 @@ class _CalendarMonthPickerState extends State<CalendarMonthPicker> {
       child: PageView.builder(
         controller: _pageController,
         itemCount: _monthCount,
-        onPageChanged: (int index) {
-          final DateTime month = _monthForPage(index);
-          setState(() => _currentMonth = month);
-          widget.onMonthChanged(month);
-        },
+        onPageChanged: _handlePageChanged,
         itemBuilder: _buildMonthPage,
       ),
     );
@@ -242,7 +244,7 @@ class _MonthNavRow extends StatelessWidget {
                       semanticLabel: localizations.selectYearSemanticsLabel,
                       builder:
                           (BuildContext context, M3EInteractionState state) {
-                            return _navLabelWithState(
+                            return _NavLabelWithState(
                               theme: theme,
                               state: state,
                               child: Row(
@@ -331,7 +333,7 @@ class _MonthArrow extends StatelessWidget {
       onTap: enabled ? onTap : null,
       semanticLabel: tooltip,
       builder: (BuildContext context, M3EInteractionState state) {
-        return _navLabelWithState(
+        return _NavLabelWithState(
           theme: theme,
           state: state,
           borderRadius: BorderRadius.circular(dateTheme.arrowIconSize),
@@ -354,19 +356,30 @@ class _MonthArrow extends StatelessWidget {
   }
 }
 
-Widget _navLabelWithState({
-  required M3EThemeData theme,
-  required M3EInteractionState state,
-  required Widget child,
-  BorderRadius? borderRadius,
-}) {
-  final double stateAlpha = state.opacity;
-  final Color stateColor = theme.colorScheme.onSurface;
-  return DecoratedBox(
-    decoration: BoxDecoration(
-      borderRadius: borderRadius ?? const BorderRadius.all(Radius.circular(8)),
-      color: stateAlpha > 0 ? stateColor.withValues(alpha: stateAlpha) : null,
-    ),
-    child: child,
-  );
+class _NavLabelWithState extends StatelessWidget {
+  const _NavLabelWithState({
+    required this.theme,
+    required this.state,
+    required this.child,
+    this.borderRadius,
+  });
+
+  final M3EThemeData theme;
+  final M3EInteractionState state;
+  final Widget child;
+  final BorderRadius? borderRadius;
+
+  @override
+  Widget build(BuildContext context) {
+    final double stateAlpha = state.opacity;
+    final Color stateColor = theme.colorScheme.onSurface;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius:
+            borderRadius ?? const BorderRadius.all(Radius.circular(8)),
+        color: stateAlpha > 0 ? stateColor.withValues(alpha: stateAlpha) : null,
+      ),
+      child: child,
+    );
+  }
 }

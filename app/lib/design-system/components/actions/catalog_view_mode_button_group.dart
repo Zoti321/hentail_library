@@ -38,6 +38,13 @@ class CatalogViewModeButtonGroup extends StatelessWidget {
     };
   }
 
+  void _onSelectedIndexChanged(int? index) {
+    if (index == null) {
+      return;
+    }
+    onModeChanged(modeForIndex(index));
+  }
+
   @override
   Widget build(BuildContext context) {
     return M3EButtonGroup(
@@ -52,12 +59,7 @@ class CatalogViewModeButtonGroup extends StatelessWidget {
       overflow: M3EButtonGroupOverflow.experimentalPaging,
       selectionRequired: true,
       selectedIndex: indexForMode(mode),
-      onSelectedIndexChanged: (int? index) {
-        if (index == null) {
-          return;
-        }
-        onModeChanged(modeForIndex(index));
-      },
+      onSelectedIndexChanged: _onSelectedIndexChanged,
       decoration: catalogViewModeButtonGroupDecoration(context),
       actions: const <M3EButtonGroupAction>[
         M3EButtonGroupAction(

@@ -10,32 +10,44 @@ bool iconSupportsFillVariation(IconData icon) {
 }
 
 /// ExpressiveNavigationRail / list-detail rail 图标：选中时尽量使用 filled（fill=1），不支持则保持 [icon]。
-Widget navigationRailIconWidget({
-  required IconData icon,
-  IconData? selectedIcon,
-  required bool selected,
-  double? size,
-  Color? color,
-}) {
-  final IconData resolvedSelected = selectedIcon ?? icon;
-  final bool explicitSelectedPair =
-      selectedIcon != null && selectedIcon != icon;
+class NavigationRailIcon extends StatelessWidget {
+  const NavigationRailIcon({
+    super.key,
+    required this.icon,
+    this.selectedIcon,
+    required this.selected,
+    this.size,
+    this.color,
+  });
 
-  if (selected) {
+  final IconData icon;
+  final IconData? selectedIcon;
+  final bool selected;
+  final double? size;
+  final Color? color;
+
+  @override
+  Widget build(BuildContext context) {
+    final IconData resolvedSelected = selectedIcon ?? icon;
+    final bool explicitSelectedPair =
+        selectedIcon != null && selectedIcon != icon;
+
+    if (selected) {
+      if (explicitSelectedPair) {
+        return Icon(resolvedSelected, size: size, color: color);
+      }
+      if (iconSupportsFillVariation(icon)) {
+        return Icon(icon, size: size, color: color, fill: 1);
+      }
+      return Icon(icon, size: size, color: color);
+    }
+
     if (explicitSelectedPair) {
-      return Icon(resolvedSelected, size: size, color: color);
+      return Icon(icon, size: size, color: color);
     }
     if (iconSupportsFillVariation(icon)) {
-      return Icon(icon, size: size, color: color, fill: 1);
+      return Icon(icon, size: size, color: color, fill: 0);
     }
     return Icon(icon, size: size, color: color);
   }
-
-  if (explicitSelectedPair) {
-    return Icon(icon, size: size, color: color);
-  }
-  if (iconSupportsFillVariation(icon)) {
-    return Icon(icon, size: size, color: color, fill: 0);
-  }
-  return Icon(icon, size: size, color: color);
 }

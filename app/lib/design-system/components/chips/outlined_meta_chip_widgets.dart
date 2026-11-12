@@ -78,27 +78,33 @@ class _InteractiveOutlinedMetaChip extends HookWidget {
       restFill,
     );
 
+    Object? handleActivate(ActivateIntent intent) {
+      onTap!();
+      return null;
+    }
+
+    void handleFocusHighlight(bool focused) {
+      if (!focused && !isHovered.value) {
+        isPressed.value = false;
+      }
+    }
+
+    void handleHoverHighlight(bool hovered) {
+      isHovered.value = hovered;
+      if (!hovered) {
+        isPressed.value = false;
+      }
+    }
+
     return FocusableActionDetector(
       actions: <Type, Action<Intent>>{
         if (onTap != null)
           ActivateIntent: CallbackAction<ActivateIntent>(
-            onInvoke: (ActivateIntent intent) {
-              onTap!();
-              return null;
-            },
+            onInvoke: handleActivate,
           ),
       },
-      onShowFocusHighlight: (bool focused) {
-        if (!focused && !isHovered.value) {
-          isPressed.value = false;
-        }
-      },
-      onShowHoverHighlight: (bool hovered) {
-        isHovered.value = hovered;
-        if (!hovered) {
-          isPressed.value = false;
-        }
-      },
+      onShowFocusHighlight: handleFocusHighlight,
+      onShowHoverHighlight: handleHoverHighlight,
       child: Builder(
         builder: (BuildContext context) {
           final bool focused = Focus.of(context).hasFocus;

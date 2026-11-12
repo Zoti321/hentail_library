@@ -3,52 +3,74 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/design-system/util/navigation_rail_icon.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-void main() {
-  test(
-    'Material Symbols use fill when selected and icon matches selectedIcon',
-    () {
-      final Widget selected = navigationRailIconWidget(
-        icon: Symbols.home,
-        selectedIcon: Symbols.home,
-        selected: true,
-      );
-      final Icon icon = selected as Icon;
-      expect(icon.fill, 1);
+Widget _wrap(Widget child) =>
+    Directionality(textDirection: TextDirection.ltr, child: child);
 
-      final Widget unselected = navigationRailIconWidget(
-        icon: Symbols.home,
-        selectedIcon: Symbols.home,
-        selected: false,
+void main() {
+  testWidgets(
+    'Material Symbols use fill when selected and icon matches selectedIcon',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(
+        _wrap(
+          const NavigationRailIcon(
+            icon: Symbols.home,
+            selectedIcon: Symbols.home,
+            selected: true,
+          ),
+        ),
       );
-      expect((unselected as Icon).fill, 0);
+      expect(tester.widget<Icon>(find.byType(Icon)).fill, 1);
+
+      await tester.pumpWidget(
+        _wrap(
+          const NavigationRailIcon(
+            icon: Symbols.home,
+            selectedIcon: Symbols.home,
+            selected: false,
+          ),
+        ),
+      );
+      expect(tester.widget<Icon>(find.byType(Icon)).fill, 0);
     },
   );
 
-  test('explicit outlined/filled pair ignores fill axis', () {
-    final Widget selected = navigationRailIconWidget(
-      icon: Icons.home_outlined,
-      selectedIcon: Icons.home,
-      selected: true,
+  testWidgets('explicit outlined/filled pair ignores fill axis', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      _wrap(
+        const NavigationRailIcon(
+          icon: Icons.home_outlined,
+          selectedIcon: Icons.home,
+          selected: true,
+        ),
+      ),
     );
-    expect((selected as Icon).icon, Icons.home);
+    final Icon selected = tester.widget<Icon>(find.byType(Icon));
+    expect(selected.icon, Icons.home);
     expect(selected.fill, isNull);
 
-    final Widget unselected = navigationRailIconWidget(
-      icon: Icons.home_outlined,
-      selectedIcon: Icons.home,
-      selected: false,
+    await tester.pumpWidget(
+      _wrap(
+        const NavigationRailIcon(
+          icon: Icons.home_outlined,
+          selectedIcon: Icons.home,
+          selected: false,
+        ),
+      ),
     );
-    expect((unselected as Icon).icon, Icons.home_outlined);
+    expect(tester.widget<Icon>(find.byType(Icon)).icon, Icons.home_outlined);
   });
 
-  test('Lucide icons stay unchanged when no fill support', () {
+  testWidgets('Lucide icons stay unchanged when no fill support', (
+    WidgetTester tester,
+  ) async {
     const IconData lucide = IconData(0xe000, fontFamily: 'Lucide');
-    final Widget selected = navigationRailIconWidget(
-      icon: lucide,
-      selectedIcon: lucide,
-      selected: true,
+    await tester.pumpWidget(
+      _wrap(const NavigationRailIcon(icon: lucide, selected: true)),
     );
-    expect((selected as Icon).fill, isNull);
+    final Icon selected = tester.widget<Icon>(find.byType(Icon));
+    expect(selected.fill, isNull);
     expect(selected.icon, lucide);
   });
 }
