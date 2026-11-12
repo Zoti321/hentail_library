@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hentai_library/core/logging/app_log.dart';
-import 'package:hentai_library/core/errors/error_message.dart';
+import 'package:hentai_library/shared/application/logging/app_log.dart';
+import 'package:hentai_library/shared/application/errors/error_message.dart';
 import 'package:hentai_library/features/library_admin/application/sync_library_use_case.dart';
 import 'package:hentai_library/features/library_admin/domain/sync_library_types.dart';
 import 'package:hentai_library/features/library_admin/presentation/providers/library_sync_providers.dart';

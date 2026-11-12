@@ -3,7 +3,7 @@ import 'dart:typed_data';
 
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/widgets.dart';
-import 'package:hentai_library/core/image/image_cache_config.dart';
+import 'package:hentai_library/shared/ui/image/image_cache_config.dart';
 import 'package:hentai_library/features/reader/domain/page_prefetch_window.dart'
     show kReaderImageCacheMaxEntries;
 
@@ -64,7 +64,7 @@ void ensureReaderImageCacheConfigured() {
     ImageCache.new,
   );
   cache.maximumSize = kReaderImageCacheMaxEntries;
-  cache.maximumSizeBytes = kReaderImageCacheMaxBytes;
+  cache.maximumSizeBytes = kGlobalImageCacheMaxBytes ~/ 2;
 }
 
 void clearReaderImageCache() {

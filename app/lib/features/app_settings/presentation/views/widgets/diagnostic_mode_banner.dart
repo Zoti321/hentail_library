@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/diagnostic_mode_notifier.dart';
 import 'package:hentai_library/shared/presentation/providers/app_navigator_provider.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';

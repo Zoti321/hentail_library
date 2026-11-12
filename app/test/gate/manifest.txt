@@ -85,7 +85,7 @@ test/features/library_admin/domain/library_sidebar_layout_test.dart
 test/features/library_admin/domain/resource_format_category_setting_test.dart
 test/features/library_admin/presentation/view_models/scan_library_controller_sync_test.dart
 test/features/comic/presentation/draft/bulk_metadata_edit_session_test.dart
-test/core/util/name_pinyin_assisted_filter_test.dart
+test/design-system/filtering/name_pinyin_assisted_filter_test.dart
 test/features/library_admin/presentation/view_models/metadata_refresh_controller_revision_test.dart
 test/features/library_admin/presentation/views/navigation/libraries_routes_test.dart
 test/features/comic_trash/presentation/view_models/trash_page_state_test.dart
@@ -105,3 +105,17 @@ test/features/metadata_backup/presentation
 test/features/home/presentation/view_models/home_page_counts_stream_test.dart
 test/features/home/presentation/view_models/reading_activity_stats_stream_test.dart
 test/features/reader/presentation/view_models/series_reader_provider_test.dart
+
+test/infrastructure/platform/shell_file_explorer_test.dart
+
+test/shared/ui/window/app_window_title_test.dart
+
+test/shared/application/navigation/app_routes_test.dart
+
+test/shared/ui/image/image_decode_cache_size_test.dart
+
+test/features/app_settings/application/diagnostics/log_redactor_test.dart
+
+test/features/app_settings/infrastructure/diagnostics/log_export_service_test.dart
+
+test/infrastructure/logging/diagnostic_logging_test.dart

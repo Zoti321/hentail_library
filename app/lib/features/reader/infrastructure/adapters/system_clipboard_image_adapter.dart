@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:hentai_library/core/errors/app_exception.dart';
+import 'package:hentai_library/shared/application/errors/app_exception.dart';
 import 'package:hentai_library/features/reader/domain/clipboard_image_port.dart';
 import 'package:super_clipboard/super_clipboard.dart';
 

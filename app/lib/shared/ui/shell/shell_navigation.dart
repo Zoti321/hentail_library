@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/design-system/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/ui/widgets/desktop/navigation_rail.dart';
 import 'package:material_symbols_icons/symbols.dart';
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/constants/app_routes.dart';
-import 'package:hentai_library/core/util/utils.dart';
+import 'package:hentai_library/shared/application/navigation/app_routes.dart';
+import 'package:hentai_library/design-system/platform/platform_desktop.dart';
 import 'package:hentai_library/shared/ui/navigation/app_navigator_context.dart';
 import 'package:hentai_library/shared/ui/widgets/desktop/desktop_title_bar.dart';
 import 'package:hentai_library/shared/ui/widgets/desktop/desktop_title_bar_metrics.dart';

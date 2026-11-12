@@ -1,5 +1,5 @@
 import 'package:hentai_library/features/comic/presentation/providers/comic_metadata_use_case_providers.dart';
-import 'package:hentai_library/core/logging/app_log.dart';
+import 'package:hentai_library/shared/application/logging/app_log.dart';
 import 'package:hentai_library/features/comic/presentation/patterns/metadata_edit/comic_metadata_edit_draft.dart';
 import 'package:hentai_library/features/comic/presentation/patterns/metadata_edit/comic_metadata_smart_facet_scope.dart';
 import 'package:hentai_library/features/comic/presentation/view_models/comic_metadata_edit_ui_state.dart';

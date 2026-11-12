@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/design-system/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 
 /// 首页顶栏：标题为 [AppLocalizations.navHome]（主导航由壳层底部栏 / Rail 承担）。

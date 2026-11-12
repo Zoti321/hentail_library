@@ -1,4 +1,4 @@
-import 'package:hentai_library/core/constants/app_routes.dart';
+import 'package:hentai_library/shared/application/navigation/app_routes.dart';
 import 'package:hentai_library/features/reader/application/open_reader_args.dart';
 import 'package:hentai_library/features/reader/application/read_session_application_service.dart';
 import 'package:hentai_library/features/reader/presentation/providers/session_providers.dart';

@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:hentai_library/infrastructure/http/cancellable_dio_request.dart';
-import 'package:hentai_library/shared/application/cancellation_token.dart';
+import 'package:hentai_library/core/async/cancellation_token.dart';
 import 'package:test/test.dart';
 
 void main() {

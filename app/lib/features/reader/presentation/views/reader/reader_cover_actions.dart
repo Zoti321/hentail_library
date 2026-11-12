@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/design-system/l10n/app_localizations.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/reader_view_model.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/reader_cover_editor_notifier.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';

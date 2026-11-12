@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/core/l10n/app_localizations_zh.dart';
+import 'package:hentai_library/design-system/l10n/app_localizations_zh.dart';
 import 'package:hentai_library/features/comic_metadata/presentation/views/metadata/metadata_header.dart';
 import 'package:material_symbols_icons/symbols.dart';
 

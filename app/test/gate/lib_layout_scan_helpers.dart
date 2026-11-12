@@ -6,8 +6,7 @@ import 'package:path/path.dart' as p;
 const bool kEnforceWayfinderPhaseBLayout = true;
 
 /// Phase A allow-list; legacy `data/` `domain/` `ui/` roots were removed in #258.
-/// `core/` is the app cross-cutting kernel (l10n, logging, util), moved back to
-/// `lib/core` on 2026-10-18 (layout rules: `docs/engineering/gate.md` § App lib 顶层布局).
+/// `core/` contains product-independent pure Dart utilities only (ADR-0052).
 /// `md3e/` was removed at MD3E Cutover shell终态 (#414 / ADR-0031).
 const Set<String> kWayfinderPhaseATopLevelLibDirs = <String>{
   'composition',

@@ -1,4 +1,4 @@
-import 'package:hentai_library/core/errors/app_exception.dart';
+import 'package:hentai_library/features/library_admin/application/library_sync_exception.dart';
 import 'package:hentai_library/infrastructure/frb/frb_call_guard.dart';
 import 'package:hentai_library/infrastructure/frb/frb_error_mapper.dart';
 import 'package:hentai_library/features/library_admin/domain/sync_library_port.dart';
@@ -47,7 +47,7 @@ class SyncLibraryFrbAdapter implements SyncLibraryPort {
           return;
         }
         if (event.phase == rust.SyncLibraryPhaseDto.failed) {
-          throw SyncException(event.errorMessage ?? '漫画库同步失败');
+          throw LibrarySyncException(event.errorMessage ?? '漫画库同步失败');
         }
         onProgress?.call(mapRustSyncProgress(event));
         if (event.phase == rust.SyncLibraryPhaseDto.done) {

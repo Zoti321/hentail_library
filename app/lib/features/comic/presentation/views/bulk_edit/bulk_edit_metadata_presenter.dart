@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/design-system/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/comic/presentation/views/bulk_edit/bulk_edit_metadata_form.dart';
 import 'package:hentai_library/shared/ui/patterns/dialog/adaptive_form_dialog.dart';
 import 'package:hentai_library/features/library_admin/public.dart';

@@ -1,5 +1,5 @@
 import 'package:hentai_library/features/app_settings/domain/app_release_info.dart';
-import 'package:hentai_library/shared/application/cancellation_token.dart';
+import 'package:hentai_library/core/async/cancellation_token.dart';
 
 abstract interface class AppUpdateGateway {
   Future<AppReleaseInfo?> fetchLatestStableRelease();

@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:dio/dio.dart';
-import 'package:hentai_library/shared/application/cancellation_token.dart';
+import 'package:hentai_library/core/async/cancellation_token.dart';
 
 Future<T> runCancellableDioRequest<T>(
   CancellationToken? cancellation,

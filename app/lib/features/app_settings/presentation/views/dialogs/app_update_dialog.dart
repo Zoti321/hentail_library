@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/core/util/open_downloaded_file.dart';
+import 'package:hentai_library/design-system/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
+import 'package:hentai_library/features/app_settings/presentation/providers/app_update_opener_providers.dart';
 import 'package:hentai_library/features/app_settings/presentation/providers/app_update_providers.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hentai_library/features/app_settings/presentation/views/dialogs/app_update_download_dialog.dart';
@@ -53,7 +53,7 @@ class AppUpdateDialog extends ConsumerWidget {
         .findPlatformAsset(release.assets);
     if (asset == null) {
       try {
-        await openReleasePage(release.htmlUrl);
+        await ref.read(openReleasePageProvider)(release.htmlUrl);
       } catch (error) {
         if (context.mounted) {
           showErrorSnackbar(context, error);

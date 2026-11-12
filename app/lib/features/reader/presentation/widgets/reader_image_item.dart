@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/image/image_decode_cache_size.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/ui/image/image_decode_cache_size.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
 import 'package:hentai_library/features/reader/domain/reader_page_payload.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';

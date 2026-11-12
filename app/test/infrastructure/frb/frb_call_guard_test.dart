@@ -1,4 +1,5 @@
-import 'package:hentai_library/core/errors/app_exception.dart';
+import 'package:hentai_library/infrastructure/frb/frb_operation_exception.dart';
+import 'package:hentai_library/shared/application/errors/app_exception.dart';
 import 'package:hentai_library/infrastructure/frb/frb_call_guard.dart';
 import 'package:hentai_library/src/rust/api/init.dart';
 import 'package:test/test.dart';
@@ -69,8 +70,8 @@ void main() {
     await expectLater(
       stream.first,
       throwsA(
-        isA<SyncException>().having(
-          (SyncException e) => e.message,
+        isA<FrbOperationException>().having(
+          (FrbOperationException e) => e.message,
           'message',
           'no such table',
         ),

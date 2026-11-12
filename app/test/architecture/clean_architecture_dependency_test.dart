@@ -1,104 +1,128 @@
 import 'dart:io';
 
-import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 
 import '../gate/import_boundary_rules.dart';
 import '../gate/lib_layout_scan_helpers.dart';
+import 'dart_dependency_graph.dart';
 
-final RegExp _directive = RegExp(
-  r'''^\s*(?:import|export)\s+['"]([^'"]+)['"]''',
-  multiLine: true,
-);
+bool _outer(String target) =>
+    target.startsWith('composition/') ||
+    target.startsWith('infrastructure/') ||
+    target.contains('/infrastructure/') ||
+    target.contains('/data/') ||
+    target.contains('/di/') ||
+    target.contains('/presentation/') ||
+    target.startsWith('shared/ui/') ||
+    target.startsWith('design-system/') ||
+    target.startsWith('src/');
 
 void main() {
-  final Directory lib = Directory('lib');
+  final lib = Directory('lib').absolute;
+  final graph = DartDependencyGraph.current();
+  final files = dartFilesUnder(lib).toList();
 
-  test('domain/application stay pure through imports and public exports', () {
-    final Map<String, List<String>> dependencies = <String, List<String>>{};
-    for (final File file in dartFilesUnder(lib)) {
-      final String path = libRelativePosixPath(lib, file);
-      dependencies[path] = _directive
-          .allMatches(file.readAsStringSync())
-          .map((Match match) => match.group(1)!)
-          .toList();
-    }
-    final Set<String> offenders = <String>{};
-    for (final String root in dependencies.keys) {
-      final bool domain = isDomainLayerPath(root);
-      if (!domain &&
-          !isApplicationLayerPath(root) &&
-          !root.endsWith('/public/contracts.dart')) {
-        continue;
-      }
-      final Set<String> visited = <String>{};
-
-      void visit(String source, List<String> chain) {
-        if (!visited.add(source)) {
-          return;
-        }
-        for (final String uri in dependencies[source] ?? <String>[]) {
-          final String? target = _resolve(source, uri);
-          final bool trustedPackage =
-              uri.startsWith('package:hentai_library/') ||
-              uri.startsWith('package:freezed_annotation/') ||
-              uri.startsWith('package:json_annotation/');
-          final bool external =
-              uri == 'dart:ui' ||
-              uri == 'dart:io' ||
-              (uri.startsWith('package:') && !trustedPackage);
-          final bool outer =
-              target != null &&
-              (target.startsWith('composition/') ||
-                  target.startsWith('infrastructure/') ||
-                  target.contains('/infrastructure/') ||
-                  target.contains('/data/') ||
-                  target.contains('/di/') ||
-                  target.contains('/presentation/') ||
-                  target.startsWith('shared/ui/') ||
-                  target.startsWith('design-system/') ||
-                  target.startsWith('src/rust/') ||
-                  (domain && isApplicationLayerPath(target)));
-          if (external || outer) {
-            offenders.add('${chain.join(' -> ')} -> $uri');
-          } else if (target != null) {
-            visit(target, <String>[...chain, target]);
-          }
-        }
-      }
-
-      visit(root, <String>[root]);
-    }
-    expect(offenders.toList()..sort(), isEmpty);
+  test('core stays pure through its entire dependency graph', () {
+    final roots = files.where(
+      (file) => libRelativePosixPath(lib, file).startsWith('core/'),
+    );
+    expect(roots, isNotEmpty);
+    expect(
+      pureDependencyViolations(
+        graph: graph,
+        roots: roots.map((file) => file.uri),
+        appLib: lib.uri,
+        allowsAppPath: (path) => path.startsWith('core/'),
+      ),
+      isEmpty,
+    );
   });
 
-  test('composition is only consumed by the app entry point', () {
-    final List<String> offenders = <String>[];
-    for (final File file in dartFilesUnder(lib)) {
-      final String source = libRelativePosixPath(lib, file);
-      if (source == 'main.dart' || source.startsWith('composition/')) {
-        continue;
-      }
-      for (final Match match in _directive.allMatches(
-        file.readAsStringSync(),
-      )) {
-        final String? target = _resolve(source, match.group(1)!);
-        if (target != null && target.startsWith('composition/')) {
-          offenders.add('$source -> $target');
+  for (final domain in <bool>[true, false]) {
+    test(
+      '${domain ? 'domain' : 'application/contracts'} stay pure through the full dependency graph',
+      () {
+        final roots = files.where((file) {
+          final path = libRelativePosixPath(lib, file);
+          return domain
+              ? isDomainLayerPath(path)
+              : isApplicationLayerPath(path) ||
+                    path.endsWith('/public/contracts.dart');
+        });
+        expect(
+          pureDependencyViolations(
+            graph: graph,
+            roots: roots.map((file) => file.uri),
+            appLib: lib.uri,
+            allowsAppPath: (target) =>
+                !_outer(target) && !(domain && isApplicationLayerPath(target)),
+          ),
+          isEmpty,
+        );
+      },
+    );
+  }
+
+  test(
+    'outer layers obey core/shared/infrastructure/composition direction',
+    () {
+      final offenders = <String>[];
+      for (final file in files) {
+        final source = libRelativePosixPath(lib, file);
+        for (final dependency in graph.directives(file.uri)) {
+          final resolved = graph.resolve(file.uri, dependency).toString();
+          if (!resolved.startsWith(lib.uri.toString())) continue;
+          final target = resolved.substring(lib.uri.toString().length);
+          final presentation =
+              source.contains('/presentation/') ||
+              source.startsWith('shared/ui/') ||
+              source.startsWith('design-system/');
+          final infrastructure =
+              source.startsWith('infrastructure/') ||
+              source.contains('/infrastructure/');
+          final forbidden =
+              (target.startsWith('composition/') &&
+                  source != 'main.dart' &&
+                  !source.startsWith('composition/')) ||
+              (presentation &&
+                  (target.startsWith('infrastructure/') ||
+                      target.contains('/infrastructure/') ||
+                      target.startsWith('src/'))) ||
+              (infrastructure &&
+                  (target.contains('/presentation/') ||
+                      target.startsWith('shared/ui/') ||
+                      target.startsWith('design-system/'))) ||
+              (source.startsWith('infrastructure/') &&
+                  target.startsWith('features/')) ||
+              (source.startsWith('shared/') &&
+                  target.startsWith('infrastructure/'));
+          if (forbidden) offenders.add('$source -> $target');
         }
       }
-    }
-    expect(offenders, isEmpty);
-  });
-}
+      expect(offenders, isEmpty);
+    },
+  );
 
-String? _resolve(String source, String uri) {
-  const String prefix = 'package:hentai_library/';
-  if (uri.startsWith(prefix)) {
-    return uri.substring(prefix.length);
-  }
-  if (uri.contains(':')) {
-    return null;
-  }
-  return p.posix.normalize(p.posix.join(p.posix.dirname(source), uri));
+  test(
+    'scan includes conditional branches/parts and ignores comments/text',
+    () {
+      expect(
+        dependencyUris('''
+// import 'ignored.dart';
+import 'pure.dart' if (dart.library.io) 'native.dart';
+export 'a.dart' if (dart.library.html) 'b.dart' show X;
+part 'generated.dart';
+final example = "export 'also_ignored.dart';";
+'''),
+        <String>[
+          'pure.dart',
+          'native.dart',
+          'a.dart',
+          'b.dart',
+          'generated.dart',
+        ],
+      );
+      expect(dependencyUris("part of 'owner.dart';"), <String>['owner.dart']);
+    },
+  );
 }

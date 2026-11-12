@@ -1,12 +1,12 @@
 import 'package:hentai_library/features/app_settings/application/app_update_gateway.dart';
-import 'package:hentai_library/shared/application/cancellation_token.dart';
+import 'package:hentai_library/core/async/cancellation_token.dart';
 import 'package:hentai_library/infrastructure/http/cancellable_dio_request.dart';
 
 import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
-import 'package:hentai_library/core/constants/app_update_constants.dart';
+import 'package:hentai_library/features/app_settings/application/app_update_constants.dart';
 import 'package:hentai_library/core/util/semver_utils.dart';
 import 'package:hentai_library/features/app_settings/domain/app_release_info.dart';
 import 'package:path/path.dart' as p;

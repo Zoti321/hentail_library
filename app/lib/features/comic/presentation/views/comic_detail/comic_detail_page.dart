@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
-import 'package:hentai_library/core/errors/app_exception.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/core/util/utils.dart';
+import 'package:hentai_library/shared/application/errors/app_exception.dart';
+import 'package:hentai_library/design-system/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/presentation/providers/file_explorer_providers.dart';
 import 'package:hentai_library/features/comic/presentation/comic_delete_flow.dart';
 import 'package:hentai_library/features/comic/presentation/view_models/comic_detail_series_nav_provider.dart';
 import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_format.dart';
@@ -139,7 +139,7 @@ class _ComicDetailContent extends ConsumerWidget {
         M3EMenuEntry(
           label: l10n.comicDetailShowInExplorer,
           leading: const Icon(LucideIcons.folderOpen),
-          onPressed: () => _showInExplorer(context),
+          onPressed: () => _showInExplorer(context, ref),
         ),
         M3EMenuEntry(
           label: l10n.comicDetailDelete,
@@ -214,25 +214,27 @@ class _ComicDetailContent extends ConsumerWidget {
     }
   }
 
-  void _showInExplorer(BuildContext context) {
+  void _showInExplorer(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
-    showInFileExplorer(comic.path)
-        .catchError((Object error, StackTrace stackTrace) {
-          if (!context.mounted) {
-            return;
-          }
-          if (error is AppException) {
-            showErrorSnackbar(context, error);
-            return;
-          }
-          showErrorSnackbar(
-            context,
-            AppException(
-              l10n.comicDetailShowInExplorerFailed,
-              cause: error,
-              stackTrace: stackTrace,
-            ),
-          );
-        });
+    ref.read(showInFileExplorerProvider)(comic.path).catchError((
+      Object error,
+      StackTrace stackTrace,
+    ) {
+      if (!context.mounted) {
+        return;
+      }
+      if (error is AppException) {
+        showErrorSnackbar(context, error);
+        return;
+      }
+      showErrorSnackbar(
+        context,
+        AppException(
+          l10n.comicDetailShowInExplorerFailed,
+          cause: error,
+          stackTrace: stackTrace,
+        ),
+      );
+    });
   }
 }

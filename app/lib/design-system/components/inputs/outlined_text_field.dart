@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/design-system/l10n/app_localizations.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Lab 通用 outlined 文本字段（单行或多行），封装 [M3ETextField]。
@@ -101,7 +100,7 @@ class _OutlinedTextFieldState extends State<OutlinedTextField> {
 
   @override
   Widget build(BuildContext context) {
-    final AppLocalizations l10n = context.l10n;
+    final AppLocalizations l10n = AppLocalizations.of(context);
     return M3ETextField(
       controller: _controller,
       focusNode: _focusNode,

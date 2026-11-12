@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/design-system/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/app_settings/presentation/log_export_flow.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/app_update_controller.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/diagnostic_mode_notifier.dart';
@@ -372,6 +372,7 @@ class _ExportLogsTile extends ConsumerWidget {
       description: Text(l10n.settingsExportLogsDescription),
       onTap: () => runLogExportFlow(
         context,
+        ref,
         diagnosticVerbose: ref.read(diagnosticModeProvider),
       ),
     );

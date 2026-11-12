@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
-import 'package:hentai_library/shared/application/cancellation_token.dart';
-import 'package:hentai_library/core/logging/app_log.dart';
-import 'package:hentai_library/core/errors/error_message.dart';
+import 'package:hentai_library/core/async/cancellation_token.dart';
+import 'package:hentai_library/shared/application/logging/app_log.dart';
+import 'package:hentai_library/shared/application/errors/error_message.dart';
 import 'package:hentai_library/features/comic_metadata/domain/tag_dictionary_import_result.dart';
 import 'package:hentai_library/features/comic_metadata/presentation/providers/download_providers.dart';
 import 'package:hentai_library/features/comic_metadata/presentation/view_models/named_facet_management_view_model.dart';

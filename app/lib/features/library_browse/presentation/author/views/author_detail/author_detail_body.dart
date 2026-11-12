@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/design-system/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/library_browse/presentation/author/view_models/author_detail_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/author/patterns/author_detail/author_detail_comics_section.dart';
 import 'package:hentai_library/features/library_browse/presentation/author/views/author_detail/author_detail_header.dart';

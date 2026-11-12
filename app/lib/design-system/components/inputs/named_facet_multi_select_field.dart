@@ -5,10 +5,9 @@ import 'package:flutter/foundation.dart'
     show ValueListenable, defaultTargetPlatform, listEquals;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/design-system/l10n/app_localizations.dart';
 import 'package:hentai_library/design-system/components/inputs/named_facet_multi_select_copy.dart';
-import 'package:hentai_library/core/util/name_pinyin_assisted_filter.dart';
+import 'package:hentai_library/design-system/filtering/name_pinyin_assisted_filter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_3_expressive/components/text_fields/components/m3e_text_field_affordance.dart';
 import 'package:material_3_expressive/components/text_fields/utils/m3e_text_field_selection_controls.dart';
@@ -626,7 +625,7 @@ class _NamedFacetMultiSelectFieldState<T>
 
   @override
   Widget build(BuildContext context) {
-    final AppLocalizations l10n = context.l10n;
+    final AppLocalizations l10n = AppLocalizations.of(context);
     final bool hasSelectedTags = widget.selectedNames.isNotEmpty;
     final bool showClearAll = hasSelectedTags && widget.onClearAll != null;
 

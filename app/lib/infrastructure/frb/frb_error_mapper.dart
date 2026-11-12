@@ -1,4 +1,5 @@
-import 'package:hentai_library/core/errors/app_exception.dart';
+import 'package:hentai_library/infrastructure/frb/frb_operation_exception.dart';
+import 'package:hentai_library/shared/application/errors/app_exception.dart';
 import 'package:hentai_library/src/rust/api/init.dart';
 
 /// 将 Rust FRB 结构化错误映射为 Dart [AppException]。
@@ -13,7 +14,7 @@ AppException mapFrbError(
       : (fallbackMessage ?? '操作失败');
 
   return switch (error.code) {
-    'Validation' => SyncException(
+    'Validation' => FrbOperationException(
       detail.isEmpty ? message : detail,
       cause: error,
       stackTrace: stackTrace,
@@ -23,7 +24,7 @@ AppException mapFrbError(
       cause: error,
       stackTrace: stackTrace,
     ),
-    'DbQueryFailed' => SyncException(
+    'DbQueryFailed' => FrbOperationException(
       detail.isEmpty ? '数据库操作失败' : detail,
       cause: error,
       stackTrace: stackTrace,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/core/errors/app_exception.dart';
+import 'package:hentai_library/shared/application/errors/app_exception.dart';
 import 'package:hentai_library/features/comic/presentation/providers/comic_detail_providers.dart';
 import 'package:hentai_library/features/comic/public/ui/bulk_edit_metadata_presenter.dart';
 import 'package:hentai_library/features/comic/presentation/actions/comic_metadata_edit_presenters.dart';

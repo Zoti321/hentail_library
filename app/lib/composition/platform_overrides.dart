@@ -1,3 +1,11 @@
+import 'package:hentai_library/composition/logging_composition.dart';
+import 'package:hentai_library/infrastructure/logging/diagnostic_logging.dart';
+import 'package:hentai_library/infrastructure/platform/shell_file_explorer.dart';
+import 'package:hentai_library/shared/presentation/providers/file_explorer_providers.dart';
+import 'package:hentai_library/features/app_settings/infrastructure/diagnostics/export_logs.dart';
+import 'package:hentai_library/features/app_settings/infrastructure/services/app_update/open_downloaded_update.dart';
+import 'package:hentai_library/features/app_settings/presentation/providers/app_update_opener_providers.dart';
+import 'package:hentai_library/features/app_settings/presentation/providers/diagnostic_providers.dart';
 import 'package:hentai_library/features/comic_metadata/infrastructure/repositories/named_facet_form_listing.dart';
 import 'package:hentai_library/features/comic_metadata/presentation/providers/comic_metadata_repository_providers.dart';
 import 'package:riverpod/misc.dart' show Override;
@@ -25,6 +33,25 @@ import 'package:hentai_library/features/reader/infrastructure/adapters/system_cl
 import 'package:hentai_library/features/reader/presentation/providers/page_image_copy_providers.dart';
 
 List<Override> platformOverrides() => <Override>[
+  showInFileExplorerProvider.overrideWithValue(showInFileExplorer),
+  openDirectoryInFileExplorerProvider.overrideWithValue(
+    openDirectoryInFileExplorer,
+  ),
+  openDownloadedUpdateProvider.overrideWithValue(openDownloadedUpdateFile),
+  openReleasePageProvider.overrideWithValue(openReleasePage),
+  diagnosticLoggingCommandProvider.overrideWithValue(applyDiagnosticLogging),
+  exportLogsCommandProvider.overrideWithValue(
+    ({
+      required String outputPath,
+      required bool redact,
+      required bool diagnosticVerbose,
+    }) => exportLogs(
+      outputPath: outputPath,
+      redact: redact,
+      diagnosticVerbose: diagnosticVerbose,
+      flush: flushAppLogs,
+    ),
+  ),
   namedFacetFormListingProvider.overrideWith(
     (ref) => const NamedFacetFormListingImpl(),
   ),

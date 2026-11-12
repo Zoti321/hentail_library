@@ -1,5 +1,5 @@
 import 'package:hentai_library/features/comic_metadata/application/tag_dictionary_download_gateway.dart';
-import 'package:hentai_library/shared/application/cancellation_token.dart';
+import 'package:hentai_library/core/async/cancellation_token.dart';
 import 'package:hentai_library/infrastructure/http/cancellable_dio_request.dart';
 
 import 'dart:typed_data';

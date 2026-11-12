@@ -2,8 +2,8 @@ import 'package:hentai_library/shared/presentation/providers/comic_return_series
 import 'package:hentai_library/features/library_admin/public/providers/library_admin_state_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/core/constants/app_routes.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/application/navigation/app_routes.dart';
+import 'package:hentai_library/design-system/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/ui/navigation/app_navigator_context.dart';
 import 'package:hentai_library/shared/ui/shell/shell_nav_item.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';

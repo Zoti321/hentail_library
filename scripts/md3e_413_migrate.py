@@ -13,8 +13,8 @@ APP = ROOT / "app"
 LIB_MD3E = APP / "lib" / "md3e"
 LIB = APP / "lib"
 
-L10N_IMPORT = "package:hentai_library/core/l10n/app_localizations.dart"
-L10N_X_IMPORT = "package:hentai_library/core/l10n/app_localizations_x.dart"
+L10N_IMPORT = "package:hentai_library/design-system/l10n/app_localizations.dart"
+L10N_X_IMPORT = "package:hentai_library/shared/ui/l10n/app_localizations_x.dart"
 
 # Lab-only pages (Widgetbook / md3e tests).
 LAB_PAGES = {

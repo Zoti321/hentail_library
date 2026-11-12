@@ -2,12 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
-import 'package:hentai_library/core/image/image_cache_config.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/logging/app_log.dart';
-import 'package:hentai_library/core/logging/app_logging.dart';
-import 'package:hentai_library/core/util/app_window_title.dart';
-import 'package:hentai_library/core/util/utils.dart';
+import 'package:hentai_library/shared/ui/image/image_cache_config.dart';
+import 'package:hentai_library/design-system/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/application/logging/app_log.dart';
+import 'package:hentai_library/composition/logging_composition.dart';
+import 'package:hentai_library/shared/ui/window/app_window_title.dart';
+import 'package:hentai_library/design-system/platform/platform_desktop.dart';
 import 'package:hentai_library/infrastructure/frb/frb_call_guard.dart';
 import 'package:hentai_library/infrastructure/frb/frb_zone_guard.dart';
 import 'package:hentai_library/src/rust/api/comic.dart';

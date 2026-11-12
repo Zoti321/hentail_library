@@ -1,7 +1,7 @@
-import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/design-system/l10n/app_localizations.dart';
 import 'package:hentai_library/features/comic_metadata/domain/managed_named_facet_kind.dart';
 
-/// comic_metadata 领域枚举 → 展示文案（owner extension；ARB 源仍在 `core/l10n`）。
+/// comic_metadata 领域枚举 → 展示文案（owner extension；ARB 源在 `app/l10n`，生成文案在 `design-system/l10n`）。
 extension ComicMetadataL10nX on AppLocalizations {
   String managedNamedFacetCountLabel(ManagedNamedFacetKind kind, int count) {
     return switch (kind) {

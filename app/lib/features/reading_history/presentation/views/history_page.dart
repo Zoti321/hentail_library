@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/reading_history/presentation/models/history_card_item.dart';
 import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_browse_page.dart';
 import 'package:hentai_library/features/reading_history/presentation/view_models/history_load_more_throttle.dart';

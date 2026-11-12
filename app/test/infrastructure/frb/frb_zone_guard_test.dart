@@ -1,6 +1,6 @@
+import 'package:hentai_library/infrastructure/frb/frb_operation_exception.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/infrastructure/frb/frb_zone_guard.dart';
 import 'package:hentai_library/src/rust/api/init.dart';
 
@@ -27,8 +27,8 @@ void main() {
     expect(presented, hasLength(1));
     expect(
       presented.single.exception,
-      isA<SyncException>().having(
-        (SyncException e) => e.message,
+      isA<FrbOperationException>().having(
+        (FrbOperationException e) => e.message,
         'message',
         'no such table (comics)',
       ),

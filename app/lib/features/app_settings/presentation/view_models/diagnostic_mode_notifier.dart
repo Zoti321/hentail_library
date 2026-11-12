@@ -1,4 +1,4 @@
-import 'package:hentai_library/core/logging/diagnostic_logging.dart';
+import 'package:hentai_library/features/app_settings/presentation/providers/diagnostic_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'diagnostic_mode_notifier.g.dart';
@@ -14,7 +14,7 @@ class DiagnosticModeNotifier extends _$DiagnosticModeNotifier {
       return;
     }
     state = enabled;
-    applyDiagnosticLogging(enabled);
+    ref.read(diagnosticLoggingCommandProvider)(enabled);
   }
 
   void disable() => setEnabled(false);

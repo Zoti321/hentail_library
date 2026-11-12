@@ -1,5 +1,5 @@
-import 'package:hentai_library/core/errors/app_exception.dart';
-import 'package:hentai_library/core/logging/app_log.dart';
+import 'package:hentai_library/shared/application/errors/app_exception.dart';
+import 'package:hentai_library/shared/application/logging/app_log.dart';
 import 'package:hentai_library/features/library_admin/domain/comic_metadata_bulk_patch.dart';
 import 'package:hentai_library/features/library_admin/presentation/providers/comic_metadata_bulk_patch_providers.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/metadata_refresh_controller.dart';

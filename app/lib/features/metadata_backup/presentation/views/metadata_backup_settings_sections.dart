@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/core/util/utils.dart';
+import 'package:hentai_library/design-system/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
+import 'package:hentai_library/design-system/platform/platform_desktop.dart';
+import 'package:hentai_library/shared/presentation/providers/file_explorer_providers.dart';
 import 'package:hentai_library/features/metadata_backup/presentation/providers/metadata_backup_use_case_providers.dart';
 import 'package:hentai_library/features/metadata_backup/domain/metadata_export_options.dart';
 import 'package:hentai_library/features/metadata_backup/presentation/metadata_export_flow.dart';
@@ -31,9 +32,13 @@ class MetadataBackupSettingsSections extends ConsumerWidget {
     }
   }
 
-  Future<void> _openBackupFolder(BuildContext context, String path) async {
+  Future<void> _openBackupFolder(
+    BuildContext context,
+    WidgetRef ref,
+    String path,
+  ) async {
     try {
-      await openDirectoryInFileExplorer(path);
+      await ref.read(openDirectoryInFileExplorerProvider)(path);
     } catch (e) {
       if (context.mounted) {
         showErrorSnackbar(context, e);
@@ -107,7 +112,7 @@ class MetadataBackupSettingsSections extends ConsumerWidget {
                     description: Text(
                       l10n.settingsMetadataBackupOpenFolderDescription,
                     ),
-                    onTap: () => _openBackupFolder(context, storagePath),
+                    onTap: () => _openBackupFolder(context, ref, storagePath),
                   ),
                 SettingsNavigationTile(
                   leading: Symbols.upload,

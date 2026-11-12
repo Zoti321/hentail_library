@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:hentai_library/core/logging/app_log.dart';
+import 'package:hentai_library/shared/application/logging/app_log.dart';
 import 'package:hentai_library/features/app_settings/infrastructure/repositories/app_setting_storage.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting_migration.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting.dart';

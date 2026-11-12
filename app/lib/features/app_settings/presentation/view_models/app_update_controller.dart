@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:hentai_library/core/constants/app_update_constants.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/logging/app_log.dart';
+import 'package:hentai_library/features/app_settings/application/app_update_constants.dart';
+import 'package:hentai_library/design-system/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/application/logging/app_log.dart';
 import 'package:hentai_library/shared/ui/navigation/app_root_navigator_key.dart';
 import 'package:hentai_library/core/util/semver_utils.dart';
 import 'package:hentai_library/features/app_settings/domain/app_release_info.dart';

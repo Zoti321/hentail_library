@@ -2,7 +2,7 @@ import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/design-system/design_system.dart';
-import 'package:hentai_library/core/constants/app_routes.dart';
+import 'package:hentai_library/shared/application/navigation/app_routes.dart';
 import 'package:hentai_library/features/comic/public.dart';
 import 'package:hentai_library/features/library_browse/public.dart';
 import 'package:hentai_library/features/series/public.dart';

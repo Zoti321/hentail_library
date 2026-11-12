@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:hentai_library/core/constants/app_routes.dart';
+import 'package:hentai_library/shared/application/navigation/app_routes.dart';
 import 'package:hentai_library/features/comic/presentation/view_models/comic_detail_return_series_notifier.dart';
 import 'package:hentai_library/shared/ui/navigation/app_navigator_context.dart';
 

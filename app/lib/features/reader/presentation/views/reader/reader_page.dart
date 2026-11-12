@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/reader/presentation/input/reader_tap_zone.dart';
 import 'package:hentai_library/features/reader/presentation/reader_input.dart';
 import 'package:hentai_library/features/reader/presentation/navigation/apply_reader_navigation_intent.dart';
@@ -19,7 +19,7 @@ import 'package:hentai_library/features/reader/presentation/routing/reader_route
 import 'package:hentai_library/features/reader/presentation/views/reader/reader_cover_actions.dart';
 import 'package:hentai_library/features/reader/presentation/views/reader/reader_settings_sheet.dart';
 import 'package:hentai_library/features/reader/presentation/widgets/reader_auto_play_binder.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/design-system/l10n/app_localizations.dart';
 import 'package:hentai_library/features/reader/presentation/views/reader/reader_layout.dart';
 import 'package:hentai_library/features/reader/presentation/patterns/reader/reader_series_catalog_sheet.dart';
 import 'package:hentai_library/features/reader/presentation/patterns/reader/reader_series_volume.dart';

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/design-system/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:material_3_expressive/components/text_fields/components/m3e_text_field_affordance.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
@@ -94,7 +93,7 @@ class _PublishedDateTextFieldState extends State<PublishedDateTextField> {
 
   @override
   Widget build(BuildContext context) {
-    final AppLocalizations l10n = context.l10n;
+    final AppLocalizations l10n = AppLocalizations.of(context);
     final M3EThemeData theme = M3ETheme.of(context);
     final M3EColorScheme scheme = theme.colorScheme;
     final M3ETextFieldTheme fieldTheme = theme.textFieldTheme;

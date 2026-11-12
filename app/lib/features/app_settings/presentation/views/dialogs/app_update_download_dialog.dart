@@ -1,13 +1,13 @@
 import 'dart:async';
 
-import 'package:hentai_library/shared/application/cancellation_token.dart';
+import 'package:hentai_library/core/async/cancellation_token.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/core/logging/app_log.dart';
-import 'package:hentai_library/core/util/open_downloaded_file.dart';
-import 'package:hentai_library/core/util/utils.dart';
+import 'package:hentai_library/design-system/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/application/logging/app_log.dart';
+import 'package:hentai_library/features/app_settings/presentation/providers/app_update_opener_providers.dart';
+import 'package:hentai_library/core/util/format_byte_size.dart';
 import 'package:hentai_library/features/app_settings/presentation/providers/app_update_providers.dart';
 import 'package:hentai_library/features/app_settings/domain/app_release_info.dart';
 import 'package:hentai_library/shared/ui/patterns/dialog/lab_dialog_presenter.dart';
@@ -87,7 +87,7 @@ class AppUpdateDownloadDialog extends HookConsumerWidget {
           return;
         }
         Navigator.of(context).pop();
-        await openDownloadedUpdateFile(savedPath);
+        await ref.read(openDownloadedUpdateProvider)(savedPath);
       } on OperationCancelledException {
         return;
       } catch (error, stackTrace) {

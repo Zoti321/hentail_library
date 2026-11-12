@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/core/logging/app_log.dart';
+import 'package:hentai_library/shared/application/logging/app_log.dart';
 import 'package:hentai_library/features/app_settings/public/providers/app_settings_providers.dart';
 import 'package:hentai_library/features/app_settings/public/reading_preferences_schema.dart';
 import 'package:hentai_library/features/reader/domain/reading_preferences.dart';

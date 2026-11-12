@@ -1,4 +1,4 @@
-import 'package:hentai_library/core/constants/app_routes.dart';
+import 'package:hentai_library/shared/application/navigation/app_routes.dart';
 
 /// Leaves the reader after session cleanup.
 ///

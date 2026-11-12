@@ -1,4 +1,4 @@
-import 'package:hentai_library/core/errors/app_exception.dart';
+import 'package:hentai_library/features/library_admin/application/library_sync_exception.dart';
 import 'package:hentai_library/features/library_admin/infrastructure/adapters/sync_library_frb_adapter.dart';
 import 'package:hentai_library/features/library_admin/domain/resource_format_category.dart';
 import 'package:hentai_library/features/library_admin/domain/value_objects/scan_interval.dart';
@@ -134,12 +134,12 @@ void main() {
     expect(mapped.errorMessage, 'db failed');
   });
 
-  test('failed progress throws SyncException in adapter flow', () {
+  test('failed progress throws LibrarySyncException in adapter flow', () {
     expect(
-      () => throw SyncException('db failed'),
+      () => throw LibrarySyncException('db failed'),
       throwsA(
-        isA<SyncException>().having(
-          (SyncException e) => e.message,
+        isA<LibrarySyncException>().having(
+          (LibrarySyncException e) => e.message,
           'message',
           'db failed',
         ),

@@ -1,6 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/composition/infrastructure_overrides.dart';
+import 'package:hentai_library/shared/presentation/providers/file_explorer_providers.dart';
+import 'package:hentai_library/features/app_settings/presentation/providers/app_update_opener_providers.dart';
+import 'package:hentai_library/features/app_settings/presentation/providers/diagnostic_providers.dart';
 import 'package:hentai_library/features/app_settings/application/app_update_gateway.dart';
 import 'package:hentai_library/features/app_settings/presentation/providers/app_setting_repository_provider.dart';
 import 'package:hentai_library/features/app_settings/presentation/providers/app_update_providers.dart';
@@ -29,6 +32,12 @@ void main() {
         isA<TagDictionaryDownloadGateway>(),
       );
       for (final Object? Function() read in <Object? Function()>[
+        () => container.read(showInFileExplorerProvider),
+        () => container.read(openDirectoryInFileExplorerProvider),
+        () => container.read(openDownloadedUpdateProvider),
+        () => container.read(openReleasePageProvider),
+        () => container.read(diagnosticLoggingCommandProvider),
+        () => container.read(exportLogsCommandProvider),
         () => container.read(appSettingRepositoryProvider),
         () => container.read(namedFacetFormListingProvider),
         () => container.read(syncLibraryPortProvider),

@@ -1,5 +1,5 @@
-import 'package:hentai_library/core/errors/app_exception.dart';
-import 'package:hentai_library/core/logging/app_log.dart';
+import 'package:hentai_library/shared/application/errors/app_exception.dart';
+import 'package:hentai_library/shared/application/logging/app_log.dart';
 import 'package:hentai_library/infrastructure/frb/frb_call_guard.dart';
 import 'package:hentai_library/features/reading_history/infrastructure/mappers/history_frb_mapper.dart';
 import 'package:hentai_library/features/reading_history/domain/reading_history.dart';

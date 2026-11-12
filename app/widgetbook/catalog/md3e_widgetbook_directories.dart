@@ -45,8 +45,8 @@ import '../lab/navigation/md3e_lab_catalog_navigation.dart';
 
 import 'package:hentai_library/features/library_browse/presentation/browse/patterns/library/library_filter_sort_side_sheet.dart';
 import 'package:hentai_library/features/comic_metadata/public/ui/metadata_lab_patterns.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/design-system/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 
 import '../preview/md3e_named_facet_multi_select_preview.dart';
 

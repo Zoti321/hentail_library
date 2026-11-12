@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:typed_data';
 
-import 'package:hentai_library/core/logging/app_log.dart';
+import 'package:hentai_library/shared/application/logging/app_log.dart';
 import 'package:hentai_library/features/comic/presentation/cover/comic_cover_load_gate.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/comic/domain/thumbnail/thumbnail_event.dart';

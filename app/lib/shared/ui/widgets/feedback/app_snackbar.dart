@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/errors/app_exception.dart';
+import 'package:hentai_library/shared/application/errors/app_exception.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 const Duration kAppSnackbarDefaultDuration = Duration(seconds: 3);

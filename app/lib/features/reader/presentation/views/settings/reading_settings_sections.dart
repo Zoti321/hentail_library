@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/design-system/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/app_settings/public/providers/app_settings_providers.dart';
 import 'package:hentai_library/features/app_settings/public/reading_preferences_schema.dart';
 import 'package:hentai_library/features/reader/domain/auto_play_interval.dart';

@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:hentai_library/core/util/debouncer.dart';
 
-import 'package:hentai_library/core/logging/app_log.dart';
+import 'package:hentai_library/shared/application/logging/app_log.dart';
 import 'package:hentai_library/features/reading_history/public.dart' as entity;
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';

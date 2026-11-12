@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:hentai_library/features/comic/public.dart';
 
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/image/image_decode_cache_size.dart';
+import 'package:hentai_library/shared/ui/image/image_decode_cache_size.dart';
 import 'package:hentai_library/features/comic_metadata/public/comic_metadata_entities.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/features/library_browse/presentation/author/view_models/author_detail_notifier.dart';

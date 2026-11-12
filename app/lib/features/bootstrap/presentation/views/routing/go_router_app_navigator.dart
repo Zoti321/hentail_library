@@ -1,5 +1,5 @@
 import 'package:go_router/go_router.dart';
-import 'package:hentai_library/core/constants/app_routes.dart';
+import 'package:hentai_library/shared/application/navigation/app_routes.dart';
 import 'package:hentai_library/features/reader/public.dart';
 import 'package:hentai_library/shared/application/contracts/app_navigator.dart';
 import 'package:hentai_library/design-system/design_system.dart';

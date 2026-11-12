@@ -1,24 +1,22 @@
-import 'dart:io';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/features/app_settings/presentation/providers/diagnostic_providers.dart';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/logging/app_log.dart';
-import 'package:hentai_library/core/logging/app_logging.dart';
-import 'package:hentai_library/core/logging/log_export_service.dart';
+import 'package:hentai_library/shared/application/logging/app_log.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hentai_library/shared/ui/patterns/dialog/lab_dialog_presenter.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 import 'package:intl/intl.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
 
 enum LogRedactionMode { redacted, full }
 
 /// 导出日志完整流程：脱敏选择 → 打包 → 另存为。
 Future<void> runLogExportFlow(
-  BuildContext context, {
+  BuildContext context,
+  WidgetRef ref, {
   bool diagnosticVerbose = false,
 }) async {
   final LogRedactionMode? mode =
@@ -43,19 +41,13 @@ Future<void> runLogExportFlow(
   }
 
   try {
-    await appLogFileWriter?.flush();
-    final Directory appDir = await getApplicationSupportDirectory();
-    final PackageInfo packageInfo = await PackageInfo.fromPlatform();
     final String outputPath = savePath.endsWith('.zip')
         ? savePath
         : '$savePath.zip';
-
-    await const LogExportService().exportToFile(
+    await ref.read(exportLogsCommandProvider)(
       outputPath: outputPath,
-      logsDirectory: Directory(p.join(appDir.path, 'logs')),
       redact: mode == LogRedactionMode.redacted,
       diagnosticVerbose: diagnosticVerbose,
-      packageInfo: packageInfo,
     );
 
     if (context.mounted) {

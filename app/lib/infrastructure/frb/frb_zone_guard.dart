@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
-import 'package:hentai_library/core/errors/app_exception.dart';
-import 'package:hentai_library/core/logging/app_log.dart';
+import 'package:hentai_library/shared/application/errors/app_exception.dart';
+import 'package:hentai_library/shared/application/logging/app_log.dart';
 import 'package:hentai_library/infrastructure/frb/frb_error_mapper.dart';
 import 'package:hentai_library/src/rust/api/init.dart';
 

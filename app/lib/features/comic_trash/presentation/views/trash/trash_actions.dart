@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/design-system/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/comic_trash/presentation/view_models/trash_page_controller.dart';
 import 'package:hentai_library/features/comic_trash/presentation/views/trash/trash_purge_dialog.dart';
 import 'package:hentai_library/features/comic_trash/domain/comic_purge_strategy.dart';

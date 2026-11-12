@@ -3,7 +3,7 @@ import 'package:hentai_library/shared/presentation/providers/trash_comics_comman
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/shared/ui/patterns/dialog/confirm_dialog.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
