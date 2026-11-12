@@ -79,13 +79,14 @@ class MetadataEditSurface extends StatelessWidget {
             ),
           ),
           bottomDivider: true,
-          actions: metadataEditDialogActions(
-            context,
-            onCancel: onCancel,
-            onSave: onSave,
-            saving: saving,
-            saveEnabled: saveEnabled,
-          ),
+          actions: <Widget>[
+            MetadataEditCancelButton(onCancel: onCancel, saving: saving),
+            MetadataEditSaveButton(
+              onSave: onSave,
+              saving: saving,
+              saveEnabled: saveEnabled,
+            ),
+          ],
         ),
       );
     }

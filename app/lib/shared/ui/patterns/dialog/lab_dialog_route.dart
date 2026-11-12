@@ -45,7 +45,7 @@ Future<T?> pushLabDialogRoute<T>(
               autofocusFirst: autofocusFirst,
               variant: variant,
               discardPrompt: discardPrompt,
-              child: overlayRouteScope(
+              child: OverlayRouteScope(
                 scope: overlayScope,
                 child: builder(themedContext),
               ),

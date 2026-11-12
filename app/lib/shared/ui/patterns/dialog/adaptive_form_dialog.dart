@@ -74,7 +74,7 @@ Future<T?> showAdaptiveFormDialog<T>(
 
   return M3EDialog.show<T>(
     context,
-    dialog: overlayRouteScope(
+    dialog: OverlayRouteScope(
       scope: scope.withM3e(themed),
       child: adaptiveDialog,
     ),

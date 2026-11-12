@@ -179,13 +179,17 @@ class _Md3eLibraryEditDialogState extends State<_Md3eLibraryEditDialog> {
         ),
       ),
       bottomDivider: true,
-      actions: metadataEditDialogActions(
-        context,
-        onCancel: () => Navigator.of(context).pop(),
-        onSave: _saving ? null : _saveAndPop,
-        saving: _saving,
-        saveEnabled: true,
-      ),
+      actions: <Widget>[
+        MetadataEditCancelButton(
+          onCancel: () => Navigator.of(context).pop(),
+          saving: _saving,
+        ),
+        MetadataEditSaveButton(
+          onSave: _saving ? null : _saveAndPop,
+          saving: _saving,
+          saveEnabled: true,
+        ),
+      ],
     );
   }
 }

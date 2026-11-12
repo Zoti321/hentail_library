@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/lab/lab_library_catalog.dart';
+import 'package:hentai_library/shared/ui/shell/desktop_shell_metrics.dart';
+import 'package:hentai_library/shared/ui/shell/desktop_shell_pane.dart';
 import 'package:hentai_library/shared/ui/shell/shell_library_picker_sheet.dart';
 import 'package:hentai_library/shared/ui/shell/shell_library_secondary_column.dart';
 import 'package:hentai_library/shared/ui/shell/shell_library_secondary_layout.dart';
@@ -15,22 +17,9 @@ import 'package:hentai_library/shared/ui/widgets/desktop/navigation_bar.dart';
 import 'package:hentai_library/shared/ui/widgets/desktop/navigation_rail.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
+export 'package:hentai_library/shared/ui/shell/desktop_shell_metrics.dart';
+export 'package:hentai_library/shared/ui/shell/desktop_shell_pane.dart';
 export 'package:hentai_library/shared/ui/shell/shell_navigation.dart';
-
-/// Shell layout metrics for the desktop content card.
-abstract final class DesktopShellMetrics {
-  static const double paneCornerRadius = 20;
-
-  /// Content card: rounded on the leading edge only (rail side).
-  static BorderRadius contentCardLeadingRadius([
-    double radius = paneCornerRadius,
-  ]) {
-    return BorderRadius.only(
-      topLeft: Radius.circular(radius),
-      bottomLeft: Radius.circular(radius),
-    );
-  }
-}
 
 /// Lab shell: navigation + content pane.
 ///
@@ -228,25 +217,35 @@ class DesktopShellState extends State<DesktopShell> {
     if (_librarySecondaryOpen || _secondaryOpenTimer != null) {
       return;
     }
-    _secondaryOpenTimer = Timer(_librarySecondaryOpenDelay, () {
-      _secondaryOpenTimer = null;
-      if (!mounted) {
-        return;
-      }
-      setState(() => _librarySecondaryOpen = true);
-    });
+    _secondaryOpenTimer = Timer(
+      _librarySecondaryOpenDelay,
+      _openLibrarySecondary,
+    );
+  }
+
+  void _openLibrarySecondary() {
+    _secondaryOpenTimer = null;
+    if (!mounted) {
+      return;
+    }
+    setState(() => _librarySecondaryOpen = true);
   }
 
   void _scheduleCloseLibrarySecondary() {
     _secondaryOpenTimer?.cancel();
     _secondaryOpenTimer = null;
     _secondaryCloseTimer?.cancel();
-    _secondaryCloseTimer = Timer(_librarySecondaryCloseDelay, () {
-      _secondaryCloseTimer = null;
-      if (mounted && _librarySecondaryOpen) {
-        setState(() => _librarySecondaryOpen = false);
-      }
-    });
+    _secondaryCloseTimer = Timer(
+      _librarySecondaryCloseDelay,
+      _closeLibrarySecondary,
+    );
+  }
+
+  void _closeLibrarySecondary() {
+    _secondaryCloseTimer = null;
+    if (mounted && _librarySecondaryOpen) {
+      setState(() => _librarySecondaryOpen = false);
+    }
   }
 
   void _cancelCloseLibrarySecondary() {
@@ -333,251 +332,6 @@ class DesktopShellState extends State<DesktopShell> {
   /// 兼容旧 API：medium- 已改用底部导航，不再打开抽屉。
   void openNavigationRail() {}
 
-  Widget _buildCompactContentColumn({
-    required BuildContext context,
-    required List<ShellRailDestination> specs,
-    required List<ExpressiveNavigationRailDestination> destinations,
-    required DesktopShellSurfaceRoles surfaces,
-    required Widget pane,
-  }) {
-    final Widget paneWithChrome = DesktopShellPane(
-      showDecoration: false,
-      child: pane,
-    );
-    // 桌面窗口需要窗口控件（关闭 / 最小化）；主导航改由底部栏承担。
-    final Widget? topBar = widget.compactShowsWindowControls
-        ? const DesktopTitleBar(
-            showWindowControls: true,
-            backgroundColor: Colors.transparent,
-          )
-        : null;
-    return ColoredBox(
-      color: surfaces.contentPaneBackground,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          ?topBar,
-          ...widget.belowTitleBar,
-          Expanded(child: paneWithChrome),
-          ExpressiveNavigationBar(
-            destinations: destinations,
-            selectedIndex: _effectiveSelectedIndex(context),
-            onDestinationSelected: (int index) =>
-                _onBottomNavDestinationSelected(context, specs, index),
-            backgroundColor: surfaces.navigationRailBackground,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDesktopContentColumn({
-    required DesktopShellSurfaceRoles surfaces,
-    required Widget pane,
-    required double cornerRadius,
-  }) {
-    return ClipRRect(
-      borderRadius: DesktopShellMetrics.contentCardLeadingRadius(cornerRadius),
-      child: ColoredBox(
-        color: surfaces.contentPaneBackground,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            DesktopTitleBar(
-              showWindowControls: true,
-              backgroundColor: Colors.transparent,
-              showNavigationMenu: widget.showNavigationMenu,
-              onNavigationMenuPressed: widget.onNavigationMenuPressed,
-            ),
-            ...widget.belowTitleBar,
-            Expanded(
-              child: DesktopShellPane(showDecoration: false, child: pane),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPane(BuildContext context) {
-    if (widget.paneBuilder != null) {
-      return widget.paneBuilder!(context, _navigationSnapshot(context));
-    }
-    return widget.paneChild ?? const SizedBox.expand();
-  }
-
-  Widget _buildRailColumn({
-    required BuildContext context,
-    required List<ShellRailDestination> specs,
-    required M3EThemeData railTheme,
-    required List<ExpressiveNavigationRailDestination> destinations,
-    required M3ENavigationRailTheme navTheme,
-    required double shellHeight,
-  }) {
-    final int libraryIndex = _libraryAnchorIndex(specs);
-    final double libraryTop = ShellRailLibraryHoverMetrics.destinationTop(
-      theme: navTheme,
-      railExtended: _effectiveRailExtended,
-      destinationIndex: libraryIndex,
-    );
-    final double libraryHeight = ShellRailLibraryHoverMetrics.destinationHeight(
-      theme: navTheme,
-      railExtended: _effectiveRailExtended,
-    );
-
-    return MouseRegion(
-      cursor: ShellNavigationCursor.chrome,
-      child: SizedBox(
-        height: shellHeight,
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: <Widget>[
-            M3ETheme(
-              data: railTheme,
-              child: ExpressiveNavigationRail(
-                destinations: destinations,
-                selectedIndex: _effectiveSelectedIndex(context),
-                extended: _effectiveRailExtended,
-                onMenuPressed: _toggleRailExtended,
-                onDestinationSelected: (int index) =>
-                    _onRailDestinationSelected(context, specs, index),
-              ),
-            ),
-            Positioned(
-              top: libraryTop,
-              left: 0,
-              right: 0,
-              height: libraryHeight,
-              child: MouseRegion(
-                hitTestBehavior: HitTestBehavior.translucent,
-                cursor: ShellNavigationCursor.interactive,
-                onEnter: (_) => _onLibraryHoverEnter(),
-                onExit: (_) => _scheduleCloseLibrarySecondary(),
-                child: const SizedBox.expand(),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLibrarySecondaryFlyout({
-    required DesktopShellSurfaceRoles surfaces,
-    required M3EColorScheme scheme,
-    required double shellHeight,
-  }) {
-    return ShellLibrarySecondaryColumn(
-      open: _librarySecondaryOpen,
-      height: shellHeight,
-      backgroundColor: surfaces.navigationRailBackground,
-      dividerColor: scheme.outlineVariant,
-      libraries: widget.libraries,
-      selectedLibraryId: _effectiveSelectedLibraryId,
-      onLibrarySelected: _onLibrarySelected,
-      onPointerEnter: _cancelCloseLibrarySecondary,
-      onPointerExit: _scheduleCloseLibrarySecondary,
-    );
-  }
-
-  Widget _buildExpandedNavigation({
-    required BuildContext context,
-    required List<ShellRailDestination> specs,
-    required M3EThemeData railTheme,
-    required DesktopShellSurfaceRoles surfaces,
-    required List<ExpressiveNavigationRailDestination> destinations,
-    required M3ENavigationRailTheme navTheme,
-    required M3EColorScheme scheme,
-    required Widget contentColumn,
-    required double shellHeight,
-  }) {
-    final Widget rail = _buildRailColumn(
-      context: context,
-      specs: specs,
-      railTheme: railTheme,
-      destinations: destinations,
-      navTheme: navTheme,
-      shellHeight: shellHeight,
-    );
-
-    final Widget flyout = _buildLibrarySecondaryFlyout(
-      surfaces: surfaces,
-      scheme: scheme,
-      shellHeight: shellHeight,
-    );
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        rail,
-        Expanded(
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: <Widget>[
-              contentColumn,
-              Positioned(left: 0, top: 0, child: flyout),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildShellBody(
-    BuildContext context,
-    BoxConstraints constraints,
-    DesktopShellSurfaceRoles surfaces,
-    List<ShellRailDestination> specs,
-    List<ExpressiveNavigationRailDestination> destinations,
-    double shellHeight,
-  ) {
-    final double shellWidth = constraints.maxWidth;
-    _syncShellLayout(shellWidth);
-    final bool usesExpandedNav = _usesExpandedNavigation ?? false;
-    final M3EThemeData m3e = M3ETheme.of(context);
-    final M3EColorScheme scheme = m3e.colorScheme;
-    final M3ENavigationRailTheme navTheme = m3e.navigationRailTheme;
-    final M3EThemeData railTheme = m3e.copyWith(
-      navigationRailTheme: navTheme.copyWith(
-        containerColor: surfaces.navigationRailBackground,
-      ),
-    );
-    final double cornerRadius = DesktopShellMetrics.paneCornerRadius;
-    // 页面视口：内容区真实宽度（已扣除侧栏），页面内 PageLayoutSpec.of 据此解析。
-    final Widget pane = PageViewport(child: _buildPane(context));
-
-    final Widget contentColumn = usesExpandedNav
-        ? _buildDesktopContentColumn(
-            surfaces: surfaces,
-            pane: pane,
-            cornerRadius: cornerRadius,
-          )
-        : _buildCompactContentColumn(
-            context: context,
-            specs: specs,
-            destinations: destinations,
-            surfaces: surfaces,
-            pane: pane,
-          );
-
-    return ColoredBox(
-      color: surfaces.shellBackground,
-      child: usesExpandedNav
-          ? _buildExpandedNavigation(
-              context: context,
-              specs: specs,
-              railTheme: railTheme,
-              surfaces: surfaces,
-              destinations: destinations,
-              navTheme: navTheme,
-              scheme: scheme,
-              contentColumn: contentColumn,
-              shellHeight: shellHeight,
-            )
-          : contentColumn,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
@@ -595,13 +349,13 @@ class DesktopShellState extends State<DesktopShell> {
         final double shellHeight = widget.fillHeight
             ? resolved.maxHeight
             : widget.height;
-        final Widget body = _buildShellBody(
-          context,
-          resolved,
-          surfaces,
-          specs,
-          destinations,
-          shellHeight,
+        final Widget body = _ShellBody(
+          state: this,
+          constraints: resolved,
+          surfaces: surfaces,
+          specs: specs,
+          destinations: destinations,
+          shellHeight: shellHeight,
         );
         if (widget.fillHeight) {
           return SizedBox(
@@ -637,39 +391,328 @@ class DesktopShellState extends State<DesktopShell> {
   }
 }
 
-/// Main pane surface (role from [DesktopShellSurfaceRoles], r=20).
-class DesktopShellPane extends StatelessWidget {
-  const DesktopShellPane({
-    super.key,
-    this.backgroundColor,
-    this.borderRadius,
-    this.showDecoration = true,
-    this.child,
+class _ShellBody extends StatelessWidget {
+  const _ShellBody({
+    required this.state,
+    required this.constraints,
+    required this.surfaces,
+    required this.specs,
+    required this.destinations,
+    required this.shellHeight,
   });
 
-  final Color? backgroundColor;
-  final BorderRadius? borderRadius;
-  final bool showDecoration;
-  final Widget? child;
+  final DesktopShellState state;
+  final BoxConstraints constraints;
+  final DesktopShellSurfaceRoles surfaces;
+  final List<ShellRailDestination> specs;
+  final List<ExpressiveNavigationRailDestination> destinations;
+  final double shellHeight;
 
   @override
   Widget build(BuildContext context) {
-    final Widget content = child ?? const SizedBox.expand();
-    if (!showDecoration) {
-      return content;
+    state._syncShellLayout(constraints.maxWidth);
+    final bool usesExpandedNav = state._usesExpandedNavigation ?? false;
+    final M3EThemeData m3e = M3ETheme.of(context);
+    final M3EColorScheme scheme = m3e.colorScheme;
+    final M3ENavigationRailTheme navTheme = m3e.navigationRailTheme;
+    final M3EThemeData railTheme = m3e.copyWith(
+      navigationRailTheme: navTheme.copyWith(
+        containerColor: surfaces.navigationRailBackground,
+      ),
+    );
+    final double cornerRadius = DesktopShellMetrics.paneCornerRadius;
+    // 页面视口：内容区真实宽度（已扣除侧栏），页面内 PageLayoutSpec.of 据此解析。
+    final Widget pane = PageViewport(child: _PaneBody(state: state));
+
+    final Widget contentColumn = usesExpandedNav
+        ? _DesktopContentColumn(
+            state: state,
+            surfaces: surfaces,
+            pane: pane,
+            cornerRadius: cornerRadius,
+          )
+        : _CompactContentColumn(
+            state: state,
+            specs: specs,
+            destinations: destinations,
+            surfaces: surfaces,
+            pane: pane,
+          );
+
+    return ColoredBox(
+      color: surfaces.shellBackground,
+      child: usesExpandedNav
+          ? _ExpandedNavigation(
+              state: state,
+              specs: specs,
+              railTheme: railTheme,
+              surfaces: surfaces,
+              destinations: destinations,
+              navTheme: navTheme,
+              scheme: scheme,
+              contentColumn: contentColumn,
+              shellHeight: shellHeight,
+            )
+          : contentColumn,
+    );
+  }
+}
+
+class _PaneBody extends StatelessWidget {
+  const _PaneBody({required this.state});
+
+  final DesktopShellState state;
+
+  @override
+  Widget build(BuildContext context) {
+    final DesktopShellPaneBuilder? paneBuilder = state.widget.paneBuilder;
+    if (paneBuilder != null) {
+      return paneBuilder(context, state._navigationSnapshot(context));
     }
+    return state.widget.paneChild ?? const SizedBox.expand();
+  }
+}
 
-    final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
-    final Color fill = backgroundColor ?? scheme.surfaceContainerLowest;
-    final BorderRadius radius =
-        borderRadius ??
-        const BorderRadius.all(
-          Radius.circular(DesktopShellMetrics.paneCornerRadius),
-        );
+class _CompactContentColumn extends StatelessWidget {
+  const _CompactContentColumn({
+    required this.state,
+    required this.specs,
+    required this.destinations,
+    required this.surfaces,
+    required this.pane,
+  });
 
-    return DecoratedBox(
-      decoration: BoxDecoration(color: fill, borderRadius: radius),
-      child: content,
+  final DesktopShellState state;
+  final List<ShellRailDestination> specs;
+  final List<ExpressiveNavigationRailDestination> destinations;
+  final DesktopShellSurfaceRoles surfaces;
+  final Widget pane;
+
+  @override
+  Widget build(BuildContext context) {
+    final Widget paneWithChrome = DesktopShellPane(
+      showDecoration: false,
+      child: pane,
+    );
+    // 桌面窗口需要窗口控件（关闭 / 最小化）；主导航改由底部栏承担。
+    final Widget? topBar = state.widget.compactShowsWindowControls
+        ? const DesktopTitleBar(
+            showWindowControls: true,
+            backgroundColor: Colors.transparent,
+          )
+        : null;
+    return ColoredBox(
+      color: surfaces.contentPaneBackground,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          ?topBar,
+          ...state.widget.belowTitleBar,
+          Expanded(child: paneWithChrome),
+          ExpressiveNavigationBar(
+            destinations: destinations,
+            selectedIndex: state._effectiveSelectedIndex(context),
+            onDestinationSelected: (int index) =>
+                state._onBottomNavDestinationSelected(context, specs, index),
+            backgroundColor: surfaces.navigationRailBackground,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DesktopContentColumn extends StatelessWidget {
+  const _DesktopContentColumn({
+    required this.state,
+    required this.surfaces,
+    required this.pane,
+    required this.cornerRadius,
+  });
+
+  final DesktopShellState state;
+  final DesktopShellSurfaceRoles surfaces;
+  final Widget pane;
+  final double cornerRadius;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: DesktopShellMetrics.contentCardLeadingRadius(cornerRadius),
+      child: ColoredBox(
+        color: surfaces.contentPaneBackground,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            DesktopTitleBar(
+              showWindowControls: true,
+              backgroundColor: Colors.transparent,
+              showNavigationMenu: state.widget.showNavigationMenu,
+              onNavigationMenuPressed: state.widget.onNavigationMenuPressed,
+            ),
+            ...state.widget.belowTitleBar,
+            Expanded(
+              child: DesktopShellPane(showDecoration: false, child: pane),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _RailColumn extends StatelessWidget {
+  const _RailColumn({
+    required this.state,
+    required this.specs,
+    required this.railTheme,
+    required this.destinations,
+    required this.navTheme,
+    required this.shellHeight,
+  });
+
+  final DesktopShellState state;
+  final List<ShellRailDestination> specs;
+  final M3EThemeData railTheme;
+  final List<ExpressiveNavigationRailDestination> destinations;
+  final M3ENavigationRailTheme navTheme;
+  final double shellHeight;
+
+  @override
+  Widget build(BuildContext context) {
+    final int libraryIndex = state._libraryAnchorIndex(specs);
+    final double libraryTop = ShellRailLibraryHoverMetrics.destinationTop(
+      theme: navTheme,
+      railExtended: state._effectiveRailExtended,
+      destinationIndex: libraryIndex,
+    );
+    final double libraryHeight = ShellRailLibraryHoverMetrics.destinationHeight(
+      theme: navTheme,
+      railExtended: state._effectiveRailExtended,
+    );
+
+    return MouseRegion(
+      cursor: ShellNavigationCursor.chrome,
+      child: SizedBox(
+        height: shellHeight,
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: <Widget>[
+            M3ETheme(
+              data: railTheme,
+              child: ExpressiveNavigationRail(
+                destinations: destinations,
+                selectedIndex: state._effectiveSelectedIndex(context),
+                extended: state._effectiveRailExtended,
+                onMenuPressed: state._toggleRailExtended,
+                onDestinationSelected: (int index) =>
+                    state._onRailDestinationSelected(context, specs, index),
+              ),
+            ),
+            Positioned(
+              top: libraryTop,
+              left: 0,
+              right: 0,
+              height: libraryHeight,
+              child: MouseRegion(
+                hitTestBehavior: HitTestBehavior.translucent,
+                cursor: ShellNavigationCursor.interactive,
+                onEnter: (_) => state._onLibraryHoverEnter(),
+                onExit: (_) => state._scheduleCloseLibrarySecondary(),
+                child: const SizedBox.expand(),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LibraryFlyout extends StatelessWidget {
+  const _LibraryFlyout({
+    required this.state,
+    required this.surfaces,
+    required this.scheme,
+    required this.shellHeight,
+  });
+
+  final DesktopShellState state;
+  final DesktopShellSurfaceRoles surfaces;
+  final M3EColorScheme scheme;
+  final double shellHeight;
+
+  @override
+  Widget build(BuildContext context) {
+    return ShellLibrarySecondaryColumn(
+      open: state._librarySecondaryOpen,
+      height: shellHeight,
+      backgroundColor: surfaces.navigationRailBackground,
+      dividerColor: scheme.outlineVariant,
+      libraries: state.widget.libraries,
+      selectedLibraryId: state._effectiveSelectedLibraryId,
+      onLibrarySelected: state._onLibrarySelected,
+      onPointerEnter: state._cancelCloseLibrarySecondary,
+      onPointerExit: state._scheduleCloseLibrarySecondary,
+    );
+  }
+}
+
+class _ExpandedNavigation extends StatelessWidget {
+  const _ExpandedNavigation({
+    required this.state,
+    required this.specs,
+    required this.railTheme,
+    required this.surfaces,
+    required this.destinations,
+    required this.navTheme,
+    required this.scheme,
+    required this.contentColumn,
+    required this.shellHeight,
+  });
+
+  final DesktopShellState state;
+  final List<ShellRailDestination> specs;
+  final M3EThemeData railTheme;
+  final DesktopShellSurfaceRoles surfaces;
+  final List<ExpressiveNavigationRailDestination> destinations;
+  final M3ENavigationRailTheme navTheme;
+  final M3EColorScheme scheme;
+  final Widget contentColumn;
+  final double shellHeight;
+
+  @override
+  Widget build(BuildContext context) {
+    final Widget rail = _RailColumn(
+      state: state,
+      specs: specs,
+      railTheme: railTheme,
+      destinations: destinations,
+      navTheme: navTheme,
+      shellHeight: shellHeight,
+    );
+
+    final Widget flyout = _LibraryFlyout(
+      state: state,
+      surfaces: surfaces,
+      scheme: scheme,
+      shellHeight: shellHeight,
+    );
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        rail,
+        Expanded(
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: <Widget>[
+              contentColumn,
+              Positioned(left: 0, top: 0, child: flyout),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

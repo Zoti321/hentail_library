@@ -52,13 +52,18 @@ class _ComicDetailAgeRestrictionChipSlotState
       return;
     }
     _hideTimer?.cancel();
-    _hideTimer = Timer(kComicDetailAgeRestrictionChipHideDebounce, () {
-      if (!mounted || widget.visible) {
-        return;
-      }
-      setState(() => _rendered = false);
-      widget.onFullyHidden?.call();
-    });
+    _hideTimer = Timer(
+      kComicDetailAgeRestrictionChipHideDebounce,
+      _handleHideTimer,
+    );
+  }
+
+  void _handleHideTimer() {
+    if (!mounted || widget.visible) {
+      return;
+    }
+    setState(() => _rendered = false);
+    widget.onFullyHidden?.call();
   }
 
   @override

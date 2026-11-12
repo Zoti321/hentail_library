@@ -36,7 +36,7 @@ Future<void> openLabCatalogDetail(
     sharedAxisRoute<void>(
       context,
       builder: (BuildContext routeContext) {
-        return overlayRouteScope(
+        return OverlayRouteScope(
           scope: scope,
           child: switch (displayTarget) {
             LibraryDisplayTarget.comics => _Md3eLabComicDetailRoute(
@@ -119,7 +119,7 @@ class _Md3eLabSeriesDetailRoute extends StatelessWidget {
           sharedAxisRoute<void>(
             context,
             builder: (BuildContext routeContext) {
-              return overlayRouteScope(
+              return OverlayRouteScope(
                 scope: scope,
                 child: ComicDetailLayout(
                   entry: comicEntry,

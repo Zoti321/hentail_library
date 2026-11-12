@@ -59,25 +59,34 @@ final class OverlayRouteScopeSnapshot {
 /// [Material] 供 [InkWell] 等 legacy 控件使用；[DefaultTextStyle] 对齐 Lab 字体（含 M3E 全屏标题）。
 ///
 /// [scope] 应由调用方在构建路由前通过 [OverlayRouteScopeSnapshot.capture] 获取。
-Widget overlayRouteScope({
-  required OverlayRouteScopeSnapshot scope,
-  required Widget child,
-}) {
-  return Localizations(
-    locale: scope.locale,
-    delegates: materialLocalizationsDelegates,
-    child: M3ETheme(
-      data: scope.m3e,
-      child: Theme(
-        data: scope.materialTheme,
-        child: DefaultTextStyle.merge(
-          style: TextStyle(
-            fontFamily:
-                scope.m3e.typeScale.bodyLarge.fontFamily ?? kAppFontFamily,
+class OverlayRouteScope extends StatelessWidget {
+  const OverlayRouteScope({
+    super.key,
+    required this.scope,
+    required this.child,
+  });
+
+  final OverlayRouteScopeSnapshot scope;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Localizations(
+      locale: scope.locale,
+      delegates: materialLocalizationsDelegates,
+      child: M3ETheme(
+        data: scope.m3e,
+        child: Theme(
+          data: scope.materialTheme,
+          child: DefaultTextStyle.merge(
+            style: TextStyle(
+              fontFamily:
+                  scope.m3e.typeScale.bodyLarge.fontFamily ?? kAppFontFamily,
+            ),
+            child: Material(type: MaterialType.transparency, child: child),
           ),
-          child: Material(type: MaterialType.transparency, child: child),
         ),
       ),
-    ),
-  );
+    );
+  }
 }

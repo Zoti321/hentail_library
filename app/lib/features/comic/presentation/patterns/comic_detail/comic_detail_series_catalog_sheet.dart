@@ -23,7 +23,7 @@ abstract final class ComicDetailSeriesCatalogSheet {
     required ValueChanged<int> onSelectIndex,
   }) {
     final double itemGap = m3e.menuTheme.itemGap;
-    return overlayRouteScope(
+    return OverlayRouteScope(
       scope: scope,
       child: M3ETheme(
         data: m3e,

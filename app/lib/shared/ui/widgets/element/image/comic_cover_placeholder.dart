@@ -20,56 +20,48 @@ class ComicCoverPlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final double resolvedIconSize = iconSize ?? 40;
     return switch (variant) {
-      ComicCoverPlaceholderVariant.card => _buildCard(colorScheme),
-      ComicCoverPlaceholderVariant.detail => _buildDetail(colorScheme),
-    };
-  }
-
-  Widget _buildCard(ColorScheme colorScheme) {
-    return switch (kind) {
-      ComicCoverPlaceholderKind.loading => ColoredBox(
-        color: colorScheme.surfaceContainerHighest,
-      ),
-      ComicCoverPlaceholderKind.noCover => ColoredBox(
-        color: colorScheme.surfaceContainerHigh,
-        child: Center(
+      ComicCoverPlaceholderVariant.card => switch (kind) {
+        ComicCoverPlaceholderKind.loading => ColoredBox(
+          color: colorScheme.surfaceContainerHighest,
+        ),
+        ComicCoverPlaceholderKind.noCover => ColoredBox(
+          color: colorScheme.surfaceContainerHigh,
+          child: Center(
+            child: Icon(
+              LucideIcons.imageOff,
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ),
+        ComicCoverPlaceholderKind.error => ColoredBox(
+          color: colorScheme.surfaceContainerHigh,
+          child: Center(
+            child: Icon(
+              LucideIcons.circleAlert,
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ),
+      },
+      ComicCoverPlaceholderVariant.detail => switch (kind) {
+        ComicCoverPlaceholderKind.loading => const SizedBox.expand(),
+        ComicCoverPlaceholderKind.noCover => Center(
           child: Icon(
             LucideIcons.imageOff,
             color: colorScheme.onSurfaceVariant,
+            size: resolvedIconSize,
           ),
         ),
-      ),
-      ComicCoverPlaceholderKind.error => ColoredBox(
-        color: colorScheme.surfaceContainerHigh,
-        child: Center(
+        ComicCoverPlaceholderKind.error => Center(
           child: Icon(
             LucideIcons.circleAlert,
             color: colorScheme.onSurfaceVariant,
+            size: resolvedIconSize,
           ),
         ),
-      ),
-    };
-  }
-
-  Widget _buildDetail(ColorScheme colorScheme) {
-    final double resolvedIconSize = iconSize ?? 40;
-    return switch (kind) {
-      ComicCoverPlaceholderKind.loading => const SizedBox.expand(),
-      ComicCoverPlaceholderKind.noCover => Center(
-        child: Icon(
-          LucideIcons.imageOff,
-          color: colorScheme.onSurfaceVariant,
-          size: resolvedIconSize,
-        ),
-      ),
-      ComicCoverPlaceholderKind.error => Center(
-        child: Icon(
-          LucideIcons.circleAlert,
-          color: colorScheme.onSurfaceVariant,
-          size: resolvedIconSize,
-        ),
-      ),
+      },
     };
   }
 }

@@ -4,6 +4,9 @@ import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/shared/ui/widgets/pagination/pagination_metrics.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
+export 'package:hentai_library/shared/ui/widgets/pagination/pagination_ellipsis_slot.dart';
+export 'package:hentai_library/shared/ui/widgets/pagination/pagination_empty_slot.dart';
+
 /// Single page number control in the standard pagination strip.
 class PaginationPageButton extends StatelessWidget {
   const PaginationPageButton({
@@ -71,35 +74,6 @@ class PaginationPageButton extends StatelessWidget {
           );
         },
       ),
-    );
-  }
-}
-
-/// Ellipsis slot matching [PaginationPageButton] footprint.
-class PaginationEllipsisSlot extends StatelessWidget {
-  const PaginationEllipsisSlot({super.key, required this.style});
-
-  final TextStyle? style;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: PaginationMetrics.pageButtonSlotWidth,
-      height: PaginationMetrics.pageButtonSlotWidth,
-      child: Center(child: Text('…', style: style)),
-    );
-  }
-}
-
-/// Invisible slot reserved for stable strip width.
-class PaginationEmptySlot extends StatelessWidget {
-  const PaginationEmptySlot({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: PaginationMetrics.pageButtonSlotWidth,
-      height: PaginationMetrics.pageButtonSlotWidth,
     );
   }
 }

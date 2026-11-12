@@ -26,7 +26,7 @@ abstract final class LibraryFilterSortSheet {
     );
     final M3EThemeData m3e = withAppFontFamily(M3ETheme.of(context));
     final String title = l10n.libraryFilterSortTooltip;
-    final Widget body = overlayRouteScope(
+    final Widget body = OverlayRouteScope(
       scope: scope,
       child: M3ETheme(data: m3e, child: const LibraryFilterSortContent()),
     );

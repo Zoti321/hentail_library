@@ -59,6 +59,11 @@ class AppComicImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Widget errorWidget =
+        errorPlaceholder ?? placeholder ?? const SizedBox.expand();
+    final Widget loadingWidget =
+        loadingPlaceholder ?? placeholder ?? const SizedBox.expand();
+
     if (useReaderImageCache) {
       final ReaderComicImageProviderBuilder? buildProvider =
           readerImageProviderBuilder;
@@ -71,15 +76,21 @@ class AppComicImage extends StatelessWidget {
               cacheHeight: cacheHeight,
             );
       if (provider == null) {
-        return _buildErrorPlaceholder();
+        return errorWidget;
       }
-      return _buildExtendedImage(provider);
+      return ExtendedImage(
+        image: provider,
+        fit: fit,
+        alignment: alignment,
+        filterQuality: filterQuality,
+        gaplessPlayback: gaplessPlayback,
+        loadStateChanged: _loadStateChanged(errorWidget, loadingWidget),
+      );
     }
 
     final Uint8List? bytes = memoryBytes;
 
     if (bytes != null && bytes.isNotEmpty) {
-      final Widget fallback = _buildErrorPlaceholder();
       return ExtendedImage.memory(
         bytes,
         fit: fit,
@@ -88,15 +99,14 @@ class AppComicImage extends StatelessWidget {
         cacheHeight: cacheHeight,
         filterQuality: filterQuality,
         gaplessPlayback: gaplessPlayback,
-        loadStateChanged: _loadStateChanged(fallback),
+        loadStateChanged: _loadStateChanged(errorWidget, loadingWidget),
       );
     }
 
     final String? resolvedPath = filePath;
     if (resolvedPath == null || resolvedPath.trim().isEmpty) {
-      return _buildErrorPlaceholder();
+      return errorWidget;
     }
-    final Widget fallback = _buildErrorPlaceholder();
     return ExtendedImage.file(
       File(resolvedPath),
       fit: fit,
@@ -105,25 +115,14 @@ class AppComicImage extends StatelessWidget {
       cacheHeight: cacheHeight,
       filterQuality: filterQuality,
       gaplessPlayback: gaplessPlayback,
-      loadStateChanged: _loadStateChanged(fallback),
-    );
-  }
-
-  Widget _buildExtendedImage(ImageProvider<Object> provider) {
-    final Widget fallback = _buildErrorPlaceholder();
-    return ExtendedImage(
-      image: provider,
-      fit: fit,
-      alignment: alignment,
-      filterQuality: filterQuality,
-      gaplessPlayback: gaplessPlayback,
-      loadStateChanged: _loadStateChanged(fallback),
+      loadStateChanged: _loadStateChanged(errorWidget, loadingWidget),
     );
   }
 
   /// [gaplessPlayback] 时不替换 loading 占位，避免 Hero 落地瞬间闪一下。
   Widget? Function(ExtendedImageState state) _loadStateChanged(
     Widget fallback,
+    Widget loading,
   ) {
     return (ExtendedImageState state) {
       if (state.extendedImageLoadState == LoadState.failed) {
@@ -134,7 +133,7 @@ class AppComicImage extends StatelessWidget {
         if (gaplessPlayback) {
           return null;
         }
-        return _buildLoadingPlaceholder();
+        return loading;
       }
       if (state.extendedImageLoadState == LoadState.completed) {
         final ValueChanged<Size>? reportSize = onImageSize;
@@ -152,13 +151,5 @@ class AppComicImage extends StatelessWidget {
       }
       return null;
     };
-  }
-
-  Widget _buildLoadingPlaceholder() {
-    return loadingPlaceholder ?? placeholder ?? const SizedBox.expand();
-  }
-
-  Widget _buildErrorPlaceholder() {
-    return errorPlaceholder ?? placeholder ?? const SizedBox.expand();
   }
 }

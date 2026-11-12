@@ -79,31 +79,24 @@ class _AdaptiveComicCoverState extends State<AdaptiveComicCover> {
 
   @override
   Widget build(BuildContext context) {
-    return _wrapChrome(
-      context,
-      AspectRatio(
-        aspectRatio: widget.containerAspectRatio,
-        child: ColoredBox(
-          color: _resolveBackgroundColor(context),
-          child: AppComicImage(
-            memoryBytes: widget.coverDisplay?.memoryBytes,
-            filePath: widget.coverDisplay?.filePath,
-            fit: _resolvedFit,
-            filterQuality: widget.filterQuality,
-            gaplessPlayback: widget.gaplessPlayback,
-            placeholder: widget.placeholder,
-            errorPlaceholder: widget.errorPlaceholder ?? widget.placeholder,
-            onDecodeError: widget.onDecodeError,
-            onImageSize: _onImageSize,
-          ),
+    final BorderRadius? borderRadius = widget.clipBorderRadius;
+    Widget result = AspectRatio(
+      aspectRatio: widget.containerAspectRatio,
+      child: ColoredBox(
+        color: _resolveBackgroundColor(context),
+        child: AppComicImage(
+          memoryBytes: widget.coverDisplay?.memoryBytes,
+          filePath: widget.coverDisplay?.filePath,
+          fit: _resolvedFit,
+          filterQuality: widget.filterQuality,
+          gaplessPlayback: widget.gaplessPlayback,
+          placeholder: widget.placeholder,
+          errorPlaceholder: widget.errorPlaceholder ?? widget.placeholder,
+          onDecodeError: widget.onDecodeError,
+          onImageSize: _onImageSize,
         ),
       ),
     );
-  }
-
-  Widget _wrapChrome(BuildContext context, Widget child) {
-    final BorderRadius? borderRadius = widget.clipBorderRadius;
-    Widget result = child;
     if (borderRadius != null) {
       result = ClipRRect(borderRadius: borderRadius, child: result);
     }

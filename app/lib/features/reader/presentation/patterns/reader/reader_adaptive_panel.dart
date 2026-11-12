@@ -41,7 +41,7 @@ abstract final class ReaderAdaptivePanel {
   }) {
     final double viewportWidth = MediaQuery.sizeOf(context).width;
     final M3EThemeData m3e = M3ETheme.of(context);
-    final Widget scopedBody = overlayRouteScope(
+    final Widget scopedBody = OverlayRouteScope(
       scope: OverlayRouteScopeSnapshot.capture(context),
       child: body,
     );

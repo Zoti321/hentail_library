@@ -27,7 +27,7 @@ Future<void> openLabReader(
       context,
       transitionType: SharedAxisTransitionType.scaled,
       builder: (BuildContext routeContext) {
-        return overlayRouteScope(
+        return OverlayRouteScope(
           scope: scope,
           child: ReaderPageLabHost(
             preview: data,

@@ -24,4 +24,3 @@ class SplitDragScope extends InheritedWidget {
     return color != oldWidget.color || radius != oldWidget.radius;
   }
 }
-

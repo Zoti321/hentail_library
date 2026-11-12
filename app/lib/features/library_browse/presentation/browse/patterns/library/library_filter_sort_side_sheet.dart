@@ -126,7 +126,7 @@ abstract final class LibraryFilterSortSideSheet {
     final OverlayRouteScopeSnapshot scope = OverlayRouteScopeSnapshot.capture(
       context,
     );
-    final Widget modalBody = overlayRouteScope(
+    final Widget modalBody = OverlayRouteScope(
       scope: scope,
       child: _LibraryFilterSortSideSheetModalBody(
         initialState: state,

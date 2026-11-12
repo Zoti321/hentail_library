@@ -30,7 +30,7 @@ Future<AppColorSchemePreference?> showColorSchemePickerDialog({
   );
   return M3EDialog.show<AppColorSchemePreference>(
     context,
-    dialog: overlayRouteScope(
+    dialog: OverlayRouteScope(
       scope: scope.withM3e(m3e),
       child: _ColorSchemePickerDialog(selected: selected),
     ),

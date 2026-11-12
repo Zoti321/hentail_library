@@ -25,7 +25,7 @@ abstract final class ShellLibraryPickerSheet {
       initialValue: M3EBottomSheetValue.collapsed,
       theme: m3e.bottomSheetTheme,
       builder: (BuildContext sheetContext) {
-        return overlayRouteScope(
+        return OverlayRouteScope(
           scope: scope,
           child: M3ETheme(
             data: m3e,
