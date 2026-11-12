@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -58,6 +60,51 @@ Future<void> _pumpField(
 }
 
 void main() {
+  testWidgets('候选加载失败后重试，在原浮层更新并保留焦点', (tester) async {
+    final first = Completer<List<SmartFacetMatchCandidate>>();
+    final second = Completer<List<SmartFacetMatchCandidate>>();
+    var attempts = 0;
+    await pumpApp(
+      tester,
+      overrides: [
+        authorsSmartForComicMetadataFormProvider(_scope).overrideWith((ref) {
+          attempts++;
+          return attempts == 1 ? first.future : second.future;
+        }),
+      ],
+      home: Center(
+        child: SizedBox(
+          width: 360,
+          child: LibraryFacetMultiSelectField(
+            kind: NamedFacetFormKind.author,
+            label: '作者',
+            selectedNames: const [],
+            onAdd: (_) {},
+            onRemove: (_) {},
+            scope: _scope,
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.byType(EditableText));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    first.completeError(StateError('unavailable'));
+    await tester.pumpAndSettle();
+    expect(find.text('作者列表加载失败'), findsOneWidget);
+    await tester.tap(find.text('重试'));
+    await tester.pump();
+    second.complete(_candidates);
+    await tester.pumpAndSettle();
+    expect(attempts, 2);
+    expect(find.text('深海'), findsOneWidget);
+    expect(
+      tester.widget<EditableText>(find.byType(EditableText)).focusNode.hasFocus,
+      isTrue,
+    );
+  });
+
   testWidgets('渲染已有 chip 并从候选浮层回传 onAdd', (WidgetTester tester) async {
     final List<String> selected = <String>['已有作者'];
     await _pumpField(

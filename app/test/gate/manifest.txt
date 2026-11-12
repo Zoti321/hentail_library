@@ -123,3 +123,6 @@ test/infrastructure/logging/diagnostic_logging_test.dart
 test/features/bootstrap/presentation/routing/shared_axis_route_page_test.dart
 test/features/bootstrap/presentation/routing/desktop_page_transition_test.dart
 test/features/app_settings/presentation/mappers/app_font_spec_test.dart
+
+test/shared/ui/widgets/feedback/app_snackbar_test.dart
+test/md3e/widgetbook_design_system_test.dart

@@ -1,115 +1,126 @@
 import 'dart:io';
 
+import 'package:analyzer/dart/analysis/utilities.dart';
+import 'package:analyzer/dart/ast/ast.dart';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 
+import '../architecture/dart_dependency_graph.dart';
 import '../gate/import_boundary_rules.dart';
 import '../gate/lib_layout_scan_helpers.dart';
 
-/// Design System 层出边门禁（ADR-0044 / #495 S0）。
-///
-/// 零允许清单：本层从第一天起即零例外。
-const String _layerRoot = 'design-system';
-
-/// 严禁的出边目标前缀（业务、DI、数据与 `shared/ui` 复合层）。
-const List<String> _forbiddenTargetPrefixes = <String>[
-  'features/',
-  'shared/domain/',
-  'shared/presentation/providers/',
-  'infrastructure/',
-  'shared/ui/',
-];
-
-/// 唯一允许的层外依赖前缀。
-const List<String> _allowedTargetPrefixes = <String>['core/'];
-
-final RegExp _layerEdgeRe = RegExp(
-  r"^\s*(?:import|export)\s+'([^']+)'",
-  multiLine: true,
-);
-
-/// 解析一条 import/export 到 lib 相对 POSIX 路径；非本仓包返回 null。
-String? resolveLayerTarget(String uri, String sourceRel) {
-  const String packagePrefix = 'package:hentai_library/';
-  if (uri.startsWith(packagePrefix)) {
-    return p.posix.normalize(uri.substring(packagePrefix.length));
-  }
-  if (uri.contains(':')) {
-    return null;
-  }
-  return p.posix.normalize(p.posix.join(p.posix.dirname(sourceRel), uri));
-}
-
-typedef _Edge = ({String rel, String uri, String? target});
+// UI libraries and their complete runtime closure. Flutter SDK internals are
+// framework dependencies; no product, state-management, router or window plugin.
+const designSystemUiPackages = <String>{
+  'animations',
+  'clock',
+  'collection',
+  'cupertino_ui',
+  'dynamic_color',
+  'equatable',
+  'flutter_hooks',
+  'intl',
+  'json_annotation',
+  'lucide_icons_flutter',
+  'material_3_expressive',
+  'material_color_utilities',
+  'material_new_shapes',
+  'material_symbols_icons',
+  'material_ui',
+  'meta',
+  'motor',
+  'path',
+  'pinyin_pro_flutter',
+  'theme_tailor_annotation',
+  'vector_math',
+};
 
 void main() {
-  late Directory libDir;
-  late List<File> layerFiles;
-  late List<_Edge> edges;
+  final lib = Directory('lib').absolute;
+  final layer = Directory('lib/design-system').absolute;
+  final graph = DartDependencyGraph.current();
+  final files = dartFilesUnder(layer).toList();
 
-  setUp(() {
-    libDir = Directory(p.join(Directory.current.path, 'lib'));
-    final Directory layerDir = Directory(p.join(libDir.path, _layerRoot));
-    layerFiles = layerDir.existsSync()
-        ? dartFilesUnder(layerDir).toList()
-        : <File>[];
-    edges = <_Edge>[];
-    for (final File file in layerFiles) {
-      final String rel = libRelativePosixPath(libDir, file);
-      final String source = file.readAsStringSync();
-      for (final RegExpMatch match in _layerEdgeRe.allMatches(source)) {
-        final String uri = match.group(1)!;
-        edges.add((rel: rel, uri: uri, target: resolveLayerTarget(uri, rel)));
-      }
-    }
-  });
-
-  test('classifyLibPath treats design-system as shared (inherits R13)', () {
-    expect(classifyLibPath('design-system/theme/theme.dart'), 'shared');
+  test('design-system retains shared module classification', () {
     expect(classifyLibPath('design-system/design_system.dart'), 'shared');
   });
 
-  test('no edge into features/ or shared domain·di·data·ui', () {
-    final List<String> offenders = <String>[
-      for (final _Edge edge in edges)
-        if (edge.target != null &&
-            _forbiddenTargetPrefixes.any(edge.target!.startsWith))
-          '${edge.rel} -> ${edge.uri}',
-    ];
-    expect(
-      offenders,
-      isEmpty,
-      reason:
-          'design-system 不得依赖业务层或 shared/ui（ADR-0044）：\n'
-          '${offenders.join('\n')}',
-    );
-  });
+  test(
+    'the full UI dependency graph is portable and excludes application code',
+    () {
+      expect(files, isNotEmpty);
+      expect(
+        portableUiDependencyViolations(
+          graph: graph,
+          roots: files.map((file) => file.uri),
+          appLib: lib.uri,
+          layer: layer.uri,
+          uiPackages: designSystemUiPackages,
+        ),
+        isEmpty,
+      );
+    },
+  );
 
-  test('edges stay inside the layer or core/', () {
-    final List<String> offenders = <String>[
-      for (final _Edge edge in edges)
-        if (edge.target != null &&
-            !edge.target!.startsWith('$_layerRoot/') &&
-            !_allowedTargetPrefixes.any(edge.target!.startsWith))
-          '${edge.rel} -> ${edge.uri}',
-    ];
-    expect(
-      offenders,
-      isEmpty,
-      reason:
-          'design-system 只允许 core/** 与层内路径：\n'
-          '${offenders.join('\n')}',
-    );
-  });
+  test(
+    'one public entry with explicit symbols, no re-export compatibility paths',
+    () {
+      final entry = File('lib/design-system/design_system.dart').absolute;
+      final unit = parseString(content: entry.readAsStringSync()).unit;
+      expect(unit.declarations, isEmpty);
+      for (final directive in unit.directives.whereType<ExportDirective>()) {
+        expect(directive.combinators.whereType<ShowCombinator>(), hasLength(1));
+        expect(
+          graph.resolve(entry.uri, directive.uri.stringValue!).toString(),
+          startsWith(layer.uri.toString()),
+        );
+      }
+      final offenders = <String>[];
+      for (final file in files.where(
+        (file) => file.absolute.uri != entry.uri,
+      )) {
+        for (final dependency in graph.directives(file.uri)) {
+          if (graph.resolve(file.uri, dependency) == entry.uri) {
+            offenders.add('${file.path} imports public barrel');
+          }
+        }
+        final unit = parseString(
+          content: file.readAsStringSync(),
+          throwIfDiagnostics: false,
+        ).unit;
+        for (final directive in unit.directives.whereType<ExportDirective>()) {
+          // Calendar's material_ui localization type is deliberately selected.
+          if (directive.uri.stringValue !=
+              'package:material_ui/material_ui.dart') {
+            offenders.add(file.path);
+          }
+        }
+      }
+      expect(offenders, isEmpty);
+    },
+  );
 
-  test('layer files are not export-only shims', () {
-    final List<String> offenders = <String>[
-      for (final File file in layerFiles)
-        if (libRelativePosixPath(libDir, file) !=
-                '$_layerRoot/design_system.dart' &&
-            isStranglerExportOnlyShim(file.readAsStringSync()))
-          libRelativePosixPath(libDir, file),
-    ];
-    expect(offenders, isEmpty, reason: '删除 export-only shim：$offenders');
+  test('production, tests and Widgetbook consume only the public entry', () {
+    final offenders = <String>[];
+    final entry = File('lib/design-system/design_system.dart').absolute.uri;
+    for (final folder in [
+      'lib',
+      'test',
+      'widgetbook',
+      'integration_test',
+      'tool',
+    ]) {
+      for (final file in dartFilesUnder(Directory(folder).absolute)) {
+        if (p.isWithin(layer.path, file.absolute.path)) continue;
+        for (final dependency in graph.directives(file.uri)) {
+          final target = graph.resolve(file.uri, dependency);
+          if (target.toString().startsWith(layer.uri.toString()) &&
+              target != entry) {
+            offenders.add('${file.path} -> $dependency');
+          }
+        }
+      }
+    }
+    expect(offenders, isEmpty);
   });
 }
