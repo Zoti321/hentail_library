@@ -11,7 +11,7 @@ class ContentSection extends StatelessWidget {
     this.description,
     this.padding = const EdgeInsets.all(16),
     this.titleTrailing,
-    // Single-field ctor: public `child` maps to private storage (API stays `child:`).
+    // 公开构造参数 child 需映射到两套私有字段（_children/_child）。
     // ignore: prefer_initializing_formals
   }) : _child = child,
        _children = null;
@@ -22,6 +22,7 @@ class ContentSection extends StatelessWidget {
     required List<Widget> children,
     this.description,
     this.titleTrailing,
+    // 公开构造参数 children 需映射到两套私有字段（_children/_child）。
     // ignore: prefer_initializing_formals
   }) : _children = children,
        _child = null,

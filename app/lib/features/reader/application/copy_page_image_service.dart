@@ -32,10 +32,13 @@ class CopyPageImageService {
         pageIndex: archivePageIndex,
       );
     } on Object catch (error, stackTrace) {
-      throw CopyPageImageException.loadFailed(
-        archivePageIndex: archivePageIndex,
-        cause: error,
-        stackTrace: stackTrace,
+      Error.throwWithStackTrace(
+        CopyPageImageException.loadFailed(
+          archivePageIndex: archivePageIndex,
+          cause: error,
+          stackTrace: stackTrace,
+        ),
+        stackTrace,
       );
     }
     if (sourceBytes == null || sourceBytes.isEmpty) {
@@ -49,20 +52,26 @@ class CopyPageImageService {
     try {
       pngBytes = await _encodePng(sourceBytes);
     } on Object catch (error, stackTrace) {
-      throw CopyPageImageException.encodeFailed(
-        archivePageIndex: archivePageIndex,
-        cause: error,
-        stackTrace: stackTrace,
+      Error.throwWithStackTrace(
+        CopyPageImageException.encodeFailed(
+          archivePageIndex: archivePageIndex,
+          cause: error,
+          stackTrace: stackTrace,
+        ),
+        stackTrace,
       );
     }
 
     try {
       await _clipboardImage.writePng(pngBytes);
     } on Object catch (error, stackTrace) {
-      throw CopyPageImageException.clipboardWriteFailed(
-        archivePageIndex: archivePageIndex,
-        cause: error,
-        stackTrace: stackTrace,
+      Error.throwWithStackTrace(
+        CopyPageImageException.clipboardWriteFailed(
+          archivePageIndex: archivePageIndex,
+          cause: error,
+          stackTrace: stackTrace,
+        ),
+        stackTrace,
       );
     }
   }

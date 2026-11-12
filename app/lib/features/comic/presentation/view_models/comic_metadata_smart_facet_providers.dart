@@ -22,7 +22,7 @@ final authorsSmartForComicMetadataFormProvider = FutureProvider.autoDispose
     .family<List<SmartFacetMatchCandidate>, ComicMetadataSmartFacetScope>((
       Ref ref,
       ComicMetadataSmartFacetScope scope,
-    ) async {
+    ) {
       return _rankFacet(
         ref: ref,
         scope: scope,
@@ -35,7 +35,7 @@ final tagsSmartForComicMetadataFormProvider = FutureProvider.autoDispose
     .family<List<SmartFacetMatchCandidate>, ComicMetadataSmartFacetScope>((
       Ref ref,
       ComicMetadataSmartFacetScope scope,
-    ) async {
+    ) {
       return _rankFacet(ref: ref, scope: scope, kind: NamedFacetFormKind.tag);
     });
 
@@ -44,7 +44,7 @@ final parodiesSmartForComicMetadataFormProvider = FutureProvider.autoDispose
     .family<List<SmartFacetMatchCandidate>, ComicMetadataSmartFacetScope>((
       Ref ref,
       ComicMetadataSmartFacetScope scope,
-    ) async {
+    ) {
       return _rankFacet(
         ref: ref,
         scope: scope,
@@ -57,7 +57,7 @@ final charactersSmartForComicMetadataFormProvider = FutureProvider.autoDispose
     .family<List<SmartFacetMatchCandidate>, ComicMetadataSmartFacetScope>((
       Ref ref,
       ComicMetadataSmartFacetScope scope,
-    ) async {
+    ) {
       return _rankFacet(
         ref: ref,
         scope: scope,

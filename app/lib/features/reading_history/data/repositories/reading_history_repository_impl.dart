@@ -30,7 +30,10 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
       if (e is AppException) {
         rethrow;
       }
-      throw AppException('记录阅读进度失败', cause: e, stackTrace: st);
+      Error.throwWithStackTrace(
+        AppException('记录阅读进度失败', cause: e, stackTrace: st),
+        st,
+      );
     }
   }
 
@@ -99,7 +102,10 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
       if (e is AppException) {
         rethrow;
       }
-      throw AppException('删除阅读历史失败', cause: e, stackTrace: st);
+      Error.throwWithStackTrace(
+        AppException('删除阅读历史失败', cause: e, stackTrace: st),
+        st,
+      );
     }
   }
 
@@ -119,7 +125,10 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
       if (e is AppException) {
         rethrow;
       }
-      throw AppException('批量删除阅读历史失败', cause: e, stackTrace: st);
+      Error.throwWithStackTrace(
+        AppException('批量删除阅读历史失败', cause: e, stackTrace: st),
+        st,
+      );
     }
   }
 
@@ -135,7 +144,10 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
       if (e is AppException) {
         rethrow;
       }
-      throw AppException('清空阅读历史失败', cause: e, stackTrace: st);
+      Error.throwWithStackTrace(
+        AppException('清空阅读历史失败', cause: e, stackTrace: st),
+        st,
+      );
     }
   }
 }

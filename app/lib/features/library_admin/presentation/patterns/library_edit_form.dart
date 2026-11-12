@@ -70,7 +70,8 @@ class _LibraryEditFormState extends State<LibraryEditForm> {
     super.didUpdateWidget(oldWidget);
     final LibraryFormValidation? validation = widget.validation;
     if (validation != null && validation != oldWidget.validation) {
-      setState(() => _tab = _tabForValidation(validation));
+      // didUpdateWidget 后必然 build，无需 setState。
+      _tab = _tabForValidation(validation);
     }
   }
 

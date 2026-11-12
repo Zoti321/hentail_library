@@ -25,13 +25,13 @@ class AppUpdateService {
   final Dio _dio;
 
   Future<AppReleaseInfo?> fetchLatestStableRelease() async {
-    final Response<dynamic> response = await _dio.get<dynamic>(
+    final Response<Object?> response = await _dio.get<Object?>(
       AppUpdateConstants.releasesApiUrl,
       queryParameters: <String, dynamic>{'per_page': 30},
     );
     final List<dynamic> rawReleases = response.data as List<dynamic>;
     AppReleaseInfo? latestRelease;
-    for (final dynamic rawRelease in rawReleases) {
+    for (final Object? rawRelease in rawReleases) {
       if (rawRelease is! Map<String, dynamic>) {
         continue;
       }
@@ -159,7 +159,7 @@ class AppUpdateService {
       return <AppReleaseAsset>[];
     }
     final List<AppReleaseAsset> assets = <AppReleaseAsset>[];
-    for (final dynamic rawAsset in rawAssets) {
+    for (final Object? rawAsset in rawAssets) {
       if (rawAsset is! Map<String, dynamic>) {
         continue;
       }

@@ -67,30 +67,28 @@ class ScanLibraryController extends _$ScanLibraryController {
     );
 
     final SyncLibraryUseCase sync = ref.read(syncLibraryUseCaseProvider);
-    _future =
-        () async {
-              await sync.run(
-                mode: mode,
-                syncAll: syncAll,
-                targetLibraryId: targetLibraryId,
-                isCancelled: () => _cancelled,
-                onProgress: (SyncLibraryProgress progress) {
-                  state = state.copyWith(progress: progress);
-                },
-                promptStorageAccess: promptStorageAccess,
-              );
-            }()
-            .then((_) {
-              state = state.copyWith(running: false);
-            })
-            .catchError((Object e, StackTrace st) {
-              logError(AppLog.ui('scan'), '漫画库同步失败', e, st);
-              final String message = caughtErrorMessage(
-                e,
-                fallbackMessage: '漫画库同步失败',
-              );
-              state = state.copyWith(running: false, error: message);
-            });
+    _future = () async {
+      try {
+        await sync.run(
+          mode: mode,
+          syncAll: syncAll,
+          targetLibraryId: targetLibraryId,
+          isCancelled: () => _cancelled,
+          onProgress: (SyncLibraryProgress progress) {
+            state = state.copyWith(progress: progress);
+          },
+          promptStorageAccess: promptStorageAccess,
+        );
+        state = state.copyWith(running: false);
+      } on Object catch (e, st) {
+        logError(AppLog.ui('scan'), '漫画库同步失败', e, st);
+        final String message = caughtErrorMessage(
+          e,
+          fallbackMessage: '漫画库同步失败',
+        );
+        state = state.copyWith(running: false, error: message);
+      }
+    }();
 
     return _future!;
   }

@@ -57,7 +57,9 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
     );
     final List<ReaderPageImageData> imageList = switch (resolvedPages) {
       ReaderViewportPagesReady(:final List<ReaderPageImageData> pages) => pages,
-      _ => const <ReaderPageImageData>[],
+      ReaderViewportPagesLoading() ||
+      ReaderViewportPagesError() ||
+      ReaderViewportPagesEmpty() => const <ReaderPageImageData>[],
     };
 
     final ReaderViewModel controller = ref.read(

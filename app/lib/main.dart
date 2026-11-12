@@ -19,8 +19,8 @@ import 'package:hentai_library/features/bootstrap/presentation/views/app.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:window_manager/window_manager.dart';
 
-Future<void> main() async {
-  runZonedGuarded(() async {
+void main() {
+  runZonedGuarded(() {
     WidgetsFlutterBinding.ensureInitialized();
     // Paint a first frame immediately so Android splash is not stuck while
     // loading the Rust cdylib (can be large / slow on emulators).

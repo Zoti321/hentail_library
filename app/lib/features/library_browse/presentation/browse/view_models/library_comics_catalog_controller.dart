@@ -70,7 +70,7 @@ class LibraryComicsCatalogController extends _$LibraryComicsCatalogController {
     );
   }
 
-  Future<PagedResult<ComicBrowseViewObject>> _fetchPage() async {
+  Future<PagedResult<ComicBrowseViewObject>> _fetchPage() {
     final LibraryComicFilter filter = ref.read(libraryComicFilterQueryProvider);
     final LibraryComicFiltersState filters =
         ref.read(libraryComicFiltersProvider).value ??

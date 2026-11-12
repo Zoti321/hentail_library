@@ -43,7 +43,8 @@ class _ComicDetailAgeRestrictionChipSlotState
       _hideTimer?.cancel();
       _hideTimer = null;
       if (!_rendered) {
-        setState(() => _rendered = true);
+        // didUpdateWidget 后必然 build，无需 setState。
+        _rendered = true;
       }
       return;
     }

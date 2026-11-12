@@ -7,7 +7,7 @@ import 'package:hentai_library/features/named_metadata/public/di/named_metadata_
 part 'library_distinct_metadata_providers.g.dart';
 
 @Riverpod(keepAlive: true)
-Future<List<String>> libraryDistinctParodies(Ref ref) async {
+Future<List<String>> libraryDistinctParodies(Ref ref) {
   ref.watch(
     domainEventRevisionsProvider.select(
       (DomainEventRevisionsState s) => s.dictionaryRevision,
@@ -18,7 +18,7 @@ Future<List<String>> libraryDistinctParodies(Ref ref) async {
 }
 
 @Riverpod(keepAlive: true)
-Future<List<String>> libraryDistinctCharacters(Ref ref) async {
+Future<List<String>> libraryDistinctCharacters(Ref ref) {
   ref.watch(
     domainEventRevisionsProvider.select(
       (DomainEventRevisionsState s) => s.dictionaryRevision,

@@ -136,6 +136,7 @@ ThemeData materialThemeFromM3e(
     pageTransitionsTheme: const PageTransitionsTheme(
       builders: {
         TargetPlatform.android: FadeUpwardsPageTransitionsBuilder(),
+        TargetPlatform.fuchsia: FadeUpwardsPageTransitionsBuilder(),
         TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
         TargetPlatform.linux: DesktopFadeThroughPageTransitionsBuilder(),
         TargetPlatform.macOS: DesktopFadeThroughPageTransitionsBuilder(),

@@ -39,7 +39,8 @@ class _ExpressiveLibraryScrollToTopButtonState
     if (oldWidget.scrollController != widget.scrollController) {
       oldWidget.scrollController.removeListener(_onScrollOffset);
       widget.scrollController.addListener(_onScrollOffset);
-      _onScrollOffset();
+      // didUpdateWidget 内不直接 setState；等本帧结束再判定阈值。
+      WidgetsBinding.instance.addPostFrameCallback((_) => _onScrollOffset());
     }
   }
 

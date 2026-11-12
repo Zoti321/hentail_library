@@ -1,5 +1,5 @@
 import 'package:hentai_library/shared/data/frb/frb_call_guard.dart';
-import 'package:hentai_library/features/library_admin/data/repositories/flutter_secure_remote_library_credential_store.dart';
+import 'package:hentai_library/features/library_admin/data/repositories/secure_remote_library_credential_store.dart';
 import 'package:hentai_library/features/library_admin/domain/resource_format_category.dart';
 import 'package:hentai_library/features/library_admin/domain/library_sidebar_layout.dart';
 import 'package:hentai_library/features/library_admin/domain/value_objects/scan_interval.dart';
@@ -11,8 +11,7 @@ import 'package:hentai_library/src/rust/api/sync.dart' as rust_sync;
 
 class LibraryRepositoryImpl implements LibraryRepository {
   const LibraryRepositoryImpl({RemoteLibraryCredentialStore? credentials})
-    : _credentials =
-          credentials ?? const FlutterSecureRemoteLibraryCredentialStore();
+    : _credentials = credentials ?? const SecureRemoteLibraryCredentialStore();
 
   final RemoteLibraryCredentialStore _credentials;
 

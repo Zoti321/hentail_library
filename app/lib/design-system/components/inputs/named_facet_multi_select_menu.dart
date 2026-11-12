@@ -72,18 +72,17 @@ class _NamedFacetMultiSelectMenuPanelState<T>
     }
     final int generation = ++_indexBuildGeneration;
     _buildingItems = items;
-    unawaited(
-      buildNamePinyinIndex(names).then((NamePinyinIndex index) {
-        if (!mounted || generation != _indexBuildGeneration) {
-          return;
-        }
-        setState(() {
-          _indexedItems = items;
-          _pinyinIndex = index;
-          _buildingItems = null;
-        });
-      }),
-    );
+    unawaited(() async {
+      final NamePinyinIndex index = await buildNamePinyinIndex(names);
+      if (!mounted || generation != _indexBuildGeneration) {
+        return;
+      }
+      setState(() {
+        _indexedItems = items;
+        _pinyinIndex = index;
+        _buildingItems = null;
+      });
+    }());
   }
 
   @override

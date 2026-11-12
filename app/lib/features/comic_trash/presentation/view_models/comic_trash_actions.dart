@@ -30,7 +30,7 @@ class ComicTrashActions extends _$ComicTrashActions {
     await _service.restoreComics(comicIds);
   }
 
-  Future<int> restoreAll() async {
+  Future<int> restoreAll() {
     _ensureLibraryIdle();
     return _service.restoreAll();
   }

@@ -70,6 +70,7 @@ abstract class AppSetting with _$AppSetting {
 
     /// Default library display target：进入库浏览时默认 Comics / Series。
     @Default(LibraryDisplayTarget.comics)
+    // fromJson/toJson 需落在 factory 参数上，非 target 注解位置。
     // ignore: invalid_annotation_target
     @JsonKey(
       fromJson: defaultLibraryDisplayTargetFromJson,

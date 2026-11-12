@@ -60,7 +60,7 @@ Future<ReaderPagePayload> comicReaderPage(
 }
 
 @Riverpod()
-Future<int?> readingProgress(Ref ref, {required String comicId}) async {
+Future<int?> readingProgress(Ref ref, {required String comicId}) {
   return ref
       .read(readingHistoryCommandPortProvider)
       .readResumePageIndex(comicId);

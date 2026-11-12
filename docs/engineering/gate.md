@@ -46,14 +46,46 @@ cd app && dart run dart_code_linter:metrics analyze lib \
 
 | 项 | 数量 | 说明 |
 |----|------|------|
-| 启用规则 | 31 | 存量违规为 0 的规则 + 已清理的规则 |
+| 启用规则 | 51 | 已对齐 DCL `recommended` 中与仓库约定兼容的部分 |
 | 组件规则 | 3 | `prefer-single-widget-per-file`、`prefer-extracting-callbacks`、`avoid-returning-widgets` |
 | `rules-exclude` 棘轮 | 129 | 仍违反上述三条组件规则的历史文件（**只许删，不许加**） |
-| 存量清理 | 41 文件 | `metrics fix` + `dart format` 修掉 `prefer-const-border-radius`、`prefer-correct-edge-insets-constructor`、`prefer-first` 等 |
+| 存量违规 | 0 | `dart-lint` 全绿；清理明细见下 |
 
-### 未启用（存量债，清理后再加）
+### 本轮清偿（DCL recommended 对齐）
 
-按 2026-11-12 实测违规数排序（`lib/`）：`prefer-dot-shorthands` 1953、`format-comment` 1562、`member-ordering` 1163、`newline-before-return` 1028、`prefer-static-class` 993、`arguments-ordering` 783、`no-magic-number` 525、`avoid-non-ascii-symbols` 361（与中文注释冲突，**不要启用**）、`prefer-moving-to-variable` 279、`avoid-ignoring-return-values` 244、`prefer-match-file-name` 202、`avoid-non-null-assertion` 174、`no-equal-arguments` 151、`prefer-correct-identifier-length` 115、`avoid-late-keyword` 73、`no-empty-block` 37、`avoid-nested-conditional-expressions` 34、`prefer-iterable-of` 34、`prefer-named-record-fields` 28、`avoid-passing-async-when-sync-expected` 26、`prefer-trailing-comma` 24（与 `dart format` 冲突）、`avoid-substring` 20、`avoid-unused-parameters` 19、`no-object-declaration` 16、`avoid-redundant-async` 12、`avoid-throw-in-catch-block` 11、`avoid-dynamic` 6、`avoid-non-exhaustive-switch-on-sealed-classes` 5、`avoid-unnecessary-setstate` 4、`prefer-async-await` 3、`use-setstate-synchronously` 2、`avoid-global-state` 2、`avoid-missing-enum-constant-in-map` 1、`prefer-correct-type-name` 1。
+| 规则 | 原违规 | 处理 |
+|------|--------|------|
+| `prefer-iterable-of` | 34 | `List<T>.from(x)` → `List<T>.of(x)`（15 文件） |
+| `avoid-redundant-async` | 12 | 去掉多余的 `async`（含 `main()` 与 Riverpod provider） |
+| `avoid-throw-in-catch-block` | 11 | `Error.throwWithStackTrace(newErr, st)`，保留原始栈 |
+| `prefer-async-await` | 3 | `.then` / `.catchError` → `try/await` |
+| `avoid-dynamic` | 6 | `dynamic` → `Object?`；元数据编辑页用 `MetadataEditSaveActions` 接口替掉 `dynamic state` |
+| `avoid-non-exhaustive-switch-on-sealed-classes` | 5 | 补齐 `ComicCover*` / `ReaderViewportPages*` 全部分支 |
+| `avoid-unnecessary-setstate` | 4 | `didUpdateWidget` 内改为直接赋值 / `addPostFrameCallback` |
+| `avoid-global-state` | 2 | 测试 seam 用 `// ignore: avoid-global-state`（注释写在 ignore 上一行，DCL 不支持行尾说明） |
+| `use-setstate-synchronously` | 2 | `mounted` 检查后再 `setState` |
+| `avoid-missing-enum-constant-in-map` | 1 | `pageTransitionsTheme` 补 `fuchsia` |
+| `prefer-correct-type-name` | 1 | `FlutterSecure…Store` → `SecureRemoteLibraryCredentialStore`（类名/文件同步改名） |
+| `prefer-commenting-analyzer-ignores` | 2 | 给已有 `ignore` 补说明注释 |
+
+**`metrics fix` 不可信**：DCL 4.4.5 的 `fix` 对重叠替换处理有 bug（会产出 `);  );`、`(l10n.x: l10n.x, …)` 之类不可解析代码）。只允许**单规则**跑、跑完必须 `dart format --output=none --set-exit-if-changed lib` 验证；批量跑一律禁止。
+
+### 刻意不启用（与仓库约定冲突）
+
+| 规则 | 原因 |
+|------|------|
+| `avoid-non-ascii-symbols` | 中文注释/文案，必然满屏 |
+| `prefer-trailing-comma` | 与 Dart 3.13 `dart format` 互相覆盖（改完再次格式化即复发） |
+| `newline-before-return` | 纯格式 churn；1270 处，且 `metrics fix` 会损坏文件 |
+| `format-comment` | 要求英文句点收尾，中文文档注释不适用 |
+| `prefer-first-or-null` | 与已启用的 `prefer-first` 互斥 |
+| `avoid-banned-imports` / `ban-name` | 需 mandatory 配置，暂不启用 |
+
+### 待清偿（存量债，清理后再加）
+
+按 2026-11-12 实测违规数排序（`lib/`）：`prefer-dot-shorthands` 1953、`member-ordering` 1163（recommended 顺序下 155）、`prefer-static-class` 993、`arguments-ordering` 783、`no-magic-number` 719、`prefer-moving-to-variable` 279、`avoid-ignoring-return-values` 244、`prefer-match-file-name` 202、`avoid-non-null-assertion` 214、`no-equal-arguments` 151、`prefer-correct-identifier-length` 115、`avoid-late-keyword` 73、`no-empty-block` 37、`avoid-nested-conditional-expressions` 34、`prefer-named-record-fields` 28、`avoid-passing-async-when-sync-expected` 26、`avoid-substring` 20、`avoid-unused-parameters` 19、`no-object-declaration` 16。
+
+**指标（metrics）暂不进门禁**：`maintainability-index` 320、`number-of-parameters` 89、`maximum-nesting-level` 15、`cyclomatic-complexity` 10 处超阈，无 baseline 机制，清偿前保持关闭。
 
 **指标（metrics）暂不进门禁**：`maintainability-index` 320、`number-of-parameters` 89、`maximum-nesting-level` 15、`cyclomatic-complexity` 10 处超阈，无 baseline 机制，清偿前保持关闭。
 

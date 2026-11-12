@@ -215,7 +215,8 @@ class ComicCover extends _$ComicCover {
     final ComicCoverSource? previous = switch (state) {
       ComicCoverLoading(:final previous) => previous,
       ComicCoverReady(:final data) => data,
-      _ => null,
+      ComicCoverNoCover() => null,
+      ComicCoverError() => null,
     };
     state = ComicCoverLoading(previous: previous);
     _loadInFlight = true;

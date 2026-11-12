@@ -67,7 +67,9 @@ class DualPageViewport extends HookConsumerWidget {
     );
     final List<ReaderPageImageData> imageList = switch (resolvedPages) {
       ReaderViewportPagesReady(:final List<ReaderPageImageData> pages) => pages,
-      _ => const <ReaderPageImageData>[],
+      ReaderViewportPagesLoading() ||
+      ReaderViewportPagesError() ||
+      ReaderViewportPagesEmpty() => const <ReaderPageImageData>[],
     };
     final int safeTotalPages = totalPages > 0 ? totalPages : 1;
     final int spreadCount = SpreadNavigation.totalSpreads(

@@ -42,7 +42,8 @@ class _LibraryScrollToTopButtonState extends State<LibraryScrollToTopButton> {
     if (oldWidget.scrollController != widget.scrollController) {
       oldWidget.scrollController.removeListener(_onScroll);
       widget.scrollController.addListener(_onScroll);
-      _onScroll();
+      // didUpdateWidget 内不直接 setState；等本帧结束再判定阈值。
+      WidgetsBinding.instance.addPostFrameCallback((_) => _onScroll());
     }
   }
 

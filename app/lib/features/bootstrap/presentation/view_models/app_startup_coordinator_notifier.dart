@@ -22,9 +22,13 @@ class AppStartupCoordinatorNotifier extends _$AppStartupCoordinatorNotifier {
   final bool _scheduleStartupAtIdle = scheduleStartupAtIdleForTests ?? true;
 
   @visibleForTesting
+  // 测试专用可变全局：覆盖启动延迟，无法改为 final。
+  // ignore: avoid-global-state
   static Duration? startupDelayForTests;
 
   @visibleForTesting
+  // 测试专用可变全局：覆盖 idle 调度，无法改为 final。
+  // ignore: avoid-global-state
   static bool? scheduleStartupAtIdleForTests;
 
   @visibleForTesting

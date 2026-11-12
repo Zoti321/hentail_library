@@ -55,10 +55,9 @@ class SyncLibraryFrbAdapter implements SyncLibraryPort {
         }
       }
     } on HentaiErrorDto catch (error, stackTrace) {
-      throw mapFrbError(
-        error,
-        fallbackMessage: '漫画库同步失败',
-        stackTrace: stackTrace,
+      Error.throwWithStackTrace(
+        mapFrbError(error, fallbackMessage: '漫画库同步失败', stackTrace: stackTrace),
+        stackTrace,
       );
     } finally {
       _activeHandle = null;

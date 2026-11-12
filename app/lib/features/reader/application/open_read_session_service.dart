@@ -111,11 +111,14 @@ class OpenReadSessionService {
     } on ReadSessionPageLoadException {
       rethrow;
     } on Object catch (error, stackTrace) {
-      throw ReadSessionPageLoadException.loadFailed(
-        comicId: comic.comicId,
-        path: comic.path,
-        cause: error,
-        stackTrace: stackTrace,
+      Error.throwWithStackTrace(
+        ReadSessionPageLoadException.loadFailed(
+          comicId: comic.comicId,
+          path: comic.path,
+          cause: error,
+          stackTrace: stackTrace,
+        ),
+        stackTrace,
       );
     }
   }
@@ -187,22 +190,28 @@ class OpenReadSessionService {
           await _openPagesUncached(comic).timeout(_openTimeout);
       _openedPages[comicId] = opened;
       return opened;
-    } on TimeoutException {
+    } on TimeoutException catch (_, stackTrace) {
       await _bestEffortClose(comic.comicId);
-      throw ReadSessionPageLoadException.timedOut(
-        comicId: comic.comicId,
-        path: comic.path,
+      Error.throwWithStackTrace(
+        ReadSessionPageLoadException.timedOut(
+          comicId: comic.comicId,
+          path: comic.path,
+        ),
+        stackTrace,
       );
     } on ReadSessionPageLoadException {
       await _bestEffortClose(comic.comicId);
       rethrow;
     } on Object catch (error, stackTrace) {
       await _bestEffortClose(comic.comicId);
-      throw ReadSessionPageLoadException.loadFailed(
-        comicId: comic.comicId,
-        path: comic.path,
-        cause: error,
-        stackTrace: stackTrace,
+      Error.throwWithStackTrace(
+        ReadSessionPageLoadException.loadFailed(
+          comicId: comic.comicId,
+          path: comic.path,
+          cause: error,
+          stackTrace: stackTrace,
+        ),
+        stackTrace,
       );
     }
   }

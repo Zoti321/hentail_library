@@ -77,7 +77,7 @@ class LibrarySeriesCatalogController extends _$LibrarySeriesCatalogController {
     );
   }
 
-  Future<PagedResult<SeriesBrowseViewObject>> _fetchPage() async {
+  Future<PagedResult<SeriesBrowseViewObject>> _fetchPage() {
     final LibrarySeriesFilter filter = ref.read(
       librarySeriesFiltersQueryProvider,
     );

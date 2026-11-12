@@ -3,6 +3,7 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/series/presentation/views/metadata_edit/series_metadata_edit_layout.dart';
 import 'package:hentai_library/shared/ui/patterns/dialog/lab_dialog_presenter.dart';
+import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_actions.dart';
 import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_surface.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -25,7 +26,8 @@ Future<SeriesMetadataEditDraft?> showSeriesMetadataEditLayout({
       ),
       confirmLabel: l10n.commonSave,
       onConfirm: () {
-        final dynamic state = pageKey.currentState;
+        final MetadataEditSaveActions? state =
+            pageKey.currentState as MetadataEditSaveActions?;
         if (state != null) {
           state.saveAndPop();
         }

@@ -101,16 +101,18 @@ class ReaderPrefetchNotifier extends _$ReaderPrefetchNotifier {
     final int generation = bumpGeneration(comicId);
     // Kick the landing/center page before neighbor prefetch contends on the archive.
     final int centerZeroBased = centerPageOneBased.clamp(1, totalPages) - 1;
-    unawaited(
-      ref
-          .read(
-            comicReaderPageProvider(
-              comicId: comicId,
-              pageIndex: centerZeroBased,
-            ).future,
-          )
-          .then<void>((_) {}, onError: (_, StackTrace _) {}),
-    );
+    unawaited(() async {
+      try {
+        await ref.read(
+          comicReaderPageProvider(
+            comicId: comicId,
+            pageIndex: centerZeroBased,
+          ).future,
+        );
+      } on Object {
+        // 预热失败由页面自身错误态处理。
+      }
+    }());
     await ref
         .read(openReadSessionServiceProvider)
         .prefetchPages(
