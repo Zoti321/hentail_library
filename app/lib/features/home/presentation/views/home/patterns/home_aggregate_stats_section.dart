@@ -9,7 +9,6 @@ import 'package:hentai_library/features/home/presentation/patterns/home/reading_
 import 'package:hentai_library/features/home/presentation/views/home/patterns/home_activity_stats_capsule.dart';
 import 'package:hentai_library/features/home/presentation/views/home/patterns/home_bento_stat_card.dart';
 import 'package:hentai_library/features/home/presentation/views/home/patterns/home_page_copy.dart';
-import 'package:hentai_library/features/home/presentation/views/home/patterns/home_nav_shortcut_card.dart';
 import 'package:hentai_library/features/home/presentation/views/home/patterns/home_shortcut_card_colors.dart';
 import 'package:intl/intl.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
@@ -172,8 +171,8 @@ class HomeAggregateStatsSection extends StatelessWidget {
     }
 
     Widget historyCard() {
-      return HomeNavShortcutCard(
-        title: l10n.historyTitle,
+      return HomeBentoStatCard(
+        label: l10n.historyTitle,
         caption: l10n.homeHistoryCardCaption,
         icon: Symbols.history,
         backgroundColor: palette.historyBackground,
@@ -184,13 +183,15 @@ class HomeAggregateStatsSection extends StatelessWidget {
           bottomLeft: Radius.circular(8),
           bottomRight: Radius.circular(20),
         ),
+        layout: HomeBentoStatLayout.shortcut,
+        minHeight: 104,
         onPressed: onOpenHistory!,
       );
     }
 
     Widget trashCard() {
-      return HomeNavShortcutCard(
-        title: l10n.navTrash,
+      return HomeBentoStatCard(
+        label: l10n.navTrash,
         caption: l10n.homeTrashCardCaption,
         icon: Symbols.delete_outline,
         backgroundColor: palette.trashBackground,
@@ -201,6 +202,8 @@ class HomeAggregateStatsSection extends StatelessWidget {
           bottomLeft: Radius.circular(20),
           bottomRight: Radius.circular(8),
         ),
+        layout: HomeBentoStatLayout.shortcut,
+        minHeight: 104,
         onPressed: onOpenTrash!,
       );
     }

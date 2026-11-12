@@ -12,6 +12,7 @@ class SpringReveal extends StatefulWidget {
     required this.visible,
     required this.hiddenOffset,
     required this.child,
+    this.motion = LabMotion.spatialReveal,
   });
 
   final bool visible;
@@ -19,6 +20,9 @@ class SpringReveal extends StatefulWidget {
   /// 隐藏状态下子组件相对原位置的偏移（显示时归零）。
   final Offset hiddenOffset;
   final Widget child;
+
+  /// 驱动显隐的弹簧；默认 M3E 空间弹簧。
+  final Motion motion;
 
   @override
   State<SpringReveal> createState() => _SpringRevealState();
@@ -33,7 +37,7 @@ class _SpringRevealState extends State<SpringReveal>
   void initState() {
     super.initState();
     _controller = SingleMotionController(
-      motion: LabMotion.spatialReveal,
+      motion: widget.motion,
       vsync: this,
       initialValue: widget.visible ? 1 : 0,
     );

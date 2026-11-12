@@ -10,7 +10,7 @@ enum HomeBentoStatLayout {
   /// 原样式：右上标签文案 + 中间大数字 + 底部 caption。
   metric,
 
-  /// 管理入口：右上箭头 + 标题 +「{数字} {单位}」（对齐 [HomeNavShortcutCard]）。
+  /// 管理入口：右上箭头 + 标题 + caption（shortcut 布局）。
   shortcut,
 }
 
