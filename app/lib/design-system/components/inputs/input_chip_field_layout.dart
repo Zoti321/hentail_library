@@ -89,6 +89,33 @@ double inputChipInlineWidth({required TextStyle style, required String text}) {
   return painter.width + kInputChipInlineCaretGap;
 }
 
+/// chip 行 + 内联输入所需的全部布局算术（行高 / 文本上 inset / 内联宽度）。
+///
+/// [NamedFacetMultiSelectField] 与 [TagInputField] 共用，避免两处各算一遍。
+({double rowLineHeight, double textTopInset, double inlineWidth})
+resolveInputChipInlineMetrics({
+  required M3EChipTheme chipTheme,
+  required TextStyle inputStyle,
+  required String text,
+  required bool hasChips,
+}) {
+  final double rowLineHeight = inputChipRowLineHeight(
+    chipTheme: chipTheme,
+    inputStyle: inputStyle,
+    hasChips: hasChips,
+  );
+  return (
+    rowLineHeight: rowLineHeight,
+    textTopInset: hasChips
+        ? inputChipInlineTopInset(
+            rowLineHeight: rowLineHeight,
+            inputStyle: inputStyle,
+          )
+        : 0,
+    inlineWidth: inputChipInlineWidth(style: inputStyle, text: text),
+  );
+}
+
 /// Chip 字段首行与 M3E trailing 槽（固定 [minFieldHeight] + Center）对齐用的上下 inset。
 ({double top, double bottom}) inputChipFieldVerticalInsets({
   required M3ETextFieldTheme fieldTheme,

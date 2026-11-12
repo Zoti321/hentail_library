@@ -88,22 +88,18 @@ class _TagInputFieldState extends State<TagInputField> {
                   TextStyle inputStyle,
                 ) {
                   final M3EChipTheme chipTheme = M3ETheme.of(context).chipTheme;
-                  final double inlineWidth = inputChipInlineWidth(
-                    style: inputStyle,
-                    text: _controller.text,
-                  );
                   final bool hasChips = widget.tags.isNotEmpty;
-                  final double rowLineHeight = inputChipRowLineHeight(
+                  final ({
+                    double rowLineHeight,
+                    double textTopInset,
+                    double inlineWidth,
+                  })
+                  metrics = resolveInputChipInlineMetrics(
                     chipTheme: chipTheme,
                     inputStyle: inputStyle,
+                    text: _controller.text,
                     hasChips: hasChips,
                   );
-                  final double textTopInset = hasChips
-                      ? inputChipInlineTopInset(
-                          rowLineHeight: rowLineHeight,
-                          inputStyle: inputStyle,
-                        )
-                      : 0;
 
                   return InputChipFieldContent(
                     fieldTheme: fieldTheme,
@@ -122,10 +118,10 @@ class _TagInputFieldState extends State<TagInputField> {
                         ),
                     ],
                     inlineField: SizedBox(
-                      width: inlineWidth,
-                      height: rowLineHeight,
+                      width: metrics.inlineWidth,
+                      height: metrics.rowLineHeight,
                       child: Padding(
-                        padding: EdgeInsets.only(top: textTopInset),
+                        padding: EdgeInsets.only(top: metrics.textTopInset),
                         child: CallbackShortcuts(
                           bindings: M3EFocus.editableInputShortcuts(_focusNode),
                           child: EditableText(

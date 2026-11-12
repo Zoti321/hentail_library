@@ -621,10 +621,6 @@ class _NamedFacetMultiSelectFieldState<T>
     _inputFocusNode.requestFocus();
   }
 
-  double _inlineWidth(TextStyle style) {
-    return inputChipInlineWidth(style: style, text: _inputController.text);
-  }
-
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
@@ -691,20 +687,19 @@ class _NamedFacetMultiSelectFieldState<T>
                           ) {
                             final M3EChipTheme chipTheme = M3ETheme.of(context)
                                 .chipTheme;
-                            final double inlineWidth = _inlineWidth(inputStyle);
                             final bool hasChips =
                                 widget.selectedNames.isNotEmpty;
-                            final double rowLineHeight = inputChipRowLineHeight(
+                            final ({
+                              double rowLineHeight,
+                              double textTopInset,
+                              double inlineWidth,
+                            })
+                            metrics = resolveInputChipInlineMetrics(
                               chipTheme: chipTheme,
                               inputStyle: inputStyle,
+                              text: _inputController.text,
                               hasChips: hasChips,
                             );
-                            final double textTopInset = hasChips
-                                ? inputChipInlineTopInset(
-                                    rowLineHeight: rowLineHeight,
-                                    inputStyle: inputStyle,
-                                  )
-                                : 0;
 
                             return InputChipFieldContent(
                               fieldTheme: fieldTheme,
@@ -721,10 +716,12 @@ class _NamedFacetMultiSelectFieldState<T>
                                   ),
                               ],
                               inlineField: SizedBox(
-                                width: inlineWidth,
-                                height: rowLineHeight,
+                                width: metrics.inlineWidth,
+                                height: metrics.rowLineHeight,
                                 child: Padding(
-                                  padding: EdgeInsets.only(top: textTopInset),
+                                  padding: EdgeInsets.only(
+                                    top: metrics.textTopInset,
+                                  ),
                                   child: CallbackShortcuts(
                                     bindings: M3EFocus.editableInputShortcuts(
                                       _inputFocusNode,

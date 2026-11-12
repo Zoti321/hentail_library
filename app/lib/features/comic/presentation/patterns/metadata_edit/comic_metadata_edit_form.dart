@@ -7,10 +7,8 @@ import 'package:hentai_library/features/comic/presentation/patterns/metadata_edi
 import 'package:hentai_library/features/comic/presentation/widgets/comic_language_quick_pick.dart';
 import 'package:hentai_library/features/comic/domain/value_objects/comic_meta_locks.dart';
 import 'package:hentai_library/features/comic/presentation/view_models/comic_metadata_smart_facet_providers.dart';
-import 'package:hentai_library/features/comic/presentation/views/widgets/form/author_library_multi_select_field.dart';
-import 'package:hentai_library/features/comic/presentation/views/widgets/form/character_library_multi_select_field.dart';
-import 'package:hentai_library/features/comic/presentation/views/widgets/form/parody_library_multi_select_field.dart';
-import 'package:hentai_library/features/comic/presentation/views/widgets/form/tag_library_multi_select_field.dart';
+import 'package:hentai_library/features/comic/presentation/views/widgets/form/library_facet_multi_select_field.dart';
+import 'package:hentai_library/features/named_metadata/public/named_metadata_form.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/content_section.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -249,9 +247,9 @@ class _AuthorsTagsFields extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        ParodyLibraryMultiSelectField(
+        LibraryFacetMultiSelectField(
+          kind: NamedFacetFormKind.parody,
           label: l10n.comicDetailParodies,
-          icon: Symbols.category,
           scope: scope,
           selectedNames: draft.parodies,
           onAdd: (String v) =>
@@ -261,9 +259,9 @@ class _AuthorsTagsFields extends ConsumerWidget {
           onClearAll: () => onParodiesChanged(const <String>[]),
         ),
         SizedBox(height: gap),
-        AuthorLibraryMultiSelectField(
+        LibraryFacetMultiSelectField(
+          kind: NamedFacetFormKind.author,
           label: l10n.comicDetailAuthors,
-          icon: Symbols.person,
           scope: scope,
           selectedNames: draft.authors,
           onAdd: (String v) =>
@@ -273,9 +271,9 @@ class _AuthorsTagsFields extends ConsumerWidget {
           onClearAll: () => onAuthorsChanged(const <String>[]),
         ),
         SizedBox(height: gap),
-        CharacterLibraryMultiSelectField(
+        LibraryFacetMultiSelectField(
+          kind: NamedFacetFormKind.character,
           label: l10n.comicDetailCharacters,
-          icon: Symbols.groups,
           scope: scope,
           selectedNames: draft.characters,
           onAdd: (String v) =>
@@ -285,9 +283,9 @@ class _AuthorsTagsFields extends ConsumerWidget {
           onClearAll: () => onCharactersChanged(const <String>[]),
         ),
         SizedBox(height: gap),
-        TagLibraryMultiSelectField(
+        LibraryFacetMultiSelectField(
+          kind: NamedFacetFormKind.tag,
           label: l10n.comicDetailTags,
-          icon: Symbols.label,
           scope: scope,
           selectedNames: draft.tags,
           onAdd: (String v) => onTagsChanged(tagListWithAdded(draft.tags, v)),
