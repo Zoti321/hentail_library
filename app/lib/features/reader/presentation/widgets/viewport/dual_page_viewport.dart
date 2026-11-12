@@ -1,21 +1,16 @@
-import 'dart:async';
-
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
+import 'package:hentai_library/features/reader/domain/reading_mode.dart';
+import 'package:hentai_library/features/reader/domain/spread_navigation.dart';
+import 'package:hentai_library/features/reader/presentation/session/reader_session_bindings.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/read_session_page_data.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_view_model.dart';
+import 'package:hentai_library/features/reader/presentation/widgets/reader_image_item.dart';
 import 'package:hentai_library/features/reader/presentation/widgets/viewport/reader_page_crossfade_policy.dart';
 import 'package:hentai_library/features/reader/presentation/widgets/viewport/reader_prefetch_hook.dart';
 import 'package:hentai_library/features/reader/presentation/widgets/viewport/reader_viewport_constants.dart';
+import 'package:hentai_library/features/reader/presentation/widgets/viewport/reader_viewport_kernel.dart';
 import 'package:hentai_library/features/reader/presentation/widgets/viewport/reader_viewport_pages.dart';
-import 'package:hentai_library/features/reader/presentation/widgets/viewport/resume_visible_sync_gate.dart';
-
-import 'package:hentai_library/features/reader/domain/reading_mode.dart';
-import 'package:hentai_library/features/reader/domain/spread_navigation.dart';
-import 'package:hentai_library/features/reader/presentation/view_models/reader_view_model.dart';
-import 'package:hentai_library/features/reader/presentation/session/reader_session_bindings.dart';
-import 'package:hentai_library/features/reader/presentation/view_models/read_session_page_data.dart';
-import 'package:hentai_library/features/reader/presentation/widgets/reader_image_item.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class DualPageViewport extends HookConsumerWidget {
@@ -84,227 +79,62 @@ class DualPageViewport extends HookConsumerWidget {
       totalPages: safeTotalPages,
       pageIndex: initialPage + 1,
     );
-    final Size viewportSize = MediaQuery.sizeOf(context);
-    final PageController pageController = usePageController(
-      initialPage: initialSpread,
+    final double slotLogicalWidth = readerDualPageSlotLogicalWidth(
+      MediaQuery.sizeOf(context).width,
     );
-    final ObjectRef<bool> hasAppliedPreferredPage = useRef<bool>(false);
-    final ObjectRef<bool> isProgrammaticScroll = useRef<bool>(false);
-    final ObjectRef<int> alignGeneration = useRef<int>(0);
-    final ObjectRef<ResumeVisibleSyncGate> resumeSyncGate =
-        useRef<ResumeVisibleSyncGate>(ResumeVisibleSyncGate());
-    final ObjectRef<DateTime?> lastWheelAt = useRef<DateTime?>(null);
-    const int wheelThrottleMs = 200;
 
-    useEffect(() {
-      hasAppliedPreferredPage.value = false;
-      resumeSyncGate.value = ResumeVisibleSyncGate();
-      resumeSyncGate.value.beginProgrammaticAlign(
-        targetOneBased: initialPage + 1,
-      );
-      return null;
-    }, <Object?>[comicId, preferredPageIndex]);
-    useEffect(() {
-      if (imageList.isEmpty) {
-        return null;
-      }
-      final int currentIndex =
-          ref
-              .read(readerViewModelProvider(viewKey))
-              .asData
-              ?.value
-              .currentIndex ??
-          1;
-      resumeSyncGate.value.beginProgrammaticAlign(targetOneBased: currentIndex);
-      return null;
-    }, <Object?>[imageList.length]);
-    useEffect(() {
-      final int? preferred = preferredPageIndex;
-      if (preferred == null || hasAppliedPreferredPage.value) {
-        return null;
-      }
-      final int safeIndex = preferred.clamp(1, safeTotalPages);
-      hasAppliedPreferredPage.value = true;
-      final int currentIndex =
-          ref
-              .read(readerViewModelProvider(viewKey))
-              .asData
-              ?.value
-              .currentIndex ??
-          1;
-      if (currentIndex != safeIndex) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!context.mounted) {
-            return;
-          }
-          ref
-              .read(readerViewModelProvider(viewKey).notifier)
-              .setIndex(safeIndex);
-        });
-      }
-      return null;
-    }, <Object?>[comicId, preferredPageIndex, totalPages]);
-
-    void alignToIndex(int currentIndex) {
-      if (!pageController.hasClients || imageList.isEmpty) {
-        return;
-      }
-      final int currentSpread = SpreadNavigation.spreadIndexForPage(
+    return ReaderPagedViewportKernel(
+      viewKey: viewKey,
+      comicId: comicId,
+      comic: comic,
+      totalPages: totalPages,
+      imageList: imageList,
+      initialPage: initialPage,
+      initialItemIndex: initialSpread,
+      preferredPageIndex: preferredPageIndex,
+      itemCount: spreadCount,
+      itemIndexForPage: (int pageOneBased) => SpreadNavigation.spreadIndexForPage(
         mode: activeMode,
         totalPages: safeTotalPages,
-        pageIndex: currentIndex,
-      );
-      if (pageController.page?.round() == currentSpread) {
-        resumeSyncGate.value.onVisibleIndex(currentIndex);
-        return;
-      }
-      isProgrammaticScroll.value = true;
-      resumeSyncGate.value.beginProgrammaticAlign(targetOneBased: currentIndex);
-      final int generation = ++alignGeneration.value;
-      final int? currentPage = pageController.page?.round();
-      if (currentPage != null && (currentPage - currentSpread).abs() > 1) {
-        pageController.jumpToPage(currentSpread);
-        resumeSyncGate.value.onVisibleIndex(currentIndex);
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!context.mounted || generation != alignGeneration.value) {
-            return;
-          }
-          isProgrammaticScroll.value = false;
-        });
-        return;
-      }
-      pageController
-          .animateToPage(
-            currentSpread,
-            duration: kReaderPageTurnAnimationDuration,
-            curve: Curves.easeInOut,
-          )
-          .whenComplete(() {
-            if (!context.mounted || generation != alignGeneration.value) {
-              return;
-            }
-            resumeSyncGate.value.onVisibleIndex(currentIndex);
-            isProgrammaticScroll.value = false;
-          });
-    }
-
-    ref.listen<int>(
-      readerViewModelProvider(viewKey).select(
-        (AsyncValue<ReaderUiState> value) =>
-            value.asData?.value.currentIndex ?? 1,
+        pageIndex: pageOneBased,
       ),
-      (int? previous, int next) {
-        final int currentSpread = SpreadNavigation.spreadIndexForPage(
-          mode: activeMode,
-          totalPages: safeTotalPages,
-          pageIndex: next,
-        );
-        final int? page = pageController.hasClients
-            ? pageController.page?.round()
-            : null;
-        if (page == currentSpread) {
-          resumeSyncGate.value.onVisibleIndex(next);
-          return;
-        }
-        alignToIndex(next);
-      },
-    );
-
-    if (resolvedPages is! ReaderViewportPagesReady) {
-      return ReaderViewportPagesFeedback(pages: resolvedPages);
-    }
-
-    final double slotLogicalWidth = readerDualPageSlotLogicalWidth(
-      viewportSize.width,
-    );
-    return Stack(
-      fit: StackFit.expand,
-      children: <Widget>[
-        Center(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: viewportSize.width),
-            child: Listener(
-              onPointerSignal: (PointerSignalEvent event) {
-                if (event is! PointerScrollEvent) {
-                  return;
-                }
-                final double dy = event.scrollDelta.dy;
-                if (dy == 0) {
-                  return;
-                }
-                final DateTime now = DateTime.now();
-                final DateTime? last = lastWheelAt.value;
-                if (last != null &&
-                    now.difference(last).inMilliseconds < wheelThrottleMs) {
-                  return;
-                }
-                lastWheelAt.value = now;
-                final ReaderViewModel controller = ref.read(
-                  readerViewModelProvider(viewKey).notifier,
-                );
-                if (dy > 0) {
-                  if (onRequestNextPage != null) {
-                    unawaited(onRequestNextPage!());
-                  } else {
-                    controller.nextPage();
-                  }
-                } else {
-                  if (onRequestPrevPage != null) {
-                    unawaited(onRequestPrevPage!());
-                  } else {
-                    controller.prevPage();
-                  }
-                }
-              },
-              child: PageView.builder(
-                controller: pageController,
-                physics: const BouncingScrollPhysics(),
-                onPageChanged: (int spreadIndex) {
-                  if (isProgrammaticScroll.value) {
-                    return;
-                  }
-                  final int safeTotalPages = totalPages > 0 ? totalPages : 1;
-                  final int primaryPage = SpreadNavigation.primaryPageForSpread(
-                    mode: activeMode,
-                    totalPages: safeTotalPages,
-                    spreadIndex: spreadIndex,
-                  );
-                  final int? applyIndex = resumeSyncGate.value.onVisibleIndex(
-                    primaryPage,
-                  );
-                  if (applyIndex == null) {
-                    return;
-                  }
-                  ref
-                      .read(readerViewModelProvider(viewKey).notifier)
-                      .setIndex(applyIndex);
-                },
-                itemCount: spreadCount,
-                itemBuilder: (BuildContext context, int spreadIndex) {
-                  final List<int> pages = SpreadNavigation.pagesInSpread(
-                    mode: activeMode,
-                    totalPages: safeTotalPages,
-                    spreadIndex: spreadIndex,
-                  );
-                  return _DualSpreadPage(
-                    comic: comic,
-                    pages: pages,
-                    imageList: imageList,
-                  );
-                },
-              ),
-            ),
+      pageForItemIndex: (int itemIndex) =>
+          SpreadNavigation.primaryPageForSpread(
+            mode: activeMode,
+            totalPages: safeTotalPages,
+            spreadIndex: itemIndex,
           ),
-        ),
-        _DualPagePrefetchBinder(
-          viewKey: viewKey,
-          comicId: comicId,
-          totalPages: safeTotalPages,
-          slotLogicalWidth: slotLogicalWidth,
-          imageList: imageList,
-          readingMode: activeMode,
-        ),
-      ],
+      slotLogicalWidth: slotLogicalWidth,
+      itemBuilder:
+          (
+            BuildContext context,
+            int spreadIndex,
+            ReaderComicRef comic,
+            List<ReaderPageImageData> imageList,
+            double slotLogicalWidth,
+          ) => _DualSpreadPage(
+            comic: comic,
+            pages: SpreadNavigation.pagesInSpread(
+              mode: activeMode,
+              totalPages: safeTotalPages,
+              spreadIndex: spreadIndex,
+            ),
+            imageList: imageList,
+            slotLogicalWidth: slotLogicalWidth,
+          ),
+      prefetchBinder: _DualPagePrefetchBinder(
+        viewKey: viewKey,
+        comicId: comicId,
+        totalPages: safeTotalPages,
+        slotLogicalWidth: slotLogicalWidth,
+        imageList: imageList,
+        readingMode: activeMode,
+      ),
+      fallback: resolvedPages is ReaderViewportPagesReady
+          ? null
+          : ReaderViewportPagesFeedback(pages: resolvedPages),
+      onRequestNextPage: onRequestNextPage,
+      onRequestPrevPage: onRequestPrevPage,
     );
   }
 }
@@ -378,17 +208,16 @@ class _DualSpreadPage extends StatelessWidget {
     required this.comic,
     required this.pages,
     required this.imageList,
+    required this.slotLogicalWidth,
   });
 
   final ReaderComicRef comic;
   final List<int> pages;
   final List<ReaderPageImageData> imageList;
+  final double slotLogicalWidth;
 
   @override
   Widget build(BuildContext context) {
-    final double slotLogicalWidth = readerDualPageSlotLogicalWidth(
-      MediaQuery.sizeOf(context).width,
-    );
     final bool enableCrossfade = readerPageCrossfadeEnabled(
       reduceMotion: MediaQuery.disableAnimationsOf(context),
     );
