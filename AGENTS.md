@@ -8,9 +8,9 @@ Setup: `./scripts/setup-dev.sh` · PR gate: `./scripts/run-gate.sh` · Human onb
 
 **Product scope** (capabilities, platforms) → `README.md` § 核心功能 / 支持平台.
 
-**Flutter UI — production** (shell, tokens, components) → `app/lib/shared/ui/theme/` + `shared/ui/widgets/`; structure ADR-0027, theme ADR-0028. Do not treat Figma or `design-system/` as the live spec for shipping routes unless an ADR says otherwise.
+**Flutter UI — production** → `app/lib/design-system/design_system.dart`（唯一公开入口）；完整视觉/交互系统与产品适配的职责见 **ADR-0053**、`docs/engineering/design-system.md`。组件不依赖应用路由、业务 Provider、领域模型、应用 ARB 或窗口/进程实现；产品导航/选择/图像适配留 `shared/ui`，外部执行经 composition 绑定。
 
-**Flutter UI — MD3E Lab** (`app/lib/md3e/`, `integrate/md3e`) → **Widgetbook** (`app/widgetbook/`, `flutter run -t widgetbook/main.dart`) + `material_3_expressive` official docs; patterns/pages live in `md3e/`. Visual acceptance for Lab is Widgetbook, not Figma frames. **New MD3E widgets** → material_ui `MaterialLocalizations` via `app/lib/shared/ui/l10n/m3e_material_localizations.dart` (`md3eMaterialLocalizationsOf` / `md3eMaterialUiLocalizationsScope`); do not use Flutter `material.dart` `MaterialLocalizations` in new code.
+**Flutter UI — MD3E Lab** (`app/lib/md3e/`, `integrate/md3e`) → **Widgetbook** (`app/widgetbook/`, `flutter run -t widgetbook/main.dart`) + `material_3_expressive` official docs; patterns/pages live in `md3e/`. Visual acceptance for Lab is Widgetbook, not Figma frames. **New MD3E widgets** → material_ui `MaterialLocalizations` via `app/lib/design-system/design_system.dart`（`materialLocalizationsOf` / `MaterialUiLocalizationsScope`）; do not use Flutter `material.dart` `MaterialLocalizations` in new code.
 
 **design-system/** → **cleared** (2026-11-01): only `.gitkeep` and `example.png` remain; `hentai-library/MASTER.md`, `pages/*`, `research/` were removed (recoverable from git history). No UI spec lives here; see ADR-0030. ADR-0029 charter is superseded for any future visual refresh unless a new ADR reintroduces a doc source.
 
@@ -20,7 +20,7 @@ Setup: `./scripts/setup-dev.sh` · PR gate: `./scripts/run-gate.sh` · Human onb
 
 **Rust** (sync, read, DB) → `core/`; see `docs/adr/README.md` (ADR-0002 and related).
 
-**Dart core / shared / infrastructure** → **ADR-0052**：core 仅纯 Dart 通用能力；产品协作按层归 shared，外部实现按 owner 归 infrastructure，初始化与绑定归 composition。移动 l10n / 日志 / 平台能力时同时检查生成配置与递归依赖门禁。
+**Dart core / shared / infrastructure** → **ADR-0052**：core 仅纯 Dart 通用能力；产品协作按层归 shared，外部实现按 owner 归 infrastructure，初始化与绑定归 composition。移动 l10n / 日志 / 平台能力时同时检查生成配置与递归依赖门禁。应用 ARB 生成在 `lib/l10n`，组件文案与设计系统边界按 ADR-0053。
 
 **Tests & CI** → `docs/engineering/gate.md`; tier names ADR-0018; workflows `.github/workflows/gate.yml`.
 

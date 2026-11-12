@@ -313,17 +313,17 @@ _Avoid_: 安全模式、青少年模式、R18 过滤
 ### Design & UI
 
 **模块所有权（module ownership）**:
-共享代码归位的统一判据：业务无关且外观通用 → `lib/design-system/`；只被**一个**产品模块消费的业务组件 → `features/<owner>/presentation/`；被 **≥2** 个模块消费的复合组件 / 壳层 / 页面级模式 / 跨模块契约 → `shared/ui/`。判据是「是否 import 了领域类型或 owner 专属文案 / 布局 token」。需要跨模块时从 owner `public/ui/**` 提升，而不是预置在 shared 备用。详见 ADR-0044。
+共享界面能力按职责归属：完整视觉与交互行为归设计系统；产品流程、领域展示与跨模块协作归产品 owner 或共享产品 UI。组件有应用风格、名称带 Comic 或消费者多，都不能单独决定其归属。详见 ADR-0053。
 
 领域类型、读模型与 Port / DI token 另有判据：**生产者拥有**（定义与实现所在模块即 owner，不看谁消费得多），并有两条**否决条件**——若消费者 import owner 会命中 ADR-0036 禁止边或造成 public 环，Port 真源留 `shared/domain/ports/`、token 留 `shared/di/`；若任一消费方是 `shared/**` 或 `core/**`，真源留 shared。详见 ADR-0045。
 _Avoid_: 共享组件（未指明层级）、common widget、放到 shared 备用；谁消费最多谁拥有、Port 一律放 shared/domain/ports
 
-**Design System 层**:
-`app/lib/design-system/`：业务无关的设计基础与通用控件（主题与 token、动效、布局常量、M3E locale 适配、输入 / 日历 / chips / 容器原语）。单一对外入口 `design_system.dart`；自身只依赖 `core/**` 与 `shared/util/**`，不得 import `features/**` 或 `shared/ui/**`。与仓库根已归档的 `design-system/` 目录无关。详见 ADR-0044。
-_Avoid_: 设计系统文档目录（仓库根归档目录）、`shared/ui`（复合壳层）
+**Design system**（Design System 层）:
+本应用完整的视觉与交互系统，包括主题、token、布局、动效、键盘、焦点、无障碍、组件状态和复杂控件；通过展示数据与回调协作，不执行产品查询、仓储操作或导航流程。实现位于 `app/lib/design-system/`，单一对外入口 `design_system.dart`，应用内依赖留在层内；与仓库根归档目录无关，详见 ADR-0053。
+_Avoid_: 仅样式集合、所有 shared UI 的统称、仅 M3E 包装层、设计系统文档目录（仓库根归档目录）
 
 **MD3E design system**:
-生产主壳的 Material 3 Expressive 取向设计系统（Cutover 主体已完成）。实现落在 `shared/ui` 与各 feature 的 MD3E 页；主题经 `buildAppTheme` 单源装配。壳层与组件色消费以 **M3E color roles** 为主；品牌 seed 定稿为配色方案「紫罗兰色」（`kBrandSeedColor` / 与偏好 `violet` 同色）。不替代 Rust 业务真值。
+生产主壳的 Material 3 Expressive 取向设计系统（Cutover 主体已完成）。视觉与交互实现位于 `design-system`，产品 UI 适配在 `shared/ui` 与各 feature 的 MD3E 页；主题经 `buildAppTheme` 单源装配。壳层与组件色消费以 **M3E color roles** 为主；品牌 seed 定稿为配色方案「紫罗兰色」（`kBrandSeedColor` / 与偏好 `violet` 同色）。不替代 Rust 业务真值。
 _Avoid_: M3 皮肤（太泛）、新主题（未指明 MD3E）、仍称并行于 Baseline
 
 **Tone-based color system**:

@@ -131,3 +131,4 @@ Accepted | Superseded by ADR-000N | Deprecated
 | [0050](./0050-riverpod-module-communication-and-use-case-cohesion.md) | Riverpod 模块通信与具体应用用例内聚 | Accepted |
 | [0051](./0051-clean-architecture-composition-and-infrastructure.md) | 整洁架构组合根、基础设施与内层依赖 | Accepted |
 | [0052](./0052-pure-dart-core-and-platform-boundaries.md) | 纯 Dart core、共享协作与平台实现边界 | Accepted |
+| [0053](./0053-design-system-portable-interaction-boundary.md) | 完整视觉与交互设计系统、产品适配与可独立成包的依赖边界（修订 ADR-0044/0047/0052） | Accepted |

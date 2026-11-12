@@ -2,7 +2,7 @@
 
 **决策**：ADR-0018（三层缝、CI tier 词汇）、ADR-0002（业务真值在 Rust）、**ADR-0033**（feature `application/`）、**ADR-0034**（cross-feature `public/`）、**ADR-0041**（Comic 实体归属）、**ADR-0042**（Series 实体归属 + 槽位契约）、**ADR-0043**（导航与路由解耦）。**Job 列表以** `.github/workflows/gate.yml` **为准**；本地与 CI 同源：`./scripts/run-gate.sh`。
 
-**Wayfinder `lib/` 顶层目录**（Phase A/B）：`composition/`、`core/`、`design-system/`、`features/`、`infrastructure/`、`shared/`、`src/`；由 `app/test/gate/lib_layout_scan_helpers.dart` · `project_layout_test.dart` 断言。`design-system/**` 归类为 `shared`（ADR-0044），因此**继承** R13 且受独立出边白名单约束。产品 feature 之间 **仅允许** import `features/<owner>/public/**` 或 `features/<owner>/public.dart`（M1）；`shared/**` **禁止** import feature public（R11），且 **不得** import `features/**`（R13，ratchet：`shared/presentation/providers`、`shared/domain`、`core/**` 等既有边只许减不许增）。
+**Wayfinder `lib/` 顶层目录**（Phase A/B）：`composition/`、`core/`、`design-system/`、`features/`、`infrastructure/`、`l10n/`、`shared/`、`src/`；由 `app/test/gate/lib_layout_scan_helpers.dart` · `project_layout_test.dart` 断言。`design-system/**` 归类为 `shared`（ADR-0044），因此**继承** R13 且受独立出边白名单约束。产品 feature 之间 **仅允许** import `features/<owner>/public/**` 或 `features/<owner>/public.dart`（M1）；`shared/**` **禁止** import feature public（R11），且 **不得** import `features/**`（R13，ratchet：`shared/presentation/providers`、`shared/domain`、`core/**` 等既有边只许减不许增）。
 
 **工具链**：CI 固定 **Flutter 3.47.8**（`gate.yml` → `FLUTTER_VERSION`）。本地请用同 major/minor 的 stable；`flutter analyze` 在 GitHub Actions（`CI=true`）下会将 info 级 lint 也计为失败。Dart 侧另设 **`dart_code_linter`** 硬门禁（`gate-dart-lint`，见下文 DCL 节）。`riverpod_lint` 为可选 dev 依赖（不依赖 `custom_lint`）；**Gate 的 `flutter analyze` 暂未挂 `plugins: riverpod_lint`**，避免未偿还的 Riverpod 风格债挡合并。本地可在 `analysis_options.yaml` 临时启用做增量清理。SDK 升级记录见 `docs/engineering/flutter-3.47-migration.md`。
 
@@ -108,7 +108,7 @@ cd app && dart run dart_code_linter:metrics analyze lib \
 
 **整洁架构目录与内层递归依赖**：ADR-0051、ADR-0052；`test/architecture/clean_architecture_dependency_test.dart` 解析完整 import/export/part 与条件分支，检查 core 仅依赖自身和纯 Dart SDK/包，domain/application/contracts 不能间接到达外层；第三方包检查完整运行时依赖声明和库源码。另检查 presentation / infrastructure / shared 与组合根方向。扫描器绕过回归用例在 `dart_dependency_graph_test.dart`，缺失文件或未解析包直接失败。原禁止边、public-only、无环与 required Provider 覆盖不变。
 
-`app/lib/core` 不含 Flutter、平台或产品语义；文件浏览、日志落盘在顶层 infrastructure，更新打开与日志导出在 app_settings 的 infrastructure，由 composition 注入。UI 生成文案位于 `design-system/l10n`（`flutter gen-l10n`），共享 BuildContext 适配在 `shared/ui/l10n`，业务展示扩展归各 owner。本轮移动的日志/平台/路由/图像/标题测试均同步列入 manifest，未降级至慢轨；无生产消费者的 Dart 自然排序副本和其四个测试随代码退役。
+`app/lib/core` 不含 Flutter、平台或产品语义；文件浏览、日志落盘在顶层 infrastructure，更新打开与日志导出在 app_settings 的 infrastructure，由 composition 注入。应用 UI 生成文案位于 `lib/l10n`（`flutter gen-l10n`，ADR-0053），设计系统通用文案独立于应用 ARB，共享 BuildContext 适配在 `shared/ui/l10n`，业务展示扩展归各 owner。本轮移动的日志/平台/路由/图像/标题测试均同步列入 manifest，未降级至慢轨；无生产消费者的 Dart 自然排序副本和其四个测试随代码退役。
 
 业务 sync/read/DB：**信任 `cargo test`**。Dart **不要**对真 FRB / `*_repository_impl` 写全流程集成测。
 
@@ -146,7 +146,7 @@ Epic [#447](https://github.com/Zoti321/hentail_library/issues/447) 清理 Flutte
 | **gate-fast** | 路径落在 `manifest.txt` 展开集合内 | `gate-dart-test` |
 | **slow-track** | `app/test/**/*_test.dart` 中未进 manifest 的文件 | `nightly-dart-ui` 扫描 `test/shared/ui` + `test/features`（与 manifest 互补；盘存脚本的慢轨计数 = 全树减 manifest） |
 
-**当前盘存（2026-11-12，`python scripts/audit_dart_tests.py --summary-json`）**：共 **320** 个 `*_test.dart`；manifest 展开 **220**；慢轨 **100**。rubric：architecture-guard 27、thin-edge 100、ui-contract 150、candidate-retire 43。慢轨分桶以工具 JSON 为准；本轮迁移未将任何保留测试移出快轨。
+**当前盘存（2026-11-12，`python scripts/audit_dart_tests.py --summary-json`）**：共 **327** 个 `*_test.dart`；manifest 展开 **227**；慢轨 **100**。rubric：architecture-guard 29、thin-edge 101、ui-contract 154、candidate-retire 43。慢轨分桶以工具 JSON 为准；本轮迁移未将任何保留测试移出快轨。
 
 ### nightly-dart-ui（`.github/workflows/nightly.yml`）
 
@@ -247,7 +247,7 @@ Epic [#447](https://github.com/Zoti321/hentail_library/issues/447) 清理 Flutte
 | public 图无环 | `import_boundary_test.dart`（`collectPublicCrossFeatureAdjacency`） |
 | bootstrap shared 注入 | `composition/overrides/*` + `feature_state_overrides.dart`（#435） |
 | L3a shared/ui → features | `shared_ui_no_feature_import_test.dart` |
-| L3a design-system → features / shared domain·di·data·ui | `test/design-system/design_system_boundary_test.dart`（ADR-0044；零 allowlist） |
+| 设计系统独立边界 / 唯一显式入口 | `test/design-system/design_system_boundary_test.dart` + `design_system_dependency_policy_test.dart`（ADR-0053；递归 import/export/part/条件分支、第三方运行时闭包；应用内只到达层内、无 baseline） |
 | L3b shared/domain → features ratchet | `shared_domain_no_feature_import_test.dart` + baseline 生成器；归属见 [`shared-domain-ownership.md`](./shared-domain-ownership.md) |
 | FRB allowlist | `import_boundary_rules.dart`、`shared_feature_import_rules.dart` |
 | `lib/` 顶层目录（含 `design-system/`）、public barrel、presentation/state | `project_layout_test.dart`、`lib_layout_scan_helpers.dart` |
@@ -271,6 +271,7 @@ Epic [#447](https://github.com/Zoti321/hentail_library/issues/447) 清理 Flutte
 | API | 文件 | 何时用 |
 |-----|------|--------|
 | `pumpLocalizedApp` | `pump_localized_app.dart` | 产品主题 + zh/en l10n + 可选 `ProviderScope` overrides（**默认首选**） |
+| `pumpDesignSystemApp` | `pump_design_system_app.dart` | 设计系统独立主题 + 框架本地化，无应用 ARB / ProviderScope / 领域模型 |
 | `pumpMd3eApp` | `pump_md3e_app.dart` | MD3E lab 主题 + `Md3eThemeScope`；可选 overrides |
 | `buildLocalizedTestMaterialApp` | `pump_localized_app.dart` | 自定义外壳（`UncontrolledProviderScope`、GoRouter）内嵌 MaterialApp |
 | `localizedTestAppConfig` | `localized_test_app.dart` | 仅 delegates/locale 元组（少见） |
