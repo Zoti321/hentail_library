@@ -67,6 +67,7 @@ export 'package:hentai_library/design-system/components/scaffold/dialog_action_b
 export 'package:hentai_library/design-system/components/scaffold/library_page_header_metrics.dart';
 export 'package:hentai_library/design-system/components/scaffold/library_toolbar_row.dart';
 export 'package:hentai_library/design-system/components/scaffold/metadata_edit_form_scroll.dart';
+export 'package:hentai_library/design-system/components/scaffold/metadata_edit_tabbed_shell.dart';
 export 'package:hentai_library/design-system/components/scaffold/metadata_field_label_row.dart';
 export 'package:hentai_library/design-system/components/scaffold/page_header.dart';
 export 'package:hentai_library/design-system/components/scaffold/page_header_back_button.dart';

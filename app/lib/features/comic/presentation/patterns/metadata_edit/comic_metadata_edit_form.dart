@@ -18,8 +18,6 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:hentai_library/shared/ui/catalog/metadata_edit/metadata_lock_callbacks.dart';
 
-enum _ComicMetadataEditTab { general, authorsTags, fieldLocks }
-
 List<String> tagListWithAdded(List<String> list, String value) {
   if (list.contains(value)) {
     return list;
@@ -55,74 +53,10 @@ class ComicMetadataEditForm extends StatefulWidget {
 }
 
 class _ComicMetadataEditFormState extends State<ComicMetadataEditForm> {
-  _ComicMetadataEditTab _tab = _ComicMetadataEditTab.general;
-  bool _detailTransitionReverse = false;
+  int _tabIndex = 0;
 
   void _update(ComicMetadataEditDraft Function(ComicMetadataEditDraft d) fn) {
     widget.onDraftChanged(fn(widget.draft));
-  }
-
-  Widget _scrollPane(Widget child) {
-    return ScrollConfiguration(
-      behavior: MetadataEditScrollBehavior(),
-      child: SingleChildScrollView(primary: false, child: child),
-    );
-  }
-
-  Widget _detailTransition(Widget child) {
-    return ListDetailDetailTransition(
-      switchKey: _tab,
-      reverse: _detailTransitionReverse,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: MetadataEditFormMetrics.detailContentHorizontalInset,
-        ),
-        child: child,
-      ),
-    );
-  }
-
-  Widget _sideTabLayout({
-    required double viewportHeight,
-    required double gap,
-    required AppLocalizations l10n,
-    required Widget tabBody,
-  }) {
-    return SizedBox(
-      height: viewportHeight,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          SizedBox(
-            width: MetadataEditFormMetrics.sideTabColumnWidth,
-            child: _scrollPane(
-              _SideTabList(l10n: l10n, tab: _tab, onSelected: _selectTab),
-            ),
-          ),
-          SizedBox(width: gap),
-          Expanded(child: _detailTransition(_scrollPane(tabBody))),
-        ],
-      ),
-    );
-  }
-
-  Widget _topTabLayout({
-    required double viewportHeight,
-    required double gap,
-    required AppLocalizations l10n,
-    required Widget tabBody,
-  }) {
-    return SizedBox(
-      height: viewportHeight,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          _TopTabBar(l10n: l10n, tab: _tab, onSelected: _selectTab),
-          SizedBox(height: gap),
-          Expanded(child: _detailTransition(_scrollPane(tabBody))),
-        ],
-      ),
-    );
   }
 
   @override
@@ -132,144 +66,57 @@ class _ComicMetadataEditFormState extends State<ComicMetadataEditForm> {
     final double gap = MetadataEditFormMetrics.sectionGap(sizeClass);
     final ComicMetadataEditDraft draft = widget.draft;
 
-    final Widget tabBody = switch (_tab) {
-      _ComicMetadataEditTab.general => _GeneralFields(
-        draft: draft,
-        titleError: widget.titleError,
-        gap: gap,
-        onTitleChanged: (String v) => _update((d) => d.copyWith(title: v)),
-        onDescriptionChanged: (String v) =>
-            _update((d) => d.copyWith(description: v)),
-        onPublishedChanged: (String v) =>
-            _update((d) => d.copyWith(publishedLabel: v)),
-        onR18Changed: (bool v) => _update((d) => d.copyWith(isR18: v)),
-        onLanguageAdded: (String v) => _update(
-          (d) => d.copyWith(languages: tagListWithAdded(d.languages, v)),
+    return MetadataEditTabbedShell(
+      selectedIndex: _tabIndex,
+      onSelected: (int index) => setState(() => _tabIndex = index),
+      tabs: <MetadataEditTab>[
+        (
+          label: l10n.dialogEditMetadataTabGeneral,
+          body: _GeneralFields(
+            draft: draft,
+            titleError: widget.titleError,
+            gap: gap,
+            onTitleChanged: (String v) => _update((d) => d.copyWith(title: v)),
+            onDescriptionChanged: (String v) =>
+                _update((d) => d.copyWith(description: v)),
+            onPublishedChanged: (String v) =>
+                _update((d) => d.copyWith(publishedLabel: v)),
+            onR18Changed: (bool v) => _update((d) => d.copyWith(isR18: v)),
+            onLanguageAdded: (String v) => _update(
+              (d) => d.copyWith(languages: tagListWithAdded(d.languages, v)),
+            ),
+            onLanguageRemoved: (String v) => _update(
+              (d) =>
+                  d.copyWith(languages: tagListWithRemoved(d.languages, v)),
+            ),
+            onSortOrderChanged: (String v) =>
+                _update((d) => d.copyWith(seriesSortOrderText: v)),
+          ),
         ),
-        onLanguageRemoved: (String v) => _update(
-          (d) => d.copyWith(languages: tagListWithRemoved(d.languages, v)),
-        ),
-        onSortOrderChanged: (String v) =>
-            _update((d) => d.copyWith(seriesSortOrderText: v)),
-      ),
-      _ComicMetadataEditTab.authorsTags => _AuthorsTagsFields(
-        draft: draft,
-        gap: gap,
-        l10n: l10n,
-        scope: widget.smartFacetScope,
-        onParodiesChanged: (List<String> v) =>
-            _update((d) => d.copyWith(parodies: v)),
-        onAuthorsChanged: (List<String> v) =>
-            _update((d) => d.copyWith(authors: v)),
-        onCharactersChanged: (List<String> v) =>
-            _update((d) => d.copyWith(characters: v)),
-        onTagsChanged: (List<String> v) => _update((d) => d.copyWith(tags: v)),
-      ),
-      _ComicMetadataEditTab.fieldLocks => ComicMetadataLocksPane(
-        locks: widget.locks,
-        onLockChanged: widget.onLockChanged,
-      ),
-    };
-
-    final bool useSideTabs = sizeClass.index >= WindowSizeClass.medium.index;
-
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        final double viewportHeight =
-            MetadataEditFormMetrics.resolveTabbedViewportHeight(
-              context,
-              constraints,
-            );
-
-        if (useSideTabs) {
-          return _sideTabLayout(
-            viewportHeight: viewportHeight,
+        (
+          label: l10n.dialogEditMetadataTabAuthorsTags,
+          body: _AuthorsTagsFields(
+            draft: draft,
             gap: gap,
             l10n: l10n,
-            tabBody: tabBody,
-          );
-        }
-
-        return _topTabLayout(
-          viewportHeight: viewportHeight,
-          gap: gap,
-          l10n: l10n,
-          tabBody: tabBody,
-        );
-      },
-    );
-  }
-
-  void _selectTab(int index) {
-    setState(() {
-      final _ComicMetadataEditTab next = _ComicMetadataEditTab.values[index];
-      _detailTransitionReverse = next.index < _tab.index;
-      _tab = next;
-    });
-  }
-}
-
-class _TopTabBar extends StatelessWidget {
-  const _TopTabBar({
-    required this.l10n,
-    required this.tab,
-    required this.onSelected,
-  });
-
-  final AppLocalizations l10n;
-  final _ComicMetadataEditTab tab;
-  final ValueChanged<int> onSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    return SegmentedCapsuleBar(
-      segments: <SegmentedCapsuleSegment>[
-        SegmentedCapsuleSegment(label: l10n.dialogEditMetadataTabGeneral),
-        SegmentedCapsuleSegment(label: l10n.dialogEditMetadataTabAuthorsTags),
-        SegmentedCapsuleSegment(label: l10n.dialogEditMetadataTabFieldLocks),
-      ],
-      selectedIndex: tab.index,
-      onSelected: onSelected,
-    );
-  }
-}
-
-class _SideTabList extends StatelessWidget {
-  const _SideTabList({
-    required this.l10n,
-    required this.tab,
-    required this.onSelected,
-  });
-
-  final AppLocalizations l10n;
-  final _ComicMetadataEditTab tab;
-  final ValueChanged<int> onSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    final List<(String label, _ComicMetadataEditTab value)> items =
-        <(String, _ComicMetadataEditTab)>[
-          (l10n.dialogEditMetadataTabGeneral, _ComicMetadataEditTab.general),
-          (
-            l10n.dialogEditMetadataTabAuthorsTags,
-            _ComicMetadataEditTab.authorsTags,
+            scope: widget.smartFacetScope,
+            onParodiesChanged: (List<String> v) =>
+                _update((d) => d.copyWith(parodies: v)),
+            onAuthorsChanged: (List<String> v) =>
+                _update((d) => d.copyWith(authors: v)),
+            onCharactersChanged: (List<String> v) =>
+                _update((d) => d.copyWith(characters: v)),
+            onTagsChanged: (List<String> v) =>
+                _update((d) => d.copyWith(tags: v)),
           ),
-          (
-            l10n.dialogEditMetadataTabFieldLocks,
-            _ComicMetadataEditTab.fieldLocks,
+        ),
+        (
+          label: l10n.dialogEditMetadataTabFieldLocks,
+          body: ComicMetadataLocksPane(
+            locks: widget.locks,
+            onLockChanged: widget.onLockChanged,
           ),
-        ];
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        for (final (String label, _ComicMetadataEditTab value) in items)
-          ListDetailNavItem(
-            key: ValueKey<_ComicMetadataEditTab>(value),
-            label: label,
-            selected: tab == value,
-            onTap: () => onSelected(value.index),
-          ),
+        ),
       ],
     );
   }

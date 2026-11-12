@@ -10,8 +10,6 @@ import 'package:hentai_library/features/series/domain/value_objects/series_meta_
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:hentai_library/shared/ui/catalog/metadata_edit/metadata_lock_callbacks.dart';
 
-enum _SeriesMetadataEditTab { content, fieldLocks }
-
 /// 系列元数据编辑表单（对齐生产 [EditSeriesDialog] 字段）。
 class SeriesMetadataEditForm extends StatefulWidget {
   const SeriesMetadataEditForm({
@@ -36,88 +34,7 @@ class SeriesMetadataEditForm extends StatefulWidget {
 }
 
 class _SeriesMetadataEditFormState extends State<SeriesMetadataEditForm> {
-  _SeriesMetadataEditTab _tab = _SeriesMetadataEditTab.content;
-  bool _detailTransitionReverse = false;
-
-  Widget _scrollPane(Widget child) {
-    return ScrollConfiguration(
-      behavior: MetadataEditScrollBehavior(),
-      child: SingleChildScrollView(primary: false, child: child),
-    );
-  }
-
-  Widget _detailTransition(Widget child) {
-    return ListDetailDetailTransition(
-      switchKey: _tab,
-      reverse: _detailTransitionReverse,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: MetadataEditFormMetrics.detailContentHorizontalInset,
-        ),
-        child: child,
-      ),
-    );
-  }
-
-  Widget _sideTabLayout({
-    required double viewportHeight,
-    required double gap,
-    required AppLocalizations l10n,
-    required Widget tabBody,
-  }) {
-    return SizedBox(
-      height: viewportHeight,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          SizedBox(
-            width: MetadataEditFormMetrics.sideTabColumnWidth,
-            child: _scrollPane(
-              _SideTabList(l10n: l10n, tab: _tab, onSelected: _selectTab),
-            ),
-          ),
-          SizedBox(width: gap),
-          Expanded(child: _detailTransition(_scrollPane(tabBody))),
-        ],
-      ),
-    );
-  }
-
-  Widget _topTabLayout({
-    required double viewportHeight,
-    required double gap,
-    required AppLocalizations l10n,
-    required Widget tabBody,
-  }) {
-    return SizedBox(
-      height: viewportHeight,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          SegmentedCapsuleBar(
-            segments: <SegmentedCapsuleSegment>[
-              SegmentedCapsuleSegment(label: l10n.dialogEditMetadataTabContent),
-              SegmentedCapsuleSegment(
-                label: l10n.dialogEditMetadataTabFieldLocks,
-              ),
-            ],
-            selectedIndex: _tab.index,
-            onSelected: _selectTab,
-          ),
-          SizedBox(height: gap),
-          Expanded(child: _detailTransition(_scrollPane(tabBody))),
-        ],
-      ),
-    );
-  }
-
-  void _selectTab(int index) {
-    setState(() {
-      final _SeriesMetadataEditTab next = _SeriesMetadataEditTab.values[index];
-      _detailTransitionReverse = next.index < _tab.index;
-      _tab = next;
-    });
-  }
+  int _tabIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -125,83 +42,28 @@ class _SeriesMetadataEditFormState extends State<SeriesMetadataEditForm> {
     final WindowSizeClass sizeClass = windowSizeClassOf(context);
     final double gap = MetadataEditFormMetrics.sectionGap(sizeClass);
 
-    final Widget tabBody = switch (_tab) {
-      _SeriesMetadataEditTab.content => _SeriesContentFields(
-        draft: widget.draft,
-        onDraftChanged: widget.onDraftChanged,
-        nameError: widget.nameError,
-        totalCountError: widget.totalCountError,
-        gap: gap,
-        l10n: l10n,
-      ),
-      _SeriesMetadataEditTab.fieldLocks => SeriesMetadataLocksPane(
-        locks: widget.locks,
-        onLockChanged: widget.onLockChanged,
-      ),
-    };
-
-    final bool useSideTabs = sizeClass.index >= WindowSizeClass.medium.index;
-
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        final double viewportHeight =
-            MetadataEditFormMetrics.resolveTabbedViewportHeight(
-              context,
-              constraints,
-            );
-
-        if (useSideTabs) {
-          return _sideTabLayout(
-            viewportHeight: viewportHeight,
+    return MetadataEditTabbedShell(
+      selectedIndex: _tabIndex,
+      onSelected: (int index) => setState(() => _tabIndex = index),
+      tabs: <MetadataEditTab>[
+        (
+          label: l10n.dialogEditMetadataTabContent,
+          body: _SeriesContentFields(
+            draft: widget.draft,
+            onDraftChanged: widget.onDraftChanged,
+            nameError: widget.nameError,
+            totalCountError: widget.totalCountError,
             gap: gap,
             l10n: l10n,
-            tabBody: tabBody,
-          );
-        }
-
-        return _topTabLayout(
-          viewportHeight: viewportHeight,
-          gap: gap,
-          l10n: l10n,
-          tabBody: tabBody,
-        );
-      },
-    );
-  }
-}
-
-class _SideTabList extends StatelessWidget {
-  const _SideTabList({
-    required this.l10n,
-    required this.tab,
-    required this.onSelected,
-  });
-
-  final AppLocalizations l10n;
-  final _SeriesMetadataEditTab tab;
-  final ValueChanged<int> onSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    final List<(String label, _SeriesMetadataEditTab value)> items =
-        <(String, _SeriesMetadataEditTab)>[
-          (l10n.dialogEditMetadataTabContent, _SeriesMetadataEditTab.content),
-          (
-            l10n.dialogEditMetadataTabFieldLocks,
-            _SeriesMetadataEditTab.fieldLocks,
           ),
-        ];
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        for (final (String label, _SeriesMetadataEditTab value) in items)
-          ListDetailNavItem(
-            key: ValueKey<_SeriesMetadataEditTab>(value),
-            label: label,
-            selected: tab == value,
-            onTap: () => onSelected(value.index),
+        ),
+        (
+          label: l10n.dialogEditMetadataTabFieldLocks,
+          body: SeriesMetadataLocksPane(
+            locks: widget.locks,
+            onLockChanged: widget.onLockChanged,
           ),
+        ),
       ],
     );
   }
