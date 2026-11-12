@@ -21,6 +21,7 @@ THIN_EDGE_PREFIXES = (
     "test/infrastructure/",
     "test/core/",
     "test/composition/",
+    "test/shared/application/",
     "test/shared/presentation/providers/",
 )
 
@@ -66,7 +67,7 @@ def collect_all_test_files(
 def classify_rubric(relative_path: str, in_manifest: bool) -> Rubric:
     p = relative_path.replace("\\", "/")
 
-    if p.startswith("test/gate/") or p == "test/project_layout_test.dart":
+    if p.startswith(("test/gate/", "test/architecture/")) or p == "test/project_layout_test.dart":
         return "architecture-guard"
 
     if p.startswith(THIN_EDGE_PREFIXES):

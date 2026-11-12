@@ -64,6 +64,14 @@ class AuditDartTestsTest(unittest.TestCase):
 
     def test_classify_rubric_precedence(self) -> None:
         self.assertEqual(
+            classify_rubric("test/architecture/dart_dependency_graph_test.dart", True),
+            "architecture-guard",
+        )
+        self.assertEqual(
+            classify_rubric("test/shared/application/navigation/app_routes_test.dart", True),
+            "thin-edge",
+        )
+        self.assertEqual(
             classify_rubric("test/gate/import_boundary_test.dart", True),
             "architecture-guard",
         )
