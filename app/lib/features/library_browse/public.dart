@@ -1,9 +1,6 @@
-/// library_browse 壳 module public API（ADR-0034 / ADR-0036 / #457）。
+/// library_browse 的模块入口；纯 Dart 消费者使用 public/contracts.dart。
 library;
 
-export 'public/di/author_detail_commands_factory.dart';
-export 'public/library_age_restriction_filter.dart';
-export 'public/presentation/library_browse_bootstrap_exports.dart';
-export 'public/ui/author_detail_page.dart';
-export 'public/ui/author_detail_commands.dart';
-export 'public/ui/library_page.dart';
+export 'public/contracts.dart';
+export 'public/providers.dart';
+export 'public/widgets.dart';

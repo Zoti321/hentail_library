@@ -1,17 +1,17 @@
 import 'package:hentai_library/features/comic/public/comic_metadata_types.dart';
-import 'package:hentai_library/features/bootstrap/di/overrides/domain_event_bus_overrides.dart';
-import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
-import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
+import 'package:hentai_library/composition/overrides/domain_event_bus_overrides.dart';
+import 'package:hentai_library/composition/feature_state_overrides.dart';
+import 'package:hentai_library/composition/composition_overrides.dart';
 import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/comic/domain/value_objects/comic_metadata_form.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/series_item_membership.dart';
 import 'package:hentai_library/features/comic/domain/repositories/comic_user_metadata_repository.dart';
-import 'package:hentai_library/features/comic/di/comic_repository_providers.dart';
+import 'package:hentai_library/features/comic/presentation/providers/comic_repository_providers.dart';
 import 'package:hentai_library/features/series/domain/series_repository.dart';
 import 'package:hentai_library/features/comic/application/comic_metadata_service.dart';
 import 'package:hentai_library/features/comic/presentation/view_models/comic_metadata_editor_notifier.dart';
-import 'package:hentai_library/features/series/public/di/series_repository_providers.dart';
+import 'package:hentai_library/features/series/public/providers/series_repository_providers.dart';
 import 'package:hentai_library/features/bootstrap/presentation/view_models/aggregates.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:riverpod/riverpod.dart';
@@ -117,7 +117,7 @@ void main() {
     container = ProviderContainer(
       overrides: <Override>[
         ...domainEventBusOverrides(),
-        ...sharedLibraryStateOverrides(),
+        ...featureStateOverrides(),
         ...bootstrapCompositionOverrides(),
         comicUserMetadataRepositoryProvider.overrideWithValue(comicRepo),
         seriesRepoProvider.overrideWithValue(seriesRepo),

@@ -74,6 +74,31 @@ bool isPublicPresentationExportAllowlisted(String libRelativePosix) {
   );
 }
 
+bool isPublicPresentationFacadeExport(
+  String source,
+  String target, [
+  String contents = '',
+]) {
+  final String module = classifyLibPath(source);
+  if (source.startsWith('features/$module/public/providers/') &&
+      target.startsWith('features/$module/presentation/providers/')) {
+    return true;
+  }
+  if ((source == 'features/$module/public/providers.dart' ||
+          source == 'features/$module/public/widgets.dart') &&
+      target.startsWith('features/$module/presentation/')) {
+    return true;
+  }
+  if (!source.startsWith('features/$module/public/') ||
+      !target.startsWith('features/$module/presentation/')) {
+    return false;
+  }
+  return RegExp(
+    "^export\\s+'package:hentai_library/${RegExp.escape(target)}'\\s+show\\s+[A-Za-z0-9_,\\s]+;",
+    multiLine: true,
+  ).hasMatch(contents);
+}
+
 final RegExp _exportOnlyShimRe = RegExp(
   r"^\s*export\s+'package:hentai_library/[^']+';\s*$",
 );
@@ -123,7 +148,7 @@ String classifyLibPath(String relativePosix) {
   if (path.startsWith('src/rust/')) {
     return 'frb_generated';
   }
-  if (path == 'main.dart') {
+  if (path.startsWith('composition/') || path == 'main.dart') {
     return 'bootstrap';
   }
   return 'shared';
@@ -173,7 +198,7 @@ bool isDomainLayerPath(String libRelativePosix) {
 
 bool isApplicationLayerPath(String libRelativePosix) {
   final String path = libRelativePosix.replaceAll(r'\', '/');
-  return path.startsWith('features/') && path.contains('/application/');
+  return path.contains('/application/');
 }
 
 /// Cross-feature allowlist (#427 / ADR-0034): `features/<owner>/public/**` only.
@@ -198,15 +223,15 @@ bool isFeaturePublicLayerPath(String libRelativePosix) {
 }
 
 bool _importTargetsFeatureApplication(String importPath) {
-  return importPath.startsWith('features/') &&
-      importPath.contains('/application/');
+  return importPath.contains('/application/');
 }
 
 bool _importTargetsDataLayer(String importPath) {
-  if (importPath.startsWith('shared/data/')) {
+  if (importPath.startsWith('infrastructure/')) {
     return true;
   }
-  return importPath.startsWith('features/') && importPath.contains('/data/');
+  return importPath.startsWith('features/') &&
+      importPath.contains('/infrastructure/');
 }
 
 bool _importTargetsPresentationLayer(String importPath) {
@@ -222,11 +247,11 @@ bool isFrbImportAllowedSource(String libRelativePosix) {
   if (path == 'main.dart') {
     return true;
   }
-  if (path.startsWith('shared/data/')) {
+  if (path.startsWith('infrastructure/')) {
     return true;
   }
-  // Wayfinder Phase C (#256 / #280): FRB thin edge lives in owner feature data/.
-  if (path.startsWith('features/') && path.contains('/data/')) {
+  // FRB calls stay in owner infrastructure; composition only selects adapters.
+  if (path.startsWith('features/') && path.contains('/infrastructure/')) {
     return true;
   }
   return false;
@@ -292,6 +317,7 @@ List<ImportViolation> collectImportViolations(Directory libDir) {
         continue;
       }
       _checkStructuralRules(
+        sourceContents: contents,
         found: found,
         sourceRel: rel,
         sourceModule: sourceModule,
@@ -325,6 +351,7 @@ List<ImportViolation> collectImportViolations(Directory libDir) {
           continue;
         }
         _checkStructuralRules(
+          sourceContents: contents,
           found: found,
           sourceRel: rel,
           sourceModule: sourceModule,
@@ -339,6 +366,7 @@ List<ImportViolation> collectImportViolations(Directory libDir) {
 }
 
 void _checkStructuralRules({
+  required String sourceContents,
   required List<ImportViolation> found,
   required String sourceRel,
   required String sourceModule,
@@ -347,10 +375,12 @@ void _checkStructuralRules({
   required String targetModule,
 }) {
   if (isDomainLayerPath(sourceRel)) {
-    final bool domainImportsSharedData = importPath.startsWith('shared/data/');
+    final bool domainImportsSharedData = importPath.startsWith(
+      'infrastructure/',
+    );
     final bool domainImportsOwnFeatureData =
         isProductModule(sourceModule) &&
-        importPath.startsWith('features/$sourceModule/data/');
+        importPath.startsWith('features/$sourceModule/infrastructure/');
     if (domainImportsSharedData || domainImportsOwnFeatureData) {
       found.add(
         violation(
@@ -498,6 +528,11 @@ void _checkStructuralRules({
   if (isFeaturePublicLayerPath(sourceRel) &&
       isProductModule(sourceModule) &&
       importPath.startsWith('features/$sourceModule/presentation/') &&
+      !isPublicPresentationFacadeExport(
+        sourceRel,
+        importPath,
+        sourceContents,
+      ) &&
       !isPublicPresentationExportAllowlisted(sourceRel)) {
     found.add(
       violation(

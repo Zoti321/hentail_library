@@ -12,7 +12,7 @@ import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hentai_library/features/app_settings/presentation/views/dialogs/app_update_dialog.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
-import 'package:hentai_library/features/app_settings/di/app_update_providers.dart';
+import 'package:hentai_library/features/app_settings/presentation/providers/app_update_providers.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -41,7 +41,7 @@ class AppUpdateController extends _$AppUpdateController {
       final PackageInfo info = await ref.read(packageInfoProvider.future);
       final String currentVersion = SemverUtils.normalizeVersion(info.version);
       final AppReleaseInfo? latestRelease = await ref
-          .read(appUpdateServiceProvider)
+          .read(appUpdateGatewayProvider)
           .fetchLatestStableRelease();
       if (latestRelease == null) {
         if (showFeedbackToasts) {

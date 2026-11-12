@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/features/comic_metadata/public/di/comic_metadata_repository_providers.dart';
-import 'package:hentai_library/shared/di/domain_event_revisions.dart';
-import 'package:hentai_library/features/comic_metadata/public/di/comic_metadata_dictionary_state_providers.dart';
+import 'package:hentai_library/features/comic_metadata/public/providers/comic_metadata_repository_providers.dart';
+import 'package:hentai_library/shared/presentation/providers/domain_event_revisions.dart';
+import 'package:hentai_library/features/comic_metadata/public/providers/comic_metadata_dictionary_state_providers.dart';
 import 'package:hentai_library/features/comic_metadata/public/comic_metadata_entities.dart';
 
 final libraryFilterTagNamesProvider = Provider<AsyncValue<List<String>>>((

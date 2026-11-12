@@ -7,12 +7,11 @@ test/gate
 # 新架构门禁（跨模块 import+export、禁止边、public 环、DI 倒置；ADR-0040）
 test/architecture
 
-# Dart 薄边缝：domain / core / data（FRB mapper · guard · adapter）
-test/shared/domain
+# Dart 薄边缝：core / infrastructure / shared Provider（FRB mapper · guard · adapter）
 test/core
-test/shared/di
+test/shared/presentation/providers
 test/features/app_settings/presentation/views/settings_page/settings_page_test.dart
-test/shared/data
+test/infrastructure
 
 # FRB 线缝冒烟（真实 cdylib；run-gate.sh dart-test 会先 cargo build）
 test/frb_wire
@@ -44,7 +43,7 @@ test/features/series/presentation/views/metadata_edit/series_metadata_edit_view_
 test/features/comic/presentation/views/widgets/form/library_facet_multi_select_field_test.dart
 test/features/home/presentation/views/home/patterns/home_bento_stat_card_test.dart
 test/features/library_admin/presentation/views/home_library_dashboard/home_library_dashboard_rows_test.dart
-test/shared/util/list_edit_test.dart
+test/core/util/list_edit_test.dart
 
 # Dart hard-manifest UI — 纯逻辑 ViewModel / policy / codec
 test/design-system/motion/app_motion_test.dart
@@ -86,7 +85,7 @@ test/features/library_admin/domain/library_sidebar_layout_test.dart
 test/features/library_admin/domain/resource_format_category_setting_test.dart
 test/features/library_admin/presentation/view_models/scan_library_controller_sync_test.dart
 test/features/comic/presentation/draft/bulk_metadata_edit_session_test.dart
-test/shared/util/name_pinyin_assisted_filter_test.dart
+test/core/util/name_pinyin_assisted_filter_test.dart
 test/features/library_admin/presentation/view_models/metadata_refresh_controller_revision_test.dart
 test/features/library_admin/presentation/views/navigation/libraries_routes_test.dart
 test/features/comic_trash/presentation/view_models/trash_page_state_test.dart
@@ -100,11 +99,9 @@ test/features/comic/domain/value_objects/comic_language_test.dart
 test/features/comic/application
 test/features/library_admin/application
 test/features/library_admin/domain/value_objects/library_form_test.dart
-test/features/library_admin/di
-test/features/bootstrap/di
+test/composition
 test/features/metadata_backup/application
 test/features/metadata_backup/presentation
 test/features/home/presentation/view_models/home_page_counts_stream_test.dart
 test/features/home/presentation/view_models/reading_activity_stats_stream_test.dart
 test/features/reader/presentation/view_models/series_reader_provider_test.dart
-test/features/reading_history/di

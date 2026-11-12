@@ -246,7 +246,17 @@ void main() {
         "^(?:import|export)\\s+'package:hentai_library/features/$sourceModule/presentation/",
         multiLine: true,
       );
-      if (ownPresentation.hasMatch(contents) && !allowlist.contains(rel)) {
+      final bool referencesPrivatePresentation = ownPresentation
+          .allMatches(contents)
+          .any((match) {
+            final String directive = contents.substring(match.start);
+            final String? target = RegExp(r"package:hentai_library/([^']+)")
+                .firstMatch(directive)
+                ?.group(1);
+            return target == null ||
+                !isPublicPresentationFacadeExport(rel, target, contents);
+          });
+      if (referencesPrivatePresentation && !allowlist.contains(rel)) {
         offenders.add(rel);
       }
     }

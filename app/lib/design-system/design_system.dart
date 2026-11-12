@@ -1,7 +1,7 @@
 /// Design System 层：业务无关的主题、动效、布局常量与通用控件（ADR-0044）。
 ///
 /// 本文件是**唯一对外入口**。层内不得依赖产品 feature、`shared` 的业务层
-/// （ui / domain / di / data）；只允许 `core`、`shared/util`、层内路径与第三方包。
+/// （ui / domain / di / data）；只允许 `core`、层内路径与第三方包。
 /// 门禁：`app/test/design-system/design_system_boundary_test.dart`（零 allowlist）。
 library;
 

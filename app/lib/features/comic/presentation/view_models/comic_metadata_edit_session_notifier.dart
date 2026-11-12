@@ -1,11 +1,11 @@
-import 'package:hentai_library/features/comic/di/comic_metadata_service.dart';
+import 'package:hentai_library/features/comic/presentation/providers/comic_metadata_use_case_providers.dart';
 import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/features/comic/presentation/patterns/metadata_edit/comic_metadata_edit_draft.dart';
 import 'package:hentai_library/features/comic/presentation/patterns/metadata_edit/comic_metadata_smart_facet_scope.dart';
 import 'package:hentai_library/features/comic/presentation/view_models/comic_metadata_edit_ui_state.dart';
 import 'package:hentai_library/features/comic/presentation/view_models/comic_metadata_editor_notifier.dart';
 import 'package:hentai_library/features/comic/presentation/view_models/comic_metadata_smart_facet_providers.dart';
-import 'package:hentai_library/features/comic/public/ui/comic_metadata_edit_mappers.dart';
+import 'package:hentai_library/features/comic/presentation/mappers/comic_metadata_edit_mappers.dart';
 import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/features/comic/domain/value_objects/comic_metadata_form.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/series_item_membership.dart';

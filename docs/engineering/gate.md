@@ -2,7 +2,7 @@
 
 **决策**：ADR-0018（三层缝、CI tier 词汇）、ADR-0002（业务真值在 Rust）、**ADR-0033**（feature `application/`）、**ADR-0034**（cross-feature `public/`）、**ADR-0041**（Comic 实体归属）、**ADR-0042**（Series 实体归属 + 槽位契约）、**ADR-0043**（导航与路由解耦）。**Job 列表以** `.github/workflows/gate.yml` **为准**；本地与 CI 同源：`./scripts/run-gate.sh`。
 
-**Wayfinder `lib/` 顶层目录**（Phase A/B）：`core/`、`design-system/`、`features/`、`shared/`、`src/`；由 `app/test/gate/lib_layout_scan_helpers.dart` · `project_layout_test.dart` 断言。`design-system/**` 归类为 `shared`（ADR-0044），因此**继承** R13 且受独立出边白名单约束。产品 feature 之间 **仅允许** import `features/<owner>/public/**` 或 `features/<owner>/public.dart`（M1）；`shared/**` **禁止** import feature public（R11），且 **不得** import `features/**`（R13，ratchet：`shared/di`、`shared/domain`、`core/**` 等既有边只许减不许增）。
+**Wayfinder `lib/` 顶层目录**（Phase A/B）：`composition/`、`core/`、`design-system/`、`features/`、`infrastructure/`、`shared/`、`src/`；由 `app/test/gate/lib_layout_scan_helpers.dart` · `project_layout_test.dart` 断言。`design-system/**` 归类为 `shared`（ADR-0044），因此**继承** R13 且受独立出边白名单约束。产品 feature 之间 **仅允许** import `features/<owner>/public/**` 或 `features/<owner>/public.dart`（M1）；`shared/**` **禁止** import feature public（R11），且 **不得** import `features/**`（R13，ratchet：`shared/presentation/providers`、`shared/domain`、`core/**` 等既有边只许减不许增）。
 
 **工具链**：CI 固定 **Flutter 3.47.8**（`gate.yml` → `FLUTTER_VERSION`）。本地请用同 major/minor 的 stable；`flutter analyze` 在 GitHub Actions（`CI=true`）下会将 info 级 lint 也计为失败。Dart 侧另设 **`dart_code_linter`** 硬门禁（`gate-dart-lint`，见下文 DCL 节）。`riverpod_lint` 为可选 dev 依赖（不依赖 `custom_lint`）；**Gate 的 `flutter analyze` 暂未挂 `plugins: riverpod_lint`**，避免未偿还的 Riverpod 风格债挡合并。本地可在 `analysis_options.yaml` 临时启用做增量清理。SDK 升级记录见 `docs/engineering/flutter-3.47-migration.md`。
 
@@ -15,7 +15,7 @@
 | DCL 规则门禁 | `./scripts/run-gate.sh dart-lint`（见下节） |
 | 合并前 UI 怀疑回归 | 再跑 `cd app && flutter test`（含慢轨，**不进 Gate**） |
 | Import 边界 | `cd app && flutter test test/gate/import_boundary_test.dart` |
-| DI token 覆盖 | `cd app && flutter test test/gate/shared_di_override_coverage_test.dart`（`shared/di` 声明 ⊆ override，漏注入即红） |
+| 共享 Provider 覆盖 | `cd app && flutter test test/gate/shared_di_override_coverage_test.dart`（共享 token 声明 ⊆ override；全 app 必需 token 与 public 结构另见 `test/architecture/public_interface_test.dart`） |
 | 领域事件门禁 | `cd app && flutter test test/gate/domain_event_rules_test.dart`（ADR-0039） |
 | Comic 实体归属 | `cd app && flutter test test/architecture/comic_entity_ownership_test.dart`（ADR-0041；shared 内不得再出现 `Comic`） |
 | Series 实体归属 | `cd app && flutter test test/architecture/series_entity_ownership_test.dart`（ADR-0042；shared 内不得再出现 `Series` 实体/VO 引用） |
@@ -102,9 +102,11 @@ cd app && dart run dart_code_linter:metrics analyze lib \
 |----|------|
 | Rust 业务 | `core/` + `tests/common/` harness → `gate-rust-test` |
 | FRB 线缝 | `app/test/frb_wire/`（`frb_wire_harness.dart`）→ manifest |
-| Dart 薄边 | mapper/guard/adapters → `app/test/shared/data/{frb,mappers}/`、`test/features/*/data/` · 见 [`feature-data-layout.md`](./feature-data-layout.md) |
+| Dart 薄边 | mapper/guard/adapters → `app/test/infrastructure/{frb,mappers}/`、`test/features/*/data/` · 见 [`feature-data-layout.md`](./feature-data-layout.md) |
 | UI 快轨 | 列入 `app/test/gate/manifest.txt` 的 UI/逻辑（含 `test/design-system`，ADR-0044 层门禁与迁入组件测试） |
 | UI 慢轨 | `test/shared/ui`、`test/features` 未进 manifest 部分 → `nightly-dart-ui`（`test/design-system` 整体走快轨） |
+
+**整洁架构目录与内层递归依赖**：ADR-0051；`test/architecture/clean_architecture_dependency_test.dart` 同时检查 import/export 链和组合根调用方向。
 
 业务 sync/read/DB：**信任 `cargo test`**。Dart **不要**对真 FRB / `*_repository_impl` 写全流程集成测。
 
@@ -180,7 +182,7 @@ Epic [#447](https://github.com/Zoti321/hentail_library/issues/447) 清理 Flutte
 | Gate 自检 | `test/gate/**`（import boundary、L3、strangler、manifest 自检） |
 | 布局 ratchet | `test/project_layout_test.dart` |
 | FRB 线缝 | `test/frb_wire/**` |
-| Dart 薄边（目录级） | `test/shared/domain`、`test/shared/data`、`test/core`、`test/shared/di` |
+| Dart 薄边（目录级） | `test/infrastructure`、`test/core`、`test/shared/presentation/providers` |
 | App / Lab 最小冒烟 | `test/widget_test.dart`、`test/md3e/**`（Lab 契约，非 Figma CI） |
 
 单文件是否 protected 以盘存 rubric **`architecture-guard`** / **`thin-edge`** 为准；**`ui-contract`** 在 manifest 内仍可 **降级**（移出 manifest，非立即删文件）。
@@ -235,13 +237,13 @@ Epic [#447](https://github.com/Zoti321/hentail_library/issues/447) 清理 Flutte
 
 |  concern | 测试 / 文件 |
 |----------|-------------|
-| L1 domain↔data、FRB 面、application 依赖、shared→feature public、public→presentation（含 `export`，R12 allowlist） | `import_boundary_test.dart`（R1–R12）；`public_presentation_export_allowlist.txt`（只缩不扩） |
+| L1 domain↔data、FRB 面、application 依赖、shared→feature public、public→presentation（含 `export`；R12 legacy allowlist + ADR-0051 显式 facade） | `import_boundary_test.dart`（R1–R12）；`public_presentation_export_allowlist.txt`（只缩不扩；规范入口由 `public_interface_test.dart` 验证） |
 | L1b shared→features ratchet（R13） | **单一实现**：`test/architecture/module_boundary_test.dart`（扫 `import` + `export`），baseline `test/gate/import_boundary_baseline.json` + `test/architecture/baseline.json`；两份 baseline 都有 stale 校验（当前扫描产不出的条目必须删）。`import_boundary_test.dart` 只断言「R13 无第二实现」。归属判定见 ADR-0045 |
 | L2 product 图 ratchet（M1 非 public 边、M2/M3） | `import_boundary_baseline.json` → `dart run tool/generate_import_boundary_baseline.dart` |
 | Cross-feature 协作约定 | [`cross-feature-collaboration.md`](cross-feature-collaboration.md)；**新增协作能力先判定可达性**（ADR-0045 / ADR-0050；Command/Query/流同样受约束） |
-| 领域事件（E1 事件子类位置 / E2 仅 application·data 发布 / E4 实现收敛） | `domain_event_rules_test.dart`（ADR-0039） |
+| 领域事件（E1 事件子类位置 / E2 仅 application·infrastructure 发布 / E4 实现收敛） | `domain_event_rules_test.dart`（ADR-0039） |
 | public 图无环 | `import_boundary_test.dart`（`collectPublicCrossFeatureAdjacency`） |
-| bootstrap shared 注入 | `features/bootstrap/di/overrides/*` + `shared_state_overrides.dart`（#435） |
+| bootstrap shared 注入 | `composition/overrides/*` + `feature_state_overrides.dart`（#435） |
 | L3a shared/ui → features | `shared_ui_no_feature_import_test.dart` |
 | L3a design-system → features / shared domain·di·data·ui | `test/design-system/design_system_boundary_test.dart`（ADR-0044；零 allowlist） |
 | L3b shared/domain → features ratchet | `shared_domain_no_feature_import_test.dart` + baseline 生成器；归属见 [`shared-domain-ownership.md`](./shared-domain-ownership.md) |

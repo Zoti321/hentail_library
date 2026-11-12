@@ -4,6 +4,8 @@
 
 Accepted（2026-11-12），已实施，验证记录见 `.scratch/module-communication/verification.md`。八项方向、完整实施计划与测试 seam 均已获用户最终确认；实施规格见 `.scratch/module-communication/plan.md`。局部修订 ADR-0033、0039、0045、0049 的跨模块 Port 表达，代码门禁随实施同步调整。
 
+> **ADR-0051 修订（2026-11-12）**：组合根迁到 `lib/composition/`；owner `data/` 迁为 `infrastructure/`；共享协作签名在 `shared/application/contracts/`，Riverpod 适配在 `shared/presentation/providers/`。内层以递归 import/export 门禁为准；下文旧目录是历史语境。
+
 ## Context
 
 模块通信本已通过 Riverpod 注入，但许多 Port 与单实现 Adapter 只把参数转给 Notifier；同时具体业务用例仍散在 UI 会话、Provider、值对象与数据服务中。仅改名不能解决内聚问题，直接把 Ref 传入 application 又会破坏纯 Dart 用例层。

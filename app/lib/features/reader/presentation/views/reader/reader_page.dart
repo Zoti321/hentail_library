@@ -26,7 +26,7 @@ import 'package:hentai_library/features/reader/presentation/patterns/reader/read
 import 'package:hentai_library/features/reader/presentation/patterns/reader/reader_viewport_status.dart';
 import 'package:hentai_library/features/reader/domain/reading_mode.dart';
 import 'package:hentai_library/features/reader/domain/reading_preferences.dart';
-import 'package:hentai_library/features/reader/public/reading_preferences_providers.dart';
+import 'package:hentai_library/features/reader/presentation/providers/reading_preferences_providers.dart';
 import 'package:hentai_library/shared/ui/navigation/app_navigator_context.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';

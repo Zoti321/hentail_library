@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/core/util/open_downloaded_file.dart';
-import 'package:hentai_library/features/app_settings/di/app_update_providers.dart';
+import 'package:hentai_library/features/app_settings/presentation/providers/app_update_providers.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hentai_library/features/app_settings/presentation/views/dialogs/app_update_download_dialog.dart';
 import 'package:hentai_library/features/app_settings/domain/app_release_info.dart';
@@ -49,7 +49,7 @@ class AppUpdateDialog extends ConsumerWidget {
   ) async {
     Navigator.of(context).pop();
     final AppReleaseAsset? asset = ref
-        .read(appUpdateServiceProvider)
+        .read(appUpdateGatewayProvider)
         .findPlatformAsset(release.assets);
     if (asset == null) {
       try {

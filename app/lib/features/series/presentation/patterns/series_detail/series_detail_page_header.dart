@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/domain/catalog/page_size/library_tab_page_size_settings.dart';
+import 'package:hentai_library/shared/ui/catalog/page_size/library_tab_page_size_settings.dart';
 import 'package:hentai_library/features/series/presentation/patterns/series_detail/series_detail_page_size_control.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/detail_header_toolbar.dart';
 import 'package:hentai_library/design-system/components/scaffold/pinned_toolbar_chrome.dart';

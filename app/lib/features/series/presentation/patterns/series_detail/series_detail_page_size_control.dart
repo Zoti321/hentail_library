@@ -5,7 +5,7 @@ import 'package:hentai_library/design-system/components/scaffold/library_page_he
 import 'package:hentai_library/design-system/components/menu/anchored_menu.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:hentai_library/shared/domain/catalog/page_size/library_tab_page_size_settings.dart';
+import 'package:hentai_library/shared/ui/catalog/page_size/library_tab_page_size_settings.dart';
 
 /// 系列详情顶栏每页条数菜单节点。
 List<M3EMenuNode> seriesDetailPageSizeMenuNodes({

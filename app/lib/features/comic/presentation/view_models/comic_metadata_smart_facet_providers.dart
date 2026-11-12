@@ -1,13 +1,14 @@
+import 'package:hentai_library/features/comic_metadata/public/providers.dart';
 import 'package:hentai_library/features/comic_metadata/public/comic_metadata_form.dart';
 import 'package:hentai_library/features/comic/domain/smart_facet_match.dart';
 import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/features/comic/domain/repositories/comic_lookup_repository.dart';
-import 'package:hentai_library/features/app_settings/public/di/app_settings_providers.dart';
-import 'package:hentai_library/shared/di/series_reading_context_providers.dart';
+import 'package:hentai_library/features/app_settings/public/providers/app_settings_providers.dart';
+import 'package:hentai_library/shared/presentation/providers/series_reading_context_providers.dart';
 import 'package:hentai_library/shared/domain/reading/series_reading_context.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
-import 'package:hentai_library/features/comic/di/comic_repository_providers.dart';
+import 'package:hentai_library/features/comic/presentation/providers/comic_repository_providers.dart';
 
 /// Scope for Smart facet match on Comic metadata form.
 typedef ComicMetadataSmartFacetScope = ({
@@ -70,8 +71,9 @@ Future<List<SmartFacetMatchCandidate>> _rankFacet({
   required ComicMetadataSmartFacetScope scope,
   required NamedFacetFormKind kind,
 }) async {
-  final List<NamedFacetFormCandidate> catalog =
-      await listNamedFacetForMetadataForm(kind);
+  final List<NamedFacetFormCandidate> catalog = await ref
+      .read(namedFacetFormListingProvider)
+      .listForMetadataForm(kind);
   // 智能匹配开关已并入 AppSetting（ADR-0046）；未加载/失败时按默认开启处理。
   final bool enabled = (await ref.watch(appSettingsProvider.future))
       .smartFacetMatchEnabled;

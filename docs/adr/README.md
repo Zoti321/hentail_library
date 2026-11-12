@@ -129,3 +129,4 @@ Accepted | Superseded by ADR-000N | Deprecated
 | [0048](./0048-comic-metadata-module-and-author-tag-ownership.md) | `comic_metadata` 模块（原 `named_metadata`）与 Author / Tag 归属（收缩 Catalog Shared Kernel，#533） | Accepted |
 | [0049](./0049-remaining-model-and-port-cohesion.md) | 剩余 models / ports 按 owner 与可达性内聚 | Accepted |
 | [0050](./0050-riverpod-module-communication-and-use-case-cohesion.md) | Riverpod 模块通信与具体应用用例内聚 | Accepted |
+| [0051](./0051-clean-architecture-composition-and-infrastructure.md) | 整洁架构组合根、基础设施与内层依赖 | Accepted |

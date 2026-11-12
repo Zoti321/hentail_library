@@ -1,12 +1,12 @@
 import 'dart:typed_data';
 
-import 'package:dio/dio.dart';
+import 'package:hentai_library/shared/application/cancellation_token.dart';
 import 'package:hentai_library/core/logging/app_log.dart';
-import 'package:hentai_library/shared/data/frb/frb_error_mapper.dart';
+import 'package:hentai_library/core/errors/error_message.dart';
 import 'package:hentai_library/features/comic_metadata/domain/tag_dictionary_import_result.dart';
-import 'package:hentai_library/features/comic_metadata/di/download_providers.dart';
+import 'package:hentai_library/features/comic_metadata/presentation/providers/download_providers.dart';
 import 'package:hentai_library/features/comic_metadata/presentation/view_models/named_facet_management_view_model.dart';
-import 'package:hentai_library/features/comic_metadata/public/di/comic_metadata_repository_providers.dart';
+import 'package:hentai_library/features/comic_metadata/public/providers/comic_metadata_repository_providers.dart';
 import 'package:hentai_library/features/comic_metadata/domain/named_facet_management_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -40,7 +40,7 @@ class TagDictionaryImportState {
 
 @Riverpod(keepAlive: true)
 class TagDictionaryImportViewModel extends _$TagDictionaryImportViewModel {
-  CancelToken? _cancelToken;
+  CancellationToken? _cancelToken;
 
   @override
   TagDictionaryImportState build() => const TagDictionaryImportState();
@@ -53,22 +53,19 @@ class TagDictionaryImportViewModel extends _$TagDictionaryImportViewModel {
       return null;
     }
     state = state.copyWith(running: true, clearError: true, clearResult: true);
-    _cancelToken = CancelToken();
+    _cancelToken = CancellationToken();
     try {
       final Uint8List bytes = await ref
-          .read(tagDictionaryDownloadServiceProvider)
+          .read(tagDictionaryDownloadGatewayProvider)
           .download(
             url: url,
             cancelToken: _cancelToken,
             onProgress: onDownloadProgress,
           );
       return await _importBytes(bytes);
-    } on DioException catch (error, stackTrace) {
-      if (CancelToken.isCancel(error)) {
-        state = state.copyWith(running: false);
-        return null;
-      }
-      return _fail(error, stackTrace, fallback: '下载标签字典失败');
+    } on OperationCancelledException {
+      state = state.copyWith(running: false);
+      return null;
     } catch (error, stackTrace) {
       return _fail(error, stackTrace, fallback: '下载标签字典失败');
     } finally {
@@ -120,7 +117,7 @@ class TagDictionaryImportViewModel extends _$TagDictionaryImportViewModel {
     required String fallback,
   }) {
     logError(AppLog.ui('tag-import'), fallback, error, stackTrace);
-    final String message = caughtErrorMessage(error, fallbackMessage: fallback);
+    final String message = appErrorMessage(error);
     state = state.copyWith(running: false, error: message);
     return null;
   }

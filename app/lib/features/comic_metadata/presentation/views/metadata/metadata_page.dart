@@ -22,7 +22,7 @@ import 'package:hentai_library/features/comic_metadata/domain/named_facet_manage
 import 'package:hentai_library/shared/ui/layout/app_shell_navigation.dart';
 import 'package:hentai_library/shared/ui/navigation/pop_or_go_home.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
-import 'package:hentai_library/shared/di/app_navigator_provider.dart';
+import 'package:hentai_library/shared/presentation/providers/app_navigator_provider.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

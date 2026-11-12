@@ -1,3 +1,5 @@
+import 'package:hentai_library/shared/presentation/providers/catalog_state_providers.dart';
+
 import 'dart:async';
 
 import 'package:hentai_library/shared/domain/library/library_age_restriction_filter.dart';
@@ -5,8 +7,7 @@ import 'package:hentai_library/features/home/presentation/view_models/home_alert
 import 'package:hentai_library/core/util/stream_throttle.dart';
 import 'package:hentai_library/features/home/domain/home_page_read_models.dart';
 import 'package:hentai_library/features/home/domain/home_page_repository.dart';
-import 'package:hentai_library/shared/di/library_state_providers.dart';
-import 'package:hentai_library/features/home/public/di/home_page_providers.dart';
+import 'package:hentai_library/features/home/public/providers/home_page_providers.dart';
 import 'package:hentai_library/features/reading_stats/public.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';

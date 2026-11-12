@@ -1,3 +1,5 @@
+import 'package:hentai_library/composition/modules/comic/comic_read_query.dart';
+
 import 'dart:async';
 import 'dart:typed_data';
 
@@ -13,7 +15,6 @@ import 'package:hentai_library/features/reader/domain/reader_page_payload.dart';
 import 'package:hentai_library/features/reader/application/open_read_session_service.dart';
 import 'package:hentai_library/features/reader/domain/opened_read_session.dart';
 import 'package:test/test.dart';
-import 'package:hentai_library/features/comic/public/di/comic_read_query.dart';
 
 class _FakeComicRepository implements ComicLookupRepository {
   _FakeComicRepository({this.comic});

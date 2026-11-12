@@ -1,5 +1,5 @@
-import 'package:hentai_library/features/library_admin/public/di/library_admin_state_providers.dart';
-import 'package:hentai_library/features/library_admin/public/ui/library_management_commands.dart';
+import 'package:hentai_library/features/library_admin/public/providers/library_admin_state_providers.dart';
+import 'package:hentai_library/features/library_admin/presentation/contracts/library_management_commands.dart';
 
 import 'dart:async';
 
@@ -17,9 +17,9 @@ import 'package:hentai_library/features/library_admin/domain/local_library.dart'
 import 'package:hentai_library/features/home/public/home_library_stat.dart';
 import 'package:hentai_library/shared/ui/patterns/home/home_library_dashboard_models.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
-import 'package:hentai_library/features/library_admin/public/ui/metadata_refresh_toasts.dart';
+import 'package:hentai_library/features/library_admin/presentation/feedback/metadata_refresh_toasts.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:hentai_library/features/home/public/di/home_library_stats_stream.dart';
+import 'package:hentai_library/features/home/public/providers/home_library_stats_stream.dart';
 
 /// 生产首页「我的漫画库」区块：库列表 UI + 扫描/编辑/排序等编排。
 class HomeLibraryManagementPanel extends HookConsumerWidget {

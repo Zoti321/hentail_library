@@ -68,7 +68,7 @@ class AuditDartTestsTest(unittest.TestCase):
             "architecture-guard",
         )
         self.assertEqual(
-            classify_rubric("test/shared/data/frb/foo_mapper_test.dart", True),
+            classify_rubric("test/infrastructure/frb/foo_mapper_test.dart", True),
             "thin-edge",
         )
         self.assertEqual(

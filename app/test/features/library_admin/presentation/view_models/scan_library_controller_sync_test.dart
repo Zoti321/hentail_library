@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:hentai_library/features/library_admin/di/library_sync.dart';
+import 'package:hentai_library/features/library_admin/presentation/providers/library_sync_providers.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/scan_library_controller.dart';
 import 'package:hentai_library/features/library_admin/domain/sync_library_port.dart';
@@ -8,7 +8,7 @@ import 'package:hentai_library/features/library_admin/domain/sync_library_types.
 import 'package:riverpod/misc.dart' show Override;
 import 'package:riverpod/riverpod.dart';
 import 'package:test/test.dart';
-import 'package:hentai_library/features/bootstrap/di/overrides/domain_event_bus_overrides.dart';
+import 'package:hentai_library/composition/overrides/domain_event_bus_overrides.dart';
 
 class _ScriptedSyncAdapter implements SyncLibraryPort {
   _ScriptedSyncAdapter(this._run);

@@ -1,7 +1,0 @@
-import 'package:hentai_library/features/reading_stats/application/record_read_session_activity.dart';
-import 'package:hentai_library/features/reading_stats/data/repositories/reading_activity_stats_repository_impl.dart';
-import 'package:hentai_library/features/reading_stats/domain/record_read_session_activity_command.dart';
-
-RecordReadSessionActivityCommand createRecordReadSessionActivityCommand() =>
-    const RecordReadSessionActivity(ReadingActivityStatsRepositoryImpl())
-        .record;

@@ -10,7 +10,7 @@ import '../gate/lib_layout_scan_helpers.dart';
 ///
 /// - `presentation/**` 不 import 本模块 `data/**`（状态实现归 owner DI，视图不直连仓储）。
 /// - `presentation/**` 不 import 领域事件实现（只经 ViewModel / Port 转发）。
-/// - `shared/di` 声明的 token 必须在应用组合根有 override。
+/// - `shared/presentation/providers` 声明的 token 必须在应用组合根有 override。
 void main() {
   late Directory libDir;
 
@@ -18,29 +18,13 @@ void main() {
     libDir = Directory(p.join(Directory.current.path, 'lib'));
   });
 
-  test('presentation 不 import 本模块 data/', () {
-    const Set<String> outOfScopeBaseline = <String>{
-      'features/library_admin/presentation/views/library/library_form_dialog.dart',
-      'features/metadata_backup/presentation/metadata_export_flow.dart',
-      'features/metadata_backup/presentation/metadata_import_flow.dart',
-      'features/metadata_backup/presentation/view_models/metadata_auto_backup_coordinator_notifier.dart',
-      'features/metadata_backup/presentation/views/metadata_backup_settings_sections.dart',
-    };
-    final List<String> offenders = _presentationDataEdges(libDir)
-        .where((String rel) => !outOfScopeBaseline.contains(rel))
-        .toList();
-    expect(
-      offenders,
-      isEmpty,
-      reason: 'presentation 直连 data 破坏依赖倒置：\n${offenders.join('\n')}',
-    );
+  test('presentation never imports infrastructure directly', () {
+    expect(_presentationDataEdges(libDir), isEmpty);
   });
 
   test('presentation 不 import 领域事件实现', () {
     final List<String> offenders = <String>[];
-    for (final File file in dartFilesUnder(
-      Directory(p.join(libDir.path, 'features')),
-    )) {
+    for (final File file in dartFilesUnder(Directory(libDir.path))) {
       if (isGeneratedDartFile(file.path)) {
         continue;
       }
@@ -49,7 +33,7 @@ void main() {
         continue;
       }
       final String contents = file.readAsStringSync();
-      if (contents.contains('shared/data/events/') ||
+      if (contents.contains('infrastructure/events/') ||
           contents.contains('shared/domain/events/domain_event_bus.dart')) {
         offenders.add(rel);
       }
@@ -64,15 +48,19 @@ void main() {
     );
   });
 
-  test('shared/di 每个注入 token 至少有一处 overrideWith', () {
+  test('shared/presentation/providers 每个注入 token 至少有一处 overrideWith', () {
     final Directory sharedDiDir = Directory(
-      p.join(libDir.path, 'shared', 'di'),
+      p.join(libDir.path, 'shared', 'presentation', 'providers'),
     );
-    final Directory featuresDir = Directory(p.join(libDir.path, 'features'));
+    final Directory featuresDir = Directory(libDir.path);
     final Set<String> declared = _collectDeclaredTokens(sharedDiDir);
     final Set<String> overridden = _collectOverriddenTokens(featuresDir);
 
-    expect(declared, isNotEmpty, reason: 'shared/di 未采集到任何 token');
+    expect(
+      declared,
+      isNotEmpty,
+      reason: 'shared/presentation/providers 未采集到任何 token',
+    );
     expect(overridden, isNotEmpty, reason: 'features/ 未采集到任何 overrideWith');
 
     final List<String> missing = declared.difference(overridden).toList()
@@ -81,7 +69,7 @@ void main() {
       missing,
       isEmpty,
       reason:
-          '以下 shared/di token 没有 overrideWith/overrideWithValue：\n'
+          '以下 shared/presentation/providers token 没有 overrideWith/overrideWithValue：\n'
           '${missing.join('\n')}',
     );
   });
@@ -101,7 +89,7 @@ List<String> _presentationDataEdges(Directory libDir) {
       continue;
     }
     final RegExp ownData = RegExp(
-      "^(?:import|export)\\s+'package:hentai_library/features/$sourceModule/data/",
+      "^(?:import|export)\\s+'package:hentai_library/(?:infrastructure/|features/[^/]+/(?:public/)?infrastructure/)",
       multiLine: true,
     );
     final String contents = file.readAsStringSync();

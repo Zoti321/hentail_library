@@ -15,8 +15,8 @@ Wayfinder feature 内可选目录 `features/*/application/`：纯 Dart 的具体
 _Avoid_: 把 Application data 目录称为 Application 层；在 application 层 import presentation / FRB
 
 **Feature public API**:
-跨 feature 协作时，消费方只 `import` owner 的 `features/<id>/public/**` 或 `public.dart`；仍通过 `shared/di` 的 Provider token + bootstrap override 拿实现。详见 ADR-0034。
-_Avoid_: deep import 其他 feature 的 presentation / data / di；让 `shared/**` import feature public
+模块对其他模块公开的契约、可观察状态和界面能力；调用方按所需能力选择入口，依赖的具体实现由宿主装配。详见 ADR-0034、ADR-0051。
+_Avoid_: deep import 其他 feature 的 presentation / infrastructure / composition；让 `shared/**` import feature public
 
 ### Library & resources
 

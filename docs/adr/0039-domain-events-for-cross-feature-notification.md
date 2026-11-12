@@ -8,6 +8,8 @@ Accepted
 
 “要它做事”采用明确 Command 函数 Provider；按需读取用 Query，订阅状态用 Provider/StreamProvider/Notifier。此修订取代下文统一 Port 命名，领域事实、发布层级与唯一 reducer 不变。shared 纯 Dart 签名归 `shared/domain/contracts/`；BuildContext 签名归 `shared/ui/contracts/`。手动备份导入保持原有事实：Rust 通知已提交变化，Dart 不新增领域事件。Library CRUD 的发布点已改为 SubmitLibraryFormUseCase / DeleteLibraryUseCase。
 
+> **ADR-0051 修订（2026-11-12）**：组合根迁到 `lib/composition/`；owner `data/` 迁为 `infrastructure/`；共享协作签名在 `shared/application/contracts/`，Riverpod 适配在 `shared/presentation/providers/`。内层以递归 import/export 门禁为准；下文旧目录是历史语境。
+
 ## Context
 
 ADR-0034（public only）解决了「谁能 import 谁」，但**同一次写入后的通知**在 Dart 侧仍有多套并行表达：

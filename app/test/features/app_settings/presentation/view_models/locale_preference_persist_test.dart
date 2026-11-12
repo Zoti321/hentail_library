@@ -6,7 +6,7 @@ import '../../../../support/fakes/settings_test_fakes.dart';
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;
-import 'package:hentai_library/features/app_settings/public/di/app_settings_providers.dart';
+import 'package:hentai_library/features/app_settings/public/providers/app_settings_providers.dart';
 
 void main() {
   test('setLocalePreference persists and reloads as English', () async {

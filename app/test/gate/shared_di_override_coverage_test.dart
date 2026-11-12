@@ -5,15 +5,15 @@ import 'package:test/test.dart';
 
 import 'lib_layout_scan_helpers.dart';
 
-/// `shared/di` 的 token 只声明、不实现：默认抛 `UnimplementedError`，
-/// 必须由 `features/bootstrap/di/**` 或 owner `public/di/**` override 填实。
+/// `shared/presentation/providers` 的 token 只声明、不实现：默认抛 `UnimplementedError`，
+/// 必须由 `composition/**` override 填实。
 ///
 /// 漏注入的 token 只在运行期（某个页面首次 `ref.read` 时）才炸，且报错点
 /// 远离改动点。本门禁把它提前到 CI。
 ///
 /// 局限：只校验「声明 ⊆ 应用内某处被 override」，不追溯该 override 所在的
-/// 函数是否真的被组合根（`bootstrapDiOverrides`）收集。组合根漏收集由
-/// `test/features/bootstrap` 的运行时用例兜底。
+/// 函数是否真的被组合根（`appProviderOverrides`）收集。组合根漏收集由
+/// `test/composition` 的运行时用例兜底。
 void main() {
   late Directory libDir;
   late Directory sharedDiDir;
@@ -21,18 +21,20 @@ void main() {
 
   setUp(() {
     libDir = Directory(p.join(Directory.current.path, 'lib'));
-    sharedDiDir = Directory(p.join(libDir.path, 'shared', 'di'));
-    featuresDir = Directory(p.join(libDir.path, 'features'));
+    sharedDiDir = Directory(
+      p.join(libDir.path, 'shared', 'presentation', 'providers'),
+    );
+    featuresDir = Directory(libDir.path);
   });
 
   test('injection scanner covers function/query/stream declarations and autoDispose families', () {
     expect(
       _declaredTokenNames("""
-final Provider<Future<void> Function(String)> saveCommandProvider = injectedDi('saveCommandProvider');
-final Provider<Future<int?> Function(String)> resumeQueryProvider = injectedDi('resumeQueryProvider');
+final Provider<Future<void> Function(String)> saveCommandProvider = requiredProvider('saveCommandProvider');
+final Provider<Future<int?> Function(String)> resumeQueryProvider = requiredProvider('resumeQueryProvider');
 final StreamProvider<Map<String, int>> progressProvider = StreamProvider((ref) => stream);
 final countsProvider = StreamProvider.autoDispose.family<Counts, bool>((ref, enabled) => stream);
-// final Provider<void> ignoredProvider = injectedDi('ignoredProvider');
+// final Provider<void> ignoredProvider = requiredProvider('ignoredProvider');
 """),
       {
         'saveCommandProvider',
@@ -43,11 +45,19 @@ final countsProvider = StreamProvider.autoDispose.family<Counts, bool>((ref, ena
     );
   });
 
-  test('shared/di 每个注入 token 至少有一处 overrideWith', () {
-    expect(sharedDiDir.existsSync(), isTrue, reason: 'missing lib/shared/di');
+  test('shared/presentation/providers 每个注入 token 至少有一处 overrideWith', () {
+    expect(
+      sharedDiDir.existsSync(),
+      isTrue,
+      reason: 'missing lib/shared/presentation/providers',
+    );
 
     final Set<String> declared = _collectDeclaredTokens(sharedDiDir);
-    expect(declared, isNotEmpty, reason: 'shared/di 未采集到任何 token，扫描规则可能已失效');
+    expect(
+      declared,
+      isNotEmpty,
+      reason: 'shared/presentation/providers 未采集到任何 token，扫描规则可能已失效',
+    );
 
     final Set<String> overridden = _collectOverriddenTokens(featuresDir);
     expect(
@@ -62,9 +72,9 @@ final countsProvider = StreamProvider.autoDispose.family<Counts, bool>((ref, ena
       missing,
       isEmpty,
       reason:
-          '以下 shared/di token 没有任何 overrideWith/overrideWithValue：\n'
+          '以下 shared/presentation/providers token 没有任何 overrideWith/overrideWithValue：\n'
           '${missing.join('\n')}\n'
-          '请在 features/bootstrap/di/** 或 owner 的 public/di/** 补注入。',
+          '请在 composition/** 补注入。',
     );
   });
 }

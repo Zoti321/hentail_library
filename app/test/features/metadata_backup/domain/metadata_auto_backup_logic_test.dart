@@ -1,4 +1,4 @@
-import 'package:hentai_library/features/metadata_backup/data/metadata_backup_file_gateway.dart';
+import 'package:hentai_library/features/metadata_backup/infrastructure/metadata_backup_file_gateway.dart';
 
 import 'dart:io';
 

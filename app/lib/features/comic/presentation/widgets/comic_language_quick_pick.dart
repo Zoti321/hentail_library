@@ -3,7 +3,7 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/comic/domain/value_objects/comic_language.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
-import 'package:hentai_library/features/comic/public/l10n/comic_l10n.dart';
+import 'package:hentai_library/features/comic/presentation/l10n/comic_l10n.dart';
 
 /// 漫画语言闭集快捷多选（对齐生产编辑元数据语言 chip）。
 class ComicLanguageQuickPick extends StatelessWidget {

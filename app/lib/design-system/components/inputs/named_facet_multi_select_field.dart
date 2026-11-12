@@ -8,7 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/design-system/components/inputs/named_facet_multi_select_copy.dart';
-import 'package:hentai_library/shared/util/name_pinyin_assisted_filter.dart';
+import 'package:hentai_library/core/util/name_pinyin_assisted_filter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_3_expressive/components/text_fields/components/m3e_text_field_affordance.dart';
 import 'package:material_3_expressive/components/text_fields/utils/m3e_text_field_selection_controls.dart';

@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/di/reading_history_providers.dart';
+import 'package:hentai_library/shared/presentation/providers/reading_history_providers.dart';
 
 /// 阅读历史中每部漫画的当前页（1 基，与阅读器 `pageIndex` 一致）。
 ///

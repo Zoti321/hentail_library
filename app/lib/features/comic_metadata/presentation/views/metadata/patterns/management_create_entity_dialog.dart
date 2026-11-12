@@ -8,7 +8,7 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/patterns/dialog/lab_dialog_presenter.dart';
 import 'package:hentai_library/features/comic_metadata/domain/named_facet_management_repository.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
-import 'package:hentai_library/features/comic_metadata/public/ui/l10n/comic_metadata_l10n.dart';
+import 'package:hentai_library/features/comic_metadata/presentation/l10n/comic_metadata_l10n.dart';
 
 const double _kManagementCreateDialogMaxWidth = 400;
 

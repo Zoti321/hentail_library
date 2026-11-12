@@ -1,4 +1,4 @@
-import 'package:hentai_library/features/metadata_backup/di/metadata_backup_use_case_providers.dart';
+import 'package:hentai_library/features/metadata_backup/presentation/providers/metadata_backup_use_case_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'dart:async';
@@ -9,7 +9,7 @@ import 'package:hentai_library/features/metadata_backup/domain/metadata_auto_bac
 import 'package:hentai_library/features/metadata_backup/presentation/view_models/metadata_auto_backup_notifier.dart';
 import 'package:hentai_library/features/metadata_backup/presentation/view_models/metadata_last_auto_backup_notifier.dart';
 import 'package:hentai_library/core/util/debouncer.dart';
-import 'package:hentai_library/shared/di/domain_event_revisions.dart';
+import 'package:hentai_library/shared/presentation/providers/domain_event_revisions.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'metadata_auto_backup_coordinator_notifier.g.dart';

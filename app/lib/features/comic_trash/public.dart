@@ -1,10 +1,6 @@
-/// comic_trash 模块 public API（ADR-0034 / #433）。
+/// comic_trash 的模块入口；纯 Dart 消费者使用 public/contracts.dart。
 library;
 
-export 'domain/comic_trash_reader_session_port.dart';
-export 'public/trash_comics_command.dart';
-export 'public/comic_trash_cross_feature_types.dart';
-export 'public/di/comic_trash_command_factory.dart';
-export 'public/di/comic_trash_providers.dart';
-export 'public/di/comic_trash_repository_factory.dart';
-export 'public/ui/trash_page.dart';
+export 'public/contracts.dart';
+export 'public/providers.dart';
+export 'public/widgets.dart';

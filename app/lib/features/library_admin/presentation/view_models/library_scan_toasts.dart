@@ -3,7 +3,7 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/library_admin/domain/sync_library_types.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
-import 'package:hentai_library/features/library_admin/public/ui/l10n/library_admin_l10n.dart';
+import 'package:hentai_library/features/library_admin/presentation/l10n/library_admin_l10n.dart';
 
 /// Finished silent Library sync outcome for shell-global snackbar copy.
 typedef LibraryScanCompletion = ({

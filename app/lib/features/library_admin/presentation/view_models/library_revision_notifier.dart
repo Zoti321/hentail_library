@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/shared/di/domain_event_revisions.dart';
+import 'package:hentai_library/shared/presentation/providers/domain_event_revisions.dart';
 import 'package:hentai_library/features/library_admin/domain/library_revision_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

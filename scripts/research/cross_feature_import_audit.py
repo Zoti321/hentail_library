@@ -44,7 +44,7 @@ def classify(relative: str) -> str:
             return parts[1]
     if p.startswith("shared/"):
         return "shared"
-    if p == "main.dart":
+    if p.startswith("composition/") or p == "main.dart":
         return "bootstrap"
     return "shared"
 
@@ -100,7 +100,7 @@ def main() -> None:
             if target is None:
                 continue
 
-            if rel.startswith("shared/domain/") and imp.startswith("shared/data/"):
+            if rel.startswith("shared/domain/") and imp.startswith("infrastructure/"):
                 domain_to_data.append(f"{rel} -> {imp}")
             if rel.startswith("shared/domain/") and imp.startswith("features/"):
                 shared_domain_to_features.append(f"{rel} -> {imp}")
@@ -109,11 +109,11 @@ def main() -> None:
                 and rel.startswith("features/")
                 and mod in MODULES
                 and mod not in ("shared", "bootstrap", "frb_generated")
-                and imp.startswith(f"features/{mod}/data/")
+                and imp.startswith(f"features/{mod}/infrastructure/")
             ):
                 domain_to_data.append(f"{rel} -> {imp}")
 
-            if target == "frb_generated" and not rel.startswith("shared/data/"):
+            if target == "frb_generated" and not rel.startswith("infrastructure/"):
                 non_data_to_frb.append(rel)
 
             if mod == "library_browse" and imp.startswith("features/reader/"):

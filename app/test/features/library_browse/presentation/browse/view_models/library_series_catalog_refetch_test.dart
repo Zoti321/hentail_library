@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
-import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
+import 'package:hentai_library/composition/composition_overrides.dart';
+import 'package:hentai_library/composition/feature_state_overrides.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/series/domain/library_series_grouping.dart';
 import 'package:hentai_library/features/series/domain/library_series_filter.dart';
@@ -13,7 +13,7 @@ import 'package:hentai_library/features/series/domain/series_repository.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_series_catalog_controller.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_tab_filter_sort_providers.dart';
-import 'package:hentai_library/features/series/public/di/series_repository_providers.dart';
+import 'package:hentai_library/features/series/public/providers/series_repository_providers.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:test/test.dart';
@@ -89,7 +89,7 @@ void main() {
       final _CountingSeriesRepo repo = _CountingSeriesRepo();
       final ProviderContainer container = ProviderContainer(
         overrides: <Override>[
-          ...sharedLibraryStateOverrides(),
+          ...featureStateOverrides(),
           ...bootstrapCompositionOverrides(),
           ...idleRevisionThrottleOverrides(),
           seriesRepoProvider.overrideWith((Ref ref) => repo),
@@ -118,7 +118,7 @@ void main() {
     final _CountingSeriesRepo repo = _CountingSeriesRepo();
     final ProviderContainer container = ProviderContainer(
       overrides: <Override>[
-        ...sharedLibraryStateOverrides(),
+        ...featureStateOverrides(),
         ...bootstrapCompositionOverrides(),
         ...idleRevisionThrottleOverrides(),
         seriesRepoProvider.overrideWith((Ref ref) => repo),
@@ -144,7 +144,7 @@ void main() {
     final _CountingSeriesRepo repo = _CountingSeriesRepo();
     final ProviderContainer container = ProviderContainer(
       overrides: <Override>[
-        ...sharedLibraryStateOverrides(),
+        ...featureStateOverrides(),
         ...bootstrapCompositionOverrides(),
         ...idleRevisionThrottleOverrides(),
         seriesRepoProvider.overrideWith((Ref ref) => repo),

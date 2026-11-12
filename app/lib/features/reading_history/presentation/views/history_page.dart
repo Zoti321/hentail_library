@@ -7,7 +7,7 @@ import 'package:hentai_library/features/reading_history/presentation/view_models
 import 'package:hentai_library/features/reading_history/presentation/view_models/history_paged_feed_controller.dart';
 import 'package:hentai_library/features/reading_history/presentation/view_models/history_paged_feed_state.dart';
 import 'package:hentai_library/features/reading_history/presentation/views/history_page_actions.dart';
-import 'package:hentai_library/features/comic/public/di/comic_cover_providers.dart';
+import 'package:hentai_library/features/comic/public/providers/comic_cover_providers.dart';
 import 'package:hentai_library/features/reading_history/presentation/widgets/history_list_item.dart';
 import 'package:hentai_library/shared/ui/layout/app_shell_navigation.dart';
 import 'package:hentai_library/shared/ui/navigation/pop_or_go_home.dart';

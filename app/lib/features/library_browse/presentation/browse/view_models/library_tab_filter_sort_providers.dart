@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/app_settings/public/app_settings_cross_feature_types.dart';
-import 'package:hentai_library/features/app_settings/public/di/app_settings_providers.dart';
+import 'package:hentai_library/features/app_settings/public/providers/app_settings_providers.dart';
 import 'package:hentai_library/features/library_browse/domain/browse/library_age_restriction_filter.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_selectors.dart';

@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/core/logging/app_log.dart';
-import 'package:hentai_library/features/library_admin/data/local_library_root_access.dart';
+import 'package:hentai_library/features/library_admin/presentation/providers/library_sync_providers.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/library/library_confirm_dialog.dart';
 import 'package:hentai_library/features/library_admin/presentation/widgets/library_edit_form_metrics.dart';
 import 'package:hentai_library/shared/ui/patterns/dialog/adaptive_form_dialog.dart';
 import 'package:hentai_library/features/library_admin/presentation/patterns/library_edit_form.dart';
-import 'package:hentai_library/features/library_admin/public/di/library_admin_state_providers.dart';
+import 'package:hentai_library/features/library_admin/public/providers/library_admin_state_providers.dart';
 import 'package:hentai_library/features/library_admin/domain/resource_format_category.dart';
 import 'package:hentai_library/features/library_admin/domain/local_library.dart';
 import 'package:hentai_library/features/library_admin/domain/value_objects/library_form.dart';
@@ -141,13 +141,13 @@ class _LibraryFormState extends ConsumerState<_LibraryFormFields> {
     }
 
     if (!_isRemote && _isCreate) {
-      await ensureLocalFilesystemAccess();
+      await ref.read(localFilesystemAccessProvider)();
       if (!mounted) {
         return;
       }
-      final bool rootReadable = await isLocalLibraryRootReadable(
-        _form.rootPath,
-      );
+      final bool rootReadable = await ref.read(
+        localLibraryRootReadableProvider,
+      )(_form.rootPath);
       if (!mounted) {
         return;
       }
@@ -197,7 +197,7 @@ class _LibraryFormState extends ConsumerState<_LibraryFormFields> {
   }
 
   Future<void> _browseLocalRoot() async {
-    await ensureLocalFilesystemAccess();
+    await ref.read(localFilesystemAccessProvider)();
     if (!mounted) {
       return;
     }
@@ -205,7 +205,9 @@ class _LibraryFormState extends ConsumerState<_LibraryFormFields> {
     if (directoryPath == null || directoryPath.isEmpty || !mounted) {
       return;
     }
-    final bool rootReadable = await isLocalLibraryRootReadable(directoryPath);
+    final bool rootReadable = await ref.read(localLibraryRootReadableProvider)(
+      directoryPath,
+    );
     if (!mounted) {
       return;
     }

@@ -1,8 +1,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:hentai_library/features/comic/domain/value_objects/library_comic_grouping.dart';
-import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
+import 'package:hentai_library/composition/composition_overrides.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
+import 'package:hentai_library/composition/feature_state_overrides.dart';
 import 'package:hentai_library/features/library_browse/domain/browse/library_age_restriction_filter.dart';
 import 'package:hentai_library/features/comic/domain/value_objects/library_comic_filter.dart';
 import 'package:hentai_library/features/comic/domain/value_objects/library_comic_sort_option.dart';
@@ -17,18 +17,18 @@ import 'package:hentai_library/shared/domain/models/value_objects/page_request.d
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/models/comic_browse_view_object.dart';
 import 'package:hentai_library/features/comic/domain/repositories/comic_catalog_repository.dart';
-import 'package:hentai_library/features/comic/di/comic_repository_providers.dart';
+import 'package:hentai_library/features/comic/presentation/providers/comic_repository_providers.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/models/series_browse_view_object.dart';
 import 'package:hentai_library/features/series/domain/series_repository.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_comic_filters_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_state.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_comics_catalog_controller.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_page_facade_notifier.dart';
-import 'package:hentai_library/shared/domain/catalog/pagination/library_pagination.dart';
+import 'package:hentai_library/shared/ui/catalog/pagination/library_pagination.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_series_catalog_controller.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_tab_page_size_notifier.dart';
-import 'package:hentai_library/features/series/public/di/series_repository_providers.dart';
-import 'package:hentai_library/features/comic_metadata/public/di/comic_metadata_repository_providers.dart';
+import 'package:hentai_library/features/series/public/providers/series_repository_providers.dart';
+import 'package:hentai_library/features/comic_metadata/public/providers/comic_metadata_repository_providers.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;
@@ -157,7 +157,7 @@ void main() {
   }) {
     final ProviderContainer container = ProviderContainer(
       overrides: <Override>[
-        ...sharedLibraryStateOverrides(),
+        ...featureStateOverrides(),
         ...bootstrapCompositionOverrides(),
         ...extraOverrides,
         ...idleRevisionThrottleOverrides(),

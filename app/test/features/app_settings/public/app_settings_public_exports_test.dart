@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/app_settings/public.dart';
 
 void main() {
-  test('public barrel exports schema, DI entry points and UI', () {
+  test('public barrel exports schema, state and UI', () {
     expect(AppSetting, isNotNull);
     expect(AppThemePreference, isNotNull);
     expect(AppColorSchemePreference, isNotNull);
@@ -14,7 +14,6 @@ void main() {
     expect(readingPreferencesControllerProvider, isNotNull);
     expect(appSettingsProvider, isNotNull);
     expect(appSettingRepositoryProvider, isNotNull);
-    expect(createAppSettingRepository, isNotNull);
     expect(SettingsPage, isNotNull);
     expect(DiagnosticModeBanner, isNotNull);
     expect(settingsProvider, isNotNull);

@@ -1,17 +1,17 @@
+import 'package:hentai_library/shared/presentation/providers/comic_read_query_provider.dart';
+import 'package:hentai_library/composition/modules/comic/comic_read_query.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/comic/public/comic.dart';
 import 'package:hentai_library/features/reading_history/public.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/comic/domain/repositories/comic_lookup_repository.dart';
-import 'package:hentai_library/shared/di/series_reading_context_providers.dart';
+import 'package:hentai_library/shared/presentation/providers/series_reading_context_providers.dart';
 import 'package:hentai_library/shared/domain/reading/series_reading_context.dart';
 import 'package:hentai_library/features/comic/public/comic_display_title.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/series_reader_provider.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:test/test.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
-import 'package:hentai_library/features/comic/public/di/comic_repository_providers.dart';
-import 'package:hentai_library/features/comic/public/di/comic_read_query.dart';
+import 'package:hentai_library/features/comic/public/providers/comic_repository_providers.dart';
 
 class _FakeComicRepo implements ComicLookupRepository {
   _FakeComicRepo(this._titles);

@@ -13,10 +13,10 @@
 | `reading/*`（Read session 域类型） | `features/reader/domain/`（ADR-0038；旧 `read_session`） |
 | 库 browse 壳（跨 Tab 偏好、作者、catalog 壳） | `features/library_browse/domain/browse/`（**不含** comic/series Tab 规则） |
 | Comic 仓储、Comics Tab 规则、展示标题、smart facet | `features/comic/domain/`（见下方分层） |
-| **`Comic` 实体、`ComicMetaLocks`、`ComicMetadataForm`、`Comic` FRB 映射** | `features/comic/domain/`、`features/comic/data/comic_entity_mapper.dart`（ADR-0041；跨模块经 `features/comic/public/**`） |
+| **`Comic` 实体、`ComicMetaLocks`、`ComicMetadataForm`、`Comic` FRB 映射** | `features/comic/domain/`、`features/comic/infrastructure/comic_entity_mapper.dart`（ADR-0041；跨模块经 `features/comic/public/**`） |
 | **Series 跨模块契约** | `shared/domain/`：`SeriesReadingContext`、`SeriesItemMembership`、`SeriesItemSortPort`、`SeriesCoverSource`（ADR-0042） |
 | Series 仓储、Series Tab 规则、Series 成员读模型 | `features/series/domain/` |
-| **`Series` / `SeriesItem` 实体、`SeriesMetaLocks`、`SeriesComicsMetadata`、`SeriesMetadataForm`、FRB 映射** | `features/series/domain/`、`features/series/data/series_frb_mapper.dart`（ADR-0042；public 不暴露实体） |
+| **`Series` / `SeriesItem` 实体、`SeriesMetaLocks`、`SeriesComicsMetadata`、`SeriesMetadataForm`、FRB 映射** | `features/series/domain/`、`features/series/infrastructure/series_frb_mapper.dart`（ADR-0042；public 不暴露实体） |
 | 库 admin（扫描、revision、current library 等） | `features/library_admin/domain/` |
 | `comic_display_title` 等 | `features/comic/domain/` |
 | reader / app_settings 端口实现类型 | 各 owner `domain/` |
@@ -26,7 +26,7 @@
 | home read models | `features/home/domain/` |
 | Content rating、Comic Language、作者/标签筛选 pick | `features/comic/domain/value_objects/`；跨模块经 `comic/public/comic_metadata_types.dart`（ADR-0049） |
 | Serialization status | `features/series/domain/value_objects/serialization_status.dart`（ADR-0049） |
-| Resource format category、远程凭据同步 Port 与 token | `features/library_admin/domain/`、`public/di/remote_library_credentials_providers.dart`；app_settings 仅传递旧设置载荷，bootstrap 注入凭据实现（ADR-0049） |
+| Resource format category、远程凭据同步 Port 与 token | `features/library_admin/domain/`、`public/providers/remote_library_credentials_providers.dart`；app_settings 仅传递旧设置载荷，bootstrap 注入凭据实现（ADR-0049） |
 | named metadata 表单/字典 | `features/comic_metadata/domain/`；跨 feature **`features/comic_metadata/public.dart`**（仓储契约、字典 Riverpod、生产页）；Comic 表单窄面 **`public/comic_metadata_form.dart`**；Lab patterns **`public/ui/metadata_lab_patterns.dart`** |
 
 Feature 内代码应 **import owner `domain/`**（`library_browse` 内按 [`library-browse-zones.md`](library-browse-zones.md) 分子目录）；跨 feature 经 **`features/<owner>/public/**`**（ADR-0034）。**勿**再新增对已删除 shared shim 路径的依赖。
@@ -69,23 +69,25 @@ Feature 内代码应 **import owner `domain/`**（`library_browse` 内按 [`libr
 - `models/enums.dart` 仅保留 `ResourceType`、`LibraryDisplayTarget`、`ThumbnailPriority`（ADR-0049）；实体目录已清空：Comic 归 comic、Series 归 series、Author / AuthorDetail / Tag 归 comic_metadata
 - `models/value_objects/page_request.dart`、`paged_result.dart`、`page_jump.dart`
 - `models/value_objects/author_ref.dart`：shared metadata chip 与 comic / series 共享引用投影；`series_item_membership.dart`：comic ↛ series 的只读成员协议。语言与 pick 已归 comic（ADR-0049），`library_form.dart` 归 library_admin（#504）
-- `reading/series_reading_context.dart`（类型；读口 `FindSeriesReadingContextQuery` @ shared/di，实现 @ series）
+- `reading/series_reading_context.dart`（类型；读口 `FindSeriesReadingContextQuery` @ shared/presentation/providers，实现 @ series）
 - `library/library_age_restriction_filter.dart`（跨 Tab 年龄限制词汇：comic / series 禁止边 + home 消费，无可达 owner——ADR-0045 可达性否决，**不是遗留**；2026-11-12 起只承载语义与 `fromStorage`，存储键已下放 browse 持久化）；批量补丁类型已归 `features/library_admin/domain/`（#513）；`library/metadata_refresh_types.dart` 与 `library/library_revision_state.dart` 已于 2026-11-12 归 `library_admin`；`LocalLibrary` / `ScanInterval` / `ScanMode` 已于 2026-11-12 归 `library_admin/domain/`（#531）
 - `thumbnail/**`
 
 ## 共享协作契约（ADR-0050）
 
-纯 Dart 契约在 `shared/domain/contracts/`：AppNavigator、ComicReadQuery、Series 查询/排序、TrashComicsCommand、退出重排和详情返回记忆命令。含 BuildContext 的作者详情与默认返回签名在 `shared/ui/contracts/`。读取进度直接订阅 `shared/di/reading_history_providers.dart` 的 StreamProvider；原 ReaderLaunch 纯转发链已合并至 AppNavigator。owner 与 shared 的落点仍按禁止边、public 环、shared/core 消费者决定，具体调用示例见 [跨模块协作](cross-feature-collaboration.md)。
+纯 Dart 契约在 `shared/application/contracts/`：AppNavigator、ComicReadQuery、Series 查询/排序、TrashComicsCommand、退出重排和详情返回记忆命令。含 BuildContext 的作者详情与默认返回签名在 `shared/ui/contracts/`。读取进度直接订阅 `shared/presentation/providers/reading_history_providers.dart` 的 StreamProvider；原 ReaderLaunch 纯转发链已合并至 AppNavigator。owner 与 shared 的落点仍按禁止边、public 环、shared/core 消费者决定，具体调用示例见 [跨模块协作](cross-feature-collaboration.md)。
 
 ## 领域事件（ADR-0039）
 
-`shared/domain/events/**` 是跨 feature 事件的**唯一**词汇表与发布/订阅接口（sealed `DomainEvent`、`DomainEventPublisher`、`DomainEventBus`）；实现 `StreamDomainEventBus`（`StreamController.broadcast(sync: true)`，无第三方依赖）在 `shared/data/events/`。它不属于 Catalog Kernel，也不经 owner `public/` 暴露——所有 feature 直接 `import shared/domain/events/events.dart`。
+`shared/domain/events/**` 是跨 feature 事件的**唯一**词汇表与发布/订阅接口（sealed `DomainEvent`、`DomainEventPublisher`、`DomainEventBus`）；实现 `StreamDomainEventBus`（`StreamController.broadcast(sync: true)`，无第三方依赖）在 `infrastructure/events/`。它不属于 Catalog Kernel，也不经 owner `public/` 暴露——所有 feature 直接 `import shared/domain/events/events.dart`。
 
-`shared/di` 只声明跨 feature **命令 Port** 与全局状态 token（#426 / ADR-0034 §3）；模块私有 token 归 owner `public/di/**`（如 `seriesRepoProvider` 于 `features/series/public/di/`），由消费方直接 watch。实现与 `createXxx()` 在 owner `di/` / `public/di/`，由 `features/bootstrap/di/overrides/` 注入。跨 feature UI 组合用 **`shared/ui/slots/**`**（契约只含 Flutter + 原始值）与 `shared/di/series_slot_providers.dart`，实现归 comic / series（ADR-0042）。
+`shared/presentation/providers/` 是共享 UI、禁止边或 public 环所需的 Riverpod 协作适配层，包含必需 token 与领域事件状态投影，不放外部实现。owner 的 token 实现在 `features/<owner>/presentation/providers/`，公开面只经 `public/providers.dart` 或窄 provider facade 导出。外部工厂、跨模块桥接及 override 组装在 `composition/`，不再有 feature `di/` 层。共享 UI 槽位的契约仍在 `shared/ui/slots/`；实现归 owner presentation，由组合根注入。
+
+共享协作契约保留的理由仍按 ADR-0045 的实际消费者和模块可达性判定。新增业务默认进入 owner，不能用 shared 绕过禁止边。纯签名放 shared/application，领域词汇与事实放 shared/domain，平台/FRB 实现放 infrastructure，框架状态与视图分别放 presentation/providers 与 ui。
 
 ## 测试目录约定
 
 - Owner 域行为单测：`app/test/features/<owner>/domain/**`
-- Shared Kernel / 跨库契约：`app/test/shared/domain/**`（分页 VO、枚举、thumbnail 与跨模块 Port；owner 实体测试归各自 `test/features/<owner>/domain/`）
+- 共享 Provider 与基础设施测试：`app/test/shared/presentation/providers/`、`app/test/infrastructure/`。旧 `test/shared/domain/` 已迁空移除。
 - Comic / Series / Comic metadata 实体归属门禁：`app/test/features/{comic,series,comic_metadata}/**`、`app/test/architecture/{comic,series,comic_metadata}_entity_ownership_test.dart`
 - 槽位契约门禁：`app/test/architecture/series_slot_contract_test.dart`（`shared/ui/slots/**` 不得 import `features/**`）

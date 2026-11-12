@@ -1,14 +1,14 @@
 import 'package:flutter/services.dart';
 import 'package:hentai_library/features/metadata_backup/application/prepare_metadata_import_use_case.dart';
-import 'package:hentai_library/features/metadata_backup/di/metadata_backup_use_case_providers.dart';
-import 'package:hentai_library/features/metadata_backup/data/metadata_backup_file_gateway.dart';
+import 'package:hentai_library/features/metadata_backup/presentation/providers/metadata_backup_use_case_providers.dart';
+import 'package:hentai_library/features/metadata_backup/infrastructure/metadata_backup_file_gateway.dart';
 import 'package:hentai_library/features/metadata_backup/domain/metadata_backup_repository.dart';
 
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/features/metadata_backup/domain/metadata_backup_bytes.dart';
+import 'package:hentai_library/features/metadata_backup/infrastructure/metadata_backup_codec.dart';
 import 'package:hentai_library/features/metadata_backup/domain/metadata_backup_manifest.dart';
 import 'package:hentai_library/features/metadata_backup/domain/metadata_import_match_tier.dart';
 import 'package:hentai_library/features/metadata_backup/domain/metadata_import_preview.dart';

@@ -33,11 +33,11 @@ String? parseFeatureImportUri(String line) {
   return 'package:hentai_library/features/${match.group(1)}';
 }
 
-/// `shared/data/mappers/**` and `shared/data/adapters/**` may import features (#295).
+/// `infrastructure/mappers/**` and `infrastructure/adapters/**` may import features (#295).
 bool isSharedDataFeatureImportExempt(String libRelativePosix) {
   final String path = libRelativePosix.replaceAll(r'\', '/');
-  if (path.startsWith('shared/data/adapters/') ||
-      path.startsWith('shared/data/mappers/')) {
+  if (path.startsWith('infrastructure/adapters/') ||
+      path.startsWith('infrastructure/mappers/')) {
     return true;
   }
   return kSharedDataExplicitFeatureImportAllowlist.contains(path);

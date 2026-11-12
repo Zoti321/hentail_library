@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:hentai_library/features/library_admin/di/metadata_refresh.dart';
+import 'package:hentai_library/features/library_admin/presentation/providers/metadata_refresh_providers.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/metadata_refresh_controller.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/scan_library_controller.dart';
@@ -9,7 +9,7 @@ import 'package:hentai_library/features/library_admin/domain/metadata_refresh_ty
 import 'package:riverpod/misc.dart' show Override;
 import 'package:riverpod/riverpod.dart';
 import 'package:test/test.dart';
-import 'package:hentai_library/features/bootstrap/di/overrides/domain_event_bus_overrides.dart';
+import 'package:hentai_library/composition/overrides/domain_event_bus_overrides.dart';
 
 class _ScriptedRefreshAdapter implements MetadataRefreshPort {
   _ScriptedRefreshAdapter({this.onRefreshComic, this.onRefreshLibrary});

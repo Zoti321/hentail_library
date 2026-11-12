@@ -3,7 +3,7 @@ import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/features/library_admin/application/metadata_refresh_use_case.dart';
 import 'package:hentai_library/features/library_admin/domain/metadata_refresh_types.dart';
-import 'package:hentai_library/features/library_admin/di/metadata_refresh.dart';
+import 'package:hentai_library/features/library_admin/presentation/providers/metadata_refresh_providers.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/scan_library_controller.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

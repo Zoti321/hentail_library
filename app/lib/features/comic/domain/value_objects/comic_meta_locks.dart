@@ -1,7 +1,4 @@
-import 'package:flutter/foundation.dart';
-
 /// Comic 元数据字段锁（Komga 式）；默认全部未锁。
-@immutable
 class ComicMetaLocks {
   const ComicMetaLocks({
     this.title = false,

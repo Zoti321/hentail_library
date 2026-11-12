@@ -2,7 +2,7 @@ import 'package:hentai_library/features/comic/application/comic_metadata_service
 import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/features/comic/domain/value_objects/comic_metadata_form.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/series_item_membership.dart';
-import 'package:hentai_library/shared/domain/contracts/persist_series_item_sort_command.dart';
+import 'package:hentai_library/shared/application/contracts/persist_series_item_sort_command.dart';
 
 typedef ApplyComicMetadata = Future<ComicMetadataApplyResult> Function(
   ComicMetadataForm form,

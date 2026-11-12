@@ -4,6 +4,8 @@
 
 Accepted
 
+> **ADR-0051 修订（2026-11-12）**：组合根迁到 `lib/composition/`；owner `data/` 迁为 `infrastructure/`；共享协作签名在 `shared/application/contracts/`，Riverpod 适配在 `shared/presentation/providers/`。内层以递归 import/export 门禁为准；下文旧目录是历史语境。
+
 ## Context
 
 Wayfinder 落地后，产品 feature 之间仍采用「零 cross-feature import + `shared/application/ports` + bootstrap override」协作（ADR-0027、import boundary M1）。该模式可行但编排面分散，与 NestJS 式「模块只 export public」心智不一致。

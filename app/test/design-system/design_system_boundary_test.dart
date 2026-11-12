@@ -15,13 +15,13 @@ const String _layerRoot = 'design-system';
 const List<String> _forbiddenTargetPrefixes = <String>[
   'features/',
   'shared/domain/',
-  'shared/di/',
-  'shared/data/',
+  'shared/presentation/providers/',
+  'infrastructure/',
   'shared/ui/',
 ];
 
 /// 唯一允许的层外依赖前缀。
-const List<String> _allowedTargetPrefixes = <String>['core/', 'shared/util/'];
+const List<String> _allowedTargetPrefixes = <String>['core/'];
 
 final RegExp _layerEdgeRe = RegExp(
   r"^\s*(?:import|export)\s+'([^']+)'",
@@ -85,7 +85,7 @@ void main() {
     );
   });
 
-  test('edges stay inside the layer or core/ + shared/util/', () {
+  test('edges stay inside the layer or core/', () {
     final List<String> offenders = <String>[
       for (final _Edge edge in edges)
         if (edge.target != null &&
@@ -97,7 +97,7 @@ void main() {
       offenders,
       isEmpty,
       reason:
-          'design-system 只允许 core/**、shared/util/** 与层内路径：\n'
+          'design-system 只允许 core/** 与层内路径：\n'
           '${offenders.join('\n')}',
     );
   });

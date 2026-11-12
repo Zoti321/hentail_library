@@ -12,13 +12,8 @@ void main() {
       expect(NamedFacetFormKind, isNotNull);
       expect(NamedFacetFormListing, isNotNull);
       expect(namedFacetFormCandidate, isNotNull);
-      expect(createAuthorRepository, isNotNull);
-      expect(createTagRepository, isNotNull);
-      expect(createNamedFacetManagementRepository, isNotNull);
-      expect(createNamedFacetDictionaryRepository, isNotNull);
       expect(allTagsProvider, isNotNull);
       expect(allAuthorsProvider, isNotNull);
-      expect(listNamedFacetForMetadataForm, isNotNull);
       expect(MetadataManagementPage, isNotNull);
     },
   );

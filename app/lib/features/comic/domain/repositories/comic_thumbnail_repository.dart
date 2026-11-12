@@ -23,7 +23,7 @@ abstract class ComicThumbnailRepository {
   Future<void> setComicCoverFromPage({
     required String comicId,
     required String path,
-    required String resourceType,
+    required ResourceType resourceType,
     required int pageIndex,
   });
 
@@ -32,7 +32,7 @@ abstract class ComicThumbnailRepository {
     required String seriesId,
     required String comicId,
     required String path,
-    required String resourceType,
+    required ResourceType resourceType,
     required int pageIndex,
   });
 

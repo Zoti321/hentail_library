@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/di/app_navigator_provider.dart';
+import 'package:hentai_library/shared/presentation/providers/app_navigator_provider.dart';
 import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 

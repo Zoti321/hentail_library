@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/features/comic/di/comic_detail_providers.dart';
+import 'package:hentai_library/features/comic/presentation/providers/comic_detail_providers.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/comic/presentation/views/bulk_edit/bulk_edit_metadata_form.dart';
 import 'package:hentai_library/features/comic/domain/comic.dart';

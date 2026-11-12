@@ -7,7 +7,7 @@ import 'package:hentai_library/features/comic_metadata/domain/named_facet_manage
 import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/shared/ui/patterns/dialog/lab_dialog_presenter.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
-import 'package:hentai_library/features/comic_metadata/public/ui/l10n/comic_metadata_l10n.dart';
+import 'package:hentai_library/features/comic_metadata/presentation/l10n/comic_metadata_l10n.dart';
 
 const double _kManagementRenameDialogMaxWidth = 400;
 

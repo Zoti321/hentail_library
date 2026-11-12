@@ -1,11 +1,12 @@
+import 'package:hentai_library/shared/presentation/providers/catalog_state_providers.dart';
+
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_selectors.dart';
-import 'package:hentai_library/shared/di/browse_library_scope_providers.dart';
-import 'package:hentai_library/shared/di/library_state_providers.dart';
+import 'package:hentai_library/shared/presentation/providers/browse_library_scope_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
 

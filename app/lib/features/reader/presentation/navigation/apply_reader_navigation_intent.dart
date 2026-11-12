@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/reader_navigation_intent.dart';
-import 'package:hentai_library/shared/domain/contracts/app_navigator.dart';
+import 'package:hentai_library/shared/application/contracts/app_navigator.dart';
 import 'package:hentai_library/shared/ui/navigation/app_navigator_context.dart';
 
 /// 在 View 侧执行 ViewModel 产出的导航意图。

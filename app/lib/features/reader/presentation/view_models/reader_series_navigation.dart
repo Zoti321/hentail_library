@@ -1,7 +1,7 @@
 import 'package:hentai_library/core/constants/app_routes.dart';
 import 'package:hentai_library/features/reader/application/open_reader_args.dart';
 import 'package:hentai_library/features/reader/application/read_session_application_service.dart';
-import 'package:hentai_library/features/reader/di/session_providers.dart';
+import 'package:hentai_library/features/reader/presentation/providers/session_providers.dart';
 import 'package:hentai_library/features/reader/presentation/routing/reader_route_args.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/reader_auto_play_carry.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/reader_navigation_intent.dart';

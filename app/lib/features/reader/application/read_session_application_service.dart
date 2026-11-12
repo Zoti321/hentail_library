@@ -2,8 +2,8 @@ import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
 import 'package:hentai_library/features/reader/application/open_reader_args.dart';
 import 'package:hentai_library/features/reader/application/open_read_session_service.dart';
 import 'package:hentai_library/features/reader/domain/read_session.dart';
-import 'package:hentai_library/features/reading_history/public.dart';
-import 'package:hentai_library/features/reading_stats/public.dart';
+import 'package:hentai_library/features/reading_history/public/reading_progress_commands.dart';
+import 'package:hentai_library/features/reading_stats/public/read_session_activity.dart';
 
 /// 系列切卷时 Application Service 返回的计划；UI 负责 prefetch 与路由跳转。
 typedef SeriesSwitchPlan = ({

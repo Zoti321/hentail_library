@@ -1,10 +1,10 @@
 import 'package:riverpod/riverpod.dart';
-import 'package:hentai_library/shared/di/domain_event_bus_providers.dart';
+import 'package:hentai_library/shared/presentation/providers/domain_event_bus_providers.dart';
 import 'package:hentai_library/shared/domain/events/events.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:test/test.dart';
-import 'package:hentai_library/features/bootstrap/di/overrides/domain_event_bus_overrides.dart';
+import 'package:hentai_library/composition/overrides/domain_event_bus_overrides.dart';
 
 void main() {
   group('LibraryRevisionNotifier', () {

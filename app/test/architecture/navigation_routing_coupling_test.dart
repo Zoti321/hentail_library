@@ -81,7 +81,7 @@ void main() {
   test('不再暴露 GoRouter 具体类型的 DI token', () {
     final List<String> offenders = <String>[];
     for (final File file in dartFilesUnder(
-      Directory(p.join(libDir.path, 'shared', 'di')),
+      Directory(p.join(libDir.path, 'shared', 'presentation', 'providers')),
     )) {
       final String source = file.readAsStringSync();
       if (_routerTypeTokenRe.hasMatch(source)) {
@@ -93,7 +93,7 @@ void main() {
       offenders,
       isEmpty,
       reason:
-          'shared/di 只声明 AppNavigator 契约，不暴露 GoRouter：\n'
+          'shared/presentation/providers 只声明 AppNavigator 契约，不暴露 GoRouter：\n'
           '${offenders.join('\n')}',
     );
   });
@@ -129,5 +129,5 @@ final RegExp _inlineLocationRe = RegExp(
   r'''\.(?:go|push|pushNamed|goNamed|replace|replaceNamed|pushReplacement|goLocation|replaceLocation)\s*\(\s*['"]/''',
 );
 
-/// `Provider<GoRouter>` / `GoRouter` 作为 shared/di 契约类型。
+/// `Provider<GoRouter>` / `GoRouter` 作为 shared/presentation/providers 契约类型。
 final RegExp _routerTypeTokenRe = RegExp(r'''GoRouter''');

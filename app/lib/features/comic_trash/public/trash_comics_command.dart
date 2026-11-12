@@ -1,3 +1,3 @@
 library;
 
-export 'package:hentai_library/shared/domain/contracts/trash_comics_command.dart';
+export 'package:hentai_library/shared/application/contracts/trash_comics_command.dart';

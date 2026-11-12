@@ -1,19 +1,19 @@
 import 'dart:async';
 
-import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
+import 'package:hentai_library/composition/composition_overrides.dart';
 
-import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
+import 'package:hentai_library/composition/feature_state_overrides.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_revision_coordinator.dart';
-import 'package:hentai_library/shared/di/domain_event_bus_providers.dart';
+import 'package:hentai_library/shared/presentation/providers/domain_event_bus_providers.dart';
 import 'package:hentai_library/shared/domain/events/events.dart';
-import 'package:hentai_library/shared/di/browse_library_scope_providers.dart';
-import 'package:hentai_library/features/comic/di/comic_cover_providers.dart';
+import 'package:hentai_library/shared/presentation/providers/browse_library_scope_providers.dart';
+import 'package:hentai_library/features/comic/presentation/providers/comic_cover_providers.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:riverpod/riverpod.dart';
 import 'package:test/test.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
-import 'package:hentai_library/features/bootstrap/di/overrides/domain_event_bus_overrides.dart';
+import 'package:hentai_library/composition/overrides/domain_event_bus_overrides.dart';
 
 class _FakeLibrariesNotifier extends LibrariesNotifier {
   static const LocalLibrary _libraryA = (
@@ -94,7 +94,7 @@ void main() {
       thumbnails = _ControllableThumbnailEventCoordinator();
       container = ProviderContainer(
         overrides: <Override>[
-          ...sharedLibraryStateOverrides(),
+          ...featureStateOverrides(),
           ...bootstrapCompositionOverrides(),
           ...domainEventBusOverrides(),
           librariesProvider.overrideWith(() => librariesNotifier),

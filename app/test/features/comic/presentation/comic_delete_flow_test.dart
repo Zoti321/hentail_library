@@ -1,10 +1,10 @@
+import 'package:hentai_library/shared/presentation/providers/trash_comics_command_provider.dart';
 import 'package:hentai_library/features/comic/public/comic_metadata_types.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/features/comic/presentation/comic_delete_flow.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';

@@ -1,13 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/shared/di/domain_event_bus_providers.dart';
+import 'package:hentai_library/shared/presentation/providers/domain_event_bus_providers.dart';
 import 'package:hentai_library/shared/domain/events/events.dart';
 import 'package:hentai_library/features/bootstrap/presentation/view_models/app_startup_coordinator_notifier.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:riverpod/riverpod.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
-import 'package:hentai_library/features/bootstrap/di/overrides/domain_event_bus_overrides.dart';
+import 'package:hentai_library/composition/overrides/domain_event_bus_overrides.dart';
 
 LocalLibrary _lib({required String id, bool scanOnStartup = false}) {
   return (

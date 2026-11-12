@@ -10,6 +10,8 @@ const bool kEnforceWayfinderPhaseBLayout = true;
 /// `lib/core` on 2026-10-18 (layout rules: `docs/engineering/gate.md` § App lib 顶层布局).
 /// `md3e/` was removed at MD3E Cutover shell终态 (#414 / ADR-0031).
 const Set<String> kWayfinderPhaseATopLevelLibDirs = <String>{
+  'composition',
+  'infrastructure',
   'core',
   'design-system',
   'features',
@@ -18,6 +20,8 @@ const Set<String> kWayfinderPhaseATopLevelLibDirs = <String>{
 };
 
 const Set<String> kWayfinderPhaseBTopLevelLibDirs = <String>{
+  'composition',
+  'infrastructure',
   'core',
   'design-system',
   'features',
@@ -29,7 +33,9 @@ const Set<String> kWayfinderPhaseBTopLevelLibDirs = <String>{
 /// legacy strangler shims; barrels inside `features/` or `shared/` are normal.
 bool isCanonicalLibRelativePath(String rel) {
   final String path = rel.replaceAll(r'\', '/');
-  return path.startsWith('features/') ||
+  return path.startsWith('composition/') ||
+      path.startsWith('infrastructure/') ||
+      path.startsWith('features/') ||
       path.startsWith('shared/') ||
       path.startsWith('src/') ||
       path.startsWith('design-system/');
@@ -138,7 +144,7 @@ final RegExp _anyPackageExport = RegExp(
 /// `shared/**` 下「只做转发」到 `features/**` 的文件（ADR-0045 / #504）。
 ///
 /// canonical 路径不受 [collectStranglerShims] 覆盖，`shared/` 曾因此可以长期
-/// 保留 export-only 转发（例如 `shared/di/home_library_stats_providers.dart`）。
+/// 保留 export-only 转发（例如 `shared/presentation/providers/home_library_stats_providers.dart`）。
 /// 允许前置注释与 `library;` 指令，但除 package export 外不得有任何代码。
 List<String> collectSharedFeatureForwarders(Directory libDir) {
   final Directory root = Directory(p.join(libDir.path, 'shared'));

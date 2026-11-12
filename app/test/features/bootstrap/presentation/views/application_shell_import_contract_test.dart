@@ -19,7 +19,7 @@ void main() {
 
     expect(source.contains('features/library_admin/presentation/'), isFalse);
     expect(source.contains('features/library_admin/di/'), isFalse);
-    expect(source.contains('features/library_admin/data/'), isFalse);
+    expect(source.contains('features/library_admin/infrastructure/'), isFalse);
     expect(source, contains('appShellFeedbackBelowTitleBarFactoryProvider'));
     expect(source, contains('appShellNavigationSlotAssemblyProvider'));
   });

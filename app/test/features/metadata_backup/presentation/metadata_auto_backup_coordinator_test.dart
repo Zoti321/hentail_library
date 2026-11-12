@@ -1,14 +1,14 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/features/bootstrap/di/overrides/domain_event_bus_overrides.dart';
+import 'package:hentai_library/composition/overrides/domain_event_bus_overrides.dart';
 import 'package:hentai_library/features/metadata_backup/application/run_metadata_auto_backup_use_case.dart';
-import 'package:hentai_library/features/metadata_backup/di/metadata_backup_use_case_providers.dart';
+import 'package:hentai_library/features/metadata_backup/presentation/providers/metadata_backup_use_case_providers.dart';
 import 'package:hentai_library/features/metadata_backup/domain/metadata_auto_backup_logic.dart';
 import 'package:hentai_library/features/metadata_backup/presentation/view_models/metadata_auto_backup_coordinator_notifier.dart';
 import 'package:hentai_library/features/metadata_backup/presentation/view_models/metadata_auto_backup_notifier.dart';
 import 'package:hentai_library/features/metadata_backup/presentation/view_models/metadata_last_auto_backup_notifier.dart';
-import 'package:hentai_library/shared/di/domain_event_bus_providers.dart';
+import 'package:hentai_library/shared/presentation/providers/domain_event_bus_providers.dart';
 import 'package:hentai_library/shared/domain/events/events.dart';
 
 class _Enabled extends MetadataAutoBackupNotifier {

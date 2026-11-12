@@ -5,6 +5,5 @@ void main() {
   test('comic_metadata_form narrow barrel exposes form listing only', () {
     expect(NamedFacetFormKind, isNotNull);
     expect(NamedFacetFormListing, isNotNull);
-    expect(listNamedFacetForMetadataForm, isNotNull);
   });
 }

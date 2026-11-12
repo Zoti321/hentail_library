@@ -1,7 +1,4 @@
-import 'package:flutter/foundation.dart';
-
 /// Series 元数据字段锁（Komga 式）；默认全部未锁。
-@immutable
 class SeriesMetaLocks {
   const SeriesMetaLocks({
     this.name = false,

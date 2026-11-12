@@ -12,7 +12,7 @@ import 'package:hentai_library/features/library_browse/domain/browse/library_age
 import 'package:hentai_library/features/library_browse/domain/browse/library_media_type_filter.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:hentai_library/features/library_browse/public/l10n/library_browse_l10n.dart';
+import 'package:hentai_library/features/library_browse/presentation/l10n/library_browse_l10n.dart';
 import 'package:hentai_library/features/comic/public/l10n/comic_l10n.dart';
 
 export 'library_filter_sort_drawer_host.dart';

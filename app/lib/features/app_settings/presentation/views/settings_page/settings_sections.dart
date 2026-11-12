@@ -16,7 +16,7 @@ import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:hentai_library/features/app_settings/public/ui/l10n/app_settings_l10n.dart';
+import 'package:hentai_library/features/app_settings/presentation/l10n/app_settings_l10n.dart';
 
 /// 生产设置页某分类的 MD3E section 列表。
 ///

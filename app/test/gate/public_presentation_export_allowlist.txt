@@ -34,9 +34,7 @@ features/series/public/ui/series_metadata_edit_layout.dart
 features/series/public/ui/series_metadata_edit_mappers.dart
 features/series/public/ui/series_metadata_edit_present.dart
 features/series/public/ui/series_metadata_edit_presenters.dart
-features/comic/public/di/comic_detail_providers.dart
+features/comic/public/providers/comic_detail_providers.dart
 features/comic/public/ui/bulk_edit_metadata_presenter.dart
-features/library_admin/public/di/library_management_commands_factory.dart
-features/library_browse/public/di/author_detail_commands_factory.dart
 features/comic/public/ui/comic_catalog_selection_actions.dart
 features/reader/public/ui/reading_settings_sections.dart

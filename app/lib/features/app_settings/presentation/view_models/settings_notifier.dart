@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:hentai_library/features/app_settings/di/app_setting_repository_factory.dart';
+import 'package:hentai_library/features/app_settings/presentation/providers/app_setting_repository_provider.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';

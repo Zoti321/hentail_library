@@ -9,7 +9,7 @@ import 'package:hentai_library/features/reader/presentation/routing/reader_route
 import 'package:hentai_library/features/reader/domain/auto_play_mode.dart';
 import 'package:hentai_library/features/reader/domain/reading_mode.dart';
 import 'package:hentai_library/features/reader/domain/reading_preferences.dart';
-import 'package:hentai_library/features/reader/public/reading_preferences_providers.dart';
+import 'package:hentai_library/features/reader/presentation/providers/reading_preferences_providers.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 

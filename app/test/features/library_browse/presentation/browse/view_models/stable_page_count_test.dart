@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/models/comic_browse_view_object.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_state.dart';
-import 'package:hentai_library/shared/domain/catalog/pagination/library_pagination.dart';
+import 'package:hentai_library/shared/ui/catalog/pagination/library_pagination.dart';
 import 'package:test/test.dart';
 
 LibraryComicsCatalogState _catalog({int comicCount = 42}) {

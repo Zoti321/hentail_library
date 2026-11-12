@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
+import 'package:hentai_library/composition/composition_overrides.dart';
 import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_browse_page.dart';
 import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_page_header.dart';
 import 'package:hentai_library/features/reading_history/presentation/widgets/history_list_item.dart';

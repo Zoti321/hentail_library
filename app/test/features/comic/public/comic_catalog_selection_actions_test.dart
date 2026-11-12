@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:hentai_library/features/comic/public/ui/comic_catalog_selection_actions.dart';
-import 'package:hentai_library/shared/domain/catalog/selection/catalog_selection_notifier.dart';
+import 'package:hentai_library/shared/ui/catalog/selection/catalog_selection_notifier.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 import '../../../support/pump_localized_app.dart';

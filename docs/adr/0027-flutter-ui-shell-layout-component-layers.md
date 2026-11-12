@@ -4,6 +4,8 @@
 
 Accepted
 
+> **ADR-0051 修订（2026-11-12）**：组合根迁到 `lib/composition/`；owner `data/` 迁为 `infrastructure/`；共享协作签名在 `shared/application/contracts/`，Riverpod 适配在 `shared/presentation/providers/`。内层以递归 import/export 门禁为准；下文旧目录是历史语境。
+
 ## Context
 
 Flutter 侧已有单响应式 App shell、Fluent 风格设计系统（`shared/ui/widgets`）与 MVVM（ADR-0017）。实践中 Shell 编排、Layout 辅助与 feature 侧栏逻辑分散在 bootstrap、shared navigation 与 library_admin；部分 shared 组件反向 import feature（导航表、库排序控件、卡片删除流等），导致设计系统无法独立门禁测试，且 Agent 难以判断新 UI 应落在哪一层。

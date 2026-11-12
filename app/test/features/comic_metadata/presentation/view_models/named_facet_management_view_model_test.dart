@@ -1,12 +1,12 @@
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/features/bootstrap/di/overrides/domain_event_bus_overrides.dart';
+import 'package:hentai_library/composition/overrides/domain_event_bus_overrides.dart';
 import 'package:hentai_library/features/comic_metadata/domain/named_facet_form_candidate.dart';
 import 'package:hentai_library/features/comic_metadata/presentation/view_models/named_facet_management_view_model.dart';
 import 'package:hentai_library/features/comic_metadata/presentation/view_models/tag_dictionary_import_view_model.dart';
 import 'package:hentai_library/features/comic_metadata/presentation/view_models/tag_management_notifier.dart';
-import 'package:hentai_library/features/comic_metadata/public/di/comic_metadata_repository_providers.dart';
+import 'package:hentai_library/features/comic_metadata/public/providers/comic_metadata_repository_providers.dart';
 import 'package:hentai_library/features/comic_metadata/domain/tag.dart';
 import 'package:hentai_library/features/comic_metadata/domain/tag_dictionary_import_result.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';

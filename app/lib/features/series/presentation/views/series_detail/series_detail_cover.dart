@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/features/series/di/series_cover_providers.dart';
+import 'package:hentai_library/features/series/presentation/providers/series_cover_providers.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/thumbnail/series_cover_source.dart';
 import 'package:hentai_library/shared/ui/models/comic_cover_source.dart';
-import 'package:hentai_library/shared/di/series_slot_providers.dart';
+import 'package:hentai_library/shared/presentation/providers/series_slot_providers.dart';
 import 'package:hentai_library/shared/ui/slots/series_slots.dart';
 import 'package:hentai_library/shared/ui/widgets/catalog/catalog_cover_hero.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/adaptive_comic_cover.dart';

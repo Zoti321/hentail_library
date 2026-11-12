@@ -1,9 +1,10 @@
+import 'package:hentai_library/shared/presentation/providers/catalog_state_providers.dart';
+
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/home/presentation/view_models/home_page_dashboard_notifier.dart';
-import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/features/reading_stats/public.dart';
 import 'package:riverpod/misc.dart' show Override;
 

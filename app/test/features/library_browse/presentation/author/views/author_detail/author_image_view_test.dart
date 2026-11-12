@@ -3,7 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/features/comic/di/comic_cover_providers.dart';
+import 'package:hentai_library/features/comic/presentation/providers/comic_cover_providers.dart';
 import 'package:hentai_library/features/comic/public/ui/comic_cover_content.dart';
 import 'package:hentai_library/features/comic_metadata/public/comic_metadata_entities.dart';
 import 'package:hentai_library/shared/ui/models/comic_cover_source.dart';
@@ -12,7 +12,7 @@ import 'package:hentai_library/shared/ui/widgets/catalog/catalog_cover_hero.dart
 import 'package:hentai_library/shared/ui/widgets/element/image/card_letterboxed_cover_image.dart';
 import 'package:hentai_library/features/library_browse/presentation/author/view_models/author_detail_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/author/views/author_detail/author_image_view.dart';
-import 'package:hentai_library/features/comic_metadata/public/di/comic_metadata_repository_providers.dart';
+import 'package:hentai_library/features/comic_metadata/public/providers/comic_metadata_repository_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart' show ProviderScope, Ref;
 import 'package:riverpod/misc.dart' show Override;
 import 'package:shared_preferences/shared_preferences.dart';

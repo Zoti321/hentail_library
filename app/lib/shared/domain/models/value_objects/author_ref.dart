@@ -4,7 +4,7 @@
 /// `id == null` 表示"仅有名字"的中间态（扫描结果 / 用户新输入），不可作为引用传播。
 ///
 /// 消费方只读本类型，需要完整 Author（外链、认证态、形象）时走
-/// `shared/di/author_detail_providers.dart` 或 comic_metadata 的字典 Provider。
+/// `shared/presentation/providers/author_detail_providers.dart` 或 comic_metadata 的字典 Provider。
 class AuthorRef {
   const AuthorRef({this.id, required this.name});
 

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/shared/domain/catalog/selection/catalog_selection_notifier.dart';
+import 'package:hentai_library/shared/ui/catalog/selection/catalog_selection_notifier.dart';
 import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_view_object.dart';
-import 'package:hentai_library/shared/di/series_slot_providers.dart';
+import 'package:hentai_library/shared/presentation/providers/series_slot_providers.dart';
 import 'package:hentai_library/shared/ui/slots/series_slots.dart';
 import 'package:hentai_library/features/comic/public/comic.dart';
 import 'package:hentai_library/shared/ui/layout/catalog_grid.dart';

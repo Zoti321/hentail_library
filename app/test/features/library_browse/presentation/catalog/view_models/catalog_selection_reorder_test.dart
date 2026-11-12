@@ -1,7 +1,7 @@
+import 'package:hentai_library/shared/presentation/providers/library_reorder_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
-import 'package:hentai_library/shared/domain/catalog/selection/catalog_selection_notifier.dart';
-import 'package:hentai_library/shared/di/library_state_providers.dart';
+import 'package:hentai_library/shared/ui/catalog/selection/catalog_selection_notifier.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:test/test.dart';
 

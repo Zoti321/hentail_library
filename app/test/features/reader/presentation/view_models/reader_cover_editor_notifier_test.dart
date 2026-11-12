@@ -1,15 +1,15 @@
 import 'dart:typed_data';
 
-import 'package:hentai_library/features/comic/di/comic_cover_providers.dart';
+import 'package:hentai_library/features/comic/presentation/providers/comic_cover_providers.dart';
 import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/comic/domain/repositories/comic_thumbnail_repository.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/reader_cover_editor_notifier.dart';
-import 'package:hentai_library/shared/di/series_slot_providers.dart';
+import 'package:hentai_library/shared/presentation/providers/series_slot_providers.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:riverpod/riverpod.dart';
 import 'package:test/test.dart';
-import 'package:hentai_library/features/comic/public/di/comic_repository_providers.dart';
+import 'package:hentai_library/features/comic/public/providers/comic_repository_providers.dart';
 
 class _RecordingThumbnailRepository implements ComicThumbnailRepository {
   final List<String> calls = <String>[];
@@ -19,10 +19,10 @@ class _RecordingThumbnailRepository implements ComicThumbnailRepository {
   Future<void> setComicCoverFromPage({
     required String comicId,
     required String path,
-    required String resourceType,
+    required ResourceType resourceType,
     required int pageIndex,
   }) async {
-    calls.add('comic:$comicId:$resourceType:$pageIndex');
+    calls.add('comic:$comicId:${resourceType.name}:$pageIndex');
     stored = Uint8List.fromList(<int>[1, 2, 3]);
   }
 
@@ -31,7 +31,7 @@ class _RecordingThumbnailRepository implements ComicThumbnailRepository {
     required String seriesId,
     required String comicId,
     required String path,
-    required String resourceType,
+    required ResourceType resourceType,
     required int pageIndex,
   }) async {
     calls.add('series:$seriesId:$comicId:$pageIndex');

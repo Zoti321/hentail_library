@@ -1,5 +1,5 @@
-import 'package:hentai_library/shared/domain/contracts/comic_read_query.dart';
-import 'package:hentai_library/shared/domain/contracts/find_series_reading_context_query.dart';
+import 'package:hentai_library/shared/application/contracts/comic_read_query.dart';
+import 'package:hentai_library/shared/application/contracts/find_series_reading_context_query.dart';
 
 typedef PreparedReaderItem = ({String comicId, String title, int order});
 typedef PreparedReaderContext = ({

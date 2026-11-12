@@ -4,7 +4,7 @@ import 'package:hentai_library/features/home/presentation/views/home/home_layout
 import 'package:hentai_library/features/reading_stats/public.dart';
 import 'package:hentai_library/shared/ui/layout/app_shell_navigation.dart';
 import 'package:hentai_library/shared/ui/patterns/home/home_aggregate_counts.dart';
-import 'package:hentai_library/shared/di/app_navigator_provider.dart';
+import 'package:hentai_library/shared/presentation/providers/app_navigator_provider.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 export 'package:hentai_library/features/home/presentation/views/home/home_layout.dart';

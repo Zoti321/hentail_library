@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/core/util/utils.dart';
-import 'package:hentai_library/features/metadata_backup/data/metadata_backup_paths.dart';
+import 'package:hentai_library/features/metadata_backup/presentation/providers/metadata_backup_use_case_providers.dart';
 import 'package:hentai_library/features/metadata_backup/domain/metadata_export_options.dart';
 import 'package:hentai_library/features/metadata_backup/presentation/metadata_export_flow.dart';
 import 'package:hentai_library/features/metadata_backup/presentation/metadata_import_flow.dart';
@@ -45,7 +45,7 @@ class MetadataBackupSettingsSections extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
     return FutureBuilder<String>(
-      future: metadataBackupsDirectory(),
+      future: ref.read(metadataBackupDirectoryQueryProvider)(),
       builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
         final String storagePath =
             snapshot.data ?? l10n.settingsMetadataBackupStoragePathLoading;

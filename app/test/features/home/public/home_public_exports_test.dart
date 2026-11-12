@@ -6,7 +6,6 @@ void main() {
     expect(HomeLibraryStat, isNotNull);
     expect(HomeLibraryAlert, isNotNull);
     expect(HomePageRepository, isNotNull);
-    expect(createHomePageRepository, isNotNull);
     expect(homeLibraryStatsStreamProvider, isNotNull);
     expect(HomePage, isNotNull);
   });

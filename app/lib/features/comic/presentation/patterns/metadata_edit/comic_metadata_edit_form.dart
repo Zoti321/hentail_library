@@ -15,7 +15,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:hentai_library/shared/ui/catalog/metadata_edit/metadata_lock_callbacks.dart';
-import 'package:hentai_library/shared/util/list_edit.dart';
+import 'package:hentai_library/core/util/list_edit.dart';
 
 /// 漫画元数据编辑表单主体（常规 + 作者&标签），字段对齐生产 [EditMetadataDialog]。
 class ComicMetadataEditForm extends StatefulWidget {

@@ -4,12 +4,12 @@ import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/app_update_coordinator_notifier.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hentai_library/features/bootstrap/presentation/view_models/app_startup_coordinator_notifier.dart';
-import 'package:hentai_library/features/bootstrap/di/data_overrides.dart';
-import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
-import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
-import 'package:hentai_library/features/bootstrap/di/overrides/domain_event_bus_overrides.dart';
+import 'package:hentai_library/composition/infrastructure_overrides.dart';
+import 'package:hentai_library/composition/feature_state_overrides.dart';
+import 'package:hentai_library/composition/composition_overrides.dart';
+import 'package:hentai_library/composition/overrides/domain_event_bus_overrides.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/app.dart';
-import 'package:hentai_library/features/comic/di/comic_cover_providers.dart';
+import 'package:hentai_library/features/comic/presentation/providers/comic_cover_providers.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 void main() {
@@ -36,9 +36,9 @@ List<Override> _smokeTestOverrides() {
     settingsProvider.overrideWith(_FakeSettingsNotifier.new),
     appUpdateCoordinatorProvider.overrideWith(_FakeAppUpdateCoordinator.new),
     appStartupCoordinatorProvider.overrideWith(_FakeAppStartupCoordinator.new),
-    ...dataProviderOverrides(),
+    ...infrastructureOverrides(),
     ...domainEventBusOverrides(),
-    ...sharedLibraryStateOverrides(),
+    ...featureStateOverrides(),
     ...bootstrapCompositionOverrides(),
   ];
 }

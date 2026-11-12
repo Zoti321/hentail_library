@@ -10,12 +10,12 @@ import 'package:hentai_library/features/reader/presentation/view_models/reader_a
 import 'package:hentai_library/features/reader/presentation/reader_exit_location.dart';
 import 'package:hentai_library/features/reader/presentation/routing/reader_route_context.dart';
 import 'package:hentai_library/features/reader/application/read_session_application_service.dart';
-import 'package:hentai_library/features/app_settings/public/di/app_settings_providers.dart';
+import 'package:hentai_library/features/app_settings/public/providers/app_settings_providers.dart';
 import 'package:hentai_library/features/app_settings/public/app_settings_cross_feature_types.dart';
 import 'package:hentai_library/features/reader/domain/reading_preferences.dart';
-import 'package:hentai_library/features/reader/public/reading_preferences_acl.dart';
-import 'package:hentai_library/features/reader/public/reading_preferences_providers.dart';
-import 'package:hentai_library/features/reader/di/session_providers.dart';
+import 'package:hentai_library/features/reader/application/reading_preferences_acl.dart';
+import 'package:hentai_library/features/reader/presentation/providers/reading_preferences_providers.dart';
+import 'package:hentai_library/features/reader/presentation/providers/session_providers.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/reader_chrome_notifier.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/reader_navigation_intent.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/reader_prefetch_notifier.dart';

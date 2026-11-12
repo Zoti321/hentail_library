@@ -9,7 +9,7 @@ void main() {
     const String allowedDeep =
         'package:hentai_library/features/library_admin/public/library_admin_commands.dart';
     const String deniedUri =
-        'package:hentai_library/features/library_admin/di/library_commands.dart';
+        'package:hentai_library/composition/modules/library_admin/library_commands.dart';
 
     expect(isFeaturePublicPath('features/library_admin/public.dart'), isTrue);
     expect(
@@ -19,7 +19,9 @@ void main() {
       isTrue,
     );
     expect(
-      isFeaturePublicPath('features/library_admin/di/library_commands.dart'),
+      isFeaturePublicPath(
+        'composition/modules/library_admin/library_commands.dart',
+      ),
       isFalse,
     );
 

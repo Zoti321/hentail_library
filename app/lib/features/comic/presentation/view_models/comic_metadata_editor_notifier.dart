@@ -1,12 +1,12 @@
 import 'package:hentai_library/features/comic/application/comic_metadata_service.dart';
-import 'package:hentai_library/features/comic/di/comic_metadata_service.dart';
-import 'package:hentai_library/shared/di/series_item_membership_providers.dart';
-import 'package:hentai_library/shared/di/series_item_sort_providers.dart';
+import 'package:hentai_library/features/comic/presentation/providers/comic_metadata_use_case_providers.dart';
+import 'package:hentai_library/shared/presentation/providers/series_item_membership_providers.dart';
+import 'package:hentai_library/shared/presentation/providers/series_item_sort_providers.dart';
 import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/features/comic/domain/value_objects/comic_metadata_form.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/series_item_membership.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:hentai_library/features/comic/di/comic_repository_providers.dart';
+import 'package:hentai_library/features/comic/presentation/providers/comic_repository_providers.dart';
 
 part 'comic_metadata_editor_notifier.g.dart';
 

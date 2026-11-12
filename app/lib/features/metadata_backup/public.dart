@@ -1,10 +1,6 @@
-/// metadata_backup 模块 public API（ADR-0034）。
-///
-/// Bootstrap 槽位注入与跨 feature 类型经本 barrel；实现细节留在 feature 内。
+/// metadata_backup 的模块入口；纯 Dart 消费者使用 public/contracts.dart。
 library;
 
-export 'public/di/metadata_backup_shared_state_overrides.dart';
-export 'domain/metadata_export_options.dart';
-export 'presentation/metadata_export_flow.dart';
-export 'presentation/view_models/metadata_auto_backup_coordinator_notifier.dart';
-export 'presentation/views/metadata_backup_settings_sections.dart';
+export 'public/contracts.dart';
+export 'public/providers.dart';
+export 'public/widgets.dart';

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/features/library_admin/di/library_commands.dart';
+import 'package:hentai_library/composition/modules/library_admin/library_commands.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/libraries_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/library/library_confirm_dialog.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/library/library_form_dialog.dart';
-import 'package:hentai_library/features/library_admin/public/di/library_admin_state_providers.dart';
+import 'package:hentai_library/features/library_admin/public/providers/library_admin_state_providers.dart';
 import 'package:hentai_library/features/library_admin/domain/local_library.dart';
 import 'package:hentai_library/features/library_admin/domain/value_objects/library_form.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';

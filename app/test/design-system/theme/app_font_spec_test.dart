@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/features/app_settings/domain/app_font_preference.dart';
+import 'package:hentai_library/features/app_settings/presentation/mappers/app_font_preference_mapper.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 

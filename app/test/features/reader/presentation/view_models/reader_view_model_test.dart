@@ -1,4 +1,5 @@
-import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
+import 'package:hentai_library/composition/modules/comic/comic_read_query.dart';
+import 'package:hentai_library/composition/composition_overrides.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
@@ -6,7 +7,7 @@ import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/comic/public/comic_lookup_repository.dart';
 import 'package:hentai_library/features/reader/application/read_session_application_service.dart';
 import 'package:hentai_library/features/reader/application/open_read_session_service.dart';
-import 'package:hentai_library/features/reader/di/session_providers.dart';
+import 'package:hentai_library/features/reader/presentation/providers/session_providers.dart';
 import 'package:hentai_library/features/reader/domain/comic_page_source_port.dart';
 import 'package:hentai_library/features/reader/application/open_reader_args.dart';
 import 'package:hentai_library/features/reader/domain/read_session_page.dart';
@@ -21,14 +22,13 @@ import 'package:hentai_library/features/reader/presentation/view_models/reader_n
 import 'package:hentai_library/features/reader/presentation/view_models/read_session_providers.dart';
 import 'package:hentai_library/features/reader/presentation/routing/reader_route_context.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
+import 'package:hentai_library/composition/feature_state_overrides.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 import '../../../../support/fakes/settings_test_fakes.dart';
 
-import 'package:hentai_library/features/comic/public/di/comic_read_query.dart';
 import 'package:hentai_library/features/app_settings/domain/reading_preferences_schema.dart';
-import 'package:hentai_library/features/app_settings/public/di/app_settings_providers.dart';
+import 'package:hentai_library/features/app_settings/public/providers/app_settings_providers.dart';
 
 const String _comicId = 'reader-controller-comic';
 const ReaderViewModelKey _key = (
@@ -203,7 +203,7 @@ ProviderContainer _createContainer({
   final OpenedReadSession session = snapshot ?? _snapshot();
   return ProviderContainer(
     overrides: <Override>[
-      ...sharedLibraryStateOverrides(),
+      ...featureStateOverrides(),
       ...bootstrapCompositionOverrides(),
       _stubCoordinatorOverride(),
       appSettingRepositoryProvider.overrideWithValue(
@@ -284,7 +284,7 @@ void main() {
       );
       final ProviderContainer container = ProviderContainer(
         overrides: <Override>[
-          ...sharedLibraryStateOverrides(),
+          ...featureStateOverrides(),
           ...bootstrapCompositionOverrides(),
           _stubCoordinatorOverride(),
           appSettingRepositoryProvider.overrideWithValue(
@@ -355,7 +355,7 @@ void main() {
       );
       final ProviderContainer container = ProviderContainer(
         overrides: <Override>[
-          ...sharedLibraryStateOverrides(),
+          ...featureStateOverrides(),
           ...bootstrapCompositionOverrides(),
           _stubCoordinatorOverride(),
           appSettingRepositoryProvider.overrideWithValue(

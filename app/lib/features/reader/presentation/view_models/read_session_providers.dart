@@ -5,7 +5,7 @@ import 'package:hentai_library/features/reader/domain/read_session_page.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/read_session_page_data.dart';
 import 'package:hentai_library/features/reader/domain/reader_page_payload.dart';
 import 'package:hentai_library/features/reader/domain/opened_read_session.dart';
-import 'package:hentai_library/features/reader/di/session_providers.dart';
+import 'package:hentai_library/features/reader/presentation/providers/session_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'read_session_providers.g.dart';

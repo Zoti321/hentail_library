@@ -18,10 +18,10 @@ Rubric = str  # architecture-guard | thin-edge | ui-contract | candidate-retire
 
 THIN_EDGE_PREFIXES = (
     "test/frb_wire/",
-    "test/shared/data/",
-    "test/shared/domain/",
+    "test/infrastructure/",
     "test/core/",
-    "test/shared/di/",
+    "test/composition/",
+    "test/shared/presentation/providers/",
 )
 
 
@@ -72,7 +72,7 @@ def classify_rubric(relative_path: str, in_manifest: bool) -> Rubric:
     if p.startswith(THIN_EDGE_PREFIXES):
         return "thin-edge"
     if p.startswith("test/features/") and (
-        "/data/" in p or "/domain/" in p or "/application/" in p
+        "/infrastructure/" in p or "/domain/" in p or "/application/" in p
     ):
         return "thin-edge"
     if p.startswith("test/support/"):

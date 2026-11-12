@@ -20,7 +20,7 @@ void main() {
   test('FRB import whitelist: feature data/ layer (Phase C #280)', () {
     expect(
       isFrbImportAllowedSource(
-        'features/library_admin/data/adapters/sync_library_frb_adapter.dart',
+        'features/library_admin/infrastructure/adapters/sync_library_frb_adapter.dart',
       ),
       isTrue,
     );
@@ -34,10 +34,13 @@ void main() {
       ),
       isFalse,
     );
-    expect(isFrbImportAllowedSource('shared/data/adapters/foo.dart'), isTrue);
+    expect(
+      isFrbImportAllowedSource('infrastructure/adapters/foo.dart'),
+      isTrue,
+    );
     expect(
       isFrbImportAllowedSource(
-        'features/comic_trash/data/adapters/comic_trash_frb_adapter.dart',
+        'features/comic_trash/infrastructure/adapters/comic_trash_frb_adapter.dart',
       ),
       isTrue,
     );

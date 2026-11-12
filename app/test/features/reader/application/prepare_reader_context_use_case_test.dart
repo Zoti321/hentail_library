@@ -1,6 +1,6 @@
 import 'package:test/test.dart';
 import 'package:hentai_library/features/reader/application/prepare_reader_context_use_case.dart';
-import 'package:hentai_library/shared/domain/contracts/comic_read_query.dart';
+import 'package:hentai_library/shared/application/contracts/comic_read_query.dart';
 
 class _Comics implements ComicReadQuery {
   final calls = <List<String>>[];
