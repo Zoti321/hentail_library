@@ -7,12 +7,18 @@ import 'package:hentai_library/shared/domain/models/entity/comic/author_detail.d
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/features/named_metadata/domain/author_repository.dart';
+import 'package:hentai_library/features/named_metadata/domain/named_facet_form_candidate.dart';
+import 'package:hentai_library/features/named_metadata/domain/named_facet_management_repository.dart';
 import 'package:hentai_library/src/rust/api/author.dart' as rust_author;
 
 class AuthorRepositoryImpl implements AuthorRepository {
-  const AuthorRepositoryImpl({AuthorFrbAdapter? adapter})
-    : _adapter = adapter ?? const AuthorFrbAdapter();
+  const AuthorRepositoryImpl({
+    required this.namedFacets,
+    AuthorFrbAdapter? adapter,
+  }) : _adapter = adapter ?? const AuthorFrbAdapter();
 
+  /// 通用 named-facet 管理路径：author 的删除 / 重命名与 tag 共用。
+  final NamedFacetManagementRepository namedFacets;
   final AuthorFrbAdapter _adapter;
 
   @override
@@ -32,10 +38,13 @@ class AuthorRepositoryImpl implements AuthorRepository {
 
   @override
   Future<PagedResult<Author>> fetchPage(PageRequest request) async {
-    final rust_author.AuthorPagedDto page = await _adapter.fetchPage(request);
+    final PagedResult<NamedFacetFormCandidate> page = await namedFacets
+        .fetchPage(ManagedNamedFacetKind.author, request);
     return PagedResult<Author>(
-      items: page.items.map(mapAuthorIdentity).toList(),
-      totalCount: page.totalCount.toInt(),
+      items: page.items
+          .map((NamedFacetFormCandidate e) => Author(name: e.name))
+          .toList(),
+      totalCount: page.totalCount,
       page: page.page,
       pageSize: page.pageSize,
     );
@@ -43,19 +52,22 @@ class AuthorRepositoryImpl implements AuthorRepository {
 
   @override
   Future<Author> add(Author author) async {
-    final rust_author.AuthorIdentityFrbDto created = await _adapter.add(
-      name: author.name,
-    );
-    return mapAuthorIdentity(created);
+    await namedFacets.add(ManagedNamedFacetKind.author, author.name);
+    return Author(name: author.name);
   }
 
   @override
-  Future<void> deleteByNames(List<String> names) =>
-      _adapter.deleteByNames(names);
+  Future<void> deleteByNames(List<String> names) => namedFacets.deleteByNames(
+    ManagedNamedFacetKind.author,
+    names,
+  );
 
   @override
-  Future<void> rename(String oldName, String newName) =>
-      _adapter.rename(oldName: oldName, newName: newName);
+  Future<void> rename(String oldName, String newName) => namedFacets.rename(
+    ManagedNamedFacetKind.author,
+    oldName,
+    newName,
+  );
 
   @override
   Future<AuthorDetail?> getDetail({

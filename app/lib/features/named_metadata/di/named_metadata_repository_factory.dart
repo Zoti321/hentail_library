@@ -12,8 +12,10 @@ import 'package:hentai_library/features/named_metadata/domain/named_facet_manage
 import 'package:hentai_library/features/named_metadata/domain/tag_repository.dart';
 
 /// Bootstrap / 测试注入用工厂（跨 feature 仍读 `shared/di` token）。
-AuthorRepository createAuthorRepository({AuthorFrbAdapter? adapter}) =>
-    AuthorRepositoryImpl(adapter: adapter);
+AuthorRepository createAuthorRepository({
+  required NamedFacetManagementRepository namedFacets,
+  AuthorFrbAdapter? adapter,
+}) => AuthorRepositoryImpl(namedFacets: namedFacets, adapter: adapter);
 
 NamedFacetManagementRepository createNamedFacetManagementRepository({
   NamedFacetManagementFrbAdapter? adapter,

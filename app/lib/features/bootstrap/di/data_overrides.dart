@@ -39,7 +39,11 @@ List<Override> dataProviderOverrides() => <Override>[
       namedFacets: ref.read(namedFacetManagementRepoProvider),
     ),
   ),
-  authorRepoProvider.overrideWith((Ref ref) => createAuthorRepository()),
+  authorRepoProvider.overrideWith(
+    (Ref ref) => createAuthorRepository(
+      namedFacets: ref.read(namedFacetManagementRepoProvider),
+    ),
+  ),
   namedFacetManagementRepoProvider.overrideWith(
     (Ref ref) => createNamedFacetManagementRepository(),
   ),
