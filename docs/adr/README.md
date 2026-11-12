@@ -125,3 +125,4 @@ Accepted | Superseded by ADR-000N | Deprecated
 | [0044](./0044-shared-ui-ownership-and-design-system-lane.md) | shared/ui 模块所有权判据与 Design System 层（#495） | Accepted |
 | [0045](./0045-port-and-read-model-ownership.md) | Port 与读模型按可达性归属（生产者拥有，#503） | Accepted |
 | [0046](./0046-reading-preferences-acl-and-schema-partitioning.md) | 偏好 schema 与领域类型的 ACL 分层（#517） | Accepted |
+| [0047](./0047-design-system-owns-presentation-scaffold.md) | Design System 承接纯外观页级 scaffold（修订 ADR-0044 §1 判据） | Accepted |
