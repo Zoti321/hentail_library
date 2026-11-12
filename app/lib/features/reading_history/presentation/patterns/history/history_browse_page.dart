@@ -3,7 +3,6 @@ import 'package:hentai_library/features/reading_history/presentation/patterns/hi
 import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_page_header.dart';
 import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_time_grouping.dart';
 import 'package:hentai_library/design-system/design_system.dart';
-import 'package:hentai_library/shared/ui/patterns/shared/page_header.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 阅读历史 browse 壳：粘滞页头 + 分桶列表（生产 / Widgetbook 共用）。

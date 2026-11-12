@@ -31,7 +31,9 @@ export 'package:hentai_library/design-system/layout/app_layout_breakpoints.dart'
 export 'package:hentai_library/design-system/layout/breakpoints.dart';
 export 'package:hentai_library/design-system/layout/fab_sizing.dart';
 export 'package:hentai_library/design-system/layout/list_detail_adaptive_layout.dart';
+export 'package:hentai_library/design-system/layout/metadata_edit_form_metrics.dart';
 export 'package:hentai_library/design-system/layout/page_layout_spec.dart';
+export 'package:hentai_library/design-system/layout/pinned_toolbar_chrome_metrics.dart';
 export 'package:hentai_library/design-system/layout/spacing.dart';
 
 // components
@@ -54,12 +56,25 @@ export 'package:hentai_library/design-system/components/inputs/outlined_text_fie
 export 'package:hentai_library/design-system/components/inputs/outlined_text_field_shell.dart';
 export 'package:hentai_library/design-system/components/inputs/published_date_text_field.dart';
 export 'package:hentai_library/design-system/components/inputs/tag_input_field.dart';
+export 'package:hentai_library/design-system/components/list_detail/list_detail_detail_transition.dart';
+export 'package:hentai_library/design-system/components/list_detail/list_detail_nav_item.dart';
 export 'package:hentai_library/design-system/components/lists/reorder_exclude.dart';
 export 'package:hentai_library/design-system/components/lists/reorderable_split_list_group.dart';
 export 'package:hentai_library/design-system/components/lists/split_list_group.dart';
+export 'package:hentai_library/design-system/components/menu/anchored_menu.dart';
+export 'package:hentai_library/design-system/components/scaffold/library_page_header_metrics.dart';
+export 'package:hentai_library/design-system/components/scaffold/metadata_edit_form_scroll.dart';
+export 'package:hentai_library/design-system/components/scaffold/metadata_field_label_row.dart';
+export 'package:hentai_library/design-system/components/scaffold/page_header.dart';
+export 'package:hentai_library/design-system/components/scaffold/page_header_back_button.dart';
+export 'package:hentai_library/design-system/components/scaffold/page_title.dart';
+export 'package:hentai_library/design-system/components/scaffold/pinned_toolbar_chrome.dart';
+export 'package:hentai_library/design-system/components/selection/segmented_capsule_bar.dart';
+export 'package:hentai_library/design-system/components/selection/segmented_capsule_bar_metrics.dart';
 export 'package:hentai_library/design-system/components/surfaces/tonal_surface.dart';
 
 // util
+export 'package:hentai_library/design-system/util/navigation_rail_icon.dart';
 export 'package:hentai_library/design-system/util/reorder_index.dart';
 
 // l10n（直接路径暴露，不经 barrel：`design-system/l10n/m3e_material_localizations.dart`）

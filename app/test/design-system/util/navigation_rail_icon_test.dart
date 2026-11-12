@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/shared/ui/widgets/desktop/navigation_rail_icon.dart';
+import 'package:hentai_library/design-system/util/navigation_rail_icon.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 void main() {

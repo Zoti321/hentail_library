@@ -7,7 +7,7 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/named_metadata/domain/named_facet_management_repository.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata/metadata_actions.dart';
 import 'package:hentai_library/shared/di/author_detail_providers.dart';
-import 'package:hentai_library/shared/ui/widgets/menu/anchored_menu.dart';
+import 'package:hentai_library/design-system/components/menu/anchored_menu.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';

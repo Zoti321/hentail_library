@@ -4,7 +4,6 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/features/reading_history/presentation/widgets/reading_history_list_item_metrics.dart';
 import 'package:hentai_library/features/reading_history/presentation/widgets/reading_history_list_item_typography.dart';
-import 'package:hentai_library/shared/ui/widgets/menu/anchored_menu.dart';
 import 'package:intl/intl.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 

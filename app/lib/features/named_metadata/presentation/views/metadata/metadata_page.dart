@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:hentai_library/shared/ui/patterns/shared/page_header.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 
 import 'package:flutter/material.dart';
@@ -21,7 +20,7 @@ import 'package:hentai_library/features/named_metadata/presentation/views/metada
 import 'package:hentai_library/features/named_metadata/presentation/widgets/management_create_entity_fab.dart';
 import 'package:hentai_library/features/named_metadata/domain/named_facet_management_repository.dart';
 import 'package:hentai_library/shared/ui/layout/app_shell_navigation.dart';
-import 'package:hentai_library/shared/ui/patterns/shared/page_header_back_button.dart';
+import 'package:hentai_library/shared/ui/navigation/pop_or_go_home.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hentai_library/shared/di/app_navigator_provider.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';

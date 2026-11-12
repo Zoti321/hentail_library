@@ -5,14 +5,8 @@ import 'package:hentai_library/features/comic/presentation/draft/bulk_metadata_e
 import 'package:hentai_library/features/comic/presentation/view_models/bulk_metadata_edit_session_notifier.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/comic_language.dart';
 import 'package:hentai_library/design-system/design_system.dart';
-import 'package:hentai_library/shared/ui/layout/metadata_edit_form_metrics.dart';
 import 'package:hentai_library/shared/ui/patterns/dialog/confirm_dialog.dart';
-import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_form_scroll.dart';
-import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_field_label_row.dart';
 import 'package:hentai_library/features/comic/presentation/widgets/comic_language_quick_pick.dart';
-import 'package:hentai_library/shared/ui/widgets/list_detail/list_detail_detail_transition.dart';
-import 'package:hentai_library/shared/ui/widgets/list_detail/list_detail_nav_item.dart';
-import 'package:hentai_library/shared/ui/widgets/selection/segmented_capsule_bar.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';

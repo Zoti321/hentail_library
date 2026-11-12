@@ -8,7 +8,7 @@ import 'package:hentai_library/features/comic/public/ui/comic_card_host.dart';
 import 'package:hentai_library/features/comic/public/ui/comic_metadata_edit_presenters.dart';
 import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
-import 'package:hentai_library/shared/ui/widgets/menu/anchored_menu.dart';
+import 'package:hentai_library/design-system/components/menu/anchored_menu.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 

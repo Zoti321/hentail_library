@@ -7,7 +7,6 @@ import 'package:hentai_library/features/app_settings/presentation/patterns/setti
 import 'package:hentai_library/features/app_settings/presentation/patterns/settings/settings_detail_panes.dart';
 import 'package:hentai_library/features/app_settings/presentation/patterns/settings/settings_master_menu.dart';
 import 'package:hentai_library/features/app_settings/presentation/patterns/settings/settings_page_header.dart';
-import 'package:hentai_library/shared/ui/widgets/list_detail/list_detail_detail_transition.dart';
 
 export 'package:hentai_library/features/app_settings/presentation/patterns/settings/settings_detail_panes.dart';
 

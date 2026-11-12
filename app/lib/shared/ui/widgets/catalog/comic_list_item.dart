@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/widgets/menu/anchored_menu.dart';
+import 'package:hentai_library/design-system/components/menu/anchored_menu.dart';
 import 'package:hentai_library/shared/ui/widgets/catalog/comic_catalog_card_shell.dart';
 import 'package:hentai_library/shared/ui/widgets/catalog/comic_card.dart';
 import 'package:hentai_library/shared/ui/widgets/catalog/cover_read_progress_strip.dart';

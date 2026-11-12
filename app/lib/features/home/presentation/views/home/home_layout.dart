@@ -6,7 +6,6 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/patterns/home/home_aggregate_counts.dart';
 import 'package:hentai_library/features/home/presentation/views/home/patterns/home_aggregate_stats_section.dart';
 import 'package:hentai_library/features/reading_stats/public.dart';
-import 'package:hentai_library/shared/ui/patterns/shared/page_header.dart';
 import 'package:hentai_library/features/home/presentation/views/home/patterns/home_page_header.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 

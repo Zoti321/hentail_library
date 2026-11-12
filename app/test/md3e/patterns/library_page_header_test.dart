@@ -4,7 +4,6 @@ import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/patterns/library/library_display_target_tabs.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/patterns/library/library_page_header.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
-import 'package:hentai_library/shared/ui/patterns/library/library_page_header_metrics.dart';
 
 import '../../support/pump_app.dart';
 

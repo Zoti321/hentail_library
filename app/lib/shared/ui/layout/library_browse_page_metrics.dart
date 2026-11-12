@@ -1,5 +1,4 @@
 import 'package:hentai_library/design-system/design_system.dart';
-import 'package:hentai_library/shared/ui/layout/pinned_toolbar_chrome_metrics.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 书库浏览页的非留白类尺寸（回到顶部按钮、工具行间距、分页与 FAB 避让）。

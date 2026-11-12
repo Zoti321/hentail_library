@@ -1,9 +1,9 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/shared/ui/widgets/list_detail/list_detail_detail_transition.dart';
+import 'package:hentai_library/design-system/components/list_detail/list_detail_detail_transition.dart';
 
-import '../../../../support/pump_app.dart';
+import '../../../support/pump_app.dart';
 
 void main() {
   group('ListDetailDetailTransition', () {

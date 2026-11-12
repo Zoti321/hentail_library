@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/ui/widgets/desktop/navigation_rail_icon.dart';
+import 'package:hentai_library/design-system/util/navigation_rail_icon.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 export 'package:hentai_library/shared/ui/shell/shell_navigation.dart'

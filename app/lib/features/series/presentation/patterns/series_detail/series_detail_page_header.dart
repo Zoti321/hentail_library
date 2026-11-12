@@ -3,7 +3,7 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/domain/catalog/page_size/library_tab_page_size_settings.dart';
 import 'package:hentai_library/features/series/presentation/patterns/series_detail/series_detail_page_size_control.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/detail_header_toolbar.dart';
-import 'package:hentai_library/shared/ui/patterns/shared/pinned_toolbar_chrome.dart';
+import 'package:hentai_library/design-system/components/scaffold/pinned_toolbar_chrome.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 系列详情工具栏：左返回；右为每页数量 / 编辑 / 更多。

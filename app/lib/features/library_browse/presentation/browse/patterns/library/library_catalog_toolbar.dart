@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/shared/ui/widgets/selection/segmented_capsule_bar.dart';
+import 'package:hentai_library/design-system/components/selection/segmented_capsule_bar.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:hentai_library/shared/ui/l10n/library_display_target_l10n.dart';
 

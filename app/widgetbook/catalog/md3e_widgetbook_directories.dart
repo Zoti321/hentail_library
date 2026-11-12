@@ -46,7 +46,6 @@ import 'package:hentai_library/features/library_browse/presentation/browse/patte
 import 'package:hentai_library/features/named_metadata/public/ui/metadata_lab_patterns.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/ui/widgets/selection/segmented_capsule_bar.dart';
 
 import '../preview/md3e_named_facet_multi_select_preview.dart';
 
