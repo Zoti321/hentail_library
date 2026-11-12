@@ -1,30 +1,22 @@
 # 贡献指南
 
-## 开始
+## 开发流程
 
-1. 仓库根：`./scripts/setup-dev.sh`
-2. 日常：`cd app` → `flutter pub get` → `dart run build_runner build --delete-conflicting-outputs`（若改了生成代码）
-3. 合并前：`./scripts/run-gate.sh`；改 UI 时再 `cd app && flutter test`
+1. 在仓库根运行 `./scripts/setup-dev.sh`（Linux、macOS 或 Windows Git Bash）。工具链版本以 `.github/workflows/gate.yml` 为准。
+2. 进入 `app/` 执行 `flutter pub get`。修改代码生成输入后执行 `dart run build_runner build`；修改 ARB 后执行 `flutter gen-l10n`；修改 Rust FRB API 后执行 `flutter_rust_bridge_codegen generate`。
+3. 提交前运行 `./scripts/run-gate.sh`。UI 变更补跑受影响的组件或页面测试；需要排查整体回归时运行 `cd app && flutter test`。
+4. 使用 [PR 模板](.github/pull_request_template.md)，写明行为变化、验证证据和未验证项。
 
-详见 `README.md` § 协作建议。
+`codegen-drift` 会就地生成并比较 `app/`、`core/` 与 HEAD 的差异，运行前先保存并提交相关改动。Agent 在当前 clone 和分支工作，新分支或 worktree 需要用户明确允许。
 
-## Agent / 文档地图
+## 文档入口
 
-| 需求 | 读哪里 |
-|------|--------|
-| 始终加载的 brief | `AGENTS.md` |
-| 领域词汇 | `GLOSSARY.md` |
-| 架构决策 | `docs/adr/` |
-| Feature 用例层 / public API | ADR-0033、ADR-0034、ADR-0051；public contracts/providers/widgets；应用接线见 `composition/` |
-| core / shared / infrastructure | ADR-0052；core 仅纯 Dart 通用能力，产品协作按层归 shared，外部实现按 owner 归 infrastructure，composition 负责绑定和初始化 |
-| UI 规范与规划 | `design-system/` 已清空（仅保留占位与示例参考图，2026-11-01）；现行 UI 真源是 `app/lib/design-system/design_system.dart`；职责/独立边界见 ADR-0053 与 `docs/engineering/design-system.md` |
-| Gate、测试缝 | `docs/engineering/gate.md` |
-| Feature `data/`、FRB 薄层、cross-feature 注入 | `docs/engineering/feature-data-layout.md`、`cross-feature-collaboration.md` |
-| `comic_trash` 数据层历史规划（已实施） | `docs/engineering/comic_trash_data_layer_plan.md` |
-| `gh`、日志、标签字典 | `docs/engineering/maintainer.md` |
+- [README](README.md)：产品能力、平台与首次运行。
+- [AGENTS](AGENTS.md)：Agent 按任务读取的入口。
+- [GLOSSARY](GLOSSARY.md)：领域术语；issue、PR 和代码使用一致词汇。
+- [架构决策](docs/adr/README.md)：决策与修订关系。
+- [工程指南](docs/engineering/README.md)：目录职责、模块协作、设计系统、测试和维护操作。
+- [Issue 约定](docs/agents/issue-tracker.md)、[分拣标签](docs/agents/triage-labels.md)：GitHub 协作流程。
+- [脚本说明](scripts/README.md)：长期维护脚本及调用方。
 
-分层与 import 的**机械真相**在 `app/test/gate/` 与 `gate.yml`，不要依赖过期快照文档。
-
-## Pull Request
-
-使用 [PR 模板](.github/pull_request_template.md)（Summary / Evidence / Merge danger）。领域用语与 `GLOSSARY.md` 一致。
+工程指南、Agent 协作文档和术语表使用英文；README 与贡献指南使用简体中文。历史 ADR 保留决策记录，当前操作步骤写入工程指南；迁移流水账和单次验证结果放 issue / PR。目录与依赖边界以 `app/test/gate/`、`app/test/architecture/` 的检查为准，避免维护重复快照。

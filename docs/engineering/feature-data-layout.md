@@ -1,37 +1,35 @@
-# Feature `infrastructure/` 目录与 FRB 薄层命名
+# Dart layout and external adapters
 
-**现行目录**：ADR-0051；原 `data/` 已迁为 `infrastructure/`，测试同步迁移。横切实现位于 `lib/infrastructure/`，业务适配仍归 owner。
+Follow ADR-0051/0052. `app/lib/` is organized by owner, with these dependency boundaries:
 
-**相关**：ADR-0002（Rust 真值）、ADR-0017（Repository 在 `infrastructure/repositories/`）、[`library-browse-zones.md`](library-browse-zones.md)（browse 分区）。
+- `features/<owner>/domain/`: entities, value objects, rules and repository/IO contracts.
+- `features/<owner>/application/`: concrete use cases depending on domain contracts.
+- `features/<owner>/infrastructure/`: FRB mapping, repository implementations and platform/file/network adapters.
+- `features/<owner>/presentation/`: views, view models and provider bindings to abstract contracts.
+- `features/<owner>/public/`: export-only contracts, providers and widgets; see [cross-feature collaboration](cross-feature-collaboration.md).
+- `composition/`: concrete factories, overrides, cross-module bridges, startup and platform binding. Product modules do not import it.
 
-## 子目录职责
+Domain and application must remain pure Dart through the entire dependency graph, including exports, parts, conditional imports and third-party runtime dependencies. Domain does not depend on application. Presentation consumes injected contracts rather than constructing infrastructure. Required providers fail explicitly until composition supplies them. Do not reintroduce feature `data/` or `di/` layers.
 
-| 子目录 | 用途 | 文件后缀 |
-| --- | --- | --- |
-| `infrastructure/repositories/` | Domain 仓储契约的 FRB/平台实现 | `*_repository_impl.dart` |
-| `infrastructure/mappers/` | Rust DTO ↔ Dart 模型（无 I/O） | `*_frb_mapper.dart` |
-| `infrastructure/adapters/` | 调用 FRB API、Stream、或实现 domain **Port** | `*_frb_adapter.dart`、非 FRB 的 `*_adapter.dart` |
-| `infrastructure/services/` | 下载、更新等 Dart 侧服务（可选） | `*_service.dart` |
+## External implementation placement
 
-**禁止**在 `infrastructure/` 根目录新增 FRB mapper/adapter（`metadata_backup` 等历史路径逐步对齐）。纯路径/常量 helper 可暂留 `infrastructure/` 根（如 `metadata_backup_paths.dart`）；Dart 侧 I/O 服务放 `infrastructure/services/`（如 `metadata_auto_backup_service.dart`）。
+Keep business adapters with their feature owner. For new grouped adapters, use `infrastructure/repositories/` (`*_repository_impl.dart`), `mappers/` (`*_frb_mapper.dart`), `adapters/` (`*_adapter.dart`) or `services/` (`*_service.dart`) as needed. Existing flat owner layouts remain valid; avoid a directory-only migration.
 
-## `library_browse` 例外（方案 A）
+Top-level `infrastructure/` contains feature-independent technical implementations: FRB guards, the event bus, logging, file browsing and native window operations. Update opening, diagnostic export and backup IO stay with their business owner. FRB DTOs are translated at the adapter boundary; inner code uses domain types.
 
-在 `infrastructure/comic/`、`infrastructure/series/` **分区内** 仍允许 `{comic,series}_repository_impl.dart` 与 `{comic,series}_frb_mapper.dart` 同目录；语义等同 `repositories/` + `mappers/`，不再加深一层。
+## Core and shared
 
-## `infrastructure/`（横切 FRB）
+`core/` contains product-independent pure Dart utilities. It cannot depend on Flutter, Riverpod, `dart:io`, FRB, plugins or other application directories.
 
-| 子目录 | 内容 |
-| --- | --- |
-| `infrastructure/frb/` | `frb_call_guard`、`frb_error_mapper`、`frb_zone_guard`（全 app） |
-| `infrastructure/events/` | `StreamDomainEventBus`；纯 Dart 事件契约仍在 shared/domain |
-| `infrastructure/logging/` | 日志文件写入/轮换、Flutter 控制台输出与 Rust 诊断级别；初始化由 `composition/logging_composition.dart` 负责（ADR-0052） |
-| `infrastructure/platform/` | 跨 feature 的系统文件浏览；UI 经 shared/application 签名与 required Provider 使用 |
+Use shared layers only for justified product collaboration:
 
-更新包打开、日志文件枚举/manifest/zip 导出属于 `app_settings/infrastructure`，脱敏算法属于该 owner 的 `application/diagnostics`，不放顶层技术实现桶。presentation 不创建这些实现；平台绑定集中在 `composition/platform_overrides.dart`。`app/lib/core` 仅容纳产品无关的纯 Dart 能力。
+- `shared/domain/`: Shared Kernel values, rules and domain facts.
+- `shared/application/`: collaboration contracts, routes, application errors and logging entry points.
+- `shared/presentation/providers/`: required collaboration tokens and event projections.
+- `shared/ui/`: product navigation, selection, domain-to-UI and image adapters.
 
-新 FRB 映射 **默认进 owner `features/<id>/infrastructure/mappers/`**；跨 feature 协作经 owner **`public/` + port**（如 [RemoteLibraryCredentialsPort]），勿再在 `infrastructure/` 新增 mapper/adapter 目录。
+Ownership and reachability rules are in [shared-domain-ownership.md](shared-domain-ownership.md). Design-system independence and application ARB placement are defined by [design-system.md](design-system.md), following ADR-0053's revision of ADR-0052.
 
-## 迁移 backlog（FRB 深模块）
+## Verification
 
-**已完成**：第一～三批（单域 mapper/adapter、`series`/`reader` 迁出 shared、`remote_credentials` @ library_admin + [RemoteLibraryCredentialsPort]、缩略图 FRB @ `library_browse/infrastructure/comic/`）。**comic_metadata（2026-11-03）**：`public/` + 仓储工厂、`*_frb_adapter`、form listing 自 `infrastructure/repositories/` 回迁；Rust FRB `named_facet` 拆 `management`/`form`/`types`，`parody`/`character` 并入 `named_facet_dictionary`（无单独 `comic_metadata_data_layer_plan.md`，约定见 [`cross-feature-collaboration.md`](cross-feature-collaboration.md)）。
+Run affected architecture tests, especially `test/architecture/clean_architecture_dependency_test.dart`, `public_interface_test.dart` and `test/project_layout_test.dart` from `app/`. The recursive scanner must fail on unresolved files/packages; preserve import baselines and required-provider coverage when moving code. See [gate.md](gate.md).

@@ -1,47 +1,22 @@
-# Reader 模块 DDD 命名词典（ADR-0038）
+# Reader naming
 
-Wayfinder module：`features/reader/`。领域会话概念仍称 **Read session**（ADR-0005）。
+The product module is `features/reader/` (ADR-0038). A **Read session** is its domain lifecycle, not a module name. Use [GLOSSARY](../../GLOSSARY.md) for session, progress and image-fidelity semantics.
 
-## 前缀
+## Types and layers
 
-| 前缀 | 用于 | 禁止用于 |
-|------|------|----------|
-| `ReadSession*` | 会话实体、页码 VO、会话规则异常、Application Service | 纯 UI、纯路由参数 |
-| `Reader*` / `NativeReader*` | 页 payload、native 资源 port、UI | 冒充会话聚合 |
-| `*Service` / `*ApplicationService` | application 用例编排 | domain 规则类型；勿再新增 `*Coordinator` |
-| `*ViewModel` / `*Notifier` | 表现层 UI 状态与命令 | 用 Facade/Controller 当页面主心智 |
+- `ReadSession`: entity in `domain/read_session.dart`; that file does not hold route arguments.
+- `ReadSessionPageIndex`, `ReadSessionException`: session values and rule failures in domain.
+- `OpenedReadSession`, `ReaderPagePayload`: domain read models/payloads.
+- `NativeReaderPort`, `ComicPageSourcePort`, `ClipboardImagePort`: external capability contracts in domain.
+- `SpreadNavigation`, `AutoPlayBoundaryPolicy`, `PagePrefetchWindow`: pure domain policies.
+- `OpenReaderArgs`: application input, separate from the entity.
+- `OpenReadSessionService`, `ReadSessionApplicationService`, `CopyPageImageService`, `PrepareReaderContextUseCase`: application orchestration.
+- `ReadSessionPageLoadException`: application error mapping, distinct from a domain invariant failure.
+- `ReaderViewModel` / `ReaderUiState`: page commands and presentation state.
+- `ReaderChromeNotifier`, `ReaderPrefetchNotifier`, `ReaderTapZone`: presentation concerns, not extra session aggregates.
 
-## 类型对照
+Cross-feature launch uses AppNavigator and the Reader public `openReader` helper. The former ReaderLaunchPort forwarding chain is retired (ADR-0050).
 
-| 角色 | 类型 | 层 / 文件 |
-|------|------|-----------|
-| Product module | `reader` | `features/reader/` |
-| 会话实体 | `ReadSession` | `domain/read_session.dart` |
-| 打开读模型 | `OpenedReadSession` | `domain/opened_read_session.dart` |
-| 打开/页 I/O 编排 | `OpenReadSessionService` | `application/open_read_session_service.dart` |
-| 进度/活动用例编排 | `ReadSessionApplicationService` | `application/read_session_application_service.dart` |
-| Page image copy 用例 | `CopyPageImageService` | `application/copy_page_image_service.dart` |
-| Rust reader 生命周期 port | `NativeReaderPort` | `domain/native_reader_port.dart` |
-| 页来源 port | `ComicPageSourcePort` | `domain/comic_page_source_port.dart` |
-| Spread 翻页策略 | `SpreadNavigation` | `domain/spread_navigation.dart` |
-| Auto-play 边界策略 | `AutoPlayBoundaryPolicy` | `domain/auto_play_boundary_policy.dart` |
-| 预取窗口策略 | `PagePrefetchWindow` | `domain/page_prefetch_window.dart` |
-| 打开命令参数 | `OpenReaderArgs` | `application/open_reader_args.dart` |
-| 跨 feature 启动 | `ReaderLaunchPort` / `openReader` | `shared/domain/ports` + `public/` |
-| 页面主 ViewModel | `ReaderViewModel` / `ReaderUiState` | `presentation/view_models/` |
-| Chrome 正交状态 | `ReaderChromeNotifier` | `presentation/view_models/`（全屏等；非第二套页面 VM） |
-| 预取基础设施 | `ReaderPrefetchNotifier` | `presentation/view_models/`（非页面命令门面） |
-| 点击区 | `ReaderTapZone` | `presentation/`（非 domain） |
-| 会话规则异常 | `ReadSessionException` | `domain/`（`DomainException`） |
-| 页加载失败（用户可见） | `ReadSessionPageLoadException` | application/data 映射（`AppException`） |
+## Naming rules
 
-## 表现层约定
-
-- 页面根只经 **`ReaderViewModel`** 发命令；**禁止** View 直连 Application Service。
-- **不**保留独立 `*Facade` 作为阅读页主聚合；外壳字段用 `readerViewModelProvider.select`。
-- 禁止新增阅读页主链 `*Controller` / `*Facade` 命名。
-
-## 文件名
-
-- `domain/read_session.dart` **只**放 `ReadSession` 实体。
-- 策略 / Policy / Domain Service / Application Service 文件名与类型一致（见 `ddd-domain-naming.md`）。
+Use `ReadSession*` for session entities, values, rules and application services; use `Reader*` / `NativeReader*` for resource payloads, native contracts and UI. Route-only input does not become a session entity. New page command APIs use the ViewModel; views do not call application services directly or add another main Controller/Facade/Coordinator chain. File names follow [ddd-domain-naming.md](ddd-domain-naming.md).

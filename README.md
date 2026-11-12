@@ -62,16 +62,15 @@ Cargokit 通过 `app/rust_builder/rust` 链接到 `core/crates/flutter` 来编�
 
 ### 工具链
 
-- **CI / Gate** 使用 **Flutter 3.47.8**（Dart 3.13.x），见 `.github/workflows/gate.yml` 的 `FLUTTER_VERSION`。
-- 本地开发请安装 **Flutter 3.47.x stable**（与 CI 对齐），`app/pubspec.lock` 解析下限为 `flutter: ">=3.47.0"`。
-- 升级说明与检查表：`docs/engineering/flutter-3.47-migration.md`。
+- Flutter / FRB 工具链版本以 `.github/workflows/gate.yml` 为准，本地与 CI 对齐；Dart SDK 下限见 `app/pubspec.yaml`，依赖版本由 `app/pubspec.lock` 固定。
+- 工程指南见 [docs/engineering](docs/engineering/README.md)，长期维护脚本见 [scripts](scripts/README.md)。
 
 ### 日常开发
 
 ```bash
 cd app
 flutter pub get
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 dart format .
 flutter analyze
 flutter test
