@@ -33,6 +33,44 @@ class AppUpdateDialog extends ConsumerWidget {
 
   final AppReleaseInfo release;
 
+  Future<void> _handleRemindLater(BuildContext context, WidgetRef ref) async {
+    await ref
+        .read(settingsProvider.notifier)
+        .setDismissedUpdateVersion(release.version);
+    if (context.mounted) {
+      Navigator.of(context).pop();
+    }
+  }
+
+  Future<void> _handleUpdateNow(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) async {
+    Navigator.of(context).pop();
+    final AppReleaseAsset? asset = ref
+        .read(appUpdateServiceProvider)
+        .findPlatformAsset(release.assets);
+    if (asset == null) {
+      try {
+        await openReleasePage(release.htmlUrl);
+      } catch (error) {
+        if (context.mounted) {
+          showErrorSnackbar(context, error);
+        }
+        return;
+      }
+      if (context.mounted) {
+        showInfoSnackbar(context, l10n.updateManualDownloadToast);
+      }
+      return;
+    }
+    if (!context.mounted) {
+      return;
+    }
+    await showAppUpdateDownloadDialog(context: context, asset: asset);
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
@@ -77,43 +115,13 @@ class AppUpdateDialog extends ConsumerWidget {
       bottomDivider: true,
       actions: <Widget>[
         M3EButton(
-          onPressed: () async {
-            await ref
-                .read(settingsProvider.notifier)
-                .setDismissedUpdateVersion(release.version);
-            if (context.mounted) {
-              Navigator.of(context).pop();
-            }
-          },
+          onPressed: () => _handleRemindLater(context, ref),
           style: M3EButtonStyle.text,
           decoration: M3EButtonDecoration(textStyle: actionLabelStyle),
           label: Text(l10n.updateRemindLater),
         ),
         M3EButton.icon(
-          onPressed: () async {
-            Navigator.of(context).pop();
-            final AppReleaseAsset? asset = ref
-                .read(appUpdateServiceProvider)
-                .findPlatformAsset(release.assets);
-            if (asset == null) {
-              try {
-                await openReleasePage(release.htmlUrl);
-              } catch (error) {
-                if (context.mounted) {
-                  showErrorSnackbar(context, error);
-                }
-                return;
-              }
-              if (context.mounted) {
-                showInfoSnackbar(context, l10n.updateManualDownloadToast);
-              }
-              return;
-            }
-            if (!context.mounted) {
-              return;
-            }
-            await showAppUpdateDownloadDialog(context: context, asset: asset);
-          },
+          onPressed: () => _handleUpdateNow(context, ref, l10n),
           style: M3EButtonStyle.filled,
           size: M3EButtonSize.sm,
           decoration: M3EButtonDecoration(textStyle: actionLabelStyle),

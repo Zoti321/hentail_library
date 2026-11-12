@@ -106,6 +106,10 @@ class _HistoryBrowseFeed extends ConsumerWidget {
 
   final TextEditingController searchController;
 
+  void _handleSearchChanged(WidgetRef ref, String value) {
+    ref.read(historyPagedFeedControllerProvider.notifier).setKeyword(value);
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final List<HistoryCardItem> items = ref.watch(
@@ -154,11 +158,7 @@ class _HistoryBrowseFeed extends ConsumerWidget {
         matchCountLabel: hasSearchQuery
             ? context.l10n.filterResultCount(totalCount)
             : null,
-        onChanged: (String value) {
-          ref
-              .read(historyPagedFeedControllerProvider.notifier)
-              .setKeyword(value);
-        },
+        onChanged: (String value) => _handleSearchChanged(ref, value),
       ),
       itemBuilder: (BuildContext context, HistoryCardItem item) {
         return HistoryListItem(

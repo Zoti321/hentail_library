@@ -167,6 +167,11 @@ class _TagDictionaryImportDialogState
     extends State<_TagDictionaryImportDialog> {
   double? _progress;
 
+  void _handleCancel(BuildContext context) {
+    widget.onCancel();
+    Navigator.of(context).pop();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -220,10 +225,7 @@ class _TagDictionaryImportDialogState
       bottomDivider: true,
       actions: <Widget>[
         M3EButton(
-          onPressed: () {
-            widget.onCancel();
-            Navigator.of(context).pop();
-          },
+          onPressed: () => _handleCancel(context),
           style: M3EButtonStyle.text,
           decoration: M3EButtonDecoration(textStyle: actionLabelStyle),
           label: Text(l10n.commonCancel),

@@ -151,12 +151,8 @@ class ReaderPage extends HookConsumerWidget {
     // 前台计时：进后台结算活动时长，回前台重新开表。
     useEffect(() {
       final AppLifecycleListener listener = AppLifecycleListener(
-        onPause: () {
-          unawaited(viewModel.pauseForeground());
-        },
-        onResume: () {
-          viewModel.resumeForeground();
-        },
+        onPause: () => unawaited(viewModel.pauseForeground()),
+        onResume: viewModel.resumeForeground,
       );
       return listener.dispose;
     }, <Object?>[viewModel]);
@@ -220,12 +216,8 @@ class ReaderPage extends HookConsumerWidget {
       data: theme,
       child: PopScope(
         canPop: false,
-        onPopInvokedWithResult: (bool didPop, dynamic result) async {
-          if (didPop) {
-            return;
-          }
-          await exitReader();
-        },
+        onPopInvokedWithResult: (bool didPop, Object? result) =>
+            _handlePopInvoked(didPop, exitReader),
         child: M3ETheme(
           data: withAppFontFamily(M3ETheme.of(context)),
           child: Scaffold(
@@ -234,22 +226,8 @@ class ReaderPage extends HookConsumerWidget {
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (Object e, StackTrace st) => ReaderOpenErrorPanel(
                 error: e,
-                onBackToDetail: () {
-                  unawaited(exitReader());
-                },
-                onRetry: () {
-                  ref.invalidate(
-                    readerSessionOpenProvider(
-                      comicId: routeContext.comicId,
-                      incognito: routeContext.incognito,
-                      startFromFirstPage: routeContext.startFromFirstPage,
-                    ),
-                  );
-                  ref.invalidate(readerViewModelProvider(viewKey));
-                  ref.invalidate(
-                    comicImagesProvider(comicId: routeContext.comicId),
-                  );
-                },
+                onBackToDetail: () => unawaited(exitReader()),
+                onRetry: () => _retryOpen(ref, viewKey, routeContext),
               ),
               // 翻页 chrome 下沉到 [_ReaderReadyBody]，避免根节点订阅 currentIndex。
               data: (ReaderPageShellData shell) => _ReaderReadyBody(
@@ -265,6 +243,32 @@ class ReaderPage extends HookConsumerWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _handlePopInvoked(
+    bool didPop,
+    Future<void> Function() exitReader,
+  ) async {
+    if (didPop) {
+      return;
+    }
+    await exitReader();
+  }
+
+  void _retryOpen(
+    WidgetRef ref,
+    ReaderViewModelKey viewKey,
+    ReaderRouteContext routeContext,
+  ) {
+    ref.invalidate(
+      readerSessionOpenProvider(
+        comicId: routeContext.comicId,
+        incognito: routeContext.incognito,
+        startFromFirstPage: routeContext.startFromFirstPage,
+      ),
+    );
+    ref.invalidate(readerViewModelProvider(viewKey));
+    ref.invalidate(comicImagesProvider(comicId: routeContext.comicId));
   }
 }
 
@@ -358,26 +362,16 @@ class _ReaderReadyBody extends ConsumerWidget {
           autoPlayEnabled: supportsAutoPlay && chrome.autoPlayEnabled,
           autoPlayIntervalSeconds: autoPlayIntervalSeconds,
           viewportStatus: ReaderViewportStatus.ready,
-          onBack: () {
-            unawaited(onExit());
-          },
-          onToggleFullscreen: () {
-            unawaited(viewModel.toggleFullscreen());
-          },
+          onBack: () => unawaited(onExit()),
+          onToggleFullscreen: () => unawaited(viewModel.toggleFullscreen()),
           onPageChanged: viewModel.setIndex,
-          onPreviousPage: () {
-            unawaited(requestPrevPage());
-          },
-          onNextPage: () {
-            unawaited(requestNextPage());
-          },
+          onPreviousPage: () => unawaited(requestPrevPage()),
+          onNextPage: () => unawaited(requestNextPage()),
           onToggleChromeFromKeyboard: viewModel.toggleShowControls,
           onAutoPlayChanged: supportsAutoPlay
               ? viewModel.setAutoPlayEnabled
               : null,
-          onOpenSettings: () {
-            unawaited(ReaderSettingsSheet.show(context));
-          },
+          onOpenSettings: () => unawaited(ReaderSettingsSheet.show(context)),
           onOpenSeriesCatalog: seriesNavContext == null
               ? null
               : () => _openSeriesCatalog(
@@ -443,26 +437,8 @@ class _ReaderPageContent extends ConsumerWidget {
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTapUp: (TapUpDetails details) {
-        focusNode.requestFocus();
-        if (readingMode.isWebtoon) {
-          viewModel.toggleShowControls();
-          return;
-        }
-        final ReaderTapZone zone = resolveReaderTapZone(
-          globalX: details.globalPosition.dx,
-          width: MediaQuery.sizeOf(context).width,
-        );
-        unawaited(() async {
-          final ReaderReplaceReaderRouteIntent? intent = await viewModel
-              .handleTapZone(
-                zone,
-                navContext: seriesNavContext,
-                session: routeContext.session,
-              );
-          applyReaderNavigationIntent(context, intent);
-        }());
-      },
+      onTapUp: (TapUpDetails details) =>
+          _handleTapUp(context, details, viewModel, readingMode),
       child: ReaderContent(
         key: ValueKey<String>(routeContext.comicId),
         comicId: routeContext.comicId,
@@ -471,24 +447,58 @@ class _ReaderPageContent extends ConsumerWidget {
         initialPage: initialPage,
         preferredPageIndex: preferredPageIndex,
         readingMode: readingMode,
-        onRequestNextPage: () async {
-          final ReaderReplaceReaderRouteIntent? intent = await viewModel
-              .requestNextPage(
-                navContext: seriesNavContext,
-                session: routeContext.session,
-              );
-          applyReaderNavigationIntent(context, intent);
-        },
-        onRequestPrevPage: () async {
-          final ReaderReplaceReaderRouteIntent? intent = await viewModel
-              .requestPrevPage(
-                navContext: seriesNavContext,
-                session: routeContext.session,
-              );
-          applyReaderNavigationIntent(context, intent);
-        },
+        onRequestNextPage: () =>
+            _requestNextPage(context, viewModel, seriesNavContext),
+        onRequestPrevPage: () =>
+            _requestPrevPage(context, viewModel, seriesNavContext),
       ),
     );
+  }
+
+  void _handleTapUp(
+    BuildContext context,
+    TapUpDetails details,
+    ReaderViewModel viewModel,
+    ReadingMode readingMode,
+  ) {
+    focusNode.requestFocus();
+    if (readingMode.isWebtoon) {
+      viewModel.toggleShowControls();
+      return;
+    }
+    final ReaderTapZone zone = resolveReaderTapZone(
+      globalX: details.globalPosition.dx,
+      width: MediaQuery.sizeOf(context).width,
+    );
+    unawaited(() async {
+      final ReaderReplaceReaderRouteIntent? intent = await viewModel
+          .handleTapZone(
+            zone,
+            navContext: seriesNavContext,
+            session: routeContext.session,
+          );
+      applyReaderNavigationIntent(context, intent);
+    }());
+  }
+
+  Future<void> _requestNextPage(
+    BuildContext context,
+    ReaderViewModel viewModel,
+    ReaderNavContextData? navContext,
+  ) async {
+    final ReaderReplaceReaderRouteIntent? intent = await viewModel
+        .requestNextPage(navContext: navContext, session: routeContext.session);
+    applyReaderNavigationIntent(context, intent);
+  }
+
+  Future<void> _requestPrevPage(
+    BuildContext context,
+    ReaderViewModel viewModel,
+    ReaderNavContextData? navContext,
+  ) async {
+    final ReaderReplaceReaderRouteIntent? intent = await viewModel
+        .requestPrevPage(navContext: navContext, session: routeContext.session);
+    applyReaderNavigationIntent(context, intent);
   }
 }
 

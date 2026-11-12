@@ -99,6 +99,12 @@ class _SeriesCustomCoverImageState extends State<_SeriesCustomCoverImage> {
     }
   }
 
+  void _handleDecodeError() {
+    if (!_decodeFailed) {
+      setState(() => _decodeFailed = true);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_decodeFailed) {
@@ -113,11 +119,7 @@ class _SeriesCustomCoverImageState extends State<_SeriesCustomCoverImage> {
     }
     return CardLetterboxedCoverImage(
       cover: ComicCoverSource.bytes(widget.thumbnail),
-      onDecodeError: () {
-        if (!_decodeFailed) {
-          setState(() => _decodeFailed = true);
-        }
-      },
+      onDecodeError: _handleDecodeError,
     );
   }
 }

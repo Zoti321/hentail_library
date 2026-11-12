@@ -33,6 +33,10 @@ class _HomeLibraryDeleteConfirmDialogState
     extends State<_HomeLibraryDeleteConfirmDialog> {
   bool _acknowledged = false;
 
+  void _handleAcknowledgementChanged(bool value) {
+    setState(() => _acknowledged = value);
+  }
+
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
@@ -44,9 +48,7 @@ class _HomeLibraryDeleteConfirmDialogState
       title: l10n.homeLibraryDeleteConfirmTitle(widget.libraryDisplayName),
       content: _HomeLibraryDeleteConfirmBody(
         acknowledged: _acknowledged,
-        onAcknowledgementChanged: (bool value) {
-          setState(() => _acknowledged = value);
-        },
+        onAcknowledgementChanged: _handleAcknowledgementChanged,
         scheme: scheme,
         spacing: spacing,
         theme: theme,
@@ -108,9 +110,8 @@ class _HomeLibraryDeleteConfirmBody extends StatelessWidget {
             children: <Widget>[
               M3ECheckbox(
                 value: acknowledged,
-                onChanged: (bool? value) {
-                  onAcknowledgementChanged(value ?? false);
-                },
+                onChanged: (bool? value) =>
+                    onAcknowledgementChanged(value ?? false),
                 focusable: true,
               ),
               SizedBox(width: spacing.sm),

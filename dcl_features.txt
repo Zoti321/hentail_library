@@ -1,0 +1,868 @@
+lib\features\app_settings\presentation\patterns\settings\settings_detail_panes.dart:
+WARNING Avoid returning widgets from a global function.
+        at E:\projects\hentai_library\app\lib\features\app_settings\presentation\patterns\settings\settings_detail_panes.dart:80:1
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+
+lib\features\app_settings\presentation\views\dialogs\app_update_dialog.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\app_settings\presentation\views\dialogs\app_update_dialog.dart:80:11
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\app_settings\presentation\views\dialogs\app_update_dialog.dart:93:11
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\app_settings\presentation\views\dialogs\app_update_download_dialog.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\app_settings\presentation\views\dialogs\app_update_download_dialog.dart:142:13
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\app_settings\presentation\views\settings_page\settings_page_body.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\app_settings\presentation\views\settings_page\settings_page_body.dart:127:7
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\app_settings\presentation\views\settings_page\settings_page_body.dart:174:21
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+STYLE   Only a single widget per file is allowed.
+        at E:\projects\hentai_library\app\lib\features\app_settings\presentation\views\settings_page\settings_page_body.dart:219:1
+        prefer-single-widget-per-file : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-single-widget-per-file
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\app_settings\presentation\views\settings_page\settings_page_body.dart:253:9
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\app_settings\presentation\views\settings_page\settings_page_body.dart:259:9
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\app_settings\presentation\views\settings_page\settings_sections.dart:
+WARNING Avoid returning widgets from a global function.
+        at E:\projects\hentai_library\app\lib\features\app_settings\presentation\views\settings_page\settings_sections.dart:21:1
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a global function.
+        at E:\projects\hentai_library\app\lib\features\app_settings\presentation\views\settings_page\settings_sections.dart:43:1
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a global function.
+        at E:\projects\hentai_library\app\lib\features\app_settings\presentation\views\settings_page\settings_sections.dart:57:1
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a global function.
+        at E:\projects\hentai_library\app\lib\features\app_settings\presentation\views\settings_page\settings_sections.dart:63:1
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a global function.
+        at E:\projects\hentai_library\app\lib\features\app_settings\presentation\views\settings_page\settings_sections.dart:75:1
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a global function.
+        at E:\projects\hentai_library\app\lib\features\app_settings\presentation\views\settings_page\settings_sections.dart:84:1
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\app_settings\presentation\views\settings_page\settings_sections.dart:188:7
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\bootstrap\presentation\views\app.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\bootstrap\presentation\views\app.dart:84:7
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\bootstrap\presentation\views\application_shell.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\bootstrap\presentation\views\application_shell.dart:43:7
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\bootstrap\presentation\views\routing\app_router.dart:
+WARNING Avoid returning widgets from a global function.
+        at E:\projects\hentai_library\app\lib\features\bootstrap\presentation\views\routing\app_router.dart:20:1
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\bootstrap\presentation\views\routing\app_router.dart:133:30
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\bootstrap\presentation\views\routing\app_router.dart:141:32
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\bootstrap\presentation\views\routing\shared_content_routes.dart:
+WARNING Avoid returning widgets from a global function.
+        at E:\projects\hentai_library\app\lib\features\bootstrap\presentation\views\routing\shared_content_routes.dart:22:1
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a global function.
+        at E:\projects\hentai_library\app\lib\features\bootstrap\presentation\views\routing\shared_content_routes.dart:26:1
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+
+lib\features\comic\di\series_slot_impls.dart:
+WARNING Avoid returning widgets from a global function.
+        at E:\projects\hentai_library\app\lib\features\comic\di\series_slot_impls.dart:10:1
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a global function.
+        at E:\projects\hentai_library\app\lib\features\comic\di\series_slot_impls.dart:29:1
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a global function.
+        at E:\projects\hentai_library\app\lib\features\comic\di\series_slot_impls.dart:37:1
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+
+lib\features\comic\presentation\patterns\metadata_edit\comic_metadata_edit_form.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\comic\presentation\patterns\metadata_edit\comic_metadata_edit_form.dart:183:11
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\comic\presentation\views\bulk_edit\bulk_edit_metadata_form.dart:
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\comic\presentation\views\bulk_edit\bulk_edit_metadata_form.dart:224:11
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\comic\presentation\views\bulk_edit\bulk_edit_metadata_form.dart:269:24
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\comic\presentation\views\bulk_edit\bulk_edit_metadata_form.dart:314:17
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\comic\presentation\views\bulk_edit\bulk_edit_metadata_form.dart:318:17
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\comic\presentation\views\bulk_edit\bulk_edit_metadata_form.dart:321:26
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\comic\presentation\views\bulk_edit\bulk_edit_metadata_form.dart:350:13
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\comic\presentation\views\bulk_edit\bulk_edit_metadata_form.dart:366:12
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\comic\presentation\views\bulk_edit\bulk_edit_metadata_form.dart:378:48
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\comic\presentation\views\bulk_edit\bulk_edit_metadata_form.dart:384:9
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\comic\presentation\views\bulk_edit\bulk_edit_metadata_form.dart:390:9
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\comic\presentation\views\bulk_edit\bulk_edit_metadata_form.dart:396:9
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\comic\presentation\views\bulk_edit\bulk_edit_metadata_form.dart:397:9
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\comic\presentation\views\bulk_edit\bulk_edit_metadata_form.dart:416:13
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\comic\presentation\views\bulk_edit\bulk_edit_metadata_form.dart:431:15
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\comic\presentation\views\bulk_edit\bulk_edit_metadata_form.dart:441:21
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\comic\presentation\views\bulk_edit\bulk_edit_metadata_form.dart:463:13
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\comic\presentation\views\bulk_edit\bulk_edit_metadata_form.dart:491:11
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\comic\presentation\views\comic_detail\comic_detail_layout.dart:
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\comic\presentation\views\comic_detail\comic_detail_layout.dart:172:51
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+
+lib\features\comic\presentation\views\comic_detail\comic_detail_page.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\comic\presentation\views\comic_detail\comic_detail_page.dart:47:7
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\comic\presentation\views\comic_detail\comic_detail_page.dart:168:7
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\comic\presentation\views\metadata_edit\comic_metadata_edit_layout.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\comic\presentation\views\metadata_edit\comic_metadata_edit_layout.dart:130:9
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\comic\presentation\views\metadata_edit\comic_metadata_edit_page.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\comic\presentation\views\metadata_edit\comic_metadata_edit_page.dart:91:9
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\comic\presentation\widgets\comic_cover_renderer.dart:
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\comic\presentation\widgets\comic_cover_renderer.dart:35:38
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\comic\presentation\widgets\comic_cover_renderer.dart:36:40
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\comic\presentation\widgets\comic_cover_renderer.dart:63:28
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\comic\presentation\widgets\comic_cover_renderer.dart:74:32
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+STYLE   Avoid a default/wildcard case in a switch over a sealed type. It hides missing subtypes instead of letting the compiler enforce exhaustiveness.
+        at E:\projects\hentai_library\app\lib\features\comic\presentation\widgets\comic_cover_renderer.dart:90:7
+        avoid-non-exhaustive-switch-on-sealed-classes : https://dcl.apps.bancolombia.com/docs/rules/dart/avoid-non-exhaustive-switch-on-sealed-classes
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\comic\presentation\widgets\comic_cover_renderer.dart:97:14
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+
+lib\features\comic\public\ui\comic_card_actions.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\comic\public\ui\comic_card_actions.dart:72:7
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\comic_trash\presentation\views\trash\trash_page.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\comic_trash\presentation\views\trash\trash_page.dart:32:9
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\comic_trash\presentation\views\trash\widgets\trash_list_item.dart:
+STYLE   Only a single widget per file is allowed.
+        at E:\projects\hentai_library\app\lib\features\comic_trash\presentation\views\trash\widgets\trash_list_item.dart:129:1
+        prefer-single-widget-per-file : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-single-widget-per-file
+
+
+lib\features\home\presentation\views\home\patterns\home_aggregate_stats_section.dart:
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\home\presentation\views\home\patterns\home_aggregate_stats_section.dart:215:27
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\home\presentation\views\home\patterns\home_aggregate_stats_section.dart:217:27
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\home\presentation\views\home\patterns\home_aggregate_stats_section.dart:226:11
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\home\presentation\views\home\patterns\home_aggregate_stats_section.dart:228:11
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\home\presentation\views\home\patterns\home_aggregate_stats_section.dart:231:13
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\home\presentation\views\home\patterns\home_aggregate_stats_section.dart:237:31
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\home\presentation\views\home\patterns\home_aggregate_stats_section.dart:239:31
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\home\presentation\views\home\patterns\home_aggregate_stats_section.dart:246:31
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\home\presentation\views\home\patterns\home_aggregate_stats_section.dart:248:31
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\home\presentation\views\home\patterns\home_aggregate_stats_section.dart:252:11
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\home\presentation\views\home\patterns\home_aggregate_stats_section.dart:258:11
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\home\presentation\views\home\patterns\home_aggregate_stats_section.dart:266:26
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\home\presentation\views\home\patterns\home_aggregate_stats_section.dart:269:42
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\home\presentation\views\home\patterns\home_aggregate_stats_section.dart:275:13
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\home\presentation\views\home\patterns\home_aggregate_stats_section.dart:282:33
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\home\presentation\views\home\patterns\home_aggregate_stats_section.dart:284:33
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\home\presentation\views\home\patterns\home_aggregate_stats_section.dart:286:33
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\home\presentation\views\home\patterns\home_aggregate_stats_section.dart:291:11
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+
+lib\features\home\presentation\views\home\patterns\home_bento_stat_card.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\home\presentation\views\home\patterns\home_bento_stat_card.dart:133:15
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\library_admin\di\app_shell_slot.dart:
+WARNING Avoid returning widgets from a global function.
+        at E:\projects\hentai_library\app\lib\features\library_admin\di\app_shell_slot.dart:21:1
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+
+lib\features\library_admin\presentation\patterns\library_edit_form.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\library_admin\presentation\patterns\library_edit_form.dart:161:9
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\library_admin\presentation\patterns\library_edit_form.dart:179:9
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\library_admin\presentation\patterns\library_edit_form.dart:182:9
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\library_admin\presentation\patterns\library_edit_form.dart:185:9
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\library_admin\presentation\patterns\library_edit_form.dart:188:9
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\library_admin\presentation\patterns\library_edit_form.dart:199:9
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\library_admin\presentation\patterns\library_edit_form.dart:202:9
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\library_admin\presentation\patterns\library_edit_form.dart:230:33
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\library_admin\presentation\patterns\library_edit_form.dart:232:17
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\library_admin\presentation\patterns\library_edit_form.dart:250:29
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+
+lib\features\library_admin\presentation\views\home_library_dashboard\patterns\home_library_delete_confirm_dialog.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\library_admin\presentation\views\home_library_dashboard\patterns\home_library_delete_confirm_dialog.dart:47:9
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\library_admin\presentation\views\home_library_dashboard\patterns\home_library_delete_confirm_dialog.dart:111:17
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\library_admin\presentation\views\home_library_dashboard\patterns\home_library_management_section.dart:
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\library_admin\presentation\views\home_library_dashboard\patterns\home_library_management_section.dart:94:17
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+STYLE   Only a single widget per file is allowed.
+        at E:\projects\hentai_library\app\lib\features\library_admin\presentation\views\home_library_dashboard\patterns\home_library_management_section.dart:162:1
+        prefer-single-widget-per-file : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-single-widget-per-file
+
+STYLE   Only a single widget per file is allowed.
+        at E:\projects\hentai_library\app\lib\features\library_admin\presentation\views\home_library_dashboard\patterns\home_library_management_section.dart:294:1
+        prefer-single-widget-per-file : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-single-widget-per-file
+
+
+lib\features\library_admin\presentation\views\library\library_edit_page.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\library_admin\presentation\views\library\library_edit_page.dart:105:9
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\library_admin\presentation\views\library\library_form_dialog.dart:
+WARNING Avoid calling 'setState' past an await point without checking if the widget is mounted.
+        at E:\projects\hentai_library\app\lib\features\library_admin\presentation\views\library\library_form_dialog.dart:161:5
+        use-setstate-synchronously : https://dcl.apps.bancolombia.com/docs/rules/flutter/use-setstate-synchronously
+
+WARNING Avoid calling 'setState' past an await point without checking if the widget is mounted.
+        at E:\projects\hentai_library\app\lib\features\library_admin\presentation\views\library\library_form_dialog.dart:219:5
+        use-setstate-synchronously : https://dcl.apps.bancolombia.com/docs/rules/flutter/use-setstate-synchronously
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\library_admin\presentation\views\library\library_form_dialog.dart:244:7
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\library_admin\presentation\widgets\scan_interval_dropdown.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\library_admin\presentation\widgets\scan_interval_dropdown.dart:46:7
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\library_browse\presentation\author\patterns\author_detail\author_detail_comics_section.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\library_browse\presentation\author\patterns\author_detail\author_detail_comics_section.dart:94:17
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\library_browse\presentation\author\views\author_detail\author_detail_header.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\library_browse\presentation\author\views\author_detail\author_detail_header.dart:250:11
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\library_browse\presentation\author\views\author_detail\author_detail_page.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\library_browse\presentation\author\views\author_detail\author_detail_page.dart:29:7
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\library_browse\presentation\browse\patterns\library\library_catalog_toolbar.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\library_browse\presentation\browse\patterns\library\library_catalog_toolbar.dart:55:13
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\library_browse\presentation\browse\patterns\library\library_display_target_tabs.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\library_browse\presentation\browse\patterns\library\library_display_target_tabs.dart:75:11
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\library_browse\presentation\browse\patterns\library\library_filter_sort_side_sheet.dart:
+STYLE   Only a single widget per file is allowed.
+        at E:\projects\hentai_library\app\lib\features\library_browse\presentation\browse\patterns\library\library_filter_sort_side_sheet.dart:360:1
+        prefer-single-widget-per-file : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-single-widget-per-file
+
+
+lib\features\library_browse\presentation\browse\patterns\library\library_page_header.dart:
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\library_browse\presentation\browse\patterns\library\library_page_header.dart:159:9
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\library_browse\presentation\browse\patterns\library\library_page_header.dart:168:11
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+
+lib\features\library_browse\presentation\browse\views\library\library_filter_section.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\library_browse\presentation\browse\views\library\library_filter_section.dart:94:15
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\library_browse\presentation\browse\views\library\library_filter_section.dart:245:7
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\library_browse\presentation\browse\views\library\library_page.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\library_browse\presentation\browse\views\library\library_page.dart:154:7
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\library_browse\presentation\browse\views\library\library_page.dart:174:27
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\library_browse\presentation\browse\views\library\library_page.dart:188:27
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\library_browse\presentation\browse\views\library\library_sort_section.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\library_browse\presentation\browse\views\library\library_sort_section.dart:154:7
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\library_browse\presentation\browse\views\library\library_sort_section.dart:178:7
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\metadata_backup\presentation\views\metadata_backup_settings_sections.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\metadata_backup\presentation\views\metadata_backup_settings_sections.dart:80:19
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\metadata_backup\presentation\views\metadata_backup_settings_sections.dart:99:21
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\metadata_backup\presentation\widgets\metadata_import_dialogs.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\metadata_backup\presentation\widgets\metadata_import_dialogs.dart:96:15
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+STYLE   Only a single widget per file is allowed.
+        at E:\projects\hentai_library\app\lib\features\metadata_backup\presentation\widgets\metadata_import_dialogs.dart:172:1
+        prefer-single-widget-per-file : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-single-widget-per-file
+
+
+lib\features\named_metadata\presentation\views\metadata\metadata_dialogs.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\named_metadata\presentation\views\metadata\metadata_dialogs.dart:223:11
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\named_metadata\presentation\views\metadata\metadata_page.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\named_metadata\presentation\views\metadata\metadata_page.dart:98:13
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\named_metadata\presentation\views\metadata\metadata_page.dart:109:18
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\named_metadata\presentation\views\metadata\metadata_page.dart:204:17
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\named_metadata\presentation\views\metadata\patterns\management_catalog_toolbar.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\named_metadata\presentation\views\metadata\patterns\management_catalog_toolbar.dart:36:13
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\named_metadata\presentation\views\metadata\patterns\management_draft_entity_chip.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\named_metadata\presentation\views\metadata\patterns\management_draft_entity_chip.dart:90:9
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\named_metadata\presentation\views\metadata\patterns\management_rename_entity_dialog.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\named_metadata\presentation\views\metadata\patterns\management_rename_entity_dialog.dart:109:11
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\reader\presentation\patterns\reader\reader_bottom_bar.dart:
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\patterns\reader\reader_bottom_bar.dart:68:17
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\patterns\reader\reader_bottom_bar.dart:79:27
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\patterns\reader\reader_bottom_bar.dart:93:17
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+
+lib\features\reader\presentation\patterns\reader\reader_chrome_band.dart:
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\patterns\reader\reader_chrome_band.dart:44:14
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+
+lib\features\reader\presentation\patterns\reader\reader_chrome_overlay.dart:
+STYLE   Only a single widget per file is allowed.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\patterns\reader\reader_chrome_overlay.dart:33:1
+        prefer-single-widget-per-file : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-single-widget-per-file
+
+
+lib\features\reader\presentation\patterns\reader\reader_interaction_scope.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\patterns\reader\reader_interaction_scope.dart:32:13
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\patterns\reader\reader_interaction_scope.dart:38:13
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\patterns\reader\reader_interaction_scope.dart:45:17
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\patterns\reader\reader_interaction_scope.dart:51:13
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\reader\presentation\patterns\reader\reader_page_progress.dart:
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\patterns\reader\reader_page_progress.dart:123:20
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+
+lib\features\reader\presentation\patterns\reader\reader_series_catalog_sheet.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\patterns\reader\reader_series_catalog_sheet.dart:58:13
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\reader\presentation\patterns\reader\reader_settings_side_sheet.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\patterns\reader\reader_settings_side_sheet.dart:169:15
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\reader\presentation\patterns\reader\reader_top_bar.dart:
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\patterns\reader\reader_top_bar.dart:57:9
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\patterns\reader\reader_top_bar.dart:69:9
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\patterns\reader\reader_top_bar.dart:76:7
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\patterns\reader\reader_top_bar.dart:84:9
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\patterns\reader\reader_top_bar.dart:116:18
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+
+lib\features\reader\presentation\patterns\reader\reader_viewport.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\patterns\reader\reader_viewport.dart:32:7
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\reader\presentation\patterns\reader\reader_viewport_status_panel.dart:
+STYLE   Only a single widget per file is allowed.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\patterns\reader\reader_viewport_status_panel.dart:35:1
+        prefer-single-widget-per-file : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-single-widget-per-file
+
+
+lib\features\reader\presentation\views\reader\reader_page.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\views\reader\reader_page.dart:154:9
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\views\reader\reader_page.dart:157:9
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\views\reader\reader_page.dart:223:9
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+WARNING Avoid using dynamic type.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\views\reader\reader_page.dart:223:47
+        avoid-dynamic : https://dcl.apps.bancolombia.com/docs/rules/dart/avoid-dynamic
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\views\reader\reader_page.dart:237:17
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\views\reader\reader_page.dart:240:17
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\views\reader\reader_page.dart:361:11
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\views\reader\reader_page.dart:364:11
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\views\reader\reader_page.dart:368:11
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\views\reader\reader_page.dart:371:11
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\views\reader\reader_page.dart:378:11
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\views\reader\reader_page.dart:446:7
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\views\reader\reader_page.dart:474:9
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\views\reader\reader_page.dart:482:9
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\reader\presentation\views\settings\reading_settings_sections.dart:
+WARNING Avoid returning widgets from a global function.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\views\settings\reading_settings_sections.dart:19:1
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+
+lib\features\reader\presentation\widgets\reader_auto_play_binder.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\widgets\reader_auto_play_binder.dart:91:42
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\reader\presentation\widgets\reader_image_item.dart:
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\widgets\reader_image_item.dart:65:35
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\widgets\reader_image_item.dart:66:37
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\widgets\reader_image_item.dart:74:16
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\widgets\reader_image_item.dart:76:14
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+WARNING Avoid returning widgets from a function.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\widgets\reader_image_item.dart:99:14
+        avoid-returning-widgets : https://dcl.apps.bancolombia.com/docs/rules/flutter/avoid-returning-widgets
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\widgets\reader_image_item.dart:177:7
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\widgets\reader_image_item.dart:180:7
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\widgets\reader_image_item.dart:310:11
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\reader\presentation\widgets\viewport\reader_viewport_kernel.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\widgets\viewport\reader_viewport_kernel.dart:212:15
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\reader\presentation\widgets\viewport\reader_viewport_kernel.dart:247:17
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\reading_history\presentation\patterns\history\reading_history_list_layout.dart:
+STYLE   Only a single widget per file is allowed.
+        at E:\projects\hentai_library\app\lib\features\reading_history\presentation\patterns\history\reading_history_list_layout.dart:55:1
+        prefer-single-widget-per-file : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-single-widget-per-file
+
+
+lib\features\reading_history\presentation\views\history_page.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\reading_history\presentation\views\history_page.dart:157:9
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\reading_history\presentation\widgets\reading_history_card.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\reading_history\presentation\widgets\reading_history_card.dart:73:17
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\reading_history\presentation\widgets\reading_history_card.dart:80:15
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\series\presentation\patterns\metadata_edit\series_metadata_edit_form.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\series\presentation\patterns\metadata_edit\series_metadata_edit_form.dart:108:11
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\series\presentation\patterns\metadata_edit\series_serialization_dropdown.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\series\presentation\patterns\metadata_edit\series_serialization_dropdown.dart:52:7
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\series\presentation\patterns\series_detail\series_detail_comics_grid.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\series\presentation\patterns\series_detail\series_detail_comics_grid.dart:84:11
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\series\presentation\views\metadata_edit\series_metadata_edit_layout.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\series\presentation\views\metadata_edit\series_metadata_edit_layout.dart:104:9
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\series\presentation\views\metadata_edit\series_metadata_edit_page.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\series\presentation\views\metadata_edit\series_metadata_edit_page.dart:90:9
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\series\presentation\views\series_detail\series_detail_layout.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\series\presentation\views\series_detail\series_detail_layout.dart:173:7
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\series\presentation\views\series_detail\series_detail_page.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\series\presentation\views\series_detail\series_detail_page.dart:194:7
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+
+lib\features\series\public\ui\series_cover_content.dart:
+STYLE   Prefer extracting the callback to a separate widget method.
+        at E:\projects\hentai_library\app\lib\features\series\public\ui\series_cover_content.dart:116:7
+        prefer-extracting-callbacks : https://dcl.apps.bancolombia.com/docs/rules/flutter/prefer-extracting-callbacks
+
+

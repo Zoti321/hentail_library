@@ -72,13 +72,7 @@ class LibraryDisplayTargetTabs extends StatelessWidget {
             for (final String label in tabLabels) M3ETab(label: label),
           ],
           selectedIndex: selectedIndex,
-          onTabSelected: (int index) {
-            onChanged(
-              index == 0
-                  ? LibraryDisplayTarget.comics
-                  : LibraryDisplayTarget.series,
-            );
-          },
+          onTabSelected: _handleTabSelected,
         ),
       ),
     );
@@ -87,5 +81,11 @@ class LibraryDisplayTargetTabs extends StatelessWidget {
       return Center(child: tabs);
     }
     return Align(alignment: Alignment.centerLeft, child: tabs);
+  }
+
+  void _handleTabSelected(int index) {
+    onChanged(
+      index == 0 ? LibraryDisplayTarget.comics : LibraryDisplayTarget.series,
+    );
   }
 }

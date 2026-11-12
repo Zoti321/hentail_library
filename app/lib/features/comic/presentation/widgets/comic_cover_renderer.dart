@@ -32,12 +32,39 @@ class ComicCoverRenderer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return switch (variant) {
-      ComicCoverPaintVariant.card => _buildCard(),
-      ComicCoverPaintVariant.detail => _buildDetail(),
+      ComicCoverPaintVariant.card => _CardCoverBody(
+        state: state,
+        fit: fit,
+        alignment: alignment,
+        onDecodeError: onDecodeError,
+        onRetry: onRetry,
+      ),
+      ComicCoverPaintVariant.detail => _DetailCoverBody(
+        state: state,
+        onDecodeError: onDecodeError,
+        onRetry: onRetry,
+      ),
     };
   }
+}
 
-  Widget _buildCard() {
+class _CardCoverBody extends StatelessWidget {
+  const _CardCoverBody({
+    required this.state,
+    required this.fit,
+    required this.alignment,
+    required this.onDecodeError,
+    required this.onRetry,
+  });
+
+  final ComicCoverState state;
+  final BoxFit? fit;
+  final AlignmentGeometry alignment;
+  final VoidCallback? onDecodeError;
+  final VoidCallback? onRetry;
+
+  @override
+  Widget build(BuildContext context) {
     return switch (state) {
       ComicCoverReady(:final data) => CardLetterboxedCoverImage(
         cover: data,
@@ -60,46 +87,64 @@ class ComicCoverRenderer extends StatelessWidget {
         variant: ComicCoverPlaceholderVariant.card,
         kind: ComicCoverPlaceholderKind.noCover,
       ),
-      ComicCoverError() => _retryablePlaceholder(
-        const ComicCoverPlaceholder(
+      ComicCoverError() => _RetryablePlaceholder(
+        onRetry: onRetry,
+        child: const ComicCoverPlaceholder(
           variant: ComicCoverPlaceholderVariant.card,
           kind: ComicCoverPlaceholderKind.error,
         ),
       ),
     };
   }
+}
 
-  Widget _buildDetail() {
+class _DetailCoverBody extends StatelessWidget {
+  const _DetailCoverBody({
+    required this.state,
+    required this.onDecodeError,
+    required this.onRetry,
+  });
+
+  final ComicCoverState state;
+  final VoidCallback? onDecodeError;
+  final VoidCallback? onRetry;
+
+  @override
+  Widget build(BuildContext context) {
     final ComicCoverSource? source = comicCoverSourceOrPrevious(state);
-    final Widget placeholder = _detailPlaceholder(state);
+    final ComicCoverPlaceholderKind kind = switch (state) {
+      ComicCoverError() => ComicCoverPlaceholderKind.error,
+      ComicCoverNoCover() => ComicCoverPlaceholderKind.noCover,
+      ComicCoverReady() ||
+      ComicCoverLoading() => ComicCoverPlaceholderKind.loading,
+    };
+    final Widget placeholder = ComicCoverPlaceholder(
+      variant: ComicCoverPlaceholderVariant.detail,
+      kind: kind,
+    );
     return AdaptiveComicCover(
       coverDisplay: source,
       containerAspectRatio: 2 / 3,
       showShadow: false,
       gaplessPlayback: true,
       placeholder: placeholder,
-      errorPlaceholder: placeholder,
+      errorPlaceholder: state is ComicCoverError
+          ? _RetryablePlaceholder(onRetry: onRetry, child: placeholder)
+          : placeholder,
       onDecodeError: onDecodeError,
     );
   }
+}
 
-  Widget _detailPlaceholder(ComicCoverState state) {
-    final ComicCoverPlaceholderKind kind = switch (state) {
-      ComicCoverError() => ComicCoverPlaceholderKind.error,
-      ComicCoverNoCover() => ComicCoverPlaceholderKind.noCover,
-      _ => ComicCoverPlaceholderKind.loading,
-    };
-    final Widget placeholder = ComicCoverPlaceholder(
-      variant: ComicCoverPlaceholderVariant.detail,
-      kind: kind,
-    );
-    if (state is ComicCoverError) {
-      return _retryablePlaceholder(placeholder);
-    }
-    return placeholder;
-  }
+/// 有重试回调时整体可点；否则原样返回占位图。
+class _RetryablePlaceholder extends StatelessWidget {
+  const _RetryablePlaceholder({required this.child, required this.onRetry});
 
-  Widget _retryablePlaceholder(Widget child) {
+  final Widget child;
+  final VoidCallback? onRetry;
+
+  @override
+  Widget build(BuildContext context) {
     final VoidCallback? retry = onRetry;
     if (retry == null) {
       return child;

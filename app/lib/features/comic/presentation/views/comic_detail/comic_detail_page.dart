@@ -44,15 +44,8 @@ class ComicDetailPage extends ConsumerWidget {
 
     return PopScope(
       canPop: appNavigatorOf(context).canPop(),
-      onPopInvokedWithResult: (bool didPop, Object? result) {
-        if (didPop) {
-          return;
-        }
-        DetailBackHeader.popOrGoLibrary(
-          context,
-          locationResolver: resolveComicDetailBackLocationFromContext,
-        );
-      },
+      onPopInvokedWithResult: (bool didPop, Object? result) =>
+          _handlePopInvoked(context, didPop),
       child: M3ETheme(
         data: withAppFontFamily(M3ETheme.of(context)),
         child: ColoredBox(
@@ -78,6 +71,16 @@ class ComicDetailPage extends ConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+
+  void _handlePopInvoked(BuildContext context, bool didPop) {
+    if (didPop) {
+      return;
+    }
+    DetailBackHeader.popOrGoLibrary(
+      context,
+      locationResolver: resolveComicDetailBackLocationFromContext,
     );
   }
 }
@@ -165,18 +168,25 @@ class _ComicDetailContent extends ConsumerWidget {
       onAuthorTap: (AuthorRef author) => author.hasIdentity
           ? ref.read(authorDetailPortProvider).showById(context, author.id!)
           : ref.read(authorDetailPortProvider).showByName(context, author.name),
-      onSeriesSelect: (int index) {
-        final List<ComicDetailSeriesNavItem>? items = seriesNav?.items;
-        if (items == null || index < 0 || index >= items.length) {
-          return;
-        }
-        final int current = seriesNav?.currentIndex ?? 0;
-        // 同级切卷：只替换当前漫画详情，保留库浏览 → 系列详情 栈。
-        // 勿用 go：会清空底层路由，系列返回只能落到 /home。
-        appNavigatorOf(context)
-            .replaceComicDetail(items[index].comicId, reverse: index < current);
-      },
+      onSeriesSelect: (int index) =>
+          _handleSeriesSelect(context, seriesNav, index),
     );
+  }
+
+  void _handleSeriesSelect(
+    BuildContext context,
+    ComicDetailSeriesNavData? seriesNav,
+    int index,
+  ) {
+    final List<ComicDetailSeriesNavItem>? items = seriesNav?.items;
+    if (items == null || index < 0 || index >= items.length) {
+      return;
+    }
+    final int current = seriesNav?.currentIndex ?? 0;
+    // 同级切卷：只替换当前漫画详情，保留库浏览 → 系列详情 栈。
+    // 勿用 go：会清空底层路由，系列返回只能落到 /home。
+    appNavigatorOf(context)
+        .replaceComicDetail(items[index].comicId, reverse: index < current);
   }
 
   Future<void> _openReader(WidgetRef ref, {required bool incognito}) async {

@@ -28,63 +28,43 @@ List<Widget> settingsSectionsFor(
 ) {
   final AppLocalizations l10n = context.l10n;
   return switch (category) {
-    SettingsCategory.appearance => _appearanceSections(),
-    SettingsCategory.interface => _interfaceSections(),
+    SettingsCategory.appearance => const <Widget>[
+      SettingsSection(
+        tiles: <Widget>[
+          _ThemeTile(),
+          _ColorSchemeTile(),
+          _DynamicColorTile(),
+          _FontTile(),
+          _LocaleTile(),
+        ],
+      ),
+    ],
+    SettingsCategory.interface => const <Widget>[
+      SettingsSection(tiles: <Widget>[_DefaultLibraryDisplayTargetTile()]),
+    ],
     SettingsCategory.reading => const <Widget>[],
-    SettingsCategory.libraryBrowse => _libraryBrowseSections(),
+    SettingsCategory.libraryBrowse => const <Widget>[
+      SettingsSection(
+        tiles: <Widget>[
+          _SmartFacetMatchTile(),
+          _HealthyModeTile(),
+          _PreferLibraryRootSeriesTile(),
+        ],
+      ),
+    ],
     // 「元数据备份」分区由 metadata_backup 提供，组合根经 sectionsBuilder 注入。
     SettingsCategory.metadataBackup => const <Widget>[],
     SettingsCategory.about => const <Widget>[_AboutVersionSection()],
-    SettingsCategory.updates => _updatesSections(),
-    SettingsCategory.storageAndLogs => _storageAndLogsSections(l10n),
+    SettingsCategory.updates => const <Widget>[
+      SettingsSection(tiles: <Widget>[_AutoUpdateTile(), _CheckUpdateTile()]),
+    ],
+    SettingsCategory.storageAndLogs => <Widget>[
+      SettingsSection(
+        title: Text(l10n.settingsSectionDiagnostics),
+        tiles: const <Widget>[_DiagnosticModeTile(), _ExportLogsTile()],
+      ),
+    ],
   };
-}
-
-List<Widget> _appearanceSections() {
-  return const <Widget>[
-    SettingsSection(
-      tiles: <Widget>[
-        _ThemeTile(),
-        _ColorSchemeTile(),
-        _DynamicColorTile(),
-        _FontTile(),
-        _LocaleTile(),
-      ],
-    ),
-  ];
-}
-
-List<Widget> _interfaceSections() {
-  return const <Widget>[
-    SettingsSection(tiles: <Widget>[_DefaultLibraryDisplayTargetTile()]),
-  ];
-}
-
-List<Widget> _libraryBrowseSections() {
-  return const <Widget>[
-    SettingsSection(
-      tiles: <Widget>[
-        _SmartFacetMatchTile(),
-        _HealthyModeTile(),
-        _PreferLibraryRootSeriesTile(),
-      ],
-    ),
-  ];
-}
-
-List<Widget> _storageAndLogsSections(AppLocalizations l10n) {
-  return <Widget>[
-    SettingsSection(
-      title: Text(l10n.settingsSectionDiagnostics),
-      tiles: const <Widget>[_DiagnosticModeTile(), _ExportLogsTile()],
-    ),
-  ];
-}
-
-List<Widget> _updatesSections() {
-  return const <Widget>[
-    SettingsSection(tiles: <Widget>[_AutoUpdateTile(), _CheckUpdateTile()]),
-  ];
 }
 
 class _AboutVersionSection extends ConsumerWidget {
@@ -165,6 +145,21 @@ class _DynamicColorTile extends ConsumerWidget {
 class _ColorSchemeTile extends ConsumerWidget {
   const _ColorSchemeTile();
 
+  Future<void> _handleTap(
+    BuildContext context,
+    WidgetRef ref,
+    AppColorSchemePreference current,
+  ) async {
+    final AppColorSchemePreference? picked = await showColorSchemePickerDialog(
+      context: context,
+      selected: current,
+    );
+    if (picked == null || picked == current) {
+      return;
+    }
+    await ref.read(settingsProvider.notifier).setColorSchemePreference(picked);
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
@@ -185,19 +180,7 @@ class _ColorSchemeTile extends ConsumerWidget {
       title: Text(l10n.settingsColorSchemeLabel),
       value: Text(l10n.colorSchemePreferenceLabel(state.preference)),
       enabled: !state.useDynamicColor,
-      onTap: () async {
-        final AppColorSchemePreference? picked =
-            await showColorSchemePickerDialog(
-              context: context,
-              selected: state.preference,
-            );
-        if (picked == null || picked == state.preference) {
-          return;
-        }
-        await ref
-            .read(settingsProvider.notifier)
-            .setColorSchemePreference(picked);
-      },
+      onTap: () => _handleTap(context, ref, state.preference),
     );
   }
 }

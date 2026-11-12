@@ -95,19 +95,14 @@ class _MetadataManagementPageState
       child: Actions(
         actions: <Type, Action<Intent>>{
           _MetadataAddIntent: CallbackAction<_MetadataAddIntent>(
-            onInvoke: (_MetadataAddIntent intent) {
-              if (_isTextInputFocused()) {
-                return null;
-              }
-              _onCreatePressed(context, metadataTabKind(selectedIndex));
-              return null;
-            },
+            onInvoke: (_MetadataAddIntent intent) =>
+                _handleAddIntent(context, selectedIndex),
           ),
         },
         child: Focus(
           autofocus: true,
-          child: _buildPage(
-            context: context,
+          child: _MetadataPageView(
+            host: this,
             layout: PageLayoutSpec.of(context),
             selectedIndex: selectedIndex,
           ),
@@ -116,138 +111,24 @@ class _MetadataManagementPageState
     );
   }
 
-  Widget _buildPage({
-    required BuildContext context,
-    required PageLayoutSpec layout,
-    required int selectedIndex,
-  }) {
-    final ManagedNamedFacetKind kind = metadataTabKind(selectedIndex);
-    final (
-      bool hasSearchQuery,
-      int itemCount,
-      int totalCount,
-      String? mergeTarget,
-      Set<String> mergeSources,
-      int mergeSelectionCount,
-    ) = ref.watch(
-      namedFacetManagementViewModelProvider(kind).select(
-        (NamedFacetManagementState s) => (
-          s.hasSearchQuery,
-          s.items.length,
-          s.totalCount,
-          s.mergeTarget,
-          s.mergeSources,
-          s.mergeSelectionCount,
-        ),
-      ),
-    );
+  Object? _handleAddIntent(BuildContext context, int selectedIndex) {
+    if (_isTextInputFocused()) {
+      return null;
+    }
+    _onCreatePressed(context, metadataTabKind(selectedIndex));
+    return null;
+  }
+
+  void _handleSearchChanged(String value) {
+    final ManagedNamedFacetKind kind = metadataTabKind(_selectedTabIndex ?? 1);
     final NamedFacetManagementViewModel viewModel = ref.read(
       namedFacetManagementViewModelProvider(kind).notifier,
     );
-    final double horizontal = layout.horizontalInset;
-    final bool mergeMode = mergeTarget != null;
-    final bool useMobileCreateDialog =
-        managementCreateInteractionOf(context) ==
-        ManagementCreateInteraction.mobileDialog;
-    final bool showInlineCreate =
-        !useMobileCreateDialog && _showInlineCreateField;
-
-    return Stack(
-      children: <Widget>[
-        CustomScrollView(
-          controller: _scrollController,
-          physics: const AlwaysScrollableScrollPhysics(),
-          slivers: <Widget>[
-            SliverPersistentHeader(
-              pinned: true,
-              delegate: PageHeaderDelegate(
-                layout: layout,
-                child: MetadataHeader(
-                  onOpenNavigation: appShellPageNavigationOpener(context),
-                  onBack: () => popOrGoHome(context),
-                  mergeSelectionCount: mergeSelectionCount,
-                  onExitMergeSelection: mergeMode ? viewModel.exitMerge : null,
-                  onMergeSelection: mergeMode
-                      ? () => unawaited(_mergeSelectedNames(kind))
-                      : null,
-                ),
-              ),
-            ),
-            SliverPadding(
-              padding: EdgeInsets.fromLTRB(
-                horizontal,
-                layout.headerToBodyGap,
-                horizontal,
-                0,
-              ),
-              sliver: SliverToBoxAdapter(
-                child: ManagementCatalogToolbar(
-                  facet: kind,
-                  facetCount: totalCount,
-                  onFacetChanged: (ManagedNamedFacetKind value) =>
-                      _handleTabSelected(
-                        kManagedNamedFacetTabOrder.indexOf(value),
-                      ),
-                ),
-              ),
-            ),
-            M3ESliverSearchBar(
-              scrollBehavior: M3ESearchBarScrollBehavior.scrollAway,
-              height: ManagementFacetSearchBar.height,
-              padding: EdgeInsets.fromLTRB(horizontal, 12, horizontal, 12),
-              child: ManagementFacetSearchBar(
-                controller: _searchController,
-                hintText: context.l10n.metadataSearchNameHint,
-                matchCountLabel: hasSearchQuery
-                    ? context.l10n.filterResultCount(itemCount)
-                    : null,
-                onChanged: (String value) {
-                  if (value.trim().isEmpty) {
-                    unawaited(viewModel.setQuery(''));
-                    return;
-                  }
-                  viewModel.setQueryDebounced(value);
-                },
-              ),
-            ),
-            SliverPadding(
-              padding: EdgeInsets.fromLTRB(horizontal, 0, horizontal, 32),
-              sliver: SliverToBoxAdapter(
-                child: PeerContentTransition(
-                  switchKey: kind,
-                  reverse: _facetTransitionReverse,
-                  child: MetadataFacetContent(
-                    kind: kind,
-                    onCreatePressed: () => _onCreatePressed(context, kind),
-                    draftChip: showInlineCreate
-                        ? ManagementDraftEntityChip(
-                            onCommit: (String name) =>
-                                _commitDraftEntity(kind, name),
-                            onDismiss: _dismissDraftEntity,
-                          )
-                        : null,
-                    mergeTarget: mergeTarget,
-                    mergeSources: mergeSources,
-                    onMergeTargetSelected: viewModel.enterMerge,
-                    onMergeSourceSelected: viewModel.toggleMergeSource,
-                    onMergeSelectionExited: viewModel.exitMerge,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-        NamedFacetFillViewportBinder(
-          scrollController: _scrollController,
-          kind: kind,
-        ),
-        ManagementCreateEntityFab(
-          facet: kind,
-          horizontalPadding: horizontal,
-          onPressed: () => _onCreatePressed(context, kind),
-        ),
-      ],
-    );
+    if (value.trim().isEmpty) {
+      unawaited(viewModel.setQuery(''));
+      return;
+    }
+    viewModel.setQueryDebounced(value);
   }
 
   void _handleTabSelected(int index) {
@@ -388,6 +269,143 @@ class _MetadataManagementPageState
       return;
     }
     ref.read(namedFacetManagementViewModelProvider(kind).notifier).loadMore();
+  }
+}
+
+class _MetadataPageView extends ConsumerWidget {
+  const _MetadataPageView({
+    required this.host,
+    required this.layout,
+    required this.selectedIndex,
+  });
+
+  final _MetadataManagementPageState host;
+  final PageLayoutSpec layout;
+  final int selectedIndex;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ManagedNamedFacetKind kind = metadataTabKind(selectedIndex);
+    final (
+      bool hasSearchQuery,
+      int itemCount,
+      int totalCount,
+      String? mergeTarget,
+      Set<String> mergeSources,
+      int mergeSelectionCount,
+    ) = host.ref.watch(
+      namedFacetManagementViewModelProvider(kind).select(
+        (NamedFacetManagementState s) => (
+          s.hasSearchQuery,
+          s.items.length,
+          s.totalCount,
+          s.mergeTarget,
+          s.mergeSources,
+          s.mergeSelectionCount,
+        ),
+      ),
+    );
+    final NamedFacetManagementViewModel viewModel = host.ref.read(
+      namedFacetManagementViewModelProvider(kind).notifier,
+    );
+    final double horizontal = layout.horizontalInset;
+    final bool mergeMode = mergeTarget != null;
+    final bool useMobileCreateDialog =
+        managementCreateInteractionOf(context) ==
+        ManagementCreateInteraction.mobileDialog;
+    final bool showInlineCreate =
+        !useMobileCreateDialog && host._showInlineCreateField;
+
+    return Stack(
+      children: <Widget>[
+        CustomScrollView(
+          controller: host._scrollController,
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: <Widget>[
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: PageHeaderDelegate(
+                layout: layout,
+                child: MetadataHeader(
+                  onOpenNavigation: appShellPageNavigationOpener(context),
+                  onBack: () => popOrGoHome(context),
+                  mergeSelectionCount: mergeSelectionCount,
+                  onExitMergeSelection: mergeMode ? viewModel.exitMerge : null,
+                  onMergeSelection: mergeMode
+                      ? () => unawaited(host._mergeSelectedNames(kind))
+                      : null,
+                ),
+              ),
+            ),
+            SliverPadding(
+              padding: EdgeInsets.fromLTRB(
+                horizontal,
+                layout.headerToBodyGap,
+                horizontal,
+                0,
+              ),
+              sliver: SliverToBoxAdapter(
+                child: ManagementCatalogToolbar(
+                  facet: kind,
+                  facetCount: totalCount,
+                  onFacetChanged: (ManagedNamedFacetKind value) =>
+                      host._handleTabSelected(
+                        kManagedNamedFacetTabOrder.indexOf(value),
+                      ),
+                ),
+              ),
+            ),
+            M3ESliverSearchBar(
+              scrollBehavior: M3ESearchBarScrollBehavior.scrollAway,
+              height: ManagementFacetSearchBar.height,
+              padding: EdgeInsets.fromLTRB(horizontal, 12, horizontal, 12),
+              child: ManagementFacetSearchBar(
+                controller: host._searchController,
+                hintText: context.l10n.metadataSearchNameHint,
+                matchCountLabel: hasSearchQuery
+                    ? context.l10n.filterResultCount(itemCount)
+                    : null,
+                onChanged: host._handleSearchChanged,
+              ),
+            ),
+            SliverPadding(
+              padding: EdgeInsets.fromLTRB(horizontal, 0, horizontal, 32),
+              sliver: SliverToBoxAdapter(
+                child: PeerContentTransition(
+                  switchKey: kind,
+                  reverse: host._facetTransitionReverse,
+                  child: MetadataFacetContent(
+                    kind: kind,
+                    onCreatePressed: () => host._onCreatePressed(context, kind),
+                    draftChip: showInlineCreate
+                        ? ManagementDraftEntityChip(
+                            onCommit: (String name) =>
+                                host._commitDraftEntity(kind, name),
+                            onDismiss: host._dismissDraftEntity,
+                          )
+                        : null,
+                    mergeTarget: mergeTarget,
+                    mergeSources: mergeSources,
+                    onMergeTargetSelected: viewModel.enterMerge,
+                    onMergeSourceSelected: viewModel.toggleMergeSource,
+                    onMergeSelectionExited: viewModel.exitMerge,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        NamedFacetFillViewportBinder(
+          scrollController: host._scrollController,
+          kind: kind,
+        ),
+        ManagementCreateEntityFab(
+          facet: kind,
+          horizontalPadding: horizontal,
+          onPressed: () => host._onCreatePressed(context, kind),
+        ),
+      ],
+    );
   }
 }
 

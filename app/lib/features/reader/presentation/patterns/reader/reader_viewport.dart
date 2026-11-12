@@ -29,18 +29,7 @@ class ReaderViewport extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTapUp: (TapUpDetails details) {
-        focusNode?.requestFocus();
-        final RenderBox? box = context.findRenderObject() as RenderBox?;
-        if (box == null) {
-          onTapZone?.call(ReaderViewportTapZone.center);
-          return;
-        }
-        final Offset local = box.globalToLocal(details.globalPosition);
-        onTapZone?.call(
-          resolveReaderViewportTapZone(localX: local.dx, width: box.size.width),
-        );
-      },
+      onTapUp: (TapUpDetails details) => _handleTapUp(context, details),
       child: switch (status) {
         ReaderViewportStatus.ready => ReaderViewportPlaceholder(
           page: currentPage,
@@ -51,6 +40,19 @@ class ReaderViewport extends StatelessWidget {
           onRetry: onRetry,
         ),
       },
+    );
+  }
+
+  void _handleTapUp(BuildContext context, TapUpDetails details) {
+    focusNode?.requestFocus();
+    final RenderBox? box = context.findRenderObject() as RenderBox?;
+    if (box == null) {
+      onTapZone?.call(ReaderViewportTapZone.center);
+      return;
+    }
+    final Offset local = box.globalToLocal(details.globalPosition);
+    onTapZone?.call(
+      resolveReaderViewportTapZone(localX: local.dx, width: box.size.width),
     );
   }
 }

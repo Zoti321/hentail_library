@@ -34,6 +34,16 @@ class ReadingHistoryCard extends HookConsumerWidget {
   /// [coverViewportProvider] scope；与 [gridIndex] 同时提供时启用视口优先级。
   final String? coverViewportScope;
 
+  Object? _handleActivateIntent(ActivateIntent intent) {
+    onTap();
+    return null;
+  }
+
+  void _handleTap() {
+    onTap();
+    unfocusAfterPointerActivation();
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
@@ -70,17 +80,11 @@ class ReadingHistoryCard extends HookConsumerWidget {
             onShowFocusHighlight: (bool value) => isFocused.value = value,
             actions: <Type, Action<Intent>>{
               ActivateIntent: CallbackAction<ActivateIntent>(
-                onInvoke: (ActivateIntent intent) {
-                  onTap();
-                  return null;
-                },
+                onInvoke: _handleActivateIntent,
               ),
             },
             child: GestureDetector(
-              onTap: () {
-                onTap();
-                unfocusAfterPointerActivation();
-              },
+              onTap: _handleTap,
               child: AnimatedContainer(
                 duration: motionDurationOf(
                   context,

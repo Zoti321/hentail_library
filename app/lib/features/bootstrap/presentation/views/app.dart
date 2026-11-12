@@ -85,53 +85,92 @@ class _AppRootState extends ConsumerState<_AppRoot> {
           (
             material_ui.ColorScheme? lightDynamic,
             material_ui.ColorScheme? darkDynamic,
-          ) {
-            final AssembledAppTheme light = assembleAppTheme(
-              Brightness.light,
-              seed: resolveAppThemeSeed(
-                useDynamicColor: themePrefs.useDynamicColor,
-                platformPrimary: lightDynamic?.primary,
-                colorSchemeId: colorSchemeId,
-              ),
-              font: font,
-            );
-            final AssembledAppTheme dark = assembleAppTheme(
-              Brightness.dark,
-              seed: resolveAppThemeSeed(
-                useDynamicColor: themePrefs.useDynamicColor,
-                platformPrimary: darkDynamic?.primary,
-                colorSchemeId: colorSchemeId,
-              ),
-              font: font,
-            );
-            return MaterialApp.router(
-              locale: locale,
-              // Prefer zh as first entry so unmatched device locales fall back to Chinese.
-              supportedLocales: const <Locale>[Locale('zh'), Locale('en')],
-              localizationsDelegates: AppLocalizations.localizationsDelegates,
-              title: appWindowTitle(),
-              debugShowCheckedModeBanner: false,
-              theme: light.material,
-              darkTheme: dark.material,
-              themeMode: themeMode,
-              routerConfig: appRouter,
-              builder: (BuildContext context, Widget? child) {
-                final AssembledAppTheme assembled =
-                    Theme.of(context).brightness == Brightness.dark
-                    ? dark
-                    : light;
-                return M3ETheme(
-                  data: assembled.m3e,
-                  child: AnnotatedRegion<SystemUiOverlayStyle>(
-                    value: appSystemUiOverlayStyle(
-                      Theme.of(context).colorScheme,
-                    ),
-                    child: child ?? const SizedBox.shrink(),
-                  ),
-                );
-              },
-            );
-          },
+          ) => _ThemedApp(
+            lightDynamic: lightDynamic,
+            darkDynamic: darkDynamic,
+            useDynamicColor: themePrefs.useDynamicColor,
+            colorSchemeId: colorSchemeId,
+            font: font,
+            locale: locale,
+            themeMode: themeMode,
+          ),
+    );
+  }
+}
+
+class _ThemedApp extends StatelessWidget {
+  const _ThemedApp({
+    required this.lightDynamic,
+    required this.darkDynamic,
+    required this.useDynamicColor,
+    required this.colorSchemeId,
+    required this.font,
+    required this.locale,
+    required this.themeMode,
+  });
+
+  final material_ui.ColorScheme? lightDynamic;
+  final material_ui.ColorScheme? darkDynamic;
+  final bool useDynamicColor;
+  final String colorSchemeId;
+  final AppFontSpec font;
+  final Locale? locale;
+  final ThemeMode themeMode;
+
+  @override
+  Widget build(BuildContext context) {
+    final AssembledAppTheme light = assembleAppTheme(
+      Brightness.light,
+      seed: resolveAppThemeSeed(
+        useDynamicColor: useDynamicColor,
+        platformPrimary: lightDynamic?.primary,
+        colorSchemeId: colorSchemeId,
+      ),
+      font: font,
+    );
+    final AssembledAppTheme dark = assembleAppTheme(
+      Brightness.dark,
+      seed: resolveAppThemeSeed(
+        useDynamicColor: useDynamicColor,
+        platformPrimary: darkDynamic?.primary,
+        colorSchemeId: colorSchemeId,
+      ),
+      font: font,
+    );
+    return MaterialApp.router(
+      locale: locale,
+      // Prefer zh as first entry so unmatched device locales fall back to Chinese.
+      supportedLocales: const <Locale>[Locale('zh'), Locale('en')],
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      title: appWindowTitle(),
+      debugShowCheckedModeBanner: false,
+      theme: light.material,
+      darkTheme: dark.material,
+      themeMode: themeMode,
+      routerConfig: appRouter,
+      builder: (BuildContext context, Widget? child) =>
+          _AppThemeOverlay(light: light, dark: dark, child: child),
+    );
+  }
+}
+
+class _AppThemeOverlay extends StatelessWidget {
+  const _AppThemeOverlay({required this.light, required this.dark, this.child});
+
+  final AssembledAppTheme light;
+  final AssembledAppTheme dark;
+  final Widget? child;
+
+  @override
+  Widget build(BuildContext context) {
+    final AssembledAppTheme assembled =
+        Theme.of(context).brightness == Brightness.dark ? dark : light;
+    return M3ETheme(
+      data: assembled.m3e,
+      child: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: appSystemUiOverlayStyle(Theme.of(context).colorScheme),
+        child: child ?? const SizedBox.shrink(),
+      ),
     );
   }
 }

@@ -91,22 +91,28 @@ class _AgeRestrictionFilterGroup extends ConsumerWidget {
             _CheckboxOptionRow(
               label: l10n.libraryAgeRestrictionFilterLabel(option),
               selected: selected == option,
-              onTap: () {
-                switch (displayTarget) {
-                  case LibraryDisplayTarget.comics:
-                    ref
-                        .read(libraryComicFiltersProvider.notifier)
-                        .toggleAgeRestrictionOption(option);
-                  case LibraryDisplayTarget.series:
-                    ref
-                        .read(librarySeriesFiltersProvider.notifier)
-                        .toggleAgeRestrictionOption(option);
-                }
-              },
+              onTap: () => _handleAgeRestrictionTap(ref, displayTarget, option),
             ),
         ],
       ),
     );
+  }
+
+  void _handleAgeRestrictionTap(
+    WidgetRef ref,
+    LibraryDisplayTarget displayTarget,
+    LibraryAgeRestrictionFilter option,
+  ) {
+    switch (displayTarget) {
+      case LibraryDisplayTarget.comics:
+        ref
+            .read(libraryComicFiltersProvider.notifier)
+            .toggleAgeRestrictionOption(option);
+      case LibraryDisplayTarget.series:
+        ref
+            .read(librarySeriesFiltersProvider.notifier)
+            .toggleAgeRestrictionOption(option);
+    }
   }
 }
 
@@ -242,23 +248,25 @@ class _AuthorFilterGroup extends ConsumerWidget {
       names: names,
       selection: selection,
       isLoading: namesAsync.isLoading && !namesAsync.hasValue,
-      labelFor: (String id) {
-        final List<Author> authors = ref
-            .watch(libraryAuthorDictionaryStateProvider)
-            .maybeWhen(
-              data: (List<Author> value) => value,
-              orElse: () => const <Author>[],
-            );
-        for (final Author author in authors) {
-          if ('${author.id}' == id) {
-            return author.name;
-          }
-        }
-        return id;
-      },
+      labelFor: (String id) => _labelFor(ref, id),
       onToggle: notifier.toggleAuthor,
       onIncludeModeChanged: notifier.setAuthorIncludeMode,
     );
+  }
+
+  String _labelFor(WidgetRef ref, String id) {
+    final List<Author> authors = ref
+        .watch(libraryAuthorDictionaryStateProvider)
+        .maybeWhen(
+          data: (List<Author> value) => value,
+          orElse: () => const <Author>[],
+        );
+    for (final Author author in authors) {
+      if ('${author.id}' == id) {
+        return author.name;
+      }
+    }
+    return id;
   }
 }
 

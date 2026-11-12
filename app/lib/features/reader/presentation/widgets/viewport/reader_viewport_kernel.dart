@@ -209,55 +209,26 @@ class ReaderPagedViewportKernel extends HookConsumerWidget {
               maxWidth: MediaQuery.sizeOf(context).width,
             ),
             child: Listener(
-              onPointerSignal: (PointerSignalEvent event) {
-                if (event is! PointerScrollEvent) {
-                  return;
-                }
-                final double dy = event.scrollDelta.dy;
-                if (dy == 0) {
-                  return;
-                }
-                final DateTime now = DateTime.now();
-                final DateTime? last = lastWheelAt.value;
-                if (last != null &&
-                    now.difference(last).inMilliseconds < wheelThrottleMs) {
-                  return;
-                }
-                lastWheelAt.value = now;
-                final ReaderViewModel notifier = ref.read(
-                  readerViewModelProvider(viewKey).notifier,
-                );
-                if (dy > 0) {
-                  if (onRequestNextPage != null) {
-                    unawaited(onRequestNextPage!());
-                  } else {
-                    notifier.nextPage();
-                  }
-                } else {
-                  if (onRequestPrevPage != null) {
-                    unawaited(onRequestPrevPage!());
-                  } else {
-                    notifier.prevPage();
-                  }
-                }
-              },
+              onPointerSignal: (PointerSignalEvent event) =>
+                  _handlePointerSignal(
+                    event,
+                    ref: ref,
+                    viewKey: viewKey,
+                    lastWheelAt: lastWheelAt,
+                    wheelThrottleMs: wheelThrottleMs,
+                    onRequestNextPage: onRequestNextPage,
+                    onRequestPrevPage: onRequestPrevPage,
+                  ),
               child: PageView.builder(
                 controller: pageController,
                 physics: const BouncingScrollPhysics(),
-                onPageChanged: (int itemIndex) {
-                  if (isProgrammaticScroll.value) {
-                    return;
-                  }
-                  final int? applyIndex = resumeSyncGate.value.onVisibleIndex(
-                    pageForItemIndex(itemIndex),
-                  );
-                  if (applyIndex == null) {
-                    return;
-                  }
-                  ref
-                      .read(readerViewModelProvider(viewKey).notifier)
-                      .setIndex(applyIndex);
-                },
+                onPageChanged: (int itemIndex) => _handlePageChanged(
+                  itemIndex,
+                  ref: ref,
+                  viewKey: viewKey,
+                  isProgrammaticScroll: isProgrammaticScroll,
+                  resumeSyncGate: resumeSyncGate,
+                ),
                 itemCount: itemCount,
                 itemBuilder: (BuildContext context, int itemIndex) =>
                     itemBuilder(
@@ -274,5 +245,64 @@ class ReaderPagedViewportKernel extends HookConsumerWidget {
         prefetchBinder,
       ],
     );
+  }
+
+  void _handlePointerSignal(
+    PointerSignalEvent event, {
+    required WidgetRef ref,
+    required ReaderViewModelKey viewKey,
+    required ObjectRef<DateTime?> lastWheelAt,
+    required int wheelThrottleMs,
+    required Future<void> Function()? onRequestNextPage,
+    required Future<void> Function()? onRequestPrevPage,
+  }) {
+    if (event is! PointerScrollEvent) {
+      return;
+    }
+    final double dy = event.scrollDelta.dy;
+    if (dy == 0) {
+      return;
+    }
+    final DateTime now = DateTime.now();
+    final DateTime? last = lastWheelAt.value;
+    if (last != null && now.difference(last).inMilliseconds < wheelThrottleMs) {
+      return;
+    }
+    lastWheelAt.value = now;
+    final ReaderViewModel notifier = ref.read(
+      readerViewModelProvider(viewKey).notifier,
+    );
+    if (dy > 0) {
+      if (onRequestNextPage != null) {
+        unawaited(onRequestNextPage());
+      } else {
+        notifier.nextPage();
+      }
+      return;
+    }
+    if (onRequestPrevPage != null) {
+      unawaited(onRequestPrevPage());
+    } else {
+      notifier.prevPage();
+    }
+  }
+
+  void _handlePageChanged(
+    int itemIndex, {
+    required WidgetRef ref,
+    required ReaderViewModelKey viewKey,
+    required ObjectRef<bool> isProgrammaticScroll,
+    required ObjectRef<ResumeVisibleSyncGate> resumeSyncGate,
+  }) {
+    if (isProgrammaticScroll.value) {
+      return;
+    }
+    final int? applyIndex = resumeSyncGate.value.onVisibleIndex(
+      pageForItemIndex(itemIndex),
+    );
+    if (applyIndex == null) {
+      return;
+    }
+    ref.read(readerViewModelProvider(viewKey).notifier).setIndex(applyIndex);
   }
 }

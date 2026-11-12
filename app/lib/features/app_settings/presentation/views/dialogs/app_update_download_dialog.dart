@@ -35,6 +35,14 @@ class AppUpdateDownloadDialog extends HookConsumerWidget {
 
   final AppReleaseAsset asset;
 
+  void _handleCancelDownload(
+    BuildContext context,
+    ObjectRef<CancelToken?> cancelTokenRef,
+  ) {
+    cancelTokenRef.value?.cancel();
+    Navigator.of(context).pop();
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
@@ -139,10 +147,7 @@ class AppUpdateDownloadDialog extends HookConsumerWidget {
       actions: <Widget>[
         if (isDownloading.value)
           M3EButton(
-            onPressed: () {
-              cancelTokenRef.value?.cancel();
-              Navigator.of(context).pop();
-            },
+            onPressed: () => _handleCancelDownload(context, cancelTokenRef),
             style: M3EButtonStyle.text,
             decoration: M3EButtonDecoration(textStyle: actionLabelStyle),
             label: Text(l10n.commonCancel),

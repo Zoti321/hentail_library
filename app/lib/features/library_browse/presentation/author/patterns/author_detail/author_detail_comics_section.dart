@@ -91,9 +91,7 @@ class _AuthorComicCoverCard extends StatelessWidget {
             child: Material(
               type: MaterialType.transparency,
               child: InkWell(
-                onTap: () {
-                  appNavigatorOf(context).pushComicDetail(comic.comicId);
-                },
+                onTap: () => _handleTap(context),
                 child: ComicCoverContent(comicId: comic.comicId),
               ),
             ),
@@ -101,5 +99,9 @@ class _AuthorComicCoverCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _handleTap(BuildContext context) {
+    appNavigatorOf(context).pushComicDetail(comic.comicId);
   }
 }

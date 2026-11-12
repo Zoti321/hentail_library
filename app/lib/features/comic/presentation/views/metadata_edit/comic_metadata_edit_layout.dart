@@ -127,15 +127,17 @@ class _ComicMetadataEditPageState extends State<ComicMetadataEditLayout>
         onLockChanged: _onLockChanged,
         titleError: _titleError,
         smartFacetScope: labComicMetadataSmartFacetScope(title: _draft.title),
-        onDraftChanged: (ComicMetadataEditDraft value) {
-          setState(() {
-            _draft = value;
-            if (_titleError != null && value.validateTitle() == null) {
-              _titleError = null;
-            }
-          });
-        },
+        onDraftChanged: _handleDraftChanged,
       ),
     );
+  }
+
+  void _handleDraftChanged(ComicMetadataEditDraft value) {
+    setState(() {
+      _draft = value;
+      if (_titleError != null && value.validateTitle() == null) {
+        _titleError = null;
+      }
+    });
   }
 }

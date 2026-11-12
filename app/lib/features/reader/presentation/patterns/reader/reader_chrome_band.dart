@@ -21,11 +21,6 @@ class ReaderChromeBand extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry? padding;
 
-  static bool _useCenteredContentRail(double viewportWidth) {
-    return WindowSizeClass.fromWidth(viewportWidth) ==
-        WindowSizeClass.extraLarge;
-  }
-
   @override
   Widget build(BuildContext context) {
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
@@ -39,9 +34,9 @@ class ReaderChromeBand extends StatelessWidget {
             top: Radius.circular(ReaderImmersiveColors.bottomChromeTopRadius),
           );
 
-    Widget content = Padding(
+    final Widget content = Padding(
       padding: padding ?? EdgeInsets.zero,
-      child: _layoutContentRail(
+      child: _ReaderContentRail(
         top: top,
         viewportWidth: viewportWidth,
         child: child,
@@ -68,13 +63,23 @@ class ReaderChromeBand extends StatelessWidget {
       ),
     );
   }
+}
 
-  static Widget _layoutContentRail({
-    required bool top,
-    required double viewportWidth,
-    required Widget child,
-  }) {
-    if (!_useCenteredContentRail(viewportWidth)) {
+class _ReaderContentRail extends StatelessWidget {
+  const _ReaderContentRail({
+    required this.top,
+    required this.viewportWidth,
+    required this.child,
+  });
+
+  final bool top;
+  final double viewportWidth;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (WindowSizeClass.fromWidth(viewportWidth) !=
+        WindowSizeClass.extraLarge) {
       return child;
     }
     return Align(

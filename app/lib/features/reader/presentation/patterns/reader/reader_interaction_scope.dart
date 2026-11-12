@@ -29,33 +29,41 @@ class ReaderInteractionScope extends StatelessWidget {
       child: Actions(
         actions: <Type, Action<Intent>>{
           ReaderPrevPageIntent: CallbackAction<ReaderPrevPageIntent>(
-            onInvoke: (_) {
-              onPreviousPage?.call();
-              return null;
-            },
+            onInvoke: _handlePrevPage,
           ),
           ReaderNextPageIntent: CallbackAction<ReaderNextPageIntent>(
-            onInvoke: (_) {
-              onNextPage?.call();
-              return null;
-            },
+            onInvoke: _handleNextPage,
           ),
           ReaderToggleAutoPlayIntent:
               CallbackAction<ReaderToggleAutoPlayIntent>(
-                onInvoke: (_) {
-                  onToggleAutoPlay?.call();
-                  return null;
-                },
+                onInvoke: _handleToggleAutoPlay,
               ),
           ReaderToggleChromeIntent: CallbackAction<ReaderToggleChromeIntent>(
-            onInvoke: (_) {
-              onToggleChromeFromKeyboard?.call();
-              return null;
-            },
+            onInvoke: _handleToggleChrome,
           ),
         },
         child: Focus(autofocus: true, focusNode: focusNode, child: child),
       ),
     );
+  }
+
+  Object? _handlePrevPage(ReaderPrevPageIntent intent) {
+    onPreviousPage?.call();
+    return null;
+  }
+
+  Object? _handleNextPage(ReaderNextPageIntent intent) {
+    onNextPage?.call();
+    return null;
+  }
+
+  Object? _handleToggleAutoPlay(ReaderToggleAutoPlayIntent intent) {
+    onToggleAutoPlay?.call();
+    return null;
+  }
+
+  Object? _handleToggleChrome(ReaderToggleChromeIntent intent) {
+    onToggleChromeFromKeyboard?.call();
+    return null;
   }
 }

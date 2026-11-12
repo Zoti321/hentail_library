@@ -180,13 +180,7 @@ class _GeneralFields extends StatelessWidget {
         SizedBox(height: M3ETheme.of(context).spacing.sm),
         ComicLanguageQuickPick(
           selected: draft.languages,
-          onCanonicalToggled: (String canonical) {
-            if (draft.languages.contains(canonical)) {
-              onLanguageRemoved(canonical);
-            } else {
-              onLanguageAdded(canonical);
-            }
-          },
+          onCanonicalToggled: _handleCanonicalToggled,
         ),
         SizedBox(height: M3ETheme.of(context).spacing.sm),
         TagInputField(
@@ -207,6 +201,14 @@ class _GeneralFields extends StatelessWidget {
         ],
       ],
     );
+  }
+
+  void _handleCanonicalToggled(String canonical) {
+    if (draft.languages.contains(canonical)) {
+      onLanguageRemoved(canonical);
+      return;
+    }
+    onLanguageAdded(canonical);
   }
 }
 

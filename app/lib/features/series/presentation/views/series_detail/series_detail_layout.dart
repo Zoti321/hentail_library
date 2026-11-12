@@ -130,6 +130,12 @@ class _SeriesDetailPageState extends ConsumerState<SeriesDetailLayout> {
     _scrollToComicsSection();
   }
 
+  void _handlePopInvoked(bool didPop, bool seriesSelection) {
+    if (!didPop && seriesSelection) {
+      ref.read(catalogSelectionProvider.notifier).exit();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
@@ -170,11 +176,8 @@ class _SeriesDetailPageState extends ConsumerState<SeriesDetailLayout> {
 
     return PopScope(
       canPop: !seriesSelection,
-      onPopInvokedWithResult: (bool didPop, Object? result) {
-        if (!didPop && seriesSelection) {
-          ref.read(catalogSelectionProvider.notifier).exit();
-        }
-      },
+      onPopInvokedWithResult: (bool didPop, Object? result) =>
+          _handlePopInvoked(didPop, seriesSelection),
       child: ColoredBox(
         color: labBrowseCanvasColor(scheme),
         child: Stack(

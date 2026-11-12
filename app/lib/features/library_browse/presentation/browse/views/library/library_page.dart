@@ -151,11 +151,8 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
 
     return PopScope(
       canPop: !librarySelection,
-      onPopInvokedWithResult: (bool didPop, Object? result) {
-        if (!didPop && librarySelection) {
-          ref.read(catalogSelectionProvider.notifier).exit();
-        }
-      },
+      onPopInvokedWithResult: (bool didPop, Object? result) =>
+          _handlePopInvoked(ref, didPop, librarySelection),
       child: Scaffold(
         backgroundColor: labBrowseCanvasColor(M3ETheme.of(context).colorScheme),
         body: Stack(
@@ -171,9 +168,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                           target: LibraryDisplayTarget.comics,
                           viewMode: _viewMode,
                           warmPeerCounts: _warmInactiveCatalogs,
-                          onViewModeChanged: (CatalogViewMode mode) {
-                            setState(() => _viewMode = mode);
-                          },
+                          onViewModeChanged: _handleViewModeChanged,
                         )
                       : const SizedBox.shrink(),
                 ),
@@ -185,9 +180,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                           target: LibraryDisplayTarget.series,
                           viewMode: _viewMode,
                           warmPeerCounts: _warmInactiveCatalogs,
-                          onViewModeChanged: (CatalogViewMode mode) {
-                            setState(() => _viewMode = mode);
-                          },
+                          onViewModeChanged: _handleViewModeChanged,
                         )
                       : const SizedBox.shrink(),
                 ),
@@ -202,9 +195,19 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
       ),
     );
   }
+
+  void _handlePopInvoked(WidgetRef ref, bool didPop, bool librarySelection) {
+    if (didPop || !librarySelection) {
+      return;
+    }
+    ref.read(catalogSelectionProvider.notifier).exit();
+  }
+
+  void _handleViewModeChanged(CatalogViewMode mode) {
+    setState(() => _viewMode = mode);
+  }
 }
 
-/// 单 Tab 完整滚动树：页头 + 工具栏 + 视口模式 + 真 Sliver 目录 + 分页。
 class _LibraryTabScrollView extends ConsumerWidget {
   const _LibraryTabScrollView({
     required this.scrollController,

@@ -7,8 +7,10 @@ import 'package:hentai_library/features/app_settings/presentation/patterns/setti
 import 'package:hentai_library/features/app_settings/presentation/patterns/settings/settings_detail_panes.dart';
 import 'package:hentai_library/features/app_settings/presentation/patterns/settings/settings_master_menu.dart';
 import 'package:hentai_library/features/app_settings/presentation/patterns/settings/settings_page_header.dart';
+import 'package:hentai_library/features/app_settings/presentation/views/settings_page/settings_narrow_pane_switcher.dart';
 
 export 'package:hentai_library/features/app_settings/presentation/patterns/settings/settings_detail_panes.dart';
+export 'package:hentai_library/features/app_settings/presentation/views/settings_page/settings_narrow_pane_switcher.dart';
 
 /// 设置页 Lab：≥840 list–detail（Kazumi 风 master + 分组卡片详情）。
 class SettingsLayout extends StatefulWidget {
@@ -87,6 +89,12 @@ class _SettingsPageState extends State<SettingsLayout> {
     return index >= 0 ? index : category.index;
   }
 
+  void _handlePopInvoked(bool didPop, Object? result) {
+    if (!didPop) {
+      _handleBack();
+    }
+  }
+
   /// 头部返回按钮与系统返回共用：窄屏详情先回分类列表，列表页交给 [SettingsLayout.onBack] 或路由。
   void _handleBack() {
     if (_showingNarrowDetail) {
@@ -106,8 +114,8 @@ class _SettingsPageState extends State<SettingsLayout> {
     // list-detail 判断使用页面实际可用宽度（壳层 pane 可能窄于整窗），与主体布局保持一致。
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        return _buildPage(
-          context,
+        return _SettingsPageBody(
+          host: this,
           listDetailWide: SettingsPageMetrics.useListDetail(
             constraints.maxWidth,
           ),
@@ -115,20 +123,25 @@ class _SettingsPageState extends State<SettingsLayout> {
       },
     );
   }
+}
 
-  Widget _buildPage(BuildContext context, {required bool listDetailWide}) {
+class _SettingsPageBody extends StatelessWidget {
+  const _SettingsPageBody({required this.host, required this.listDetailWide});
+
+  final _SettingsPageState host;
+  final bool listDetailWide;
+
+  @override
+  Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     final PageLayoutSpec layout = PageLayoutSpec.of(context);
     final double horizontalPadding = layout.horizontalInset;
 
     return PopScope<Object?>(
       canPop:
-          listDetailWide || (!_showingNarrowDetail && widget.onBack == null),
-      onPopInvokedWithResult: (bool didPop, Object? result) {
-        if (!didPop) {
-          _handleBack();
-        }
-      },
+          listDetailWide ||
+          (!host._showingNarrowDetail && host.widget.onBack == null),
+      onPopInvokedWithResult: host._handlePopInvoked,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
@@ -137,16 +150,16 @@ class _SettingsPageState extends State<SettingsLayout> {
             child: Builder(
               builder: (BuildContext context) {
                 final SettingsCategoryInfo selectedInfo = settingsCategoryInfo(
-                  _selected,
+                  host._selected,
                 );
                 final String? headerTitle =
-                    (!listDetailWide && _showingNarrowDetail)
+                    (!listDetailWide && host._showingNarrowDetail)
                     ? selectedInfo.label(l10n)
                     : null;
                 return SettingsPageHeader(
                   title: headerTitle,
-                  showBack: !listDetailWide && _showingNarrowDetail,
-                  onBack: _handleBack,
+                  showBack: !listDetailWide && host._showingNarrowDetail,
+                  onBack: host._handleBack,
                 );
               },
             ),
@@ -169,22 +182,21 @@ class _SettingsPageState extends State<SettingsLayout> {
                   final Widget master = SettingsMasterMenu(
                     key: const Key('_settings_master'),
                     wide: wide,
-                    selected: _selected,
-                    visibleCategories: widget.visibleCategories,
-                    onSelect: (SettingsCategory category) {
-                      _selectCategory(category, wide: wide);
-                    },
+                    selected: host._selected,
+                    visibleCategories: host.widget.visibleCategories,
+                    onSelect: (SettingsCategory category) =>
+                        host._selectCategory(category, wide: wide),
                   );
 
                   final Widget detail = SettingsDetailPane(
                     key: const Key('_settings_detail'),
-                    category: _selected,
+                    category: host._selected,
                     showTitle: wide,
-                    labState: _labState,
-                    onLabStateChanged: _updateLabState,
-                    optionLabels: widget.optionLabels,
-                    showUnwiredTiles: widget.showUnwiredTiles,
-                    sectionsBuilder: widget.sectionsBuilder,
+                    labState: host._labState,
+                    onLabStateChanged: host._updateLabState,
+                    optionLabels: host.widget.optionLabels,
+                    showUnwiredTiles: host.widget.showUnwiredTiles,
+                    sectionsBuilder: host.widget.sectionsBuilder,
                   );
 
                   if (wide) {
@@ -194,14 +206,14 @@ class _SettingsPageState extends State<SettingsLayout> {
                       paneGap: SettingsPageMetrics.paneGap,
                       listPane: master,
                       detailPane: ListDetailDetailTransition(
-                        switchKey: _selected,
-                        reverse: _detailTransitionReverse,
+                        switchKey: host._selected,
+                        reverse: host._detailTransitionReverse,
                         child: detail,
                       ),
                     );
                   }
                   return SettingsNarrowPaneSwitcher(
-                    showingDetail: _showingNarrowDetail,
+                    showingDetail: host._showingNarrowDetail,
                     masterList: master,
                     detailPane: detail,
                   );
@@ -210,71 +222,6 @@ class _SettingsPageState extends State<SettingsLayout> {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-/// Narrow master ↔ detail transition (slide + fade).
-class SettingsNarrowPaneSwitcher extends StatelessWidget {
-  const SettingsNarrowPaneSwitcher({
-    super.key,
-    required this.showingDetail,
-    required this.masterList,
-    required this.detailPane,
-  });
-
-  final bool showingDetail;
-  final Widget masterList;
-  final Widget detailPane;
-
-  @override
-  Widget build(BuildContext context) {
-    if (MediaQuery.disableAnimationsOf(context)) {
-      return showingDetail ? detailPane : masterList;
-    }
-
-    final Duration duration = LabMotion.motionDurationOf(
-      context,
-      LabMotion.routeTransitionDuration,
-    );
-    // 与 Lab 页面转场同款 M3E expressive spatial 弹簧：进场允许轻微过冲，退场沿反向曲线收回。
-    final Curve springCurve = SpringCurve(
-      motion: LabMotion.routeSpring,
-      duration: LabMotion.routeTransitionDuration,
-    );
-
-    return ClipRect(
-      child: AnimatedSwitcher(
-        duration: duration,
-        reverseDuration: duration,
-        switchInCurve: springCurve,
-        switchOutCurve: springCurve.flipped,
-        layoutBuilder: (Widget? currentChild, List<Widget> previousChildren) {
-          return Stack(
-            alignment: Alignment.topLeft,
-            children: <Widget>[...previousChildren, ?currentChild],
-          );
-        },
-        transitionBuilder: (Widget child, Animation<double> animation) {
-          final bool isIncoming = child.key == ValueKey<bool>(showingDetail);
-          final Offset begin = isIncoming
-              ? (showingDetail ? const Offset(0.12, 0) : const Offset(-0.08, 0))
-              : (showingDetail
-                    ? const Offset(-0.08, 0)
-                    : const Offset(0.12, 0));
-          return SlideTransition(
-            position: Tween<Offset>(
-              begin: begin,
-              end: Offset.zero,
-            ).animate(animation),
-            child: FadeTransition(opacity: animation, child: child),
-          );
-        },
-        child: KeyedSubtree(
-          key: ValueKey<bool>(showingDetail),
-          child: showingDetail ? detailPane : masterList,
-        ),
       ),
     );
   }

@@ -19,6 +19,10 @@ class ManagementCatalogToolbar extends StatelessWidget {
   final int facetCount;
   final ValueChanged<ManagedNamedFacetKind> onFacetChanged;
 
+  void _handleSelected(int index) {
+    onFacetChanged(ManagedNamedFacetUi.facetAt(index));
+  }
+
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
@@ -33,9 +37,7 @@ class ManagementCatalogToolbar extends StatelessWidget {
           child: SegmentedCapsuleBar(
             segments: ManagedNamedFacetUi.capsuleSegments(l10n),
             selectedIndex: ManagedNamedFacetUi.indexOf(facet),
-            onSelected: (int index) {
-              onFacetChanged(ManagedNamedFacetUi.facetAt(index));
-            },
+            onSelected: _handleSelected,
           ),
         ),
         const SizedBox(width: 12),

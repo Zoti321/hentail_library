@@ -52,6 +52,13 @@ class HomeBentoStatCard extends StatefulWidget {
 class _HomeBentoStatCardState extends State<HomeBentoStatCard> {
   bool _pressed = false;
 
+  void _handleStateChanged(M3EInteractionState state) {
+    final bool next = state.pressed;
+    if (_pressed != next) {
+      setState(() => _pressed = next);
+    }
+  }
+
   BorderRadius get _motionRadius => _pressed
       ? const BorderRadius.all(Radius.circular(kTonalSurfaceRadius))
       : widget.borderRadius;
@@ -130,12 +137,7 @@ class _HomeBentoStatCardState extends State<HomeBentoStatCard> {
                   ? SystemMouseCursors.click
                   : SystemMouseCursors.basic,
               padding: EdgeInsets.zero,
-              onStateChanged: (M3EInteractionState state) {
-                final bool next = state.pressed;
-                if (_pressed != next) {
-                  setState(() => _pressed = next);
-                }
-              },
+              onStateChanged: _handleStateChanged,
               child: content,
             ),
           );

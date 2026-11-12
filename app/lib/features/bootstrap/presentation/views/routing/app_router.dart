@@ -127,27 +127,34 @@ class LibraryBrowsePage extends HookConsumerWidget {
       final String? scopedId = libraryId.isEmpty ? null : libraryId;
       // 先抓住 notifier：dispose 后不能再用 ref。
       final BrowseLibraryId scope = ref.read(browseLibraryIdProvider.notifier);
-      var cancelled = false;
-      int? epoch;
       // claim/release 必须离开 build；epoch 防止旧页 dispose 清掉新页已 claim 的 id。
-      Future<void>.microtask(() {
-        if (cancelled) {
-          return;
-        }
-        epoch = scope.claim(scopedId);
-      });
-      return () {
-        cancelled = true;
-        Future<void>.microtask(() {
-          final int? claimed = epoch;
-          if (claimed == null) {
-            return;
-          }
-          scope.release(claimed);
-        });
-      };
+      final _LibraryScopeClaim claim = _LibraryScopeClaim();
+      Future<void>.microtask(() => claim.claim(scope, scopedId));
+      return () => Future<void>.microtask(() => claim.release(scope));
     }, <Object?>[libraryId]);
 
     return const LibraryPage();
+  }
+}
+
+/// 单库浏览页的 claim/release 生命周期；claim/release 都离开 build 执行。
+class _LibraryScopeClaim {
+  bool _cancelled = false;
+  int? _epoch;
+
+  void claim(BrowseLibraryId scope, String? libraryId) {
+    if (_cancelled) {
+      return;
+    }
+    _epoch = scope.claim(libraryId);
+  }
+
+  void release(BrowseLibraryId scope) {
+    _cancelled = true;
+    final int? claimed = _epoch;
+    if (claimed == null) {
+      return;
+    }
+    scope.release(claimed);
   }
 }

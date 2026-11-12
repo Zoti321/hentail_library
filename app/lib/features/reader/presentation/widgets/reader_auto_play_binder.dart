@@ -88,27 +88,15 @@ class ReaderAutoPlayBinder extends HookConsumerWidget {
           seconds: readerAutoPlayIntervalSeconds,
         );
         Timer? timer;
-        timer = Timer.periodic(interval, (_) {
-          if (!context.mounted) {
-            timer?.cancel();
-            return;
-          }
-          if (ref.read(readerViewModelProvider(viewKey)).asData?.value ==
-              null) {
-            return;
-          }
-          unawaited(() async {
-            final ({bool keepTicking, ReaderReplaceReaderRouteIntent? replace})
-            tick = await viewModel.advanceAutoPlay(
-              navContext: seriesNavContext,
-              session: routeContext.session,
-            );
-            applyReaderNavigationIntent(context, tick.replace);
-            if (!tick.keepTicking) {
-              timer?.cancel();
-            }
-          }());
-        });
+        void onTick() => _handleTick(
+          context: context,
+          ref: ref,
+          viewKey: viewKey,
+          viewModel: viewModel,
+          seriesNavContext: seriesNavContext,
+          cancelTimer: () => timer?.cancel(),
+        );
+        timer = Timer.periodic(interval, (_) => onTick());
         return () {
           timer?.cancel();
         };
@@ -129,5 +117,33 @@ class ReaderAutoPlayBinder extends HookConsumerWidget {
       ],
     );
     return const SizedBox.shrink();
+  }
+
+  void _handleTick({
+    required BuildContext context,
+    required WidgetRef ref,
+    required ReaderViewModelKey viewKey,
+    required ReaderViewModel viewModel,
+    required ReaderNavContextData? seriesNavContext,
+    required VoidCallback cancelTimer,
+  }) {
+    if (!context.mounted) {
+      cancelTimer();
+      return;
+    }
+    if (ref.read(readerViewModelProvider(viewKey)).asData?.value == null) {
+      return;
+    }
+    unawaited(() async {
+      final ({bool keepTicking, ReaderReplaceReaderRouteIntent? replace}) tick =
+          await viewModel.advanceAutoPlay(
+            navContext: seriesNavContext,
+            session: routeContext.session,
+          );
+      applyReaderNavigationIntent(context, tick.replace);
+      if (!tick.keepTicking) {
+        cancelTimer();
+      }
+    }());
   }
 }

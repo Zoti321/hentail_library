@@ -60,6 +60,29 @@ class SeriesMetadataEditViewState
     }
   }
 
+  void _handleLockChanged({
+    required SeriesMetadataEditSession notifier,
+    required AppLocalizations l10n,
+    required bool? name,
+    required bool? serializationStatus,
+    required bool? totalCount,
+  }) {
+    unawaited(() async {
+      try {
+        await notifier.setLock(
+          name: name,
+          serializationStatus: serializationStatus,
+          totalCount: totalCount,
+        );
+      } catch (error, stackTrace) {
+        logError(AppLog.ui('editSeries'), '设置系列元数据字段锁失败', error, stackTrace);
+        if (mounted) {
+          showErrorSnackbar(context, l10n.commonSaveFailedToast);
+        }
+      }
+    }());
+  }
+
   void _leave() {
     final NavigatorState navigator = Navigator.of(context);
     if (navigator.canPop()) {
@@ -88,27 +111,14 @@ class SeriesMetadataEditViewState
         draft: session.draft,
         locks: session.locks,
         onLockChanged:
-            ({bool? name, bool? serializationStatus, bool? totalCount}) {
-              unawaited(() async {
-                try {
-                  await notifier.setLock(
-                    name: name,
-                    serializationStatus: serializationStatus,
-                    totalCount: totalCount,
-                  );
-                } catch (error, stackTrace) {
-                  logError(
-                    AppLog.ui('editSeries'),
-                    '设置系列元数据字段锁失败',
-                    error,
-                    stackTrace,
-                  );
-                  if (mounted) {
-                    showErrorSnackbar(context, l10n.commonSaveFailedToast);
-                  }
-                }
-              }());
-            },
+            ({bool? name, bool? serializationStatus, bool? totalCount}) =>
+                _handleLockChanged(
+                  notifier: notifier,
+                  l10n: l10n,
+                  name: name,
+                  serializationStatus: serializationStatus,
+                  totalCount: totalCount,
+                ),
         nameError: session.nameError,
         totalCountError: session.totalCountError,
         onDraftChanged: notifier.updateDraft,

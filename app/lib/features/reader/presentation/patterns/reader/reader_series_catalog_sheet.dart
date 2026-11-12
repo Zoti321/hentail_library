@@ -55,13 +55,15 @@ class _ReaderSeriesCatalogBody extends StatelessWidget {
             label: '${i + 1}-${volumes[i].title}',
             leading: const Icon(Symbols.menu_book),
             selected: volumes[i].id == currentVolumeId,
-            onTap: () {
-              onVolumeSelected(volumes[i].id);
-              Navigator.of(context).maybePop();
-            },
+            onTap: () => _handleVolumeTap(context, volumes[i].id),
           ),
         ],
       ],
     );
+  }
+
+  void _handleVolumeTap(BuildContext context, String id) {
+    onVolumeSelected(id);
+    Navigator.of(context).maybePop();
   }
 }

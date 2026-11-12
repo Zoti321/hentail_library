@@ -62,8 +62,8 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
 
   @override
   Widget build(BuildContext context) {
-    final Widget loadingSurface = _buildReaderLoadingSurface(context);
-    final Widget errorPlaceholder = _buildReaderImageErrorPlaceholder(context);
+    const Widget loadingSurface = _ReaderLoadingSurface();
+    const Widget errorPlaceholder = _ReaderImageErrorPlaceholder();
     final ReaderPageImageData imageData = widget.imageData;
     final int? cacheWidth = _readerDecodeCacheWidth(context);
     const FilterQuality filterQuality = kReaderPageFilterQuality;
@@ -71,11 +71,16 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
     if (imageData is ReaderDirPageImageData) {
       final String dirPath = imageData.file.path.trim();
       if (dirPath.isEmpty) {
-        return _wrapWithContextMenu(context, errorPlaceholder);
+        return _ReaderContextMenuRegion(
+          comic: widget.comic,
+          archivePageIndex: widget.imageData.archivePageIndex,
+          child: errorPlaceholder,
+        );
       }
-      return _wrapWithContextMenu(
-        context,
-        ReaderPageFadeIn(
+      return _ReaderContextMenuRegion(
+        comic: widget.comic,
+        archivePageIndex: widget.imageData.archivePageIndex,
+        child: ReaderPageFadeIn(
           enabled: widget.enableCrossfade,
           child: Align(
             alignment: widget.alignment,
@@ -96,7 +101,11 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
       );
     }
     if (imageData is! ReaderArchivePageImageData) {
-      return _wrapWithContextMenu(context, errorPlaceholder);
+      return _ReaderContextMenuRegion(
+        comic: widget.comic,
+        archivePageIndex: widget.imageData.archivePageIndex,
+        child: errorPlaceholder,
+      );
     }
     final ReaderArchivePageImageData archiveData = imageData;
     ref
@@ -116,10 +125,18 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
     return pageAsync.when(
       skipLoadingOnReload: false,
       skipLoadingOnRefresh: false,
-      loading: () => _wrapWithContextMenu(context, loadingSurface),
+      loading: () => _ReaderContextMenuRegion(
+        comic: widget.comic,
+        archivePageIndex: widget.imageData.archivePageIndex,
+        child: loadingSurface,
+      ),
       error: (_, StackTrace _) {
         _scheduleReaderPageReload(archiveData);
-        return _wrapWithContextMenu(context, errorPlaceholder);
+        return _ReaderContextMenuRegion(
+          comic: widget.comic,
+          archivePageIndex: widget.imageData.archivePageIndex,
+          child: errorPlaceholder,
+        );
       },
       data: (ReaderPagePayload page) {
         final Widget content = switch (page) {
@@ -150,7 +167,11 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
             ),
           ),
         };
-        return _wrapWithContextMenu(context, content);
+        return _ReaderContextMenuRegion(
+          comic: widget.comic,
+          archivePageIndex: widget.imageData.archivePageIndex,
+          child: content,
+        );
       },
     );
   }
@@ -169,19 +190,6 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
           width: size.width,
           height: size.height,
         );
-  }
-
-  Widget _wrapWithContextMenu(BuildContext context, Widget child) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onSecondaryTapUp: (TapUpDetails details) {
-        _showContextMenu(context, details.globalPosition);
-      },
-      onLongPressStart: (LongPressStartDetails details) {
-        _showContextMenu(context, details.globalPosition);
-      },
-      child: child,
-    );
   }
 
   Widget _buildArchiveFilePathPage({
@@ -277,12 +285,22 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
       }
     }
   }
+}
 
-  Widget _buildReaderLoadingSurface(BuildContext context) {
+class _ReaderLoadingSurface extends StatelessWidget {
+  const _ReaderLoadingSurface();
+
+  @override
+  Widget build(BuildContext context) {
     return ColoredBox(color: context.reader.readerPlaceholderSurface);
   }
+}
 
-  Widget _buildReaderImageErrorPlaceholder(BuildContext context) {
+class _ReaderImageErrorPlaceholder extends StatelessWidget {
+  const _ReaderImageErrorPlaceholder();
+
+  @override
+  Widget build(BuildContext context) {
     return ColoredBox(
       color: context.reader.readerPlaceholderSurface,
       child: Center(
@@ -294,8 +312,33 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
       ),
     );
   }
+}
 
-  void _showContextMenu(BuildContext context, Offset position) {
+/// 页图右键 / 长按菜单（复制图片）。
+class _ReaderContextMenuRegion extends ConsumerWidget {
+  const _ReaderContextMenuRegion({
+    required this.comic,
+    required this.archivePageIndex,
+    required this.child,
+  });
+
+  final ReaderComicRef comic;
+  final int archivePageIndex;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onSecondaryTapUp: (TapUpDetails details) =>
+          _showContextMenu(context, ref, details.globalPosition),
+      onLongPressStart: (LongPressStartDetails details) =>
+          _showContextMenu(context, ref, details.globalPosition),
+      child: child,
+    );
+  }
+
+  void _showContextMenu(BuildContext context, WidgetRef ref, Offset position) {
     ContextMenuCommon.show(
       context,
       position: position,
@@ -307,23 +350,26 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
         child: ContextMenuActionItem(
           icon: Symbols.content_copy,
           label: context.l10n.readerCopyPageImage,
-          onTap: () {
-            onClose();
-            _copyPageImage(context);
-          },
+          onTap: () => _handleCopyPage(context, ref, onClose),
         ),
       ),
     );
   }
 
-  Future<void> _copyPageImage(BuildContext context) async {
+  void _handleCopyPage(
+    BuildContext context,
+    WidgetRef ref,
+    VoidCallback onClose,
+  ) {
+    onClose();
+    unawaited(_copyPageImage(context, ref));
+  }
+
+  Future<void> _copyPageImage(BuildContext context, WidgetRef ref) async {
     try {
       await ref
           .read(copyPageImageServiceProvider)
-          .execute(
-            comic: widget.comic,
-            archivePageIndex: widget.imageData.archivePageIndex,
-          );
+          .execute(comic: comic, archivePageIndex: archivePageIndex);
       if (context.mounted) {
         showSuccessSnackbar(context, context.l10n.readerCopyPageImageSuccess);
       }

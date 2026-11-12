@@ -166,19 +166,19 @@ class _ReaderSettingsSideSheetBodyState
               leading: Symbols.view_day,
               title: Text(l10n.readerSettingsPageLayout),
               value: Text(_state.pagedLayoutLabel),
-              onTap: () {
-                _apply(
-                  _state.copyWith(
-                    pagedLayoutLabel: _state.pagedLayoutLabel == '单页'
-                        ? '双页'
-                        : '单页',
-                  ),
-                );
-              },
+              onTap: _handleTogglePagedLayout,
             ),
           ],
         ),
       ],
+    );
+  }
+
+  void _handleTogglePagedLayout() {
+    _apply(
+      _state.copyWith(
+        pagedLayoutLabel: _state.pagedLayoutLabel == '单页' ? '双页' : '单页',
+      ),
     );
   }
 }

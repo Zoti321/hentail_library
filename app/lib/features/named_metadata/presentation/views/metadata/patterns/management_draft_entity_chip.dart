@@ -48,6 +48,12 @@ class _ManagementDraftEntityChipState extends State<ManagementDraftEntityChip> {
     super.dispose();
   }
 
+  void _handlePressed() {
+    if (!_focusNode.hasFocus) {
+      _focusNode.requestFocus();
+    }
+  }
+
   void _onFocusChange() {
     if (!_focusNode.hasFocus && !_closing) {
       _closing = true;
@@ -87,11 +93,7 @@ class _ManagementDraftEntityChipState extends State<ManagementDraftEntityChip> {
         width: widget.width,
         staticChrome: true,
         editingFocusNode: _focusNode,
-        onPressed: () {
-          if (!_focusNode.hasFocus) {
-            _focusNode.requestFocus();
-          }
-        },
+        onPressed: _handlePressed,
         child: CallbackShortcuts(
           bindings: M3EFocus.editableInputShortcuts(_focusNode),
           child: EditableText(

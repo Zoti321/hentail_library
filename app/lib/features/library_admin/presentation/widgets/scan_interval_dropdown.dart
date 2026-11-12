@@ -18,6 +18,13 @@ class ScanIntervalDropdown extends StatelessWidget {
   final ValueChanged<ScanInterval> onChanged;
   final bool enabled;
 
+  void _handleSelectionChanged(List<M3EDropdownItem<ScanInterval>> items) {
+    if (items.isEmpty) {
+      return;
+    }
+    onChanged(items.first.value);
+  }
+
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
@@ -43,12 +50,7 @@ class ScanIntervalDropdown extends StatelessWidget {
           color: theme.colorScheme.onSurface,
         ),
       ),
-      onSelectionChanged: (List<M3EDropdownItem<ScanInterval>> items) {
-        if (items.isEmpty) {
-          return;
-        }
-        onChanged(items.first.value);
-      },
+      onSelectionChanged: _handleSelectionChanged,
     );
   }
 }

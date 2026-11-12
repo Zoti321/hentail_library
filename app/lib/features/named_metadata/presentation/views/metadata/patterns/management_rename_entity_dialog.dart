@@ -61,6 +61,12 @@ class _ManagementRenameEntityDialogState
     super.dispose();
   }
 
+  void _handleSubmitted(String _) {
+    if (!_saving) {
+      _submit();
+    }
+  }
+
   Future<void> _submit() async {
     final String name = _controller.text.trim();
     if (name.isEmpty) {
@@ -106,11 +112,7 @@ class _ManagementRenameEntityDialogState
           label: l10n.metadataNewName,
           controller: _controller,
           autofocus: true,
-          onSubmitted: (_) {
-            if (!_saving) {
-              _submit();
-            }
-          },
+          onSubmitted: _handleSubmitted,
         ),
       ),
       bottomDivider: true,

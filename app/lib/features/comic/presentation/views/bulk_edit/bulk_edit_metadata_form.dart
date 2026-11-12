@@ -56,8 +56,6 @@ class BulkEditMetadataFormState extends ConsumerState<BulkEditMetadataForm> {
   BulkMetadataEditSessionNotifier get _sessionNotifier =>
       ref.read(bulkMetadataEditSessionProvider(widget.comicIds).notifier);
 
-  BulkMetadataEditSession get _session => _sessionNotifier.session;
-
   /// 保存入口：校验有改动 → 二次确认 → 返回 patch。无改动时静默返回（与旧弹窗一致）。
   Future<void> confirm() async {
     final AppLocalizations l10n = context.l10n;
@@ -82,106 +80,6 @@ class BulkEditMetadataFormState extends ConsumerState<BulkEditMetadataForm> {
     Navigator.of(context).pop(patch);
   }
 
-  void _addMultiValue(BulkMetadataEditFieldKind kind, String name) {
-    _sessionNotifier.mutate((BulkMetadataEditSession session) {
-      final BulkMetadataEditMultiValueFieldState field =
-          session.multiFields[kind]!;
-      if (field.values.contains(name)) {
-        return;
-      }
-      field.values = <String>[...field.values, name];
-      session.markDirty(kind);
-    });
-  }
-
-  void _removeMultiValue(BulkMetadataEditFieldKind kind, String name) {
-    _sessionNotifier.mutate((BulkMetadataEditSession session) {
-      final BulkMetadataEditMultiValueFieldState field =
-          session.multiFields[kind]!;
-      field.values = field.values.where((String v) => v != name).toList();
-      session.markDirty(kind);
-    });
-  }
-
-  void _toggleLanguage(String canonical) {
-    final BulkMetadataEditMultiValueFieldState field =
-        _session.multiFields[BulkMetadataEditFieldKind.languages]!;
-    if (field.values.contains(canonical)) {
-      _removeMultiValue(BulkMetadataEditFieldKind.languages, canonical);
-    } else {
-      _addMultiValue(BulkMetadataEditFieldKind.languages, canonical);
-    }
-  }
-
-  String _fieldLabel(AppLocalizations l10n, BulkMetadataEditFieldKind kind) {
-    return switch (kind) {
-      BulkMetadataEditFieldKind.tags => l10n.bulkEditMetadataFieldTags,
-      BulkMetadataEditFieldKind.authors => l10n.bulkEditMetadataFieldAuthors,
-      BulkMetadataEditFieldKind.languages =>
-        l10n.bulkEditMetadataFieldLanguages,
-      BulkMetadataEditFieldKind.parodies => l10n.bulkEditMetadataFieldParodies,
-      BulkMetadataEditFieldKind.characters =>
-        l10n.bulkEditMetadataFieldCharacters,
-      BulkMetadataEditFieldKind.contentRating =>
-        l10n.bulkEditMetadataFieldContentRating,
-      BulkMetadataEditFieldKind.description =>
-        l10n.bulkEditMetadataFieldDescription,
-      BulkMetadataEditFieldKind.publishedAt =>
-        l10n.bulkEditMetadataFieldPublishedAt,
-    };
-  }
-
-  String _multiOpLabel(
-    AppLocalizations l10n,
-    ComicMetadataBulkMultiValueOp op,
-  ) {
-    return switch (op) {
-      ComicMetadataBulkMultiValueOp.add => l10n.bulkEditMetadataOpAdd,
-      ComicMetadataBulkMultiValueOp.remove => l10n.bulkEditMetadataOpRemove,
-      ComicMetadataBulkMultiValueOp.replace => l10n.bulkEditMetadataOpReplace,
-    };
-  }
-
-  String _scalarOpLabel(AppLocalizations l10n, ComicMetadataBulkScalarOp op) {
-    return switch (op) {
-      ComicMetadataBulkScalarOp.replace => l10n.bulkEditMetadataOpReplace,
-      ComicMetadataBulkScalarOp.clear => l10n.bulkEditMetadataOpClear,
-    };
-  }
-
-  BulkMetadataEditScalarFieldState _scalarState(
-    BulkMetadataEditFieldKind kind,
-  ) {
-    return kind == BulkMetadataEditFieldKind.description
-        ? _session.descriptionField
-        : _session.publishedAtField;
-  }
-
-  bool _isMixed(BulkMetadataEditFieldKind kind) {
-    return switch (kind) {
-      BulkMetadataEditFieldKind.description =>
-        _session.descriptionField.mixedValues,
-      BulkMetadataEditFieldKind.publishedAt =>
-        _session.publishedAtField.mixedValues,
-      BulkMetadataEditFieldKind.contentRating =>
-        _session.contentRatingField.mixedValues,
-      BulkMetadataEditFieldKind.languages ||
-      BulkMetadataEditFieldKind.authors ||
-      BulkMetadataEditFieldKind.tags ||
-      BulkMetadataEditFieldKind.parodies ||
-      BulkMetadataEditFieldKind.characters =>
-        _session.multiFields[kind]!.mixedValues,
-    };
-  }
-
-  /// 多种值提示（操作模式由分段胶囊表达，不在标题行重复）。
-  String? _mixedHint(AppLocalizations l10n, BulkMetadataEditFieldKind kind) {
-    if (_session.isFieldDirty(kind)) {
-      return null;
-    }
-    return _isMixed(kind) ? l10n.bulkEditMetadataMixedValues : null;
-  }
-
   void _selectTabIndex(int index) {
     _selectTab(_BulkEditTab.values[index]);
   }
@@ -191,90 +89,6 @@ class BulkEditMetadataFormState extends ConsumerState<BulkEditMetadataForm> {
       _detailTransitionReverse = tab.index < _tab.index;
       _tab = tab;
     });
-  }
-
-  Widget _scrollPane(Widget child) {
-    return ScrollConfiguration(
-      behavior: MetadataEditScrollBehavior(),
-      child: SingleChildScrollView(primary: false, child: child),
-    );
-  }
-
-  Widget _buildTabBar(AppLocalizations l10n) {
-    return SegmentedCapsuleBar(
-      segments: <SegmentedCapsuleSegment>[
-        SegmentedCapsuleSegment(label: l10n.dialogEditMetadataTabGeneral),
-        SegmentedCapsuleSegment(label: l10n.dialogEditMetadataTabAuthorsTags),
-      ],
-      selectedIndex: _tab.index,
-      onSelected: _selectTabIndex,
-    );
-  }
-
-  Widget _buildTabFieldSections(
-    AppLocalizations l10n,
-    List<BulkMetadataEditFieldKind> fields,
-    M3ESpacing spacing,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        for (final BulkMetadataEditFieldKind kind in fields) ...<Widget>[
-          _buildSection(l10n, kind),
-          SizedBox(height: spacing.lg),
-        ],
-      ],
-    );
-  }
-
-  Widget _buildListDetailTabLayout(
-    AppLocalizations l10n,
-    List<BulkMetadataEditFieldKind> fields,
-    M3ESpacing spacing,
-    double paneGap,
-  ) {
-    return Expanded(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          SizedBox(
-            width: MetadataEditFormMetrics.sideTabColumnWidth,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                ListDetailNavItem(
-                  label: l10n.dialogEditMetadataTabGeneral,
-                  selected: _tab == _BulkEditTab.general,
-                  onTap: () => _selectTab(_BulkEditTab.general),
-                ),
-                ListDetailNavItem(
-                  label: l10n.dialogEditMetadataTabAuthorsTags,
-                  selected: _tab == _BulkEditTab.authorsAndTags,
-                  onTap: () => _selectTab(_BulkEditTab.authorsAndTags),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(width: paneGap),
-          Expanded(
-            child: ListDetailDetailTransition(
-              switchKey: _tab,
-              reverse: _detailTransitionReverse,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal:
-                      MetadataEditFormMetrics.detailContentHorizontalInset,
-                ),
-                child: _scrollPane(
-                  _buildTabFieldSections(l10n, fields, spacing),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   @override
@@ -290,14 +104,51 @@ class BulkEditMetadataFormState extends ConsumerState<BulkEditMetadataForm> {
         ),
       );
     }
-    final AppLocalizations l10n = context.l10n;
-    final M3ESpacing spacing = M3ETheme.of(context).spacing;
     final WindowSizeClass sizeClass = windowSizeClassOf(context);
-    final double paneGap = MetadataEditFormMetrics.sectionGap(sizeClass);
-    final List<BulkMetadataEditFieldKind> fields = _fieldsFor(_tab);
-    final bool useListDetail =
-        sizeClass.index >= WindowSizeClass.expanded.index;
+    return _BulkEditScaffold(
+      notifier: _sessionNotifier,
+      tab: _tab,
+      detailTransitionReverse: _detailTransitionReverse,
+      fields: _fieldsFor(_tab),
+      spacing: M3ETheme.of(context).spacing,
+      paneGap: MetadataEditFormMetrics.sectionGap(sizeClass),
+      useListDetail: sizeClass.index >= WindowSizeClass.expanded.index,
+      onTabIndexSelected: _selectTabIndex,
+      onTabSelected: _selectTab,
+    );
+  }
+}
 
+class _BulkEditScaffold extends StatelessWidget {
+  const _BulkEditScaffold({
+    required this.notifier,
+    required this.tab,
+    required this.detailTransitionReverse,
+    required this.fields,
+    required this.spacing,
+    required this.paneGap,
+    required this.useListDetail,
+    required this.onTabIndexSelected,
+    required this.onTabSelected,
+  });
+
+  final BulkMetadataEditSessionNotifier notifier;
+  final _BulkEditTab tab;
+  final bool detailTransitionReverse;
+  final List<BulkMetadataEditFieldKind> fields;
+  final M3ESpacing spacing;
+  final double paneGap;
+  final bool useListDetail;
+  final ValueChanged<int> onTabIndexSelected;
+  final ValueChanged<_BulkEditTab> onTabSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final Widget sections = _BulkSectionList(
+      notifier: notifier,
+      fields: fields,
+      spacing: spacing,
+    );
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final double viewportHeight =
@@ -311,15 +162,27 @@ class BulkEditMetadataFormState extends ConsumerState<BulkEditMetadataForm> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               if (!useListDetail) ...<Widget>[
-                _buildTabBar(l10n),
+                _BulkTabBar(selectedTab: tab, onSelected: onTabIndexSelected),
                 SizedBox(height: spacing.lg),
               ],
               if (useListDetail)
-                _buildListDetailTabLayout(l10n, fields, spacing, paneGap)
+                _BulkListDetailLayout(
+                  notifier: notifier,
+                  tab: tab,
+                  fields: fields,
+                  spacing: spacing,
+                  paneGap: paneGap,
+                  detailTransitionReverse: detailTransitionReverse,
+                  onTabSelected: onTabSelected,
+                )
               else
                 Expanded(
-                  child: _scrollPane(
-                    _buildTabFieldSections(l10n, fields, spacing),
+                  child: ScrollConfiguration(
+                    behavior: MetadataEditScrollBehavior(),
+                    child: SingleChildScrollView(
+                      primary: false,
+                      child: sections,
+                    ),
                   ),
                 ),
             ],
@@ -328,155 +191,368 @@ class BulkEditMetadataFormState extends ConsumerState<BulkEditMetadataForm> {
       },
     );
   }
+}
 
-  Widget _buildSection(AppLocalizations l10n, BulkMetadataEditFieldKind kind) {
+class _BulkTabBar extends StatelessWidget {
+  const _BulkTabBar({required this.selectedTab, required this.onSelected});
+
+  final _BulkEditTab selectedTab;
+  final ValueChanged<int> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
+    return SegmentedCapsuleBar(
+      segments: <SegmentedCapsuleSegment>[
+        SegmentedCapsuleSegment(label: l10n.dialogEditMetadataTabGeneral),
+        SegmentedCapsuleSegment(label: l10n.dialogEditMetadataTabAuthorsTags),
+      ],
+      selectedIndex: selectedTab.index,
+      onSelected: onSelected,
+    );
+  }
+}
+
+class _BulkListDetailLayout extends StatelessWidget {
+  const _BulkListDetailLayout({
+    required this.notifier,
+    required this.tab,
+    required this.fields,
+    required this.spacing,
+    required this.paneGap,
+    required this.detailTransitionReverse,
+    required this.onTabSelected,
+  });
+
+  final BulkMetadataEditSessionNotifier notifier;
+  final _BulkEditTab tab;
+  final List<BulkMetadataEditFieldKind> fields;
+  final M3ESpacing spacing;
+  final double paneGap;
+  final bool detailTransitionReverse;
+  final ValueChanged<_BulkEditTab> onTabSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
+    return Expanded(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          SizedBox(
+            width: MetadataEditFormMetrics.sideTabColumnWidth,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                ListDetailNavItem(
+                  label: l10n.dialogEditMetadataTabGeneral,
+                  selected: tab == _BulkEditTab.general,
+                  onTap: () => onTabSelected(_BulkEditTab.general),
+                ),
+                ListDetailNavItem(
+                  label: l10n.dialogEditMetadataTabAuthorsTags,
+                  selected: tab == _BulkEditTab.authorsAndTags,
+                  onTap: () => onTabSelected(_BulkEditTab.authorsAndTags),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(width: paneGap),
+          Expanded(
+            child: ListDetailDetailTransition(
+              switchKey: tab,
+              reverse: detailTransitionReverse,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal:
+                      MetadataEditFormMetrics.detailContentHorizontalInset,
+                ),
+                child: ScrollConfiguration(
+                  behavior: MetadataEditScrollBehavior(),
+                  child: SingleChildScrollView(
+                    primary: false,
+                    child: _BulkSectionList(
+                      notifier: notifier,
+                      fields: fields,
+                      spacing: spacing,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BulkSectionList extends StatelessWidget {
+  const _BulkSectionList({
+    required this.notifier,
+    required this.fields,
+    required this.spacing,
+  });
+
+  final BulkMetadataEditSessionNotifier notifier;
+  final List<BulkMetadataEditFieldKind> fields;
+  final M3ESpacing spacing;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        for (final BulkMetadataEditFieldKind kind in fields) ...<Widget>[
+          _BulkFieldSection(kind: kind, notifier: notifier),
+          SizedBox(height: spacing.lg),
+        ],
+      ],
+    );
+  }
+}
+
+class _BulkFieldSection extends StatelessWidget {
+  const _BulkFieldSection({required this.kind, required this.notifier});
+
+  final BulkMetadataEditFieldKind kind;
+  final BulkMetadataEditSessionNotifier notifier;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
     final M3ESpacing spacing = M3ETheme.of(context).spacing;
-    final String label = _fieldLabel(l10n, kind);
-    final String? mixedHint = _mixedHint(l10n, kind);
+    final String label = _bulkFieldLabel(l10n, kind);
+    final String? mixedHint = _bulkMixedHint(l10n, kind, notifier.session);
+    final Widget header = _SectionHeader(label: label, hint: mixedHint);
 
     if (kind == BulkMetadataEditFieldKind.contentRating) {
+      final bool isR18 = notifier.session.contentRatingField.isR18;
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          _SectionHeader(label: label, hint: mixedHint),
+          header,
           SizedBox(height: spacing.sm),
           SettingsSwitchTile(
             leading: Symbols.eighteen_up_rating,
-            title: Text(
-              _session.contentRatingField.isR18 ? 'R18' : l10n.filterAgeAllAges,
-            ),
+            title: Text(isR18 ? 'R18' : l10n.filterAgeAllAges),
             description: Text(label),
-            value: _session.contentRatingField.isR18,
-            onChanged: (bool value) {
-              _sessionNotifier.mutate((BulkMetadataEditSession session) {
-                session.contentRatingField.isR18 = value;
-                session.markDirty(kind);
-              });
-            },
+            value: isR18,
+            onChanged: _handleR18Changed,
           ),
         ],
       );
     }
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        _SectionHeader(label: label, hint: mixedHint),
+        header,
         SizedBox(height: spacing.sm),
-        ..._buildFieldBody(l10n, kind),
+        _BulkFieldBody(kind: kind, notifier: notifier),
       ],
     );
   }
 
-  List<Widget> _buildFieldBody(
-    AppLocalizations l10n,
-    BulkMetadataEditFieldKind kind,
-  ) {
-    final SizedBox gap = SizedBox(height: M3ETheme.of(context).spacing.sm);
+  void _handleR18Changed(bool value) {
+    notifier.mutate((BulkMetadataEditSession session) {
+      session.contentRatingField.isR18 = value;
+      session.markDirty(kind);
+    });
+  }
+}
+
+class _BulkFieldBody extends StatelessWidget {
+  const _BulkFieldBody({required this.kind, required this.notifier});
+
+  final BulkMetadataEditFieldKind kind;
+  final BulkMetadataEditSessionNotifier notifier;
+
+  @override
+  Widget build(BuildContext context) {
     return switch (kind) {
       BulkMetadataEditFieldKind.description ||
-      BulkMetadataEditFieldKind.publishedAt => _buildScalarBody(
-        l10n,
-        kind,
-        gap,
+      BulkMetadataEditFieldKind.publishedAt => _BulkScalarBody(
+        kind: kind,
+        notifier: notifier,
       ),
-      BulkMetadataEditFieldKind.languages => <Widget>[
-        _buildOpBar(l10n, kind, gap),
-        ComicLanguageQuickPick(
-          selected: _session.multiFields[kind]!.values,
-          onCanonicalToggled: _toggleLanguage,
-        ),
-        gap,
-        _buildTagInput(l10n, kind),
-      ],
+      BulkMetadataEditFieldKind.languages => _BulkLanguageBody(
+        notifier: notifier,
+      ),
       BulkMetadataEditFieldKind.tags ||
       BulkMetadataEditFieldKind.authors ||
       BulkMetadataEditFieldKind.parodies ||
-      BulkMetadataEditFieldKind.characters => <Widget>[
-        _buildOpBar(l10n, kind, gap),
-        _buildTagInput(l10n, kind),
-      ],
-      BulkMetadataEditFieldKind.contentRating => const <Widget>[],
+      BulkMetadataEditFieldKind.characters => _BulkMultiValueBody(
+        kind: kind,
+        notifier: notifier,
+      ),
+      BulkMetadataEditFieldKind.contentRating => const SizedBox.shrink(),
     };
   }
+}
 
-  List<Widget> _buildScalarBody(
-    AppLocalizations l10n,
-    BulkMetadataEditFieldKind kind,
-    SizedBox gap,
-  ) {
-    final BulkMetadataEditScalarFieldState state = _scalarState(kind);
+class _BulkScalarBody extends StatelessWidget {
+  const _BulkScalarBody({required this.kind, required this.notifier});
+
+  final BulkMetadataEditFieldKind kind;
+  final BulkMetadataEditSessionNotifier notifier;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
+    final BulkMetadataEditSession session = notifier.session;
+    final BulkMetadataEditScalarFieldState state = _bulkScalarState(
+      session,
+      kind,
+    );
     final bool enabled = state.op == ComicMetadataBulkScalarOp.replace;
     final Widget editor = kind == BulkMetadataEditFieldKind.description
         ? OutlinedTextField(
-            label: _fieldLabel(l10n, kind),
-            initialValue: _session.descriptionField.description,
+            label: _bulkFieldLabel(l10n, kind),
+            initialValue: session.descriptionField.description,
             maxLines: 4,
             enabled: enabled,
-            onChanged: (String value) {
-              _sessionNotifier.mutate((BulkMetadataEditSession session) {
-                session.descriptionField.description = value;
-                session.markDirty(kind);
-              });
-            },
+            onChanged: _handleDescriptionChanged,
           )
         : _Disabled(
             disabled: !enabled,
             child: PublishedDateTextField(
-              label: _fieldLabel(l10n, kind),
-              value: _session.publishedAtField.publishedAt == null
+              label: _bulkFieldLabel(l10n, kind),
+              value: session.publishedAtField.publishedAt == null
                   ? ''
                   : DateFormat('yyyy-MM-dd')
-                        .format(_session.publishedAtField.publishedAt!),
-              onChanged: (String value) {
-                _sessionNotifier.mutate((BulkMetadataEditSession session) {
-                  session.publishedAtField.publishedAt = DateTime.tryParse(
-                    value.trim(),
-                  );
-                  session.markDirty(kind);
-                });
-              },
+                        .format(session.publishedAtField.publishedAt!),
+              onChanged: _handlePublishedChanged,
             ),
           );
-    return <Widget>[_buildOpBar(l10n, kind, gap), editor];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        _BulkOpBar(kind: kind, notifier: notifier),
+        editor,
+      ],
+    );
   }
 
-  Widget _buildOpBar(
-    AppLocalizations l10n,
-    BulkMetadataEditFieldKind kind,
-    SizedBox gap,
-  ) {
+  void _handleDescriptionChanged(String value) {
+    notifier.mutate((BulkMetadataEditSession session) {
+      session.descriptionField.description = value;
+      session.markDirty(kind);
+    });
+  }
+
+  void _handlePublishedChanged(String value) {
+    notifier.mutate((BulkMetadataEditSession session) {
+      session.publishedAtField.publishedAt = DateTime.tryParse(value.trim());
+      session.markDirty(kind);
+    });
+  }
+}
+
+class _BulkLanguageBody extends StatelessWidget {
+  const _BulkLanguageBody({required this.notifier});
+
+  final BulkMetadataEditSessionNotifier notifier;
+
+  static const BulkMetadataEditFieldKind _kind =
+      BulkMetadataEditFieldKind.languages;
+
+  @override
+  Widget build(BuildContext context) {
+    final M3ESpacing spacing = M3ETheme.of(context).spacing;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        _BulkOpBar(kind: _kind, notifier: notifier),
+        ComicLanguageQuickPick(
+          selected: notifier.session.multiFields[_kind]!.values,
+          onCanonicalToggled: _handleCanonicalToggled,
+        ),
+        SizedBox(height: spacing.sm),
+        _BulkTagInput(kind: _kind, notifier: notifier),
+      ],
+    );
+  }
+
+  void _handleCanonicalToggled(String canonical) {
+    final List<String> values = notifier.session.multiFields[_kind]!.values;
+    if (values.contains(canonical)) {
+      notifier.mutate((BulkMetadataEditSession session) {
+        final BulkMetadataEditMultiValueFieldState field =
+            session.multiFields[_kind]!;
+        field.values = field.values
+            .where((String v) => v != canonical)
+            .toList();
+        session.markDirty(_kind);
+      });
+      return;
+    }
+    notifier.mutate((BulkMetadataEditSession session) {
+      final BulkMetadataEditMultiValueFieldState field =
+          session.multiFields[_kind]!;
+      if (field.values.contains(canonical)) {
+        return;
+      }
+      field.values = <String>[...field.values, canonical];
+      session.markDirty(_kind);
+    });
+  }
+}
+
+class _BulkMultiValueBody extends StatelessWidget {
+  const _BulkMultiValueBody({required this.kind, required this.notifier});
+
+  final BulkMetadataEditFieldKind kind;
+  final BulkMetadataEditSessionNotifier notifier;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        _BulkOpBar(kind: kind, notifier: notifier),
+        _BulkTagInput(kind: kind, notifier: notifier),
+      ],
+    );
+  }
+}
+
+class _BulkOpBar extends StatelessWidget {
+  const _BulkOpBar({required this.kind, required this.notifier});
+
+  final BulkMetadataEditFieldKind kind;
+  final BulkMetadataEditSessionNotifier notifier;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
+    final M3ESpacing spacing = M3ETheme.of(context).spacing;
     if (kind == BulkMetadataEditFieldKind.description ||
         kind == BulkMetadataEditFieldKind.publishedAt) {
-      final BulkMetadataEditScalarFieldState state = _scalarState(kind);
+      final BulkMetadataEditScalarFieldState state = _bulkScalarState(
+        notifier.session,
+        kind,
+      );
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           SegmentedCapsuleBar(
             segments: ComicMetadataBulkScalarOp.values
                 .map(
-                  (ComicMetadataBulkScalarOp op) =>
-                      SegmentedCapsuleSegment(label: _scalarOpLabel(l10n, op)),
+                  (ComicMetadataBulkScalarOp op) => SegmentedCapsuleSegment(
+                    label: _bulkScalarOpLabel(l10n, op),
+                  ),
                 )
                 .toList(growable: false),
             selectedIndex: state.op.index,
-            onSelected: (int index) {
-              _sessionNotifier.mutate((BulkMetadataEditSession session) {
-                final BulkMetadataEditScalarFieldState field =
-                    kind == BulkMetadataEditFieldKind.description
-                    ? session.descriptionField
-                    : session.publishedAtField;
-                field.op = ComicMetadataBulkScalarOp.values[index];
-                session.markDirty(kind);
-              });
-            },
+            onSelected: _handleScalarSelected,
           ),
-          gap,
+          SizedBox(height: spacing.sm),
         ],
       );
     }
     final BulkMetadataEditMultiValueFieldState state =
-        _session.multiFields[kind]!;
+        notifier.session.multiFields[kind]!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
@@ -484,46 +560,164 @@ class BulkEditMetadataFormState extends ConsumerState<BulkEditMetadataForm> {
           segments: ComicMetadataBulkMultiValueOp.values
               .map(
                 (ComicMetadataBulkMultiValueOp op) =>
-                    SegmentedCapsuleSegment(label: _multiOpLabel(l10n, op)),
+                    SegmentedCapsuleSegment(label: _bulkMultiOpLabel(l10n, op)),
               )
               .toList(growable: false),
           selectedIndex: state.op.index,
-          onSelected: (int index) {
-            _sessionNotifier.mutate((BulkMetadataEditSession session) {
-              session.multiFields[kind]!.op =
-                  ComicMetadataBulkMultiValueOp.values[index];
-              session.markDirty(kind);
-            });
-          },
+          onSelected: _handleMultiSelected,
         ),
-        gap,
+        SizedBox(height: spacing.sm),
       ],
     );
   }
 
-  String _tagInputLabel(AppLocalizations l10n, BulkMetadataEditFieldKind kind) {
-    return switch (kind) {
-      BulkMetadataEditFieldKind.tags => l10n.metadataAddTag,
-      BulkMetadataEditFieldKind.authors => l10n.metadataAddAuthor,
-      BulkMetadataEditFieldKind.parodies => l10n.metadataAddParody,
-      BulkMetadataEditFieldKind.characters => l10n.metadataAddCharacter,
-      BulkMetadataEditFieldKind.languages => l10n.comicLanguageLabel(
-        ComicLanguageNames.other,
-      ),
-      BulkMetadataEditFieldKind.description ||
-      BulkMetadataEditFieldKind.publishedAt ||
-      BulkMetadataEditFieldKind.contentRating => l10n.metadataAdd,
-    };
+  void _handleScalarSelected(int index) {
+    notifier.mutate((BulkMetadataEditSession session) {
+      final BulkMetadataEditScalarFieldState field =
+          kind == BulkMetadataEditFieldKind.description
+          ? session.descriptionField
+          : session.publishedAtField;
+      field.op = ComicMetadataBulkScalarOp.values[index];
+      session.markDirty(kind);
+    });
   }
 
-  Widget _buildTagInput(AppLocalizations l10n, BulkMetadataEditFieldKind kind) {
+  void _handleMultiSelected(int index) {
+    notifier.mutate((BulkMetadataEditSession session) {
+      session.multiFields[kind]!.op =
+          ComicMetadataBulkMultiValueOp.values[index];
+      session.markDirty(kind);
+    });
+  }
+}
+
+class _BulkTagInput extends StatelessWidget {
+  const _BulkTagInput({required this.kind, required this.notifier});
+
+  final BulkMetadataEditFieldKind kind;
+  final BulkMetadataEditSessionNotifier notifier;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
     return TagInputField(
       label: _tagInputLabel(l10n, kind),
-      tags: _session.multiFields[kind]!.values,
-      onTagCommitted: (String name) => _addMultiValue(kind, name),
-      onTagRemoved: (String name) => _removeMultiValue(kind, name),
+      tags: notifier.session.multiFields[kind]!.values,
+      onTagCommitted: _handleAdded,
+      onTagRemoved: _handleRemoved,
     );
   }
+
+  void _handleAdded(String name) {
+    notifier.mutate((BulkMetadataEditSession session) {
+      final BulkMetadataEditMultiValueFieldState field =
+          session.multiFields[kind]!;
+      if (field.values.contains(name)) {
+        return;
+      }
+      field.values = <String>[...field.values, name];
+      session.markDirty(kind);
+    });
+  }
+
+  void _handleRemoved(String name) {
+    notifier.mutate((BulkMetadataEditSession session) {
+      final BulkMetadataEditMultiValueFieldState field =
+          session.multiFields[kind]!;
+      field.values = field.values.where((String v) => v != name).toList();
+      session.markDirty(kind);
+    });
+  }
+}
+
+String _bulkFieldLabel(AppLocalizations l10n, BulkMetadataEditFieldKind kind) {
+  return switch (kind) {
+    BulkMetadataEditFieldKind.tags => l10n.bulkEditMetadataFieldTags,
+    BulkMetadataEditFieldKind.authors => l10n.bulkEditMetadataFieldAuthors,
+    BulkMetadataEditFieldKind.languages => l10n.bulkEditMetadataFieldLanguages,
+    BulkMetadataEditFieldKind.parodies => l10n.bulkEditMetadataFieldParodies,
+    BulkMetadataEditFieldKind.characters =>
+      l10n.bulkEditMetadataFieldCharacters,
+    BulkMetadataEditFieldKind.contentRating =>
+      l10n.bulkEditMetadataFieldContentRating,
+    BulkMetadataEditFieldKind.description =>
+      l10n.bulkEditMetadataFieldDescription,
+    BulkMetadataEditFieldKind.publishedAt =>
+      l10n.bulkEditMetadataFieldPublishedAt,
+  };
+}
+
+String _bulkMultiOpLabel(
+  AppLocalizations l10n,
+  ComicMetadataBulkMultiValueOp op,
+) {
+  return switch (op) {
+    ComicMetadataBulkMultiValueOp.add => l10n.bulkEditMetadataOpAdd,
+    ComicMetadataBulkMultiValueOp.remove => l10n.bulkEditMetadataOpRemove,
+    ComicMetadataBulkMultiValueOp.replace => l10n.bulkEditMetadataOpReplace,
+  };
+}
+
+String _bulkScalarOpLabel(AppLocalizations l10n, ComicMetadataBulkScalarOp op) {
+  return switch (op) {
+    ComicMetadataBulkScalarOp.replace => l10n.bulkEditMetadataOpReplace,
+    ComicMetadataBulkScalarOp.clear => l10n.bulkEditMetadataOpClear,
+  };
+}
+
+String _tagInputLabel(AppLocalizations l10n, BulkMetadataEditFieldKind kind) {
+  return switch (kind) {
+    BulkMetadataEditFieldKind.tags => l10n.metadataAddTag,
+    BulkMetadataEditFieldKind.authors => l10n.metadataAddAuthor,
+    BulkMetadataEditFieldKind.parodies => l10n.metadataAddParody,
+    BulkMetadataEditFieldKind.characters => l10n.metadataAddCharacter,
+    BulkMetadataEditFieldKind.languages => l10n.comicLanguageLabel(
+      ComicLanguageNames.other,
+    ),
+    BulkMetadataEditFieldKind.description ||
+    BulkMetadataEditFieldKind.publishedAt ||
+    BulkMetadataEditFieldKind.contentRating => l10n.metadataAdd,
+  };
+}
+
+BulkMetadataEditScalarFieldState _bulkScalarState(
+  BulkMetadataEditSession session,
+  BulkMetadataEditFieldKind kind,
+) {
+  return kind == BulkMetadataEditFieldKind.description
+      ? session.descriptionField
+      : session.publishedAtField;
+}
+
+bool _bulkIsMixed(
+  BulkMetadataEditSession session,
+  BulkMetadataEditFieldKind kind,
+) {
+  return switch (kind) {
+    BulkMetadataEditFieldKind.description =>
+      session.descriptionField.mixedValues,
+    BulkMetadataEditFieldKind.publishedAt =>
+      session.publishedAtField.mixedValues,
+    BulkMetadataEditFieldKind.contentRating =>
+      session.contentRatingField.mixedValues,
+    BulkMetadataEditFieldKind.languages ||
+    BulkMetadataEditFieldKind.authors ||
+    BulkMetadataEditFieldKind.tags ||
+    BulkMetadataEditFieldKind.parodies ||
+    BulkMetadataEditFieldKind.characters =>
+      session.multiFields[kind]!.mixedValues,
+  };
+}
+
+String? _bulkMixedHint(
+  AppLocalizations l10n,
+  BulkMetadataEditFieldKind kind,
+  BulkMetadataEditSession session,
+) {
+  if (session.isFieldDirty(kind)) {
+    return null;
+  }
+  return _bulkIsMixed(session, kind) ? l10n.bulkEditMetadataMixedValues : null;
 }
 
 class _SectionHeader extends StatelessWidget {

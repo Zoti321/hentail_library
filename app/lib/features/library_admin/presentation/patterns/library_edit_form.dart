@@ -125,19 +125,6 @@ class _LibraryEditFormState extends State<LibraryEditForm> {
     });
   }
 
-  Widget _detailTransition(Widget child) {
-    return ListDetailDetailTransition(
-      switchKey: _tab,
-      reverse: _detailTransitionReverse,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: LibraryEditFormMetrics.detailContentHorizontalInset,
-        ),
-        child: child,
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
@@ -153,19 +140,13 @@ class _LibraryEditFormState extends State<LibraryEditForm> {
         rootPath: _isRemote ? null : form.rootPath,
         rootError: _isRemote ? null : validation?.rootError,
         enabled: widget.enabled,
-        onBrowseRoot: _isRemote
-            ? null
-            : () {
-                widget.onBrowseRoot?.call();
-              },
-        onNameChanged: (String value) {
-          _patch((LibraryForm f) => f.copyWith(name: value));
-        },
+        onBrowseRoot: _isRemote ? null : () => widget.onBrowseRoot?.call(),
+        onNameChanged: (String value) =>
+            _patch((LibraryForm f) => f.copyWith(name: value)),
         onRootChanged: _isRemote
             ? null
-            : (String value) {
-                _patch((LibraryForm f) => f.copyWith(rootPath: value));
-              },
+            : (String value) =>
+                  _patch((LibraryForm f) => f.copyWith(rootPath: value)),
       ),
       _LibraryEditTab.webDav => _WebDavTab(
         rootPath: form.rootPath,
@@ -176,18 +157,14 @@ class _LibraryEditFormState extends State<LibraryEditForm> {
         rootError: validation?.rootError,
         passwordError: validation?.passwordError,
         enabled: widget.enabled,
-        onRootChanged: (String value) {
-          _patch((LibraryForm f) => f.copyWith(rootPath: value));
-        },
-        onUsernameChanged: (String value) {
-          _patch((LibraryForm f) => f.copyWith(username: value));
-        },
-        onPasswordChanged: (String value) {
-          _patch((LibraryForm f) => f.copyWith(password: value));
-        },
-        onAllowHttpChanged: (bool value) {
-          _patch((LibraryForm f) => f.copyWith(allowHttp: value));
-        },
+        onRootChanged: (String value) =>
+            _patch((LibraryForm f) => f.copyWith(rootPath: value)),
+        onUsernameChanged: (String value) =>
+            _patch((LibraryForm f) => f.copyWith(username: value)),
+        onPasswordChanged: (String value) =>
+            _patch((LibraryForm f) => f.copyWith(password: value)),
+        onAllowHttpChanged: (bool value) =>
+            _patch((LibraryForm f) => f.copyWith(allowHttp: value)),
       ),
       _LibraryEditTab.scanner => _ScannerTab(
         scanOnStartup: form.scanOnStartup,
@@ -196,12 +173,10 @@ class _LibraryEditFormState extends State<LibraryEditForm> {
             .toSet(),
         selectableResourceFormatCategories: _selectableResourceFormatCategories,
         enabled: widget.enabled,
-        onScanOnStartupChanged: (bool value) {
-          _patch((LibraryForm f) => f.copyWith(scanOnStartup: value));
-        },
-        onScanIntervalChanged: (ScanInterval value) {
-          _patch((LibraryForm f) => f.copyWith(scanInterval: value));
-        },
+        onScanOnStartupChanged: (bool value) =>
+            _patch((LibraryForm f) => f.copyWith(scanOnStartup: value)),
+        onScanIntervalChanged: (ScanInterval value) =>
+            _patch((LibraryForm f) => f.copyWith(scanInterval: value)),
         onResourceFormatCategoryChanged: _setResourceFormatCategory,
       ),
     };
@@ -227,9 +202,19 @@ class _LibraryEditFormState extends State<LibraryEditForm> {
               ),
               SizedBox(height: gap),
               if (boundedHeight)
-                Flexible(child: _detailTransition(scrollableTabBody))
+                Flexible(
+                  child: _DetailTransition(
+                    tab: _tab,
+                    reverse: _detailTransitionReverse,
+                    child: scrollableTabBody,
+                  ),
+                )
               else
-                _detailTransition(tabBody),
+                _DetailTransition(
+                  tab: _tab,
+                  reverse: _detailTransitionReverse,
+                  child: tabBody,
+                ),
             ],
           );
         }
@@ -247,7 +232,13 @@ class _LibraryEditFormState extends State<LibraryEditForm> {
               ),
             ),
             SizedBox(width: gap),
-            Expanded(child: _detailTransition(scrollableTabBody)),
+            Expanded(
+              child: _DetailTransition(
+                tab: _tab,
+                reverse: _detailTransitionReverse,
+                child: scrollableTabBody,
+              ),
+            ),
           ],
         );
       },
@@ -601,6 +592,32 @@ class _ResourceFormatCategoryRow extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _DetailTransition extends StatelessWidget {
+  const _DetailTransition({
+    required this.tab,
+    required this.reverse,
+    required this.child,
+  });
+
+  final _LibraryEditTab tab;
+  final bool reverse;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListDetailDetailTransition(
+      switchKey: tab,
+      reverse: reverse,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: LibraryEditFormMetrics.detailContentHorizontalInset,
+        ),
+        child: child,
       ),
     );
   }

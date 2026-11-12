@@ -207,8 +207,9 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
                   name: 'Default',
-                  builder: (BuildContext context) =>
-                      const Md3eWidgetbookScope(child: Md3eTagInputFieldPreview()),
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
+                    child: Md3eTagInputFieldPreview(),
+                  ),
                 ),
               ],
             ),

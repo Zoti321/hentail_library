@@ -65,8 +65,7 @@ class ReaderBottomBar extends StatelessWidget {
             SizedBox(height: ReaderChromeMetrics.progressControlsGapOf(width)),
             Row(
               children: <Widget>[
-                _iconButton(
-                  context: context,
+                _ReaderIconButton(
                   icon: Symbols.chevron_left,
                   tooltip: l10n.readerPrevPage,
                   semanticLabel: l10n.readerPrevPage,
@@ -76,8 +75,7 @@ class ReaderBottomBar extends StatelessWidget {
                   child: Align(
                     alignment: Alignment.center,
                     child: onAutoPlayChanged != null
-                        ? _iconButton(
-                            context: context,
+                        ? _ReaderIconButton(
                             icon: autoPlayEnabled
                                 ? Symbols.pause
                                 : Symbols.play_arrow,
@@ -90,8 +88,7 @@ class ReaderBottomBar extends StatelessWidget {
                         : const SizedBox.shrink(),
                   ),
                 ),
-                _iconButton(
-                  context: context,
+                _ReaderIconButton(
                   icon: Symbols.chevron_right,
                   tooltip: l10n.readerNextPage,
                   semanticLabel: l10n.readerNextPage,
@@ -104,15 +101,25 @@ class ReaderBottomBar extends StatelessWidget {
       ),
     );
   }
+}
 
-  static Widget _iconButton({
-    required BuildContext context,
-    required IconData icon,
-    required String tooltip,
-    required String semanticLabel,
-    VoidCallback? onPressed,
-    bool filled = false,
-  }) {
+class _ReaderIconButton extends StatelessWidget {
+  const _ReaderIconButton({
+    required this.icon,
+    required this.tooltip,
+    required this.semanticLabel,
+    this.onPressed,
+    this.filled = false,
+  });
+
+  final IconData icon;
+  final String tooltip;
+  final String semanticLabel;
+  final VoidCallback? onPressed;
+  final bool filled;
+
+  @override
+  Widget build(BuildContext context) {
     final double iconSize = ReaderChromeMetrics.actionIconSizeOf(
       MediaQuery.sizeOf(context).width,
     );

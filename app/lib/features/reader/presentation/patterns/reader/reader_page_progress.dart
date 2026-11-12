@@ -47,55 +47,6 @@ class _ReaderPageProgressState extends State<ReaderPageProgress> {
     widget.onPageChanged(resolved.round().clamp(1, _safeTotal));
   }
 
-  Widget _buildProgressSlider({
-    required double sliderValue,
-    required double viewportWidth,
-  }) {
-    final double? trackThickness =
-        ReaderChromeMetrics.progressSliderTrackThicknessOf(viewportWidth);
-    final double? thumbLength = ReaderChromeMetrics.progressSliderThumbLengthOf(
-      viewportWidth,
-    );
-    String semanticLabel(double value) => ReaderPageCopy.pageProgressLabel(
-      value.round().clamp(1, _safeTotal),
-      _safeTotal,
-    );
-
-    if (widget.autoPlayEnabled) {
-      return M3ESlider.wavy(
-        value: sliderValue,
-        min: 1,
-        max: _safeTotal.toDouble(),
-        size: M3ESliderSize.xs,
-        trackThickness: trackThickness,
-        thumbLength: thumbLength,
-        // 覆盖主题默认 amplitudeForProgress（≤10% / ≥95% 为 0），
-        // 自动翻页全程保持可见波浪。
-        amplitude: 1,
-        wavelength: readerAutoPlaySliderWavelength(
-          widget.autoPlayIntervalSeconds,
-        ),
-        haptic: M3EHapticFeedback.light,
-        semanticFormatterCallback: semanticLabel,
-        onChanged: _onChanged,
-        onChangeEnd: _onChangeEnd,
-      );
-    }
-
-    return M3ESlider(
-      value: sliderValue,
-      min: 1,
-      max: _safeTotal.toDouble(),
-      size: M3ESliderSize.xs,
-      trackThickness: trackThickness,
-      thumbLength: thumbLength,
-      haptic: M3EHapticFeedback.light,
-      semanticFormatterCallback: semanticLabel,
-      onChanged: _onChanged,
-      onChangeEnd: _onChangeEnd,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final M3EThemeData theme = M3ETheme.of(context);
@@ -120,9 +71,14 @@ class _ReaderPageProgressState extends State<ReaderPageProgress> {
             child: Text('$_displayPage', style: pageNumberStyle),
           ),
           Expanded(
-            child: _buildProgressSlider(
-              sliderValue: sliderValue,
+            child: _ReaderProgressSlider(
+              value: sliderValue,
+              safeTotal: _safeTotal,
               viewportWidth: viewportWidth,
+              autoPlayEnabled: widget.autoPlayEnabled,
+              autoPlayIntervalSeconds: widget.autoPlayIntervalSeconds,
+              onChanged: _onChanged,
+              onChangeEnd: _onChangeEnd,
             ),
           ),
           SizedBox(
@@ -137,4 +93,70 @@ class _ReaderPageProgressState extends State<ReaderPageProgress> {
       ),
     );
   }
+}
+
+class _ReaderProgressSlider extends StatelessWidget {
+  const _ReaderProgressSlider({
+    required this.value,
+    required this.safeTotal,
+    required this.viewportWidth,
+    required this.autoPlayEnabled,
+    required this.autoPlayIntervalSeconds,
+    required this.onChanged,
+    required this.onChangeEnd,
+  });
+
+  final double value;
+  final int safeTotal;
+  final double viewportWidth;
+  final bool autoPlayEnabled;
+  final int autoPlayIntervalSeconds;
+  final ValueChanged<double> onChanged;
+  final ValueChanged<double> onChangeEnd;
+
+  @override
+  Widget build(BuildContext context) {
+    final double? trackThickness =
+        ReaderChromeMetrics.progressSliderTrackThicknessOf(viewportWidth);
+    final double? thumbLength = ReaderChromeMetrics.progressSliderThumbLengthOf(
+      viewportWidth,
+    );
+
+    if (autoPlayEnabled) {
+      return M3ESlider.wavy(
+        value: value,
+        min: 1,
+        max: safeTotal.toDouble(),
+        size: M3ESliderSize.xs,
+        trackThickness: trackThickness,
+        thumbLength: thumbLength,
+        // 覆盖主题默认 amplitudeForProgress（≤10% / ≥95% 为 0），
+        // 自动翻页全程保持可见波浪。
+        amplitude: 1,
+        wavelength: readerAutoPlaySliderWavelength(autoPlayIntervalSeconds),
+        haptic: M3EHapticFeedback.light,
+        semanticFormatterCallback: _semanticLabel,
+        onChanged: onChanged,
+        onChangeEnd: onChangeEnd,
+      );
+    }
+
+    return M3ESlider(
+      value: value,
+      min: 1,
+      max: safeTotal.toDouble(),
+      size: M3ESliderSize.xs,
+      trackThickness: trackThickness,
+      thumbLength: thumbLength,
+      haptic: M3EHapticFeedback.light,
+      semanticFormatterCallback: _semanticLabel,
+      onChanged: onChanged,
+      onChangeEnd: onChangeEnd,
+    );
+  }
+
+  String _semanticLabel(double pageValue) => ReaderPageCopy.pageProgressLabel(
+    pageValue.round().clamp(1, safeTotal),
+    safeTotal,
+  );
 }

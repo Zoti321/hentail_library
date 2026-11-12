@@ -124,6 +124,24 @@ class _SeriesDetailCatalogLayout extends ConsumerWidget {
   final Series series;
   final SeriesComicsMetadata? metadata;
 
+  void _handleComicTap({
+    required WidgetRef ref,
+    required int globalIndex,
+    required int page,
+    required int pageSize,
+    required List<SeriesComicPageItem> items,
+    required String seriesId,
+  }) {
+    final int localIndex = globalIndex - (page - 1) * pageSize;
+    if (localIndex < 0 || localIndex >= items.length) {
+      return;
+    }
+    ref.read(comicDetailReturnSeriesPortProvider).remember(seriesId);
+    ref
+        .read(appNavigatorProvider)
+        .pushComicDetail(items[localIndex].comic.comicId);
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final String seriesId = series.id;
@@ -191,16 +209,14 @@ class _SeriesDetailCatalogLayout extends ConsumerWidget {
       onAuthorTap: (AuthorRef author) => author.hasIdentity
           ? ref.read(authorDetailPortProvider).showById(context, author.id!)
           : ref.read(authorDetailPortProvider).showByName(context, author.name),
-      onComicTap: (int globalIndex) {
-        final int localIndex = globalIndex - (page - 1) * pageSize;
-        if (localIndex < 0 || localIndex >= items.length) {
-          return;
-        }
-        ref.read(comicDetailReturnSeriesPortProvider).remember(seriesId);
-        ref
-            .read(appNavigatorProvider)
-            .pushComicDetail(items[localIndex].comic.comicId);
-      },
+      onComicTap: (int globalIndex) => _handleComicTap(
+        ref: ref,
+        globalIndex: globalIndex,
+        page: page,
+        pageSize: pageSize,
+        items: items,
+        seriesId: seriesId,
+      ),
     );
   }
 }

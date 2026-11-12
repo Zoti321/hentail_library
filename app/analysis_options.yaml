@@ -96,89 +96,21 @@ dart_code_linter:
     - prefer-single-widget-per-file:
         ignore-private-widgets: true
     - prefer-extracting-callbacks
-    - avoid-returning-widgets
-  # 棘轮（只减不增）：下列历史文件仍违反上面三条组件规则，暂按文件豁免 DCL 全部规则。
-  # 修好一个文件就从这里删一行；新增/改动的新文件一律受管。
-  rules-exclude:
-    - lib/features/app_settings/presentation/patterns/settings/metadata_backup_import_lab_flow.dart
-    - lib/features/app_settings/presentation/patterns/settings/settings_detail_panes.dart
-    - lib/features/app_settings/presentation/patterns/settings/settings_page_header.dart
-    - lib/features/app_settings/presentation/views/dialogs/app_update_dialog.dart
-    - lib/features/app_settings/presentation/views/dialogs/app_update_download_dialog.dart
-    - lib/features/app_settings/presentation/views/dialogs/color_scheme_picker_dialog.dart
-    - lib/features/app_settings/presentation/views/settings_page/settings_page_body.dart
-    - lib/features/app_settings/presentation/views/settings_page/settings_sections.dart
-    - lib/features/bootstrap/presentation/views/app.dart
-    - lib/features/bootstrap/presentation/views/application_shell.dart
-    - lib/features/bootstrap/presentation/views/routing/app_router.dart
-    - lib/features/bootstrap/presentation/views/routing/shared_content_routes.dart
-    - lib/features/comic/di/series_slot_impls.dart
-    - lib/features/comic/presentation/patterns/comic_detail/comic_detail_metadata_section.dart
-    - lib/features/comic/presentation/patterns/metadata_edit/comic_metadata_edit_form.dart
-    - lib/features/comic/presentation/views/bulk_edit/bulk_edit_metadata_form.dart
-    - lib/features/comic/presentation/views/comic_detail/comic_detail_layout.dart
-    - lib/features/comic/presentation/views/comic_detail/comic_detail_page.dart
-    - lib/features/comic/presentation/views/metadata_edit/comic_metadata_edit_layout.dart
-    - lib/features/comic/presentation/views/metadata_edit/comic_metadata_edit_page.dart
-    - lib/features/comic/presentation/widgets/comic_cover_renderer.dart
-    - lib/features/comic/public/ui/comic_card_actions.dart
-    - lib/features/comic_trash/presentation/views/trash/trash_page.dart
-    - lib/features/comic_trash/presentation/views/trash/widgets/trash_list_item.dart
-    - lib/features/home/presentation/views/home/patterns/home_activity_stats_capsule.dart
-    - lib/features/home/presentation/views/home/patterns/home_aggregate_stats_section.dart
-    - lib/features/home/presentation/views/home/patterns/home_bento_stat_card.dart
-    - lib/features/library_admin/di/app_shell_slot.dart
-    - lib/features/library_admin/presentation/patterns/library_edit_form.dart
-    - lib/features/library_admin/presentation/views/home_library_dashboard/patterns/home_library_delete_confirm_dialog.dart
-    - lib/features/library_admin/presentation/views/home_library_dashboard/patterns/home_library_management_section.dart
-    - lib/features/library_admin/presentation/views/library/library_edit_page.dart
-    - lib/features/library_admin/presentation/views/library/library_form_dialog.dart
-    - lib/features/library_admin/presentation/widgets/scan_interval_dropdown.dart
-    - lib/features/library_browse/presentation/author/patterns/author_detail/author_detail_comics_section.dart
-    - lib/features/library_browse/presentation/author/views/author_detail/author_detail_header.dart
-    - lib/features/library_browse/presentation/author/views/author_detail/author_detail_page.dart
-    - lib/features/library_browse/presentation/browse/patterns/library/library_catalog_toolbar.dart
-    - lib/features/library_browse/presentation/browse/patterns/library/library_display_target_tabs.dart
-    - lib/features/library_browse/presentation/browse/patterns/library/library_filter_sort_side_sheet.dart
-    - lib/features/library_browse/presentation/browse/patterns/library/library_page_header.dart
-    - lib/features/library_browse/presentation/browse/views/library/library_filter_section.dart
-    - lib/features/library_browse/presentation/browse/views/library/library_grouping_section.dart
-    - lib/features/library_browse/presentation/browse/views/library/library_page.dart
-    - lib/features/library_browse/presentation/browse/views/library/library_sort_section.dart
-    - lib/features/metadata_backup/presentation/views/metadata_backup_settings_sections.dart
-    - lib/features/metadata_backup/presentation/widgets/metadata_export_options_dialog.dart
-    - lib/features/metadata_backup/presentation/widgets/metadata_import_dialogs.dart
-    - lib/features/named_metadata/presentation/views/metadata/metadata_dialogs.dart
-    - lib/features/named_metadata/presentation/views/metadata/metadata_facet_list.dart
-    - lib/features/named_metadata/presentation/views/metadata/metadata_page.dart
-    - lib/features/named_metadata/presentation/views/metadata/patterns/management_catalog_toolbar.dart
-    - lib/features/named_metadata/presentation/views/metadata/patterns/management_draft_entity_chip.dart
-    - lib/features/named_metadata/presentation/views/metadata/patterns/management_rename_entity_dialog.dart
-    - lib/features/reader/presentation/patterns/reader/reader_bottom_bar.dart
-    - lib/features/reader/presentation/patterns/reader/reader_chrome_band.dart
-    - lib/features/reader/presentation/patterns/reader/reader_chrome_overlay.dart
-    - lib/features/reader/presentation/patterns/reader/reader_interaction_scope.dart
-    - lib/features/reader/presentation/patterns/reader/reader_page_progress.dart
-    - lib/features/reader/presentation/patterns/reader/reader_series_catalog_sheet.dart
-    - lib/features/reader/presentation/patterns/reader/reader_settings_side_sheet.dart
-    - lib/features/reader/presentation/patterns/reader/reader_top_bar.dart
-    - lib/features/reader/presentation/patterns/reader/reader_viewport.dart
-    - lib/features/reader/presentation/patterns/reader/reader_viewport_status_panel.dart
-    - lib/features/reader/presentation/views/reader/reader_page.dart
-    - lib/features/reader/presentation/views/settings/reading_settings_sections.dart
-    - lib/features/reader/presentation/widgets/reader_auto_play_binder.dart
-    - lib/features/reader/presentation/widgets/reader_image_item.dart
-    - lib/features/reader/presentation/widgets/viewport/dual_page_viewport.dart
-    - lib/features/reader/presentation/widgets/viewport/reader_viewport_kernel.dart
-    - lib/features/reading_history/presentation/patterns/history/history_grouped_list.dart
-    - lib/features/reading_history/presentation/patterns/history/reading_history_list_layout.dart
-    - lib/features/reading_history/presentation/views/history_page.dart
-    - lib/features/reading_history/presentation/widgets/reading_history_card.dart
-    - lib/features/series/presentation/patterns/metadata_edit/series_metadata_edit_form.dart
-    - lib/features/series/presentation/patterns/metadata_edit/series_serialization_dropdown.dart
-    - lib/features/series/presentation/patterns/series_detail/series_detail_comics_grid.dart
-    - lib/features/series/presentation/views/metadata_edit/series_metadata_edit_layout.dart
-    - lib/features/series/presentation/views/metadata_edit/series_metadata_edit_page.dart
-    - lib/features/series/presentation/views/series_detail/series_detail_layout.dart
-    - lib/features/series/presentation/views/series_detail/series_detail_page.dart
-    - lib/features/series/public/ui/series_cover_content.dart
+    # 路由 / 分区适配器：签名由 GoRouter / SettingsPage 回调 typedef 固定为返回
+    # Widget(s)，无法改成 Widget 类；按名豁免（其余代码仍受管）。
+    - avoid-returning-widgets:
+        ignored-names:
+          - buildSharedComicDetailPage
+          - buildSharedSeriesDetailPage
+          - buildSeriesCoverSlot
+          - buildSeriesMemberCoverSlot
+          - buildSeriesMemberCardSlot
+          - _settingsSections
+          - settingsSectionsFor
+          - _sectionsForCategory
+          - readerSettingsSections
+          - libraryAdminShellFeedbackBelowTitleBar
+  # 棘轮已清空（2026-11-12）：历史上列在此处的组件文件已全部修复，
+  # 一文件一 Widget / 抽回调 / 不返回 Widget 三条规则对 lib 全域生效。
+  # 后续如需临时豁免，只允许「只减不增」地逐个文件登记，修好后立即删行。
+  rules-exclude: []

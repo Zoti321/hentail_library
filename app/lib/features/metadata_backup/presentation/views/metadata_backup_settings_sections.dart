@@ -20,6 +20,27 @@ import 'package:material_symbols_icons/symbols.dart';
 class MetadataBackupSettingsSections extends ConsumerWidget {
   const MetadataBackupSettingsSections({super.key});
 
+  Future<void> _backupNow(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) async {
+    await ref.read(metadataAutoBackupCoordinatorProvider.notifier).backupNow();
+    if (context.mounted) {
+      showSuccessSnackbar(context, l10n.settingsMetadataBackupNowSuccess);
+    }
+  }
+
+  Future<void> _openBackupFolder(BuildContext context, String path) async {
+    try {
+      await openDirectoryInFileExplorer(path);
+    } catch (e) {
+      if (context.mounted) {
+        showErrorSnackbar(context, e);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
@@ -77,17 +98,7 @@ class MetadataBackupSettingsSections extends ConsumerWidget {
                   leading: Symbols.save,
                   title: Text(l10n.settingsMetadataBackupNowLabel),
                   description: Text(l10n.settingsMetadataBackupNowDescription),
-                  onTap: () async {
-                    await ref
-                        .read(metadataAutoBackupCoordinatorProvider.notifier)
-                        .backupNow();
-                    if (context.mounted) {
-                      showSuccessSnackbar(
-                        context,
-                        l10n.settingsMetadataBackupNowSuccess,
-                      );
-                    }
-                  },
+                  onTap: () => _backupNow(context, ref, l10n),
                 ),
                 if (isDesktop)
                   SettingsNavigationTile(
@@ -96,15 +107,7 @@ class MetadataBackupSettingsSections extends ConsumerWidget {
                     description: Text(
                       l10n.settingsMetadataBackupOpenFolderDescription,
                     ),
-                    onTap: () async {
-                      try {
-                        await openDirectoryInFileExplorer(storagePath);
-                      } catch (e) {
-                        if (context.mounted) {
-                          showErrorSnackbar(context, e);
-                        }
-                      }
-                    },
+                    onTap: () => _openBackupFolder(context, storagePath),
                   ),
                 SettingsNavigationTile(
                   leading: Symbols.upload,

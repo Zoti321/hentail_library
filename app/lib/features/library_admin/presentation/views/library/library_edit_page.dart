@@ -86,6 +86,13 @@ class _LibraryEditPageState extends State<LibraryEditPage> {
     }
   }
 
+  void _handleFormChanged(LibraryForm value) {
+    setState(() {
+      _form = value;
+      _validation = null;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
@@ -102,14 +109,7 @@ class _LibraryEditPageState extends State<LibraryEditPage> {
         isCreate: _isCreate,
         validation: _validation,
         enabled: !_saving,
-        onFormChanged: (LibraryForm value) {
-          setState(() {
-            _form = value;
-            if (_validation != null) {
-              _validation = null;
-            }
-          });
-        },
+        onFormChanged: _handleFormChanged,
         onBrowseRoot: _form.isRemote ? null : _browseLocalRoot,
       ),
     );

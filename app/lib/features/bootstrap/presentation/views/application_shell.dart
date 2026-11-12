@@ -21,6 +21,10 @@ class ApplicationShell extends ConsumerWidget {
 
   final Widget routeChild;
 
+  void _handleToggleSidebar(WidgetRef ref, bool expanded) {
+    ref.read(settingsProvider.notifier).setDesktopSidebarExpanded(!expanded);
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final bool isSidebarExpandedPref = ref.watch(
@@ -40,11 +44,8 @@ class ApplicationShell extends ConsumerWidget {
     return ResponsiveAppShell(
       routeChild: routeChild,
       isDesktopSidebarExpanded: isSidebarExpandedPref,
-      onToggleDesktopSidebarExpanded: () {
-        ref
-            .read(settingsProvider.notifier)
-            .setDesktopSidebarExpanded(!isSidebarExpandedPref);
-      },
+      onToggleDesktopSidebarExpanded: () =>
+          _handleToggleSidebar(ref, isSidebarExpandedPref),
       isReaderFullscreen: readerFullscreen,
       shellFeedbackBelowTitleBar: feedbackFactory(),
       navigationSlotBuilder: (BuildContext ctx) => navigationAssembly(ctx, ref),

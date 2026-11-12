@@ -247,16 +247,21 @@ class _AuthorNameRow extends HookConsumerWidget {
           size: M3EIconButtonSize.sm,
           tooltip: l10n.authorDetailRename,
           semanticLabel: l10n.authorDetailRename,
-          onPressed: () {
-            controller.text = detail.name;
-            controller.selection = TextSelection(
-              baseOffset: 0,
-              extentOffset: detail.name.length,
-            );
-            editing.value = true;
-          },
+          onPressed: () => _startEditing(controller, editing),
         ),
       ],
     );
+  }
+
+  void _startEditing(
+    TextEditingController controller,
+    ValueNotifier<bool> editing,
+  ) {
+    controller.text = detail.name;
+    controller.selection = TextSelection(
+      baseOffset: 0,
+      extentOffset: detail.name.length,
+    );
+    editing.value = true;
   }
 }

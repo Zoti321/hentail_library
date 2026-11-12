@@ -54,8 +54,7 @@ class ReaderTopBar extends StatelessWidget {
 
     final List<Widget> actions = <Widget>[
       if (!compactChrome && onToggleFullscreen != null)
-        _iconButton(
-          context: context,
+        _ReaderTopBarIconButton(
           icon: isFullscreen ? Symbols.fullscreen_exit : Symbols.fullscreen,
           tooltip: isFullscreen
               ? l10n.readerExitFullscreen
@@ -66,23 +65,20 @@ class ReaderTopBar extends StatelessWidget {
           onPressed: onToggleFullscreen,
         ),
       if (!compactChrome && onOpenSeriesCatalog != null)
-        _iconButton(
-          context: context,
+        _ReaderTopBarIconButton(
           icon: Symbols.list,
           tooltip: l10n.readerSeriesCatalog,
           semanticLabel: l10n.readerSeriesCatalog,
           onPressed: onOpenSeriesCatalog,
         ),
-      _iconButton(
-        context: context,
+      _ReaderTopBarIconButton(
         icon: Symbols.settings,
         tooltip: l10n.readerSettingsTitle,
         semanticLabel: l10n.readerSettingsTitle,
         onPressed: onOpenSettings,
       ),
       if (menuEntries.isEmpty)
-        _iconButton(
-          context: context,
+        _ReaderTopBarIconButton(
           icon: Symbols.more_vert,
           tooltip: l10n.metadataMoreActions,
           semanticLabel: l10n.metadataMoreActions,
@@ -93,8 +89,7 @@ class ReaderTopBar extends StatelessWidget {
           position: M3EMenuAnchorPosition.bottomEnd,
           children: menuEntries,
           anchorBuilder: (BuildContext context, VoidCallback open) {
-            return _iconButton(
-              context: context,
+            return _ReaderTopBarIconButton(
               icon: Symbols.more_vert,
               tooltip: l10n.metadataMoreActions,
               semanticLabel: l10n.metadataMoreActions,
@@ -113,8 +108,7 @@ class ReaderTopBar extends StatelessWidget {
         safeArea: true,
         centerTitle: false,
         title: _ReaderAppBarTitleBlock(title: title, subtitle: subtitle),
-        leading: _iconButton(
-          context: context,
+        leading: _ReaderTopBarIconButton(
           icon: Symbols.arrow_back,
           tooltip: l10n.shellBack,
           semanticLabel: l10n.readerBackSemantic,
@@ -124,14 +118,23 @@ class ReaderTopBar extends StatelessWidget {
       ),
     );
   }
+}
 
-  static Widget _iconButton({
-    required BuildContext context,
-    required IconData icon,
-    required String tooltip,
-    required String semanticLabel,
-    VoidCallback? onPressed,
-  }) {
+class _ReaderTopBarIconButton extends StatelessWidget {
+  const _ReaderTopBarIconButton({
+    required this.icon,
+    required this.tooltip,
+    required this.semanticLabel,
+    this.onPressed,
+  });
+
+  final IconData icon;
+  final String tooltip;
+  final String semanticLabel;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
     final double iconSize = ReaderChromeMetrics.actionIconSizeOf(
       MediaQuery.sizeOf(context).width,
     );

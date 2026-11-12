@@ -59,6 +59,18 @@ class _SeriesMetadataEditPageState extends State<SeriesMetadataEditLayout>
     }
   }
 
+  void _handleDraftChanged(SeriesMetadataEditDraft value) {
+    setState(() {
+      _draft = value;
+      if (_nameError != null && value.validateName() == null) {
+        _nameError = null;
+      }
+      if (_totalCountError != null && value.validateTotalCount() == null) {
+        _totalCountError = null;
+      }
+    });
+  }
+
   @override
   Future<void> saveAndPop() => _handleSave();
 
@@ -101,18 +113,7 @@ class _SeriesMetadataEditPageState extends State<SeriesMetadataEditLayout>
         onLockChanged: _onLockChanged,
         nameError: _nameError,
         totalCountError: _totalCountError,
-        onDraftChanged: (SeriesMetadataEditDraft value) {
-          setState(() {
-            _draft = value;
-            if (_nameError != null && value.validateName() == null) {
-              _nameError = null;
-            }
-            if (_totalCountError != null &&
-                value.validateTotalCount() == null) {
-              _totalCountError = null;
-            }
-          });
-        },
+        onDraftChanged: _handleDraftChanged,
       ),
     );
   }

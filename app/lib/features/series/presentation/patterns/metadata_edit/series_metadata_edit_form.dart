@@ -105,9 +105,8 @@ class _SeriesContentFields extends StatelessWidget {
         SizedBox(height: spacing.sm),
         SeriesSerializationDropdown(
           value: draft.serializationStatus,
-          onChanged: (SerializationStatus status) {
-            onDraftChanged(draft.copyWith(serializationStatus: status));
-          },
+          onChanged: (SerializationStatus status) =>
+              onDraftChanged(draft.copyWith(serializationStatus: status)),
         ),
         SizedBox(height: gap),
         OutlinedTextField(

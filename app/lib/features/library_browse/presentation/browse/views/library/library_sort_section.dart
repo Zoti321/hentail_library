@@ -151,9 +151,8 @@ class _ComicSortRow extends ConsumerWidget {
       isSelected: sortOption.field == field,
       isAscending: !sortOption.descending,
       comingSoon: !implemented,
-      onTap: () {
-        ref.read(libraryComicFiltersProvider.notifier).setSortField(field);
-      },
+      onTap: () =>
+          ref.read(libraryComicFiltersProvider.notifier).setSortField(field),
     );
   }
 }
@@ -175,9 +174,8 @@ class _SeriesSortRow extends ConsumerWidget {
       isSelected: sortOption.field == field,
       isAscending: !sortOption.descending,
       comingSoon: !implemented,
-      onTap: () {
-        ref.read(librarySeriesFiltersProvider.notifier).setSortField(field);
-      },
+      onTap: () =>
+          ref.read(librarySeriesFiltersProvider.notifier).setSortField(field),
     );
   }
 }

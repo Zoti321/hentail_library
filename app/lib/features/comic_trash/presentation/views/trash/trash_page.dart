@@ -21,6 +21,15 @@ const double _kTrashLoadMoreThreshold = 400;
 class TrashPage extends ConsumerWidget {
   const TrashPage({super.key});
 
+  bool _handleScroll(ScrollUpdateNotification notification, WidgetRef ref) {
+    final ScrollMetrics metrics = notification.metrics;
+    if (metrics.maxScrollExtent > 0 &&
+        metrics.pixels >= metrics.maxScrollExtent - _kTrashLoadMoreThreshold) {
+      ref.read(trashPageControllerProvider.notifier).loadMore();
+    }
+    return false;
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final PageLayoutSpec layout = PageLayoutSpec.of(context);
@@ -29,15 +38,8 @@ class TrashPage extends ConsumerWidget {
     return ColoredBox(
       color: labBrowseCanvasColor(scheme),
       child: NotificationListener<ScrollUpdateNotification>(
-        onNotification: (ScrollUpdateNotification notification) {
-          final ScrollMetrics metrics = notification.metrics;
-          if (metrics.maxScrollExtent > 0 &&
-              metrics.pixels >=
-                  metrics.maxScrollExtent - _kTrashLoadMoreThreshold) {
-            ref.read(trashPageControllerProvider.notifier).loadMore();
-          }
-          return false;
-        },
+        onNotification: (ScrollUpdateNotification notification) =>
+            _handleScroll(notification, ref),
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: <Widget>[

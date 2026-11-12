@@ -119,25 +119,6 @@ class _ComicDetailPageState extends State<ComicDetailLayout> {
     });
   }
 
-  Widget _buildScrollBody() {
-    final Widget content = ComicDetailScrollContent(
-      entry: _entry,
-      onRead: _resolveVoid(widget.onRead),
-      onReadIncognito: _resolveVoid(widget.onReadIncognito),
-      onMetadataChipTap: widget.onMetadataChipTap ?? (_) {},
-      onAuthorTap: widget.onAuthorTap,
-    );
-    // 生产走路由 Shared Axis；Lab 无页内切换时在此做同款过渡。
-    if (widget.onSeriesSelect != null) {
-      return content;
-    }
-    return ListDetailDetailTransition(
-      switchKey: '${_entry.seriesCurrentIndex}:${_entry.title}',
-      reverse: _seriesNavReverse,
-      child: content,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
@@ -155,6 +136,22 @@ class _ComicDetailPageState extends State<ComicDetailLayout> {
       onSeriesSelectIndex: _selectSeriesIndex,
     );
 
+    final Widget content = ComicDetailScrollContent(
+      entry: _entry,
+      onRead: _resolveVoid(widget.onRead),
+      onReadIncognito: _resolveVoid(widget.onReadIncognito),
+      onMetadataChipTap: widget.onMetadataChipTap ?? (_) {},
+      onAuthorTap: widget.onAuthorTap,
+    );
+    // 生产走路由 Shared Axis；Lab 无页内切换时在此做同款过渡。
+    final Widget scrollBody = widget.onSeriesSelect != null
+        ? content
+        : ListDetailDetailTransition(
+            switchKey: '${_entry.seriesCurrentIndex}:${_entry.title}',
+            reverse: _seriesNavReverse,
+            child: content,
+          );
+
     return ColoredBox(
       color: labBrowseCanvasColor(scheme),
       child: Stack(
@@ -169,7 +166,7 @@ class _ComicDetailPageState extends State<ComicDetailLayout> {
               ),
               SliverPadding(
                 padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                sliver: SliverToBoxAdapter(child: _buildScrollBody()),
+                sliver: SliverToBoxAdapter(child: scrollBody),
               ),
             ],
           ),

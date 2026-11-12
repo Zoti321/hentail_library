@@ -99,37 +99,58 @@ class ComicMetadataEditViewState
               bool? languages,
               bool? parodies,
               bool? characters,
-            }) {
-              unawaited(() async {
-                try {
-                  await notifier.setLock(
-                    title: title,
-                    description: description,
-                    publishedAt: publishedAt,
-                    contentRating: contentRating,
-                    authors: authors,
-                    tags: tags,
-                    languages: languages,
-                    parodies: parodies,
-                    characters: characters,
-                  );
-                } catch (error, stackTrace) {
-                  logError(
-                    AppLog.ui('editMetadata'),
-                    '设置元数据字段锁失败',
-                    error,
-                    stackTrace,
-                  );
-                  if (mounted) {
-                    showErrorSnackbar(context, l10n.commonSaveFailedToast);
-                  }
-                }
-              }());
-            },
+            }) => _handleLockChanged(
+              notifier: notifier,
+              l10n: l10n,
+              title: title,
+              description: description,
+              publishedAt: publishedAt,
+              contentRating: contentRating,
+              authors: authors,
+              tags: tags,
+              languages: languages,
+              parodies: parodies,
+              characters: characters,
+            ),
         titleError: session.titleError,
         smartFacetScope: session.smartFacetScope,
         onDraftChanged: notifier.updateDraft,
       ),
     );
+  }
+
+  void _handleLockChanged({
+    required ComicMetadataEditSession notifier,
+    required AppLocalizations l10n,
+    bool? title,
+    bool? description,
+    bool? publishedAt,
+    bool? contentRating,
+    bool? authors,
+    bool? tags,
+    bool? languages,
+    bool? parodies,
+    bool? characters,
+  }) {
+    unawaited(() async {
+      try {
+        await notifier.setLock(
+          title: title,
+          description: description,
+          publishedAt: publishedAt,
+          contentRating: contentRating,
+          authors: authors,
+          tags: tags,
+          languages: languages,
+          parodies: parodies,
+          characters: characters,
+        );
+      } catch (error, stackTrace) {
+        logError(AppLog.ui('editMetadata'), '设置元数据字段锁失败', error, stackTrace);
+        if (mounted) {
+          showErrorSnackbar(context, l10n.commonSaveFailedToast);
+        }
+      }
+    }());
   }
 }

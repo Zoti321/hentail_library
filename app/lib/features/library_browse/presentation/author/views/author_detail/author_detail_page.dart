@@ -26,12 +26,8 @@ class AuthorDetailPage extends ConsumerWidget {
 
     return PopScope(
       canPop: appNavigatorOf(context).canPop(),
-      onPopInvokedWithResult: (bool didPop, Object? result) {
-        if (didPop) {
-          return;
-        }
-        DetailBackHeader.popOrGoLibrary(context);
-      },
+      onPopInvokedWithResult: (bool didPop, Object? result) =>
+          _handlePopInvoked(context, didPop),
       child: M3ETheme(
         data: withAppFontFamily(M3ETheme.of(context)),
         child: ColoredBox(
@@ -40,23 +36,41 @@ class AuthorDetailPage extends ConsumerWidget {
             loading: () => const DetailLoadingStatus(),
             error: (Object error, StackTrace stackTrace) =>
                 DetailErrorStatus(label: error.toString()),
-            data: (AuthorDetail? detail) {
-              if (detail == null) {
-                return DetailNotFoundStatus(
-                  icon: LucideIcons.user,
-                  label: context.l10n.comicDetailNotFound,
-                );
-              }
-              return AuthorDetailLayout(
-                detail: detail,
-                onBack: () => DetailBackHeader.popOrGoLibrary(context),
-              );
-            },
+            data: (AuthorDetail? detail) =>
+                _AuthorDetailDataView(detail: detail),
             skipLoadingOnReload: true,
             skipLoadingOnRefresh: true,
           ),
         ),
       ),
+    );
+  }
+
+  void _handlePopInvoked(BuildContext context, bool didPop) {
+    if (didPop) {
+      return;
+    }
+    DetailBackHeader.popOrGoLibrary(context);
+  }
+}
+
+class _AuthorDetailDataView extends StatelessWidget {
+  const _AuthorDetailDataView({required this.detail});
+
+  final AuthorDetail? detail;
+
+  @override
+  Widget build(BuildContext context) {
+    final AuthorDetail? resolved = detail;
+    if (resolved == null) {
+      return DetailNotFoundStatus(
+        icon: LucideIcons.user,
+        label: context.l10n.comicDetailNotFound,
+      );
+    }
+    return AuthorDetailLayout(
+      detail: resolved,
+      onBack: () => DetailBackHeader.popOrGoLibrary(context),
     );
   }
 }

@@ -156,7 +156,7 @@ class _LibraryHeaderActions extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        _actionIcon(
+        _HeaderActionIcon(
           icon: Icons.filter_list,
           tooltip: l10n.libraryFilterSortTooltip,
           semanticLabel: l10n.libraryFilterSortSemantic,
@@ -165,7 +165,7 @@ class _LibraryHeaderActions extends StatelessWidget {
         ),
         SizedBox(width: gap),
         if (menuChildren.isEmpty)
-          _actionIcon(
+          _HeaderActionIcon(
             icon: Icons.more_vert,
             tooltip: l10n.metadataMoreActions,
             onPressed: null,
@@ -175,7 +175,7 @@ class _LibraryHeaderActions extends StatelessWidget {
             position: M3EMenuAnchorPosition.bottomEnd,
             children: menuChildren,
             anchorBuilder: (BuildContext context, VoidCallback open) {
-              return _actionIcon(
+              return _HeaderActionIcon(
                 icon: Icons.more_vert,
                 tooltip: l10n.metadataMoreActions,
                 onPressed: open,
@@ -185,14 +185,25 @@ class _LibraryHeaderActions extends StatelessWidget {
       ],
     );
   }
+}
 
-  Widget _actionIcon({
-    required IconData icon,
-    required String tooltip,
-    String? semanticLabel,
-    Color? color,
-    VoidCallback? onPressed,
-  }) {
+class _HeaderActionIcon extends StatelessWidget {
+  const _HeaderActionIcon({
+    required this.icon,
+    required this.tooltip,
+    this.semanticLabel,
+    this.color,
+    this.onPressed,
+  });
+
+  final IconData icon;
+  final String tooltip;
+  final String? semanticLabel;
+  final Color? color;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
     return M3EIconButton(
       icon: Icon(
         icon,

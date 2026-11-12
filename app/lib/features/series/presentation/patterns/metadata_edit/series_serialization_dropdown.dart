@@ -23,6 +23,16 @@ class SeriesSerializationDropdown extends StatelessWidget {
     SerializationStatus.hiatus,
   ];
 
+  void _handleSelectionChanged(
+    List<M3EDropdownItem<SerializationStatus>> items,
+  ) {
+    if (items.isEmpty) {
+      onChanged(SerializationStatus.unknown);
+      return;
+    }
+    onChanged(items.first.value);
+  }
+
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
@@ -49,13 +59,7 @@ class SeriesSerializationDropdown extends StatelessWidget {
           color: theme.colorScheme.onSurface,
         ),
       ),
-      onSelectionChanged: (List<M3EDropdownItem<SerializationStatus>> items) {
-        if (items.isEmpty) {
-          onChanged(SerializationStatus.unknown);
-          return;
-        }
-        onChanged(items.first.value);
-      },
+      onSelectionChanged: _handleSelectionChanged,
     );
   }
 

@@ -145,10 +145,13 @@ class _LibraryFormState extends ConsumerState<_LibraryFormFields> {
       if (!mounted) {
         return;
       }
-      if (!await isLocalLibraryRootReadable(_form.rootPath)) {
-        if (!mounted) {
-          return;
-        }
+      final bool rootReadable = await isLocalLibraryRootReadable(
+        _form.rootPath,
+      );
+      if (!mounted) {
+        return;
+      }
+      if (!rootReadable) {
         setState(() {
           _validation = LibraryFormValidation(
             rootError: l10n.formLibraryRootUnreadable,
@@ -205,10 +208,11 @@ class _LibraryFormState extends ConsumerState<_LibraryFormFields> {
     if (directoryPath == null || directoryPath.isEmpty || !mounted) {
       return;
     }
-    if (!await isLocalLibraryRootReadable(directoryPath)) {
-      if (!mounted) {
-        return;
-      }
+    final bool rootReadable = await isLocalLibraryRootReadable(directoryPath);
+    if (!mounted) {
+      return;
+    }
+    if (!rootReadable) {
       setState(() {
         _validation = LibraryFormValidation(
           rootError: context.l10n.formLibraryRootUnreadable,
@@ -228,6 +232,13 @@ class _LibraryFormState extends ConsumerState<_LibraryFormFields> {
     });
   }
 
+  void _handleFormChanged(LibraryForm value) {
+    setState(() {
+      _form = value;
+      _validation = null;
+    });
+  }
+
   void _handleCancel() {
     Navigator.of(context).pop();
   }
@@ -241,14 +252,7 @@ class _LibraryFormState extends ConsumerState<_LibraryFormFields> {
       isCreate: _isCreate,
       validation: _validation,
       enabled: !_saving,
-      onFormChanged: (LibraryForm value) {
-        setState(() {
-          _form = value;
-          if (_validation != null) {
-            _validation = null;
-          }
-        });
-      },
+      onFormChanged: _handleFormChanged,
       onBrowseRoot: _isRemote ? null : _browseLocalRoot,
     );
 

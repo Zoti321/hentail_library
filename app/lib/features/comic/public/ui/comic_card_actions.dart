@@ -69,9 +69,8 @@ class ComicCardActions extends ConsumerWidget {
     }
     return GestureDetector(
       behavior: HitTestBehavior.deferToChild,
-      onSecondaryTapUp: (TapUpDetails details) {
-        _showMenu(context, ref, details.globalPosition);
-      },
+      onSecondaryTapUp: (TapUpDetails details) =>
+          _showMenu(context, ref, details.globalPosition),
       child: child,
     );
   }

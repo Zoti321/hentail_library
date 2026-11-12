@@ -23,6 +23,21 @@ class SeriesDetailComicsGrid extends ConsumerWidget {
   final List<SeriesDetailComicItem> items;
   final ValueChanged<int>? onComicTap;
 
+  void _handleTap({
+    required bool selectionActive,
+    required String? comicId,
+    required CatalogSelectionNotifier selectionNotifier,
+    required int index,
+  }) {
+    if (selectionActive) {
+      if (comicId != null) {
+        selectionNotifier.toggle(comicId);
+      }
+      return;
+    }
+    onComicTap?.call(index);
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
@@ -81,15 +96,12 @@ class SeriesDetailComicsGrid extends ConsumerWidget {
           onSelectionChanged: comicId == null
               ? null
               : (_) => selectionNotifier.toggle(comicId),
-          onTap: () {
-            if (selectionActive) {
-              if (comicId != null) {
-                selectionNotifier.toggle(comicId);
-              }
-              return;
-            }
-            onComicTap?.call(index);
-          },
+          onTap: () => _handleTap(
+            selectionActive: selectionActive,
+            comicId: comicId,
+            selectionNotifier: selectionNotifier,
+            index: index,
+          ),
         );
         final SeriesMemberCardSlot? slot = cardSlot;
         if (comic == null || slot == null) {

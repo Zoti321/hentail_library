@@ -52,13 +52,7 @@ class LibraryCatalogToolbar extends StatelessWidget {
               ),
             ],
             selectedIndex: displayTarget == LibraryDisplayTarget.comics ? 0 : 1,
-            onSelected: (int index) {
-              onDisplayTargetChanged(
-                index == 0
-                    ? LibraryDisplayTarget.comics
-                    : LibraryDisplayTarget.series,
-              );
-            },
+            onSelected: _handleSelected,
           ),
         ),
         const SizedBox(width: 12),
@@ -70,6 +64,12 @@ class LibraryCatalogToolbar extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  void _handleSelected(int index) {
+    onDisplayTargetChanged(
+      index == 0 ? LibraryDisplayTarget.comics : LibraryDisplayTarget.series,
     );
   }
 }
