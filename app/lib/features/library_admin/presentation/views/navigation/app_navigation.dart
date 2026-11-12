@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/di/library_management_providers.dart';
+import 'package:hentai_library/features/library_admin/public/di/library_admin_state_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/core/constants/app_routes.dart';

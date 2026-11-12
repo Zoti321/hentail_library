@@ -76,7 +76,7 @@ UI / 编排命令类型；发现面经 owner `public/` re-export（ADR-0034）�
 
 - `ports/author_detail_port.dart`
 - `ports/comic_trash_command_port.dart`
-- `ports/library_management_port.dart`
+- `ports/library_browse_fallback_port.dart`（窄口，仅 `goDefaultLibraryBrowse(BuildContext)`；实现 @ `library_admin`；全量 `LibraryManagementPort` 已归 `features/library_admin/public/ui/`）
 - `ports/series_reading_context_port.dart`
 - `ports/series_item_membership_port.dart`（ADR-0042）
 - `ports/series_item_sort_port.dart`（ADR-0042）

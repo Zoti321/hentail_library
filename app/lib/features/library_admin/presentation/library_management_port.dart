@@ -9,10 +9,16 @@ import 'package:hentai_library/shared/di/app_navigator_provider.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
+import 'package:hentai_library/shared/domain/ports/library_browse_fallback_port.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 
-/// library_admin 对 [LibraryManagementPort] 的实现（#292）。
-class _LibraryManagementAdapter implements LibraryManagementPort {
+/// library_admin 对 [LibraryManagementPort] 与
+/// [LibraryBrowseFallbackPort] 的实现（#292 / ADR-0045）。
+///
+/// 同一个适配器实现两个接口：全量命令只对 owner 与产品 feature 可见，
+/// `shared/ui` 只拿到 `goDefaultLibraryBrowse` 的方法面。
+class _LibraryManagementAdapter
+    implements LibraryManagementPort, LibraryBrowseFallbackPort {
   _LibraryManagementAdapter(this._ref);
 
   final Ref _ref;
@@ -134,4 +140,7 @@ class _LibraryManagementAdapter implements LibraryManagementPort {
 }
 
 LibraryManagementPort createLibraryManagementPort(Ref ref) =>
+    _LibraryManagementAdapter(ref);
+
+LibraryBrowseFallbackPort createLibraryBrowseFallbackPort(Ref ref) =>
     _LibraryManagementAdapter(ref);

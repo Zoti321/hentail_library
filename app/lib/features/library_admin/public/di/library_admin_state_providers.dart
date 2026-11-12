@@ -7,6 +7,7 @@ import 'package:hentai_library/features/library_admin/domain/library_repository.
 import 'package:hentai_library/features/library_admin/domain/library_scan_activity_state.dart';
 import 'package:hentai_library/features/library_admin/domain/library_revision_state.dart';
 import 'package:hentai_library/features/library_admin/domain/library_scan_command_port.dart';
+import 'package:hentai_library/features/library_admin/public/ui/library_management_port.dart';
 import 'package:hentai_library/shared/di/injected_di.dart';
 
 /// library_admin 拥有的库状态投影 token（#513，ADR-0045）。
@@ -59,6 +60,13 @@ final Provider<LibrariesPort> librariesPortProvider = injectedDi(
 
 final Provider<LibraryScanCommandPort> libraryScanCommandPortProvider =
     injectedDi('libraryScanCommandPortProvider');
+
+/// 全量库管理 UI 命令 token（真源 @ library_admin，ADR-0045）。
+///
+/// `shared/**` 不消费本 token；它只读 `shared/di` 的
+/// `libraryBrowseFallbackPortProvider` 窄口。
+final Provider<LibraryManagementPort> libraryManagementPortProvider =
+    injectedDi('libraryManagementPortProvider');
 
 /// 单库 / 全库元数据刷新命令口 token。
 final Provider<LibraryMetadataRefreshCommandPort>

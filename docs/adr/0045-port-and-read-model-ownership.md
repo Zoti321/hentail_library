@@ -51,7 +51,7 @@ Accepted（2026-11-11，#503）
 
 | 契约 / token | 消费方 | 豁免理由 |
 |------|--------|----------|
-| `LibraryManagementPort` + token | `shared/ui/navigation/library_browse_navigation.dart` | shared 消费方 |
+| `LibraryBrowseFallbackPort` + token（窄口，仅 `goDefaultLibraryBrowse(BuildContext)`） | `shared/ui/navigation/library_browse_navigation.dart` | shared 消费方。全量 `LibraryManagementPort` 已归 `library_admin`（2026-11-12 修订） |
 | `LibraryReorderModePort` + token（真源 `shared/domain/ports/`） | `shared/domain/catalog/selection/catalog_selection_notifier.dart` | shared 消费方 |
 | `ReaderLaunchPort` + token | `shared/**`、comic / library_browse | 禁止边 + shared 消费方 |
 | `SeriesReadingContextPort` / `SeriesItemMembershipPort` / `SeriesItemSortPort` + token | comic / series 之外多方；ADR-0035 §4 判定 | 禁止边 |
@@ -67,6 +67,8 @@ Accepted（2026-11-11，#503）
 | `appNavigatorProvider`、`domainEventBusProvider` / `domainEventRevisions` | 全局 | 基础设施 |
 
 > **实现修订（2026-11-12，`shared/domain/library/` 收敛 P0–P2）**：`library_media_type_filter.dart` → `library_browse/domain/browse/`（筛选态，零新边）；`library_revision_state.dart` + `libraryRevisionStateProvider` → `library_admin/domain/` 与 `library_admin/public/di/`（token 与类型同址）；`metadata_refresh_types.dart` 真源 → `library_admin/domain/`，`metadata_refresh_toasts.dart` → `library_admin/public/ui/`（消除 `shared/ui → admin` 唯一 R13 边）。`shared/domain/library/` 由 7 文件降为 4 文件（`library_age_restriction_filter` / `library_scan_mode` / `scan_interval` / `comic_detail_return_series_port`：前两者为已登记豁免，后两者待 P4 与本模块 Port / `LocalLibrary` 联动迁移）。
+
+> **实现修订（2026-11-12，P3 / #530）**：全量 `LibraryManagementPort` 真源迁 `library_admin` 的 public UI 契约面，token 归 `library_admin/public/di/`；`shared/domain/ports/` 只保留仅含 `BuildContext` 的 `LibraryBrowseFallbackPort`（token `libraryBrowseFallbackPortProvider` @ `shared/di`），由同一适配器在两个 token 上注入。删除 `library_admin/di/library_management_navigation.dart` 与 `shared/ui` 的同名重复实现（保留 `shared/ui` 一份），`route_not_found_page` 改读窄口。`shared/domain/ports/library_management_port.dart` 删除，`shared/` 不再认识 `LocalLibrary` / `ScanMode`。
 
 ### 5. 实现修订（2026-11-11，P3m 收口；2026-11-12 由 ADR-0046 收口）
 

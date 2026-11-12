@@ -8,7 +8,7 @@ Accepted
 
 Wayfinder feature 模块已有 `domain` / `data` / `presentation`，但 `*Service`、`*Coordinator` 与交互草稿混在 `domain/`，ViewModel 又承担过多用例编排。ADR-0002 将业务真值放在 Rust；Dart 侧需要一层 **无 Flutter、无 FRB** 的用例编排，且与 glossary 中的 **Application data**（应用数据目录）术语区分。
 
-`shared/domain/ports/` 与 `shared/domain/library/` 中的跨 feature **命令契约**（含部分含 `BuildContext` 的 UI 命令类型；#434 起不再使用 `shared/application/ports/`）；消费方 **import owner** `features/<id>/public.dart`（ADR-0034）。feature 内仍缺同级 **用例编排** 命名层。
+`shared/domain/ports/` 与 `shared/domain/library/` 中的跨 feature **命令契约**（含部分含 `BuildContext` 的 UI 命令类型；#434 起不再使用 `shared/application/ports/`；2026-11-12 / #530 起 `LibraryManagementPort` 已归 `library_admin`，shared 只留 `LibraryBrowseFallbackPort` 窄口）；消费方 **import owner** `features/<id>/public.dart`（ADR-0034）。feature 内仍缺同级 **用例编排** 命名层。
 
 ## Decision
 

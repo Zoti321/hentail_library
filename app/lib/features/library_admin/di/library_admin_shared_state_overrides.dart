@@ -3,8 +3,8 @@ import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/comic_metadata_bulk_patch_controller.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_throttle_busy.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/metadata_refresh_controller.dart';
+import 'package:hentai_library/shared/di/library_browse_fallback_providers.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
-import 'package:hentai_library/shared/di/library_management_providers.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 /// library_admin owner：Port 工厂与库状态投影（#435）。
@@ -22,6 +22,9 @@ List<Override> libraryAdminSharedStateOverrides() => <Override>[
     createLibraryMetadataRefreshCommandPort,
   ),
   libraryManagementPortProvider.overrideWith(createLibraryManagementPort),
+  libraryBrowseFallbackPortProvider.overrideWith(
+    createLibraryBrowseFallbackPort,
+  ),
   librariesStateProvider.overrideWith(
     (Ref ref) => ref.watch(librariesProvider),
   ),
