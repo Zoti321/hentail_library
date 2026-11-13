@@ -1,10 +1,11 @@
 import 'dart:typed_data';
 
 import 'package:hentai_library/core/async/cancellation_token.dart';
+import 'package:hentai_library/features/comic_metadata/application/import_tag_dictionary_use_case.dart';
 import 'package:hentai_library/shared/application/logging/app_log.dart';
 import 'package:hentai_library/shared/application/errors/error_message.dart';
 import 'package:hentai_library/features/comic_metadata/domain/tag_dictionary_import_result.dart';
-import 'package:hentai_library/features/comic_metadata/presentation/providers/download_providers.dart';
+import 'package:hentai_library/features/comic_metadata/presentation/providers/tag_dictionary_import_providers.dart';
 import 'package:hentai_library/features/comic_metadata/presentation/view_models/named_facet_management_view_model.dart';
 import 'package:hentai_library/features/comic_metadata/public/providers/comic_metadata_repository_providers.dart';
 import 'package:hentai_library/features/comic_metadata/domain/named_facet_management_repository.dart';
@@ -55,14 +56,14 @@ class TagDictionaryImportViewModel extends _$TagDictionaryImportViewModel {
     state = state.copyWith(running: true, clearError: true, clearResult: true);
     _cancelToken = CancellationToken();
     try {
-      final Uint8List bytes = await ref
-          .read(tagDictionaryDownloadGatewayProvider)
-          .download(
-            url: url,
-            cancelToken: _cancelToken,
-            onProgress: onDownloadProgress,
-          );
-      return await _importBytes(bytes);
+      final result = await ref.read(importTagDictionaryUseCaseProvider)(
+        url: url,
+        cancelToken: _cancelToken,
+        onDownloadProgress: onDownloadProgress,
+      );
+      return await _completeImport(result);
+    } on TagDictionaryImportFailure catch (failure) {
+      return _fail(failure.cause, failure.stackTrace, fallback: '导入标签字典失败');
     } on OperationCancelledException {
       state = state.copyWith(running: false);
       return null;
@@ -98,6 +99,16 @@ class TagDictionaryImportViewModel extends _$TagDictionaryImportViewModel {
       final TagDictionaryImportResult result = await ref
           .read(tagRepoProvider)
           .importTagDictionary(bytes);
+      return await _completeImport(result);
+    } catch (error, stackTrace) {
+      return _fail(error, stackTrace, fallback: '导入标签字典失败');
+    }
+  }
+
+  Future<TagDictionaryImportResult?> _completeImport(
+    TagDictionaryImportResult result,
+  ) async {
+    try {
       await ref
           .read(
             namedFacetManagementViewModelProvider(ManagedNamedFacetKind.tag)

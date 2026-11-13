@@ -1,3 +1,7 @@
+import 'package:hentai_library/features/comic_metadata/infrastructure/metadata_management_preferences.dart';
+import 'package:hentai_library/features/comic_metadata/infrastructure/services/tag_dictionary/read_tag_dictionary_file.dart';
+import 'package:hentai_library/features/comic_metadata/presentation/providers/metadata_management_preferences_providers.dart';
+import 'package:hentai_library/features/comic_metadata/presentation/providers/tag_dictionary_file_provider.dart';
 import 'package:hentai_library/features/series/infrastructure/series_detail_page_size_storage.dart';
 import 'package:hentai_library/features/series/presentation/providers/series_page_size_storage_providers.dart';
 import 'package:hentai_library/features/library_admin/infrastructure/library_migration_store_impl.dart';
@@ -44,6 +48,13 @@ import 'package:hentai_library/features/library_browse/presentation/providers/au
 
 List<Override> platformOverrides() => <Override>[
   openAuthorLinkCommandProvider.overrideWithValue(openAuthorLink),
+  mergeConfirmationSkippedQueryProvider.overrideWithValue(
+    loadMergeConfirmationSkipped,
+  ),
+  setMergeConfirmationSkippedCommandProvider.overrideWithValue(
+    saveMergeConfirmationSkipped,
+  ),
+  readTagDictionaryFileProvider.overrideWithValue(readTagDictionaryFile),
   seriesDetailPageSizeQueryProvider.overrideWithValue(loadSeriesDetailPageSize),
   setSeriesDetailPageSizeCommandProvider.overrideWithValue(
     saveSeriesDetailPageSize,

@@ -22,9 +22,7 @@ import 'package:hentai_library/shared/ui/navigation/pop_or_go_home.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hentai_library/shared/presentation/providers/app_navigator_provider.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-const String _kMergeConfirmSkipKey = 'metadata_merge_confirm_skip';
+import 'package:hentai_library/features/comic_metadata/presentation/providers/metadata_management_preferences_providers.dart';
 
 /// 元数据管理页（MD3E 生产版）：作者 / 标签 / 原作 / 角色四类命名元数据。
 class MetadataManagementPage extends ConsumerStatefulWidget {
@@ -183,15 +181,13 @@ class _MetadataManagementPageState
     if (target == null || sources.isEmpty) {
       return;
     }
-    final prefs = await SharedPreferences.getInstance();
-    final bool skip = prefs.getBool(_kMergeConfirmSkipKey) ?? false;
+    final bool skip = await ref.read(mergeConfirmationSkippedQueryProvider)();
     if (!skip && mounted) {
       final bool confirmed = await showMetadataMergeConfirmDialog(
         context: context,
         target: target,
         sourceCount: sources.length,
-        onSkipChanged: (bool value) =>
-            prefs.setBool(_kMergeConfirmSkipKey, value),
+        onSkipChanged: ref.read(setMergeConfirmationSkippedCommandProvider),
       );
       if (!confirmed || !mounted) {
         return;

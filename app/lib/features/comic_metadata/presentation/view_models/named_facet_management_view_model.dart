@@ -87,11 +87,14 @@ class NamedFacetManagementState {
 
 const Object _sentinel = Object();
 
+typedef _SearchSnapshot = ({List<String> names, NamePinyinIndex index});
+
 @Riverpod(keepAlive: true)
 class NamedFacetManagementViewModel extends _$NamedFacetManagementViewModel {
   int _page = 1;
-  List<String>? _searchAllNames;
-  NamePinyinIndex? _searchPinyinIndex;
+  _SearchSnapshot? _searchSnapshot;
+  int _cacheRevision = 0;
+  int _requestGeneration = 0;
   Timer? _searchDebounce;
   int _searchGeneration = 0;
 
@@ -105,10 +108,18 @@ class NamedFacetManagementViewModel extends _$NamedFacetManagementViewModel {
   }
 
   Future<void> refresh() async {
+    if (!ref.mounted) {
+      return;
+    }
+    final int request = ++_requestGeneration;
+    final String query = state.query;
     state = state.copyWith(isLoading: true, isLoadingMore: false, error: null);
+    if (!_isCurrentRequest(request)) {
+      return;
+    }
     try {
-      if (state.hasSearchQuery) {
-        await _refreshSearch();
+      if (query.isNotEmpty) {
+        await _refreshSearch(query, request);
         return;
       }
 
@@ -120,6 +131,9 @@ class NamedFacetManagementViewModel extends _$NamedFacetManagementViewModel {
             kind,
             pageRequest(page: _page, pageSize: kNamedFacetManagementPageSize),
           );
+      if (!_isCurrentRequest(request)) {
+        return;
+      }
       state = state.copyWith(
         items: <String>[
           for (final NamedFacetFormCandidate entry in result.items) entry.name,
@@ -132,6 +146,9 @@ class NamedFacetManagementViewModel extends _$NamedFacetManagementViewModel {
         error: null,
       );
     } catch (error) {
+      if (!_isCurrentRequest(request)) {
+        return;
+      }
       state = state.copyWith(
         isLoading: false,
         isLoadingMore: false,
@@ -143,22 +160,32 @@ class NamedFacetManagementViewModel extends _$NamedFacetManagementViewModel {
 
   /// Immediate query apply (tests / programmatic). UI should prefer [setQueryDebounced].
   Future<void> setQuery(String value) async {
+    if (!ref.mounted) {
+      return;
+    }
     _searchDebounce?.cancel();
     final String next = value.trim();
     if (next == state.query) {
       return;
     }
+    final int request = ++_requestGeneration;
     state = state.copyWith(query: next);
+    if (!_isCurrentRequest(request)) {
+      return;
+    }
     await refresh();
   }
 
   void setQueryDebounced(String value) {
+    if (!ref.mounted) {
+      return;
+    }
     final String next = value.trim();
+    _searchDebounce?.cancel();
+    final int generation = ++_searchGeneration;
     if (next == state.query) {
       return;
     }
-    _searchDebounce?.cancel();
-    final int generation = ++_searchGeneration;
     _searchDebounce = Timer(kNamedFacetSearchDebounce, () {
       if (!ref.mounted || generation != _searchGeneration) {
         return;
@@ -168,15 +195,20 @@ class NamedFacetManagementViewModel extends _$NamedFacetManagementViewModel {
   }
 
   Future<void> loadMore() async {
-    if (state.isLoading ||
+    if (!ref.mounted ||
+        state.isLoading ||
         state.isLoadingMore ||
         state.hasSearchQuery ||
         !state.hasMore) {
       return;
     }
+    final int request = _requestGeneration;
+    final int nextPage = _page + 1;
     state = state.copyWith(isLoadingMore: true, error: null);
+    if (!_isCurrentRequest(request)) {
+      return;
+    }
     try {
-      final int nextPage = _page + 1;
       final result = await ref
           .read(namedFacetManagementRepoProvider)
           .fetchPage(
@@ -186,6 +218,9 @@ class NamedFacetManagementViewModel extends _$NamedFacetManagementViewModel {
               pageSize: kNamedFacetManagementPageSize,
             ),
           );
+      if (!_isCurrentRequest(request)) {
+        return;
+      }
       _page = result.page;
       final List<String> pageNames = <String>[
         for (final NamedFacetFormCandidate entry in result.items) entry.name,
@@ -203,33 +238,38 @@ class NamedFacetManagementViewModel extends _$NamedFacetManagementViewModel {
         error: null,
       );
     } catch (error) {
+      if (!_isCurrentRequest(request)) {
+        return;
+      }
       state = state.copyWith(isLoadingMore: false, error: error);
     }
   }
 
   Future<void> add(String name) async {
     await ref.read(namedFacetManagementServiceProvider).add(kind, name);
-    await refresh();
+    await _refreshAfterDictionaryChange();
   }
 
   Future<void> rename(String oldName, String newName) async {
     await ref
         .read(namedFacetManagementServiceProvider)
         .rename(kind, oldName, newName);
-    await refresh();
+    await _refreshAfterDictionaryChange();
   }
 
   Future<void> delete(String name) async {
     await ref.read(namedFacetManagementServiceProvider).delete(kind, name);
-    await refresh();
+    await _refreshAfterDictionaryChange();
   }
 
   /// 标签字典变了（清空或导入）之后，管理页和 [allTagsProvider] 读同一份名字。
   Future<void> refreshAfterTagDictionaryChange() async {
+    if (!ref.mounted) {
+      return;
+    }
     ref.invalidate(allTagsProvider);
     if (kind == ManagedNamedFacetKind.tag) {
-      _invalidateSearchCache();
-      await refresh();
+      await _refreshAfterDictionaryChange();
     }
   }
 
@@ -269,7 +309,14 @@ class NamedFacetManagementViewModel extends _$NamedFacetManagementViewModel {
     await ref
         .read(namedFacetManagementServiceProvider)
         .merge(kind: kind, targetName: targetName, sourceNames: sourceNames);
-    exitMerge();
+    if (ref.mounted) {
+      exitMerge();
+    }
+    await _refreshAfterDictionaryChange();
+  }
+
+  Future<void> _refreshAfterDictionaryChange() async {
+    _invalidateSearchCache();
     await refresh();
   }
 
@@ -279,11 +326,16 @@ class NamedFacetManagementViewModel extends _$NamedFacetManagementViewModel {
         .countAttachments(kind, name);
   }
 
-  Future<void> _refreshSearch() async {
-    final List<String> all = await _ensureSearchSnapshot();
-    final NamePinyinIndex index = _searchPinyinIndex!;
-    final List<String> filtered = all
-        .where((String item) => index.matches(item, state.query))
+  bool _isCurrentRequest(int request) =>
+      ref.mounted && request == _requestGeneration;
+
+  Future<void> _refreshSearch(String query, int request) async {
+    final _SearchSnapshot? snapshot = await _ensureSearchSnapshot(request);
+    if (!_isCurrentRequest(request) || snapshot == null) {
+      return;
+    }
+    final List<String> filtered = snapshot.names
+        .where((String item) => snapshot.index.matches(item, query))
         .toList();
     Map<String, int> counts = const <String, int>{};
     if (kind != ManagedNamedFacetKind.author && filtered.isNotEmpty) {
@@ -291,7 +343,7 @@ class NamedFacetManagementViewModel extends _$NamedFacetManagementViewModel {
           .read(namedFacetManagementServiceProvider)
           .countAttachmentsBatch(kind, filtered);
     }
-    if (!ref.mounted) {
+    if (!_isCurrentRequest(request)) {
       return;
     }
     state = state.copyWith(
@@ -305,22 +357,30 @@ class NamedFacetManagementViewModel extends _$NamedFacetManagementViewModel {
     );
   }
 
-  Future<List<String>> _ensureSearchSnapshot() async {
-    final List<String>? cached = _searchAllNames;
-    if (cached != null && _searchPinyinIndex != null) {
+  Future<_SearchSnapshot?> _ensureSearchSnapshot(int request) async {
+    final _SearchSnapshot? cached = _searchSnapshot;
+    if (cached != null) {
       return cached;
     }
+    final int revision = _cacheRevision;
     final List<String> all = await ref
         .read(namedFacetManagementRepoProvider)
         .listAll(kind);
-    _searchAllNames = all;
-    _searchPinyinIndex = await buildNamePinyinIndex(all);
-    return all;
+    if (!_isCurrentRequest(request) || revision != _cacheRevision) {
+      return null;
+    }
+    final NamePinyinIndex index = await buildNamePinyinIndex(all);
+    if (!_isCurrentRequest(request) || revision != _cacheRevision) {
+      return null;
+    }
+    final _SearchSnapshot snapshot = (names: all, index: index);
+    _searchSnapshot = snapshot;
+    return snapshot;
   }
 
   void _invalidateSearchCache() {
-    _searchAllNames = null;
-    _searchPinyinIndex = null;
+    _cacheRevision++;
+    _searchSnapshot = null;
   }
 
   Map<String, int> _countsFromEntries(List<NamedFacetFormCandidate> entries) {

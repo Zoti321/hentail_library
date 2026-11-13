@@ -1,8 +1,9 @@
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 
-import 'dart:io';
 import 'dart:typed_data';
+
+import 'package:hentai_library/features/comic_metadata/presentation/providers/tag_dictionary_file_provider.dart';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -114,7 +115,10 @@ Future<void> importTagDictionaryFromFile(
   }
 
   final PlatformFile file = picked.files.single;
-  final Uint8List? bytes = await _readPickedJsonBytes(file);
+  final Uint8List? bytes = await ref.read(readTagDictionaryFileProvider)(
+    bytes: file.bytes,
+    path: file.path,
+  );
   if (bytes == null || bytes.isEmpty) {
     if (context.mounted) {
       showErrorSnackbar(context, l10n.metadataImportTagDictionaryInvalidFile);
@@ -154,19 +158,4 @@ Future<void> importTagDictionaryFromFile(
       result.skippedFilteredOrEmptyOrDedupe,
     ),
   );
-}
-
-Future<Uint8List?> _readPickedJsonBytes(PlatformFile file) async {
-  if (file.bytes != null && file.bytes!.isNotEmpty) {
-    return Uint8List.fromList(file.bytes!);
-  }
-  final String? path = file.path;
-  if (path == null || path.isEmpty) {
-    return null;
-  }
-  try {
-    return await File(path).readAsBytes();
-  } catch (_) {
-    return null;
-  }
 }
