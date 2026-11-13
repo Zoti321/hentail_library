@@ -23,7 +23,8 @@ class BulkMetadataEditScalarFieldState {
   ComicMetadataBulkScalarOp op = ComicMetadataBulkScalarOp.replace;
   bool mixedValues = false;
   String description = '';
-  DateTime? publishedAt;
+  String publishedAtText = '';
+  DateTime? get publishedAt => DateTime.tryParse(publishedAtText.trim());
 }
 
 class BulkMetadataEditContentRatingFieldState {
@@ -101,8 +102,13 @@ class BulkMetadataEditSession {
   bool isFieldDirty(BulkMetadataEditFieldKind kind) =>
       dirtyFields.contains(kind);
 
+  bool get hasInvalidPublishedAt =>
+      isFieldDirty(BulkMetadataEditFieldKind.publishedAt) &&
+      publishedAtField.op == ComicMetadataBulkScalarOp.replace &&
+      publishedAtField.publishedAt == null;
+
   ComicMetadataBulkPatch? buildPatch() {
-    if (dirtyFields.isEmpty) {
+    if (dirtyFields.isEmpty || hasInvalidPublishedAt) {
       return null;
     }
     final BulkMetadataEditMultiValueFieldState tags =
@@ -159,7 +165,7 @@ class BulkMetadataEditSession {
           ? (publishedAtField.op == ComicMetadataBulkScalarOp.clear
                 ? const ComicMetadataBulkPublishedAtPatch.clear()
                 : ComicMetadataBulkPublishedAtPatch.replace(
-                    publishedAtField.publishedAt?.millisecondsSinceEpoch ?? 0,
+                    publishedAtField.publishedAt!,
                   ))
           : null,
     );

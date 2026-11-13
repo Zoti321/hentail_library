@@ -16,6 +16,26 @@ import 'package:hentai_library/src/rust/api/comic.dart' as rust_comic;
 import 'package:hentai_library/src/rust/api/series.dart' as rust_series;
 
 void main() {
+  for (final count in [0, -1, 2147483648, 4294967297]) {
+    test(
+      'Series metadata mapping rejects an unsupported planned count: $count',
+      () {
+        expect(
+          () => mapUpdateSeriesUserMeta(totalCount: count),
+          throwsRangeError,
+        );
+      },
+    );
+  }
+
+  test('Series metadata mapping preserves the maximum planned count', () {
+    expect(
+      mapUpdateSeriesUserMeta(totalCount: 2147483647).totalCount,
+      2147483647,
+    );
+    expect(mapUpdateSeriesUserMeta(clearTotalCount: true).totalCount, isNull);
+  });
+
   test('mapRustSeries maps Series DTO including locks and items', () {
     const rust_series.SeriesDto dto = rust_series.SeriesDto(
       seriesId: 's1',

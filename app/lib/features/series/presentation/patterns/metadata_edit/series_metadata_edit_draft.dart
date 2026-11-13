@@ -1,4 +1,5 @@
 import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_view_object.dart';
+import 'package:hentai_library/features/series/domain/value_objects/series_metadata_form.dart';
 
 /// Lab 系列元数据编辑草稿。
 class SeriesMetadataEditDraft {
@@ -33,22 +34,11 @@ class SeriesMetadataEditDraft {
     );
   }
 
-  String? validateName() {
-    if (name.trim().isEmpty) {
-      return '系列名称不能为空';
-    }
-    return null;
-  }
+  SeriesMetadataForm toForm() => SeriesMetadataForm(
+    name: name,
+    serializationStatus: serializationStatus,
+    totalCountText: totalCountText,
+  );
 
-  String? validateTotalCount() {
-    final String text = totalCountText.trim();
-    if (text.isEmpty) {
-      return null;
-    }
-    final int? value = int.tryParse(text);
-    if (value == null || value < 0) {
-      return '请输入有效数字';
-    }
-    return null;
-  }
+  SeriesMetadataFormValidation validate() => toForm().validate();
 }

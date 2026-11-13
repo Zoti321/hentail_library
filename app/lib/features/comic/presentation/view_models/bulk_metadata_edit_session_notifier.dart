@@ -11,15 +11,22 @@ class BulkMetadataEditUiState {
   const BulkMetadataEditUiState({
     required this.loading,
     required this.revision,
+    this.showValidationErrors = false,
   });
 
   final bool loading;
   final int revision;
+  final bool showValidationErrors;
 
-  BulkMetadataEditUiState copyWith({bool? loading, int? revision}) {
+  BulkMetadataEditUiState copyWith({
+    bool? loading,
+    int? revision,
+    bool? showValidationErrors,
+  }) {
     return BulkMetadataEditUiState(
       loading: loading ?? this.loading,
       revision: revision ?? this.revision,
+      showValidationErrors: showValidationErrors ?? this.showValidationErrors,
     );
   }
 }
@@ -32,6 +39,9 @@ class BulkMetadataEditSessionNotifier
 
   /// 当前草稿（仅 Notifier / 同 feature 命令路径读取）。
   BulkMetadataEditSession get session => _session;
+
+  bool get showPublishedAtError =>
+      state.showValidationErrors && _session.hasInvalidPublishedAt;
 
   @override
   BulkMetadataEditUiState build(List<String> comicIds) {
@@ -54,19 +64,19 @@ class BulkMetadataEditSessionNotifier
     if (!ref.mounted) {
       return;
     }
-    state = BulkMetadataEditUiState(
-      loading: false,
-      revision: state.revision + 1,
-    );
+    state = state.copyWith(loading: false, revision: state.revision + 1);
   }
 
   void mutate(void Function(BulkMetadataEditSession session) update) {
     update(_session);
-    state = BulkMetadataEditUiState(
-      loading: false,
-      revision: state.revision + 1,
-    );
+    state = state.copyWith(loading: false, revision: state.revision + 1);
   }
 
-  ComicMetadataBulkPatch? buildPatch() => _session.buildPatch();
+  ComicMetadataBulkPatch? buildPatch() {
+    state = state.copyWith(
+      showValidationErrors: true,
+      revision: state.revision + 1,
+    );
+    return _session.buildPatch();
+  }
 }

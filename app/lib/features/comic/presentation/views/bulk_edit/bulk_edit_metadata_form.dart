@@ -7,7 +7,6 @@ import 'package:hentai_library/features/comic/domain/value_objects/comic_languag
 import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/features/comic/presentation/widgets/comic_language_quick_pick.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
@@ -416,10 +415,10 @@ class _BulkScalarBody extends StatelessWidget {
             disabled: !enabled,
             child: PublishedDateTextField(
               label: _bulkFieldLabel(l10n, kind),
-              value: session.publishedAtField.publishedAt == null
-                  ? ''
-                  : DateFormat('yyyy-MM-dd')
-                        .format(session.publishedAtField.publishedAt!),
+              value: session.publishedAtField.publishedAtText,
+              errorText: notifier.showPublishedAtError
+                  ? l10n.formDateInvalidFormat
+                  : null,
               onChanged: _handlePublishedChanged,
             ),
           );
@@ -441,7 +440,7 @@ class _BulkScalarBody extends StatelessWidget {
 
   void _handlePublishedChanged(String value) {
     notifier.mutate((BulkMetadataEditSession session) {
-      session.publishedAtField.publishedAt = DateTime.tryParse(value.trim());
+      session.publishedAtField.publishedAtText = value;
       session.markDirty(kind);
     });
   }

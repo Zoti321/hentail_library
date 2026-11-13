@@ -1,21 +1,8 @@
 import 'package:hentai_library/features/comic/domain/smart_facet_match.dart';
-import 'package:hentai_library/features/comic/presentation/view_models/comic_metadata_smart_facet_providers.dart';
-import 'package:hentai_library/features/comic/domain/comic.dart';
+import 'package:hentai_library/features/comic/application/load_comic_smart_facet_candidates_use_case.dart'
+    show ComicMetadataSmartFacetScope;
 
-/// Builds [ComicMetadataSmartFacetScope] for metadata edit UI.
-ComicMetadataSmartFacetScope comicMetadataSmartFacetScopeForComic(
-  Comic comic, {
-  String? seriesId,
-}) {
-  return (
-    comicId: comic.comicId,
-    title: comic.title,
-    resourcePath: comic.path,
-    seriesId: seriesId,
-  );
-}
-
-/// Lab / Widgetbook scope when no [Comic] entity is loaded.
+/// Builds a Lab or Widgetbook scope without a loaded Comic.
 ComicMetadataSmartFacetScope labComicMetadataSmartFacetScope({
   required String title,
   String comicId = 'lab-comic-id',

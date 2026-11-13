@@ -5,6 +5,8 @@ import 'package:hentai_library/features/series/domain/value_objects/series_meta_
 
 part 'series.freezed.dart';
 
+const int maxSeriesTotalCount = 2147483647;
+
 /// 系列聚合：由 Library sync 根据文件夹结构自动生成。
 ///
 /// 真源 @ `features/series/domain/`（ADR-0042）；跨模块只交换窄投影或 Port 事实。

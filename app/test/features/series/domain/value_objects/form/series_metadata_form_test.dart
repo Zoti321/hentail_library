@@ -1,37 +1,7 @@
 import 'package:hentai_library/features/series/public/serialization_status.dart';
 import 'package:hentai_library/features/series/domain/series.dart';
 import 'package:hentai_library/features/series/domain/value_objects/series_metadata_form.dart';
-import 'package:hentai_library/features/series/application/series_metadata_service.dart';
-import 'package:hentai_library/features/series/domain/series_repository.dart';
 import 'package:test/test.dart';
-
-class _RecordingSeriesRepository implements SeriesRepository {
-  String? seriesId;
-  String? name;
-  SerializationStatus? serializationStatus;
-  int? totalCount;
-  bool? clearTotalCount;
-  int callCount = 0;
-
-  @override
-  Future<void> updateUserMeta({
-    required String seriesId,
-    String? name,
-    SerializationStatus? serializationStatus,
-    int? totalCount,
-    bool clearTotalCount = false,
-  }) async {
-    callCount += 1;
-    this.seriesId = seriesId;
-    this.name = name;
-    this.serializationStatus = serializationStatus;
-    this.totalCount = totalCount;
-    this.clearTotalCount = clearTotalCount;
-  }
-
-  @override
-  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
-}
 
 Series _series({
   String name = '原系列',
@@ -48,6 +18,54 @@ Series _series({
 }
 
 void main() {
+  group('SeriesMetadataForm.diffAgainst', () {
+    test('validates all fields before parsing changes', () {
+      final diff = SeriesMetadataForm(
+        name: ' ',
+        serializationStatus: SerializationStatus.ended,
+        totalCountText: 'bad',
+      ).diffAgainst(_series());
+      expect(diff, isA<SeriesMetadataDraftInvalid>());
+      final invalid = diff as SeriesMetadataDraftInvalid;
+      expect(invalid.validation.nameError, isNotNull);
+      expect(invalid.validation.totalCountError, isNotNull);
+    });
+
+    test('trimmed names and equivalent numeric text produce no changes', () {
+      final original = _series();
+      final diff = SeriesMetadataForm.fromSeries(original)
+          .copyWith(name: ' 原系列 ', totalCountText: ' 012 ')
+          .diffAgainst(original);
+      expect(diff, isA<SeriesMetadataDraftUnchanged>());
+    });
+
+    test('changed fields form one patch and blank count distinguishes clear from unchanged', () {
+      final original = _series();
+      final diff = SeriesMetadataForm(
+        name: ' 新名 ',
+        serializationStatus: SerializationStatus.ended,
+        totalCountText: '8',
+      ).diffAgainst(original) as SeriesMetadataDraftChanges;
+      expect(diff.name, '新名');
+      expect(diff.serializationStatus, SerializationStatus.ended);
+      expect(diff.totalCount, 8);
+      expect(diff.clearTotalCount, isFalse);
+
+      final cleared =
+          SeriesMetadataForm.fromSeries(original)
+                  .copyWith(totalCountText: ' ')
+                  .diffAgainst(original)
+              as SeriesMetadataDraftChanges;
+      expect(cleared.name, isNull);
+      expect(cleared.totalCount, isNull);
+      expect(cleared.clearTotalCount, isTrue);
+      final noCount = _series(totalCount: null);
+      expect(
+        SeriesMetadataForm.fromSeries(noCount).diffAgainst(noCount),
+        isA<SeriesMetadataDraftUnchanged>(),
+      );
+    });
+  });
   group('SeriesMetadataForm.fromSeries', () {
     test('maps name, status, and totalCount text', () {
       final SeriesMetadataForm form = SeriesMetadataForm.fromSeries(
@@ -67,6 +85,35 @@ void main() {
   });
 
   group('SeriesMetadataForm.validate', () {
+    for (final count in [2147483648, 4294967297]) {
+      test(
+        'rejects a planned count that cannot be persisted exactly: $count',
+        () {
+          final form = SeriesMetadataForm(
+            name: 'Series',
+            serializationStatus: SerializationStatus.ongoing,
+            totalCountText: '$count',
+          );
+          expect(form.validate().totalCountError, isNotNull);
+          expect(
+            form.diffAgainst(_series()),
+            isA<SeriesMetadataDraftInvalid>(),
+          );
+        },
+      );
+    }
+
+    test('accepts the largest supported count without changing its value', () {
+      final form = SeriesMetadataForm(
+        name: 'Series',
+        serializationStatus: SerializationStatus.ongoing,
+        totalCountText: '2147483647',
+      );
+      expect(form.validate().isValid, isTrue);
+      final diff = form.diffAgainst(_series()) as SeriesMetadataDraftChanges;
+      expect(diff.totalCount, 2147483647);
+    });
+
     test('rejects blank name', () {
       final SeriesMetadataFormValidation v = SeriesMetadataForm(
         name: '  ',
@@ -115,113 +162,6 @@ void main() {
         totalCountText: '  ',
       ).validate();
       expect(v.isValid, isTrue);
-    });
-  });
-
-  group('applySeriesMetadataForm', () {
-    test('returns Invalid and does not call repository', () async {
-      final _RecordingSeriesRepository repo = _RecordingSeriesRepository();
-      final SeriesMetadataApplyResult result = await applySeriesMetadataForm(
-        repo,
-        SeriesMetadataForm(
-          name: '',
-          serializationStatus: SerializationStatus.ongoing,
-          totalCountText: 'x',
-        ),
-        _series(),
-      );
-
-      expect(result, isA<SeriesMetadataApplyInvalid>());
-      expect(repo.callCount, 0);
-      final SeriesMetadataApplyInvalid invalid =
-          result as SeriesMetadataApplyInvalid;
-      expect(invalid.validation.nameError, isNotNull);
-      expect(invalid.validation.totalCountError, isNotNull);
-    });
-
-    test('only submits changed serialization status', () async {
-      final _RecordingSeriesRepository repo = _RecordingSeriesRepository();
-      final Series original = _series(
-        name: '原系列',
-        status: SerializationStatus.ongoing,
-        totalCount: 12,
-      );
-      final SeriesMetadataApplyResult result = await applySeriesMetadataForm(
-        repo,
-        SeriesMetadataForm.fromSeries(original)
-            .copyWith(serializationStatus: SerializationStatus.ended),
-        original,
-      );
-
-      expect(result, isA<SeriesMetadataApplySucceeded>());
-      expect(repo.callCount, 1);
-      expect(repo.seriesId, 'series-1');
-      expect(repo.name, isNull);
-      expect(repo.serializationStatus, SerializationStatus.ended);
-      expect(repo.totalCount, isNull);
-      expect(repo.clearTotalCount, isFalse);
-    });
-
-    test(
-      'does not clear totalCount when already empty and unchanged',
-      () async {
-        final _RecordingSeriesRepository repo = _RecordingSeriesRepository();
-        final Series original = _series(totalCount: null);
-        final SeriesMetadataApplyResult result = await applySeriesMetadataForm(
-          repo,
-          SeriesMetadataForm.fromSeries(original),
-          original,
-        );
-
-        expect(result, isA<SeriesMetadataApplySucceeded>());
-        expect(repo.callCount, 0);
-      },
-    );
-
-    test('sets totalCount when text is a positive integer', () async {
-      final _RecordingSeriesRepository repo = _RecordingSeriesRepository();
-      final Series original = _series(
-        name: '旧名',
-        status: SerializationStatus.ongoing,
-        totalCount: 3,
-      );
-      final SeriesMetadataApplyResult result = await applySeriesMetadataForm(
-        repo,
-        SeriesMetadataForm(
-          name: ' 新系列 ',
-          serializationStatus: SerializationStatus.ended,
-          totalCountText: '8',
-        ),
-        original,
-      );
-
-      expect(result, isA<SeriesMetadataApplySucceeded>());
-      expect(repo.callCount, 1);
-      expect(repo.seriesId, 'series-1');
-      expect(repo.name, '新系列');
-      expect(repo.serializationStatus, SerializationStatus.ended);
-      expect(repo.totalCount, 8);
-      expect(repo.clearTotalCount, isFalse);
-    });
-
-    test('clears totalCount when text becomes empty', () async {
-      final _RecordingSeriesRepository repo = _RecordingSeriesRepository();
-      final Series original = _series(
-        name: '系列',
-        status: SerializationStatus.ongoing,
-        totalCount: 12,
-      );
-      final SeriesMetadataApplyResult result = await applySeriesMetadataForm(
-        repo,
-        SeriesMetadataForm.fromSeries(original).copyWith(totalCountText: ''),
-        original,
-      );
-
-      expect(result, isA<SeriesMetadataApplySucceeded>());
-      expect(repo.callCount, 1);
-      expect(repo.name, isNull);
-      expect(repo.totalCount, isNull);
-      expect(repo.clearTotalCount, isTrue);
     });
   });
 }

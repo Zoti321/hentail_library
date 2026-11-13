@@ -1,5 +1,6 @@
 import 'package:hentai_library/infrastructure/frb/frb_call_guard.dart';
 import 'package:hentai_library/features/library_admin/infrastructure/adapters/remote_credentials_frb_adapter.dart';
+import 'package:hentai_library/features/library_admin/infrastructure/mappers/comic_metadata_bulk_patch_frb_mapper.dart';
 import 'package:hentai_library/features/library_admin/domain/comic_metadata_bulk_patch_port.dart';
 import 'package:hentai_library/features/library_admin/domain/comic_metadata_bulk_patch.dart';
 import 'package:hentai_library/features/library_admin/domain/library_repository.dart';
@@ -24,7 +25,7 @@ class ComicMetadataBulkPatchFrbAdapter implements ComicMetadataBulkPatchPort {
       final comic_rust.BulkPatchResultFrbDto result = await guardFrb(
         () => comic_rust.applyComicMetadataBulkPatchFrb(
           comicIds: comicIds,
-          patch: _mapPatch(patch),
+          patch: mapComicMetadataBulkPatchToFrb(patch),
           handle: handle,
         ),
         fallbackMessage: '批量编辑元数据失败',
@@ -47,65 +48,5 @@ class ComicMetadataBulkPatchFrbAdapter implements ComicMetadataBulkPatchPort {
     if (handle != null) {
       sync_rust.cancelSyncFrb(handle: handle);
     }
-  }
-
-  comic_rust.ComicMetadataBulkPatchFrbDto _mapPatch(
-    ComicMetadataBulkPatch patch,
-  ) {
-    return comic_rust.ComicMetadataBulkPatchFrbDto(
-      tags: patch.tags == null ? null : _mapMultiValue(patch.tags!),
-      authors: patch.authors == null ? null : _mapMultiValue(patch.authors!),
-      languages: patch.languages == null
-          ? null
-          : _mapMultiValue(patch.languages!),
-      parodies: patch.parodies == null ? null : _mapMultiValue(patch.parodies!),
-      characters: patch.characters == null
-          ? null
-          : _mapMultiValue(patch.characters!),
-      contentRating: patch.contentRating,
-      description: patch.description == null
-          ? null
-          : _mapDescription(patch.description!),
-      publishedAt: patch.publishedAt == null
-          ? null
-          : _mapPublishedAt(patch.publishedAt!),
-    );
-  }
-
-  comic_rust.MultiValuePatchFrbDto _mapMultiValue(
-    ComicMetadataBulkMultiValuePatch patch,
-  ) {
-    return comic_rust.MultiValuePatchFrbDto(
-      op: switch (patch.op) {
-        ComicMetadataBulkMultiValueOp.add => comic_rust.MultiValueOpFrbDto.add,
-        ComicMetadataBulkMultiValueOp.remove =>
-          comic_rust.MultiValueOpFrbDto.remove,
-        ComicMetadataBulkMultiValueOp.replace =>
-          comic_rust.MultiValueOpFrbDto.replace,
-      },
-      values: patch.values,
-    );
-  }
-
-  comic_rust.ScalarPatchFrbDto _mapDescription(
-    ComicMetadataBulkDescriptionPatch patch,
-  ) {
-    return switch (patch.op) {
-      ComicMetadataBulkScalarOp.replace => comic_rust.ScalarPatchFrbDto.replace(
-        patch.value ?? '',
-      ),
-      ComicMetadataBulkScalarOp.clear => comic_rust.ScalarPatchFrbDto.clear(),
-    };
-  }
-
-  comic_rust.PublishedAtPatchFrbDto _mapPublishedAt(
-    ComicMetadataBulkPublishedAtPatch patch,
-  ) {
-    return switch (patch.op) {
-      ComicMetadataBulkScalarOp.replace =>
-        comic_rust.PublishedAtPatchFrbDto.replace(patch.value ?? 0),
-      ComicMetadataBulkScalarOp.clear =>
-        comic_rust.PublishedAtPatchFrbDto.clear(),
-    };
   }
 }

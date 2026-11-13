@@ -153,6 +153,10 @@ rust_series.UpdateSeriesUserMetaDto mapUpdateSeriesUserMeta({
   int? totalCount,
   bool clearTotalCount = false,
 }) {
+  if (totalCount != null &&
+      (totalCount < 1 || totalCount > maxSeriesTotalCount)) {
+    throw RangeError.range(totalCount, 1, maxSeriesTotalCount, 'totalCount');
+  }
   return rust_series.UpdateSeriesUserMetaDto(
     name: name,
     serializationStatus: serializationStatus?.toRust(),

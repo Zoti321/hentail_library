@@ -28,16 +28,26 @@ class ComicMetadataBulkDescriptionPatch {
   final String? value;
 }
 
-class ComicMetadataBulkPublishedAtPatch {
-  const ComicMetadataBulkPublishedAtPatch.replace(this.value)
-    : op = ComicMetadataBulkScalarOp.replace;
+sealed class ComicMetadataBulkPublishedAtPatch {
+  const ComicMetadataBulkPublishedAtPatch._();
 
-  const ComicMetadataBulkPublishedAtPatch.clear()
-    : op = ComicMetadataBulkScalarOp.clear,
-      value = null;
+  const factory ComicMetadataBulkPublishedAtPatch.replace(DateTime value) =
+      ComicMetadataBulkPublishedAtReplace;
 
-  final ComicMetadataBulkScalarOp op;
-  final int? value;
+  const factory ComicMetadataBulkPublishedAtPatch.clear() =
+      ComicMetadataBulkPublishedAtClear;
+}
+
+final class ComicMetadataBulkPublishedAtReplace
+    extends ComicMetadataBulkPublishedAtPatch {
+  const ComicMetadataBulkPublishedAtReplace(this.value) : super._();
+
+  final DateTime value;
+}
+
+final class ComicMetadataBulkPublishedAtClear
+    extends ComicMetadataBulkPublishedAtPatch {
+  const ComicMetadataBulkPublishedAtClear() : super._();
 }
 
 class ComicMetadataBulkPatch {

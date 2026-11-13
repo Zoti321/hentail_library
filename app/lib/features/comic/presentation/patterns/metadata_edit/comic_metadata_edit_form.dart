@@ -6,7 +6,8 @@ import 'package:hentai_library/features/comic/presentation/patterns/metadata_edi
 import 'package:hentai_library/features/comic/presentation/patterns/metadata_edit/comic_metadata_locks_pane.dart';
 import 'package:hentai_library/features/comic/presentation/widgets/comic_language_quick_pick.dart';
 import 'package:hentai_library/features/comic/domain/value_objects/comic_meta_locks.dart';
-import 'package:hentai_library/features/comic/presentation/view_models/comic_metadata_smart_facet_providers.dart';
+import 'package:hentai_library/features/comic/application/load_comic_smart_facet_candidates_use_case.dart'
+    show ComicMetadataSmartFacetScope;
 import 'package:hentai_library/features/comic/presentation/views/widgets/form/library_facet_multi_select_field.dart';
 import 'package:hentai_library/features/comic_metadata/public/comic_metadata_form.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

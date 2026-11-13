@@ -59,12 +59,13 @@ class _SeriesMetadataEditPageState extends State<SeriesMetadataEditLayout>
   }
 
   void _handleDraftChanged(SeriesMetadataEditDraft value) {
+    final validation = value.validate();
     setState(() {
       _draft = value;
-      if (_nameError != null && value.validateName() == null) {
+      if (_nameError != null && validation.nameError == null) {
         _nameError = null;
       }
-      if (_totalCountError != null && value.validateTotalCount() == null) {
+      if (_totalCountError != null && validation.totalCountError == null) {
         _totalCountError = null;
       }
     });
@@ -74,12 +75,11 @@ class _SeriesMetadataEditPageState extends State<SeriesMetadataEditLayout>
   Future<void> saveAndPop() => _handleSave();
 
   Future<void> _handleSave() async {
-    final String? nameError = _draft.validateName();
-    final String? totalError = _draft.validateTotalCount();
-    if (nameError != null || totalError != null) {
+    final validation = _draft.validate();
+    if (!validation.isValid) {
       setState(() {
-        _nameError = nameError;
-        _totalCountError = totalError;
+        _nameError = validation.nameError;
+        _totalCountError = validation.totalCountError;
       });
       return;
     }

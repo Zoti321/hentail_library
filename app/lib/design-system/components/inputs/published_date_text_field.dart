@@ -18,6 +18,7 @@ class PublishedDateTextField extends StatefulWidget {
     required this.label,
     required this.value,
     required this.onChanged,
+    this.errorText,
     this.firstDate,
     this.lastDate,
     this.initialCalendarMode = M3EDatePickerMode.year,
@@ -26,6 +27,7 @@ class PublishedDateTextField extends StatefulWidget {
   final String label;
   final String value;
   final ValueChanged<String> onChanged;
+  final String? errorText;
   final DateTime? firstDate;
   final DateTime? lastDate;
   final M3EDatePickerMode initialCalendarMode;
@@ -111,6 +113,7 @@ class _PublishedDateTextFieldState extends State<PublishedDateTextField> {
         controller: _controller,
         keyboardType: TextInputType.datetime,
         onChanged: widget.onChanged,
+        errorText: widget.errorText,
         showClearButton: true,
         clearButtonSemanticsLabel: l10n.clearDateTooltip,
         trailing: M3ETextFieldAffordance(
