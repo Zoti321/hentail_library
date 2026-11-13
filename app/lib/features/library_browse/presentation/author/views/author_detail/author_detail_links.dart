@@ -4,6 +4,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/library_browse/presentation/author/view_models/author_detail_notifier.dart';
+import 'package:hentai_library/features/library_browse/presentation/providers/author_link_providers.dart';
 import 'package:hentai_library/features/comic_metadata/public/comic_metadata_entities.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
@@ -11,7 +12,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 /// 链接 chip 列表 + 「添加链接」；添加时原位变为输入框，平台按 URL 自动识别。
 class AuthorDetailLinks extends HookConsumerWidget {
@@ -19,13 +19,13 @@ class AuthorDetailLinks extends HookConsumerWidget {
 
   final AuthorDetail detail;
 
-  Future<void> _openLink(BuildContext context, String url) async {
+  Future<void> _openLink(
+    BuildContext context,
+    WidgetRef ref,
+    String url,
+  ) async {
     try {
-      final Uri uri = Uri.parse(url);
-      if (!await canLaunchUrl(uri)) {
-        throw StateError('cannot launch');
-      }
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
+      await ref.read(openAuthorLinkCommandProvider)(url);
     } catch (_) {
       if (!context.mounted) {
         return;
@@ -121,7 +121,7 @@ class AuthorDetailLinks extends HookConsumerWidget {
               showBorder: false,
               textColor: cs.primary,
               icon: _platformIcon(link.platform),
-              onTap: () => _openLink(context, link.url),
+              onTap: () => _openLink(context, ref, link.url),
               onRemove: () => _deleteLink(context, ref, link),
               removeTooltip: l10n.authorDetailDeleteLink,
               removeOnDesktopHoverOnly: true,

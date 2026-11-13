@@ -127,6 +127,121 @@ fn comic_dto_carries_author_stable_id() {
 }
 
 #[test]
+fn identity_rename_targets_the_original_author_after_its_old_name_is_reused() {
+    common::with_global_db(|| {
+        let temp = TempDir::new().expect("tempdir");
+        let db_path = common::create_fixture_db(temp.path());
+        let runtime = tokio::runtime::Runtime::new().expect("runtime");
+        runtime.block_on(async {
+            init_db_at_path(&db_path).await.expect("init_db");
+            let db = connection().expect("connection");
+            let lib = create_local_library(&temp.path().to_string_lossy(), None)
+                .await
+                .expect("library");
+            seed_comic(
+                &db,
+                "identity-comic",
+                &lib.library_id,
+                "E:/identity.cbz",
+                "Identity",
+                "safe",
+            )
+            .await;
+            replace_comic_authors(&db, "identity-comic", &["Alice".to_string()])
+                .await
+                .expect("attach original author");
+            let original_id = author_id_named(&db, "Alice").await;
+            let link = add_author_link(
+                original_id,
+                AuthorLinkPlatform::Other,
+                "https://example.com/alice",
+                None,
+            )
+            .await
+            .expect("link");
+            rename_author("Alice", "Alicia")
+                .await
+                .expect("concurrent rename");
+            let replacement = add_author("Alice").await.expect("old name reused");
+            assert_ne!(original_id, replacement.id);
+            let notifications = hentai_core::revision::notify_count();
+
+            hentai_core::rename_author_identity(original_id, " Bob ")
+                .await
+                .expect("rename selected author");
+
+            let selected = get_author_detail(original_id, true)
+                .await
+                .expect("detail")
+                .expect("original author");
+            assert_eq!(selected.identity.name, "Bob");
+            assert_eq!(author_id_named(&db, "Bob").await, original_id);
+            assert_eq!(author_id_named(&db, "Alice").await, replacement.id);
+            let links = list_author_links(original_id)
+                .await
+                .expect("retained links");
+            assert_eq!(links.len(), 1);
+            assert_eq!(links[0].id, link.id);
+            assert_eq!(links[0].url, "https://example.com/alice");
+            assert!(list_author_links(replacement.id)
+                .await
+                .expect("replacement links")
+                .is_empty());
+            let comic = hentai_core::find_comic_by_id("identity-comic")
+                .await
+                .expect("comic")
+                .expect("retained");
+            assert_eq!(
+                comic.authors,
+                vec![hentai_core::ComicAuthorDto {
+                    id: Some(original_id),
+                    name: "Bob".to_string()
+                }]
+            );
+            assert_eq!(hentai_core::revision::notify_count(), notifications + 1);
+        });
+    });
+}
+
+#[test]
+fn identity_rename_rejects_conflicts_invalid_names_and_missing_ids_without_notifications() {
+    common::with_global_db(|| {
+        let temp = TempDir::new().expect("tempdir");
+        let db_path = common::create_fixture_db(temp.path());
+        let runtime = tokio::runtime::Runtime::new().expect("runtime");
+        runtime.block_on(async {
+            init_db_at_path(&db_path).await.expect("init_db");
+            let author = add_author("Selected").await.expect("selected");
+            let reserved = add_author("Reserved").await.expect("reserved");
+            for (id, name, message) in [
+                (author.id, " Reserved ", "作者显示名已存在"),
+                (author.id, " \n ", "作者显示名不能为空"),
+                (i64::MAX, "New name", "作者不存在"),
+            ] {
+                let notifications = hentai_core::revision::notify_count();
+                let error = hentai_core::rename_author_identity(id, name).await.expect_err("invalid rename");
+                assert_eq!(error.code, hentai_core::HentaiErrorCode::Validation);
+                assert!(error.message.contains(message), "{error:?}");
+                assert_eq!(hentai_core::revision::notify_count(), notifications);
+                let guard = hentai_core::try_acquire_library_write_lock().expect("failure releases lock");
+                drop(guard);
+            }
+            assert_eq!(get_author_detail(author.id, true).await.expect("detail").expect("selected retained").identity.name, "Selected");
+            assert_eq!(get_author_detail(reserved.id, true).await.expect("detail").expect("reserved retained").identity.name, "Reserved");
+
+            let db = connection().expect("connection");
+            db.execute_unprepared("CREATE TRIGGER block_identity_rename BEFORE UPDATE ON authors WHEN NEW.name = 'Blocked' BEGIN SELECT RAISE(ABORT, 'identity update blocked'); END").await.expect("failure trigger");
+            let notifications = hentai_core::revision::notify_count();
+            let error = hentai_core::rename_author_identity(author.id, "Blocked").await.expect_err("database rejects update");
+            assert!(error.message.contains("identity update blocked"), "{error:?}");
+            assert_eq!(hentai_core::revision::notify_count(), notifications);
+            assert_eq!(get_author_detail(author.id, true).await.expect("detail").expect("selected retained").identity.name, "Selected");
+            let _guard = hentai_core::try_acquire_library_write_lock().expect("database failure releases lock");
+        });
+    });
+}
+
+#[test]
 fn rename_keeps_links_delete_cascades_and_filter_uses_id() {
     common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");

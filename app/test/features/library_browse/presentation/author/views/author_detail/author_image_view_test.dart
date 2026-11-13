@@ -1,3 +1,4 @@
+import 'package:hentai_library/composition/modules/library_browse/library_browse_preferences_overrides.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 
 import 'dart:async';
@@ -272,7 +273,10 @@ void main() {
     final _PlatformAuthorRepository repo = _PlatformAuthorRepository();
     await pumpLocalizedApp(
       tester,
-      overrides: <Override>[authorRepoProvider.overrideWithValue(repo)],
+      overrides: <Override>[
+        ...libraryBrowsePreferencesOverrides(),
+        authorRepoProvider.overrideWithValue(repo),
+      ],
       home: const Scaffold(
         body: SizedBox(
           width: 400,

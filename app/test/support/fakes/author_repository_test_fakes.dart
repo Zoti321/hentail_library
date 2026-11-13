@@ -35,6 +35,9 @@ class EmptyAuthorRepository implements AuthorRepository {
   Future<void> rename(String oldName, String newName) async {}
 
   @override
+  Future<void> renameById(int authorId, String newName) async {}
+
+  @override
   Future<AuthorDetail?> getDetail({
     required int authorId,
     required bool showR18,

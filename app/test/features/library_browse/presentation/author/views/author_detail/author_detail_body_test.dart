@@ -1,3 +1,4 @@
+import 'package:hentai_library/composition/modules/library_browse/library_browse_preferences_overrides.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +18,7 @@ import '../../../../../../support/fakes/author_repository_test_fakes.dart';
 import '../../../../../../support/pump_localized_app.dart';
 
 class _StubAuthorRepository extends EmptyAuthorRepository {
-  final List<(String, String)> renames = <(String, String)>[];
+  final List<(int, String)> renames = <(int, String)>[];
   final List<(AuthorLinkPlatform, String)> addedLinks =
       <(AuthorLinkPlatform, String)>[];
   final List<(int, int)> deletedLinks = <(int, int)>[];
@@ -25,7 +26,12 @@ class _StubAuthorRepository extends EmptyAuthorRepository {
 
   @override
   Future<void> rename(String oldName, String newName) async {
-    renames.add((oldName, newName));
+    throw StateError('Author details must rename by stable identity');
+  }
+
+  @override
+  Future<void> renameById(int authorId, String newName) async {
+    renames.add((authorId, newName));
   }
 
   @override
@@ -93,6 +99,7 @@ Future<void> _pumpBody(WidgetTester tester, _StubAuthorRepository repo) async {
   addTearDown(tester.view.resetPhysicalSize);
 
   final List<Override> overrides = <Override>[
+    ...libraryBrowsePreferencesOverrides(),
     authorRepoProvider.overrideWithValue(repo),
   ];
   final M3EThemeData m3e = buildThemeData(brightness: Brightness.light);
@@ -135,7 +142,7 @@ void main() {
     await tester.testTextInput.receiveAction(TextInputAction.done);
     await tester.pumpAndSettle();
 
-    expect(repo.renames, <(String, String)>[('Alice', 'Bob')]);
+    expect(repo.renames, <(int, String)>[(1, 'Bob')]);
   });
 
   testWidgets('add link field detects platform from pasted url', (

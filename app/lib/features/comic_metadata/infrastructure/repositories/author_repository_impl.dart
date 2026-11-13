@@ -65,6 +65,10 @@ class AuthorRepositoryImpl implements AuthorRepository {
       namedFacets.rename(ManagedNamedFacetKind.author, oldName, newName);
 
   @override
+  Future<void> renameById(int authorId, String newName) =>
+      _adapter.renameById(authorId, newName);
+
+  @override
   Future<AuthorDetail?> getDetail({
     required int authorId,
     required bool showR18,

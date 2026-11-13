@@ -19,6 +19,8 @@ abstract class AuthorRepository {
 
   Future<void> rename(String oldName, String newName);
 
+  Future<void> renameById(int authorId, String newName);
+
   Future<AuthorDetail?> getDetail({
     required int authorId,
     required bool showR18,

@@ -162,7 +162,7 @@ class _AuthorNameRow extends HookConsumerWidget {
       try {
         await ref
             .read(authorDetailCommandsProvider)
-            .rename(authorId: detail.id, oldName: detail.name, newName: value);
+            .rename(authorId: detail.id, newName: value);
         if (context.mounted) {
           editing.value = false;
         }

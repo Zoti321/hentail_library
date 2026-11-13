@@ -31,8 +31,11 @@ import 'package:hentai_library/features/metadata_backup/presentation/providers/m
 import 'package:hentai_library/features/reader/infrastructure/adapters/page_image_png_encoder.dart';
 import 'package:hentai_library/features/reader/infrastructure/adapters/system_clipboard_image_adapter.dart';
 import 'package:hentai_library/features/reader/presentation/providers/page_image_copy_providers.dart';
+import 'package:hentai_library/features/library_browse/infrastructure/open_author_link.dart';
+import 'package:hentai_library/features/library_browse/presentation/providers/author_link_providers.dart';
 
 List<Override> platformOverrides() => <Override>[
+  openAuthorLinkCommandProvider.overrideWithValue(openAuthorLink),
   showInFileExplorerProvider.overrideWithValue(showInFileExplorer),
   openDirectoryInFileExplorerProvider.overrideWithValue(
     openDirectoryInFileExplorer,

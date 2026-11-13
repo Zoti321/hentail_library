@@ -10,6 +10,14 @@ class AuthorFrbAdapter {
   Future<List<rust_author.AuthorIdentityFrbDto>> listAll() =>
       guardFrb(rust_author.listAllAuthorsFrb, fallbackMessage: '读取作者列表失败');
 
+  Future<void> renameById(int authorId, String newName) => guardFrb(
+    () => rust_author.renameAuthorByIdFrb(
+      authorId: _toI64(authorId),
+      newName: newName,
+    ),
+    fallbackMessage: '重命名作者失败',
+  );
+
   Stream<List<rust_author.AuthorIdentityFrbDto>> watchAll() => guardFrbStream(
     () => rust_author.watchAuthorsFrb(),
     fallbackMessage: '监听作者列表失败',

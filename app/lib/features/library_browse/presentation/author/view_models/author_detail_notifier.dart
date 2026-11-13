@@ -1,3 +1,4 @@
+
 import 'dart:typed_data';
 
 import 'package:hentai_library/features/comic/public.dart';
@@ -98,13 +99,11 @@ class AuthorDetailCommands {
     return null;
   }
 
-  Future<void> rename({
-    required int authorId,
-    required String oldName,
-    required String newName,
-  }) async {
-    await _ref.read(authorRepoProvider).rename(oldName, newName);
-    _ref.invalidate(authorDetailProvider(authorId));
+  Future<void> rename({required int authorId, required String newName}) async {
+    await _ref.read(authorRepoProvider).renameById(authorId, newName);
+    if (_ref.mounted) {
+      _ref.invalidate(authorDetailProvider(authorId));
+    }
   }
 
   Future<void> addLink({

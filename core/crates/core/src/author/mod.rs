@@ -313,6 +313,18 @@ pub async fn rename_author(old_name: &str, new_name: &str) -> Result<(), HentaiE
     with_library_write(|| rename_author_locked(old_name, new_name)).await
 }
 
+/// Rename the selected Author by stable identity, preserving links and Comic attachments.
+pub async fn rename_author_identity(author_id: i64, new_name: &str) -> Result<(), HentaiError> {
+    with_library_write(|| async {
+        let db = connection()?;
+        ensure_author_exists(&db, author_id).await?;
+        rename_author_by_id(&db, author_id, new_name).await?;
+        crate::revision::notify_committed();
+        Ok(())
+    })
+    .await
+}
+
 /// [`rename_author`] body for callers that already hold the library write lock (ADR-0026).
 pub(crate) async fn rename_author_locked(
     old_name: &str,

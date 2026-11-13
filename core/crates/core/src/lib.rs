@@ -37,10 +37,10 @@ pub use author::{
     fetch_author_names_page_result, fetch_authors_page, fetch_authors_page_result,
     get_author_detail, list_all_author_names, list_all_authors, list_author_links,
     list_author_names_for_form, list_distinct_author_names, load_author_image, reject_author_merge,
-    rename_author, replace_comic_authors, resolve_author_image, update_author_link, watch_authors,
-    AuthorDetailDto, AuthorFacetCountDto, AuthorIdentity, AuthorImageRef, AuthorImageSlot,
-    AuthorImageSource, AuthorLinkDto, AuthorLinkPlatform, AuthorTopComicDto,
-    PagedAuthorIdentitiesDto, PagedAuthorNamesDto,
+    rename_author, rename_author_identity, replace_comic_authors, resolve_author_image,
+    update_author_link, watch_authors, AuthorDetailDto, AuthorFacetCountDto, AuthorIdentity,
+    AuthorImageRef, AuthorImageSlot, AuthorImageSource, AuthorLinkDto, AuthorLinkPlatform,
+    AuthorTopComicDto, PagedAuthorIdentitiesDto, PagedAuthorNamesDto,
 };
 pub use character::{list_all_characters, list_distinct_characters};
 pub use comic::{

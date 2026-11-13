@@ -31,6 +31,14 @@ Future<void> renameAuthorFrb({
   newName: newName,
 );
 
+Future<void> renameAuthorByIdFrb({
+  required PlatformInt64 authorId,
+  required String newName,
+}) => RustLib.instance.api.crateApiAuthorRenameAuthorByIdFrb(
+  authorId: authorId,
+  newName: newName,
+);
+
 Stream<List<AuthorIdentityFrbDto>> watchAuthorsFrb() =>
     RustLib.instance.api.crateApiAuthorWatchAuthorsFrb();
 
