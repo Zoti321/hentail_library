@@ -1,3 +1,4 @@
+import 'package:hentai_library/composition/modules/library_browse/library_browse_preferences_overrides.dart';
 import 'package:flutter/widgets.dart';
 import 'package:hentai_library/features/comic/domain/value_objects/library_comic_grouping.dart';
 import 'package:hentai_library/composition/composition_overrides.dart';
@@ -157,6 +158,7 @@ void main() {
   }) {
     final ProviderContainer container = ProviderContainer(
       overrides: <Override>[
+        ...libraryBrowsePreferencesOverrides(),
         ...featureStateOverrides(),
         ...bootstrapCompositionOverrides(),
         ...extraOverrides,

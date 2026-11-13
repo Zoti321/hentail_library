@@ -1,3 +1,5 @@
+import 'package:hentai_library/features/library_browse/domain/browse/library_comic_browse_preferences.dart';
+
 import 'dart:math' as math;
 
 import 'package:hentai_library/features/comic/public.dart';
@@ -17,7 +19,7 @@ export 'library_filter_sort_drawer_host.dart';
 
 /// 筛选排序抽屉的本地状态（Widgetbook / 测试用，不绑 Riverpod）。
 ///
-/// 字段与生产 [LibraryComicFiltersState] 的抽屉子集一致。
+/// 字段与生产 [LibraryComicBrowsePreferences] 的抽屉子集一致。
 class LibraryFilterSortState {
   LibraryFilterSortState({
     this.ageRestriction = LibraryAgeRestrictionFilter.unrestricted,

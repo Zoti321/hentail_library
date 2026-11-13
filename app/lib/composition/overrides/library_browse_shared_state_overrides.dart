@@ -12,7 +12,7 @@ List<Override> libraryBrowseSharedStateOverrides() => <Override>[
   libraryComicAgeRestrictionStateProvider.overrideWith(
     (Ref ref) => ref.watch(
       libraryComicFiltersProvider.select(
-        (AsyncValue<LibraryComicFiltersState> state) =>
+        (AsyncValue<LibraryComicBrowsePreferences> state) =>
             state.value?.ageRestriction ??
             LibraryAgeRestrictionFilter.unrestricted,
       ),

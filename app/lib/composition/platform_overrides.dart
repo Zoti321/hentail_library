@@ -1,3 +1,5 @@
+import 'package:hentai_library/features/series/infrastructure/series_detail_page_size_storage.dart';
+import 'package:hentai_library/features/series/presentation/providers/series_page_size_storage_providers.dart';
 import 'package:hentai_library/composition/logging_composition.dart';
 import 'package:hentai_library/infrastructure/logging/diagnostic_logging.dart';
 import 'package:hentai_library/infrastructure/platform/shell_file_explorer.dart';
@@ -36,6 +38,10 @@ import 'package:hentai_library/features/library_browse/presentation/providers/au
 
 List<Override> platformOverrides() => <Override>[
   openAuthorLinkCommandProvider.overrideWithValue(openAuthorLink),
+  seriesDetailPageSizeQueryProvider.overrideWithValue(loadSeriesDetailPageSize),
+  setSeriesDetailPageSizeCommandProvider.overrideWithValue(
+    saveSeriesDetailPageSize,
+  ),
   showInFileExplorerProvider.overrideWithValue(showInFileExplorer),
   openDirectoryInFileExplorerProvider.overrideWithValue(
     openDirectoryInFileExplorer,

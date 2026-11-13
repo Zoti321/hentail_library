@@ -2,7 +2,7 @@
 ///
 /// 只保留枚举语义与存储解码；comic/series 语义方法见各自
 /// `public/library_age_restriction_*.dart`。存储键属 browse 持久化实现，
-/// 见 `features/library_browse/.../library_comic_filters_persistence.dart`。
+/// 见 `features/library_browse/infrastructure/library_browse_preferences_storage.dart`。
 enum LibraryAgeRestrictionFilter {
   /// 不限：显示全部分级。
   unrestricted,

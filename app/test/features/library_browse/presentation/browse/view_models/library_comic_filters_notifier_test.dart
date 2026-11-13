@@ -1,3 +1,6 @@
+import 'package:hentai_library/composition/modules/library_browse/library_browse_preferences_overrides.dart';
+import 'package:hentai_library/features/library_browse/domain/browse/library_comic_browse_preferences.dart';
+
 import 'package:hentai_library/features/comic/public/comic_metadata_types.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/library_browse/domain/browse/library_age_restriction_filter.dart';
@@ -18,6 +21,7 @@ import '../../../../../support/fakes/author_repository_test_fakes.dart';
 ProviderContainer createContainer() {
   final ProviderContainer container = ProviderContainer(
     overrides: <Override>[
+      ...libraryBrowsePreferencesOverrides(),
       authorRepoProvider.overrideWithValue(const EmptyAuthorRepository()),
     ],
   );
@@ -94,7 +98,7 @@ void main() {
 
     await notifier.resetAll();
 
-    final LibraryComicFiltersState state = await container.read(
+    final LibraryComicBrowsePreferences state = await container.read(
       libraryComicFiltersProvider.future,
     );
     expect(state.ageRestriction, LibraryAgeRestrictionFilter.unrestricted);
@@ -124,7 +128,7 @@ void main() {
     first.dispose();
 
     final ProviderContainer second = createContainer();
-    final LibraryComicFiltersState state = await second.read(
+    final LibraryComicBrowsePreferences state = await second.read(
       libraryComicFiltersProvider.future,
     );
     expect(state.ageRestriction, LibraryAgeRestrictionFilter.allAges);
@@ -145,7 +149,7 @@ void main() {
     first.dispose();
 
     final ProviderContainer second = createContainer();
-    final LibraryComicFiltersState state = await second.read(
+    final LibraryComicBrowsePreferences state = await second.read(
       libraryComicFiltersProvider.future,
     );
     expect(state.languageFilter, isEmpty);
@@ -180,7 +184,7 @@ void main() {
       await notifier.setTagIncludeMode(LibraryMetadataIncludeMode.all);
       await notifier.toggleAuthor('42');
 
-      final LibraryComicFiltersState state = await container.read(
+      final LibraryComicBrowsePreferences state = await container.read(
         libraryComicFiltersProvider.future,
       );
       expect(
@@ -203,7 +207,7 @@ void main() {
     await notifier.toggleCharacter('Saber');
     await notifier.toggleCharacter('Saber');
 
-    LibraryComicFiltersState state = await first.read(
+    LibraryComicBrowsePreferences state = await first.read(
       libraryComicFiltersProvider.future,
     );
     expect(
@@ -227,71 +231,5 @@ void main() {
     state = await second.read(libraryComicFiltersProvider.future);
     expect(state.parodyFilter.isActive, isFalse);
     expect(state.characterFilter.isActive, isFalse);
-  });
-
-  group('migrateLegacyLibraryAgeRestriction', () {
-    Future<SharedPreferences> prefsWith(Map<String, Object> values) async {
-      SharedPreferences.setMockInitialValues(values);
-      return SharedPreferences.getInstance();
-    }
-
-    test('旧键存在、双键皆无：写入双键并删除旧键', () async {
-      final SharedPreferences prefs = await prefsWith(<String, Object>{
-        kLegacyLibraryAgeRestrictionStorageKey:
-            LibraryAgeRestrictionFilter.r18Only.name,
-      });
-
-      await migrateLegacyLibraryAgeRestriction(prefs);
-
-      expect(
-        prefs.getString(kLibraryComicsAgeRestrictionStorageKey),
-        LibraryAgeRestrictionFilter.r18Only.name,
-      );
-      expect(
-        prefs.getString(kLibrarySeriesAgeRestrictionStorageKey),
-        LibraryAgeRestrictionFilter.r18Only.name,
-      );
-      expect(
-        prefs.containsKey(kLegacyLibraryAgeRestrictionStorageKey),
-        isFalse,
-      );
-    });
-
-    test('双键已存在：不迁移、不覆盖、旧键保留', () async {
-      final SharedPreferences prefs = await prefsWith(<String, Object>{
-        kLegacyLibraryAgeRestrictionStorageKey:
-            LibraryAgeRestrictionFilter.r18Only.name,
-        kLibraryComicsAgeRestrictionStorageKey:
-            LibraryAgeRestrictionFilter.allAges.name,
-      });
-
-      await migrateLegacyLibraryAgeRestriction(prefs);
-
-      expect(
-        prefs.getString(kLibraryComicsAgeRestrictionStorageKey),
-        LibraryAgeRestrictionFilter.allAges.name,
-      );
-      expect(prefs.getString(kLibrarySeriesAgeRestrictionStorageKey), isNull);
-      expect(
-        prefs.getString(kLegacyLibraryAgeRestrictionStorageKey),
-        LibraryAgeRestrictionFilter.r18Only.name,
-      );
-    });
-
-    test('旧值为 unrestricted：不写双键，仅删除旧键', () async {
-      final SharedPreferences prefs = await prefsWith(<String, Object>{
-        kLegacyLibraryAgeRestrictionStorageKey:
-            LibraryAgeRestrictionFilter.unrestricted.name,
-      });
-
-      await migrateLegacyLibraryAgeRestriction(prefs);
-
-      expect(prefs.getString(kLibraryComicsAgeRestrictionStorageKey), isNull);
-      expect(prefs.getString(kLibrarySeriesAgeRestrictionStorageKey), isNull);
-      expect(
-        prefs.containsKey(kLegacyLibraryAgeRestrictionStorageKey),
-        isFalse,
-      );
-    });
   });
 }

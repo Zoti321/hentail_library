@@ -1,9 +1,16 @@
+import 'package:hentai_library/features/library_browse/infrastructure/library_browse_preferences_repository_impl.dart';
+import 'package:hentai_library/features/comic_metadata/public/providers/comic_metadata_repository_providers.dart';
+
+import '../../../../../support/fakes/author_repository_test_fakes.dart';
+
+import 'package:hentai_library/composition/modules/library_browse/library_browse_preferences_overrides.dart';
+import 'package:hentai_library/features/library_browse/domain/browse/library_series_browse_preferences.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hentai_library/features/library_browse/domain/browse/library_age_restriction_filter.dart';
-import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_comic_filters_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_series_filters_notifier.dart';
 import 'package:hentai_library/features/series/domain/library_series_grouping.dart';
 import 'package:hentai_library/features/series/domain/library_series_filter.dart';
@@ -26,18 +33,25 @@ void main() {
     return SharedPreferences.getInstance();
   }
 
-  Future<LibrarySeriesFiltersState> readState(ProviderContainer container) {
+  Future<LibrarySeriesBrowsePreferences> readState(
+    ProviderContainer container,
+  ) {
     return container.read(librarySeriesFiltersProvider.future);
   }
 
   test('未落盘时维度全部取默认值', () async {
     await mockPrefs();
-    final ProviderContainer container = ProviderContainer();
+    final ProviderContainer container = ProviderContainer(
+      overrides: <Override>[
+        ...libraryBrowsePreferencesOverrides(),
+        authorRepoProvider.overrideWithValue(const EmptyAuthorRepository()),
+      ],
+    );
     addTearDown(container.dispose);
 
-    final LibrarySeriesFiltersState state = await readState(container);
+    final LibrarySeriesBrowsePreferences state = await readState(container);
 
-    expect(state, LibrarySeriesFiltersState.defaults);
+    expect(state, LibrarySeriesBrowsePreferences.defaults);
     expect(state.ageRestriction, LibraryAgeRestrictionFilter.unrestricted);
     expect(
       state.serializationStatusFilter,
@@ -49,7 +63,12 @@ void main() {
 
   test('筛选与分组维度写回自己的键', () async {
     final SharedPreferences prefs = await mockPrefs();
-    final ProviderContainer container = ProviderContainer();
+    final ProviderContainer container = ProviderContainer(
+      overrides: <Override>[
+        ...libraryBrowsePreferencesOverrides(),
+        authorRepoProvider.overrideWithValue(const EmptyAuthorRepository()),
+      ],
+    );
     addTearDown(container.dispose);
     await readState(container);
 
@@ -83,7 +102,12 @@ void main() {
 
   test('resetAll 清空全部键并恢复默认', () async {
     final SharedPreferences prefs = await mockPrefs();
-    final ProviderContainer container = ProviderContainer();
+    final ProviderContainer container = ProviderContainer(
+      overrides: <Override>[
+        ...libraryBrowsePreferencesOverrides(),
+        authorRepoProvider.overrideWithValue(const EmptyAuthorRepository()),
+      ],
+    );
     addTearDown(container.dispose);
     await readState(container);
 
@@ -99,7 +123,7 @@ void main() {
 
     await container.read(librarySeriesFiltersProvider.notifier).resetAll();
 
-    expect(await readState(container), LibrarySeriesFiltersState.defaults);
+    expect(await readState(container), LibrarySeriesBrowsePreferences.defaults);
     expect(prefs.containsKey(kLibrarySeriesAgeRestrictionStorageKey), false);
     expect(prefs.containsKey(LibrarySeriesGrouping.storageKey), false);
     expect(prefs.containsKey('library_sort_series'), false);
@@ -108,6 +132,8 @@ void main() {
   test('查询 filter 的 prefer root 来自设置页', () async {
     final ProviderContainer container = ProviderContainer(
       overrides: <Override>[
+        ...libraryBrowsePreferencesOverrides(),
+        authorRepoProvider.overrideWithValue(const EmptyAuthorRepository()),
         settingsProvider.overrideWith(
           () => _FixedSettingsNotifier(
             AppSetting(preferLibraryRootSeries: false),

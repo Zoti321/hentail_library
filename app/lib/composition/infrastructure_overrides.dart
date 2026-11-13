@@ -12,6 +12,7 @@ import 'package:hentai_library/composition/modules/reader/native_reader_port_fac
 import 'package:hentai_library/composition/modules/reading_history/reading_history_repository_factory.dart';
 import 'package:hentai_library/composition/modules/series/series_repository_factory.dart';
 import 'package:hentai_library/composition/platform_overrides.dart';
+import 'package:hentai_library/composition/modules/library_browse/library_browse_preferences_overrides.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/composition/adapters/comic_trash_reader_session_adapter.dart';
 import 'package:hentai_library/features/reader/public.dart';
@@ -26,6 +27,7 @@ import 'package:riverpod/misc.dart' show Override;
 
 List<Override> infrastructureOverrides() => <Override>[
   ...platformOverrides(),
+  ...libraryBrowsePreferencesOverrides(),
   remoteLibraryCredentialsPortProvider.overrideWith(
     (Ref ref) =>
         createRemoteLibraryCredentialsPort(ref.read(libraryRepoProvider)),

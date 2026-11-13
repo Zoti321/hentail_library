@@ -1,3 +1,4 @@
+import 'package:hentai_library/features/library_browse/domain/browse/library_comic_browse_preferences.dart';
 
 import 'dart:typed_data';
 
@@ -18,7 +19,7 @@ final authorDetailProvider = FutureProvider.autoDispose
           ref.invalidateSelf();
         }
       });
-      final LibraryComicFiltersState filters = await ref.watch(
+      final LibraryComicBrowsePreferences filters = await ref.watch(
         libraryComicFiltersProvider.future,
       );
       return ref
@@ -74,7 +75,7 @@ final authorImageProvider = FutureProvider.autoDispose
           },
         );
       }
-      final LibraryComicFiltersState filters = await ref.watch(
+      final LibraryComicBrowsePreferences filters = await ref.watch(
         libraryComicFiltersProvider.future,
       );
       return repo.loadImage(

@@ -1,3 +1,5 @@
+import 'package:hentai_library/features/library_browse/domain/browse/library_comic_browse_preferences.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
@@ -34,7 +36,7 @@ class _ComicsGroupingSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final LibraryComicGrouping selected = ref.watch(
       libraryComicFiltersProvider.select(
-        (AsyncValue<LibraryComicFiltersState> state) =>
+        (AsyncValue<LibraryComicBrowsePreferences> state) =>
             state.value?.grouping ?? LibraryComicGrouping.defaultValue,
       ),
     );

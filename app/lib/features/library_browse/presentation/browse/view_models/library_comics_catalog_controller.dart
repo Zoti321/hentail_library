@@ -1,3 +1,5 @@
+import 'package:hentai_library/features/library_browse/domain/browse/library_comic_browse_preferences.dart';
+
 import 'package:hentai_library/features/library_browse/presentation/browse/models/comic_browse_view_object.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
@@ -29,9 +31,9 @@ class LibraryComicsCatalogController extends _$LibraryComicsCatalogController {
   /// 分页查询键 =（关键词，整份筛选意图，每页数量，浏览库 id）；任一变化即回到第 1 页。
   void _syncPaginationWithQueryKey() {
     final String keyword = ref.watch(libraryFilterQueryProvider);
-    final LibraryComicFiltersState filters =
+    final LibraryComicBrowsePreferences filters =
         ref.watch(libraryComicFiltersProvider).value ??
-        LibraryComicFiltersState.defaults;
+        LibraryComicBrowsePreferences.defaults;
     final int pageSize = ref.watch(libraryComicsTabPageSizeProvider);
     final String? libraryId = ref.watch(browseLibraryIdProvider);
     _pagination.syncQueryKey((keyword, filters, pageSize, libraryId));
@@ -72,9 +74,9 @@ class LibraryComicsCatalogController extends _$LibraryComicsCatalogController {
 
   Future<PagedResult<ComicBrowseViewObject>> _fetchPage() {
     final LibraryComicFilter filter = ref.read(libraryComicFilterQueryProvider);
-    final LibraryComicFiltersState filters =
+    final LibraryComicBrowsePreferences filters =
         ref.read(libraryComicFiltersProvider).value ??
-        LibraryComicFiltersState.defaults;
+        LibraryComicBrowsePreferences.defaults;
     final int pageSize = ref.read(libraryComicsTabPageSizeProvider);
     return _pagination.fetchPage<ComicBrowseViewObject>(
       pageSize: pageSize,

@@ -1,24 +1,18 @@
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
-import 'package:hentai_library/shared/ui/catalog/page_size/library_tab_page_size_settings.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/library_tab_page_size_settings.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hentai_library/features/library_browse/domain/browse/library_browse_preferences_repository.dart';
+import 'package:hentai_library/features/library_browse/presentation/providers/library_browse_preferences_provider.dart';
 
 part 'library_tab_page_size_notifier.g.dart';
 
 @Riverpod(keepAlive: true)
 class LibraryTabPageSizeNotifier extends _$LibraryTabPageSizeNotifier {
-  static const String _comicsStorageKey = 'library_page_size_comics';
-  static const String _seriesStorageKey = 'library_page_size_series';
+  LibraryBrowsePreferencesRepository get _preferences =>
+      ref.read(libraryBrowsePreferencesRepositoryProvider);
 
   @override
-  Future<LibraryTabPageSizeSettings> build() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    return (
-      comics: normalizeLibraryPageSize(prefs.getInt(_comicsStorageKey)),
-      series: normalizeLibraryPageSize(prefs.getInt(_seriesStorageKey)),
-    );
-  }
+  Future<LibraryTabPageSizeSettings> build() => _preferences.loadPageSizes();
 
   Future<void> setPageSize(LibraryDisplayTarget target, int pageSize) async {
     final int normalized = normalizeLibraryPageSize(pageSize);
@@ -29,15 +23,6 @@ class LibraryTabPageSizeNotifier extends _$LibraryTabPageSizeNotifier {
       normalized,
     );
     state = AsyncData<LibraryTabPageSizeSettings>(updated);
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final String storageKey = switch (target) {
-      LibraryDisplayTarget.comics => _comicsStorageKey,
-      LibraryDisplayTarget.series => _seriesStorageKey,
-    };
-    if (normalized == kDefaultPageSize) {
-      await prefs.remove(storageKey);
-    } else {
-      await prefs.setInt(storageKey, normalized);
-    }
+    await _preferences.savePageSize(target, normalized);
   }
 }

@@ -1,3 +1,5 @@
+import 'package:hentai_library/features/library_browse/domain/browse/library_comic_browse_preferences.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/l10n/app_localizations.dart';
@@ -129,7 +131,7 @@ class _MediaTypeFilterGroup extends ConsumerWidget {
     }
     final LibraryMediaTypeFilterSelection selected = ref.watch(
       libraryComicFiltersProvider.select(
-        (AsyncValue<LibraryComicFiltersState> state) =>
+        (AsyncValue<LibraryComicBrowsePreferences> state) =>
             state.value?.mediaTypeFilter ??
             const LibraryMediaTypeFilterSelection(),
       ),
@@ -204,7 +206,7 @@ class _TagFilterGroup extends ConsumerWidget {
     );
     final LibraryMetadataFilterSelection selection = ref.watch(
       libraryComicFiltersProvider.select(
-        (AsyncValue<LibraryComicFiltersState> state) =>
+        (AsyncValue<LibraryComicBrowsePreferences> state) =>
             state.value?.tagFilter ?? const LibraryMetadataFilterSelection(),
       ),
     );
@@ -237,7 +239,7 @@ class _AuthorFilterGroup extends ConsumerWidget {
     );
     final LibraryMetadataFilterSelection selection = ref.watch(
       libraryComicFiltersProvider.select(
-        (AsyncValue<LibraryComicFiltersState> state) =>
+        (AsyncValue<LibraryComicBrowsePreferences> state) =>
             state.value?.authorFilter ?? const LibraryMetadataFilterSelection(),
       ),
     );
@@ -283,7 +285,7 @@ class _LanguageFilterGroup extends ConsumerWidget {
     }
     final Set<String> selected = ref.watch(
       libraryComicFiltersProvider.select(
-        (AsyncValue<LibraryComicFiltersState> state) =>
+        (AsyncValue<LibraryComicBrowsePreferences> state) =>
             state.value?.languageFilter ?? const <String>{},
       ),
     );
@@ -317,7 +319,7 @@ class _ParodyFilterGroup extends ConsumerWidget {
     );
     final LibraryMetadataFilterSelection selection = ref.watch(
       libraryComicFiltersProvider.select(
-        (AsyncValue<LibraryComicFiltersState> state) =>
+        (AsyncValue<LibraryComicBrowsePreferences> state) =>
             state.value?.parodyFilter ?? const LibraryMetadataFilterSelection(),
       ),
     );
@@ -350,7 +352,7 @@ class _CharacterFilterGroup extends ConsumerWidget {
     );
     final LibraryMetadataFilterSelection selection = ref.watch(
       libraryComicFiltersProvider.select(
-        (AsyncValue<LibraryComicFiltersState> state) =>
+        (AsyncValue<LibraryComicBrowsePreferences> state) =>
             state.value?.characterFilter ??
             const LibraryMetadataFilterSelection(),
       ),
@@ -381,7 +383,7 @@ class _OrganizeFilterGroup extends ConsumerWidget {
     }
     final bool needsMetadataOnly = ref.watch(
       libraryComicFiltersProvider.select(
-        (AsyncValue<LibraryComicFiltersState> state) =>
+        (AsyncValue<LibraryComicBrowsePreferences> state) =>
             state.value?.needsMetadataOnly ?? false,
       ),
     );
