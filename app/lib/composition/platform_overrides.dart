@@ -15,6 +15,8 @@ import 'package:hentai_library/composition/modules/app_settings/app_setting_repo
 import 'package:hentai_library/features/app_settings/infrastructure/services/app_update/github_app_update_gateway.dart';
 import 'package:hentai_library/features/app_settings/presentation/providers/app_setting_repository_provider.dart';
 import 'package:hentai_library/features/app_settings/presentation/providers/app_update_providers.dart';
+import 'package:hentai_library/features/app_settings/infrastructure/load_installed_app_version.dart';
+import 'package:hentai_library/features/app_settings/presentation/providers/installed_app_version_providers.dart';
 import 'package:hentai_library/features/comic_metadata/infrastructure/services/tag_dictionary/dio_tag_dictionary_download_gateway.dart';
 import 'package:hentai_library/features/comic_metadata/presentation/providers/download_providers.dart';
 import 'package:hentai_library/features/library_admin/infrastructure/adapters/sync_library_frb_adapter.dart';
@@ -68,6 +70,7 @@ List<Override> platformOverrides() => <Override>[
     (ref) => createAppSettingRepository(),
   ),
   appUpdateGatewayProvider.overrideWith((ref) => GitHubAppUpdateGateway()),
+  installedAppVersionQueryProvider.overrideWithValue(loadInstalledAppVersion),
   tagDictionaryDownloadGatewayProvider.overrideWith(
     (ref) => DioTagDictionaryDownloadGateway(),
   ),

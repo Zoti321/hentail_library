@@ -1,3 +1,5 @@
+import 'package:hentai_library/features/home/infrastructure/repositories/home_alert_dismiss_repository_impl.dart';
+import 'package:hentai_library/features/home/presentation/providers/home_alert_dismiss_repository_provider.dart';
 import 'package:hentai_library/shared/presentation/providers/comic_read_query_provider.dart';
 import 'package:hentai_library/composition/modules/comic/comic_browse_repository_factory.dart';
 import 'package:hentai_library/composition/modules/comic/comic_read_query.dart';
@@ -27,6 +29,9 @@ import 'package:riverpod/misc.dart' show Override;
 
 List<Override> infrastructureOverrides() => <Override>[
   ...platformOverrides(),
+  homeAlertDismissRepositoryProvider.overrideWith(
+    (ref) => const HomeAlertDismissRepositoryImpl(),
+  ),
   ...libraryBrowsePreferencesOverrides(),
   remoteLibraryCredentialsPortProvider.overrideWith(
     (Ref ref) =>

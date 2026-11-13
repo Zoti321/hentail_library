@@ -3,25 +3,22 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:hentai_library/features/app_settings/application/app_update_constants.dart';
+import 'package:hentai_library/features/app_settings/application/check_app_update_use_case.dart';
 import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/application/logging/app_log.dart';
 import 'package:hentai_library/shared/ui/navigation/app_root_navigator_key.dart';
-import 'package:hentai_library/core/util/semver_utils.dart';
 import 'package:hentai_library/features/app_settings/domain/app_release_info.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/features/app_settings/presentation/views/dialogs/app_update_dialog.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hentai_library/features/app_settings/presentation/providers/app_update_providers.dart';
-import 'package:package_info_plus/package_info_plus.dart';
+import 'package:hentai_library/features/app_settings/presentation/providers/installed_app_version_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'app_update_controller.g.dart';
 
 enum AppUpdateCheckOutcome { upToDate, updateAvailable, failed }
-
-@Riverpod(keepAlive: true)
-Future<PackageInfo> packageInfo(Ref ref) => PackageInfo.fromPlatform();
 
 @Riverpod(keepAlive: true)
 class AppUpdateController extends _$AppUpdateController {
@@ -38,40 +35,38 @@ class AppUpdateController extends _$AppUpdateController {
   }) async {
     final BuildContext? uiContext = dialogContext;
     try {
-      final PackageInfo info = await ref.read(packageInfoProvider.future);
-      final String currentVersion = SemverUtils.normalizeVersion(info.version);
-      final AppReleaseInfo? latestRelease = await ref
-          .read(appUpdateGatewayProvider)
-          .fetchLatestStableRelease();
-      if (latestRelease == null) {
-        if (showFeedbackToasts) {
-          _showFeedbackToast(
-            uiContext,
-            (AppLocalizations l10n) => l10n.settingsUpdateCheckFailed,
-          );
-        }
-        return AppUpdateCheckOutcome.failed;
-      }
-      if (!SemverUtils.isGreaterThan(latestRelease.version, currentVersion)) {
-        if (showFeedbackToasts) {
-          _showFeedbackToast(
-            uiContext,
-            (AppLocalizations l10n) => l10n.settingsUpdateUpToDate,
-          );
-        }
-        return AppUpdateCheckOutcome.upToDate;
-      }
-      if (respectDismissedVersion) {
-        final AppSetting? settings = ref.read(settingsProvider).asData?.value;
-        if (settings != null &&
-            settings.dismissedUpdateVersion == latestRelease.version) {
+      final String currentVersion = await ref.read(
+        installedAppVersionProvider.future,
+      );
+      final result = await ref.read(checkAppUpdateUseCaseProvider)(
+        currentVersion: currentVersion,
+        respectDismissedVersion: respectDismissedVersion,
+      );
+      switch (result) {
+        case AppUpdateUnavailable():
+          if (showFeedbackToasts) {
+            _showFeedbackToast(
+              uiContext,
+              (AppLocalizations l10n) => l10n.settingsUpdateCheckFailed,
+            );
+          }
+          return AppUpdateCheckOutcome.failed;
+        case AppUpdateCurrent():
+          if (showFeedbackToasts) {
+            _showFeedbackToast(
+              uiContext,
+              (AppLocalizations l10n) => l10n.settingsUpdateUpToDate,
+            );
+          }
           return AppUpdateCheckOutcome.upToDate;
-        }
+        case AppUpdateDismissed():
+          return AppUpdateCheckOutcome.upToDate;
+        case AppUpdateAvailable(:final release):
+          if (showDialogOnUpdate) {
+            await _showUpdateDialogForContext(release, uiContext);
+          }
+          return AppUpdateCheckOutcome.updateAvailable;
       }
-      if (showDialogOnUpdate) {
-        await _showUpdateDialogForContext(latestRelease, uiContext);
-      }
-      return AppUpdateCheckOutcome.updateAvailable;
     } catch (error, stackTrace) {
       if (showFeedbackToasts) {
         logError(AppLog.ui('appUpdate'), '检查更新失败', error, stackTrace);

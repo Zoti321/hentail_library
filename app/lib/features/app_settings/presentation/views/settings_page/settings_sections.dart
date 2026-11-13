@@ -4,6 +4,7 @@ import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/app_settings/presentation/log_export_flow.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/app_update_controller.dart';
+import 'package:hentai_library/features/app_settings/presentation/providers/installed_app_version_providers.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/diagnostic_mode_notifier.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hentai_library/features/app_settings/presentation/patterns/settings/settings_catalog.dart';
@@ -13,7 +14,6 @@ import 'package:hentai_library/shared/ui/l10n/library_display_target_l10n.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:hentai_library/features/app_settings/presentation/l10n/app_settings_l10n.dart';
 
 /// 生产设置页某分类的 MD3E section 列表。
@@ -71,11 +71,11 @@ class _AboutVersionSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
-    final AsyncValue<PackageInfo> packageInfoAsync = ref.watch(
-      packageInfoProvider,
+    final AsyncValue<String> versionAsync = ref.watch(
+      installedAppVersionProvider,
     );
-    final String versionLabel = packageInfoAsync.maybeWhen(
-      data: (PackageInfo info) => l10n.settingsCurrentVersion(info.version),
+    final String versionLabel = versionAsync.maybeWhen(
+      data: (String version) => l10n.settingsCurrentVersion(version),
       orElse: () => l10n.settingsCurrentVersionLoading,
     );
     return SettingsSection(
@@ -405,18 +405,18 @@ class _CheckUpdateTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
-    final AsyncValue<PackageInfo> packageInfoAsync = ref.watch(
-      packageInfoProvider,
+    final AsyncValue<String> versionAsync = ref.watch(
+      installedAppVersionProvider,
     );
-    final String versionLabel = packageInfoAsync.maybeWhen(
-      data: (PackageInfo info) => l10n.settingsCurrentVersion(info.version),
+    final String versionLabel = versionAsync.maybeWhen(
+      data: (String version) => l10n.settingsCurrentVersion(version),
       orElse: () => l10n.settingsCurrentVersionLoading,
     );
     return SettingsNavigationTile(
       leading: Symbols.info,
       title: Text(l10n.settingsCheckForUpdatesLabel),
       value: Text(versionLabel),
-      onTap: packageInfoAsync.isLoading
+      onTap: versionAsync.isLoading
           ? null
           : () => ref
                 .read(appUpdateControllerProvider.notifier)

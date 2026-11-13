@@ -14,6 +14,8 @@ void main() {
     expect(readingPreferencesControllerProvider, isNotNull);
     expect(appSettingsProvider, isNotNull);
     expect(appSettingRepositoryProvider, isNotNull);
+    expect(installedAppVersionProvider, isNotNull);
+    expect(installedAppVersionQueryProvider, isNotNull);
     expect(SettingsPage, isNotNull);
     expect(DiagnosticModeBanner, isNotNull);
     expect(settingsProvider, isNotNull);
