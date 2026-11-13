@@ -37,31 +37,21 @@ class ComicTrashActions extends _$ComicTrashActions {
 
   Future<ComicPurgeResult> purge(List<String> comicIds) async {
     _ensureLibraryIdle();
-    final ComicPurgeResult result = await _service.purgeComics(comicIds);
-    await _afterPurge(comicIds, result);
-    return result;
+    return _afterPurge(await _service.purgeComics(comicIds));
   }
 
   Future<ComicPurgeResult> purgeAll() async {
     _ensureLibraryIdle();
-    final List<String> ids = await _service.listTrashedIds();
-    final ComicPurgeResult result = await _service.purgeComics(ids);
-    await _afterPurge(ids, result);
-    return result;
+    return _afterPurge(await _service.purgeAll());
   }
 
-  Future<void> _afterPurge(
-    List<String> requested,
-    ComicPurgeResult result,
-  ) async {
-    if (result.succeeded > 0) {
-      final Set<String> remaining = (await _service.listTrashedIds()).toSet();
+  ComicPurgeResult _afterPurge(ComicPurgeOutcome outcome) {
+    if (outcome.purgedIds.isNotEmpty) {
       ref
           .read(comicCoverCacheManagerProvider.notifier)
-          .clearForComics(
-            requested.where((String id) => !remaining.contains(id)),
-          );
+          .clearForComics(outcome.purgedIds);
     }
+    return outcome.result;
   }
 
   void _ensureLibraryIdle() {
