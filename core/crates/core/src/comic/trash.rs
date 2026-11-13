@@ -5,6 +5,7 @@ use std::path::Path;
 
 use sea_orm::{ConnectionTrait, DatabaseConnection, Statement, TransactionTrait, Value};
 
+use crate::comic::delete_comics_side_effects;
 use crate::comic::dto::{now_ms, PageRequestDto};
 use crate::comic::pagination::paginate;
 use crate::comic_id::normalize_path_for_key;
@@ -13,7 +14,6 @@ use crate::error::HentaiError;
 use crate::library_write::{begin_library_write_txn, with_library_write};
 use crate::reader::close_reader;
 use crate::sync::series_rebuild::rebuild_series_from_comics;
-use crate::sync::writer::delete_comics_side_effects;
 
 const MAX_ERROR_SAMPLES: usize = 5;
 const ID_BATCH_SIZE: usize = 500;

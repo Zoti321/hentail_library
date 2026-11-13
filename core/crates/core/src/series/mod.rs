@@ -15,6 +15,7 @@ pub use repository::{
     PagedSeriesResultDto, SeriesBrowseItemDto, SeriesComicPageItemDto, SeriesComicsMetadataDto,
     SeriesDto, SeriesItemDto, SeriesMetaLocks, SeriesReadingContextDto,
 };
+pub(crate) use write::refresh_series_name_from_folder;
 pub use write::{
     set_series_item_sort_order_locked, set_series_meta_locks, update_series_item_sort_order,
     update_series_user_meta, SetSeriesMetaLocksDto, UpdateSeriesUserMetaDto,

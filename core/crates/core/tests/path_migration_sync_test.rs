@@ -31,9 +31,9 @@ fn write_cbz(path: &Path) {
 #[test]
 fn rename_cbz_migrates_user_metadata_and_reading_history() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let db_path = common::create_fixture_db(temp.path());
-        let root = temp.path().join("library");
+        let temp = TempDir::new().expect("tempdir").keep();
+        let db_path = common::create_fixture_db(temp.as_path());
+        let root = temp.as_path().join("library");
         std::fs::create_dir(&root).expect("mkdir root");
 
         let old_path = root.join("volume.cbz");
@@ -108,7 +108,7 @@ fn rename_cbz_migrates_user_metadata_and_reading_history() {
             assert_eq!(plan.added_count, 0);
             assert_eq!(plan.migrations.len(), 1);
             assert_eq!(plan.migrations[0].from_comic_id, old_id);
-            assert_eq!(plan.migrations[0].to_comic.comic_id, new_id);
+            assert_eq!(plan.migrations[0].scanned.comic.comic_id, new_id);
 
             apply_scan_replace_plan(&db, &plan, "")
                 .await
@@ -136,9 +136,9 @@ fn rename_cbz_migrates_user_metadata_and_reading_history() {
 #[test]
 fn ambiguous_same_fingerprint_moves_do_not_migrate() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let db_path = common::create_fixture_db(temp.path());
-        let root = temp.path().join("library");
+        let temp = TempDir::new().expect("tempdir").keep();
+        let db_path = common::create_fixture_db(temp.as_path());
+        let root = temp.as_path().join("library");
         std::fs::create_dir(&root).expect("mkdir root");
 
         let first_path = root.join("a.cbz");

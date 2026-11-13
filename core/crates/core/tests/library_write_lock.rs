@@ -6,11 +6,12 @@ use hentai_core::library_write::{begin_library_write_txn, try_acquire_library_wr
 use hentai_core::ComicGrouping;
 use hentai_core::{
     add_author, add_named_facet_name, clear_all_reading, count_trashed_comics, create_sync_handle,
-    delete_authors_by_names, delete_named_facet_by_names, fetch_comics_page, import_comic_metadata,
-    merge_named_facet_name, reject_author_merge, rename_author, rename_named_facet_name,
-    set_comic_meta_locks, sync_library, update_comic_user_meta, ComicFilterDto, ComicSortOptionDto,
-    HentaiError, HentaiErrorCode, JunctionNamedFacet, LibraryDto, PageRequestDto,
-    SetComicMetaLocksDto, SyncScanMode, UpdateComicUserMetaDto,
+    delete_authors_by_names, delete_library, delete_named_facet_by_names, fetch_comics_page,
+    import_comic_metadata, merge_named_facet_name, reject_author_merge, rename_author,
+    rename_author_identity, rename_named_facet_name, set_comic_meta_locks, sync_library,
+    update_comic_user_meta, ComicFilterDto, ComicSortOptionDto, HentaiError, HentaiErrorCode,
+    JunctionNamedFacet, LibraryDto, PageRequestDto, SetComicMetaLocksDto, SyncScanMode,
+    UpdateComicUserMetaDto,
 };
 use sea_orm::{ConnectionTrait, DatabaseBackend, Statement};
 
@@ -74,6 +75,9 @@ fn cross_comic_writes_fail_fast_while_library_write_lock_held() {
             // Import must refuse before parsing the payload.
             assert_busy(import_comic_metadata(b"not-a-backup").await);
             assert_busy(rename_author("old", "new").await);
+            let notifications = hentai_core::revision::notify_count();
+            assert_busy(rename_author_identity(i64::MAX, "new").await);
+            assert_eq!(hentai_core::revision::notify_count(), notifications);
             assert_busy(delete_authors_by_names(vec!["old".to_string()]).await);
             assert_busy(rename_named_facet_name(Tag, "old", "new").await);
             assert_busy(delete_named_facet_by_names(Tag, vec!["old".to_string()]).await);
@@ -100,7 +104,7 @@ fn author_entry_points_do_not_double_acquire_the_lock() {
 
     with_solo_library(|_library, runtime| {
         runtime.block_on(async {
-            add_author("Some Author").await.expect("add author");
+            let author = add_author("Some Author").await.expect("add author");
             add_named_facet_name(Tag, "Some Tag")
                 .await
                 .expect("add tag");
@@ -110,7 +114,10 @@ fn author_entry_points_do_not_double_acquire_the_lock() {
             rename_author("Some Author", "Renamed Author")
                 .await
                 .expect("author rename");
-            delete_authors_by_names(vec!["Renamed Author".to_string()])
+            rename_author_identity(author.id, "Identity Renamed Author")
+                .await
+                .expect("identity rename does not double acquire");
+            delete_authors_by_names(vec!["Identity Renamed Author".to_string()])
                 .await
                 .expect("author delete");
 
@@ -252,4 +259,132 @@ async fn trash_first_comic<C: ConnectionTrait>(db: &C) -> u64 {
         .await
         .expect("update comics");
     result.rows_affected()
+}
+
+fn with_retained_removal_library(
+    test: impl FnOnce(LibraryDto, std::path::PathBuf, &tokio::runtime::Runtime),
+) {
+    common::with_global_db(|| {
+        // Retain resources and database files for manual cleanup.
+        let temp = tempfile::tempdir().expect("tempdir").keep();
+        let resource = temp.join("library").join("series").join("solo.cbz");
+        common::write_cbz(&resource, 1);
+        let runtime = tokio::runtime::Runtime::new().expect("runtime");
+        let library = runtime.block_on(async {
+            hentai_core::init_db_at_path(&temp.join("removal.sqlite"))
+                .await
+                .expect("init database");
+            let library = hentai_core::create_local_library(
+                &temp.join("library").to_string_lossy(),
+                Some("Removal"),
+            )
+            .await
+            .expect("create library");
+            sync_library(
+                create_sync_handle(),
+                SyncScanMode::Full,
+                false,
+                Some(&library.library_id),
+                vec![],
+                |_| {},
+            )
+            .await
+            .expect("sync library");
+            library
+        });
+        test(library, resource, &runtime);
+    });
+}
+
+async fn removal_row_counts() -> Vec<i64> {
+    let db = hentai_core::connection().expect("connection");
+    let mut counts = Vec::new();
+    for table in [
+        "libraries",
+        "comics",
+        "comic_meta",
+        "series",
+        "series_items",
+        "library_resource_snapshots",
+    ] {
+        let row = db
+            .query_one(Statement::from_string(
+                db.get_database_backend(),
+                format!("SELECT COUNT(*) FROM {table}"),
+            ))
+            .await
+            .expect("row count query")
+            .expect("row count");
+        counts.push(row.try_get_by_index(0).expect("count"));
+    }
+    counts
+}
+
+#[test]
+fn library_removal_refuses_an_active_writer_then_deletes_only_records() {
+    with_retained_removal_library(|library, resource, runtime| {
+        runtime.block_on(async {
+            let before = removal_row_counts().await;
+            assert_eq!(before, vec![1, 1, 1, 1, 1, 1]);
+            let notifications = hentai_core::revision::notify_count();
+            let changes = hentai_core::revision::subscribe();
+            let guard = try_acquire_library_write_lock().expect("hold active writer");
+
+            assert_busy(delete_library(&library.library_id).await);
+
+            assert_eq!(removal_row_counts().await, before);
+            assert_eq!(hentai_core::revision::notify_count(), notifications);
+            assert!(!changes.has_changed().expect("revision remains open"));
+            drop(guard);
+            delete_library(&library.library_id)
+                .await
+                .expect("delete after writer completes");
+            assert_eq!(removal_row_counts().await, vec![0; 6]);
+            assert!(resource.exists(), "Library removal retains Resources");
+            assert_eq!(hentai_core::revision::notify_count(), notifications + 1);
+            delete_library(&library.library_id)
+                .await
+                .expect("missing library is a no-op");
+            assert_eq!(hentai_core::revision::notify_count(), notifications + 1);
+            try_acquire_library_write_lock().expect("no-op releases lock");
+        });
+    });
+}
+
+#[test]
+fn library_removal_rolls_back_on_final_delete_failure_and_releases_the_lock() {
+    with_retained_removal_library(|library, resource, runtime| {
+        runtime.block_on(async {
+            let db = hentai_core::connection().expect("connection");
+            db.execute_unprepared(
+                "CREATE TRIGGER block_library_removal BEFORE DELETE ON libraries \
+                 BEGIN SELECT RAISE(ABORT, 'library removal blocked'); END",
+            )
+            .await
+            .expect("inject final deletion failure");
+            let before = removal_row_counts().await;
+            let notifications = hentai_core::revision::notify_count();
+
+            let error = delete_library(&library.library_id)
+                .await
+                .expect_err("final delete fails");
+
+            assert!(
+                error.message.contains("library removal blocked"),
+                "{error:?}"
+            );
+            assert_eq!(removal_row_counts().await, before);
+            assert_eq!(hentai_core::revision::notify_count(), notifications);
+            try_acquire_library_write_lock().expect("failed removal releases lock");
+            db.execute_unprepared("DROP TRIGGER block_library_removal")
+                .await
+                .expect("remove injected failure");
+            delete_library(&library.library_id)
+                .await
+                .expect("new removal succeeds");
+            assert_eq!(removal_row_counts().await, vec![0; 6]);
+            assert!(resource.exists());
+            assert_eq!(hentai_core::revision::notify_count(), notifications + 1);
+        });
+    });
 }

@@ -11,10 +11,10 @@ use hentai_core::sync::resource_format_category::ResourceFormatCategory;
 use hentai_core::sync::scanner::{scan_roots, ScanContext};
 use hentai_core::sync::writer::apply_scan_replace_plan;
 use hentai_core::{
-    comic_id_from_path, connection, find_series_by_id, find_series_thumbnail_by_series_id,
-    init_db_at_path, series_id_from_folder_path, set_series_meta_locks,
-    update_series_item_sort_order, update_series_user_meta, SetSeriesMetaLocksDto,
-    UpdateSeriesUserMetaDto,
+    comic_id_from_path, connection, find_comic_by_id, find_series_by_id,
+    find_series_thumbnail_by_series_id, init_db_at_path, series_id_from_folder_path,
+    set_series_meta_locks, update_series_item_sort_order, update_series_user_meta,
+    SetSeriesMetaLocksDto, UpdateSeriesUserMetaDto,
 };
 use sea_orm::{ConnectionTrait, Statement};
 use tempfile::TempDir;
@@ -128,9 +128,9 @@ fn assert_locked_orders(series: &hentai_core::SeriesDto, comic_a: &str, comic_b:
 #[test]
 fn whole_folder_rename_preserves_series_user_state_and_updates_unlocked_name() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let db_path = common::create_fixture_db(temp.path());
-        let root = temp.path().join("library");
+        let temp = TempDir::new().expect("tempdir").keep();
+        let db_path = common::create_fixture_db(temp.as_path());
+        let root = temp.as_path().join("library");
         let series_dir = root.join("SeriesOld");
         std::fs::create_dir_all(&series_dir).expect("mkdir");
         write_cbz_pages(&series_dir.join("01.cbz"), 1);
@@ -205,9 +205,9 @@ fn whole_folder_rename_preserves_series_user_state_and_updates_unlocked_name() {
 #[test]
 fn whole_folder_move_preserves_locked_name_orders_and_cover() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let db_path = common::create_fixture_db(temp.path());
-        let root = temp.path().join("library");
+        let temp = TempDir::new().expect("tempdir").keep();
+        let db_path = common::create_fixture_db(temp.as_path());
+        let root = temp.as_path().join("library");
         let series_dir = root.join("SeriesOld");
         std::fs::create_dir_all(&series_dir).expect("mkdir");
         write_cbz_pages(&series_dir.join("01.cbz"), 1);
@@ -260,9 +260,9 @@ fn whole_folder_move_preserves_locked_name_orders_and_cover() {
 #[test]
 fn partial_member_move_keeps_old_series_state_and_creates_default_destination() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let db_path = common::create_fixture_db(temp.path());
-        let root = temp.path().join("library");
+        let temp = TempDir::new().expect("tempdir").keep();
+        let db_path = common::create_fixture_db(temp.as_path());
+        let root = temp.as_path().join("library");
         let series_dir = root.join("SeriesOld");
         std::fs::create_dir_all(&series_dir).expect("mkdir");
         write_cbz_pages(&series_dir.join("01.cbz"), 1);
@@ -332,9 +332,9 @@ fn partial_member_move_keeps_old_series_state_and_creates_default_destination() 
 #[test]
 fn ambiguous_comic_fingerprints_skip_series_migration() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let db_path = common::create_fixture_db(temp.path());
-        let root = temp.path().join("library");
+        let temp = TempDir::new().expect("tempdir").keep();
+        let db_path = common::create_fixture_db(temp.as_path());
+        let root = temp.as_path().join("library");
         let series_dir = root.join("SeriesOld");
         std::fs::create_dir_all(&series_dir).expect("mkdir");
         // Same page count → identical weak fingerprint → comic migration skipped.
@@ -395,9 +395,9 @@ fn ambiguous_comic_fingerprints_skip_series_migration() {
 #[test]
 fn whole_folder_migrate_with_extra_new_comic_still_preserves_series_state() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let db_path = common::create_fixture_db(temp.path());
-        let root = temp.path().join("library");
+        let temp = TempDir::new().expect("tempdir").keep();
+        let db_path = common::create_fixture_db(temp.as_path());
+        let root = temp.as_path().join("library");
         let series_dir = root.join("SeriesOld");
         std::fs::create_dir_all(&series_dir).expect("mkdir");
         write_cbz_pages(&series_dir.join("01.cbz"), 1);
@@ -439,6 +439,106 @@ fn whole_folder_migrate_with_extra_new_comic_still_preserves_series_state() {
                 .expect("thumb")
                 .expect("exists");
             assert_eq!(thumb.source_comic_id, new_comic_a);
+        });
+    });
+}
+
+#[test]
+fn last_locked_member_moving_into_existing_series_keeps_its_order() {
+    common::with_global_db(|| {
+        let temp = TempDir::new().expect("tempdir").keep();
+        let db_path = common::create_fixture_db(temp.as_path());
+        let root = temp.as_path().join("library");
+        let source = root.join("Source");
+        let destination = root.join("Destination");
+        std::fs::create_dir_all(&source).expect("source directory");
+        std::fs::create_dir_all(&destination).expect("destination directory");
+        write_cbz_pages(&source.join("01.cbz"), 1);
+        write_cbz_pages(&destination.join("02.cbz"), 2);
+        let source_comic = comic_id_from_path(&norm(&source.join("01.cbz")));
+        let target_comic = comic_id_from_path(&norm(&destination.join("02.cbz")));
+        let source_series = series_id_from_folder_path(&norm(&source));
+        let target_series = series_id_from_folder_path(&norm(&destination));
+
+        let runtime = tokio::runtime::Runtime::new().expect("runtime");
+        runtime.block_on(async {
+            init_db_at_path(&db_path).await.expect("init");
+            sync_once(&root).await;
+            update_series_item_sort_order(&source_series, &source_comic, 9.5)
+                .await
+                .expect("lock the only source member");
+            update_series_item_sort_order(&target_series, &target_comic, 2.5)
+                .await
+                .expect("lock existing target member");
+            update_series_user_meta(
+                &target_series,
+                UpdateSeriesUserMetaDto {
+                    name: Some("Existing destination".to_string()),
+                    serialization_status: Some("ended".to_string()),
+                    total_count: Some(7),
+                    clear_total_count: false,
+                },
+            )
+            .await
+            .expect("target metadata");
+
+            let moved_path = destination.join("01.cbz");
+            std::fs::rename(source.join("01.cbz"), &moved_path).expect("move last member");
+            let moved_comic = comic_id_from_path(&norm(&moved_path));
+            let db = connection().expect("connection");
+            let scanned = scan_roots(
+                std::slice::from_ref(&root),
+                &ScanContext {
+                    existing_by_id: HashMap::new(),
+                    thumbnail_stats: HashMap::new(),
+                },
+                &create_sync_handle(),
+                true,
+                &ResourceFormatCategory::ALL,
+            )
+            .expect("scan after move");
+            let plan = build_scan_replace_plan(&db, scanned, "")
+                .await
+                .expect("migration plan");
+            assert_eq!(plan.migrated_count, 1);
+            assert_eq!(plan.migrations.len(), 1);
+            assert_eq!(plan.migrations[0].from_comic_id, source_comic);
+            assert_eq!(plan.migrations[0].scanned.comic.comic_id, moved_comic);
+            assert!(
+                plan.series_migrations.is_empty(),
+                "occupied target Series is not rekeyed"
+            );
+            let notifications = hentai_core::revision::notify_count();
+
+            apply_scan_replace_plan(&db, &plan, "")
+                .await
+                .expect("apply migration");
+
+            let target = find_series_by_id(&target_series)
+                .await
+                .expect("target lookup")
+                .expect("existing target retained");
+            assert_eq!(target.items.len(), 2);
+            assert_locked_orders(&target, &moved_comic, &target_comic);
+            assert_eq!(target.name, "Existing destination");
+            assert_eq!(target.serialization_status, "ended");
+            assert_eq!(target.total_count, Some(7));
+            assert!(
+                target.locks.name && target.locks.serialization_status && target.locks.total_count
+            );
+            assert!(find_series_by_id(&source_series)
+                .await
+                .expect("source lookup")
+                .is_none());
+            assert!(find_comic_by_id(&source_comic)
+                .await
+                .expect("old Comic lookup")
+                .is_none());
+            assert!(find_comic_by_id(&moved_comic)
+                .await
+                .expect("moved Comic lookup")
+                .is_some());
+            assert_eq!(hentai_core::revision::notify_count(), notifications + 1);
         });
     });
 }

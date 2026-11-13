@@ -59,21 +59,12 @@ pub async fn rebuild_series_from_comics<C: ConnectionTrait>(
             .await
             .map_err(crate::db::map_db_err)?,
     };
-    for row in existing_rows {
-        if !active_series_ids.contains(&row.series_id) {
-            Series::delete_by_id(row.series_id)
-                .exec(db)
-                .await
-                .map_err(crate::db::map_db_err)?;
-        }
-    }
-
     let rewrite_comic_ids: Vec<String> = groups
         .values()
         .flat_map(|entries| entries.iter().map(|(comic_id, _)| comic_id.clone()))
         .collect();
 
-    // Capture locks before clearing memberships so migrate-across-series keeps ADR-0006.
+    // Snapshot before deleting stale Series, whose cascading delete removes member locks.
     let locked_orders: HashMap<String, f64> = if rewrite_comic_ids.is_empty() {
         HashMap::new()
     } else {
@@ -87,6 +78,15 @@ pub async fn rebuild_series_from_comics<C: ConnectionTrait>(
             .map(|item| (item.comic_id, item.sort_order))
             .collect()
     };
+
+    for row in existing_rows {
+        if !active_series_ids.contains(&row.series_id) {
+            Series::delete_by_id(row.series_id)
+                .exec(db)
+                .await
+                .map_err(crate::db::map_db_err)?;
+        }
+    }
 
     // Clear old memberships for comics we are about to rewrite so insert order
     // across Folder series cannot hit series_items.comic_id UNIQUE (#84).

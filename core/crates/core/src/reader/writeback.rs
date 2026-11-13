@@ -1,12 +1,13 @@
 //! First-open / refresh physical metadata writeback (page_count etc.).
 
-use crate::comic::find_comic_by_id;
-use crate::db::connection;
+use sea_orm::TransactionTrait;
+
+use crate::comic::{find_comic_by_id, upsert_comics};
+use crate::db::{connection, map_db_err};
 use crate::error::HentaiError;
 use crate::library::resolve_access_for_comic;
 use crate::metadata_lock::merge_refresh_scan_with_existing;
 use crate::resource::{parse_file_with, parsed_to_comic, ResourceAccess};
-use crate::sync::writer::upsert_comics;
 
 /// After a successful reader page-list, reconcile DB `page_count` (and parse merge).
 pub async fn writeback_after_open(comic_id: &str, page_count: i32) -> Result<(), HentaiError> {
@@ -54,7 +55,13 @@ pub async fn writeback_with_access(
     };
     let merged = merge_refresh_scan_with_existing(&scanned, &existing);
     let db = connection()?;
-    upsert_comics(&db, &[merged]).await?;
+    let txn = db.begin().await.map_err(map_db_err)?;
+    let skipped = upsert_comics(&txn, &[merged]).await?;
+    if !skipped.is_empty() {
+        return Ok(());
+    }
+    txn.commit().await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
     tracing::info!(comic_id, page_count, "comic physical metadata writeback");
     Ok(())
 }

@@ -27,9 +27,9 @@ fn write_cbz(path: &Path) {
 #[test]
 fn disabling_archive_resource_format_category_removes_existing_archive_comic_on_resync() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let db_path = common::create_fixture_db(temp.path());
-        let root = temp.path().join("library");
+        let temp = TempDir::new().expect("tempdir").keep();
+        let db_path = common::create_fixture_db(temp.as_path());
+        let root = temp.as_path().join("library");
         std::fs::create_dir(&root).expect("mkdir root");
 
         let folder = root.join("image_comic");

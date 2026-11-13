@@ -4,6 +4,7 @@ mod filter_predicate;
 mod grouping;
 mod page_query;
 pub mod pagination;
+mod persistence;
 pub mod repository;
 mod trash;
 pub(crate) mod visibility;
@@ -20,6 +21,7 @@ pub use dto::{
 };
 pub use grouping::ComicGrouping;
 pub use pagination::{paginate, PageWindow};
+pub(crate) use persistence::{delete_comics_side_effects, upsert_comics};
 pub use repository::{
     count_all, fetch_comics_browse_page, fetch_comics_page, find_comic_by_id, find_comics_by_ids,
     load_comics_ordered, search_by_keyword, search_by_keyword_page, search_by_tag_expression,

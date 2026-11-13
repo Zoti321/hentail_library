@@ -66,27 +66,6 @@ fn finalize_parsed_with(
     }))
 }
 
-fn finalize_parsed(
-    path: &Path,
-    resource_type: &str,
-    title: String,
-    authors: Vec<String>,
-    page_count: i32,
-    description: Option<String>,
-    published_at: Option<i64>,
-) -> Result<Option<ParsedResource>, HentaiError> {
-    finalize_parsed_with(
-        local_access(),
-        &path.to_string_lossy(),
-        resource_type,
-        title,
-        authors,
-        page_count,
-        description,
-        published_at,
-    )
-}
-
 pub fn parse_directory(dir: &Path) -> Result<Option<ParsedResource>, HentaiError> {
     parse_directory_with(local_access(), &dir.to_string_lossy())
 }
@@ -292,6 +271,20 @@ pub fn parse_file(file: &Path) -> Result<Option<ParsedResource>, HentaiError> {
     parse_file_with(local_access(), &file.to_string_lossy())
 }
 
+/// Parse a Resource using the kind reported by its access adapter.
+pub fn parse_resource_with(
+    access: &dyn ResourceAccess,
+    location: &str,
+) -> Result<Option<ParsedResource>, HentaiError> {
+    let Some(stat) = access.stat(location)? else {
+        return Ok(None);
+    };
+    match stat.kind {
+        ResourceKind::Dir => parse_directory_with(access, location),
+        ResourceKind::File => parse_file_with(access, location),
+    }
+}
+
 pub fn parse_file_with(
     access: &dyn ResourceAccess,
     location: &str,
@@ -306,58 +299,61 @@ pub fn parse_file_with(
         ".zip" => parse_zip_archive_with(access, location, "zip"),
         ".cbz" => parse_zip_archive_with(access, location, "cbz"),
         ".epub" => parse_epub_with(access, location),
-        // Path-bound: Local uses path; Remote materializes via access then parses.
-        ".cbr" => parse_path_bound_with(access, location, |p| parse_rar_archive(p, "cbr")),
-        ".rar" => parse_path_bound_with(access, location, |p| parse_rar_archive(p, "rar")),
-        ".cb7" => parse_path_bound_with(access, location, |p| parse_sevenz_archive(p, "cb7")),
-        ".7z" => parse_path_bound_with(access, location, |p| parse_sevenz_archive(p, "sevenz")),
-        ".pdf" => parse_path_bound_with(access, location, parse_pdf),
+        ".cbr" => parse_image_archive_with(access, location, "cbr", count_rar_images),
+        ".rar" => parse_image_archive_with(access, location, "rar", count_rar_images),
+        ".cb7" => parse_image_archive_with(access, location, "cb7", count_sevenz_images),
+        ".7z" => parse_image_archive_with(access, location, "sevenz", count_sevenz_images),
+        ".pdf" => parse_pdf_with(access, location),
         _ => Ok(None),
     }
 }
 
-fn is_remote_http_location(location: &str) -> bool {
-    let lower = location.to_ascii_lowercase();
-    lower.starts_with("http://") || lower.starts_with("https://")
-}
-
-fn parse_path_bound_with(
+fn parse_path_bound_with<T>(
     access: &dyn ResourceAccess,
     location: &str,
-    parse: impl FnOnce(&Path) -> Result<Option<ParsedResource>, HentaiError>,
-) -> Result<Option<ParsedResource>, HentaiError> {
-    if !is_remote_http_location(location) {
-        return parse(Path::new(location));
+    parse: impl FnOnce(&Path) -> Result<T, HentaiError>,
+) -> Result<T, HentaiError> {
+    if let Some(path) = access.local_path(location) {
+        return parse(&path);
     }
     let mut stream = access.open_stream(location)?;
     let mut temp = tempfile::NamedTempFile::new()
         .map_err(|e| HentaiError::validation(format!("创建临时文件失败: {e}")))?;
     std::io::copy(&mut stream, &mut temp)
         .map_err(|e| HentaiError::remote_unreachable(format!("下载远程资源失败: {e}")))?;
-    let mut parsed = parse(temp.path())?;
-    if let Some(ref mut p) = parsed {
-        // Keep identity keyed on the remote URL, not the temp path.
-        p.path = location.to_string();
-    }
-    Ok(parsed)
+    parse(temp.path())
+}
+
+fn parse_image_archive_with(
+    access: &dyn ResourceAccess,
+    location: &str,
+    resource_type: &str,
+    count_pages: impl FnOnce(&Path) -> Result<Option<i32>, HentaiError>,
+) -> Result<Option<ParsedResource>, HentaiError> {
+    let Some(page_count) = parse_path_bound_with(access, location, count_pages)? else {
+        return Ok(None);
+    };
+    finalize_parsed_with(
+        access,
+        location,
+        resource_type,
+        basename_without_extension(Path::new(location)),
+        vec![],
+        page_count,
+        None,
+        None,
+    )
 }
 
 pub fn parse_rar_archive(
     file: &Path,
     resource_type: &str,
 ) -> Result<Option<ParsedResource>, HentaiError> {
-    let page_count = count_rar_images(file)?;
-    let Some(page_count) = page_count else {
-        return Ok(None);
-    };
-    finalize_parsed(
-        file,
+    parse_image_archive_with(
+        local_access(),
+        &file.to_string_lossy(),
         resource_type,
-        basename_without_extension(file),
-        vec![],
-        page_count,
-        None,
-        None,
+        count_rar_images,
     )
 }
 
@@ -365,37 +361,39 @@ pub fn parse_sevenz_archive(
     file: &Path,
     resource_type: &str,
 ) -> Result<Option<ParsedResource>, HentaiError> {
-    let page_count = count_sevenz_images(file)?;
-    let Some(page_count) = page_count else {
-        return Ok(None);
-    };
-    finalize_parsed(
-        file,
+    parse_image_archive_with(
+        local_access(),
+        &file.to_string_lossy(),
         resource_type,
-        basename_without_extension(file),
-        vec![],
-        page_count,
-        None,
-        None,
+        count_sevenz_images,
     )
 }
 
 pub fn parse_pdf(file: &Path) -> Result<Option<ParsedResource>, HentaiError> {
-    let page_count = count_pdf_pages(file)?;
-    let Some(page_count) = page_count else {
-        return Ok(None);
-    };
-    let (title, authors, description, published_at) =
-        read_pdf_embedded_meta(file).unwrap_or((None, vec![], None, None));
-    finalize_parsed(
-        file,
-        "pdf",
-        title.unwrap_or_else(|| basename_without_extension(file)),
-        authors,
-        page_count,
-        description,
-        published_at,
-    )
+    parse_pdf_with(local_access(), &file.to_string_lossy())
+}
+
+fn parse_pdf_with(
+    access: &dyn ResourceAccess,
+    location: &str,
+) -> Result<Option<ParsedResource>, HentaiError> {
+    parse_path_bound_with(access, location, |file| {
+        let Some(page_count) = count_pdf_pages(file)? else {
+            return Ok(None);
+        };
+        let (title, authors, description, published_at) =
+            read_pdf_embedded_meta(file).unwrap_or((None, vec![], None, None));
+        finalize_parsed_with(
+            access,
+            location,
+            "pdf",
+            title.unwrap_or_else(|| basename_without_extension(Path::new(location))),
+            authors,
+            page_count,
+            description,
+            published_at,
+        )
+    })
 }
 
 pub fn parse_epub(file: &Path) -> Result<Option<ParsedResource>, HentaiError> {

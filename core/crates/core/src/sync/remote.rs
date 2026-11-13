@@ -179,11 +179,7 @@ fn register_remote_file(
         locks: Default::default(),
         library_id: String::new(),
     };
-    Ok(Some(ScanItem {
-        path,
-        resource_type: resource_type.to_string(),
-        comic,
-    }))
+    Ok(Some(ScanItem::from_resource(comic)))
 }
 
 pub(crate) fn remote_resource_type_from_location(location: &str) -> Option<&'static str> {

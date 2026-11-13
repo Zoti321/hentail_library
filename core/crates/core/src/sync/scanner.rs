@@ -11,7 +11,7 @@ use super::resource_format_category::{resource_type_enabled, ResourceFormatCateg
 use std::path::Path;
 
 use crate::resource::{
-    comic_id_for_path, extension_lower, local_access, parse_directory_with, parse_file_with,
+    comic_id_for_path, extension_lower, local_access, parse_directory_with, parse_resource_with,
     read_resource_size_with, read_source_stat_with, ResourceAccess, ResourceKind,
 };
 
@@ -25,6 +25,66 @@ pub struct ScanItem {
     pub path: String,
     pub resource_type: String,
     pub comic: ComicDto,
+    metadata_source: ScanMetadataSource,
+}
+
+#[derive(Clone, Copy)]
+enum ScanMetadataSource {
+    Resource,
+    Catalog,
+}
+
+impl ScanItem {
+    pub fn from_resource(comic: ComicDto) -> Self {
+        Self {
+            path: comic.path.clone(),
+            resource_type: comic.resource_type.clone(),
+            comic,
+            metadata_source: ScanMetadataSource::Resource,
+        }
+    }
+
+    fn from_catalog(comic: ComicDto) -> Self {
+        Self {
+            metadata_source: ScanMetadataSource::Catalog,
+            ..Self::from_resource(comic)
+        }
+    }
+
+    pub(super) fn requires_catalog_record(&self) -> bool {
+        matches!(self.metadata_source, ScanMetadataSource::Catalog)
+    }
+
+    pub(super) fn merge_with_catalog(
+        &self,
+        current: Option<&ComicDto>,
+    ) -> Result<ComicDto, HentaiError> {
+        let Some(current) = current else {
+            return match self.metadata_source {
+                ScanMetadataSource::Resource => Ok(self.comic.clone()),
+                ScanMetadataSource::Catalog => Err(HentaiError::validation(format!(
+                    "待复用漫画已移除，请重新同步: {}",
+                    self.comic.comic_id
+                ))),
+            };
+        };
+        Ok(match self.metadata_source {
+            ScanMetadataSource::Resource => {
+                crate::metadata_lock::merge_kept_scan_with_existing(&self.comic, current)
+            }
+            ScanMetadataSource::Catalog => {
+                // Reuse did not parse metadata; an old projection is not a scan value.
+                let mut refreshed = current.clone();
+                refreshed.path = self.comic.path.clone();
+                refreshed.resource_type = self.comic.resource_type.clone();
+                refreshed.resource_size = self.comic.resource_size;
+                if !self.comic.library_id.is_empty() {
+                    refreshed.library_id = self.comic.library_id.clone();
+                }
+                refreshed
+            }
+        })
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -313,34 +373,18 @@ fn resolve_scan_item(
                 }
                 let mut comic = existing.clone();
                 refresh_resource_size(access, path, &mut comic)?;
-                return Ok(Some(ScanItem {
-                    path: existing.path.clone(),
-                    resource_type: existing.resource_type.clone(),
-                    comic,
-                }));
+                return Ok(Some(ScanItem::from_catalog(comic)));
             }
         }
     }
-    let kind = match access.stat(path)? {
-        Some(stat) => stat.kind,
-        None => return Ok(None),
-    };
-    let parsed = match kind {
-        ResourceKind::Dir => parse_directory_with(access, path)?,
-        ResourceKind::File => parse_file_with(access, path)?,
-    };
-    let Some(parsed) = parsed else {
+    let Some(parsed) = parse_resource_with(access, path)? else {
         return Ok(None);
     };
     if !resource_type_enabled(&parsed.resource_type, enabled_groups) {
         return Ok(None);
     }
     let comic = crate::resource::parsed_to_comic(&parsed);
-    Ok(Some(ScanItem {
-        path: parsed.path,
-        resource_type: parsed.resource_type,
-        comic,
-    }))
+    Ok(Some(ScanItem::from_resource(comic)))
 }
 
 fn refresh_resource_size(

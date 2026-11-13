@@ -1,13 +1,12 @@
 use sea_orm::{ActiveModelTrait, ConnectionTrait, Set, TransactionTrait};
 
+use crate::author::replace_comic_authors;
 use crate::comic::dto::{now_ms, serialize_languages};
 use crate::db::{connection, map_db_err};
 use crate::entity::{comic_meta, comics};
 use crate::error::HentaiError;
 use crate::metadata_lock::{normalize_names, ComicAutoLocks, ComicMetaField};
-use crate::sync::writer::{
-    replace_comic_authors, replace_comic_characters, replace_comic_parodies, replace_comic_tags,
-};
+use crate::named_facet::{replace_comic_named_facet, JunctionNamedFacet};
 use crate::util::{compute_sort_key, decode_basic_html_entities};
 
 #[derive(Debug, Clone, Default)]
@@ -166,15 +165,15 @@ pub(crate) async fn update_comic_user_meta_in<C: ConnectionTrait>(
         meta_touched = true;
     }
     if let Some(tags) = meta.tags {
-        replace_comic_tags(db, comic_id, &tags).await?;
+        replace_comic_named_facet(db, JunctionNamedFacet::Tag, comic_id, &tags).await?;
         meta_touched = true;
     }
     if let Some(parodies) = meta.parodies {
-        replace_comic_parodies(db, comic_id, &parodies).await?;
+        replace_comic_named_facet(db, JunctionNamedFacet::Parody, comic_id, &parodies).await?;
         meta_touched = true;
     }
     if let Some(characters) = meta.characters {
-        replace_comic_characters(db, comic_id, &characters).await?;
+        replace_comic_named_facet(db, JunctionNamedFacet::Character, comic_id, &characters).await?;
         meta_touched = true;
     }
     if meta_touched {

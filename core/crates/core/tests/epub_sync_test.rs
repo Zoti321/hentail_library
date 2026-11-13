@@ -50,8 +50,8 @@ fn create_epub(path: &Path, author: &str) {
 
 #[test]
 fn parse_epub_reads_author_metadata() {
-    let temp = TempDir::new().expect("tempdir");
-    let path = temp.path().join("comic.epub");
+    let temp = TempDir::new().expect("tempdir").keep();
+    let path = temp.as_path().join("comic.epub");
     create_epub(&path, "测试作者");
 
     let parsed = parse_epub(&path).expect("parse").expect("resource");
@@ -63,22 +63,18 @@ fn parse_epub_reads_author_metadata() {
 #[test]
 fn upsert_epub_author_twice_does_not_fail_when_author_exists() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let db_path = common::create_fixture_db(temp.path());
+        let temp = TempDir::new().expect("tempdir").keep();
+        let db_path = common::create_fixture_db(temp.as_path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
             let db = connection().expect("connection");
 
-            let epub_path = temp.path().join("comic.epub");
+            let epub_path = temp.as_path().join("comic.epub");
             create_epub(&epub_path, "作者A");
             let parsed = parse_epub(&epub_path).expect("parse").expect("resource");
             let comic: ComicDto = parsed_to_comic(&parsed);
-            let make_item = || ScanItem {
-                path: parsed.path.clone(),
-                resource_type: parsed.resource_type.clone(),
-                comic: comic.clone(),
-            };
+            let make_item = || ScanItem::from_resource(comic.clone());
 
             let plan = build_scan_replace_plan(&db, vec![make_item()], "")
                 .await

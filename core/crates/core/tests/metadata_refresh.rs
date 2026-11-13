@@ -45,11 +45,7 @@ async fn upsert_paths(db: &DatabaseConnection, paths: &[&Path]) {
     for path in paths {
         let parsed = parse_file(path).expect("parse").expect("resource");
         let comic = parsed_to_comic(&parsed);
-        items.push(ScanItem {
-            path: parsed.path.clone(),
-            resource_type: parsed.resource_type.clone(),
-            comic,
-        });
+        items.push(ScanItem::from_resource(comic));
     }
     let plan = build_scan_replace_plan(db, items, "").await.expect("plan");
     apply_scan_replace_plan(db, &plan, "")
@@ -86,14 +82,14 @@ async fn drop_failing_comic_meta_trigger(db: &DatabaseConnection) {
 #[test]
 fn refresh_comic_metadata_overwrites_unlocked_title_from_disk() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let db_path = common::create_fixture_db(temp.path());
+        let temp = TempDir::new().expect("tempdir").keep();
+        let db_path = common::create_fixture_db(temp.as_path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
             let db = connection().expect("connection");
 
-            let cbz = temp.path().join("book.cbz");
+            let cbz = temp.as_path().join("book.cbz");
             create_cbz_with_title(&cbz, "FromDisk");
             upsert_path(&db, &cbz).await;
 
@@ -123,14 +119,14 @@ fn refresh_comic_metadata_overwrites_unlocked_title_from_disk() {
 #[test]
 fn refresh_comic_metadata_preserves_locked_title() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let db_path = common::create_fixture_db(temp.path());
+        let temp = TempDir::new().expect("tempdir").keep();
+        let db_path = common::create_fixture_db(temp.as_path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
             let db = connection().expect("connection");
 
-            let cbz = temp.path().join("book.cbz");
+            let cbz = temp.as_path().join("book.cbz");
             create_cbz_with_title(&cbz, "FromDisk");
             upsert_path(&db, &cbz).await;
 
@@ -161,14 +157,14 @@ fn refresh_comic_metadata_preserves_locked_title() {
 #[test]
 fn refresh_comic_metadata_fails_when_file_missing_without_changing_db() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let db_path = common::create_fixture_db(temp.path());
+        let temp = TempDir::new().expect("tempdir").keep();
+        let db_path = common::create_fixture_db(temp.as_path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
             let db = connection().expect("connection");
 
-            let cbz = temp.path().join("book.cbz");
+            let cbz = temp.as_path().join("book.cbz");
             create_cbz_with_title(&cbz, "FromDisk");
             upsert_path(&db, &cbz).await;
 
@@ -200,14 +196,14 @@ fn refresh_comic_metadata_fails_when_file_missing_without_changing_db() {
 #[test]
 fn refresh_comic_metadata_is_atomic_per_comic() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let db_path = common::create_fixture_db(temp.path());
+        let temp = TempDir::new().expect("tempdir").keep();
+        let db_path = common::create_fixture_db(temp.as_path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
             let db = connection().expect("connection");
 
-            let cbz = temp.path().join("book.cbz");
+            let cbz = temp.as_path().join("book.cbz");
             create_cbz_with_title(&cbz, "FreshRefresh");
             upsert_path(&db, &cbz).await;
 
@@ -261,14 +257,14 @@ fn refresh_comic_metadata_is_atomic_per_comic() {
 #[test]
 fn refresh_comic_metadata_rejects_when_library_write_lock_held() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let db_path = common::create_fixture_db(temp.path());
+        let temp = TempDir::new().expect("tempdir").keep();
+        let db_path = common::create_fixture_db(temp.as_path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
             let db = connection().expect("connection");
 
-            let cbz = temp.path().join("book.cbz");
+            let cbz = temp.as_path().join("book.cbz");
             create_cbz_with_title(&cbz, "FromDisk");
             upsert_path(&db, &cbz).await;
             let comic_id = comic_id_from_path(&cbz.to_string_lossy());
@@ -283,14 +279,14 @@ fn refresh_comic_metadata_rejects_when_library_write_lock_held() {
 #[test]
 fn refresh_series_metadata_refreshes_members_and_unlocked_name() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let db_path = common::create_fixture_db(temp.path());
+        let temp = TempDir::new().expect("tempdir").keep();
+        let db_path = common::create_fixture_db(temp.as_path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
             let db = connection().expect("connection");
 
-            let folder = temp.path().join("FolderSeries");
+            let folder = temp.as_path().join("FolderSeries");
             fs::create_dir_all(&folder).expect("mkdir");
             let a = folder.join("a.cbz");
             let b = folder.join("b.cbz");
@@ -356,14 +352,14 @@ fn refresh_series_metadata_refreshes_members_and_unlocked_name() {
 #[test]
 fn refresh_series_metadata_preserves_locked_name_and_continues_after_member_failure() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let db_path = common::create_fixture_db(temp.path());
+        let temp = TempDir::new().expect("tempdir").keep();
+        let db_path = common::create_fixture_db(temp.as_path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
             let db = connection().expect("connection");
 
-            let folder = temp.path().join("LockedNameSeries");
+            let folder = temp.as_path().join("LockedNameSeries");
             fs::create_dir_all(&folder).expect("mkdir");
             let a = folder.join("a.cbz");
             let b = folder.join("b.cbz");
@@ -437,8 +433,8 @@ fn refresh_series_metadata_preserves_locked_name_and_continues_after_member_fail
 #[test]
 fn refresh_series_metadata_rejects_when_library_write_lock_held() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let db_path = common::create_fixture_db(temp.path());
+        let temp = TempDir::new().expect("tempdir").keep();
+        let db_path = common::create_fixture_db(temp.as_path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -455,10 +451,10 @@ fn refresh_series_metadata_rejects_when_library_write_lock_held() {
 #[test]
 fn refresh_library_metadata_refreshes_comics_and_unlocked_series_name() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let root = temp.path().join("lib_root");
+        let temp = TempDir::new().expect("tempdir").keep();
+        let root = temp.as_path().join("lib_root");
         fs::create_dir_all(&root).expect("mkdir root");
-        let db_path = common::create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.as_path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -540,10 +536,10 @@ fn refresh_library_metadata_refreshes_comics_and_unlocked_series_name() {
 #[test]
 fn refresh_library_metadata_stops_on_cancel_and_keeps_partial_writes() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let root = temp.path().join("lib_cancel");
+        let temp = TempDir::new().expect("tempdir").keep();
+        let root = temp.as_path().join("lib_cancel");
         fs::create_dir_all(&root).expect("mkdir root");
-        let db_path = common::create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.as_path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -610,12 +606,12 @@ fn refresh_library_metadata_stops_on_cancel_and_keeps_partial_writes() {
 #[test]
 fn refresh_library_metadata_scopes_to_target_library_only() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let root_a = temp.path().join("lib_a");
-        let root_b = temp.path().join("lib_b");
+        let temp = TempDir::new().expect("tempdir").keep();
+        let root_a = temp.as_path().join("lib_a");
+        let root_b = temp.as_path().join("lib_b");
         fs::create_dir_all(&root_a).expect("mkdir a");
         fs::create_dir_all(&root_b).expect("mkdir b");
-        let db_path = common::create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.as_path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -683,8 +679,8 @@ fn refresh_library_metadata_scopes_to_target_library_only() {
 #[test]
 fn refresh_library_metadata_skips_remote_without_credentials() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let db_path = common::create_fixture_db(temp.path());
+        let temp = TempDir::new().expect("tempdir").keep();
+        let db_path = common::create_fixture_db(temp.as_path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -708,8 +704,8 @@ fn refresh_library_metadata_skips_remote_without_credentials() {
 #[test]
 fn refresh_library_metadata_rejects_when_library_write_lock_held() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let db_path = common::create_fixture_db(temp.path());
+        let temp = TempDir::new().expect("tempdir").keep();
+        let db_path = common::create_fixture_db(temp.as_path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -726,10 +722,10 @@ fn refresh_library_metadata_rejects_when_library_write_lock_held() {
 #[test]
 fn refresh_library_metadata_continues_after_comic_failure() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let root = temp.path().join("lib_partial");
+        let temp = TempDir::new().expect("tempdir").keep();
+        let root = temp.as_path().join("lib_partial");
         fs::create_dir_all(&root).expect("mkdir root");
-        let db_path = common::create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.as_path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -794,14 +790,14 @@ fn refresh_library_metadata_continues_after_comic_failure() {
 #[test]
 fn refresh_series_metadata_stops_on_cancel_and_keeps_partial_writes() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let db_path = common::create_fixture_db(temp.path());
+        let temp = TempDir::new().expect("tempdir").keep();
+        let db_path = common::create_fixture_db(temp.as_path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
             let db = connection().expect("connection");
 
-            let folder = temp.path().join("CancelSeries");
+            let folder = temp.as_path().join("CancelSeries");
             fs::create_dir_all(&folder).expect("mkdir");
             let a = folder.join("a.cbz");
             let b = folder.join("b.cbz");
@@ -847,4 +843,236 @@ fn refresh_series_metadata_stops_on_cancel_and_keeps_partial_writes() {
             assert_eq!(series.name, "CustomName");
         });
     });
+}
+
+fn series_name_edit_during_refresh(initial_locked: bool, lock_during_refresh: bool) {
+    common::with_global_db(|| {
+        let root = tempfile::tempdir().unwrap().keep();
+        let db_path = common::create_fixture_db(&root);
+        let runtime = tokio::runtime::Runtime::new().unwrap();
+        runtime.block_on(async {
+            init_db_at_path(&db_path).await.unwrap();
+            let db = connection().unwrap();
+            let folder = root.join("FolderSeries");
+            fs::create_dir(&folder).unwrap();
+            let cbz = folder.join("book.cbz");
+            create_cbz_with_title(&cbz, "Disk title");
+            upsert_path(&db, &cbz).await;
+            let series_id = series_id_from_folder_path(&folder.to_string_lossy());
+            db.execute(Statement::from_sql_and_values(
+                sea_orm::DatabaseBackend::Sqlite,
+                "UPDATE series SET name = 'Opening name', name_locked = ? WHERE series_id = ?",
+                [initial_locked.into(), series_id.clone().into()],
+            )).await.unwrap();
+            let notifications = hentai_core::revision::notify_count();
+            let mut changed = false;
+            let result = refresh_series_metadata(&series_id, &create_sync_handle(), |_| {
+                let conn = rusqlite::Connection::open(&db_path).unwrap();
+                conn.execute(
+                    "UPDATE series SET name = 'Newest user name', name_locked = ?, total_count = 8, total_count_locked = 1 WHERE series_id = ?",
+                    rusqlite::params![lock_during_refresh, &series_id],
+                ).unwrap();
+                changed = true;
+            }).await.unwrap();
+            assert!(changed);
+            assert_eq!(result.succeeded, 1);
+            assert_eq!(result.failed, 0);
+            let series = find_series_by_id(&series_id).await.unwrap().unwrap();
+            assert_eq!(series.name, if lock_during_refresh { "Newest user name" } else { "FolderSeries" });
+            assert_eq!(series.locks.name, lock_during_refresh);
+            assert_eq!(series.total_count, Some(8));
+            assert!(series.locks.total_count);
+            let expected_notifications = if lock_during_refresh { 1 } else { 2 };
+            assert_eq!(hentai_core::revision::notify_count(), notifications + expected_notifications);
+        });
+    });
+}
+
+#[test]
+fn refresh_series_name_preserves_a_name_locked_after_member_refresh() {
+    series_name_edit_during_refresh(false, true);
+}
+
+#[test]
+fn refresh_series_name_uses_a_lock_released_after_member_refresh() {
+    series_name_edit_during_refresh(true, false);
+}
+
+#[test]
+fn refresh_series_name_without_members_notifies_only_after_a_change() {
+    common::with_global_db(|| {
+        let root = tempfile::tempdir().unwrap().keep();
+        let db_path = common::create_fixture_db(&root);
+        let runtime = tokio::runtime::Runtime::new().unwrap();
+        runtime.block_on(async {
+            init_db_at_path(&db_path).await.unwrap();
+            let db = connection().unwrap();
+            let folder = root.join("FolderSeries");
+            fs::create_dir(&folder).unwrap();
+            let cbz = folder.join("book.cbz");
+            create_cbz_with_title(&cbz, "Disk title");
+            upsert_path(&db, &cbz).await;
+            let series_id = series_id_from_folder_path(&folder.to_string_lossy());
+            db.execute(Statement::from_sql_and_values(
+                sea_orm::DatabaseBackend::Sqlite,
+                "DELETE FROM series_items WHERE series_id = ?",
+                [series_id.clone().into()],
+            ))
+            .await
+            .unwrap();
+            db.execute(Statement::from_sql_and_values(
+                sea_orm::DatabaseBackend::Sqlite,
+                "UPDATE series SET name = 'Opening name', name_locked = 0 WHERE series_id = ?",
+                [series_id.clone().into()],
+            ))
+            .await
+            .unwrap();
+            let notifications = hentai_core::revision::notify_count();
+            for _ in 0..2 {
+                let result = refresh_series_metadata(&series_id, &create_sync_handle(), |_| {})
+                    .await
+                    .unwrap();
+                assert_eq!(result.succeeded, 0);
+                assert_eq!(result.failed, 0);
+                assert_eq!(
+                    find_series_by_id(&series_id).await.unwrap().unwrap().name,
+                    "FolderSeries"
+                );
+                assert_eq!(hentai_core::revision::notify_count(), notifications + 1);
+            }
+        });
+    });
+}
+
+#[test]
+fn series_and_library_refresh_exclude_comics_already_in_trash() {
+    common::with_global_db(|| {
+        let root = tempfile::tempdir().unwrap().keep();
+        let db_path = common::create_fixture_db(&root);
+        let runtime = tokio::runtime::Runtime::new().unwrap();
+        runtime.block_on(async {
+            init_db_at_path(&db_path).await.unwrap();
+            let db = connection().unwrap();
+            let library = create_local_library(&root.to_string_lossy(), None)
+                .await
+                .unwrap();
+            let folder = root.join("FolderSeries");
+            fs::create_dir(&folder).unwrap();
+            let active = folder.join("active.cbz");
+            let trash = folder.join("trash.cbz");
+            create_cbz_with_title(&active, "Active title");
+            create_cbz_with_title(&trash, "Trash title");
+            upsert_paths(&db, &[&active, &trash]).await;
+            let series_id = series_id_from_folder_path(&folder.to_string_lossy());
+            let trash_id = comic_id_from_path(&trash.to_string_lossy());
+            db.execute(Statement::from_sql_and_values(
+                sea_orm::DatabaseBackend::Sqlite,
+                "UPDATE comics SET library_id = ?",
+                [library.library_id.clone().into()],
+            ))
+            .await
+            .unwrap();
+            db.execute(Statement::from_sql_and_values(
+                sea_orm::DatabaseBackend::Sqlite,
+                "UPDATE series SET library_id = ? WHERE series_id = ?",
+                [library.library_id.clone().into(), series_id.clone().into()],
+            ))
+            .await
+            .unwrap();
+            db.execute(Statement::from_sql_and_values(
+                sea_orm::DatabaseBackend::Sqlite,
+                "UPDATE comics SET deleted_at = 20 WHERE comic_id = ?",
+                [trash_id.clone().into()],
+            ))
+            .await
+            .unwrap();
+            // A trashed resource must not be opened or reported as a refresh failure.
+            fs::remove_file(&trash).unwrap();
+            let mut progress = Vec::new();
+            let series_result =
+                refresh_series_metadata(&series_id, &create_sync_handle(), |p| progress.push(p))
+                    .await
+                    .unwrap();
+            assert_eq!((series_result.succeeded, series_result.failed), (1, 0));
+            assert!(progress.iter().all(|p| p.total == 1));
+            progress.clear();
+            let library_result =
+                refresh_library_metadata(&library.library_id, &create_sync_handle(), |p| {
+                    progress.push(p)
+                })
+                .await
+                .unwrap();
+            assert_eq!((library_result.succeeded, library_result.failed), (1, 0));
+            assert!(progress.iter().all(|p| p.total == 1));
+            assert_eq!(
+                find_comic_by_id(&trash_id).await.unwrap().unwrap().title,
+                "Trash title"
+            );
+        });
+    });
+}
+
+fn cancel_before_series_name_update(without_members: bool) {
+    common::with_global_db(|| {
+        let root = tempfile::tempdir().unwrap().keep();
+        let db_path = common::create_fixture_db(&root);
+        let runtime = tokio::runtime::Runtime::new().unwrap();
+        runtime.block_on(async {
+            init_db_at_path(&db_path).await.unwrap();
+            let db = connection().unwrap();
+            let library = create_local_library(&root.to_string_lossy(), None).await.unwrap();
+            let folder = root.join("FolderSeries");
+            fs::create_dir(&folder).unwrap();
+            let cbz = folder.join("book.cbz");
+            create_cbz_with_title(&cbz, "Disk title");
+            upsert_path(&db, &cbz).await;
+            let series_id = series_id_from_folder_path(&folder.to_string_lossy());
+            let comic_id = comic_id_from_path(&cbz.to_string_lossy());
+            db.execute(Statement::from_sql_and_values(
+                sea_orm::DatabaseBackend::Sqlite,
+                "UPDATE comics SET library_id = ? WHERE comic_id = ?",
+                [library.library_id.clone().into(), comic_id.clone().into()],
+            )).await.unwrap();
+            db.execute(Statement::from_sql_and_values(
+                sea_orm::DatabaseBackend::Sqlite,
+                "UPDATE series SET name = 'Opening name', name_locked = 0, library_id = ? WHERE series_id = ?",
+                [library.library_id.clone().into(), series_id.clone().into()],
+            )).await.unwrap();
+            if without_members {
+                db.execute(Statement::from_sql_and_values(
+                    sea_orm::DatabaseBackend::Sqlite,
+                    "DELETE FROM comics WHERE comic_id = ?",
+                    [comic_id.into()],
+                )).await.unwrap();
+            }
+            for library_scope in [false, true] {
+                let handle = create_sync_handle();
+                if without_members { cancel_sync(&handle); }
+                let notifications = hentai_core::revision::notify_count();
+                let emit = |_| cancel_sync(&handle);
+                let (succeeded, failed, cancelled) = if library_scope {
+                    let result = refresh_library_metadata(&library.library_id, &handle, emit).await.unwrap();
+                    (result.succeeded, result.failed, result.cancelled)
+                } else {
+                    let result = refresh_series_metadata(&series_id, &handle, emit).await.unwrap();
+                    (result.succeeded, result.failed, result.cancelled)
+                };
+                assert!(cancelled, "scope library={library_scope}");
+                let committed_members = i32::from(!without_members);
+                assert_eq!((succeeded, failed), (committed_members, 0));
+                assert_eq!(find_series_by_id(&series_id).await.unwrap().unwrap().name, "Opening name");
+                assert_eq!(hentai_core::revision::notify_count(), notifications + committed_members as u64);
+            }
+        });
+    });
+}
+
+#[test]
+fn series_and_library_refresh_cancel_after_the_last_member_without_renaming() {
+    cancel_before_series_name_update(false);
+}
+
+#[test]
+fn series_and_library_refresh_cancel_without_members_before_renaming() {
+    cancel_before_series_name_update(true);
 }
