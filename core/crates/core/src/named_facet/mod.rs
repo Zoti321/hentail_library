@@ -367,6 +367,7 @@ async fn delete_named_facet_by_names_locked(
     ))
     .await
     .map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(())
 }
 

@@ -112,3 +112,124 @@ fn trash_commit_notifies() {
         );
     });
 }
+
+fn with_retained_dictionary_db(test: impl FnOnce(&tokio::runtime::Runtime)) {
+    common::with_global_db(|| {
+        // Retain test files for manual cleanup under the repository removal policy.
+        let temp = tempfile::tempdir().expect("tempdir").keep();
+        let runtime = tokio::runtime::Runtime::new().expect("runtime");
+        runtime
+            .block_on(init_db_at_path(&temp.join("dictionary-delete.sqlite")))
+            .expect("init database");
+        test(&runtime);
+    });
+}
+
+#[test]
+fn dictionary_delete_notifies_subscribers_once_after_success() {
+    with_retained_dictionary_db(|runtime| {
+        runtime.block_on(async {
+            for facet in [
+                JunctionNamedFacet::Tag,
+                JunctionNamedFacet::Parody,
+                JunctionNamedFacet::Character,
+            ] {
+                hentai_core::add_named_facet_name(facet, "remove-me")
+                    .await
+                    .expect("seed dictionary name");
+                let notifications = revision::notify_count();
+                let changes = revision::subscribe();
+
+                hentai_core::delete_named_facet_by_names(facet, vec!["remove-me".to_string()])
+                    .await
+                    .expect("delete dictionary name");
+
+                assert!(!hentai_core::list_all_named_facet_names(facet)
+                    .await
+                    .expect("remaining names")
+                    .contains(&"remove-me".to_string()));
+                assert_eq!(revision::notify_count(), notifications + 1, "{facet:?}");
+                assert!(
+                    changes.has_changed().expect("revision remains open"),
+                    "{facet:?}"
+                );
+            }
+        });
+    });
+}
+
+#[test]
+fn dictionary_delete_missing_name_notifies_but_empty_request_does_not() {
+    with_retained_dictionary_db(|runtime| {
+        runtime.block_on(async {
+            let notifications = revision::notify_count();
+            let changes = revision::subscribe();
+            hentai_core::delete_named_facet_by_names(JunctionNamedFacet::Tag, Vec::new())
+                .await
+                .expect("empty request");
+            assert_eq!(revision::notify_count(), notifications);
+            assert!(!changes.has_changed().expect("revision remains open"));
+
+            hentai_core::delete_named_facet_by_names(
+                JunctionNamedFacet::Tag,
+                vec!["missing".to_string()],
+            )
+            .await
+            .expect("idempotent deletion");
+            assert_eq!(revision::notify_count(), notifications + 1);
+            assert!(changes.has_changed().expect("revision remains open"));
+        });
+    });
+}
+
+#[test]
+fn dictionary_delete_sql_failure_keeps_names_without_notification() {
+    use sea_orm::ConnectionTrait;
+
+    with_retained_dictionary_db(|runtime| {
+        runtime.block_on(async {
+            let db = hentai_core::connection().expect("connection");
+            for facet in [
+                JunctionNamedFacet::Tag,
+                JunctionNamedFacet::Parody,
+                JunctionNamedFacet::Character,
+            ] {
+                hentai_core::add_named_facet_name(facet, "retained")
+                    .await
+                    .expect("seed dictionary name");
+                db.execute_unprepared(&format!(
+                    "CREATE TRIGGER block_dictionary_delete BEFORE DELETE ON {} \
+                     BEGIN SELECT RAISE(ABORT, 'dictionary delete blocked'); END",
+                    facet.dict_table(),
+                ))
+                .await
+                .expect("inject deletion failure");
+                let notifications = revision::notify_count();
+                let changes = revision::subscribe();
+
+                let error =
+                    hentai_core::delete_named_facet_by_names(facet, vec!["retained".to_string()])
+                        .await
+                        .expect_err("dictionary deletion fails");
+
+                assert!(
+                    error.message.contains("dictionary delete blocked"),
+                    "{error:?}"
+                );
+                assert!(hentai_core::list_all_named_facet_names(facet)
+                    .await
+                    .expect("retained names")
+                    .contains(&"retained".to_string()));
+                assert_eq!(revision::notify_count(), notifications);
+                assert!(!changes.has_changed().expect("revision remains open"));
+                db.execute_unprepared("DROP TRIGGER block_dictionary_delete")
+                    .await
+                    .expect("remove injected failure");
+                hentai_core::delete_named_facet_by_names(facet, vec!["retained".to_string()])
+                    .await
+                    .expect("new deletion succeeds and lock was released");
+                assert_eq!(revision::notify_count(), notifications + 1);
+            }
+        });
+    });
+}
