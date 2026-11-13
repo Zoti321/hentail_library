@@ -120,6 +120,60 @@ const Set<String> pureDartLibraries = <String>{
   'dart:typed_data',
 };
 
+// Outer-layer policies follow application libraries. Package internals are
+// outside this check; inner purity and portable UI have separate package rules.
+Set<String> appLayerDependencyViolations({
+  required DartDependencyGraph graph,
+  required Iterable<Uri> roots,
+  required Uri appLib,
+  required bool Function(String source, String target) allowsAppPath,
+}) {
+  final base = appLib.toString();
+  final violations = <String>{};
+  final edges = <Uri, List<Uri>>{};
+
+  List<Uri> dependencies(Uri file) => edges.putIfAbsent(
+    file,
+    () => [
+      for (final dependency in graph.directives(file))
+        if (!dependency.startsWith('dart:') &&
+            (!dependency.startsWith('package:') ||
+                dependency.startsWith('package:hentai_library/')))
+          graph.resolve(file, dependency),
+    ],
+  );
+
+  for (final root in roots) {
+    if (!root.toString().startsWith(base)) {
+      throw ArgumentError.value(root, 'roots', 'Root is outside app lib');
+    }
+    final source = root.toString().substring(base.length);
+    final visited = <Uri>{};
+    final chain = <String>[source];
+    void visit(Uri file) {
+      if (!visited.add(file)) return;
+      for (final target in dependencies(file)) {
+        final targetUri = target.toString();
+        if (!targetUri.startsWith(base)) {
+          violations.add('${chain.join(' -> ')} -> outside app lib: $target');
+          continue;
+        }
+        final path = targetUri.substring(base.length);
+        chain.add(path);
+        if (!allowsAppPath(source, path)) {
+          violations.add(chain.join(' -> '));
+        } else {
+          visit(target);
+        }
+        chain.removeLast();
+      }
+    }
+
+    visit(root);
+  }
+  return violations;
+}
+
 /// Evaluate local policy at every hop. Check package manifests recursively as
 /// well as reachable source libraries; package names alone establish no trust.
 Set<String> pureDependencyViolations({

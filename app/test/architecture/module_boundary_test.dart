@@ -32,7 +32,7 @@ const Set<String> _kInScopeModules = <String>{
 const Map<String, Set<String>> _kForbiddenEdges = <String, Set<String>>{
   'comic': <String>{'library_browse', 'series', 'reader'},
   'series': <String>{'library_browse', 'reader'},
-  'reader': <String>{'comic'},
+  'reader': <String>{'comic', 'series'},
   'comic_metadata': <String>{'comic', 'library_browse', 'series', 'reader'},
   'app_settings': <String>{
     'reader',
@@ -44,13 +44,7 @@ const Map<String, Set<String>> _kForbiddenEdges = <String, Set<String>>{
 };
 
 /// R12 白名单条目数上限：只允许缩小。
-const int _kR12AllowlistRatchet = 41;
-
-/// 禁止边存量（只减不增）：reader → comic 的 public 读取面在 #488 前已存在，
-/// 归 reader 模块收敛 PR 处理；新边一律失败。
-const Set<String> _kForbiddenBaseline = <String>{
-  'X1|reader|comic|features/reader/presentation/view_models/reader_cover_editor_notifier.dart|package:hentai_library/features/comic/public.dart',
-};
+const int _kR12AllowlistRatchet = 37;
 
 final RegExp _edgeUriRe = RegExp(
   r"^\s*(?:import|export)\s+'package:hentai_library/([^']+)'",
@@ -169,9 +163,6 @@ void main() {
     for (final _Edge edge in edges) {
       final Set<String>? forbidden = _kForbiddenEdges[edge.source];
       if (forbidden == null || !forbidden.contains(edge.target)) {
-        continue;
-      }
-      if (_kForbiddenBaseline.contains(_key('X1', edge))) {
         continue;
       }
       offenders.add(_format(edge, '禁止边 ${edge.source} ↛ ${edge.target}'));

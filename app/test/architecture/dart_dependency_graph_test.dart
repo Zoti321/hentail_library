@@ -1,6 +1,7 @@
 import 'package:test/test.dart';
 
 import 'dart_dependency_graph.dart';
+import 'outer_layer_dependency_policy.dart';
 
 final _app = Uri.parse('file:///fixture/lib/');
 final _core = _app.resolve('core/value.dart');
@@ -21,7 +22,11 @@ class _FixtureGraph extends DartDependencyGraph {
   final Map<String, Set<String>> declarations;
 
   @override
-  List<String> directives(Uri source) => dependencyUris(sources[source]!);
+  List<String> directives(Uri source) {
+    final code = sources[source];
+    if (code == null) throw StateError('Unresolved Dart library: $source');
+    return dependencyUris(code);
+  }
 
   @override
   Set<String> runtimeDependencies(String package) =>
@@ -41,6 +46,142 @@ Set<String> _violations(_FixtureGraph graph) => pureDependencyViolations(
 );
 
 void main() {
+  group('outer-layer application graph', () {
+    Set<String> check(Map<String, String> sources, String root) {
+      final graph = _FixtureGraph({
+        for (final entry in sources.entries)
+          _app.resolve(entry.key): entry.value,
+      });
+      graph.packages['hentai_library'] = _app;
+      return appLayerDependencyViolations(
+        graph: graph,
+        roots: [_app.resolve(root)],
+        appLib: _app,
+        allowsAppPath: allowsOuterLayerDependency,
+      );
+    }
+
+    test('rejects infrastructure reaching UI through a public barrel', () {
+      final violations = check({
+        'features/a/infrastructure/repository.dart':
+            "import 'package:hentai_library/features/b/public.dart';",
+        'features/b/public.dart': "export 'presentation/view.dart';",
+      }, 'features/a/infrastructure/repository.dart');
+      expect(
+        violations.single,
+        'features/a/infrastructure/repository.dart -> features/b/public.dart -> features/b/presentation/view.dart',
+      );
+    });
+
+    test('follows private helper imports as well as conditional exports', () {
+      final violations = check({
+        'features/a/presentation/view.dart': "import '../helper.dart';",
+        'features/a/helper.dart':
+            "export 'pure.dart' if (dart.library.io) 'infrastructure/io.dart';",
+        'features/a/pure.dart': '',
+      }, 'features/a/presentation/view.dart');
+      expect(
+        violations.single,
+        endsWith('features/a/helper.dart -> features/a/infrastructure/io.dart'),
+      );
+    });
+
+    test('part and part-of directives cannot cross layer boundaries', () {
+      final violations = check({
+        'features/a/infrastructure/repository.dart':
+            "part '../presentation/body.dart';",
+      }, 'features/a/infrastructure/repository.dart');
+      expect(
+        violations.single,
+        endsWith(' -> features/a/presentation/body.dart'),
+      );
+      expect(
+        check({
+          'features/a/presentation/body.dart':
+              "part of '../../../composition/owner.dart';",
+        }, 'features/a/presentation/body.dart').single,
+        endsWith(' -> composition/owner.dart'),
+      );
+    });
+
+    test('each root keeps its own policy when sharing cached dependencies', () {
+      final graph = _FixtureGraph({
+        _app.resolve('composition/assembly.dart'):
+            "import '../features/a/helper.dart';",
+        _app.resolve('features/a/infrastructure/repository.dart'):
+            "import '../helper.dart';",
+        _app.resolve('features/a/helper.dart'):
+            "export 'presentation/view.dart';",
+        _app.resolve('features/a/presentation/view.dart'): '',
+      });
+      final violations = appLayerDependencyViolations(
+        graph: graph,
+        roots: [
+          _app.resolve('composition/assembly.dart'),
+          _app.resolve('features/a/infrastructure/repository.dart'),
+        ],
+        appLib: _app,
+        allowsAppPath: allowsOuterLayerDependency,
+      );
+      expect(
+        violations.single,
+        'features/a/infrastructure/repository.dart -> features/a/helper.dart -> features/a/presentation/view.dart',
+      );
+    });
+
+    test(
+      'shared bridges cannot give top-level infrastructure product knowledge',
+      () {
+        final violations = check({
+          'infrastructure/technical.dart': "import '../shared/helper.dart';",
+          'shared/helper.dart': "export '../features/a/domain/entity.dart';",
+        }, 'infrastructure/technical.dart');
+        expect(
+          violations.single,
+          contains('shared/helper.dart -> features/a/domain/entity.dart'),
+        );
+      },
+    );
+
+    test('allows composition assembly and pure export cycles', () {
+      expect(
+        check({
+          'composition/assembly.dart': "import '../features/a/infrastructure/repository.dart'; import '../features/a/presentation/view.dart';",
+          'features/a/infrastructure/repository.dart':
+              "import '../domain/entity.dart';",
+          'features/a/presentation/view.dart':
+              "import '../domain/entity.dart';",
+          'features/a/domain/entity.dart': "export 'entity.dart';",
+        }, 'composition/assembly.dart'),
+        isEmpty,
+      );
+      expect(
+        check({
+          'features/a/presentation/view.dart':
+              "import '../domain/entity.dart';",
+          'features/a/domain/entity.dart': "export 'entity.dart';",
+        }, 'features/a/presentation/view.dart'),
+        isEmpty,
+      );
+    });
+
+    test('missing app libraries fail and escaped files are rejected', () {
+      expect(
+        () => check({
+          'features/a/presentation/view.dart': "import '../missing.dart';",
+        }, 'features/a/presentation/view.dart'),
+        throwsStateError,
+      );
+      expect(
+        check({
+          'features/a/presentation/view.dart':
+              "import '../../../../test/helper.dart';",
+        }, 'features/a/presentation/view.dart').single,
+        contains('outside app lib'),
+      );
+    });
+  });
+
   test('rejects a relative import escaping the app lib boundary', () {
     final violations = _violations(
       _FixtureGraph(<Uri, String>{_core: "export '../../test/product.dart';"}),

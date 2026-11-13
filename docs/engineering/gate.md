@@ -19,7 +19,7 @@ For focused Flutter checks, run `flutter test <path>` from `app/`. For full UI r
 ## Test seams and harnesses
 
 - Rust business/DB tests: `core/crates/core/tests/`, shared harness `tests/common/`.
-- FRB wire contracts: `app/test/frb_wire/`; the harness finds the host cdylib in `core/target/{debug,release}` or `HENTAI_FLUTTER_LIB`.
+- FRB wire contracts: `app/test/frb_wire/`; the harness finds the host cdylib in `core/target/{debug,release}` or `HENTAI_FLUTTER_LIB`. Wire smoke databases remain in the OS temporary directory (`frb_wire_*`) for manual cleanup, following the repository's file-removal policy.
 - Dart thin edges: owner domain/application/infrastructure, mappers, guards and injected capabilities. Do not repeat Rust business flows against real FRB repository implementations.
 - Observable UI contracts: use `test/support/pump_localized_app.dart` (pumpLocalizedApp) for product UI; `pump_design_system_app.dart` for independent design-system components. Existing `pumpApp`, fakes and `configureTestView` cover host/provider/view setup. Avoid copying MaterialApp/localization boilerplate; calendar tests may need their specialized localization host.
 
@@ -54,7 +54,7 @@ Run affected tests from `app/`; current rules and baselines are the source of tr
 
 - `test/project_layout_test.dart`: allowed directories and module structure.
 - `test/gate/import_boundary_test.dart`, `test/architecture/module_boundary_test.dart`: public-only/forbidden edges, import/export graphs, acyclicity and shrink-only baselines.
-- `test/architecture/clean_architecture_dependency_test.dart`, `dart_dependency_graph_test.dart`: recursive core/inner-layer purity and composition direction, including third-party runtime dependencies and scanner bypass regressions.
+- `test/architecture/clean_architecture_dependency_test.dart`, `dart_dependency_graph_test.dart`: recursive core/inner-layer purity, including third-party runtime dependencies; outer-layer direction through application import/export/part graphs, with conditional-branch and scanner bypass regressions. Violations report the dependency chain from the original consumer.
 - `test/architecture/public_interface_test.dart`, `test/gate/shared_di_override_coverage_test.dart`: export-only public surfaces and required-provider binding.
 - Entity ownership, slot, navigation and `test/gate/shared_*_no_feature_import_test.dart` checks: preserve owner and shared boundaries.
 - `test/gate/domain_event_rules_test.dart`: shared event vocabulary, permitted publishers and one bus implementation.

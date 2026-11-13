@@ -5,6 +5,7 @@ import 'package:test/test.dart';
 import '../gate/import_boundary_rules.dart';
 import '../gate/lib_layout_scan_helpers.dart';
 import 'dart_dependency_graph.dart';
+import 'outer_layer_dependency_policy.dart';
 
 bool _outer(String target) =>
     target.startsWith('composition/') ||
@@ -66,40 +67,15 @@ void main() {
   test(
     'outer layers obey core/shared/infrastructure/composition direction',
     () {
-      final offenders = <String>[];
-      for (final file in files) {
-        final source = libRelativePosixPath(lib, file);
-        for (final dependency in graph.directives(file.uri)) {
-          final resolved = graph.resolve(file.uri, dependency).toString();
-          if (!resolved.startsWith(lib.uri.toString())) continue;
-          final target = resolved.substring(lib.uri.toString().length);
-          final presentation =
-              source.contains('/presentation/') ||
-              source.startsWith('shared/ui/') ||
-              source.startsWith('design-system/');
-          final infrastructure =
-              source.startsWith('infrastructure/') ||
-              source.contains('/infrastructure/');
-          final forbidden =
-              (target.startsWith('composition/') &&
-                  source != 'main.dart' &&
-                  !source.startsWith('composition/')) ||
-              (presentation &&
-                  (target.startsWith('infrastructure/') ||
-                      target.contains('/infrastructure/') ||
-                      target.startsWith('src/'))) ||
-              (infrastructure &&
-                  (target.contains('/presentation/') ||
-                      target.startsWith('shared/ui/') ||
-                      target.startsWith('design-system/'))) ||
-              (source.startsWith('infrastructure/') &&
-                  target.startsWith('features/')) ||
-              (source.startsWith('shared/') &&
-                  target.startsWith('infrastructure/'));
-          if (forbidden) offenders.add('$source -> $target');
-        }
-      }
-      expect(offenders, isEmpty);
+      expect(
+        appLayerDependencyViolations(
+          graph: graph,
+          roots: files.map((file) => file.uri),
+          appLib: lib.uri,
+          allowsAppPath: allowsOuterLayerDependency,
+        ),
+        isEmpty,
+      );
     },
   );
 
@@ -125,4 +101,28 @@ final example = "export 'also_ignored.dart';";
       expect(dependencyUris("part of 'owner.dart';"), <String>['owner.dart']);
     },
   );
+
+  test('native adapters belong to infrastructure and metadata UI does not open files', () {
+    final offenders = <String>[];
+    for (final file in files) {
+      final source = libRelativePosixPath(lib, file);
+      final infrastructure =
+          source.startsWith('infrastructure/') ||
+          source.contains('/infrastructure/');
+      final metadataPresentation =
+          source.startsWith('features/metadata_backup/presentation/') ||
+          source.startsWith('features/comic_metadata/presentation/');
+      for (final dependency in graph.directives(file.uri)) {
+        if ((!infrastructure &&
+                (dependency.startsWith('package:shared_preferences/') ||
+                    dependency.startsWith('package:package_info_plus/') ||
+                    dependency.startsWith('package:window_manager/') ||
+                    dependency.startsWith('package:url_launcher/'))) ||
+            (metadataPresentation && dependency == 'dart:io')) {
+          offenders.add('$source -> $dependency');
+        }
+      }
+    }
+    expect(offenders, isEmpty);
+  });
 }
