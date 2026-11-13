@@ -10,6 +10,8 @@ import 'package:hentai_library/features/metadata_backup/infrastructure/metadata_
 class LocalMetadataBackupFileGateway implements MetadataBackupFileGateway {
   const LocalMetadataBackupFileGateway();
   @override
+  Future<Uint8List> read(String path) => File(path).readAsBytes();
+  @override
   Future<Uint8List> decode(List<int> bytes, String path) =>
       decodeMetadataBackupFileBytes(bytes, path);
   @override

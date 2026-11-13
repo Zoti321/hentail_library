@@ -14,12 +14,8 @@ void main() {
     try {
       final compressed = await gateway.compress(Uint8List.fromList([1, 2, 3]));
       await gateway.write(path, compressed);
-      expect(await gateway.decode(await File(path).readAsBytes(), path), [
-        1,
-        2,
-        3,
-      ]);
-      expect(GZipCodec().decode(await File(path).readAsBytes()), [1, 2, 3]);
+      expect(await gateway.decode(await gateway.read(path), path), [1, 2, 3]);
+      expect(GZipCodec().decode(await gateway.read(path)), [1, 2, 3]);
     } finally {
       if (await File(path).exists()) await File(path).delete();
       await directory.delete();

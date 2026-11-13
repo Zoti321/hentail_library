@@ -76,12 +76,25 @@ class MetadataAutoBackupCoordinatorNotifier
     required bool fromStartup,
     bool force = false,
   }) async {
+    if (!ref.mounted) {
+      return;
+    }
     try {
+      final lastBackupAt = await ref.read(
+        metadataLastAutoBackupProvider.future,
+      );
+      if (!ref.mounted) {
+        return;
+      }
+      final enabled = await ref.read(metadataAutoBackupProvider.future);
+      if (!ref.mounted) {
+        return;
+      }
       await ref.read(runMetadataAutoBackupUseCaseProvider)(
-        enabled: ref.read(metadataAutoBackupProvider).asData?.value ?? true,
+        enabled: enabled,
         fromStartup: fromStartup,
         force: force,
-        lastBackupAt: ref.read(metadataLastAutoBackupProvider).asData?.value,
+        lastBackupAt: lastBackupAt,
         now: _now,
       );
     } catch (e, st) {

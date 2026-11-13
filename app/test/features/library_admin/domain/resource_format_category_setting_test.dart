@@ -1,3 +1,6 @@
+import 'package:hentai_library/features/library_admin/infrastructure/library_migration_store_impl.dart';
+import 'package:hentai_library/features/library_admin/presentation/providers/library_migration_store_provider.dart';
+
 import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -28,6 +31,7 @@ class _LegacyFile implements LegacySettingsJsonFile {
 }
 
 class _Libraries implements LibraryRepository {
+  String? failUpdateFor;
   final Map<String, List<ResourceFormatCategory>> saved =
       <String, List<ResourceFormatCategory>>{};
 
@@ -55,6 +59,7 @@ class _Libraries implements LibraryRepository {
     required String libraryId,
     required List<ResourceFormatCategory> groups,
   }) async {
+    if (libraryId == failUpdateFor) throw StateError('format write failed');
     saved[libraryId] = List<ResourceFormatCategory>.of(groups);
     return (await list()).firstWhere(
       (LocalLibrary lib) => lib.libraryId == libraryId,
@@ -130,6 +135,9 @@ void main() {
           final _Libraries libraries = _Libraries();
           final ProviderContainer container = ProviderContainer(
             overrides: [
+              libraryMigrationStoreProvider.overrideWithValue(
+                const LibraryMigrationStoreImpl(),
+              ),
               libraryRepoProvider.overrideWithValue(libraries),
               appSettingRepositoryProvider.overrideWithValue(settings),
             ],
@@ -160,6 +168,49 @@ void main() {
     }
   }
 
+  test('failed migration retains the staged settings until the next explicit refresh succeeds', () async {
+    SharedPreferences.setMockInitialValues(<String, Object>{});
+    final prefs = await SharedPreferences.getInstance();
+    final settings = AppSettingRepositoryImpl(
+      sharedPreferences: prefs,
+      legacySettingsFile: _LegacyFile(
+        jsonEncode({
+          'enabledFormatGroups': ['pdf'],
+        }),
+      ),
+    );
+    await settings.load();
+    final libraries = _Libraries()..failUpdateFor = 'remote';
+    final container = ProviderContainer(
+      overrides: [
+        libraryMigrationStoreProvider.overrideWithValue(
+          const LibraryMigrationStoreImpl(),
+        ),
+        libraryRepoProvider.overrideWithValue(libraries),
+        appSettingRepositoryProvider.overrideWithValue(settings),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container.read(librariesProvider.future);
+    expect(libraries.saved.keys, ['local']);
+    expect(
+      (await settings.peekLegacyResourceFormatPayload())?.enabledFormatGroups,
+      ['pdf'],
+    );
+    expect(
+      prefs.getBool('migrated_enabled_format_groups_to_libraries_v1'),
+      isNot(true),
+    );
+    libraries.failUpdateFor = null;
+    await container.read(librariesProvider.notifier).refresh();
+    expect(libraries.saved.values, everyElement([ResourceFormatCategory.pdf]));
+    expect(
+      prefs.getBool('migrated_enabled_format_groups_to_libraries_v1'),
+      isTrue,
+    );
+    expect(await settings.peekLegacyResourceFormatPayload(), isNull);
+  });
+
   test('no legacy payload keeps default formats', () async {
     SharedPreferences.setMockInitialValues(<String, Object>{});
     final AppSettingRepositoryImpl settings = AppSettingRepositoryImpl(
@@ -170,6 +221,9 @@ void main() {
     final _Libraries libraries = _Libraries();
     final ProviderContainer container = ProviderContainer(
       overrides: [
+        libraryMigrationStoreProvider.overrideWithValue(
+          const LibraryMigrationStoreImpl(),
+        ),
         libraryRepoProvider.overrideWithValue(libraries),
         appSettingRepositoryProvider.overrideWithValue(settings),
       ],

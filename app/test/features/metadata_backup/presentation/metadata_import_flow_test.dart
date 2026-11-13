@@ -67,71 +67,74 @@ void main() {
     ],
   );
 
-  for (final confirm in [false, true]) {
-    testWidgets(
-      'actual import flow commits only after confirmation: $confirm',
-      (tester) async {
-        final repo = _FlowRepository(
-          manifest,
-          const MetadataImportPreview(
-            wouldApply: 2,
-            skippedNotFound: 0,
-            skippedAmbiguous: 0,
-            wouldUpsertOrphanFacetCount: 0,
-            samplesWouldApply: [],
-            samplesNotFound: [],
-            samplesAmbiguous: [],
-          ),
-        );
-        const picker = MethodChannel('miguelruivo.flutter.plugins.filepicker');
-        tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-          picker,
-          (_) async => [
-            {
-              'name': 'backup.hlmeta.json',
-              'path': '/isolated/backup.hlmeta.json',
-              'size': 1,
-              'bytes': Uint8List.fromList([9]),
-            },
-          ],
-        );
-        addTearDown(
-          () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+  for (final fromFile in [false, true]) {
+    for (final confirm in [false, true]) {
+      testWidgets(
+        'actual import flow commits only after confirmation: $confirm, reads file: $fromFile',
+        (tester) async {
+          final files = _PickedFiles();
+          final repo = _FlowRepository(
+            manifest,
+            const MetadataImportPreview(
+              wouldApply: 2,
+              skippedNotFound: 0,
+              skippedAmbiguous: 0,
+              wouldUpsertOrphanFacetCount: 0,
+              samplesWouldApply: [],
+              samplesNotFound: [],
+              samplesAmbiguous: [],
+            ),
+          );
+          const picker = MethodChannel(
+            'miguelruivo.flutter.plugins.filepicker',
+          );
+          tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
             picker,
-            null,
-          ),
-        );
-        await pumpLocalizedApp(
-          tester,
-          wrapProviderScope: true,
-          overrides: [
-            prepareMetadataImportUseCaseProvider.overrideWithValue(
-              PrepareMetadataImportUseCase(
-                repo,
-                const LocalMetadataBackupFileGateway(),
+            (_) async => [
+              {
+                'name': 'backup.hlmeta.json',
+                'path': '/isolated/backup.hlmeta.json',
+                'size': 1,
+                if (!fromFile) 'bytes': Uint8List.fromList([9]),
+              },
+            ],
+          );
+          addTearDown(
+            () => tester.binding.defaultBinaryMessenger
+                .setMockMethodCallHandler(picker, null),
+          );
+          await pumpLocalizedApp(
+            tester,
+            wrapProviderScope: true,
+            overrides: [
+              prepareMetadataImportUseCaseProvider.overrideWithValue(
+                PrepareMetadataImportUseCase(repo, files),
+              ),
+            ],
+            home: Builder(
+              builder: (context) => FilledButton(
+                onPressed: () => runMetadataImportFlow(context),
+                child: const Text('start-import'),
               ),
             ),
-          ],
-          home: Builder(
-            builder: (context) => FilledButton(
-              onPressed: () => runMetadataImportFlow(context),
-              child: const Text('start-import'),
-            ),
-          ),
-        );
-        await tester.tap(find.text('start-import'));
-        await tester.pumpAndSettle();
-        expect(find.byType(MetadataImportConfirmDialog), findsOneWidget);
-        expect(repo.imports, 0);
-        await tester.tap(find.text(confirm ? '导入 2' : '取消').last);
-        await tester.pumpAndSettle();
-        expect(repo.imports, confirm ? 1 : 0);
-        if (confirm) expect(repo.importedBytes, [9]);
-        expect(tester.takeException(), isNull);
-      },
-    );
+          );
+          await tester.tap(find.text('start-import'));
+          await tester.pumpAndSettle();
+          expect(find.byType(MetadataImportConfirmDialog), findsOneWidget);
+          expect(repo.imports, 0);
+          expect(
+            files.reads,
+            fromFile ? ['/isolated/backup.hlmeta.json'] : isEmpty,
+          );
+          await tester.tap(find.text(confirm ? '导入 2' : '取消').last);
+          await tester.pumpAndSettle();
+          expect(repo.imports, confirm ? 1 : 0);
+          if (confirm) expect(repo.importedBytes, [9]);
+          expect(tester.takeException(), isNull);
+        },
+      );
+    }
   }
-
   testWidgets('confirm dialog cancels without calling import', (
     WidgetTester tester,
   ) async {
@@ -352,4 +355,13 @@ class _FlowRepository implements MetadataBackupRepository {
     String? libraryId,
     required bool includeOrphanFacets,
   }) => throw UnimplementedError();
+}
+
+class _PickedFiles extends LocalMetadataBackupFileGateway {
+  final reads = <String>[];
+  @override
+  Future<Uint8List> read(String path) async {
+    reads.add(path);
+    return Uint8List.fromList([9]);
+  }
 }

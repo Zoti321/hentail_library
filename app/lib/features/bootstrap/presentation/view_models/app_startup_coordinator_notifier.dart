@@ -14,8 +14,8 @@ class AppStartupCoordinatorNotifier extends _$AppStartupCoordinatorNotifier {
   int _startupToken = 0;
   bool _startupScheduled = false;
   Timer? _intervalTicker;
-  final Map<String, DateTime> _intervalAnchors = <String, DateTime>{};
-  final Map<String, ScanInterval> _lastIntervals = <String, ScanInterval>{};
+  final LibraryScanIntervalSchedule _intervalSchedule =
+      LibraryScanIntervalSchedule();
   DateTime Function() _now = DateTime.now;
   final Duration _startupDelay =
       startupDelayForTests ?? const Duration(seconds: 3);
@@ -51,7 +51,7 @@ class AppStartupCoordinatorNotifier extends _$AppStartupCoordinatorNotifier {
       AsyncValue<LibrariesState> next,
     ) {
       next.whenData((LibrariesState state) {
-        _syncIntervalAnchors(state.libraries);
+        _intervalSchedule.reconcile(state.libraries, now: _now());
         _ensureIntervalTicker();
         if (!_startupScheduled) {
           _scheduleStartupScansAtIdle(state.libraries);
@@ -59,29 +59,6 @@ class AppStartupCoordinatorNotifier extends _$AppStartupCoordinatorNotifier {
       });
     }, fireImmediately: true);
     return true;
-  }
-
-  void _syncIntervalAnchors(List<LocalLibrary> libraries) {
-    final DateTime now = _now();
-    final Set<String> alive = libraries
-        .map((LocalLibrary library) => library.libraryId)
-        .toSet();
-    _intervalAnchors.removeWhere((String id, _) => !alive.contains(id));
-    _lastIntervals.removeWhere((String id, _) => !alive.contains(id));
-
-    for (final LocalLibrary library in libraries) {
-      final String id = library.libraryId;
-      final ScanInterval previous = _lastIntervals[id] ?? ScanInterval.disabled;
-      _lastIntervals[id] = library.scanInterval;
-      if (library.scanInterval == ScanInterval.disabled) {
-        _intervalAnchors.remove(id);
-        continue;
-      }
-      if (previous != library.scanInterval ||
-          !_intervalAnchors.containsKey(id)) {
-        _intervalAnchors[id] = now;
-      }
-    }
   }
 
   void _ensureIntervalTicker() {
@@ -96,23 +73,13 @@ class AppStartupCoordinatorNotifier extends _$AppStartupCoordinatorNotifier {
       return;
     }
     final DateTime now = _now();
-    final List<String> due = _scheduler.libraryIdsDueForInterval(
-      libraries: state.libraries,
-      intervalAnchors: Map<String, DateTime>.from(_intervalAnchors),
+    final List<LocalLibrary> due = _intervalSchedule.dueLibraries(
+      state.libraries,
       now: now,
     );
-    for (final String libraryId in due) {
-      await _startIncrementalQueued(libraryId, fromStartup: false);
-      LocalLibrary? matched;
-      for (final LocalLibrary library in state.libraries) {
-        if (library.libraryId == libraryId) {
-          matched = library;
-          break;
-        }
-      }
-      final Duration? period = matched?.scanInterval.period;
-      final DateTime anchor = _intervalAnchors[libraryId] ?? now;
-      _intervalAnchors[libraryId] = period == null ? now : anchor.add(period);
+    for (final LocalLibrary library in due) {
+      await _startIncrementalQueued(library.libraryId, fromStartup: false);
+      _intervalSchedule.advance(library, fallbackAnchor: now);
     }
   }
 

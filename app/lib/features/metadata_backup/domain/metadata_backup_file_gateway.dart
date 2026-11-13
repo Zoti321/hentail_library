@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 abstract interface class MetadataBackupFileGateway {
+  Future<Uint8List> read(String path);
   Future<Uint8List> decode(List<int> bytes, String path);
   Future<List<int>> compress(Uint8List bytes);
   Future<void> write(String path, List<int> bytes);

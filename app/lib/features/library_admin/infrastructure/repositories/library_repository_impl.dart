@@ -52,22 +52,11 @@ class LibraryRepositoryImpl implements LibraryRepository {
       ),
       fallbackMessage: '创建远程库失败',
     );
-    try {
-      await _credentials.savePassword(
-        libraryId: library.libraryId,
-        password: password,
-      );
-    } catch (e, st) {
-      try {
-        guardFrbSync(
-          () => rust.deleteLibraryFrb(libraryId: library.libraryId),
-          fallbackMessage: '回滚远程库失败',
-        );
-      } catch (_) {
-        // Best-effort rollback; surface the credential failure.
-      }
-      Error.throwWithStackTrace(e, st);
-    }
+    // Registration may return an existing Library, which this call cannot delete.
+    await _credentials.savePassword(
+      libraryId: library.libraryId,
+      password: password,
+    );
     return library;
   }
 
@@ -117,14 +106,11 @@ class LibraryRepositoryImpl implements LibraryRepository {
 
   @override
   Future<void> delete(String libraryId) async {
-    try {
-      guardFrbSync(
-        () => rust.deleteLibraryFrb(libraryId: libraryId),
-        fallbackMessage: '删除库失败',
-      );
-    } finally {
-      await _credentials.deletePassword(libraryId);
-    }
+    guardFrbSync(
+      () => rust.deleteLibraryFrb(libraryId: libraryId),
+      fallbackMessage: '删除库失败',
+    );
+    await _credentials.deletePassword(libraryId);
   }
 
   @override

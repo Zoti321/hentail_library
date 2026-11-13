@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hentai_library/shared/application/logging/app_log.dart';
 import 'package:hentai_library/shared/application/errors/error_message.dart';
@@ -27,20 +29,19 @@ abstract class ScanLibraryState with _$ScanLibraryState {
 
 @Riverpod(keepAlive: true)
 class ScanLibraryController extends _$ScanLibraryController {
-  bool _cancelled = false;
-  Future<void>? _future;
+  _ScanLibraryRun? _activeRun;
 
   @override
   ScanLibraryState build() => const ScanLibraryState();
 
   /// Waits until any in-flight Library sync finishes (or was never running).
   Future<void> waitUntilIdle() async {
-    while (state.running) {
-      final Future<void>? inFlight = _future;
-      if (inFlight == null) {
+    while (ref.mounted && state.running) {
+      final _ScanLibraryRun? run = _activeRun;
+      if (run == null) {
         return;
       }
-      await inFlight;
+      await run.completion.future;
     }
   }
 
@@ -53,9 +54,13 @@ class ScanLibraryController extends _$ScanLibraryController {
     bool fromStartup = false,
     bool promptStorageAccess = true,
   }) {
-    if (state.running) return _future ?? Future<void>.value();
+    if (state.running) {
+      return _activeRun?.completion.future ?? Future<void>.value();
+    }
 
-    _cancelled = false;
+    final SyncLibraryUseCase sync = ref.read(syncLibraryUseCaseProvider);
+    final _ScanLibraryRun run = _ScanLibraryRun();
+    _activeRun = run;
     state = state.copyWith(
       running: true,
       cancelled: false,
@@ -66,38 +71,65 @@ class ScanLibraryController extends _$ScanLibraryController {
       progress: null,
     );
 
-    final SyncLibraryUseCase sync = ref.read(syncLibraryUseCaseProvider);
-    _future = () async {
+    run.completion.complete(() async {
       try {
+        if (!_isCurrentRun(run)) {
+          return;
+        }
         await sync.run(
           mode: mode,
           syncAll: syncAll,
           targetLibraryId: targetLibraryId,
-          isCancelled: () => _cancelled,
+          isCancelled: () => !_isCurrentRun(run),
           onProgress: (SyncLibraryProgress progress) {
-            state = state.copyWith(progress: progress);
+            if (_isCurrentRun(run)) {
+              state = state.copyWith(progress: progress);
+            }
           },
           promptStorageAccess: promptStorageAccess,
         );
-        state = state.copyWith(running: false);
+        if (_isCurrentRun(run)) {
+          state = state.copyWith(running: false);
+        }
       } on Object catch (e, st) {
         logError(AppLog.ui('scan'), '漫画库同步失败', e, st);
-        final String message = appErrorMessage(e);
-        state = state.copyWith(running: false, error: message);
+        if (_isCurrentRun(run)) {
+          final String message = appErrorMessage(e);
+          state = state.copyWith(running: false, error: message);
+        }
+      } finally {
+        if (identical(_activeRun, run)) {
+          _activeRun = null;
+        }
       }
-    }();
+    }());
 
-    return _future!;
+    return run.completion.future;
   }
+
+  bool _isCurrentRun(_ScanLibraryRun run) =>
+      ref.mounted && identical(_activeRun, run) && !run.cancelled;
 
   void cancel() {
     if (!state.running) return;
-    _cancelled = true;
-    ref.read(syncLibraryUseCaseProvider).cancelActive();
-    state = state.copyWith(running: false, cancelled: true);
+    final _ScanLibraryRun? run = _activeRun;
+    if (run == null) return;
+    run.cancelled = true;
+    try {
+      ref.read(syncLibraryUseCaseProvider).cancelActive();
+    } finally {
+      if (ref.mounted && identical(_activeRun, run)) {
+        state = state.copyWith(running: false, cancelled: true);
+      }
+    }
   }
 
   void setRunInBackground(bool value) {
     state = state.copyWith(runInBackground: value);
   }
+}
+
+class _ScanLibraryRun {
+  final Completer<void> completion = Completer<void>();
+  bool cancelled = false;
 }

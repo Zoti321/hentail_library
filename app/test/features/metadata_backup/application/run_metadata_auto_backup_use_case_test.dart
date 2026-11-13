@@ -24,6 +24,9 @@ class _Repository implements MetadataBackupRepository {
 }
 
 class _Files implements MetadataBackupFileGateway {
+  @override
+  Future<Uint8List> read(String path) => throw UnimplementedError();
+
   final calls = <String>[];
   Completer<void>? hold;
   @override

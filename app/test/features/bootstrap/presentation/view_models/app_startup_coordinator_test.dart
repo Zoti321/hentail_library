@@ -9,7 +9,11 @@ import 'package:riverpod/riverpod.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:hentai_library/composition/overrides/domain_event_bus_overrides.dart';
 
-LocalLibrary _lib({required String id, bool scanOnStartup = false}) {
+LocalLibrary _lib({
+  required String id,
+  bool scanOnStartup = false,
+  ScanInterval scanInterval = ScanInterval.disabled,
+}) {
   return (
     libraryId: id,
     kind: 'local',
@@ -19,7 +23,7 @@ LocalLibrary _lib({required String id, bool scanOnStartup = false}) {
     username: '',
     allowHttp: false,
     scanOnStartup: scanOnStartup,
-    scanInterval: ScanInterval.disabled,
+    scanInterval: scanInterval,
     pinned: true,
     sidebarOrder: 0,
   );
@@ -34,11 +38,25 @@ class _FakeLibrariesNotifier extends LibrariesNotifier {
   Future<LibrariesState> build() async {
     return LibrariesState(libraries: _libraries);
   }
+
+  void setLibraries(List<LocalLibrary> libraries) {
+    state = AsyncData(LibrariesState(libraries: libraries));
+  }
 }
 
+typedef _ScanStart = ({
+  String? libraryId,
+  bool silent,
+  bool fromStartup,
+  ScanMode mode,
+  bool promptStorageAccess,
+  bool syncAll,
+});
+
 class _RecordingScanLibraryController extends ScanLibraryController {
-  final List<({String? libraryId, bool silent, bool fromStartup})> starts =
-      <({String? libraryId, bool silent, bool fromStartup})>[];
+  final starts = <_ScanStart>[];
+  final events = <String>[];
+  Completer<void>? idleHold;
 
   final Completer<void> _firstStart = Completer<void>();
   final Completer<void> _allDone = Completer<void>();
@@ -67,6 +85,8 @@ class _RecordingScanLibraryController extends ScanLibraryController {
 
   @override
   Future<void> waitUntilIdle() async {
+    events.add('wait');
+    if (idleHold case final hold?) await hold.future;
     while (state.running) {
       final Future<void>? inFlight = _future;
       if (inFlight == null) {
@@ -93,7 +113,11 @@ class _RecordingScanLibraryController extends ScanLibraryController {
       libraryId: targetLibraryId,
       silent: silent,
       fromStartup: fromStartup,
+      mode: mode,
+      promptStorageAccess: promptStorageAccess,
+      syncAll: syncAll,
     ));
+    events.add('start:$targetLibraryId');
     if (!_firstStart.isCompleted) {
       _firstStart.complete();
     }
@@ -142,6 +166,136 @@ class _RecordingScanLibraryController extends ScanLibraryController {
 }
 
 void main() {
+  group('AppStartupCoordinator Scan interval', () {
+    setUp(() {
+      AppStartupCoordinatorNotifier.startupDelayForTests = Duration.zero;
+      AppStartupCoordinatorNotifier.scheduleStartupAtIdleForTests = false;
+    });
+    tearDown(() {
+      AppStartupCoordinatorNotifier.startupDelayForTests = null;
+      AppStartupCoordinatorNotifier.scheduleStartupAtIdleForTests = null;
+    });
+
+    testWidgets(
+      'hourly boundary queues silent incremental sync once after completion',
+      (tester) async {
+        final epoch = DateTime.utc(2026, 1, 1);
+        var now = epoch;
+        final h = await _intervalHarness(() => now, [
+          _lib(id: 'a', scanInterval: ScanInterval.hourly),
+        ]);
+        try {
+          now = epoch.add(const Duration(minutes: 59, seconds: 59));
+          await tester.pump(const Duration(seconds: 30));
+          expect(h.scan.starts, isEmpty);
+
+          h.scan.holdNextStart();
+          now = epoch.add(const Duration(hours: 1));
+          await tester.pump(const Duration(seconds: 30));
+          expect(h.scan.events, ['wait', 'start:a']);
+          expect(h.scan.starts.single, (
+            libraryId: 'a',
+            silent: true,
+            fromStartup: false,
+            mode: ScanMode.incremental,
+            promptStorageAccess: false,
+            syncAll: false,
+          ));
+          h.scan.releaseHold();
+          await tester.pump();
+          await tester.pump(const Duration(seconds: 30));
+          expect(h.scan.starts, hasLength(1));
+        } finally {
+          h.container.dispose();
+        }
+      },
+    );
+
+    testWidgets(
+      'library updates reset changed intervals and clean disabled or removed anchors',
+      (tester) async {
+        final epoch = DateTime.utc(2026, 1, 1);
+        var now = epoch;
+        final h = await _intervalHarness(() => now, [
+          for (final id in ['a', 'b', 'c'])
+            _lib(id: id, scanInterval: ScanInterval.hourly),
+        ]);
+        try {
+          now = epoch.add(const Duration(minutes: 50));
+          h.libraries.setLibraries([
+            _lib(id: 'a', scanInterval: ScanInterval.every6Hours),
+            _lib(id: 'b'),
+          ]);
+          await tester.pump();
+          now = epoch.add(const Duration(hours: 1));
+          await tester.pump(const Duration(seconds: 30));
+          expect(h.scan.starts, isEmpty);
+          h.libraries.setLibraries([
+            _lib(id: 'a', scanInterval: ScanInterval.every6Hours),
+            _lib(id: 'b', scanInterval: ScanInterval.hourly),
+            _lib(id: 'c', scanInterval: ScanInterval.hourly),
+          ]);
+          await tester.pump();
+          now = epoch.add(const Duration(hours: 1, minutes: 59, seconds: 59));
+          await tester.pump(const Duration(seconds: 30));
+          expect(h.scan.starts, isEmpty);
+          now = epoch.add(const Duration(hours: 2));
+          await tester.pump(const Duration(seconds: 30));
+          expect(h.scan.starts.map((s) => s.libraryId), ['b', 'c']);
+
+          h.libraries.setLibraries([
+            _lib(id: 'a', scanInterval: ScanInterval.every6Hours),
+          ]);
+          await tester.pump();
+          now = epoch.add(const Duration(hours: 6, minutes: 49, seconds: 59));
+          await tester.pump(const Duration(seconds: 30));
+          expect(h.scan.starts, hasLength(2));
+          now = epoch.add(const Duration(hours: 6, minutes: 50));
+          await tester.pump(const Duration(seconds: 30));
+          expect(h.scan.starts.map((s) => s.libraryId), ['b', 'c', 'a']);
+        } finally {
+          h.container.dispose();
+        }
+      },
+    );
+
+    testWidgets(
+      'a changed interval while waiting advances the latest anchor using the queued snapshot period',
+      (tester) async {
+        final epoch = DateTime.utc(2026, 1, 1);
+        var now = epoch;
+        final h = await _intervalHarness(() => now, [
+          _lib(id: 'a', scanInterval: ScanInterval.hourly),
+        ]);
+        try {
+          h.scan.idleHold = Completer<void>();
+          now = epoch.add(const Duration(hours: 1));
+          await tester.pump(const Duration(seconds: 30));
+          expect(h.scan.events, ['wait']);
+          expect(h.scan.starts, isEmpty);
+          now = epoch.add(const Duration(hours: 1, minutes: 30));
+          h.libraries.setLibraries([
+            _lib(id: 'a', scanInterval: ScanInterval.every6Hours),
+          ]);
+          await tester.pump();
+          h.scan.idleHold!.complete();
+          await tester.pump();
+          expect(h.scan.events, ['wait', 'start:a']);
+
+          // New anchor 01:30 + queued hourly period = 02:30; next due is 08:30.
+          now = epoch.add(const Duration(hours: 8, minutes: 29, seconds: 59));
+          await tester.pump(const Duration(seconds: 30));
+          expect(h.scan.starts, hasLength(1));
+          now = epoch.add(const Duration(hours: 8, minutes: 30));
+          await tester.pump(const Duration(seconds: 30));
+          expect(h.scan.starts.map((s) => s.libraryId), ['a', 'a']);
+        } finally {
+          h.container.dispose();
+        }
+      },
+    );
+  });
+
   group('AppStartupCoordinator Scan on startup', () {
     late _RecordingScanLibraryController scan;
     late ProviderContainer container;
@@ -224,4 +378,26 @@ void main() {
       },
     );
   });
+}
+
+Future<
+  ({
+    ProviderContainer container,
+    _FakeLibrariesNotifier libraries,
+    _RecordingScanLibraryController scan,
+  })
+>
+_intervalHarness(DateTime Function() now, List<LocalLibrary> initial) async {
+  final libraries = _FakeLibrariesNotifier(initial);
+  final scan = _RecordingScanLibraryController();
+  final container = ProviderContainer(
+    overrides: [
+      librariesProvider.overrideWith(() => libraries),
+      scanLibraryControllerProvider.overrideWith(() => scan),
+    ],
+  );
+  container.read(appStartupCoordinatorProvider);
+  container.read(appStartupCoordinatorProvider.notifier).nowOverride = now;
+  await container.read(librariesProvider.future);
+  return (container: container, libraries: libraries, scan: scan);
 }

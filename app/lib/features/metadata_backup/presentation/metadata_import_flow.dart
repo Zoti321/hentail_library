@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -50,13 +49,12 @@ Future<void> runMetadataImportFlow(
   }
 
   try {
-    final List<int> rawBytes = file.bytes ?? await File(path).readAsBytes();
     await _showBlockingProgressDialog(
       context,
       title: l10n.settingsMetadataBackupImportPreviewRunningTitle,
       body: l10n.settingsMetadataBackupImportPreviewRunningBody,
     );
-    final PreparedMetadataImport prepared = await useCase(rawBytes, path);
+    final PreparedMetadataImport prepared = await useCase(file.bytes, path);
     if (context.mounted) {
       Navigator.of(context, rootNavigator: true).pop();
     }

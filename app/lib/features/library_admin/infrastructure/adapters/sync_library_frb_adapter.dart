@@ -32,6 +32,10 @@ class SyncLibraryFrbAdapter implements SyncLibraryPort {
         syncAll: syncAll,
         targetLibraryId: targetLibraryId,
       );
+      if (isCancelled()) {
+        rust.cancelSyncFrb(handle: handle);
+        return;
+      }
       await for (final rust.SyncLibraryProgressDto event in guardFrbStream(
         () => rust.syncLibraryFrb(
           handle: handle,
@@ -60,7 +64,9 @@ class SyncLibraryFrbAdapter implements SyncLibraryPort {
         stackTrace,
       );
     } finally {
-      _activeHandle = null;
+      if (identical(_activeHandle, handle)) {
+        _activeHandle = null;
+      }
     }
   }
 

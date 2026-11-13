@@ -1,5 +1,9 @@
 import 'package:hentai_library/features/series/infrastructure/series_detail_page_size_storage.dart';
 import 'package:hentai_library/features/series/presentation/providers/series_page_size_storage_providers.dart';
+import 'package:hentai_library/features/library_admin/infrastructure/library_migration_store_impl.dart';
+import 'package:hentai_library/features/library_admin/presentation/providers/library_migration_store_provider.dart';
+import 'package:hentai_library/features/metadata_backup/infrastructure/metadata_backup_preferences_repository_impl.dart';
+import 'package:hentai_library/features/metadata_backup/presentation/providers/metadata_backup_preferences_provider.dart';
 import 'package:hentai_library/composition/logging_composition.dart';
 import 'package:hentai_library/infrastructure/logging/diagnostic_logging.dart';
 import 'package:hentai_library/infrastructure/platform/shell_file_explorer.dart';
@@ -43,6 +47,12 @@ List<Override> platformOverrides() => <Override>[
   seriesDetailPageSizeQueryProvider.overrideWithValue(loadSeriesDetailPageSize),
   setSeriesDetailPageSizeCommandProvider.overrideWithValue(
     saveSeriesDetailPageSize,
+  ),
+  libraryMigrationStoreProvider.overrideWith(
+    (ref) => const LibraryMigrationStoreImpl(),
+  ),
+  metadataBackupPreferencesRepositoryProvider.overrideWith(
+    (ref) => const MetadataBackupPreferencesRepositoryImpl(),
   ),
   showInFileExplorerProvider.overrideWithValue(showInFileExplorer),
   openDirectoryInFileExplorerProvider.overrideWithValue(

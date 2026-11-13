@@ -12,44 +12,90 @@ export 'package:hentai_library/features/library_admin/domain/libraries_state.dar
 
 part 'libraries_notifier.g.dart';
 
-@Riverpod(keepAlive: true)
+Duration? _noAutomaticLibraryRetry(int _, Object _) => null;
+
+@Riverpod(keepAlive: true, retry: _noAutomaticLibraryRetry)
 class LibrariesNotifier extends _$LibrariesNotifier {
   LibraryRepository get _repo => ref.read(libraryRepoProvider);
+  int _projectionGeneration = 0;
+  int _buildGeneration = 0;
+  AsyncValue<LibrariesState>? _nextBuild;
 
   @override
   Future<LibrariesState> build() async {
+    final next = _nextBuild;
+    _nextBuild = null;
+    if (next == null) {
+      _buildGeneration++;
+    }
+    ref.onDispose(() {
+      if (_nextBuild == null) {
+        _buildGeneration++;
+      }
+      _projectionGeneration++;
+    });
+    if (next != null) {
+      if (next.hasError) {
+        Error.throwWithStackTrace(next.error!, next.stackTrace!);
+      }
+      return next.requireValue;
+    }
+    _projectionGeneration++;
     return _load();
   }
 
   Future<void> refresh() async {
-    state = await AsyncValue.guard(_load);
+    final generation = ++_projectionGeneration;
+    final next = await AsyncValue.guard(_load);
+    if (ref.mounted && generation == _projectionGeneration) {
+      _applyProjection(next);
+    }
   }
 
   Future<void> updateSidebarLayout(
     List<LibrarySidebarPlacement> placements,
   ) async {
+    final generation = ++_projectionGeneration;
     final List<LocalLibrary> libraries = await _repo.updateSidebarLayout(
       placements,
     );
-    state = AsyncData(LibrariesState(libraries: libraries));
+    if (ref.mounted && generation == _projectionGeneration) {
+      _applyProjection(AsyncData(LibrariesState(libraries: libraries)));
+    }
   }
 
   Future<LibraryFormApplyResult> submitLibraryForm(
     LibraryForm form, {
     LocalLibrary? original,
   }) async {
+    final generation = _buildGeneration;
     final LibraryFormApplyResult result = await ref.read(
       submitLibraryFormUseCaseProvider,
     )(form, original: original);
-    if (result is LibraryFormApplySucceeded) {
+    if (result is LibraryFormApplySucceeded &&
+        ref.mounted &&
+        generation == _buildGeneration) {
       await refresh();
     }
     return result;
   }
 
   Future<void> deleteLibrary(String libraryId) async {
+    final generation = _buildGeneration;
     await ref.read(deleteLibraryUseCaseProvider)(libraryId);
-    await refresh();
+    if (ref.mounted && generation == _buildGeneration) {
+      await refresh();
+    }
+  }
+
+  void _applyProjection(AsyncValue<LibrariesState> next) {
+    if (state.isLoading) {
+      // Reuse the accepted projection instead of rerunning migrations.
+      _nextBuild = next;
+      ref.invalidateSelf();
+    } else {
+      state = next;
+    }
   }
 
   Future<LibrariesState> _load() => ref.read(loadLibrariesUseCaseProvider)();

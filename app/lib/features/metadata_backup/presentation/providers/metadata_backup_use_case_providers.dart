@@ -2,6 +2,7 @@ import 'package:hentai_library/features/metadata_backup/domain/metadata_backup_f
 import 'package:hentai_library/shared/presentation/providers/required_provider.dart';
 import 'package:hentai_library/features/metadata_backup/application/run_metadata_auto_backup_use_case.dart';
 import 'package:hentai_library/features/metadata_backup/presentation/view_models/metadata_last_auto_backup_notifier.dart';
+import 'package:hentai_library/features/metadata_backup/presentation/providers/metadata_backup_preferences_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/metadata_backup/application/metadata_export_use_case.dart';
 import 'package:hentai_library/features/metadata_backup/application/prepare_metadata_import_use_case.dart';
@@ -28,11 +29,16 @@ final Provider<MetadataBackupFileGateway> metadataBackupFileGatewayProvider =
 final Provider<Future<String> Function()> metadataBackupDirectoryQueryProvider =
     requiredProvider('metadataBackupDirectoryQueryProvider');
 final runMetadataAutoBackupUseCaseProvider =
-    Provider<RunMetadataAutoBackupUseCase>(
-      (ref) => RunMetadataAutoBackupUseCase(
+    Provider<RunMetadataAutoBackupUseCase>((ref) {
+      final preferences = ref.read(metadataBackupPreferencesRepositoryProvider);
+      return RunMetadataAutoBackupUseCase(
         repository: ref.read(metadataBackupRepositoryProvider),
         files: ref.read(metadataBackupFileGatewayProvider),
-        recordCompletion: (at) =>
-            ref.read(metadataLastAutoBackupProvider.notifier).recordBackup(at),
-      ),
-    );
+        recordCompletion: (at) async {
+          await preferences.recordBackup(at);
+          if (ref.mounted) {
+            ref.invalidate(metadataLastAutoBackupProvider);
+          }
+        },
+      );
+    });

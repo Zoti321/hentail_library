@@ -26,8 +26,9 @@ class PrepareMetadataImportUseCase {
   final MetadataBackupRepository _repository;
   final MetadataBackupFileGateway _files;
 
-  Future<PreparedMetadataImport> call(List<int> rawBytes, String path) async {
-    final bytes = await _files.decode(rawBytes, path);
+  Future<PreparedMetadataImport> call(List<int>? rawBytes, String path) async {
+    final source = rawBytes ?? await _files.read(path);
+    final bytes = await _files.decode(source, path);
     final manifest = _repository.peekManifest(bytes);
     final preview = _repository.previewImport(bytes);
     return PreparedMetadataImport._(
