@@ -12,7 +12,7 @@ use crate::formats::{
 };
 use crate::resource::{
     basename, collect_epub_spine_image_names, extension_lower, is_comic_image_extension,
-    local_access, ResourceAccess, ResourceKind, ResourceStream,
+    local_access, ResourceAccess, ResourceKind, ResourceStat, ResourceStream,
 };
 use crate::sync::remote::normalize_remote_location_key;
 use crate::util::natural_sort::compare_filename_natural;
@@ -26,6 +26,12 @@ pub enum ReaderBackend {
     Rar(RarBackend),
     SevenZ(SevenZBackend),
     Pdf(PdfBackend),
+}
+
+pub struct OpenedReaderBackend {
+    pub(super) backend: ReaderBackend,
+    pub(super) source_stat: ResourceStat,
+    pub(super) local_source: Option<PathBuf>,
 }
 
 pub struct DirBackend {
@@ -43,7 +49,7 @@ pub struct EpubBackend {
 }
 
 #[tracing::instrument(err, fields(resource_type, path))]
-pub fn open_backend(path: &str, resource_type: &str) -> Result<ReaderBackend, HentaiError> {
+pub fn open_backend(path: &str, resource_type: &str) -> Result<OpenedReaderBackend, HentaiError> {
     open_backend_with(local_access(), path, resource_type)
 }
 
@@ -51,7 +57,7 @@ pub fn open_backend_with(
     access: &dyn ResourceAccess,
     path: &str,
     resource_type: &str,
-) -> Result<ReaderBackend, HentaiError> {
+) -> Result<OpenedReaderBackend, HentaiError> {
     tracing::debug!(resource_type, "opening reader backend");
     let normalized = normalize_reader_location(path);
     if normalized.is_empty() {
@@ -60,7 +66,7 @@ pub fn open_backend_with(
     let Some(stat) = access.stat(&normalized)? else {
         return Err(HentaiError::reader_not_found(&normalized));
     };
-    match resource_type {
+    let backend = match resource_type {
         "dir" => {
             if stat.kind != ResourceKind::Dir {
                 return Err(HentaiError::reader_kind_mismatch(format!(
@@ -95,7 +101,22 @@ pub fn open_backend_with(
             open_path_bound_pdf(access, &normalized)
         }
         other => Err(HentaiError::reader_unsupported_type(other)),
-    }
+    }?;
+    let local_source = if stat.kind == ResourceKind::File {
+        if access.stat(&normalized)?.as_ref() != Some(&stat) {
+            return Err(HentaiError::reader_invalid_content(
+                "打开期间源文件已改变，请重新打开",
+            ));
+        }
+        access.local_path(&normalized)
+    } else {
+        None
+    };
+    Ok(OpenedReaderBackend {
+        backend,
+        source_stat: stat,
+        local_source,
+    })
 }
 
 fn ensure_file_kind(
@@ -222,12 +243,7 @@ fn normalize_reader_location(path: &str) -> String {
     }
 }
 
-fn is_remote_location(location: &str) -> bool {
-    let lower = location.to_ascii_lowercase();
-    lower.starts_with("http://") || lower.starts_with("https://")
-}
-
-fn materialize_remote_file(
+fn materialize_source(
     access: &dyn ResourceAccess,
     location: &str,
 ) -> Result<tempfile::NamedTempFile, HentaiError> {
@@ -245,13 +261,13 @@ fn open_path_bound_pdf(
     access: &dyn ResourceAccess,
     location: &str,
 ) -> Result<ReaderBackend, HentaiError> {
-    if is_remote_location(location) {
-        let temp = materialize_remote_file(access, location)?;
+    if let Some(path) = access.local_path(location) {
+        Ok(ReaderBackend::Pdf(open_pdf_backend(&path)?))
+    } else {
+        let temp = materialize_source(access, location)?;
         let path = temp.path().to_path_buf();
         let backend = open_pdf_backend_kept(&path, temp)?;
         Ok(ReaderBackend::Pdf(backend))
-    } else {
-        Ok(ReaderBackend::Pdf(open_pdf_backend(Path::new(location))?))
     }
 }
 
@@ -259,13 +275,13 @@ fn open_path_bound_rar(
     access: &dyn ResourceAccess,
     location: &str,
 ) -> Result<ReaderBackend, HentaiError> {
-    if is_remote_location(location) {
-        let temp = materialize_remote_file(access, location)?;
+    if let Some(path) = access.local_path(location) {
+        Ok(ReaderBackend::Rar(open_rar_backend(&path)?))
+    } else {
+        let temp = materialize_source(access, location)?;
         let path = temp.path().to_path_buf();
         let backend = open_rar_backend_kept(&path, temp)?;
         Ok(ReaderBackend::Rar(backend))
-    } else {
-        Ok(ReaderBackend::Rar(open_rar_backend(Path::new(location))?))
     }
 }
 
@@ -273,15 +289,13 @@ fn open_path_bound_sevenz(
     access: &dyn ResourceAccess,
     location: &str,
 ) -> Result<ReaderBackend, HentaiError> {
-    if is_remote_location(location) {
-        let temp = materialize_remote_file(access, location)?;
+    if let Some(path) = access.local_path(location) {
+        Ok(ReaderBackend::SevenZ(open_sevenz_backend(&path)?))
+    } else {
+        let temp = materialize_source(access, location)?;
         let path = temp.path().to_path_buf();
         let backend = open_sevenz_backend_kept(&path, temp)?;
         Ok(ReaderBackend::SevenZ(backend))
-    } else {
-        Ok(ReaderBackend::SevenZ(open_sevenz_backend(Path::new(
-            location,
-        ))?))
     }
 }
 
@@ -373,10 +387,169 @@ pub fn read_epub_page(backend: &EpubBackend, page_index: usize) -> Result<Vec<u8
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::error::HentaiErrorCode;
     use crate::resource::FakeResourceAccess;
+    use std::collections::VecDeque;
     use std::io::{Cursor, Write};
     use zip::write::SimpleFileOptions;
     use zip::ZipWriter;
+
+    const VERSIONED_SOURCE: &str = "https://nas.example/dav/version.cbz";
+
+    struct ScriptedOpenStat {
+        access: FakeResourceAccess,
+        stats: Mutex<VecDeque<Result<Option<ResourceStat>, HentaiError>>>,
+        calls: Mutex<Vec<&'static str>>,
+    }
+
+    impl ResourceAccess for ScriptedOpenStat {
+        fn local_path(&self, location: &str) -> Option<PathBuf> {
+            self.access.local_path(location)
+        }
+
+        fn list(&self, location: &str) -> Result<Vec<crate::resource::ResourceEntry>, HentaiError> {
+            self.access.list(location)
+        }
+
+        fn stat(&self, _location: &str) -> Result<Option<ResourceStat>, HentaiError> {
+            self.calls.lock().expect("calls").push("stat");
+            self.stats
+                .lock()
+                .expect("stats")
+                .pop_front()
+                .expect("unexpected stat retry")
+        }
+
+        fn open_stream(&self, location: &str) -> Result<ResourceStream, HentaiError> {
+            self.calls.lock().expect("calls").push("open_stream");
+            self.access.open_stream(location)
+        }
+    }
+
+    fn scripted_open_stat(
+        after_open: impl FnOnce(&ResourceStat) -> Result<Option<ResourceStat>, HentaiError>,
+    ) -> (ScriptedOpenStat, ResourceStat) {
+        let mut bytes = Vec::new();
+        {
+            let mut zip = ZipWriter::new(Cursor::new(&mut bytes));
+            zip.start_file("001.jpg", SimpleFileOptions::default())
+                .expect("start");
+            zip.write_all(b"snapshot-page").expect("write");
+            zip.finish().expect("finish");
+        }
+        let mut access = FakeResourceAccess::new();
+        access.insert_file(VERSIONED_SOURCE, bytes);
+        access.set_modified_ms(VERSIONED_SOURCE, 1234);
+        let before = access
+            .stat(VERSIONED_SOURCE)
+            .expect("stat")
+            .expect("source");
+        let stats = VecDeque::from([Ok(Some(before.clone())), after_open(&before)]);
+        (
+            ScriptedOpenStat {
+                access,
+                stats: Mutex::new(stats),
+                calls: Mutex::new(Vec::new()),
+            },
+            before,
+        )
+    }
+
+    fn assert_open_checked_once(access: &ScriptedOpenStat) {
+        assert_eq!(
+            *access.calls.lock().expect("calls"),
+            ["stat", "open_stream", "stat"]
+        );
+        assert!(access.stats.lock().expect("stats").is_empty());
+    }
+
+    fn assert_changed_source_rejected(change: impl FnOnce(&mut ResourceStat)) {
+        let (access, _) = scripted_open_stat(|before| {
+            let mut after = before.clone();
+            change(&mut after);
+            Ok(Some(after))
+        });
+        let error = open_backend_with(&access, VERSIONED_SOURCE, "cbz")
+            .err()
+            .expect("changed source must reject the opened backend");
+        assert_eq!(error.code, HentaiErrorCode::ReaderInvalidContent);
+        assert_open_checked_once(&access);
+    }
+
+    #[test]
+    fn source_kind_change_during_open_is_rejected_without_retry() {
+        assert_changed_source_rejected(|stat| stat.kind = ResourceKind::Dir);
+    }
+
+    #[test]
+    fn source_mtime_change_during_open_is_rejected_without_retry() {
+        assert_changed_source_rejected(|stat| stat.modified_ms += 1);
+    }
+
+    #[test]
+    fn source_size_change_during_open_is_rejected_without_retry() {
+        assert_changed_source_rejected(|stat| stat.size += 1);
+    }
+
+    #[test]
+    fn source_missing_after_stream_open_is_rejected_without_retry() {
+        let (access, _) = scripted_open_stat(|_| Ok(None));
+        let error = open_backend_with(&access, VERSIONED_SOURCE, "cbz")
+            .err()
+            .expect("missing source must reject the opened backend");
+        assert_eq!(error.code, HentaiErrorCode::ReaderInvalidContent);
+        assert_open_checked_once(&access);
+    }
+
+    #[test]
+    fn post_open_stat_failure_preserves_the_original_error_without_retry() {
+        let mut original = HentaiError::remote_auth_failed("post-open stat rejected");
+        original.context = Some("scripted second stat".to_string());
+        let (access, _) = scripted_open_stat(|_| Err(original.clone()));
+        let error = open_backend_with(&access, VERSIONED_SOURCE, "cbz")
+            .err()
+            .expect("stat error must reject the opened backend");
+        assert_eq!(error.code, original.code);
+        assert_eq!(error.message, original.message);
+        assert_eq!(error.context, original.context);
+        assert_open_checked_once(&access);
+    }
+
+    #[test]
+    fn stable_open_returns_the_source_metadata_and_owned_stream_backend() {
+        let (access, before) = scripted_open_stat(|stat| Ok(Some(stat.clone())));
+        let opened = open_backend_with(&access, VERSIONED_SOURCE, "cbz").expect("open");
+        assert_eq!(opened.source_stat, before);
+        assert_eq!(opened.local_source, None);
+        let ReaderBackend::Zip(zip) = opened.backend else {
+            panic!("expected zip backend");
+        };
+        assert_eq!(read_zip_page(&zip, 0).expect("page"), b"snapshot-page");
+        assert_open_checked_once(&access);
+    }
+
+    #[test]
+    fn path_bound_snapshot_uses_stream_capability_instead_of_location_scheme() {
+        let root = tempfile::tempdir().expect("tempdir").keep();
+        let pages = root.join("pages");
+        std::fs::create_dir(&pages).expect("pages");
+        std::fs::write(pages.join("001.jpg"), b"snapshot-page").expect("page");
+        let archive = root.join("source.cb7");
+        sevenz_rust::compress_to_path(&pages, &archive).expect("archive");
+        let location = "/memory/source.cb7";
+        let mut access = FakeResourceAccess::new();
+        access.insert_file(location, std::fs::read(archive).expect("archive bytes"));
+        let opened = open_backend_with(&access, location, "cb7").expect("open snapshot");
+        assert!(opened.local_source.is_none());
+        access.insert_file(location, b"replaced-source");
+        let ReaderBackend::SevenZ(backend) = opened.backend else {
+            panic!("expected 7z backend");
+        };
+        assert_eq!(
+            crate::formats::read_sevenz_page(&backend, 0).expect("page"),
+            b"snapshot-page"
+        );
+    }
 
     #[test]
     fn fake_open_stream_feeds_zip_backend() {
@@ -391,7 +564,9 @@ mod tests {
         let mut fake = FakeResourceAccess::new();
         fake.insert_file("/lib/comic.cbz", bytes);
 
-        let backend = open_backend_with(&fake, "/lib/comic.cbz", "cbz").expect("open");
+        let backend = open_backend_with(&fake, "/lib/comic.cbz", "cbz")
+            .expect("open")
+            .backend;
         let ReaderBackend::Zip(zip) = backend else {
             panic!("expected zip backend");
         };
@@ -404,7 +579,7 @@ mod tests {
     #[ignore = "requires EPUB_ORDER_FIXTURE path to a real comic epub"]
     fn epub_real_fixture_first_pages_follow_spine() {
         let path = std::env::var("EPUB_ORDER_FIXTURE").expect("EPUB_ORDER_FIXTURE");
-        let backend = open_backend(&path, "epub").expect("open real epub");
+        let backend = open_backend(&path, "epub").expect("open real epub").backend;
         let ReaderBackend::Epub(epub) = backend else {
             panic!("expected epub");
         };
@@ -432,7 +607,9 @@ mod tests {
         let mut fake = FakeResourceAccess::new();
         fake.insert_file("/lib/comic.epub", bytes);
 
-        let backend = open_backend_with(&fake, "/lib/comic.epub", "epub").expect("open");
+        let backend = open_backend_with(&fake, "/lib/comic.epub", "epub")
+            .expect("open")
+            .backend;
         let ReaderBackend::Epub(epub) = backend else {
             panic!("expected epub backend");
         };

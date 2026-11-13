@@ -48,14 +48,14 @@ fn seed_comic(comic_id: &str, path: &str, resource_type: &str) {
 #[test]
 fn set_comic_thumbnail_from_page_marks_user_set_cover() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let db_path = temp.path().join("cover.sqlite");
+        let temp = TempDir::new().expect("tempdir").keep();
+        let db_path = temp.join("cover.sqlite");
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime
             .block_on(init_db_at_path(&db_path))
             .expect("init db");
 
-        let comic_dir = temp.path().join("comic");
+        let comic_dir = temp.join("comic");
         fs::create_dir_all(&comic_dir).expect("mkdir");
         write_solid_jpeg(&comic_dir.join("001.jpg"), 255, 0, 0);
         write_solid_jpeg(&comic_dir.join("002.jpg"), 0, 0, 255);
@@ -76,14 +76,46 @@ fn set_comic_thumbnail_from_page_marks_user_set_cover() {
             .expect("thumbnail exists");
         assert!(!thumb.thumbnail.is_empty());
         assert!(thumb.is_user_set);
+
+        let archive_path = temp.join("comic.cbz");
+        {
+            use std::io::Write;
+            let mut archive = zip::ZipWriter::new(fs::File::create(&archive_path).unwrap());
+            archive
+                .start_file("001.jpg", zip::write::SimpleFileOptions::default())
+                .unwrap();
+            archive
+                .write_all(&fs::read(comic_dir.join("002.jpg")).unwrap())
+                .unwrap();
+            archive.finish().unwrap();
+        }
+        let archive_id = "cover-archive-1";
+        let archive_path = archive_path.to_string_lossy().replace('\\', "/");
+        seed_comic(archive_id, &archive_path, "cbz");
+        for _ in 0..2 {
+            runtime
+                .block_on(set_comic_thumbnail_from_page(
+                    archive_id,
+                    &archive_path,
+                    "cbz",
+                    0,
+                ))
+                .expect("set archive cover on cache miss and hit");
+            let archive_thumb = runtime
+                .block_on(find_thumbnail_by_comic_id(archive_id))
+                .unwrap()
+                .unwrap();
+            assert!(archive_thumb.is_user_set);
+            assert_eq!(archive_thumb.thumbnail, thumb.thumbnail);
+        }
     });
 }
 
 #[test]
 fn legacy_thumbnail_has_no_cover_page_until_user_sets_cover() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let db_path = common::create_fixture_db(temp.path());
+        let temp = TempDir::new().expect("tempdir").keep();
+        let db_path = common::create_fixture_db(&temp);
         let legacy_id = "86408880d30b0de95ca959feb60a3b72dcb1889b";
         {
             let conn = rusqlite::Connection::open(&db_path).expect("open fixture");
@@ -110,7 +142,7 @@ fn legacy_thumbnail_has_no_cover_page_until_user_sets_cover() {
             }
         );
 
-        let comic_dir = temp.path().join("comic");
+        let comic_dir = temp.join("comic");
         fs::create_dir_all(&comic_dir).expect("mkdir");
         write_solid_jpeg(&comic_dir.join("001.jpg"), 255, 0, 0);
         write_solid_jpeg(&comic_dir.join("002.jpg"), 0, 0, 255);
@@ -139,14 +171,14 @@ fn legacy_thumbnail_has_no_cover_page_until_user_sets_cover() {
 #[test]
 fn sync_does_not_regenerate_user_set_comic_thumbnail_after_source_change() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let db_path = temp.path().join("cover.sqlite");
+        let temp = TempDir::new().expect("tempdir").keep();
+        let db_path = temp.join("cover.sqlite");
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime
             .block_on(init_db_at_path(&db_path))
             .expect("init db");
 
-        let comic_dir = temp.path().join("comic");
+        let comic_dir = temp.join("comic");
         fs::create_dir_all(&comic_dir).expect("mkdir");
         write_solid_jpeg(&comic_dir.join("001.jpg"), 255, 0, 0);
         write_solid_jpeg(&comic_dir.join("002.jpg"), 0, 0, 255);
@@ -233,14 +265,14 @@ fn seed_series_item(series_id: &str, comic_id: &str, sort_order: i32) {
 #[test]
 fn series_custom_thumbnail_is_preferred_over_fallback() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let db_path = temp.path().join("cover.sqlite");
+        let temp = TempDir::new().expect("tempdir").keep();
+        let db_path = temp.join("cover.sqlite");
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime
             .block_on(init_db_at_path(&db_path))
             .expect("init db");
 
-        let comic_dir = temp.path().join("series_comic");
+        let comic_dir = temp.join("series_comic");
         fs::create_dir_all(&comic_dir).expect("mkdir");
         write_solid_jpeg(&comic_dir.join("001.jpg"), 255, 0, 0);
         write_solid_jpeg(&comic_dir.join("002.jpg"), 0, 0, 255);
@@ -279,15 +311,15 @@ fn series_custom_thumbnail_is_preferred_over_fallback() {
 #[test]
 fn series_cover_falls_back_to_latest_sort_order_comic() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let db_path = temp.path().join("cover.sqlite");
+        let temp = TempDir::new().expect("tempdir").keep();
+        let db_path = temp.join("cover.sqlite");
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime
             .block_on(init_db_at_path(&db_path))
             .expect("init db");
 
-        let older_dir = temp.path().join("vol1");
-        let newer_dir = temp.path().join("vol2");
+        let older_dir = temp.join("vol1");
+        let newer_dir = temp.join("vol2");
         fs::create_dir_all(&older_dir).expect("mkdir1");
         fs::create_dir_all(&newer_dir).expect("mkdir2");
         write_solid_jpeg(&older_dir.join("001.jpg"), 255, 0, 0);
@@ -298,7 +330,7 @@ fn series_cover_falls_back_to_latest_sort_order_comic() {
         let series_id = "series-fallback";
         let older_path = older_dir.to_string_lossy().replace('\\', "/");
         let newer_path = newer_dir.to_string_lossy().replace('\\', "/");
-        let folder = temp.path().to_string_lossy().replace('\\', "/");
+        let folder = temp.to_string_lossy().replace('\\', "/");
 
         seed_comic(older_id, &older_path, "dir");
         seed_comic(newer_id, &newer_path, "dir");

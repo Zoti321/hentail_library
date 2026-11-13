@@ -1,19 +1,160 @@
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::fs;
 use std::io::Write;
 use std::path::{Path, PathBuf};
+use std::sync::{Arc, Mutex, MutexGuard, OnceLock, PoisonError};
 
 use crate::db;
 use crate::error::HentaiError;
+use crate::resource::{ResourceKind, ResourceStat};
 
 const PAGE_FILE_WIDTH: usize = 5;
 
-pub struct ReaderCache {
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(super) struct ReaderSourceVersion {
+    modified_ms: i64,
+    size: u64,
+}
+
+impl ReaderSourceVersion {
+    pub(super) fn from_stat(stat: &ResourceStat) -> Option<Self> {
+        (stat.kind == ResourceKind::File && stat.modified_ms != 0).then_some(Self {
+            modified_ms: stat.modified_ms,
+            size: stat.size,
+        })
+    }
+}
+
+#[derive(Default)]
+struct ComicCacheState {
+    request: Option<Arc<()>>,
+    foreground_lifetime: Arc<()>,
+    clear_pending: bool,
+}
+
+#[derive(Default)]
+struct ComicCacheRequests {
+    state: Mutex<ComicCacheState>,
+}
+
+impl ComicCacheRequests {
+    fn lock(&self) -> MutexGuard<'_, ComicCacheState> {
+        self.state.lock().unwrap_or_else(PoisonError::into_inner)
+    }
+}
+
+fn comic_cache_requests(comic_id: &str) -> Arc<ComicCacheRequests> {
+    static STORE: OnceLock<Mutex<HashMap<String, Arc<ComicCacheRequests>>>> = OnceLock::new();
+    STORE
+        .get_or_init(|| Mutex::new(HashMap::new()))
+        .lock()
+        .unwrap_or_else(PoisonError::into_inner)
+        .entry(comic_id.to_string())
+        .or_default()
+        .clone()
+}
+
+pub struct ReaderPageCacheRequest {
+    pub(super) comic_id: String,
+    owner: Arc<ComicCacheRequests>,
+    identity: Arc<()>,
+}
+
+impl ReaderPageCacheRequest {
+    // Reserve before dispatch: worker scheduling must not decide request ownership.
+    pub fn begin(comic_id: &str) -> Self {
+        Self::begin_with(comic_id, false)
+    }
+
+    pub fn begin_clear(comic_id: &str) -> Self {
+        Self::begin_with(comic_id, true)
+    }
+
+    fn begin_with(comic_id: &str, clear: bool) -> Self {
+        let owner = comic_cache_requests(comic_id);
+        let identity = Arc::new(());
+        {
+            let mut state = owner.lock();
+            state.request = Some(identity.clone());
+            state.clear_pending = clear;
+            if clear {
+                state.foreground_lifetime = Arc::new(());
+            }
+        }
+        Self {
+            comic_id: comic_id.to_string(),
+            owner,
+            identity,
+        }
+    }
+
+    fn owns(&self, state: &ComicCacheState) -> bool {
+        state
+            .request
+            .as_ref()
+            .is_some_and(|current| Arc::ptr_eq(current, &self.identity))
+    }
+
+    pub(super) fn is_current(&self) -> bool {
+        self.owns(&self.owner.lock())
+    }
+
+    pub(super) fn apply_if_current<T>(
+        &self,
+        apply: impl FnOnce() -> Result<T, HentaiError>,
+    ) -> Result<Option<T>, HentaiError> {
+        let state = self.owner.lock();
+        if self.owns(&state) {
+            return apply().map(Some);
+        }
+        Ok(None)
+    }
+
+    pub(super) fn clear_with(
+        &self,
+        clear: impl FnOnce() -> Result<(), HentaiError>,
+    ) -> Result<(), HentaiError> {
+        let mut state = self.owner.lock();
+        if !self.owns(&state) {
+            return Ok(());
+        }
+        let result = clear();
+        state.clear_pending = false;
+        result
+    }
+}
+
+pub(super) struct ReaderPageCacheRead {
+    owner: Arc<ComicCacheRequests>,
+    lifetime: Arc<()>,
+}
+
+impl ReaderPageCacheRead {
+    pub(super) fn capture(comic_id: &str) -> Self {
+        let owner = comic_cache_requests(comic_id);
+        let lifetime = owner.lock().foreground_lifetime.clone();
+        Self { owner, lifetime }
+    }
+
+    pub(super) fn apply_if_current<T>(
+        &self,
+        apply: impl FnOnce() -> Result<T, HentaiError>,
+    ) -> Result<Option<T>, HentaiError> {
+        let state = self.owner.lock();
+        // A queued clear must not remove a new foreground result after it is returned.
+        if !state.clear_pending && Arc::ptr_eq(&state.foreground_lifetime, &self.lifetime) {
+            return apply().map(Some);
+        }
+        Ok(None)
+    }
+}
+
+pub(super) struct ReaderCache {
     root: PathBuf,
 }
 
 impl ReaderCache {
-    pub fn app() -> Result<Self, HentaiError> {
+    pub(super) fn app() -> Result<Self, HentaiError> {
         let config = db::db_config()?;
         let parent = config
             .db_file_path
@@ -25,32 +166,28 @@ impl ReaderCache {
     }
 
     #[cfg(test)]
-    pub fn with_root(root: impl Into<PathBuf>) -> Self {
+    pub(super) fn with_root(root: impl Into<PathBuf>) -> Self {
         Self { root: root.into() }
     }
 
-    pub fn root(&self) -> &Path {
-        &self.root
-    }
-
-    pub fn cached_page_path(
+    pub(super) fn cached_page_path(
         &self,
         comic_id: &str,
-        source_path: &str,
+        source: &ReaderSourceVersion,
         page_index: i32,
     ) -> Result<Option<PathBuf>, HentaiError> {
         let page_index = normalize_page_index(page_index)?;
-        let dir = self.comic_cache_dir(comic_id, source_path)?;
+        let dir = self.comic_cache_dir(comic_id, source);
         if !dir.is_dir() {
             return Ok(None);
         }
         Ok(find_cached_page_file(&dir, page_index))
     }
 
-    pub fn write_page(
+    pub(super) fn write_page(
         &self,
         comic_id: &str,
-        source_path: &str,
+        source: &ReaderSourceVersion,
         page_index: i32,
         bytes: &[u8],
     ) -> Result<PathBuf, HentaiError> {
@@ -58,7 +195,7 @@ impl ReaderCache {
         if bytes.is_empty() {
             return Err(HentaiError::reader_invalid_content("页面数据为空"));
         }
-        let dir = self.comic_cache_dir(comic_id, source_path)?;
+        let dir = self.comic_cache_dir(comic_id, source);
         fs::create_dir_all(&dir).map_err(map_io_err)?;
         let extension = image_extension(bytes);
         let file_path = dir.join(format!("{page_index:0PAGE_FILE_WIDTH$}.{extension}"));
@@ -83,13 +220,13 @@ impl ReaderCache {
         Ok(file_path)
     }
 
-    pub fn evict_outside_pages(
+    pub(super) fn evict_outside_pages(
         &self,
         comic_id: &str,
-        source_path: &str,
+        source: &ReaderSourceVersion,
         keep_page_indexes: &[i32],
     ) -> Result<(), HentaiError> {
-        let dir = self.comic_cache_dir(comic_id, source_path)?;
+        let dir = self.comic_cache_dir(comic_id, source);
         if !dir.is_dir() {
             return Ok(());
         }
@@ -114,7 +251,7 @@ impl ReaderCache {
         Ok(())
     }
 
-    pub fn clear_comic(&self, comic_id: &str) -> Result<(), HentaiError> {
+    pub(super) fn clear_comic(&self, comic_id: &str) -> Result<(), HentaiError> {
         let dir = self.root.join(comic_id);
         if !dir.is_dir() {
             return Ok(());
@@ -154,9 +291,10 @@ impl ReaderCache {
         }
     }
 
-    fn comic_cache_dir(&self, comic_id: &str, source_path: &str) -> Result<PathBuf, HentaiError> {
-        let fingerprint = source_fingerprint(source_path)?;
-        Ok(self.root.join(comic_id).join(fingerprint))
+    fn comic_cache_dir(&self, comic_id: &str, source: &ReaderSourceVersion) -> PathBuf {
+        self.root
+            .join(comic_id)
+            .join(format!("v2_{}_{}", source.modified_ms, source.size))
     }
 }
 
@@ -174,17 +312,6 @@ pub fn image_extension(bytes: &[u8]) -> &'static str {
     } else {
         "bin"
     }
-}
-
-fn source_fingerprint(source_path: &str) -> Result<String, HentaiError> {
-    let metadata = fs::metadata(source_path).map_err(map_io_err)?;
-    let modified_ms = metadata
-        .modified()
-        .ok()
-        .and_then(|time| time.duration_since(std::time::UNIX_EPOCH).ok())
-        .map(|duration| duration.as_millis() as i64)
-        .unwrap_or(0);
-    Ok(format!("{}_{}", modified_ms, metadata.len()))
 }
 
 fn normalize_page_index(page_index: i32) -> Result<i32, HentaiError> {
@@ -287,7 +414,76 @@ fn remove_tree_best_effort(path: &Path) {
 }
 
 #[cfg(test)]
+mod version_tests {
+    use super::*;
+    use crate::resource::ResourceAccess;
+
+    pub(super) fn source_version(path: &str) -> ReaderSourceVersion {
+        ReaderSourceVersion::from_stat(
+            &crate::resource::local_access().stat(path).unwrap().unwrap(),
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn legacy_live_path_cache_is_ignored_without_removing_files() {
+        let root = tempfile::tempdir().unwrap().keep();
+        let source = ReaderSourceVersion::from_stat(&ResourceStat {
+            kind: ResourceKind::File,
+            modified_ms: 10,
+            size: 20,
+        })
+        .unwrap();
+        let legacy_dir = root.join("comic").join("10_20");
+        fs::create_dir_all(&legacy_dir).unwrap();
+        let legacy = legacy_dir.join("00000.bin");
+        fs::write(&legacy, b"old-cache").unwrap();
+        let cache = ReaderCache::with_root(&root);
+        assert!(cache
+            .cached_page_path("comic", &source, 0)
+            .unwrap()
+            .is_none());
+        let current = cache
+            .write_page("comic", &source, 0, b"fresh-cache")
+            .unwrap();
+        assert_ne!(legacy, current);
+        assert_eq!(fs::read(legacy).unwrap(), b"old-cache");
+        assert_eq!(fs::read(current).unwrap(), b"fresh-cache");
+    }
+
+    #[test]
+    fn late_page_write_does_not_populate_replacement_source_version() {
+        let root = tempfile::tempdir().unwrap().keep();
+        let source = root.join("source.cbz");
+        fs::write(&source, b"source-A").unwrap();
+        let source_path = source.to_string_lossy();
+        let old_version = source_version(&source_path);
+        fs::write(&source, b"replacement-source-B-with-another-size").unwrap();
+        let new_version = source_version(&source_path);
+        assert_ne!(old_version, new_version);
+        let cache = ReaderCache::with_root(root.join("cache"));
+        cache
+            .write_page("versioned", &new_version, 0, b"decoded-B")
+            .unwrap();
+        cache
+            .write_page("versioned", &old_version, 0, b"decoded-A")
+            .unwrap();
+        let replacement = cache
+            .cached_page_path("versioned", &new_version, 0)
+            .unwrap()
+            .unwrap();
+        assert_eq!(fs::read(replacement).unwrap(), b"decoded-B");
+        let original = cache
+            .cached_page_path("versioned", &old_version, 0)
+            .unwrap()
+            .unwrap();
+        assert_eq!(fs::read(original).unwrap(), b"decoded-A");
+    }
+}
+
+#[cfg(test)]
 mod tests {
+    use super::version_tests::source_version;
     use super::*;
 
     #[test]
@@ -298,13 +494,18 @@ mod tests {
 
         let cache = ReaderCache::with_root(temp.path().join("reader_cache"));
         let written = cache
-            .write_page("comic-1", &source.to_string_lossy(), 3, b"\xFF\xD8\xFFpage")
+            .write_page(
+                "comic-1",
+                &source_version(&source.to_string_lossy()),
+                3,
+                b"\xFF\xD8\xFFpage",
+            )
             .expect("write");
         assert!(written.exists());
         assert!(fs::metadata(&written).expect("meta").len() > 0);
 
         let hit = cache
-            .cached_page_path("comic-1", &source.to_string_lossy(), 3)
+            .cached_page_path("comic-1", &source_version(&source.to_string_lossy()), 3)
             .expect("lookup")
             .expect("cached");
         assert_eq!(hit, written);
@@ -316,16 +517,14 @@ mod tests {
         let source = temp.path().join("comic.cbz");
         fs::write(&source, b"archive-bytes").expect("write source");
         let cache = ReaderCache::with_root(temp.path().join("reader_cache"));
-        let dir = cache
-            .comic_cache_dir("comic-1", &source.to_string_lossy())
-            .expect("dir");
+        let dir = cache.comic_cache_dir("comic-1", &source_version(&source.to_string_lossy()));
         fs::create_dir_all(&dir).expect("mkdir");
         let empty = dir.join("00000.webp");
         fs::File::create(&empty).expect("create empty");
         assert_eq!(fs::metadata(&empty).expect("meta").len(), 0);
 
         assert!(cache
-            .cached_page_path("comic-1", &source.to_string_lossy(), 0)
+            .cached_page_path("comic-1", &source_version(&source.to_string_lossy()), 0)
             .expect("lookup")
             .is_none());
         assert!(!empty.exists(), "poison empty cache file must be removed");
@@ -338,7 +537,12 @@ mod tests {
         fs::write(&source, b"archive-bytes").expect("write source");
         let cache = ReaderCache::with_root(temp.path().join("reader_cache"));
         assert!(cache
-            .write_page("comic-1", &source.to_string_lossy(), 0, &[])
+            .write_page(
+                "comic-1",
+                &source_version(&source.to_string_lossy()),
+                0,
+                &[]
+            )
             .is_err());
     }
 
@@ -349,34 +553,48 @@ mod tests {
         fs::write(&source, b"archive-bytes").expect("write source");
         let cache = ReaderCache::with_root(temp.path().join("reader_cache"));
         cache
-            .write_page("comic-1", &source.to_string_lossy(), 1, b"\xFF\xD8\xFFone")
+            .write_page(
+                "comic-1",
+                &source_version(&source.to_string_lossy()),
+                1,
+                b"\xFF\xD8\xFFone",
+            )
             .expect("write1");
         cache
-            .write_page("comic-1", &source.to_string_lossy(), 2, b"\xFF\xD8\xFFtwo")
+            .write_page(
+                "comic-1",
+                &source_version(&source.to_string_lossy()),
+                2,
+                b"\xFF\xD8\xFFtwo",
+            )
             .expect("write2");
         cache
             .write_page(
                 "comic-1",
-                &source.to_string_lossy(),
+                &source_version(&source.to_string_lossy()),
                 8,
                 b"\xFF\xD8\xFFeight",
             )
             .expect("write8");
 
         cache
-            .evict_outside_pages("comic-1", &source.to_string_lossy(), &[2, 3])
+            .evict_outside_pages(
+                "comic-1",
+                &source_version(&source.to_string_lossy()),
+                &[2, 3],
+            )
             .expect("evict");
 
         assert!(cache
-            .cached_page_path("comic-1", &source.to_string_lossy(), 1)
+            .cached_page_path("comic-1", &source_version(&source.to_string_lossy()), 1)
             .expect("lookup1")
             .is_none());
         assert!(cache
-            .cached_page_path("comic-1", &source.to_string_lossy(), 2)
+            .cached_page_path("comic-1", &source_version(&source.to_string_lossy()), 2)
             .expect("lookup2")
             .is_some());
         assert!(cache
-            .cached_page_path("comic-1", &source.to_string_lossy(), 8)
+            .cached_page_path("comic-1", &source_version(&source.to_string_lossy()), 8)
             .expect("lookup8")
             .is_none());
     }
@@ -388,10 +606,20 @@ mod tests {
         fs::write(&source, b"archive-bytes").expect("write source");
         let cache = ReaderCache::with_root(temp.path().join("reader_cache"));
         let written = cache
-            .write_page("comic-1", &source.to_string_lossy(), 1, b"\xFF\xD8\xFFone")
+            .write_page(
+                "comic-1",
+                &source_version(&source.to_string_lossy()),
+                1,
+                b"\xFF\xD8\xFFone",
+            )
             .expect("write1");
         cache
-            .write_page("comic-1", &source.to_string_lossy(), 2, b"\xFF\xD8\xFFtwo")
+            .write_page(
+                "comic-1",
+                &source_version(&source.to_string_lossy()),
+                2,
+                b"\xFF\xD8\xFFtwo",
+            )
             .expect("write2");
 
         // Simulate Flutter still decoding/holding the cached page file on exit.
@@ -427,7 +655,12 @@ mod tests {
                 let cache = ReaderCache::with_root(cache_root);
                 let mut page = worker;
                 while !stop.load(Ordering::Relaxed) {
-                    let _ = cache.write_page("comic-1", &source_str, page, b"\xFF\xD8\xFFpage");
+                    let _ = cache.write_page(
+                        "comic-1",
+                        &source_version(&source_str),
+                        page,
+                        b"\xFF\xD8\xFFpage",
+                    );
                     page = (page + 4) % 200;
                 }
             }));

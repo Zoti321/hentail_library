@@ -7,7 +7,7 @@ use std::path::Path;
 
 use hentai_core::{
     add_author, connection, create_local_library, init_db_at_path, load_author_image,
-    replace_comic_authors, AuthorImageSlot,
+    replace_comic_authors, set_comic_thumbnail_from_page, AuthorImageSlot,
 };
 use image::{ImageBuffer, Rgb};
 use sea_orm::{ConnectionTrait, Statement};
@@ -20,18 +20,28 @@ fn write_jpeg(path: &Path, r: u8, g: u8, b: u8) {
 
 #[test]
 fn author_image_resolves_to_hd_cover_of_first_visible_comic() {
+    assert_author_image_cover(false);
+}
+
+#[test]
+fn author_image_uses_selected_page_from_reader() {
+    assert_author_image_cover(true);
+}
+
+fn assert_author_image_cover(select_page: bool) {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let root = temp.path().join("library");
+        let temp = TempDir::new().expect("tempdir").keep();
+        let root = temp.join("library");
         let comic_dir = root.join("comic");
         fs::create_dir_all(&comic_dir).expect("mkdir");
         write_jpeg(&comic_dir.join("001.jpg"), 255, 0, 0);
         write_jpeg(&comic_dir.join("cover.jpg"), 0, 0, 255);
-        let cover_bytes = fs::read(comic_dir.join("cover.jpg")).expect("read cover");
+        let expected_page = if select_page { "001.jpg" } else { "cover.jpg" };
+        let cover_bytes = fs::read(comic_dir.join(expected_page)).expect("read cover");
 
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         let (author_id, lonely_id) = runtime.block_on(async {
-            init_db_at_path(temp.path().join("author_image.sqlite"))
+            init_db_at_path(temp.join("author_image.sqlite"))
                 .await
                 .expect("init db");
             let library = create_local_library(&root.to_string_lossy(), None)
@@ -62,6 +72,17 @@ fn author_image_resolves_to_hd_cover_of_first_visible_comic() {
             let lonely = add_author("Lonely").await.expect("lonely");
             (painter.id, lonely.id)
         });
+
+        if select_page {
+            runtime
+                .block_on(set_comic_thumbnail_from_page(
+                    "hd-comic",
+                    &comic_dir.to_string_lossy(),
+                    "dir",
+                    0,
+                ))
+                .expect("select author cover page");
+        }
 
         let avatar = load_author_image(author_id, AuthorImageSlot::Avatar, false)
             .expect("avatar")
