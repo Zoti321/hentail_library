@@ -1,6 +1,5 @@
-import 'package:hentai_library/design-system/design_system.dart';
+import 'package:hentai_library/features/reader/presentation/providers/reader_window_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:window_manager/window_manager.dart';
 
 part 'reader_chrome_notifier.g.dart';
 
@@ -14,15 +13,11 @@ class ReaderChromeNotifier extends _$ReaderChromeNotifier {
       // Hide in-app chrome before the OS resize. Otherwise the title bar can
       // remain visible through intermediate window sizes and overflow the shell.
       state = true;
-      if (supportsDesktopWindowChrome) {
-        await windowManager.setFullScreen(true);
-      }
+      await ref.read(readerWindowFullscreenCommandProvider)(true);
       return;
     }
 
-    if (supportsDesktopWindowChrome) {
-      await windowManager.setFullScreen(false);
-    }
+    await ref.read(readerWindowFullscreenCommandProvider)(false);
     state = false;
   }
 

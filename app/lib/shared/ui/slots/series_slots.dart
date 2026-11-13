@@ -70,5 +70,5 @@ typedef SeriesMemberSelectionActionsSlot = Future<void> Function(
   List<String> ids,
 );
 
-/// 系列封面状态失效动作（实现归 series；reader 经此触发，不 import series）。
+/// 系列封面状态失效动作（实现归 series，由 owner 写后命令调用）。
 typedef SeriesCoverInvalidationSlot = void Function(String seriesId);

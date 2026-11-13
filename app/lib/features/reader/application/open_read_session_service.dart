@@ -12,6 +12,17 @@ import 'package:hentai_library/features/reader/domain/read_session_page.dart';
 import 'package:hentai_library/features/reader/domain/reader_page_payload.dart';
 import 'package:hentai_library/features/reader/domain/opened_read_session.dart';
 
+typedef _OpenedPages = ({ReaderComicRef comic, List<ReadSessionPage> pages});
+
+class _ReaderOpenAttempt {
+  _ReaderOpenAttempt(this.lifetime);
+  final Object lifetime;
+  String? path;
+  bool nativeStarted = false;
+  late final Future<_OpenedPages> result;
+  late final Future<_OpenedPages> operation;
+}
+
 /// 阅读 I/O 编排：显式 open/close、页码约定与 [OpenedReadSession]。
 ///
 /// 同一 comicId 在 close 前复用页列表，避免 open 与 loadPages 双次列页。
@@ -35,6 +46,9 @@ class OpenReadSessionService {
   final Map<String, ({ReaderComicRef comic, List<ReadSessionPage> pages})>
   _openedPages =
       <String, ({ReaderComicRef comic, List<ReadSessionPage> pages})>{};
+  final _lifetimes = <String, Object>{};
+  final _opening = <String, _ReaderOpenAttempt>{};
+  final _operations = <String, Future<Object?>>{};
 
   /// UI 页码为 1-based；归档页字节 API 为 0-based。
   static int uiToArchivePageIndex(int oneBasedPageIndex) =>
@@ -56,6 +70,7 @@ class OpenReadSessionService {
     bool incognito = false,
     bool startFromFirstPage = false,
   }) async {
+    final lifetime = _lifetimes.putIfAbsent(comicId, Object.new);
     final ({ReaderComicRef comic, List<ReadSessionPage> pages}) opened =
         await _openPages(comicId);
     final int resumePageIndex = (incognito || startFromFirstPage)
@@ -64,6 +79,7 @@ class OpenReadSessionService {
             storedPageIndex: await _readResumePage(comicId),
             totalPages: opened.pages.length,
           );
+    _ensureLifetime(comicId, lifetime);
     return OpenedReadSession(
       comic: opened.comic,
       pages: opened.pages,
@@ -72,14 +88,35 @@ class OpenReadSessionService {
   }
 
   Future<List<ReadSessionPage>> loadPages(String comicId) async {
+    final lifetime = _lifetimes.putIfAbsent(comicId, Object.new);
     final ({ReaderComicRef comic, List<ReadSessionPage> pages}) opened =
         await _openPages(comicId);
+    _ensureLifetime(comicId, lifetime);
     return opened.pages;
   }
 
   Future<void> close(String comicId) async {
     _openedPages.remove(comicId);
-    await _sessionPort.closeComic(comicId);
+    _lifetimes.remove(comicId);
+    _opening.remove(comicId);
+    await _closeNative(comicId);
+  }
+
+  Future<void> _closeNative(String comicId) {
+    final previous = _operations[comicId];
+    final closing = Future<void>.microtask(
+      () => _sessionPort.closeComic(comicId),
+    );
+    late final Future<void> barrier;
+    barrier = Future<void>.microtask(() async {
+      await _waitForOperation(previous);
+      await _waitForOperation(closing);
+      if (identical(_operations[comicId], barrier)) {
+        _operations.remove(comicId);
+      }
+    });
+    _operations[comicId] = barrier;
+    return closing;
   }
 
   Future<Uint8List?> loadPageBytes({
@@ -172,6 +209,26 @@ class OpenReadSessionService {
     if (cached != null) {
       return cached;
     }
+    final existing = _opening[comicId];
+    if (existing != null) {
+      return existing.result;
+    }
+    final attempt = _ReaderOpenAttempt(
+      _lifetimes.putIfAbsent(comicId, Object.new),
+    );
+    attempt.operation = Future<_OpenedPages>.microtask(
+      () => _runOpen(comicId, attempt),
+    );
+    _opening[comicId] = attempt;
+    attempt.result = _finishOpen(comicId, attempt);
+    return attempt.result;
+  }
+
+  Future<_OpenedPages> _runOpen(
+    String comicId,
+    _ReaderOpenAttempt attempt,
+  ) async {
+    _ensureLifetime(comicId, attempt.lifetime);
     final found = await _comicLookup.findById(comicId);
     if (found == null) {
       throw ReadSessionPageLoadException.comicNotFound(comicId);
@@ -183,48 +240,110 @@ class OpenReadSessionService {
       pageCount: found.pageCount,
       title: found.title,
     );
+    attempt.path = comic.path;
+    _ensureLifetime(comicId, attempt.lifetime);
+    final previous = _operations[comicId];
+    late final Future<_OpenedPages> nativeOperation;
+    nativeOperation = Future<_OpenedPages>.microtask(() async {
+      await _waitForOperation(previous);
+      try {
+        _ensureLifetime(comicId, attempt.lifetime);
+        return await _openNative(comic, attempt);
+      } finally {
+        if (identical(_operations[comicId], nativeOperation)) {
+          _operations.remove(comicId);
+        }
+      }
+    });
+    _operations[comicId] = nativeOperation;
+    return nativeOperation;
+  }
+
+  Future<_OpenedPages> _openNative(
+    ReaderComicRef comic,
+    _ReaderOpenAttempt attempt,
+  ) async {
+    final comicId = comic.comicId;
     try {
-      final ({ReaderComicRef comic, List<ReadSessionPage> pages}) opened =
-          await _openPagesUncached(comic).timeout(_openTimeout);
+      attempt.nativeStarted = true;
+      await _sessionPort.openComic(comic);
+      _ensureLifetime(comicId, attempt.lifetime);
+      final pages = await _pageSource.loadPages(comic);
+      _ensureLifetime(comicId, attempt.lifetime);
+      if (pages.isEmpty) {
+        throw ReadSessionPageLoadException.emptyPages(
+          comicId: comicId,
+          path: comic.path,
+        );
+      }
+      final opened = (
+        comic: comic,
+        pages: List<ReadSessionPage>.unmodifiable(pages),
+      );
       _openedPages[comicId] = opened;
       return opened;
+    } catch (_) {
+      await _bestEffortClose(comicId);
+      rethrow;
+    }
+  }
+
+  Future<_OpenedPages> _finishOpen(
+    String comicId,
+    _ReaderOpenAttempt attempt,
+  ) async {
+    try {
+      return await attempt.operation.timeout(_openTimeout);
     } on TimeoutException catch (_, stackTrace) {
-      await _bestEffortClose(comic.comicId);
+      if (identical(_lifetimes[comicId], attempt.lifetime)) {
+        _lifetimes.remove(comicId);
+      }
+      if (attempt.nativeStarted) {
+        // Keep cleanup in the native barrier without delaying the timeout result.
+        unawaited(_waitForOperation(_closeNative(comicId)));
+      }
       Error.throwWithStackTrace(
         ReadSessionPageLoadException.timedOut(
-          comicId: comic.comicId,
-          path: comic.path,
+          comicId: comicId,
+          path: attempt.path ?? comicId,
         ),
         stackTrace,
       );
     } on ReadSessionPageLoadException {
-      await _bestEffortClose(comic.comicId);
       rethrow;
     } on Object catch (error, stackTrace) {
-      await _bestEffortClose(comic.comicId);
       Error.throwWithStackTrace(
         ReadSessionPageLoadException.loadFailed(
-          comicId: comic.comicId,
-          path: comic.path,
+          comicId: comicId,
+          path: attempt.path ?? comicId,
           cause: error,
           stackTrace: stackTrace,
         ),
         stackTrace,
       );
+    } finally {
+      if (identical(_opening[comicId], attempt)) {
+        _opening.remove(comicId);
+      }
     }
   }
 
-  Future<({ReaderComicRef comic, List<ReadSessionPage> pages})>
-  _openPagesUncached(ReaderComicRef comic) async {
-    await _sessionPort.openComic(comic);
-    final List<ReadSessionPage> pages = await _pageSource.loadPages(comic);
-    if (pages.isEmpty) {
-      throw ReadSessionPageLoadException.emptyPages(
-        comicId: comic.comicId,
-        path: comic.path,
+  Future<void> _waitForOperation(Future<Object?>? operation) async {
+    try {
+      await operation;
+    } catch (_) {
+      // Each operation reports its own failure to its caller.
+    }
+  }
+
+  void _ensureLifetime(String comicId, Object lifetime) {
+    if (!identical(_lifetimes[comicId], lifetime)) {
+      throw ReadSessionPageLoadException.loadFailed(
+        comicId: comicId,
+        path: comicId,
+        cause: StateError('Reader open was closed'),
       );
     }
-    return (comic: comic, pages: List<ReadSessionPage>.unmodifiable(pages));
   }
 
   Future<void> _bestEffortClose(String comicId) async {

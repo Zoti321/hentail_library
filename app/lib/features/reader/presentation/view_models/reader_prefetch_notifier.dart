@@ -19,12 +19,17 @@ class ReaderPrefetchNotifier extends _$ReaderPrefetchNotifier {
 
   /// 会话内被 UI/预热触达过的页（1-based）；含 PageView 预建邻页。
   final Map<String, Set<int>> _touchedPages = <String, Set<int>>{};
+  int _nextGeneration = 0;
 
   @override
-  Map<String, int> build() => <String, int>{};
+  Map<String, int> build() {
+    _lastWarmWindows.clear();
+    _touchedPages.clear();
+    return <String, int>{};
+  }
 
   int bumpGeneration(String comicId) {
-    final int next = (state[comicId] ?? 0) + 1;
+    final int next = ++_nextGeneration;
     state = <String, int>{...state, comicId: next};
     return next;
   }
@@ -122,6 +127,9 @@ class ReaderPrefetchNotifier extends _$ReaderPrefetchNotifier {
               .toList(growable: false),
           generation: generation,
         );
+    if (!ref.mounted || state[comicId] != generation) {
+      return false;
+    }
     // Prefetch 末尾会 evict；邻页可能在 await 期间被 PageView load 后又被删盘。
     // 再扫一遍窗口外触达页的 keepAlive，避免卡在失效 FilePath。
     final Set<int> staleAfterEvict = (_touchedPages[comicId] ?? const <int>{})
@@ -204,7 +212,7 @@ class ReaderPrefetchNotifier extends _$ReaderPrefetchNotifier {
     required int generation,
     required int pageOneBased,
   }) {
-    if ((state[comicId] ?? 0) != generation) {
+    if (!ref.mounted || state[comicId] != generation) {
       return false;
     }
     final Set<int>? window = _lastWarmWindows[comicId];

@@ -6,6 +6,9 @@ import 'package:window_manager/window_manager.dart';
 
 Future<void> initializeWindowManager() => windowManager.ensureInitialized();
 
+Future<void> windowManagerSetFullscreen(bool value) =>
+    windowManager.setFullScreen(value);
+
 /// Native configuration selected by the application composition root.
 Future<void> configureDesktopWindow({
   required String title,

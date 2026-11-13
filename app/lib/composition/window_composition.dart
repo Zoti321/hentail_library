@@ -4,6 +4,10 @@ import 'package:hentai_library/infrastructure/window/window_close_listener.dart'
 import 'package:hentai_library/infrastructure/window/window_manager_bindings.dart';
 import 'package:hentai_library/shared/ui/window/app_window_title.dart';
 
+Future<void> setAppWindowFullscreen(bool value) async {
+  if (supportsDesktopWindowChrome) await windowManagerSetFullscreen(value);
+}
+
 Future<void> configurePreviewWindow() async {
   if (supportsDesktopWindowChrome) await initializeWindowManager();
 }

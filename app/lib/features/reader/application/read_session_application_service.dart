@@ -28,6 +28,7 @@ class ReadSessionApplicationService {
 
   ReadSession? _session;
   Future<void>? _flushInFlight;
+  int _sessionGeneration = 0;
 
   bool get hasActiveSession => _session != null;
 
@@ -36,20 +37,29 @@ class ReadSessionApplicationService {
     bool incognito = false,
     int initialPageIndex = 1,
   }) async {
+    final int generation = ++_sessionGeneration;
+    final ReadSession? previous = _session;
     if (incognito) {
       _session = null;
       return;
     }
-    if (_session != null && _session!.comicId != comic.comicId) {
-      await _flushSession(_session!);
-      await _reportActivity(_session!);
+    if (previous != null && previous.comicId != comic.comicId) {
+      await _flushSession(previous);
+      if (generation != _sessionGeneration) {
+        return;
+      }
+      await _reportActivity(previous);
+      if (generation != _sessionGeneration) {
+        return;
+      }
     }
-    _session = ReadSession(
+    final ReadSession session = ReadSession(
       comic: comic,
       initialPageIndex: initialPageIndex,
       foregroundStartedAt: _now(),
     );
-    await _flushSession(_session!);
+    _session = session;
+    await _flushSession(session);
   }
 
   void updatePage(int pageIndex) {
@@ -84,6 +94,7 @@ class ReadSessionApplicationService {
   }
 
   Future<void> endSession() async {
+    _sessionGeneration++;
     final ReadSession? session = _session;
     if (session == null) {
       return;
@@ -137,20 +148,24 @@ class ReadSessionApplicationService {
     );
   }
 
-  Future<void> _flushSession(ReadSession session) async {
+  Future<void> _flushSession(ReadSession session) {
     final Future<void>? inFlight = _flushInFlight;
-    if (inFlight != null) {
-      await inFlight;
-    }
-    final Future<void> flushTask = _persistSession(session);
+    final Future<void> flushTask = Future<void>.microtask(() async {
+      if (inFlight != null) {
+        try {
+          await inFlight;
+        } catch (_) {
+          // The predecessor reports its error to its own caller.
+        }
+      }
+      await _persistSession(session);
+    });
     _flushInFlight = flushTask;
-    try {
-      await flushTask;
-    } finally {
+    return flushTask.whenComplete(() {
       if (identical(_flushInFlight, flushTask)) {
         _flushInFlight = null;
       }
-    }
+    });
   }
 
   Future<void> _persistSession(ReadSession session) async {

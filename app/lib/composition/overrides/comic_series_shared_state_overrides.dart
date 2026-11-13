@@ -12,9 +12,17 @@ import 'package:hentai_library/shared/presentation/providers/series_reading_cont
 import 'package:hentai_library/shared/presentation/providers/series_slot_providers.dart';
 import 'package:hentai_library/shared/presentation/providers/thumbnail_activity_providers.dart';
 import 'package:riverpod/misc.dart' show Override;
+import 'package:hentai_library/shared/presentation/providers/cover_command_providers.dart';
+import 'package:hentai_library/features/series/presentation/providers/series_cover_providers.dart';
 
 /// comic / series owner：跨壳层命令/查询、UI 槽位与 return-series 栈（#457 / #493 / ADR-0042）。
 List<Override> comicSeriesSharedStateOverrides() => <Override>[
+  setComicCoverFromPageCommandProvider.overrideWith(
+    (ref) => ref.watch(comicCoverSetCommandProvider),
+  ),
+  setSeriesCoverFromPageCommandProvider.overrideWith(
+    (ref) => ref.watch(seriesCoverSetCommandProvider),
+  ),
   rememberComicReturnSeriesCommandProvider.overrideWith(
     createRememberComicReturnSeriesCommand,
   ),

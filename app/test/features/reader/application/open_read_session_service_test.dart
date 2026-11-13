@@ -20,9 +20,11 @@ class _FakeComicRepository implements ComicLookupRepository {
   _FakeComicRepository({this.comic});
 
   final Comic? comic;
+  Future<Comic?>? pendingLookup;
 
   @override
-  Future<Comic?> findById(String comicId) async => comic;
+  Future<Comic?> findById(String comicId) async =>
+      pendingLookup == null ? comic : await pendingLookup!;
 
   @override
   @override
@@ -126,6 +128,43 @@ class _FakeNativeReaderPort implements NativeReaderPort {
   Future<void> clear() async {}
 }
 
+class _ControlledNativeReaderPort implements NativeReaderPort {
+  final firstOpen = Completer<void>();
+  final entered = Completer<void>();
+  final events = <String>[];
+  int opens = 0;
+  int? active;
+  Object? closeError;
+  Completer<void>? firstClose;
+  final closeEntered = Completer<void>();
+  int closes = 0;
+
+  @override
+  Future<void> openComic(ReaderComicRef comic) async {
+    final run = ++opens;
+    events.add('open:$run');
+    if (run == 1) {
+      entered.complete();
+      await firstOpen.future;
+    }
+    active = run;
+  }
+
+  @override
+  Future<void> closeComic(String comicId) async {
+    events.add('close');
+    if (++closes == 1 && firstClose != null) {
+      closeEntered.complete();
+      await firstClose!.future;
+    }
+    active = null;
+    if (closeError != null) throw closeError!;
+  }
+
+  @override
+  Future<void> clear() async {}
+}
+
 Comic _inputComic() {
   final DateTime now = DateTime.utc(2026, 1, 1);
   return Comic.restore(
@@ -165,6 +204,326 @@ OpenReadSessionService _service({
 
 void main() {
   group('OpenReadSessionService', () {
+    test(
+      'a hanging native timeout cleanup does not delay the timeout result',
+      () async {
+        final native = _ControlledNativeReaderPort()
+          ..firstClose = Completer<void>();
+        final service = OpenReadSessionService(
+          comicLookup: createComicReadQuery(
+            _FakeComicRepository(comic: _inputComic()),
+          ),
+          pageSource: _FakeComicPageSourcePort(
+            pages: [ReadSessionArchivePage(comicId: 'c1', pageIndex: 0)],
+          ),
+          readResumePage: (_) async => 1,
+          sessionPort: native,
+          openTimeout: const Duration(milliseconds: 40),
+        );
+        try {
+          await expectLater(
+            service
+                .open(comicId: 'c1')
+                .timeout(const Duration(milliseconds: 250)),
+            throwsA(
+              isA<ReadSessionPageLoadException>().having(
+                (e) => e.kind,
+                'kind',
+                ReadSessionFailureKind.timedOut,
+              ),
+            ),
+          );
+          expect(native.firstClose!.isCompleted, isFalse);
+        } finally {
+          native.firstClose!.complete();
+          native.firstOpen.complete();
+        }
+        await service.open(comicId: 'c1');
+        expect(native.active, 2);
+      },
+    );
+
+    test('cached loadPages cannot return a lifetime closed before its continuation', () async {
+      final service = _service(
+        pages: [ReadSessionArchivePage(comicId: 'c1', pageIndex: 0)],
+      );
+      await service.open(comicId: 'c1');
+      final pages = service.loadPages('c1');
+      final checked = expectLater(
+        pages,
+        throwsA(isA<ReadSessionPageLoadException>()),
+      );
+      await service.close('c1');
+      await checked;
+    });
+
+    test(
+      'delayed timeout cleanup finishes before reopening native resources',
+      () async {
+        final native = _ControlledNativeReaderPort()
+          ..firstClose = Completer<void>();
+        final service = OpenReadSessionService(
+          comicLookup: createComicReadQuery(
+            _FakeComicRepository(comic: _inputComic()),
+          ),
+          pageSource: _FakeComicPageSourcePort(
+            pages: [ReadSessionArchivePage(comicId: 'c1', pageIndex: 0)],
+          ),
+          readResumePage: (_) async => 1,
+          sessionPort: native,
+          openTimeout: const Duration(milliseconds: 40),
+        );
+        final old = service.open(comicId: 'c1');
+        final checked = expectLater(
+          old,
+          throwsA(isA<ReadSessionPageLoadException>()),
+        );
+        await native.closeEntered.future;
+        native.firstOpen.complete();
+        await Future<void>.delayed(Duration.zero);
+        await service.close('c1');
+        final next = service.open(comicId: 'c1');
+        await Future<void>.delayed(Duration.zero);
+        try {
+          expect(native.opens, 1);
+        } finally {
+          native.firstClose!.complete();
+        }
+        await checked;
+        await next;
+        expect(native.active, 2);
+      },
+    );
+
+    test('a closed lookup cannot block a later open or clean up its native session', () async {
+      final pending = Completer<Comic?>();
+      final repo = _FakeComicRepository(comic: _inputComic())
+        ..pendingLookup = pending.future;
+      final native = _ControlledNativeReaderPort()..firstOpen.complete();
+      final service = OpenReadSessionService(
+        comicLookup: createComicReadQuery(repo),
+        pageSource: _FakeComicPageSourcePort(
+          pages: [ReadSessionArchivePage(comicId: 'c1', pageIndex: 0)],
+        ),
+        readResumePage: (_) async => 1,
+        sessionPort: native,
+      );
+      final old = service.open(comicId: 'c1');
+      final checked = expectLater(
+        old,
+        throwsA(isA<ReadSessionPageLoadException>()),
+      );
+      await Future<void>.delayed(Duration.zero);
+      await service.close('c1');
+      repo.pendingLookup = null;
+      await service.open(comicId: 'c1');
+      expect(native.active, 1);
+      pending.complete(_inputComic());
+      await checked;
+      expect(native.active, 1);
+      expect(native.events, ['close', 'open:1']);
+    });
+
+    test('concurrent open options and loadPages share only the native page-list operation', () async {
+      final native = _ControlledNativeReaderPort();
+      final pages = _FakeComicPageSourcePort(
+        pages: [
+          ReadSessionArchivePage(comicId: 'c1', pageIndex: 0),
+          ReadSessionArchivePage(comicId: 'c1', pageIndex: 1),
+        ],
+      );
+      final service = OpenReadSessionService(
+        comicLookup: createComicReadQuery(
+          _FakeComicRepository(comic: _inputComic()),
+        ),
+        pageSource: pages,
+        readResumePage: (_) async => 2,
+        sessionPort: native,
+      );
+      final ordinary = service.open(comicId: 'c1');
+      final incognito = service.open(comicId: 'c1', incognito: true);
+      final listed = service.loadPages('c1');
+      await native.entered.future;
+      native.firstOpen.complete();
+      expect((await ordinary).resumePageIndex, 2);
+      expect((await incognito).resumePageIndex, 1);
+      expect(await listed, hasLength(2));
+      expect(native.opens, 1);
+      expect(pages.loadPagesCallCount, 1);
+    });
+
+    test(
+      'a reopen waiting for uncancellable native work retains its own timeout',
+      () async {
+        final native = _ControlledNativeReaderPort();
+        final service = OpenReadSessionService(
+          comicLookup: createComicReadQuery(
+            _FakeComicRepository(comic: _inputComic()),
+          ),
+          pageSource: _FakeComicPageSourcePort(
+            pages: [ReadSessionArchivePage(comicId: 'c1', pageIndex: 0)],
+          ),
+          readResumePage: (_) async => 1,
+          sessionPort: native,
+          openTimeout: const Duration(milliseconds: 40),
+        );
+        final old = service.open(comicId: 'c1');
+        final checked = expectLater(
+          old,
+          throwsA(isA<ReadSessionPageLoadException>()),
+        );
+        await native.entered.future;
+        await service.close('c1');
+        await expectLater(
+          service.open(comicId: 'c1'),
+          throwsA(
+            isA<ReadSessionPageLoadException>().having(
+              (e) => e.kind,
+              'kind',
+              ReadSessionFailureKind.timedOut,
+            ),
+          ),
+        );
+        expect(native.opens, 1);
+        native.firstOpen.complete();
+        await checked;
+        await service.open(comicId: 'c1');
+        expect(native.active, 2);
+      },
+    );
+
+    test('close failure remains with its caller and late cleanup cannot replace it', () async {
+      final error = StateError('native close');
+      final native = _ControlledNativeReaderPort()..closeError = error;
+      final service = OpenReadSessionService(
+        comicLookup: createComicReadQuery(
+          _FakeComicRepository(comic: _inputComic()),
+        ),
+        pageSource: _FakeComicPageSourcePort(
+          pages: [ReadSessionArchivePage(comicId: 'c1', pageIndex: 0)],
+        ),
+        readResumePage: (_) async => 1,
+        sessionPort: native,
+      );
+      final old = service.open(comicId: 'c1');
+      final checked = expectLater(
+        old,
+        throwsA(isA<ReadSessionPageLoadException>()),
+      );
+      await native.entered.future;
+      await expectLater(service.close('c1'), throwsA(same(error)));
+      native.firstOpen.complete();
+      await checked;
+      native.closeError = null;
+      await service.open(comicId: 'c1');
+      expect(native.active, 2);
+    });
+
+    for (final reopenImmediately in [false, true]) {
+      test(
+        'close prevents a late native open from owning a reopened session: $reopenImmediately',
+        () async {
+          final native = _ControlledNativeReaderPort();
+          final pages = _FakeComicPageSourcePort(
+            pages: [ReadSessionArchivePage(comicId: 'c1', pageIndex: 0)],
+          );
+          final service = OpenReadSessionService(
+            comicLookup: createComicReadQuery(
+              _FakeComicRepository(comic: _inputComic()),
+            ),
+            pageSource: pages,
+            readResumePage: (_) async => 1,
+            sessionPort: native,
+          );
+          final old = service.open(comicId: 'c1');
+          final oldChecked = expectLater(
+            old,
+            throwsA(isA<ReadSessionPageLoadException>()),
+          );
+          await native.entered.future;
+          await service.close('c1');
+          final next = reopenImmediately ? service.open(comicId: 'c1') : null;
+          await Future<void>.delayed(Duration.zero);
+          try {
+            expect(native.opens, 1);
+          } finally {
+            native.firstOpen.complete();
+          }
+          await oldChecked;
+          final reopened = await (next ?? service.open(comicId: 'c1'));
+          expect(reopened.totalPages, 1);
+          expect(native.active, 2);
+          expect(native.events, ['open:1', 'close', 'close', 'open:2']);
+          expect(pages.loadPagesCallCount, 1);
+        },
+      );
+    }
+
+    test(
+      'timed out native open is closed when it eventually completes',
+      () async {
+        final native = _ControlledNativeReaderPort();
+        final pages = _FakeComicPageSourcePort(
+          pages: [ReadSessionArchivePage(comicId: 'c1', pageIndex: 0)],
+        );
+        final service = OpenReadSessionService(
+          comicLookup: createComicReadQuery(
+            _FakeComicRepository(comic: _inputComic()),
+          ),
+          pageSource: pages,
+          readResumePage: (_) async => 1,
+          sessionPort: native,
+          openTimeout: const Duration(milliseconds: 40),
+        );
+        await expectLater(
+          service.open(comicId: 'c1'),
+          throwsA(
+            isA<ReadSessionPageLoadException>().having(
+              (e) => e.kind,
+              'kind',
+              ReadSessionFailureKind.timedOut,
+            ),
+          ),
+        );
+        native.firstOpen.complete();
+        await Future<void>.delayed(Duration.zero);
+        expect(native.active, isNull);
+        expect(pages.loadPagesCallCount, 0);
+        await service.open(comicId: 'c1');
+        expect(native.active, 2);
+      },
+    );
+
+    test(
+      'close during resume lookup prevents an obsolete open result',
+      () async {
+        final resume = Completer<int?>();
+        final entered = Completer<void>();
+        final service = OpenReadSessionService(
+          comicLookup: createComicReadQuery(
+            _FakeComicRepository(comic: _inputComic()),
+          ),
+          pageSource: _FakeComicPageSourcePort(
+            pages: [ReadSessionArchivePage(comicId: 'c1', pageIndex: 0)],
+          ),
+          readResumePage: (_) {
+            entered.complete();
+            return resume.future;
+          },
+          sessionPort: _FakeNativeReaderPort(),
+        );
+        final old = service.open(comicId: 'c1');
+        final checked = expectLater(
+          old,
+          throwsA(isA<ReadSessionPageLoadException>()),
+        );
+        await entered.future;
+        await service.close('c1');
+        resume.complete(1);
+        await checked;
+      },
+    );
+
     test('open throws when comic is missing', () async {
       final OpenReadSessionService service = _service(comic: null);
       expect(
@@ -279,6 +638,7 @@ void main() {
           ),
         ),
       );
+      await Future<void>.delayed(Duration.zero);
       expect(sessionPort.closedComicIds, <String>['c1']);
     });
 

@@ -2,3 +2,5 @@
 library;
 
 export 'package:hentai_library/features/comic/presentation/providers/comic_cover_commands.dart';
+export 'package:hentai_library/shared/application/contracts/cover_commands.dart'
+    show ComicCoverSetCommand;
