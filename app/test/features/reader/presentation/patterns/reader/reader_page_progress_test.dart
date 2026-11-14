@@ -8,6 +8,56 @@ import '../../../../../support/pump_app.dart';
 
 void main() {
   group('ReaderPageProgress', () {
+    testWidgets('large text and long page counts fit a compact viewport', (
+      tester,
+    ) async {
+      await pumpApp(
+        tester,
+        home: MediaQuery(
+          data: const MediaQueryData(
+            size: Size(390, 800),
+            textScaler: TextScaler.linear(2),
+          ),
+          child: Scaffold(
+            body: Center(
+              child: SizedBox(
+                width: 320,
+                child: ReaderPageProgress(
+                  currentPage: 12345,
+                  totalPages: 123456,
+                  onPageChanged: (_) {},
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      expect(tester.takeException(), isNull);
+      final label = find.text('123456');
+      final text = tester.renderObject<RenderBox>(label);
+      expect(text.size.width, greaterThan(40));
+    });
+
+    for (final total in [0, 1]) {
+      testWidgets('progress is disabled when totalPages=$total', (
+        tester,
+      ) async {
+        await pumpApp(
+          tester,
+          home: Scaffold(
+            body: ReaderPageProgress(
+              currentPage: 1,
+              totalPages: total,
+              onPageChanged: (_) => fail('unexpected page change'),
+            ),
+          ),
+        );
+        final slider = tester.widget<M3ESlider>(find.byType(M3ESlider));
+        expect(slider.onChanged, isNull);
+        expect(slider.onChangeEnd, isNull);
+      });
+    }
+
     testWidgets(
       'onChangeEnd uses last onChanged when callback value is stale',
       (WidgetTester tester) async {

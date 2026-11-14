@@ -66,8 +66,8 @@ class _ReaderPageProgressState extends State<ReaderPageProgress> {
       label: ReaderPageCopy.pageProgressLabel(_displayPage, _safeTotal),
       child: Row(
         children: <Widget>[
-          SizedBox(
-            width: 40,
+          ConstrainedBox(
+            constraints: const BoxConstraints(minWidth: 40),
             child: Text('$_displayPage', style: pageNumberStyle),
           ),
           Expanded(
@@ -77,12 +77,12 @@ class _ReaderPageProgressState extends State<ReaderPageProgress> {
               viewportWidth: viewportWidth,
               autoPlayEnabled: widget.autoPlayEnabled,
               autoPlayIntervalSeconds: widget.autoPlayIntervalSeconds,
-              onChanged: _onChanged,
-              onChangeEnd: _onChangeEnd,
+              onChanged: widget.totalPages > 1 ? _onChanged : null,
+              onChangeEnd: widget.totalPages > 1 ? _onChangeEnd : null,
             ),
           ),
-          SizedBox(
-            width: 40,
+          ConstrainedBox(
+            constraints: const BoxConstraints(minWidth: 40),
             child: Text(
               '$_safeTotal',
               textAlign: TextAlign.end,
@@ -111,8 +111,8 @@ class _ReaderProgressSlider extends StatelessWidget {
   final double viewportWidth;
   final bool autoPlayEnabled;
   final int autoPlayIntervalSeconds;
-  final ValueChanged<double> onChanged;
-  final ValueChanged<double> onChangeEnd;
+  final ValueChanged<double>? onChanged;
+  final ValueChanged<double>? onChangeEnd;
 
   @override
   Widget build(BuildContext context) {
@@ -126,7 +126,8 @@ class _ReaderProgressSlider extends StatelessWidget {
       return M3ESlider.wavy(
         value: value,
         min: 1,
-        max: safeTotal.toDouble(),
+        // M3E requires a non-empty range even when the slider is disabled.
+        max: safeTotal > 1 ? safeTotal.toDouble() : 2,
         size: M3ESliderSize.xs,
         trackThickness: trackThickness,
         thumbLength: thumbLength,
@@ -144,7 +145,8 @@ class _ReaderProgressSlider extends StatelessWidget {
     return M3ESlider(
       value: value,
       min: 1,
-      max: safeTotal.toDouble(),
+      // M3E requires a non-empty range even when the slider is disabled.
+      max: safeTotal > 1 ? safeTotal.toDouble() : 2,
       size: M3ESliderSize.xs,
       trackThickness: trackThickness,
       thumbLength: thumbLength,
