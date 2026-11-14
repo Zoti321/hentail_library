@@ -17,7 +17,7 @@ usage() {
   rust-test       cargo test（core/ workspace）
   codegen-drift   FRB generate + build_runner，随后检查 git 工作区无漂移
   dart-static     dart format --set-exit-if-changed + flutter analyze
-  dart-lint       dart_code_linter 规则门禁（app/lib，硬失败）
+  dart-lint       dart_code_linter 规则门禁（app/lib + app/test，硬失败）
   dart-test       cargo build hentai_flutter（FRB 线缝用）+ flutter test ← app/test/gate/manifest.txt
   all             以上全部
 
@@ -74,17 +74,17 @@ run_dart_static() {
   echo "==> gate-dart-static"
   (
     cd "$APP_DIR"
-    dart format --output=none --set-exit-if-changed lib test
-    flutter analyze
+    dart format --output=none --set-exit-if-changed lib test widgetbook
+    flutter analyze --fatal-infos
   )
 }
 
 run_dart_lint() {
   echo "==> gate-dart-lint"
-  # 规则集与棘轮见 app/analysis_options.yaml -> dart_code_linter。
-  # 任何级别（style / performance / warning / error）都硬失败。
+  # One package options file scopes production and test rules with include.
+  # Every diagnostic severity fails, including style and performance.
   (cd "$APP_DIR" &&
-    dart run dart_code_linter:metrics analyze lib \
+    dart run dart_code_linter:metrics analyze lib test \
       --no-congratulate \
       --fatal-style \
       --fatal-performance \

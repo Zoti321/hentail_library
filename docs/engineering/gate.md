@@ -40,11 +40,52 @@ The rubric is an audit heuristic, not permission to delete tests: architecture-g
 
 Demotion requires a PR listing each path, rubric and reason, plus manifest/self-test updates. Protect architecture/layout, FRB wire, thin-edge and minimum App/Lab smoke coverage unless paired with the corresponding rule/ADR migration. Keep a demoted test until a successful focused run or nightly validates it; retire it in a later PR linked to that decision. Check actual nightly path selection before claiming coverage. Moves retain existing assertions and fast-track coverage.
 
+## Dart analysis
+
+The package analysis options inherit Flutter's recommended lints, enable strict
+casts, inference and raw types, and check discarded/unawaited futures. Context
+usage across asynchronous gaps and deprecated API diagnostics are not globally
+suppressed. Await dependent work, return its future, or explicitly mark independent
+work with `unawaited`; the latter does not handle errors. Preserve the existing
+error recipient or add one at the owning boundary when needed.
+
+Riverpod lint runs as a top-level analyzer plugin through `dart-static`, using the
+version declared in the analysis options. Keep it compatible with the dependency
+and CI SDK. Plugin ignores use the `riverpod_lint/` diagnostic prefix and must be
+local with an adjacent reason. Existing exceptions cover imperative edit/cursor
+observations, test fixture instrumentation, bootstrap scopes hidden behind host
+widgets, and deliberate short-lived reads/subscriptions. They do not authorize
+blanket exceptions for new code or extending provider lifetimes to silence lints.
+UI context and image decoding stay in UI adapters; providers receive callbacks.
+
+Analyzer still checks generated code for type errors. FRB 2.13 emits an opaque
+`RustArcStaticData` without inferable generic arguments. Its generator preamble
+suppresses only `inference_failure_on_instance_creation` in generated FRB output;
+remove that workaround when the generator supplies the type. Do not hand-edit
+generated output or exclude all generated files from Analyzer.
+
 ## DCL
 
-`dart-lint` runs dart_code_linter on `app/lib`; generated files are excluded. Every diagnostic severity fails. `app/analysis_options.yaml` owns rules and the `rules-exclude` ratchet: exemptions only shrink. Fix a legacy file, remove its exemption, then rerun dart-lint. Enable a new rule only after a clean local run. Metrics are currently outside the hard gate.
+`dart-lint` runs dart_code_linter on production and tests in one CLI invocation;
+generated files are excluded. Every diagnostic severity fails. The single package analysis
+options file owns all rules. Per-rule `include` patterns keep production rules
+on `lib/**`, assertion/file-name rules on `test/**`, and private-test-declaration
+rules on `test/**/*_test.dart` (shared support helpers stay importable). This keeps Widget organization
+rules out of test fixtures without disabling test lint coverage. The registered
+color assertion helper performs actual channel assertions, rather than bypassing
+the missing-assertion rule. The shared `rules-exclude` list stays empty; exemptions
+may only shrink. Enable a new rule only after a clean local run. Metrics are
+currently outside the hard gate.
 
-Keep DCL out of top-level analyzer plugins to avoid duplicate/fatal analyzer diagnostics; riverpod_lint is not enabled in the Gate analyzer configuration. Deliberately excluded rules include non-ASCII/comment punctuation requirements (Chinese source text), trailing commas (formatter conflict), newline-before-return (format churn), and prefer-first-or-null (conflicts with prefer-first). Rules requiring mandatory configuration remain disabled until configured.
+Keep DCL out of top-level analyzer plugins to avoid duplicate/fatal analyzer
+diagnostics. Deliberately excluded rules include non-ASCII/comment punctuation
+requirements (Chinese source text), trailing commas (formatter conflict),
+newline-before-return (format churn), and prefer-first-or-null (conflicts with
+prefer-first). Rules requiring mandatory configuration remain disabled until
+configured. Existing Widget-factory name exceptions implement route, composition
+slot or Settings section callback contracts. DCL matches names, not owners: audit
+all matching declarations when adding or renaming a function, remove stale names,
+and do not reuse an exempt name to bypass the rule.
 
 DCL's installed rule implementation may be smaller than its presets; validate new rule names with `dart run dart_code_linter:metrics analyze lib -c`. The current DCL fixer can corrupt overlapping replacements: apply at most one rule at a time, inspect the diff and verify Dart formatting/parsing afterward.
 

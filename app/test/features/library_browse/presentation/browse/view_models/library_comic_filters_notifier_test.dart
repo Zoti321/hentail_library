@@ -18,7 +18,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../../support/fakes/author_repository_test_fakes.dart';
 
-ProviderContainer createContainer() {
+ProviderContainer _createContainer() {
   final ProviderContainer container = ProviderContainer(
     overrides: <Override>[
       ...libraryBrowsePreferencesOverrides(),
@@ -39,7 +39,7 @@ void main() {
   test(
     'selecting readAt for the first time defaults to descending, then toggles',
     () async {
-      final ProviderContainer container = createContainer();
+      final ProviderContainer container = _createContainer();
       await container.read(libraryComicFiltersProvider.future);
 
       await container
@@ -64,7 +64,7 @@ void main() {
   );
 
   test('selecting a non-readAt field for the first time still defaults to ascending', () async {
-    final ProviderContainer container = createContainer();
+    final ProviderContainer container = _createContainer();
     await container.read(libraryComicFiltersProvider.future);
 
     await container
@@ -79,7 +79,7 @@ void main() {
   });
 
   test('resetAll restores every comics filter and sort to defaults', () async {
-    final ProviderContainer container = createContainer();
+    final ProviderContainer container = _createContainer();
     await container.read(libraryComicFiltersProvider.future);
     final LibraryComicFiltersNotifier notifier = container.read(
       libraryComicFiltersProvider.notifier,
@@ -115,7 +115,7 @@ void main() {
   });
 
   test('preferences persist across containers', () async {
-    final ProviderContainer first = createContainer();
+    final ProviderContainer first = _createContainer();
     await first.read(libraryComicFiltersProvider.future);
     final LibraryComicFiltersNotifier notifier = first.read(
       libraryComicFiltersProvider.notifier,
@@ -127,7 +127,7 @@ void main() {
     await notifier.setSortField(LibraryComicSortField.fileSize);
     first.dispose();
 
-    final ProviderContainer second = createContainer();
+    final ProviderContainer second = _createContainer();
     final LibraryComicBrowsePreferences state = await second.read(
       libraryComicFiltersProvider.future,
     );
@@ -141,14 +141,14 @@ void main() {
   });
 
   test('session include-sets do not persist across containers', () async {
-    final ProviderContainer first = createContainer();
+    final ProviderContainer first = _createContainer();
     await first.read(libraryComicFiltersProvider.future);
     await first
         .read(libraryComicFiltersProvider.notifier)
         .toggleIncludeSet(LibraryIncludeSetKind.language, 'zh');
     first.dispose();
 
-    final ProviderContainer second = createContainer();
+    final ProviderContainer second = _createContainer();
     final LibraryComicBrowsePreferences state = await second.read(
       libraryComicFiltersProvider.future,
     );
@@ -156,7 +156,7 @@ void main() {
   });
 
   test('derived query filter and isCustomized reflect current state', () async {
-    final ProviderContainer container = createContainer();
+    final ProviderContainer container = _createContainer();
     await container.read(libraryComicFiltersProvider.future);
     expect(container.read(libraryComicFiltersIsCustomizedProvider), isFalse);
 
@@ -175,7 +175,7 @@ void main() {
   test(
     'tag and author tri-state toggles survive to the query filter',
     () async {
-      final ProviderContainer container = createContainer();
+      final ProviderContainer container = _createContainer();
       await container.read(libraryComicFiltersProvider.future);
       final LibraryComicFiltersNotifier notifier = container.read(
         libraryComicFiltersProvider.notifier,
@@ -197,7 +197,7 @@ void main() {
   );
 
   test('parody and character tri-state stay session-scoped', () async {
-    final ProviderContainer first = createContainer();
+    final ProviderContainer first = _createContainer();
     await first.read(libraryComicFiltersProvider.future);
     final LibraryComicFiltersNotifier notifier = first.read(
       libraryComicFiltersProvider.notifier,
@@ -227,7 +227,7 @@ void main() {
     expect(filter.charactersExclude, <String>{'Saber'});
     first.dispose();
 
-    final ProviderContainer second = createContainer();
+    final ProviderContainer second = _createContainer();
     state = await second.read(libraryComicFiltersProvider.future);
     expect(state.parodyFilter.isActive, isFalse);
     expect(state.characterFilter.isActive, isFalse);

@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 
-List<String> readGateManifestEntries() {
+List<String> _readGateManifestEntries() {
   final File manifest = File(p.join('test', 'gate', 'manifest.txt'));
   return manifest
       .readAsLinesSync()
@@ -15,7 +15,7 @@ List<String> readGateManifestEntries() {
 void main() {
   group('gate manifest', () {
     test('every entry points to an existing test file or directory', () {
-      final List<String> missing = readGateManifestEntries()
+      final List<String> missing = _readGateManifestEntries()
           .where(
             (String entry) =>
                 FileSystemEntity.typeSync(entry) ==
@@ -26,13 +26,13 @@ void main() {
     });
 
     test('entries are unique', () {
-      final List<String> entries = readGateManifestEntries();
+      final List<String> entries = _readGateManifestEntries();
       expect(entries.toSet().length, entries.length);
     });
 
     test('covers the thin-edge seams, FRB wire, layout and app smoke', () {
       expect(
-        readGateManifestEntries(),
+        _readGateManifestEntries(),
         containsAll(<String>[
           'test/core',
           'test/infrastructure',

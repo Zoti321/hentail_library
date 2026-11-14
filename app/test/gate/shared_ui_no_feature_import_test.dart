@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 
 import 'shared_feature_import_rules.dart';
 
-List<String> readSharedUiFeatureImportAllowlist() {
+List<String> _readSharedUiFeatureImportAllowlist() {
   final File manifest = File(
     p.join('test', 'gate', 'shared_ui_feature_import_allowlist.txt'),
   );
@@ -17,7 +17,7 @@ List<String> readSharedUiFeatureImportAllowlist() {
       .toList();
 }
 
-List<String> collectSharedUiFeatureImportViolations(Directory libDir) {
+List<String> _collectSharedUiFeatureImportViolations(Directory libDir) {
   final List<String> roots = <String>[
     'shared/ui/widgets',
     'shared/ui/layout',
@@ -40,7 +40,7 @@ List<String> collectSharedUiFeatureImportViolations(Directory libDir) {
       final String rel = p
           .relative(entity.path, from: libDir.path)
           .replaceAll(r'\', '/');
-      if (readSharedUiFeatureImportAllowlist().contains(rel)) {
+      if (_readSharedUiFeatureImportAllowlist().contains(rel)) {
         continue;
       }
       final List<String> lines = entity.readAsLinesSync();
@@ -62,7 +62,7 @@ void main() {
   });
 
   test('shared UI does not import features (allowlist contract)', () {
-    final List<String> violations = collectSharedUiFeatureImportViolations(
+    final List<String> violations = _collectSharedUiFeatureImportViolations(
       libDir,
     );
     expect(

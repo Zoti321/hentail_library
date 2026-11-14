@@ -163,7 +163,7 @@ void main() {
       } else {
         pending.complete(_state('late'));
       }
-      await result;
+      await expectLater(result, completes);
     });
 
     test('disposed sidebar write preserves its result: fail=$fail', () async {

@@ -4,14 +4,14 @@ import 'package:flutter_test/flutter_test.dart';
 
 /// 原 `lib/md3e` 搬迁后的 MD3E 代码所在目录（#413）。Baseline 的 `shared/ui/widgets`
 /// 与 feature 内既有代码不在本门禁范围内。
-const List<String> roots = <String>[
+const List<String> _roots = <String>[
   'lib/shared/ui/patterns',
   'lib/shared/ui/shell',
 ];
 
-List<File> dartFiles() {
+List<File> _dartFiles() {
   final List<File> files = <File>[];
-  for (final String root in roots) {
+  for (final String root in _roots) {
     final Directory dir = Directory(root);
     if (!dir.existsSync()) {
       continue;
@@ -31,7 +31,7 @@ void main() {
     final RegExp materialDialogPattern = RegExp(r'return\s+Dialog\s*\(');
 
     final List<String> violations = <String>[];
-    for (final File file in dartFiles()) {
+    for (final File file in _dartFiles()) {
       final String content = file.readAsStringSync();
       if (showDialogPattern.hasMatch(content)) {
         violations.add('${file.path}: showDialog');

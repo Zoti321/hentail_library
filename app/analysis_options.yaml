@@ -1,7 +1,8 @@
-# `riverpod_lint` 在 pubspec 中保留；接入 `plugins: riverpod_lint` 后 CI（CI=true analyze）
-# 会对既有代码报 avoid_build_context_in_providers / only_use_keep_alive_inside_keep_alive 等
-# 数十处 info·warning。Gate 暂不启用插件；清理后可打开 plugins 段。
 analyzer:
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
   exclude:
     - rust_builder/**
     - build/**
@@ -10,95 +11,123 @@ analyzer:
     - windows/**
     - macos/**
     - linux/**
-  errors:
-    deprecated_member_use: ignore
-    use_build_context_synchronously: ignore
 include: package:flutter_lints/flutter.yaml
+
+plugins:
+  riverpod_lint: 3.1.9
 
 linter:
   rules:
+    unawaited_futures: true
+    discarded_futures: true
 
-# --- dart_code_linter ------------------------------------------------
-# Gate: ./scripts/run-gate.sh dart-lint（CI job gate-dart-lint）。
-# 只经 CLI + `dart_code_linter.rules` 生效；**不要**加顶层 `plugins:`，
-# 否则 `flutter analyze`（CI=true 下 info 亦致命）会重复计算且无法按文件棘轮。
-#
-# 已对齐 DCL `recommended` 预设中与仓库约定不冲突的部分；本轮新增：
-#   avoid-dynamic / avoid-global-state / avoid-missing-enum-constant-in-map /
-#   avoid-non-exhaustive-switch-on-sealed-classes / avoid-redundant-async /
-#   avoid-throw-in-catch-block / avoid-unnecessary-setstate / prefer-async-await /
-#   prefer-commenting-analyzer-ignores / prefer-correct-type-name /
-#   use-setstate-synchronously / prefer-iterable-of
-#
-# 刻意不启用（理由见 docs/engineering/gate.md「DCL」节）：
-#   avoid-non-ascii-symbols     中文注释/文案，必然满屏
-#   prefer-trailing-comma       与 Dart 3.13 `dart format` 互相覆盖
-#   newline-before-return       纯格式 churn；DCL `fix` 重叠替换会损坏文件
-#   format-comment              中文文档注释不以英文句点结尾
-#   prefer-moving-to-variable / avoid-non-null-assertion / no-magic-number /
-#   member-ordering / no-empty-block / avoid-unused-parameters /
-#   avoid-nested-conditional-expressions —— 存量债，见 gate.md 待清偿清单
-# 注意：`prefer-first-or-null` 与 `prefer-first` 互斥（已选后者）；`avoid-banned-imports` /
-# `ban-name` 需 mandatory 配置，暂不启用。
+# One configuration owns all rules; per-rule includes distinguish lib, test,
+# and test case declarations (shared support helpers remain importable).
+# DCL runs through the CLI, not an analyzer plugin. Chinese punctuation and
+# dart format govern comments/trailing commas; prefer-first excludes first-or-null.
+# Widget factory exceptions implement fixed route/slot/Settings contracts.
+# DCL matches exception names globally: review new same-name declarations.
 dart_code_linter:
   rules:
-    - always-remove-listener
-    - avoid-border-all
-    - avoid-cascade-after-if-null
-    - avoid-collection-methods-with-unrelated-types
-    - avoid-double-slash-imports
-    - avoid-duplicate-exports
-    - avoid-dynamic
-    - avoid-expanded-as-spacer
-    - avoid-global-state
-    - avoid-missing-enum-constant-in-map
-    - avoid-non-configurable-callbacks-in-init-state
-    - avoid-non-exhaustive-switch-on-sealed-classes
-    - avoid-redundant-async
-    - avoid-redundant-async-on-load
-    - avoid-shrink-wrap-in-lists
-    - avoid-throw-in-catch-block
-    - avoid-top-level-members-in-tests
-    - avoid-unnecessary-conditionals
-    - avoid-unnecessary-setstate
-    - avoid-unnecessary-type-assertions
-    - avoid-unnecessary-type-casts
-    - avoid-unrelated-type-assertions
-    - avoid-wrapping-in-padding
-    - check-for-equals-in-render-object-setters
-    - consistent-update-render-object
-    - double-literal-format
-    - list-all-equatable-fields
-    - missing-test-assertion
-    - no-blank-line-before-single-return
-    - no-boolean-literal-compare
-    - no-equal-then-else
-    - only-barrel-import
-    - prefer-async-await
-    - prefer-commenting-analyzer-ignores
-    - prefer-correct-test-file-name
-    - prefer-conditional-expressions
-    - prefer-correct-type-name
-    - prefer-define-hero-tag
-    - prefer-enums-by-name
-    - prefer-first
-    - prefer-immediate-return
-    - prefer-iterable-of
-    - prefer-last
-    - prefer-media-query-direct-access
-    - prefer-single-quotes
-    - use-setstate-synchronously
-    - prefer-using-list-view
-    - tag-name
-    # --- Flutter 组件规范：一文件一 Widget / 抽回调 / 不返回 Widget ---
-    # `ignore-private-widgets`：允许同文件挂内部私有子部件（_Foo），
-    # 只要求「一个文件一个对外 Widget」；避免为纯实现细节扩张 public API。
+    - always-remove-listener:
+        include: [lib/**]
+    - avoid-border-all:
+        include: [lib/**]
+    - avoid-cascade-after-if-null:
+        include: [lib/**]
+    - avoid-collection-methods-with-unrelated-types:
+        include: [lib/**]
+    - avoid-double-slash-imports:
+        include: [lib/**]
+    - avoid-duplicate-exports:
+        include: [lib/**]
+    - avoid-dynamic:
+        include: [lib/**]
+    - avoid-expanded-as-spacer:
+        include: [lib/**]
+    - avoid-global-state:
+        include: [lib/**]
+    - avoid-missing-enum-constant-in-map:
+        include: [lib/**]
+    - avoid-non-configurable-callbacks-in-init-state:
+        include: [lib/**]
+    - avoid-non-exhaustive-switch-on-sealed-classes:
+        include: [lib/**]
+    - avoid-redundant-async:
+        include: [lib/**]
+    - avoid-redundant-async-on-load:
+        include: [lib/**]
+    - avoid-shrink-wrap-in-lists:
+        include: [lib/**]
+    - avoid-throw-in-catch-block:
+        include: [lib/**]
+    - avoid-top-level-members-in-tests:
+        include: [test/**/*_test.dart]
+    - avoid-unnecessary-conditionals:
+        include: [lib/**]
+    - avoid-unnecessary-setstate:
+        include: [lib/**]
+    - avoid-unnecessary-type-assertions:
+        include: [lib/**]
+    - avoid-unnecessary-type-casts:
+        include: [lib/**]
+    - avoid-unrelated-type-assertions:
+        include: [lib/**]
+    - avoid-wrapping-in-padding:
+        include: [lib/**]
+    - check-for-equals-in-render-object-setters:
+        include: [lib/**]
+    - consistent-update-render-object:
+        include: [lib/**]
+    - double-literal-format:
+        include: [lib/**]
+    - list-all-equatable-fields:
+        include: [lib/**]
+    - no-blank-line-before-single-return:
+        include: [lib/**]
+    - no-boolean-literal-compare:
+        include: [lib/**]
+    - no-equal-then-else:
+        include: [lib/**]
+    - only-barrel-import:
+        include: [lib/**]
+    - prefer-async-await:
+        include: [lib/**]
+    - prefer-commenting-analyzer-ignores:
+        include: [lib/**]
+    - prefer-conditional-expressions:
+        include: [lib/**]
+    - prefer-correct-type-name:
+        include: [lib/**]
+    - prefer-define-hero-tag:
+        include: [lib/**]
+    - prefer-enums-by-name:
+        include: [lib/**]
+    - prefer-first:
+        include: [lib/**]
+    - prefer-immediate-return:
+        include: [lib/**]
+    - prefer-iterable-of:
+        include: [lib/**]
+    - prefer-last:
+        include: [lib/**]
+    - prefer-media-query-direct-access:
+        include: [lib/**]
+    - prefer-single-quotes:
+        include: [lib/**]
+    - use-setstate-synchronously:
+        include: [lib/**]
+    - prefer-using-list-view:
+        include: [lib/**]
+    - tag-name:
+        include: [lib/**]
     - prefer-single-widget-per-file:
+        include: [lib/**]
         ignore-private-widgets: true
-    - prefer-extracting-callbacks
-    # 路由 / 分区适配器：签名由 GoRouter / SettingsPage 回调 typedef 固定为返回
-    # Widget(s)，无法改成 Widget 类；按名豁免（其余代码仍受管）。
+    - prefer-extracting-callbacks:
+        include: [lib/**]
     - avoid-returning-widgets:
+        include: [lib/**]
         ignored-names:
           - buildSharedComicDetailPage
           - buildSharedSeriesDetailPage
@@ -110,7 +139,10 @@ dart_code_linter:
           - _sectionsForCategory
           - readerSettingsSections
           - libraryAdminShellFeedbackBelowTitleBar
-  # 棘轮已清空（2026-11-12）：历史上列在此处的组件文件已全部修复，
-  # 一文件一 Widget / 抽回调 / 不返回 Widget 三条规则对 lib 全域生效。
-  # 后续如需临时豁免，只允许「只减不增」地逐个文件登记，修好后立即删行。
+    - missing-test-assertion:
+        include: [test/**]
+        include-assertions:
+          - _expectColorClose
+    - prefer-correct-test-file-name:
+        include: [test/**]
   rules-exclude: []

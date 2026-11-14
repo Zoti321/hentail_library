@@ -11,7 +11,7 @@ import '../gate/lib_layout_scan_helpers.dart';
 
 // UI libraries and their complete runtime closure. Flutter SDK internals are
 // framework dependencies; no product, state-management, router or window plugin.
-const designSystemUiPackages = <String>{
+const _designSystemUiPackages = <String>{
   'animations',
   'clock',
   'collection',
@@ -55,7 +55,7 @@ void main() {
           roots: files.map((file) => file.uri),
           appLib: lib.uri,
           layer: layer.uri,
-          uiPackages: designSystemUiPackages,
+          uiPackages: _designSystemUiPackages,
         ),
         isEmpty,
       );
