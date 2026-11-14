@@ -522,11 +522,13 @@ class _GroupingRadioRow extends StatelessWidget {
                 SizedBox(
                   width: 24,
                   height: 24,
-                  child: Radio<bool>(
-                    value: true,
+                  child: RadioGroup<bool>(
                     groupValue: selected,
                     onChanged: (_) => onSelected(),
-                    fillColor: WidgetStatePropertyAll<Color>(cs.primary),
+                    child: Radio<bool>(
+                      value: true,
+                      fillColor: WidgetStatePropertyAll<Color>(cs.primary),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 8),

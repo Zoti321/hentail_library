@@ -103,7 +103,7 @@ NamePinyinIndexEntry buildNamePinyinIndexEntry(String name) {
   return NamePinyinIndexEntry(
     name: name,
     nameLower: name.toLowerCase(),
-    fullPinyin: pinyin(
+    fullPinyin: _pinyinKey(
       name,
       options: const PinyinOptions(
         toneType: ToneType.none,
@@ -111,7 +111,7 @@ NamePinyinIndexEntry buildNamePinyinIndexEntry(String name) {
         v: true,
       ),
     ).toLowerCase(),
-    initials: pinyin(
+    initials: _pinyinKey(
       name,
       options: const PinyinOptions(
         pattern: PinyinPattern.first,
@@ -164,4 +164,12 @@ String normalizeLatinPinyinQuery(String query) {
         _toneMarkVowels,
         (Match match) => _toneMarkToAscii[match.group(0)!] ?? match.group(0)!,
       );
+}
+
+String _pinyinKey(String name, {required PinyinOptions options}) {
+  final Object? result = pinyin(name, options: options);
+  if (result is! String) {
+    throw StateError('Expected a string pinyin key.');
+  }
+  return result;
 }

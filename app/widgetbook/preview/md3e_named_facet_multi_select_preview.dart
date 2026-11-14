@@ -34,7 +34,7 @@ class _Md3eNamedFacetMultiSelectFieldPreviewState
 
   @override
   Widget build(BuildContext context) {
-    final String state = context.knobs.list(
+    final String state = context.knobs.object.dropdown(
       label: 'Candidates',
       options: <String>['Loaded', 'Loading', 'Error', 'Empty'],
     );

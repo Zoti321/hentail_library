@@ -115,10 +115,10 @@ class _GroupingRadioRow extends StatelessWidget {
             SizedBox(
               width: 24,
               height: 24,
-              child: Radio<bool>(
-                value: true,
+              child: RadioGroup<bool>(
                 groupValue: selected,
                 onChanged: (_) => onSelected(),
+                child: Radio<bool>(value: true),
               ),
             ),
             const SizedBox(width: 8),

@@ -1,3 +1,4 @@
+import 'package:hentai_library/features/comic_metadata/public/comic_metadata_entities.dart';
 import 'package:hentai_library/features/comic/public/comic_metadata_types.dart';
 import 'package:hentai_library/composition/overrides/domain_event_bus_overrides.dart';
 import 'package:hentai_library/composition/feature_state_overrides.dart';
@@ -29,9 +30,9 @@ class _RecordingComicRepository implements ComicUserMetadataRepository {
     String? description,
     DateTime? publishedAt,
     bool clearPublishedAt = false,
-    List? authors,
+    List<String>? authors,
     ContentRating? contentRating,
-    List? tags,
+    List<Tag>? tags,
     List<String>? languages,
     List<String>? parodies,
     List<String>? characters,
