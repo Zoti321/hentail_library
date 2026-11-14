@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'library_scroll_to_top_button.dart';
 import '../../layout/breakpoints.dart';
+import '../../l10n/design_system_localizations.dart';
+import '../../motion/motion.dart';
 import '../../layout/fab_sizing.dart';
 import '../../layout/library_browse_page_metrics.dart';
 import '../../motion/spring_reveal.dart';
@@ -85,6 +87,10 @@ class _ExpressiveLibraryScrollToTopButtonState
     if (!widget.scrollController.hasClients) {
       return;
     }
+    if (LabMotion.reduceMotionOf(context)) {
+      widget.scrollController.jumpTo(0);
+      return;
+    }
     widget.scrollController.animateTo(
       0,
       duration: const Duration(milliseconds: 300),
@@ -114,7 +120,7 @@ class _ExpressiveLibraryScrollToTopButtonState
         hiddenOffset: const Offset(0, 24),
         child: Semantics(
           button: true,
-          label: '回到顶部',
+          label: DesignSystemLocalizations.of(context).scrollToTopLabel,
           child: M3EFab(
             size: fabSize,
             color: M3EFabColor.primary,

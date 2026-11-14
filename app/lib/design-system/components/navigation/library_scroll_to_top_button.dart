@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../actions/ghost_button.dart';
+import '../../motion/motion.dart';
 import '../../l10n/design_system_localizations.dart';
 import '../../theme/extensions/theme_context_extensions.dart';
 import '../../theme/tokens/app_theme_tokens.dart';
@@ -36,6 +37,7 @@ class _LibraryScrollToTopButtonState extends State<LibraryScrollToTopButton> {
   void initState() {
     super.initState();
     widget.scrollController.addListener(_onScroll);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _onScroll());
   }
 
   @override
@@ -56,11 +58,13 @@ class _LibraryScrollToTopButtonState extends State<LibraryScrollToTopButton> {
   }
 
   void _onScroll() {
-    if (!widget.scrollController.hasClients) {
+    if (!mounted || !widget.scrollController.hasClients) {
       return;
     }
-    final double offset = widget.scrollController.offset;
-    final double viewport = widget.scrollController.position.viewportDimension;
+    final position = widget.scrollController.position;
+    if (!position.hasPixels || !position.hasViewportDimension) return;
+    final double offset = position.pixels;
+    final double viewport = position.viewportDimension;
     final double showThreshold =
         viewport * kLibraryScrollToTopShowViewportRatio;
     final double hideThreshold =
@@ -77,6 +81,10 @@ class _LibraryScrollToTopButtonState extends State<LibraryScrollToTopButton> {
 
   void _scrollToTop() {
     if (!widget.scrollController.hasClients) {
+      return;
+    }
+    if (LabMotion.reduceMotionOf(context)) {
+      widget.scrollController.jumpTo(0);
       return;
     }
     widget.scrollController.animateTo(
@@ -101,30 +109,41 @@ class _LibraryScrollToTopButtonState extends State<LibraryScrollToTopButton> {
       bottom: kLibraryScrollToTopBottomPadding,
       child: AnimatedOpacity(
         opacity: visible ? 1 : 0,
-        duration: kLibraryScrollToTopFadeDuration,
+        duration: LabMotion.motionDurationOf(
+          context,
+          kLibraryScrollToTopFadeDuration,
+        ),
         curve: Curves.easeOutCubic,
         child: IgnorePointer(
           ignoring: !visible,
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: cs.surface,
-              borderRadius: BorderRadius.circular(tokens.radius.md),
-              border: Border.all(
-                color: Theme.of(context).colorScheme.outlineVariant,
+          child: ExcludeFocus(
+            excluding: !visible,
+            child: ExcludeSemantics(
+              excluding: !visible,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: cs.surface,
+                  borderRadius: BorderRadius.circular(tokens.radius.md),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.outlineVariant,
+                  ),
+                  boxShadow: context.shadows.raisedPanel(),
+                ),
+                child: GhostButton.icon(
+                  icon: LucideIcons.arrowUp,
+                  tooltip: l10n.scrollToTopLabel,
+                  semanticLabel: l10n.scrollToTopLabel,
+                  size: 40,
+                  iconSize: 18,
+                  borderRadius: tokens.radius.md,
+                  foregroundColor: Theme.of(context)
+                      .colorScheme
+                      .onSurfaceVariant,
+                  hoverColor: cs.surfaceContainerHighest,
+                  overlayColor: cs.primary.withAlpha(32),
+                  onPressed: _scrollToTop,
+                ),
               ),
-              boxShadow: context.shadows.raisedPanel(),
-            ),
-            child: GhostButton.icon(
-              icon: LucideIcons.arrowUp,
-              tooltip: l10n.scrollToTopLabel,
-              semanticLabel: l10n.scrollToTopLabel,
-              size: 40,
-              iconSize: 18,
-              borderRadius: tokens.radius.md,
-              foregroundColor: Theme.of(context).colorScheme.onSurfaceVariant,
-              hoverColor: cs.surfaceContainerHighest,
-              overlayColor: cs.primary.withAlpha(32),
-              onPressed: _scrollToTop,
             ),
           ),
         ),
