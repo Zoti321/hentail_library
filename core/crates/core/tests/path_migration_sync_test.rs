@@ -29,7 +29,7 @@ fn write_cbz(path: &Path) {
 }
 
 #[test]
-fn rename_cbz_migrates_user_metadata_and_reading_history() {
+fn unverified_unique_rename_does_not_transfer_user_metadata_or_history() {
     common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir").keep();
         let db_path = common::create_fixture_db(temp.as_path());
@@ -103,12 +103,10 @@ fn rename_cbz_migrates_user_metadata_and_reading_history() {
                 .await
                 .expect("second plan");
 
-            assert_eq!(plan.migrated_count, 1);
-            assert!(plan.removed_ids.is_empty());
-            assert_eq!(plan.added_count, 0);
-            assert_eq!(plan.migrations.len(), 1);
-            assert_eq!(plan.migrations[0].from_comic_id, old_id);
-            assert_eq!(plan.migrations[0].scanned.comic.comic_id, new_id);
+            assert_eq!(plan.migrated_count, 0);
+            assert_eq!(plan.removed_ids, vec![old_id.clone()]);
+            assert_eq!(plan.added_count, 1);
+            assert!(plan.migrations.is_empty());
 
             apply_scan_replace_plan(&db, &plan, "")
                 .await
@@ -120,15 +118,10 @@ fn rename_cbz_migrates_user_metadata_and_reading_history() {
                 .expect("find new")
                 .expect("new comic");
             assert_eq!(migrated.path, new_path.to_string_lossy());
-            assert_eq!(migrated.title, "用户标题");
-            assert_eq!(migrated.tags, vec!["标签A".to_string()]);
-
-            let history = get_reading_by_comic_id(&new_id)
-                .await
-                .expect("history")
-                .expect("reading history");
-            assert_eq!(history.page_index, Some(3));
-            assert_eq!(history.last_read_time_ms, read_at);
+            assert_ne!(migrated.title, "用户标题");
+            assert!(migrated.tags.is_empty());
+            assert!(!migrated.locks.title && !migrated.locks.tags);
+            assert!(get_reading_by_comic_id(&new_id).await.unwrap().is_none());
         });
     });
 }

@@ -9,8 +9,7 @@ use crate::error::HentaiError;
 
 use super::scanner::ScanItem;
 use crate::path_migration::{
-    detect_path_migration_pairs, detect_series_path_migration_pairs, migrated_id_sets,
-    ComicMigrationPair, SeriesMigrationPair,
+    detect_series_path_migration_pairs, migrated_id_sets, ComicMigrationPair, SeriesMigrationPair,
 };
 use crate::resource::can_generate_thumbnail;
 
@@ -57,21 +56,35 @@ pub async fn build_scan_replace_plan(
     }
     let existing_ids: HashSet<String> = existing_by_id.keys().cloned().collect();
     let id_diff = compute_id_diff(&existing_ids, &scanned_ids);
-    let removed_by_id: HashMap<String, ComicDto> = id_diff
-        .removed_ids
-        .iter()
-        .filter_map(|id| {
-            existing_by_id
-                .get(id)
-                .map(|comic| (id.clone(), comic.clone()))
+    let stored = super::fingerprint::load_fingerprints(db, library_id).await?;
+    let mut removed_by_digest: HashMap<(String, String), Vec<String>> = HashMap::new();
+    let mut added_by_digest: HashMap<(String, String), Vec<String>> = HashMap::new();
+    for id in &id_diff.removed_ids {
+        if let Some(old) = stored.get(id) {
+            removed_by_digest
+                .entry((old.resource_type.clone(), old.digest.clone()))
+                .or_default()
+                .push(id.clone());
+        }
+    }
+    for id in &id_diff.added_ids {
+        if let Some(digest) = &unique[id].content_digest {
+            added_by_digest
+                .entry((unique[id].resource_type.clone(), digest.clone()))
+                .or_default()
+                .push(id.clone());
+        }
+    }
+    let migration_pairs: Vec<ComicMigrationPair> = removed_by_digest
+        .into_iter()
+        .filter_map(|(digest, from)| {
+            let to = added_by_digest.get(&digest)?;
+            (from.len() == 1 && to.len() == 1).then(|| ComicMigrationPair {
+                from_comic_id: from[0].clone(),
+                to_comic_id: to[0].clone(),
+            })
         })
         .collect();
-    let added_by_id: HashMap<String, ComicDto> = id_diff
-        .added_ids
-        .iter()
-        .filter_map(|id| unique.get(id).map(|item| (id.clone(), item.comic.clone())))
-        .collect();
-    let migration_pairs = detect_path_migration_pairs(&removed_by_id, &added_by_id);
     let (migrated_from_ids, migrated_to_ids) = migrated_id_sets(&migration_pairs);
     let migrations = build_migrations(&migration_pairs, &unique);
     let series_migrations =
@@ -106,14 +119,23 @@ pub async fn build_scan_replace_plan(
         .iter()
         .map(|item| item.merge_with_catalog(existing_by_id.get(&item.comic.comic_id)))
         .collect::<Result<_, _>>()?;
-    let thumbnail_targets = build_thumbnail_targets(
-        db,
-        &thumbnail_candidates,
-        &added_ids,
-        kept_ids,
-        &thumbnail_invalidated.iter().cloned().collect(),
-    )
-    .await?;
+    let remote = Libraries::find_by_id(library_id)
+        .one(db)
+        .await
+        .map_err(map_db_err)?
+        .is_some_and(|library| library.kind == "remote");
+    let thumbnail_targets = if remote {
+        Vec::new()
+    } else {
+        build_thumbnail_targets(
+            db,
+            &thumbnail_candidates,
+            &added_ids,
+            kept_ids,
+            &thumbnail_invalidated.iter().cloned().collect(),
+        )
+        .await?
+    };
     Ok(ComicScanReplacePlan {
         removed_ids,
         added_count: added_ids.len() as i32,

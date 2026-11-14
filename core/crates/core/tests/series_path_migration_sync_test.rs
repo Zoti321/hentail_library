@@ -113,20 +113,8 @@ async fn seed_series_user_state(
     .expect("series thumb");
 }
 
-fn assert_locked_orders(series: &hentai_core::SeriesDto, comic_a: &str, comic_b: &str) {
-    let by_id: HashMap<_, _> = series
-        .items
-        .iter()
-        .map(|i| (i.comic_id.as_str(), i))
-        .collect();
-    assert!(by_id[comic_a].sort_order_locked);
-    assert!((by_id[comic_a].sort_order - 9.5).abs() < f64::EPSILON);
-    assert!(by_id[comic_b].sort_order_locked);
-    assert!((by_id[comic_b].sort_order - 2.5).abs() < f64::EPSILON);
-}
-
 #[test]
-fn whole_folder_rename_preserves_series_user_state_and_updates_unlocked_name() {
+fn unverified_folder_rename_creates_default_series() {
     common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir").keep();
         let db_path = common::create_fixture_db(temp.as_path());
@@ -148,8 +136,6 @@ fn whole_folder_rename_preserves_series_user_state_and_updates_unlocked_name() {
             let renamed = root.join("SeriesNew");
             std::fs::rename(&series_dir, &renamed).expect("rename folder");
             let new_series_id = series_id_from_folder_path(&norm(&renamed));
-            let new_comic_a = comic_id_from_path(&norm(&renamed.join("01.cbz")));
-            let new_comic_b = comic_id_from_path(&norm(&renamed.join("02.cbz")));
 
             let db = connection().expect("connection");
             let handle = create_sync_handle();
@@ -168,10 +154,8 @@ fn whole_folder_rename_preserves_series_user_state_and_updates_unlocked_name() {
             let plan = build_scan_replace_plan(&db, scanned, "")
                 .await
                 .expect("plan");
-            assert_eq!(plan.migrated_count, 2);
-            assert_eq!(plan.series_migrations.len(), 1);
-            assert_eq!(plan.series_migrations[0].from_series_id, old_series_id);
-            assert_eq!(plan.series_migrations[0].to_series_id, new_series_id);
+            assert_eq!(plan.migrated_count, 0);
+            assert!(plan.series_migrations.is_empty());
             apply_scan_replace_plan(&db, &plan, "")
                 .await
                 .expect("apply");
@@ -186,24 +170,23 @@ fn whole_folder_rename_preserves_series_user_state_and_updates_unlocked_name() {
                 .expect("exists");
             assert_eq!(series.name, "SeriesNew");
             assert!(!series.locks.name);
-            assert_eq!(series.serialization_status, "ongoing");
-            assert_eq!(series.total_count, Some(12));
-            assert!(series.locks.serialization_status);
-            assert!(series.locks.total_count);
+            assert_eq!(series.serialization_status, "unknown");
+            assert_eq!(series.total_count, None);
+            assert!(!series.locks.serialization_status);
+            assert!(!series.locks.total_count);
             assert_eq!(series.items.len(), 2);
-            assert_locked_orders(&series, &new_comic_a, &new_comic_b);
+            assert!(series.items.iter().all(|item| !item.sort_order_locked));
 
-            let thumb = find_series_thumbnail_by_series_id(&new_series_id)
+            assert!(find_series_thumbnail_by_series_id(&new_series_id)
                 .await
-                .expect("thumb")
-                .expect("exists");
-            assert_eq!(thumb.source_comic_id, new_comic_a);
+                .unwrap()
+                .is_none());
         });
     });
 }
 
 #[test]
-fn whole_folder_move_preserves_locked_name_orders_and_cover() {
+fn unverified_folder_move_does_not_transfer_locked_state() {
     common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir").keep();
         let db_path = common::create_fixture_db(temp.as_path());
@@ -226,8 +209,6 @@ fn whole_folder_move_preserves_locked_name_orders_and_cover() {
             std::fs::create_dir_all(nested.parent().unwrap()).expect("mkdir parent");
             std::fs::rename(&series_dir, &nested).expect("move folder");
             let new_series_id = series_id_from_folder_path(&norm(&nested));
-            let new_comic_a = comic_id_from_path(&norm(&nested.join("01.cbz")));
-            let new_comic_b = comic_id_from_path(&norm(&nested.join("02.cbz")));
 
             sync_once(&root).await;
 
@@ -239,20 +220,19 @@ fn whole_folder_move_preserves_locked_name_orders_and_cover() {
                 .await
                 .expect("new")
                 .expect("exists");
-            assert_eq!(series.name, "自定义系列名");
-            assert!(series.locks.name);
-            assert_eq!(series.serialization_status, "ongoing");
-            assert_eq!(series.total_count, Some(12));
-            assert!(series.locks.serialization_status);
-            assert!(series.locks.total_count);
+            assert_ne!(series.name, "自定义系列名");
+            assert!(!series.locks.name);
+            assert_eq!(series.serialization_status, "unknown");
+            assert_eq!(series.total_count, None);
+            assert!(!series.locks.serialization_status);
+            assert!(!series.locks.total_count);
             assert_eq!(series.items.len(), 2);
-            assert_locked_orders(&series, &new_comic_a, &new_comic_b);
+            assert!(series.items.iter().all(|item| !item.sort_order_locked));
 
-            let thumb = find_series_thumbnail_by_series_id(&new_series_id)
+            assert!(find_series_thumbnail_by_series_id(&new_series_id)
                 .await
-                .expect("thumb")
-                .expect("exists");
-            assert_eq!(thumb.source_comic_id, new_comic_a);
+                .unwrap()
+                .is_none());
         });
     });
 }
@@ -299,7 +279,7 @@ fn partial_member_move_keeps_old_series_state_and_creates_default_destination() 
             let plan = build_scan_replace_plan(&db, scanned, "")
                 .await
                 .expect("plan");
-            assert_eq!(plan.migrated_count, 1);
+            assert_eq!(plan.migrated_count, 0);
             assert!(plan.series_migrations.is_empty());
             apply_scan_replace_plan(&db, &plan, "")
                 .await
@@ -393,7 +373,7 @@ fn ambiguous_comic_fingerprints_skip_series_migration() {
 }
 
 #[test]
-fn whole_folder_migrate_with_extra_new_comic_still_preserves_series_state() {
+fn unverified_folder_move_with_extra_comic_creates_default_series() {
     common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir").keep();
         let db_path = common::create_fixture_db(temp.as_path());
@@ -416,8 +396,6 @@ fn whole_folder_migrate_with_extra_new_comic_still_preserves_series_state() {
             std::fs::rename(&series_dir, &renamed).expect("rename");
             write_cbz_pages(&renamed.join("03.cbz"), 3);
             let new_series_id = series_id_from_folder_path(&norm(&renamed));
-            let new_comic_a = comic_id_from_path(&norm(&renamed.join("01.cbz")));
-            let new_comic_b = comic_id_from_path(&norm(&renamed.join("02.cbz")));
 
             sync_once(&root).await;
 
@@ -425,26 +403,25 @@ fn whole_folder_migrate_with_extra_new_comic_still_preserves_series_state() {
                 .await
                 .expect("new")
                 .expect("exists");
-            assert_eq!(series.name, "自定义系列名");
-            assert!(series.locks.name);
-            assert_eq!(series.serialization_status, "ongoing");
-            assert_eq!(series.total_count, Some(12));
-            assert!(series.locks.serialization_status);
-            assert!(series.locks.total_count);
+            assert_ne!(series.name, "自定义系列名");
+            assert!(!series.locks.name);
+            assert_eq!(series.serialization_status, "unknown");
+            assert_eq!(series.total_count, None);
+            assert!(!series.locks.serialization_status);
+            assert!(!series.locks.total_count);
             assert_eq!(series.items.len(), 3);
-            assert_locked_orders(&series, &new_comic_a, &new_comic_b);
+            assert!(series.items.iter().all(|item| !item.sort_order_locked));
 
-            let thumb = find_series_thumbnail_by_series_id(&new_series_id)
+            assert!(find_series_thumbnail_by_series_id(&new_series_id)
                 .await
-                .expect("thumb")
-                .expect("exists");
-            assert_eq!(thumb.source_comic_id, new_comic_a);
+                .unwrap()
+                .is_none());
         });
     });
 }
 
 #[test]
-fn last_locked_member_moving_into_existing_series_keeps_its_order() {
+fn unverified_member_move_keeps_destination_state_without_source_order() {
     common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir").keep();
         let db_path = common::create_fixture_db(temp.as_path());
@@ -500,10 +477,8 @@ fn last_locked_member_moving_into_existing_series_keeps_its_order() {
             let plan = build_scan_replace_plan(&db, scanned, "")
                 .await
                 .expect("migration plan");
-            assert_eq!(plan.migrated_count, 1);
-            assert_eq!(plan.migrations.len(), 1);
-            assert_eq!(plan.migrations[0].from_comic_id, source_comic);
-            assert_eq!(plan.migrations[0].scanned.comic.comic_id, moved_comic);
+            assert_eq!(plan.migrated_count, 0);
+            assert!(plan.migrations.is_empty());
             assert!(
                 plan.series_migrations.is_empty(),
                 "occupied target Series is not rekeyed"
@@ -519,7 +494,18 @@ fn last_locked_member_moving_into_existing_series_keeps_its_order() {
                 .expect("target lookup")
                 .expect("existing target retained");
             assert_eq!(target.items.len(), 2);
-            assert_locked_orders(&target, &moved_comic, &target_comic);
+            let moved = target
+                .items
+                .iter()
+                .find(|item| item.comic_id == moved_comic)
+                .unwrap();
+            assert!(!moved.sort_order_locked);
+            let kept = target
+                .items
+                .iter()
+                .find(|item| item.comic_id == target_comic)
+                .unwrap();
+            assert!(kept.sort_order_locked);
             assert_eq!(target.name, "Existing destination");
             assert_eq!(target.serialization_status, "ended");
             assert_eq!(target.total_count, Some(7));

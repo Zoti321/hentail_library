@@ -24,7 +24,7 @@ fn sync_rolls_back_catalog_snapshot_and_success_then_retry_converges() {
             let added = library_root.join("b.cbz");
             common::write_cbz(&added, 2);
             let added_id = comic_id_from_path(&added.to_string_lossy());
-            for (table, event) in [("comic_meta", "INSERT"), ("library_resource_snapshots", "INSERT"), ("libraries", "UPDATE")] {
+            for (table, event) in [("comic_meta", "INSERT"), ("comic_content_fingerprints", "INSERT"), ("library_resource_snapshots", "INSERT"), ("libraries", "UPDATE")] {
                 db.execute(Statement::from_string(sea_orm::DatabaseBackend::Sqlite,
                     format!("CREATE TRIGGER fail_sync_{table} BEFORE {event} ON {table} BEGIN SELECT RAISE(ABORT, 'injected sync failure'); END"))).await.unwrap();
                 assert!(sync().await.is_err());

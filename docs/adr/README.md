@@ -132,3 +132,5 @@ Accepted | Superseded by ADR-000N | Deprecated
 | [0051](./0051-clean-architecture-composition-and-infrastructure.md) | 整洁架构组合根、基础设施与内层依赖 | Accepted |
 | [0052](./0052-pure-dart-core-and-platform-boundaries.md) | 纯 Dart core、共享协作与平台实现边界 | Accepted |
 | [0053](./0053-design-system-portable-interaction-boundary.md) | 完整视觉与交互设计系统、产品适配与可独立成包的依赖边界（修订 ADR-0044/0047/0052） | Accepted |
+| [0054](./0054-verified-path-migration.md) | Verified continuity for automatic Path migration | Accepted; supersedes ADR-0013 weak-fingerprint sync eligibility |
+| [0055](./0055-content-verified-path-migration.md) | Content-verified Path migration | Accepted; extends ADR-0054 |

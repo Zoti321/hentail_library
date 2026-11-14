@@ -99,6 +99,13 @@ pub(crate) async fn apply_scan_replace_plan_in(
         // skip here means the resource yielded no pages at all.
         tracing::debug!(?skipped, "scan upsert skipped comics without pages");
     }
+    for item in plan
+        .to_upsert
+        .iter()
+        .chain(plan.migrations.iter().map(|migration| &migration.scanned))
+    {
+        super::fingerprint::store_fingerprint(txn, item).await?;
+    }
     normalize_reading_history_titles(txn).await?;
     purge_expired_reading_histories(txn).await?;
     rebuild_series_from_comics(txn, Some(library_id)).await?;

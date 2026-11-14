@@ -27,6 +27,7 @@ pub struct ScanItem {
     pub comic: ComicDto,
     metadata_source: ScanMetadataSource,
     pub(crate) observed_stat: Option<(i64, i64)>,
+    pub(crate) content_digest: Option<String>,
 }
 
 #[derive(Clone, Copy)]
@@ -43,6 +44,7 @@ impl ScanItem {
             comic,
             metadata_source: ScanMetadataSource::Resource,
             observed_stat: None,
+            content_digest: None,
         }
     }
 

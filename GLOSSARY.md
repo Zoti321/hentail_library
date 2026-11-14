@@ -54,7 +54,7 @@ _Avoid_: item/work as an ambiguous replacement, Dart transaction aggregate.
 **Comic identity**: Identity anchored to a normalized local path or WebDAV resource URL, not content hashes. Moving/renaming changes `comicId`; Path migration preserves continuity when eligible. ADR-0001/0013.
 _Avoid_: content ID, file fingerprint identity.
 
-**Path migration**: Rekeying an existing Comic/Series after a location change while preserving metadata, locks and history. Sync pairs removed/added Comics only by unique one-to-one weak fingerprints (type, size, page count). A Folder series migrates only if all members migrate to the same new parent, retaining its custom metadata/cover/locks; an unlocked name may follow the folder. Changing a readable local root remaps relative paths, including Series. Ambiguous fingerprints, incomplete parent moves, unmatched relative paths or unreadable new roots defer to later sync reconciliation. Identity remains location-based. ADR-0013.
+**Path migration**: Rekeying an existing Comic/Series after a verified location change while preserving its user state; explicit readable Local root changes retain eligible relative-path continuity. Unique matches of previously recorded full-content fingerprints also permit automatic continuity; weak fingerprints and ambiguous copies do not, and records without prior content evidence cannot be matched retroactively (ADR-0001/0013/0054/0055).
 _Avoid_: content-hash identity, unconditional rename preservation, Metadata refresh.
 
 **Comic deletion**: Historical umbrella for the user-driven trash-then-purge lifecycle. Use the specific stage in new text. Sync orphan cleanup and Library removal delete records, not Resources. ADR-0012/0023.

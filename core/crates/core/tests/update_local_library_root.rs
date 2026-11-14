@@ -54,19 +54,19 @@ async fn seed_comic(
 #[test]
 fn update_local_library_root_keeps_library_id_and_rejects_nesting() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let root_a = temp.path().join("lib_a");
-        let root_b = temp.path().join("lib_b");
+        let temp = TempDir::new().expect("tempdir").keep();
+        let root_a = temp.as_path().join("lib_a");
+        let root_b = temp.as_path().join("lib_b");
         let root_a_child = root_a.join("nested");
         let root_b_child = root_b.join("child");
-        let root_a_moved = temp.path().join("lib_a_moved");
+        let root_a_moved = temp.as_path().join("lib_a_moved");
         std::fs::create_dir_all(&root_a).expect("mkdir a");
         std::fs::create_dir_all(&root_b).expect("mkdir b");
         std::fs::create_dir_all(&root_a_child).expect("mkdir nested");
         std::fs::create_dir_all(&root_b_child).expect("mkdir b/child");
         std::fs::create_dir_all(&root_a_moved).expect("mkdir moved");
 
-        let db_path = common::create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.as_path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init");
@@ -121,14 +121,14 @@ fn update_local_library_root_keeps_library_id_and_rejects_nesting() {
 #[test]
 fn update_local_library_root_remaps_comics_series_and_user_state_when_readable() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let old_root = temp.path().join("lib_old");
+        let temp = TempDir::new().expect("tempdir").keep();
+        let old_root = temp.as_path().join("lib_old");
         let series_old = old_root.join("SeriesA");
         std::fs::create_dir_all(&series_old).expect("mkdir old series");
         let old_comic_path = series_old.join("a.cbz");
         write_cbz(&old_comic_path);
 
-        let db_path = common::create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.as_path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init");
@@ -213,7 +213,7 @@ fn update_local_library_root_remaps_comics_series_and_user_state_when_readable()
             .await
             .expect("insert series thumbnail");
 
-            let new_root = temp.path().join("lib_new");
+            let new_root = temp.as_path().join("lib_new");
             std::fs::rename(&old_root, &new_root).expect("rename root");
             let new_comic_path = new_root.join("SeriesA").join("a.cbz");
             let new_comic_id = comic_id_from_path(&new_comic_path.to_string_lossy());
@@ -281,9 +281,9 @@ fn update_local_library_root_remaps_comics_series_and_user_state_when_readable()
 #[test]
 fn update_local_library_root_skips_missing_relative_paths_but_commits_root_change() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let old_root = temp.path().join("lib_old");
-        let new_root = temp.path().join("lib_new");
+        let temp = TempDir::new().expect("tempdir").keep();
+        let old_root = temp.as_path().join("lib_old");
+        let new_root = temp.as_path().join("lib_new");
         std::fs::create_dir_all(&old_root).expect("mkdir old");
         std::fs::create_dir_all(&new_root).expect("mkdir new");
         let keep_old = old_root.join("keep.cbz");
@@ -292,7 +292,7 @@ fn update_local_library_root_skips_missing_relative_paths_but_commits_root_chang
         write_cbz(&miss_old);
         write_cbz(&new_root.join("keep.cbz"));
 
-        let db_path = common::create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.as_path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init");
@@ -351,14 +351,14 @@ fn update_local_library_root_skips_missing_relative_paths_but_commits_root_chang
 #[test]
 fn update_local_library_root_saves_unreadable_root_without_migration() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let old_root = temp.path().join("lib_old");
+        let temp = TempDir::new().expect("tempdir").keep();
+        let old_root = temp.as_path().join("lib_old");
         std::fs::create_dir_all(&old_root).expect("mkdir old");
         let old_comic_path = old_root.join("a.cbz");
         write_cbz(&old_comic_path);
-        let unreadable_root = temp.path().join("missing_root");
+        let unreadable_root = temp.as_path().join("missing_root");
 
-        let db_path = common::create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.as_path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init");
@@ -396,13 +396,13 @@ fn update_local_library_root_saves_unreadable_root_without_migration() {
 #[test]
 fn update_local_library_root_fails_immediately_when_library_write_lock_is_busy() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let old_root = temp.path().join("lib_old");
-        let new_root = temp.path().join("lib_new");
+        let temp = TempDir::new().expect("tempdir").keep();
+        let old_root = temp.as_path().join("lib_old");
+        let new_root = temp.as_path().join("lib_new");
         std::fs::create_dir_all(&old_root).expect("mkdir old");
         std::fs::create_dir_all(&new_root).expect("mkdir new");
 
-        let db_path = common::create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.as_path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init");
@@ -433,14 +433,14 @@ fn update_local_library_root_fails_immediately_when_library_write_lock_is_busy()
 #[test]
 fn update_local_library_root_recomputes_unlocked_series_name_from_new_folder() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let old_root = temp.path().join("lib_old");
+        let temp = TempDir::new().expect("tempdir").keep();
+        let old_root = temp.as_path().join("lib_old");
         let series_old = old_root.join("SeriesA");
         std::fs::create_dir_all(&series_old).expect("mkdir old series");
         let old_comic_path = series_old.join("a.cbz");
         write_cbz(&old_comic_path);
 
-        let db_path = common::create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.as_path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init");
@@ -482,7 +482,7 @@ fn update_local_library_root_recomputes_unlocked_series_name_from_new_folder() {
             .await
             .expect("insert series item");
 
-            let new_root = temp.path().join("lib_new");
+            let new_root = temp.as_path().join("lib_new");
             std::fs::rename(&old_root, &new_root).expect("rename root");
             let new_series_path = new_root.join("SeriesA").to_string_lossy().replace('\\', "/");
             let new_series_id = series_id_from_folder_path(&new_series_path);

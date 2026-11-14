@@ -234,7 +234,7 @@ fn scan_reuse_does_not_treat_an_old_projection_as_resource_metadata() {
 }
 
 #[test]
-fn scan_migration_reloads_latest_metadata_and_keeps_live_child_attachments() {
+fn unverified_scan_move_does_not_transfer_latest_user_metadata() {
     with_db(|runtime, db| {
         runtime.block_on(async {
             let existing = seed(&db).await;
@@ -242,7 +242,7 @@ fn scan_migration_reloads_latest_metadata_and_keeps_live_child_attachments() {
             let plan = build_scan_replace_plan(&db, vec![item(moved.clone())], "")
                 .await
                 .unwrap();
-            assert_eq!(plan.migrations.len(), 1);
+            assert!(plan.migrations.is_empty());
             update_comic_user_meta(
                 &existing.comic_id,
                 UpdateComicUserMetaDto {
@@ -261,15 +261,15 @@ fn scan_migration_reloads_latest_metadata_and_keeps_live_child_attachments() {
                 .unwrap()
                 .is_none());
             let current = find_comic_by_id(&moved.comic_id).await.unwrap().unwrap();
-            assert_eq!(current.title, "Newest moved title");
-            assert_eq!(current.languages, ["zh"]);
-            assert_eq!(current.tags, ["Newest tag"]);
-            assert_eq!(current.author_names(), ["Newest author"]);
+            assert_eq!(current.title, "New source title");
+            assert!(current.languages.is_empty());
+            assert!(current.tags.is_empty());
+            assert_eq!(current.author_names(), moved.author_names());
             assert!(
-                current.locks.title
-                    && current.locks.languages
-                    && current.locks.tags
-                    && current.locks.authors
+                !current.locks.title
+                    && !current.locks.languages
+                    && !current.locks.tags
+                    && !current.locks.authors
             );
         })
     });
@@ -306,7 +306,7 @@ fn scan_commit_does_not_recreate_a_kept_comic_removed_after_planning() {
 }
 
 #[test]
-fn scan_commit_preserves_trash_for_kept_and_migrated_comics() {
+fn scan_commit_preserves_trash_only_for_kept_comics() {
     for destination in [LOCATION, "/moved/book.cbz"] {
         with_db(|runtime, db| {
             runtime.block_on(async {
@@ -324,7 +324,10 @@ fn scan_commit_preserves_trash_for_kept_and_migrated_comics() {
                 .await
                 .unwrap();
                 apply_scan_replace_plan(&db, &plan, "").await.unwrap();
-                assert!(hentai_core::is_comic_trashed(&target_id).await.unwrap());
+                assert_eq!(
+                    hentai_core::is_comic_trashed(&target_id).await.unwrap(),
+                    destination == LOCATION
+                );
             })
         });
     }

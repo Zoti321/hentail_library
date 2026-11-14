@@ -27,6 +27,8 @@ mod m20261006_000025_author_platform_images;
 mod m20261109_000026_reading_activity_stats;
 mod m20261109_000027_backfill_finished_from_history;
 
+mod m20261114_000028_comic_content_fingerprints;
+
 pub struct Migrator;
 
 #[async_trait::async_trait]
@@ -59,6 +61,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20261006_000025_author_platform_images::Migration),
             Box::new(m20261109_000026_reading_activity_stats::Migration),
             Box::new(m20261109_000027_backfill_finished_from_history::Migration),
+            Box::new(m20261114_000028_comic_content_fingerprints::Migration),
         ]
     }
 }

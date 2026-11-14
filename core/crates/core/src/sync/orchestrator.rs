@@ -234,6 +234,17 @@ async fn sync_one_library(
     for item in &mut scan_items {
         item.comic.library_id = library.library_id.clone();
     }
+    if !super::fingerprint::prepare_content_fingerprints(
+        db,
+        &library.library_id,
+        local_access(),
+        &mut scan_items,
+        handle,
+    )
+    .await?
+    {
+        return Ok(SyncOneOutcome::None);
+    }
     Ok(map_finish_outcome(
         finish_scan_write(
             db, handle, library, scan_items, /*enqueue_thumbs=*/ true, emit,
@@ -307,6 +318,17 @@ async fn sync_remote_library(
     };
     for item in &mut scan_items {
         item.comic.library_id = library.library_id.clone();
+    }
+    if !super::fingerprint::prepare_content_fingerprints(
+        db,
+        &library.library_id,
+        &access,
+        &mut scan_items,
+        handle,
+    )
+    .await?
+    {
+        return Ok(SyncOneOutcome::None);
     }
     // ADR-0008: no thumbnail generation during remote sync.
     Ok(map_finish_outcome(

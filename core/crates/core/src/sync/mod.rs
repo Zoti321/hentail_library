@@ -33,3 +33,5 @@ pub use refresh::{
 };
 pub use remote::{comic_id_for_remote_location, scan_remote_lightweight, RemoteScanOutcome};
 pub use resource_format_category::ResourceFormatCategory;
+
+pub mod fingerprint;
