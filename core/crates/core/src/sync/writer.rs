@@ -21,6 +21,17 @@ pub async fn apply_scan_replace_plan(
     library_id: &str,
 ) -> Result<(), HentaiError> {
     let txn = db.begin().await.map_err(map_db_err)?;
+    apply_scan_replace_plan_in(&txn, plan, library_id).await?;
+    txn.commit().await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
+    Ok(())
+}
+
+pub(crate) async fn apply_scan_replace_plan_in(
+    txn: &sea_orm::DatabaseTransaction,
+    plan: &ComicScanReplacePlan,
+    library_id: &str,
+) -> Result<(), HentaiError> {
     let ids: HashSet<String> = plan
         .to_upsert
         .iter()
@@ -33,7 +44,7 @@ pub async fn apply_scan_replace_plan(
         .chain(plan.removed_ids.iter().cloned())
         .collect();
     // Locks, metadata and page counts belong to this transaction, not the scan plan.
-    let current: HashMap<String, ComicDto> = load_comics_ordered(&txn, ids.into_iter().collect())
+    let current: HashMap<String, ComicDto> = load_comics_ordered(txn, ids.into_iter().collect())
         .await?
         .into_iter()
         .map(|comic| (comic.comic_id.clone(), comic))
@@ -67,10 +78,10 @@ pub async fn apply_scan_replace_plan(
             })
         })
         .collect::<Result<_, HentaiError>>()?;
-    apply_comic_rekeys(&txn, &migrations).await?;
-    apply_series_rekeys(&txn, &plan.series_migrations).await?;
+    apply_comic_rekeys(txn, &migrations).await?;
+    apply_series_rekeys(txn, &plan.series_migrations).await?;
     if !plan.removed_ids.is_empty() {
-        delete_comics_side_effects(&txn, &plan.removed_ids).await?;
+        delete_comics_side_effects(txn, &plan.removed_ids).await?;
     }
     if !plan.thumbnail_invalidated_comic_ids.is_empty() {
         ComicThumbnails::delete_many()
@@ -78,21 +89,19 @@ pub async fn apply_scan_replace_plan(
                 comic_thumbnails::Column::ComicId
                     .is_in(plan.thumbnail_invalidated_comic_ids.clone()),
             )
-            .exec(&txn)
+            .exec(txn)
             .await
             .map_err(map_db_err)?;
     }
-    let skipped = upsert_comics(&txn, &to_upsert).await?;
+    let skipped = upsert_comics(txn, &to_upsert).await?;
     if !skipped.is_empty() {
         // Scan plans carry a parsed page count (Remote placeholder is 1), so a
         // skip here means the resource yielded no pages at all.
         tracing::debug!(?skipped, "scan upsert skipped comics without pages");
     }
-    normalize_reading_history_titles(&txn).await?;
-    purge_expired_reading_histories(&txn).await?;
-    rebuild_series_from_comics(&txn, Some(library_id)).await?;
-    txn.commit().await.map_err(map_db_err)?;
-    crate::revision::notify_committed();
+    normalize_reading_history_titles(txn).await?;
+    purge_expired_reading_histories(txn).await?;
+    rebuild_series_from_comics(txn, Some(library_id)).await?;
     Ok(())
 }
 

@@ -48,14 +48,20 @@ pub async fn rebuild_snapshot_from_scan_items(
     library: &LibraryDto,
     scan_items: &[ScanItem],
 ) -> Result<(), HentaiError> {
-    let access: &dyn ResourceAccess = local_access();
+    let rows = prepare_snapshot(library_id, library, scan_items)?;
     let txn = db.begin().await.map_err(map_db_err)?;
-    LibraryResourceSnapshots::delete_many()
-        .filter(library_resource_snapshots::Column::LibraryId.eq(library_id))
-        .exec(&txn)
-        .await
-        .map_err(map_db_err)?;
+    replace_snapshot_in(&txn, library_id, rows).await?;
+    txn.commit().await.map_err(map_db_err)?;
+    Ok(())
+}
 
+pub(crate) fn prepare_snapshot(
+    library_id: &str,
+    library: &LibraryDto,
+    scan_items: &[ScanItem],
+) -> Result<Vec<library_resource_snapshots::ActiveModel>, HentaiError> {
+    let access: &dyn ResourceAccess = local_access();
+    let mut rows = Vec::new();
     for item in scan_items {
         let location_key = scan_item_location_key(library, item);
         if location_key.is_empty() {
@@ -64,22 +70,42 @@ pub async fn rebuild_snapshot_from_scan_items(
         let (modified_ms, size) = if library.kind == "remote" {
             (item.comic.last_updated_at, item.comic.resource_size)
         } else {
-            read_source_stat_with(access, &item.path, &item.resource_type)?
-                .unwrap_or((item.comic.last_updated_at, item.comic.resource_size))
+            let stat = read_source_stat_with(access, &item.path, &item.resource_type)?
+                .ok_or_else(|| HentaiError::validation("Sync source disappeared"))?;
+            if item.observed_stat.is_some_and(|observed| observed != stat)
+                || stat.1 != item.comic.resource_size
+            {
+                return Err(HentaiError::validation("Sync source changed; retry sync"));
+            }
+            stat
         };
-        let active = library_resource_snapshots::ActiveModel {
+        rows.push(library_resource_snapshots::ActiveModel {
             library_id: Set(library_id.to_string()),
             location_key: Set(location_key),
             resource_type: Set(item.resource_type.clone()),
             modified_ms: Set(modified_ms),
             size: Set(size),
-        };
-        LibraryResourceSnapshots::insert(active)
-            .exec(&txn)
+        });
+    }
+    Ok(rows)
+}
+
+pub(crate) async fn replace_snapshot_in(
+    db: &impl ConnectionTrait,
+    library_id: &str,
+    rows: Vec<library_resource_snapshots::ActiveModel>,
+) -> Result<(), HentaiError> {
+    LibraryResourceSnapshots::delete_many()
+        .filter(library_resource_snapshots::Column::LibraryId.eq(library_id))
+        .exec(db)
+        .await
+        .map_err(map_db_err)?;
+    for row in rows {
+        LibraryResourceSnapshots::insert(row)
+            .exec(db)
             .await
             .map_err(map_db_err)?;
     }
-    txn.commit().await.map_err(map_db_err)?;
     Ok(())
 }
 

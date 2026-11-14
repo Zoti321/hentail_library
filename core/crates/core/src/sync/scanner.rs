@@ -26,6 +26,7 @@ pub struct ScanItem {
     pub resource_type: String,
     pub comic: ComicDto,
     metadata_source: ScanMetadataSource,
+    pub(crate) observed_stat: Option<(i64, i64)>,
 }
 
 #[derive(Clone, Copy)]
@@ -41,6 +42,7 @@ impl ScanItem {
             resource_type: comic.resource_type.clone(),
             comic,
             metadata_source: ScanMetadataSource::Resource,
+            observed_stat: None,
         }
     }
 
@@ -358,6 +360,29 @@ fn collect_from_directory(
 }
 
 fn resolve_scan_item(
+    access: &dyn ResourceAccess,
+    path: &str,
+    ctx: &ScanContext,
+    force_full_parse: bool,
+    enabled_groups: &[ResourceFormatCategory],
+) -> Result<Option<ScanItem>, HentaiError> {
+    let before = access.stat(path)?;
+    let result = resolve_scan_item_inner(access, path, ctx, force_full_parse, enabled_groups)?;
+    let after = access.stat(path)?;
+    if before != after {
+        return Err(HentaiError::validation(
+            "Sync source changed during inspection",
+        ));
+    }
+    result
+        .map(|mut item| {
+            item.observed_stat = read_source_stat_with(access, path, &item.resource_type)?;
+            Ok(item)
+        })
+        .transpose()
+}
+
+fn resolve_scan_item_inner(
     access: &dyn ResourceAccess,
     path: &str,
     ctx: &ScanContext,

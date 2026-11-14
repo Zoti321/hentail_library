@@ -1,3 +1,6 @@
+#[cfg(test)]
+extern crate self as hentai_core;
+
 pub mod author;
 pub mod character;
 pub mod comic;

@@ -1,14 +1,16 @@
 use std::collections::HashMap;
 
 use crate::db::connection;
+use crate::db::map_db_err;
 use crate::error::HentaiError;
 use crate::library::{
-    find_library_by_id, list_libraries, record_library_sync_failure, record_library_sync_success,
-    LibraryDto,
+    find_library_by_id, list_libraries, record_library_sync_failure,
+    record_library_sync_success_in, LibraryDto,
 };
-use crate::probe::rebuild_snapshot_from_scan_items;
+use crate::probe::{prepare_snapshot, replace_snapshot_in};
 use crate::reader::clear_reader_sessions;
 use crate::resource::{local_access, normalize_roots, WebDavResourceAccess};
+use sea_orm::TransactionTrait;
 
 use super::dto::{
     LibrarySyncCountsDto, SyncLibraryPhaseDto, SyncLibraryProgressDto, SyncLibraryRouteDto,
@@ -18,7 +20,7 @@ use super::handle::SyncHandle;
 use super::plan::{build_scan_replace_plan, load_existing_comics_map, load_thumbnail_stats};
 use super::remote::{scan_remote_lightweight, RemoteScanOutcome};
 use super::scanner::{scan_roots_excluding, ScanContext, ScanItem};
-use super::writer::apply_scan_replace_plan;
+use super::writer::apply_scan_replace_plan_in;
 use crate::library::{set_remote_library_credentials, RemoteLibraryCredential};
 use crate::library_write::with_library_write;
 use crate::thumbnail::enqueue_thumbnails_low;
@@ -93,7 +95,7 @@ async fn sync_library_locked(
     let mut skip_warnings: Vec<String> = Vec::new();
     for library in targets {
         if return_if_cancelled(&handle, "library_loop") {
-            return Ok(());
+            break;
         }
         match sync_one_library(
             &db,
@@ -105,7 +107,10 @@ async fn sync_library_locked(
         )
         .await?
         {
-            SyncOneOutcome::Progress(progress) => {
+            SyncOneOutcome::Progress(mut progress) => {
+                if let Some(warning) = progress.error_message.take() {
+                    skip_warnings.push(warning);
+                }
                 last_progress = Some(progress);
             }
             SyncOneOutcome::Skipped { warning } => {
@@ -399,6 +404,31 @@ async fn finish_scan_write(
     enqueue_thumbs: bool,
     emit: &mut impl FnMut(SyncLibraryProgressDto),
 ) -> Result<Option<SyncLibraryProgressDto>, HentaiError> {
+    finish_scan_write_with_maintenance(
+        db,
+        handle,
+        library,
+        scan_items,
+        enqueue_thumbs,
+        emit,
+        enqueue_thumbnails_low,
+    )
+    .await
+}
+
+async fn finish_scan_write_with_maintenance<F, Fut>(
+    db: &sea_orm::DatabaseConnection,
+    handle: &SyncHandle,
+    library: &LibraryDto,
+    scan_items: Vec<ScanItem>,
+    enqueue_thumbs: bool,
+    emit: &mut impl FnMut(SyncLibraryProgressDto),
+    enqueue: F,
+) -> Result<Option<SyncLibraryProgressDto>, HentaiError>
+where
+    F: FnOnce(Vec<String>) -> Fut,
+    Fut: std::future::Future<Output = Result<(), HentaiError>>,
+{
     let library_id = &library.library_id;
     if return_if_cancelled(handle, "scanning") {
         return Ok(None);
@@ -453,10 +483,30 @@ async fn finish_scan_write(
     if return_if_cancelled(handle, "writing_db") {
         return Ok(None);
     }
-    apply_scan_replace_plan(db, &plan, library_id).await?;
-    rebuild_snapshot_from_scan_items(db, library_id, library, &snapshot_items).await?;
-    record_library_sync_success(library_id).await?;
+    let rows = prepare_snapshot(library_id, library, &snapshot_items)?;
+    if return_if_cancelled(handle, "snapshot_prepared") {
+        return Ok(None);
+    }
+    let txn = db.begin().await.map_err(map_db_err)?;
+    let writes: Result<(), HentaiError> = async {
+        apply_scan_replace_plan_in(&txn, &plan, library_id).await?;
+        replace_snapshot_in(&txn, library_id, rows).await?;
+        record_library_sync_success_in(&txn, library_id).await?;
+        Ok(())
+    }
+    .await;
+    if let Err(error) = writes {
+        txn.rollback().await.map_err(map_db_err)?;
+        return Err(error);
+    }
+    if return_if_cancelled(handle, "before_commit") {
+        txn.rollback().await.map_err(map_db_err)?;
+        return Ok(None);
+    }
+    txn.commit().await.map_err(map_db_err)?;
     clear_reader_sessions();
+    crate::revision::notify_committed();
+    let mut maintenance_warning = None;
 
     let thumb_total = if enqueue_thumbs {
         let thumbnail_targets = plan.thumbnail_generation_targets.clone();
@@ -466,7 +516,11 @@ async fn finish_scan_write(
                 .iter()
                 .map(|c| c.comic_id.clone())
                 .collect();
-            enqueue_thumbnails_low(comic_ids).await?;
+            if let Err(error) = enqueue(comic_ids).await {
+                maintenance_warning = Some(format!(
+                    "Sync committed; thumbnail maintenance failed: {error}"
+                ));
+            }
         }
         thumb_total
     } else {
@@ -502,8 +556,12 @@ async fn finish_scan_write(
             None
         },
         Some(0),
-        Some(0),
-        None,
+        Some(if maintenance_warning.is_some() {
+            thumb_total
+        } else {
+            0
+        }),
+        maintenance_warning,
     )))
 }
 
@@ -537,5 +595,76 @@ fn progress(
         thumbnail_done,
         thumbnail_failed_count,
         error_message,
+    }
+}
+
+#[cfg(test)]
+#[path = "../../tests/common/mod.rs"]
+mod test_common;
+
+#[cfg(test)]
+mod completion_tests {
+    use super::*;
+    #[test]
+    fn maintenance_failure_reports_committed_success_and_invalidates_reader() {
+        test_common::with_global_db(|| {
+            let root = tempfile::tempdir().unwrap().keep();
+            let library_root = root.join("library");
+            let path = library_root.join("a.cbz");
+            test_common::write_cbz(&path, 1);
+            let runtime = tokio::runtime::Runtime::new().unwrap();
+            runtime.block_on(async {
+                crate::init_db_at_path(&root.join("db.sqlite"))
+                    .await
+                    .unwrap();
+                let library = crate::create_local_library(&library_root.to_string_lossy(), None)
+                    .await
+                    .unwrap();
+                let comic_id = crate::comic_id_from_path(&path.to_string_lossy());
+                crate::reader::open_reader_with(
+                    local_access(),
+                    &comic_id,
+                    &path.to_string_lossy(),
+                    "cbz",
+                )
+                .unwrap();
+                let old = crate::reader::ReaderPageRead::capture(&comic_id).unwrap();
+                let db = connection().unwrap();
+                let ctx = ScanContext {
+                    existing_by_id: HashMap::new(),
+                    thumbnail_stats: HashMap::new(),
+                };
+                let items = super::super::scanner::scan_roots(
+                    &[library_root],
+                    &ctx,
+                    &crate::create_sync_handle(),
+                    true,
+                    &super::super::resource_format_category::ResourceFormatCategory::ALL,
+                )
+                .unwrap();
+                let progress = finish_scan_write_with_maintenance(
+                    &db,
+                    &crate::create_sync_handle(),
+                    &library,
+                    items,
+                    true,
+                    &mut |_| {},
+                    |_| async { Err(HentaiError::validation("injected thumbnail failure")) },
+                )
+                .await
+                .unwrap()
+                .unwrap();
+                assert!(progress.error_message.unwrap().contains("Sync committed"));
+                assert_eq!(progress.thumbnail_failed_count, Some(1));
+                assert!(crate::find_comic_by_id(&comic_id).await.unwrap().is_some());
+                assert_eq!(
+                    crate::probe::snapshot_row_count(&db, &library.library_id)
+                        .await
+                        .unwrap(),
+                    1
+                );
+                assert!(crate::reader::load_reader_page(old, 0).is_err());
+            });
+        });
     }
 }
