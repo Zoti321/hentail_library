@@ -208,6 +208,9 @@ class ReaderPage extends HookConsumerWidget {
         routeContext: routeContext,
         canPop: appNavigatorOf(context).canPop(),
       );
+      if (!context.mounted) {
+        return;
+      }
       applyReaderExitIntent(context, intent);
     }
 
@@ -328,6 +331,9 @@ class _ReaderReadyBody extends ConsumerWidget {
             navContext: seriesNavContext,
             session: routeContext.session,
           );
+      if (!context.mounted) {
+        return;
+      }
       applyReaderNavigationIntent(context, intent);
     }
 
@@ -337,6 +343,9 @@ class _ReaderReadyBody extends ConsumerWidget {
             navContext: seriesNavContext,
             session: routeContext.session,
           );
+      if (!context.mounted) {
+        return;
+      }
       applyReaderNavigationIntent(context, intent);
     }
 
@@ -476,6 +485,9 @@ class _ReaderPageContent extends ConsumerWidget {
             navContext: seriesNavContext,
             session: routeContext.session,
           );
+      if (!context.mounted) {
+        return;
+      }
       applyReaderNavigationIntent(context, intent);
     }());
   }
@@ -487,6 +499,9 @@ class _ReaderPageContent extends ConsumerWidget {
   ) async {
     final ReaderReplaceReaderRouteIntent? intent = await viewModel
         .requestNextPage(navContext: navContext, session: routeContext.session);
+    if (!context.mounted) {
+      return;
+    }
     applyReaderNavigationIntent(context, intent);
   }
 
@@ -497,6 +512,9 @@ class _ReaderPageContent extends ConsumerWidget {
   ) async {
     final ReaderReplaceReaderRouteIntent? intent = await viewModel
         .requestPrevPage(navContext: navContext, session: routeContext.session);
+    if (!context.mounted) {
+      return;
+    }
     applyReaderNavigationIntent(context, intent);
   }
 }
@@ -512,24 +530,29 @@ void _openSeriesCatalog(
     for (final ReaderComicListItem item in navContext.items)
       ReaderSeriesVolume(id: item.comicId, title: item.title),
   ];
-  ReaderSeriesCatalogSheet.show(
-    context,
-    volumes: volumes,
-    currentVolumeId: routeContext.comicId,
-    onVolumeSelected: (String targetComicId) {
-      if (targetComicId == routeContext.comicId) {
-        return;
-      }
-      unawaited(() async {
-        final ReaderReplaceReaderRouteIntent? intent = await ref
-            .read(readerSeriesNavigationProvider.notifier)
-            .prepareSwitchComic(
-              currentSession: routeContext.session,
-              targetComicId: targetComicId,
-            );
-        applyReaderNavigationIntent(context, intent);
-      }());
-    },
+  unawaited(
+    ReaderSeriesCatalogSheet.show(
+      context,
+      volumes: volumes,
+      currentVolumeId: routeContext.comicId,
+      onVolumeSelected: (String targetComicId) {
+        if (targetComicId == routeContext.comicId) {
+          return;
+        }
+        unawaited(() async {
+          final ReaderReplaceReaderRouteIntent? intent = await ref
+              .read(readerSeriesNavigationProvider.notifier)
+              .prepareSwitchComic(
+                currentSession: routeContext.session,
+                targetComicId: targetComicId,
+              );
+          if (!context.mounted) {
+            return;
+          }
+          applyReaderNavigationIntent(context, intent);
+        }());
+      },
+    ),
   );
 }
 

@@ -78,6 +78,51 @@ void main() {
         imageList: images,
       );
 
+  test(
+    'precache stops after the UI unmounts during a pending decode',
+    () async {
+      await warm(1);
+      final decoded = <ReaderPagePayload>[];
+      final pending = Completer<void>();
+      var mounted = true;
+      final result = controller().precacheWindow(
+        isMounted: () => mounted,
+        precachePage: (page, width) {
+          decoded.add(page);
+          expect(width, 320);
+          return pending.future;
+        },
+        comicId: 'comic',
+        pageIndexesOneBased: {1, 2},
+        imageList: images,
+        cacheWidth: 320,
+      );
+      expect(decoded, hasLength(1));
+      mounted = false;
+      pending.complete();
+      await result;
+      expect(decoded, hasLength(1));
+    },
+  );
+
+  test('precache visits each page while the UI remains mounted', () async {
+    await warm(1);
+    final decoded = <ReaderPagePayload>[];
+    await controller().precacheWindow(
+      isMounted: () => true,
+      precachePage: (page, _) async => decoded.add(page),
+      comicId: 'comic',
+      pageIndexesOneBased: {1, 2},
+      imageList: images,
+    );
+    expect(decoded.whereType<ReaderPageFilePath>().map((page) => page.path), [
+      images[0] is ReaderDirPageImageData
+          ? (images[0] as ReaderDirPageImageData).file.path
+          : '',
+      (images[1] as ReaderDirPageImageData).file.path,
+    ]);
+  });
+
   for (final clear in [false, true]) {
     test(
       'old window cannot evict a replacement cache, cleared: $clear',

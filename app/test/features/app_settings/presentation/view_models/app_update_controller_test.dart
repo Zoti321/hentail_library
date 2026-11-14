@@ -127,7 +127,7 @@ void main() {
           respectDismissedVersion: true,
           showDialogOnUpdate: true,
           showFeedbackToasts: true,
-          dialogContext: context,
+          feedback: appUpdateFeedback(context),
         ),
         AppUpdateCheckOutcome.upToDate,
       );
@@ -146,7 +146,7 @@ void main() {
           respectDismissedVersion: true,
           showDialogOnUpdate: true,
           showFeedbackToasts: true,
-          dialogContext: context,
+          feedback: appUpdateFeedback(context),
         ),
         AppUpdateCheckOutcome.upToDate,
       );
@@ -181,7 +181,7 @@ void main() {
     );
     final pending = container
         .read(appUpdateControllerProvider.notifier)
-        .runManualCheck(context: context);
+        .runManualCheck(feedback: appUpdateFeedback(context));
     await tester.pumpAndSettle();
     expect(find.byType(AppUpdateDialog), findsOneWidget);
     expect(
@@ -191,6 +191,40 @@ void main() {
     Navigator.of(tester.element(find.byType(AppUpdateDialog))).pop();
     await tester.pumpAndSettle();
     await pending;
+    expect(gateway.calls, 1);
+  });
+
+  testWidgets('a detached manual-check context receives no delayed UI', (
+    tester,
+  ) async {
+    final response = Completer<AppReleaseInfo?>();
+    final requested = Completer<void>();
+    final gateway = _Gateway(() {
+      requested.complete();
+      return response.future;
+    });
+    final container = _container(gateway);
+    late BuildContext context;
+    await pumpLocalizedApp(
+      tester,
+      home: Builder(
+        builder: (value) {
+          context = value;
+          return const Scaffold();
+        },
+      ),
+    );
+    final pending = container
+        .read(appUpdateControllerProvider.notifier)
+        .runManualCheck(feedback: appUpdateFeedback(context));
+    await tester.pump();
+    await requested.future;
+    await tester.pumpWidget(const SizedBox.shrink());
+    response.complete(_release());
+    await tester.pumpAndSettle();
+    await pending;
+    expect(find.byType(AppUpdateDialog), findsNothing);
+    expect(tester.takeException(), isNull);
     expect(gateway.calls, 1);
   });
 }

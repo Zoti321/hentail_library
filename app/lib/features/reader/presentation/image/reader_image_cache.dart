@@ -1,3 +1,5 @@
+import 'package:hentai_library/features/reader/domain/reader_page_payload.dart';
+
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -157,11 +159,38 @@ Future<void> precacheReaderFilePath({
       cacheWidth: cacheWidth,
       cacheHeight: cacheHeight,
     );
-    if (provider == null) {
+    if (provider == null || !context.mounted) {
       return;
     }
     await precacheReaderImage(context: context, provider: provider);
   } on FileSystemException {
     // 预取窗口已滑走、磁盘缓存被驱逐。
+  }
+}
+
+Future<void> precacheReaderPayload({
+  required BuildContext context,
+  required ReaderPagePayload page,
+  int? cacheWidth,
+}) async {
+  if (!context.mounted) return;
+  switch (page) {
+    case ReaderPageFilePath(:final path):
+      await precacheReaderFilePath(
+        context: context,
+        filePath: path,
+        cacheWidth: cacheWidth,
+      );
+    case ReaderPageBytes(:final data):
+      final provider = buildReaderImageProvider(
+        memoryBytes: data,
+        cacheWidth: cacheWidth,
+      );
+      if (provider == null) return;
+      try {
+        await precacheReaderImage(context: context, provider: provider);
+      } on Object {
+        // A failed speculative decode must not stop the remaining warm window.
+      }
   }
 }

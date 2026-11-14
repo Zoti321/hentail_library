@@ -420,7 +420,7 @@ class _CheckUpdateTile extends ConsumerWidget {
           ? null
           : () => ref
                 .read(appUpdateControllerProvider.notifier)
-                .runManualCheck(context: context),
+                .runManualCheck(feedback: appUpdateFeedback(context)),
     );
   }
 }

@@ -1,3 +1,5 @@
+import 'package:hentai_library/features/reader/presentation/image/reader_image_cache.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -56,7 +58,12 @@ void useReaderPrefetchWindow({
             return;
           }
           await controller.precacheWindow(
-            context: context,
+            isMounted: () => context.mounted,
+            precachePage: (page, width) => precacheReaderPayload(
+              context: context,
+              page: page,
+              cacheWidth: width,
+            ),
             comicId: comicId,
             pageIndexesOneBased: targets,
             imageList: imageList,

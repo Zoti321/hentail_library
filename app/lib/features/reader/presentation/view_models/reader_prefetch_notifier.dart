@@ -1,7 +1,5 @@
 import 'dart:async';
-import 'dart:typed_data';
 
-import 'package:flutter/material.dart';
 import 'package:hentai_library/features/reader/domain/reader_page_payload.dart';
 import 'package:hentai_library/features/reader/domain/page_prefetch_window.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/read_session_page_data.dart';
@@ -168,7 +166,8 @@ class ReaderPrefetchNotifier extends _$ReaderPrefetchNotifier {
   }
 
   Future<void> precacheWindow({
-    required BuildContext context,
+    required bool Function() isMounted,
+    required Future<void> Function(ReaderPagePayload, int?) precachePage,
     required String comicId,
     required Set<int> pageIndexesOneBased,
     required List<ReaderPageImageData> imageList,
@@ -190,7 +189,7 @@ class ReaderPrefetchNotifier extends _$ReaderPrefetchNotifier {
             generation: generation,
             pageOneBased: pageOneBased,
           ) ||
-          !context.mounted) {
+          !isMounted()) {
         return;
       }
       if (pageOneBased < 1 || pageOneBased > imageList.length) {
@@ -198,7 +197,8 @@ class ReaderPrefetchNotifier extends _$ReaderPrefetchNotifier {
       }
       final ReaderPageImageData imageData = imageList[pageOneBased - 1];
       await _precachePage(
-        context: context,
+        isMounted: isMounted,
+        precachePage: precachePage,
         comicId: comicId,
         generation: generation,
         imageData: imageData,
@@ -220,18 +220,15 @@ class ReaderPrefetchNotifier extends _$ReaderPrefetchNotifier {
   }
 
   Future<void> _precachePage({
-    required BuildContext context,
+    required bool Function() isMounted,
+    required Future<void> Function(ReaderPagePayload, int?) precachePage,
     required String comicId,
     required int generation,
     required ReaderPageImageData imageData,
     int? cacheWidth,
   }) async {
     if (imageData is ReaderDirPageImageData) {
-      await precacheReaderFilePath(
-        context: context,
-        filePath: imageData.file.path,
-        cacheWidth: cacheWidth,
-      );
+      await precachePage(ReaderPageFilePath(imageData.file.path), cacheWidth);
       return;
     }
     if (imageData is! ReaderArchivePageImageData) {
@@ -248,30 +245,10 @@ class ReaderPrefetchNotifier extends _$ReaderPrefetchNotifier {
           generation: generation,
           pageOneBased: imageData.pageIndex + 1,
         ) ||
-        !context.mounted) {
+        !isMounted()) {
       return;
     }
-    switch (page) {
-      case ReaderPageFilePath(:final String path):
-        await precacheReaderFilePath(
-          context: context,
-          filePath: path,
-          cacheWidth: cacheWidth,
-        );
-      case ReaderPageBytes(:final Uint8List data):
-        final ImageProvider<Object>? provider = buildReaderImageProvider(
-          memoryBytes: data,
-          cacheWidth: cacheWidth,
-        );
-        if (provider == null) {
-          return;
-        }
-        try {
-          await precacheReaderImage(context: context, provider: provider);
-        } on Object {
-          // 单页预热失败不阻断窗口内其余页。
-        }
-    }
+    await precachePage(page, cacheWidth);
   }
 
   Future<void> warmOpenComic({
@@ -279,9 +256,13 @@ class ReaderPrefetchNotifier extends _$ReaderPrefetchNotifier {
     int? resumePageOneBased,
   }) async {
     final snapshot = await ref.read(
+      // One-shot read of an active UI provider; do not retain its snapshot or extend its lifetime.
+      // ignore: riverpod_lint/only_use_keep_alive_inside_keep_alive
       readerSessionOpenProvider(comicId: comicId).future,
     );
     final int center = resumePageOneBased ?? snapshot.resumePageIndex;
+    // One-shot read of an active UI provider; do not retain its snapshot or extend its lifetime.
+    // ignore: riverpod_lint/only_use_keep_alive_inside_keep_alive
     await ref.read(comicImagesProvider(comicId: comicId).future);
     await warmWindow(
       comicId: comicId,

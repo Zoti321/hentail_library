@@ -31,9 +31,9 @@ class AppUpdateController extends _$AppUpdateController {
     required bool respectDismissedVersion,
     required bool showDialogOnUpdate,
     required bool showFeedbackToasts,
-    BuildContext? dialogContext,
+    AppUpdateFeedback? feedback,
   }) async {
-    final BuildContext? uiContext = dialogContext;
+    final ui = feedback ?? appUpdateFeedback(null);
     try {
       final String currentVersion = await ref.read(
         installedAppVersionProvider.future,
@@ -45,16 +45,14 @@ class AppUpdateController extends _$AppUpdateController {
       switch (result) {
         case AppUpdateUnavailable():
           if (showFeedbackToasts) {
-            _showFeedbackToast(
-              uiContext,
+            ui.showToast(
               (AppLocalizations l10n) => l10n.settingsUpdateCheckFailed,
             );
           }
           return AppUpdateCheckOutcome.failed;
         case AppUpdateCurrent():
           if (showFeedbackToasts) {
-            _showFeedbackToast(
-              uiContext,
+            ui.showToast(
               (AppLocalizations l10n) => l10n.settingsUpdateUpToDate,
             );
           }
@@ -63,28 +61,25 @@ class AppUpdateController extends _$AppUpdateController {
           return AppUpdateCheckOutcome.upToDate;
         case AppUpdateAvailable(:final release):
           if (showDialogOnUpdate) {
-            await _showUpdateDialogForContext(release, uiContext);
+            await ui.showUpdate(release);
           }
           return AppUpdateCheckOutcome.updateAvailable;
       }
     } catch (error, stackTrace) {
       if (showFeedbackToasts) {
         logError(AppLog.ui('appUpdate'), '检查更新失败', error, stackTrace);
-        _showFeedbackToast(
-          uiContext,
-          (AppLocalizations l10n) => l10n.settingsUpdateCheckFailed,
-        );
+        ui.showToast((AppLocalizations l10n) => l10n.settingsUpdateCheckFailed);
       }
       return AppUpdateCheckOutcome.failed;
     }
   }
 
-  Future<void> runManualCheck({BuildContext? context}) {
+  Future<void> runManualCheck({AppUpdateFeedback? feedback}) {
     return checkForUpdate(
       respectDismissedVersion: false,
       showDialogOnUpdate: true,
       showFeedbackToasts: true,
-      dialogContext: context,
+      feedback: feedback,
     );
   }
 
@@ -100,45 +95,57 @@ class AppUpdateController extends _$AppUpdateController {
     await Future<void>.delayed(AppUpdateConstants.startupCheckDelay);
     await SchedulerBinding.instance.endOfFrame;
     final Completer<void> completer = Completer<void>();
-    SchedulerBinding.instance.scheduleTask<void>(
-      () {
-        unawaited(
-          checkForUpdate(
-            respectDismissedVersion: true,
-            showDialogOnUpdate: true,
-            showFeedbackToasts: false,
-          ).whenComplete(completer.complete),
-        );
-      },
-      Priority.idle,
-      debugLabel: 'startup_update_check_idle',
+    unawaited(
+      SchedulerBinding.instance.scheduleTask<void>(
+        () {
+          unawaited(
+            checkForUpdate(
+              respectDismissedVersion: true,
+              showDialogOnUpdate: true,
+              showFeedbackToasts: false,
+            ).whenComplete(completer.complete),
+          );
+        },
+        Priority.idle,
+        debugLabel: 'startup_update_check_idle',
+      ),
     );
     return completer.future;
   }
+}
 
-  Future<void> _showUpdateDialogForContext(
-    AppReleaseInfo release,
-    BuildContext? uiContext,
-  ) async {
-    if (uiContext != null && uiContext.mounted) {
-      await showAppUpdateDialog(context: uiContext, release: release);
-      return;
-    }
-    final BuildContext? rootContext = appRootNavigatorKey.currentContext;
-    if (rootContext != null && rootContext.mounted) {
-      await showAppUpdateDialog(context: rootContext, release: release);
-    }
+Future<void> _showUpdateDialogForContext(
+  AppReleaseInfo release,
+  BuildContext? uiContext,
+) async {
+  if (uiContext != null && uiContext.mounted) {
+    await showAppUpdateDialog(context: uiContext, release: release);
+    return;
   }
-
-  void _showFeedbackToast(
-    BuildContext? uiContext,
-    String Function(AppLocalizations l10n) message,
-  ) {
-    final BuildContext? ctx = uiContext != null && uiContext.mounted
-        ? uiContext
-        : appRootNavigatorKey.currentContext;
-    if (ctx != null && ctx.mounted) {
-      showInfoSnackbar(ctx, message(AppLocalizations.of(ctx)));
-    }
+  final BuildContext? rootContext = appRootNavigatorKey.currentContext;
+  if (rootContext != null && rootContext.mounted) {
+    await showAppUpdateDialog(context: rootContext, release: release);
   }
 }
+
+void _showFeedbackToast(
+  BuildContext? uiContext,
+  String Function(AppLocalizations l10n) message,
+) {
+  final BuildContext? ctx = uiContext != null && uiContext.mounted
+      ? uiContext
+      : appRootNavigatorKey.currentContext;
+  if (ctx != null && ctx.mounted) {
+    showInfoSnackbar(ctx, message(AppLocalizations.of(ctx)));
+  }
+}
+
+typedef AppUpdateFeedback = ({
+  Future<void> Function(AppReleaseInfo) showUpdate,
+  void Function(String Function(AppLocalizations)) showToast,
+});
+
+AppUpdateFeedback appUpdateFeedback(BuildContext? context) => (
+  showUpdate: (release) => _showUpdateDialogForContext(release, context),
+  showToast: (message) => _showFeedbackToast(context, message),
+);
