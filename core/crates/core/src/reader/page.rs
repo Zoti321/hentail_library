@@ -41,12 +41,14 @@ pub fn load_reader_page(
         return load_page_bytes(session, page_index).map(|data| ReaderPageDto::Bytes { data });
     };
     let cache = ReaderCache::app()?;
-    load_archive_page_with(
+    let result = load_archive_page_with(
         &read.cache,
-        || cache.cached_page_path(comic_id, source, page_index),
+        || session.with_current_io(|| cache.cached_page_path(comic_id, source, page_index)),
         || load_page_bytes(session, page_index),
-        |bytes| cache.write_page(comic_id, source, page_index, bytes),
-    )
+        |bytes| session.with_current_io(|| cache.write_page(comic_id, source, page_index, bytes)),
+    )?;
+    session.ensure_current()?;
+    Ok(result)
 }
 
 pub(crate) fn load_page_image_bytes(
@@ -68,21 +70,27 @@ pub(crate) fn load_page_image_bytes(
             return load_page_bytes(session, page_index);
         };
         let cache = ReaderCache::app()?;
-        load_archive_page_bytes_with(
+        let result = load_archive_page_bytes_with(
             &read,
             || {
-                cache
-                    .cached_page_path(comic_id, source, page_index)?
-                    .map(|path| read_file_bytes(&path.to_string_lossy()))
-                    .transpose()
+                session.with_current_io(|| {
+                    cache
+                        .cached_page_path(comic_id, source, page_index)?
+                        .map(|path| read_file_bytes(&path.to_string_lossy()))
+                        .transpose()
+                })
             },
             || load_page_bytes(session, page_index),
             |bytes| {
-                cache
-                    .write_page(comic_id, source, page_index, bytes)
-                    .map(|_| ())
+                session.with_current_io(|| {
+                    cache
+                        .write_page(comic_id, source, page_index, bytes)
+                        .map(|_| ())
+                })
             },
-        )
+        )?;
+        session.ensure_current()?;
+        Ok(result)
     })
 }
 

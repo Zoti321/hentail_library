@@ -36,11 +36,17 @@ impl ReaderPageCacheRequest {
                 load_page_bytes(session, page_index).map(Some)
             },
             |page_index, bytes| {
-                cache
-                    .write_page(&self.comic_id, source, page_index, bytes)
-                    .map(|_| ())
+                session.with_current_io(|| {
+                    cache
+                        .write_page(&self.comic_id, source, page_index, bytes)
+                        .map(|_| ())
+                })
             },
-            || cache.evict_outside_pages(&self.comic_id, source, page_indexes),
+            || {
+                session.with_current_io(|| {
+                    cache.evict_outside_pages(&self.comic_id, source, page_indexes)
+                })
+            },
         )
     }
 

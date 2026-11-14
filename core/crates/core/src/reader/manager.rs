@@ -14,9 +14,10 @@ use super::cache::ReaderSourceVersion;
 struct CachedSession {
     _lifetime: Arc<()>,
     identity: Arc<()>,
+    publication: Arc<Mutex<()>>,
     normalized_path: String,
     resource_type: String,
-    backend: ReaderBackend,
+    backend: Arc<Mutex<ReaderBackend>>,
     source_stat: ResourceStat,
     local_source: Option<PathBuf>,
     /// Active acquire count (Flutter open + ephemeral leases).
@@ -30,6 +31,7 @@ impl CachedSession {
         ReaderSessionRead {
             comic_id: comic_id.to_string(),
             identity: self.identity.clone(),
+            publication: self.publication.clone(),
             path: self.normalized_path.clone(),
             resource_type: self.resource_type.clone(),
             source_version: ReaderSourceVersion::from_stat(&self.source_stat),
@@ -43,6 +45,7 @@ impl CachedSession {
 pub struct ReaderSessionRead {
     pub(super) comic_id: String,
     identity: Arc<()>,
+    publication: Arc<Mutex<()>>,
     pub(super) path: String,
     pub(super) resource_type: String,
     pub(super) source_version: Option<ReaderSourceVersion>,
@@ -67,14 +70,35 @@ impl ReaderSessionRead {
         read: impl FnOnce(&ReaderBackend) -> Result<T, HentaiError>,
     ) -> Result<T, HentaiError> {
         self.ensure_current()?;
-        let result = {
+        let backend = {
             let store = store()
                 .lock()
                 .map_err(|error| HentaiError::validation(error.to_string()))?;
             let session = self.current_session(&store)?;
-            read(&session.backend)?
+            session.backend.clone()
         };
-        self.validate_source()?;
+        let result = {
+            let backend = backend
+                .lock()
+                .map_err(|error| HentaiError::validation(error.to_string()))?;
+            self.ensure_current()?;
+            read(&backend)?
+        };
+        self.ensure_current()?;
+        Ok(result)
+    }
+
+    pub(super) fn with_current_io<T>(
+        &self,
+        operation: impl FnOnce() -> Result<T, HentaiError>,
+    ) -> Result<T, HentaiError> {
+        let _publication = self
+            .publication
+            .lock()
+            .map_err(|error| HentaiError::validation(error.to_string()))?;
+        self.ensure_current()?;
+        let result = operation()?;
+        self.ensure_current()?;
         Ok(result)
     }
 
@@ -314,9 +338,10 @@ fn acquire_reader_with(
     let session = CachedSession {
         _lifetime: lifetime,
         identity: Arc::new(()),
+        publication: Arc::new(Mutex::new(())),
         normalized_path,
         resource_type: resource_type.to_string(),
-        backend: backend.backend,
+        backend: Arc::new(Mutex::new(backend.backend)),
         source_stat: backend.source_stat,
         local_source: backend.local_source,
         ref_count: 1,
@@ -417,7 +442,16 @@ pub fn close_reader(comic_id: &str) {
     let Ok(mut store) = store().lock() else {
         return;
     };
-    if store.close(comic_id) {
+    let publication = store
+        .sessions
+        .get(comic_id)
+        .map(|session| session.publication.clone());
+    let removed = store.close(comic_id);
+    drop(store);
+    if let Some(publication) = publication {
+        let _guard = publication.lock();
+    }
+    if removed {
         tracing::info!(comic_id, "reader closed");
     }
 }
@@ -428,7 +462,16 @@ pub fn clear_reader_sessions() {
         return;
     };
     let count = store.sessions.len();
+    let publications: Vec<_> = store
+        .sessions
+        .values()
+        .map(|session| session.publication.clone())
+        .collect();
     store.clear();
+    drop(store);
+    for publication in publications {
+        let _guard = publication.lock();
+    }
     if count > 0 {
         tracing::info!(count, "reader sessions cleared");
     }
@@ -447,6 +490,50 @@ mod tests {
         f: impl FnOnce(&ReaderBackend) -> Result<T, HentaiError>,
     ) -> Result<T, HentaiError> {
         ReaderSessionRead::capture(comic_id)?.with_backend(f)
+    }
+
+    #[test]
+    fn blocked_decode_allows_other_sessions_and_rejects_closed_completion() {
+        use std::sync::mpsc;
+        use std::time::Duration;
+        let access = fake_cbz();
+        let a = "decode_isolation_a";
+        let b = "decode_isolation_b";
+        open_reader_with(&access, a, "/lease/comic.cbz", "cbz").unwrap();
+        let read = ReaderSessionRead::capture(a).unwrap();
+        let (entered_tx, entered_rx) = mpsc::channel();
+        let (release_tx, release_rx) = mpsc::channel();
+        let worker = std::thread::spawn(move || {
+            read.with_backend(|_| {
+                entered_tx.send(()).unwrap();
+                release_rx.recv_timeout(Duration::from_secs(10)).unwrap();
+                Ok(vec![42])
+            })
+        });
+        entered_rx.recv_timeout(Duration::from_secs(10)).unwrap();
+        let (done_tx, done_rx) = mpsc::channel();
+        let other = std::thread::spawn(move || {
+            open_reader_with(&access, b, "/lease/comic.cbz", "cbz").unwrap();
+            let bytes =
+                super::super::open::load_page_bytes(&ReaderSessionRead::capture(b).unwrap(), 0)
+                    .unwrap();
+            close_reader(b);
+            close_reader(a);
+            open_reader_with(&access, a, "/lease/reopened.cbz", "cbz").unwrap();
+            done_tx.send(bytes).unwrap();
+        });
+        let completed = done_rx.recv_timeout(Duration::from_secs(5));
+        release_tx.send(()).unwrap();
+        other.join().unwrap();
+        assert_eq!(completed.unwrap(), b"page");
+        assert_eq!(
+            worker.join().unwrap().unwrap_err().code,
+            HentaiErrorCode::ReaderSessionNotOpen
+        );
+        let bytes = super::super::open::load_page_bytes(&ReaderSessionRead::capture(a).unwrap(), 0)
+            .unwrap();
+        assert_eq!(bytes, b"replacement-page");
+        close_reader(a);
     }
 
     fn fake_cbz() -> FakeResourceAccess {
