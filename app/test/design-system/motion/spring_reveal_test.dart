@@ -45,6 +45,49 @@ Future<List<double>> _sampleFirstFrames(
 }
 
 void main() {
+  for (final reduceMotion in [false, true]) {
+    testWidgets(
+      'hidden reveal excludes keyboard focus (reduceMotion=$reduceMotion)',
+      (tester) async {
+        final focus = FocusNode();
+        addTearDown(focus.dispose);
+        final visible = ValueNotifier(true);
+        addTearDown(visible.dispose);
+        await pumpDesignSystemApp(
+          tester,
+          home: MediaQuery(
+            data: MediaQueryData(disableAnimations: reduceMotion),
+            child: ValueListenableBuilder<bool>(
+              valueListenable: visible,
+              builder: (context, show, _) => SpringReveal(
+                visible: show,
+                hiddenOffset: _hidden,
+                child: TextButton(
+                  focusNode: focus,
+                  onPressed: () {},
+                  child: const Text('action'),
+                ),
+              ),
+            ),
+          ),
+        );
+        focus.requestFocus();
+        await tester.pump();
+        expect(focus.hasFocus, isTrue);
+        visible.value = false;
+        await tester.pump();
+        expect(focus.canRequestFocus, isFalse);
+        await tester.pumpAndSettle();
+        expect(focus.hasFocus, isFalse);
+        visible.value = true;
+        await tester.pumpAndSettle();
+        focus.requestFocus();
+        await tester.pump();
+        expect(focus.hasFocus, isTrue);
+      },
+    );
+  }
+
   testWidgets('不同 motion 给出不同轨迹', (WidgetTester tester) async {
     final List<double> spatial = await _sampleFirstFrames(
       tester,

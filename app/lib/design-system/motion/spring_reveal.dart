@@ -50,6 +50,7 @@ class _SpringRevealState extends State<SpringReveal>
   @override
   void didUpdateWidget(SpringReveal oldWidget) {
     super.didUpdateWidget(oldWidget);
+    _controller.motion = widget.motion;
     if (oldWidget.visible == widget.visible) {
       return;
     }
@@ -74,14 +75,20 @@ class _SpringRevealState extends State<SpringReveal>
         ignoring: !widget.visible,
         child: ExcludeSemantics(
           excluding: !widget.visible,
-          child: Opacity(opacity: widget.visible ? 1 : 0, child: widget.child),
+          child: Opacity(
+            opacity: widget.visible ? 1 : 0,
+            child: ExcludeFocus(
+              excluding: !widget.visible,
+              child: widget.child,
+            ),
+          ),
         ),
       );
     }
 
     return AnimatedBuilder(
       animation: _controller,
-      child: widget.child,
+      child: ExcludeFocus(excluding: !widget.visible, child: widget.child),
       builder: (BuildContext context, Widget? child) {
         final double raw = _controller.value;
         final double opacity = raw.clamp(0.0, 1.0);
