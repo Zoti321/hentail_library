@@ -160,21 +160,6 @@ class _InputChipFieldContentState extends State<InputChipFieldContent> {
   final GlobalKey _wrapKey = GlobalKey();
   bool _multiline = false;
 
-  @override
-  void initState() {
-    super.initState();
-    _scheduleMeasure();
-  }
-
-  @override
-  void didUpdateWidget(covariant InputChipFieldContent oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.chips.length != widget.chips.length ||
-        oldWidget.hasChips != widget.hasChips) {
-      _scheduleMeasure();
-    }
-  }
-
   void _scheduleMeasure() {
     WidgetsBinding.instance.addPostFrameCallback((_) => _measureWrap());
   }
@@ -222,15 +207,20 @@ class _InputChipFieldContentState extends State<InputChipFieldContent> {
       children: <Widget>[...widget.chips, widget.inlineField],
     );
 
-    return Padding(
-      padding: EdgeInsets.only(top: insets.top, bottom: insets.bottom),
-      child: widget.onTap == null
-          ? wrap
-          : GestureDetector(
-              behavior: HitTestBehavior.translucent,
-              onTap: widget.onTap,
-              child: wrap,
-            ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        _scheduleMeasure();
+        return Padding(
+          padding: EdgeInsets.only(top: insets.top, bottom: insets.bottom),
+          child: widget.onTap == null
+              ? wrap
+              : GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onTap: widget.onTap,
+                  child: wrap,
+                ),
+        );
+      },
     );
   }
 }

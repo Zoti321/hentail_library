@@ -185,7 +185,6 @@ class _AppDenseSearchBarState extends State<AppDenseSearchBar> {
 
   @override
   Widget build(BuildContext context) {
-    final bool compact = windowSizeClassOf(context).isCompact;
     final M3EThemeData theme = M3ETheme.of(context);
     final M3ESearchBarTheme denseBarTheme = theme.searchBarTheme.copyWith(
       minHeight: AppDenseSearchBar.height,
@@ -213,7 +212,13 @@ class _AppDenseSearchBarState extends State<AppDenseSearchBar> {
           final bool showMatch = matchLabel != null && matchLabel.isNotEmpty;
           const double matchGap = 12;
           final double matchReserve = showMatch ? matchGap + 96 : 0;
-          final double available = constraints.maxWidth;
+          final double available = constraints.hasBoundedWidth
+              ? constraints.maxWidth
+              : math.min(
+                  AppDenseSearchBar.maxWidth,
+                  MediaQuery.sizeOf(context).width,
+                );
+          final bool compact = available < Breakpoints.medium;
           final double barWidth = compact
               ? math.max(0, available - matchReserve)
               : math.min(
@@ -251,23 +256,26 @@ class _AppDenseSearchBarState extends State<AppDenseSearchBar> {
             ),
           );
 
-          return Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              if (compact) Expanded(child: searchBar) else searchBar,
-              if (showMatch) ...<Widget>[
-                const SizedBox(width: matchGap),
-                Flexible(
-                  child: Text(
-                    matchLabel,
-                    style: matchStyle,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    softWrap: false,
+          return SizedBox(
+            width: available,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                if (compact) Expanded(child: searchBar) else searchBar,
+                if (showMatch) ...<Widget>[
+                  const SizedBox(width: matchGap),
+                  Flexible(
+                    child: Text(
+                      matchLabel,
+                      style: matchStyle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      softWrap: false,
+                    ),
                   ),
-                ),
+                ],
               ],
-            ],
+            ),
           );
         },
       ),
