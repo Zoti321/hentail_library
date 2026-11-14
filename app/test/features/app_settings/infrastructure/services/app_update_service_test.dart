@@ -1,7 +1,83 @@
+import 'dart:io';
+
+import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/app_settings/infrastructure/services/app_update/github_app_update_gateway.dart';
 
 void main() {
+  group('GitHub release connection recovery', () {
+    for (final bool persistent in <bool>[false, true]) {
+      test(
+        persistent
+            ? 'bounds handshake retries'
+            : 'recovers from handshake interruption',
+        () async {
+          final Dio dio = Dio();
+          addTearDown(() => dio.close(force: true));
+          int attempts = 0;
+          dio.interceptors.add(
+            InterceptorsWrapper(
+              onRequest: (options, handler) {
+                attempts++;
+                if (persistent || attempts == 1) {
+                  handler.reject(
+                    DioException(
+                      requestOptions: options,
+                      error: const HandshakeException(
+                        'Connection terminated during handshake',
+                      ),
+                    ),
+                  );
+                } else {
+                  handler.resolve(
+                    Response<Object?>(
+                      requestOptions: options,
+                      data: <Object?>[],
+                    ),
+                  );
+                }
+              },
+            ),
+          );
+          final gateway = GitHubAppUpdateGateway(dio: dio);
+          if (persistent) {
+            await expectLater(
+              gateway.fetchLatestStableRelease(),
+              throwsA(isA<DioException>()),
+            );
+            expect(attempts, 3);
+          } else {
+            expect(await gateway.fetchLatestStableRelease(), isNull);
+            expect(attempts, 2);
+          }
+        },
+      );
+    }
+    test('does not retry certificate rejection or HTTP errors', () async {
+      for (final type in <DioExceptionType>[
+        DioExceptionType.badCertificate,
+        DioExceptionType.badResponse,
+      ]) {
+        final Dio dio = Dio();
+        addTearDown(() => dio.close(force: true));
+        int attempts = 0;
+        dio.interceptors.add(
+          InterceptorsWrapper(
+            onRequest: (options, handler) {
+              attempts++;
+              handler.reject(DioException(requestOptions: options, type: type));
+            },
+          ),
+        );
+        await expectLater(
+          GitHubAppUpdateGateway(dio: dio).fetchLatestStableRelease(),
+          throwsA(isA<DioException>()),
+        );
+        expect(attempts, 1);
+      }
+    });
+  });
+
   group('GitHubAppUpdateGateway.parseReleaseNotes', () {
     late GitHubAppUpdateGateway service;
 

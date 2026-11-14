@@ -30,10 +30,7 @@ class GitHubAppUpdateGateway implements AppUpdateGateway {
 
   @override
   Future<AppReleaseInfo?> fetchLatestStableRelease() async {
-    final Response<Object?> response = await _dio.get<Object?>(
-      AppUpdateConstants.releasesApiUrl,
-      queryParameters: <String, dynamic>{'per_page': 30},
-    );
+    final Response<Object?> response = await _fetchReleases();
     final List<dynamic> rawReleases = response.data as List<dynamic>;
     AppReleaseInfo? latestRelease;
     for (final Object? rawRelease in rawReleases) {
@@ -56,6 +53,30 @@ class GitHubAppUpdateGateway implements AppUpdateGateway {
       }
     }
     return latestRelease;
+  }
+
+  Future<Response<Object?>> _fetchReleases() async {
+    for (int attempt = 0; ; attempt++) {
+      try {
+        return await _dio.get<Object?>(
+          AppUpdateConstants.releasesApiUrl,
+          queryParameters: <String, dynamic>{'per_page': 30},
+        );
+      } on DioException catch (error) {
+        // Retry this read-only request only for interrupted connections.
+        final bool interrupted =
+            error.type == DioExceptionType.connectionError ||
+            error.type == DioExceptionType.connectionTimeout ||
+            error.type == DioExceptionType.receiveTimeout ||
+            (error.type == DioExceptionType.unknown &&
+                error.error is HandshakeException &&
+                (error.error as HandshakeException).message.contains(
+                  'Connection terminated during handshake',
+                ));
+        if (!interrupted || attempt >= 2) rethrow;
+        await Future<void>.delayed(Duration(milliseconds: 300 * (attempt + 1)));
+      }
+    }
   }
 
   @override
