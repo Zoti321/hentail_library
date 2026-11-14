@@ -1,12 +1,13 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 
-use crate::comic::dto::ComicDto;
-use crate::comic::repository::find_comics_by_ids;
-use crate::comic::write::{update_comic_user_meta, UpdateComicUserMetaDto};
+use crate::comic::repository::{find_comics_by_ids, find_visible_comic_by_id_in};
+use crate::comic::write::{update_comic_user_meta_in, UpdateComicUserMetaDto};
+use crate::db::{connection, map_db_err};
 use crate::error::HentaiError;
 use crate::library_write::with_library_write;
 use crate::metadata_lock::merge_multi_value;
 use crate::sync::handle::SyncHandle;
+use sea_orm::TransactionTrait;
 
 pub const BULK_PATCH_MAX_IDS: usize = 2000;
 const MAX_ERROR_SAMPLES: usize = 5;
@@ -73,9 +74,16 @@ fn push_error_sample(result: &mut BulkPatchResultDto, message: String) {
 }
 
 async fn apply_patch_to_one(
-    comic: &ComicDto,
+    comic_id: &str,
+    library_id: &str,
     patch: &ComicMetadataBulkPatch,
 ) -> Result<PatchOutcome, HentaiError> {
+    let db = connection()?;
+    let txn = db.begin().await.map_err(map_db_err)?;
+    let comic = find_visible_comic_by_id_in(&txn, comic_id)
+        .await?
+        .filter(|comic| comic.library_id == library_id)
+        .ok_or_else(|| HentaiError::validation(format!("Comic unavailable: {comic_id}")))?;
     let mut meta = UpdateComicUserMetaDto::default();
     let mut changed = false;
 
@@ -147,9 +155,12 @@ async fn apply_patch_to_one(
     }
 
     if !changed {
+        txn.commit().await.map_err(map_db_err)?;
         return Ok(PatchOutcome::Unchanged);
     }
-    update_comic_user_meta(&comic.comic_id, meta).await?;
+    update_comic_user_meta_in(&txn, &comic.comic_id, meta).await?;
+    txn.commit().await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(PatchOutcome::Succeeded)
 }
 
@@ -194,11 +205,8 @@ async fn apply_comic_metadata_bulk_patch_locked(
         return Err(HentaiError::validation("批量编辑不可跨 Library"));
     }
 
-    let comic_map: HashMap<String, ComicDto> = comics
-        .into_iter()
-        .map(|comic| (comic.comic_id.clone(), comic))
-        .collect();
-    let found_ids: HashSet<String> = comic_map.keys().cloned().collect();
+    let library_id = library_ids.into_iter().next().unwrap_or_default();
+    let mut seen = HashSet::new();
 
     let mut result = BulkPatchResultDto::default();
     for comic_id in comic_ids {
@@ -206,13 +214,10 @@ async fn apply_comic_metadata_bulk_patch_locked(
             result.cancelled = true;
             break;
         }
-        if !found_ids.contains(&comic_id) {
-            result.failed += 1;
-            push_error_sample(&mut result, format!("漫画不存在: {comic_id}"));
+        if !seen.insert(comic_id.clone()) {
             continue;
         }
-        let comic = comic_map.get(&comic_id).expect("validated above");
-        match apply_patch_to_one(comic, &patch).await {
+        match apply_patch_to_one(&comic_id, &library_id, &patch).await {
             Ok(PatchOutcome::Succeeded) => result.succeeded += 1,
             Ok(PatchOutcome::Unchanged) => result.unchanged += 1,
             Err(err) => {
