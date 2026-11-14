@@ -61,6 +61,118 @@ void main() {
     expect(find.byIcon(Symbols.auto_awesome), findsOneWidget);
   });
 
+  testWidgets('selected rows stay visible and toggle with click and Tab', (
+    tester,
+  ) async {
+    final semantics = tester.ensureSemantics();
+    await pumpDesignSystemApp(
+      tester,
+      home: const Center(
+        child: SizedBox(
+          width: 360,
+          child: _NamedFacetMultiSelectTestHarness(initialSelected: ['深海']),
+        ),
+      ),
+    );
+    await tester.tap(find.byType(EditableText));
+    await tester.pumpAndSettle();
+    expect(find.byIcon(Symbols.check_box), findsOneWidget);
+    expect(
+      find.byWidgetPredicate(
+        (w) => w is Semantics && w.properties.checked == true,
+      ),
+      findsOneWidget,
+    );
+    expect(find.text('深海'), findsNWidgets(2));
+    await tester.tap(find.text('深海').last);
+    await tester.pumpAndSettle();
+    expect(find.byIcon(Symbols.check_box), findsNothing);
+    expect(find.text('深海'), findsOneWidget);
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.pumpAndSettle();
+    expect(find.byIcon(Symbols.check_box), findsOneWidget);
+    expect(find.text('深海'), findsNWidgets(2));
+    expect(
+      tester.widget<EditableText>(find.byType(EditableText)).focusNode.hasFocus,
+      isTrue,
+    );
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.pumpAndSettle();
+    expect(find.byIcon(Symbols.check_box), findsNothing);
+    expect(find.byKey(FacetMultiSelectField.menuPanelKey), findsOneWidget);
+    semantics.dispose();
+  });
+
+  testWidgets('submitting an existing name does not duplicate a chip', (
+    tester,
+  ) async {
+    await pumpDesignSystemApp(
+      tester,
+      home: const Center(
+        child: SizedBox(
+          width: 360,
+          child: _NamedFacetMultiSelectTestHarness(initialSelected: ['深海']),
+        ),
+      ),
+    );
+    await tester.tap(find.byType(EditableText));
+    await tester.enterText(find.byType(EditableText), '深海');
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pumpAndSettle();
+    expect(find.text('深海'), findsNWidgets(2));
+  });
+
+  testWidgets('menu avoids keyboard insets and uses constrained field width', (
+    tester,
+  ) async {
+    await pumpDesignSystemApp(
+      tester,
+      home: const MediaQuery(
+        data: MediaQueryData(
+          size: Size(800, 600),
+          viewInsets: EdgeInsets.only(bottom: 350),
+        ),
+        child: Center(
+          child: SizedBox(
+            width: 300,
+            child: _NamedFacetMultiSelectTestHarness(initialSelected: []),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.byType(EditableText));
+    await tester.pumpAndSettle();
+    final panel = tester.getRect(
+      find.byKey(FacetMultiSelectField.menuPanelKey),
+    );
+    expect(panel.bottom, lessThanOrEqualTo(250));
+    expect(panel.width, 300);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+    'Home edits query without changing the candidate selected by Tab',
+    (tester) async {
+      await pumpDesignSystemApp(
+        tester,
+        home: const Center(
+          child: SizedBox(
+            width: 360,
+            child: _NamedFacetMultiSelectTestHarness(initialSelected: []),
+          ),
+        ),
+      );
+      await tester.tap(find.byType(EditableText));
+      await tester.enterText(find.byType(EditableText), 'Python');
+      await tester.pumpAndSettle();
+      await tester.sendKeyEvent(LogicalKeyboardKey.home);
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      expect(find.byIcon(Symbols.check_box), findsOneWidget);
+      expect(find.text('Python'), findsNWidgets(2));
+    },
+  );
+
   testWidgets('clear all trailing button removes every chip', (
     WidgetTester tester,
   ) async {

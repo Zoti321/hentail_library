@@ -9,6 +9,7 @@ const _candidates = <_Candidate>[
   (name: '深海', smartMatched: true),
   (name: '图书馆', smartMatched: false),
   (name: 'Python', smartMatched: false),
+  (name: '用于验证窄窗口和大字体的超长标签名称 Long candidate label', smartMatched: true),
 ];
 
 /// Widgetbook demo with local selection + smart facet candidates.
@@ -23,6 +24,7 @@ class Md3eNamedFacetMultiSelectFieldPreview extends StatefulWidget {
 class _Md3eNamedFacetMultiSelectFieldPreviewState
     extends State<Md3eNamedFacetMultiSelectFieldPreview> {
   final List<String> _selected = <String>[
+    '深海',
     '已有作者',
     '偶像大师',
     'Clannad',

@@ -99,9 +99,11 @@ class _NamedFacetMultiSelectFieldState<T>
 
   OverlayEntry? _overlayEntry;
   double _fieldWidth = 0;
-  List<String> _visibleRemainingNames = const <String>[];
+  double _menuAvailableHeight = _kNamedFacetMultiSelectMenuMaxHeight;
+  List<String> _visibleCandidateNames = const <String>[];
   bool _menuSessionActive = false;
   bool _menuOpensAbove = false;
+  double _menuAboveShift = 0;
   final Object _tapRegionGroup = Object();
   bool _highlightMovedByKeyboard = false;
   late final SingleMotionController _panelExpandCtrl;
@@ -274,9 +276,19 @@ class _NamedFacetMultiSelectFieldState<T>
       return;
     }
     final Offset globalTopLeft = box.localToGlobal(Offset.zero);
-    final double screenHeight = MediaQuery.sizeOf(context).height;
-    final double spaceBelow = screenHeight - globalTopLeft.dy - box.size.height;
-    final double spaceAbove = globalTopLeft.dy;
+    _fieldWidth = box.size.width;
+    final MediaQueryData media = MediaQuery.of(context);
+    final double screenHeight =
+        media.size.height -
+        math.max(media.viewInsets.bottom, media.padding.bottom);
+    final double spaceBelow = math.max(
+      0,
+      screenHeight - globalTopLeft.dy - box.size.height,
+    );
+    final double spaceAbove = math.max(
+      0,
+      math.min(globalTopLeft.dy, screenHeight) - media.padding.top,
+    );
     final M3EDropdownMenuTheme menuTheme = M3ETheme.of(context)
         .dropdownMenuTheme;
     final double panelMaxHeight = math.min(
@@ -287,13 +299,28 @@ class _NamedFacetMultiSelectFieldState<T>
       ),
     );
     _menuOpensAbove = spaceBelow < panelMaxHeight && spaceAbove > spaceBelow;
+    _menuAboveShift = _menuOpensAbove
+        ? math.max(0, globalTopLeft.dy - screenHeight)
+        : 0;
+    final double gap = menuTheme.panelMarginTop > 0
+        ? menuTheme.panelMarginTop
+        : M3ETheme.of(context).spacing.xs;
+    _menuAvailableHeight = math.max(
+      0,
+      math.min(
+        panelMaxHeight,
+        (_menuOpensAbove ? spaceAbove : spaceBelow) - gap,
+      ),
+    );
   }
 
   Offset _menuFollowerOffset(M3EDropdownMenuTheme menuTheme) {
     final double gap = M3ETheme.of(context).spacing.xs;
     final double margin = menuTheme.panelMarginTop;
     final double magnitude = margin > 0 ? margin : gap;
-    return _menuOpensAbove ? Offset(0, -magnitude) : Offset(0, magnitude);
+    return _menuOpensAbove
+        ? Offset(0, -magnitude - _menuAboveShift)
+        : Offset(0, magnitude);
   }
 
   void _removeOverlay({bool immediate = false}) {
@@ -326,13 +353,13 @@ class _NamedFacetMultiSelectFieldState<T>
 
   OverlayEntry _buildOverlayEntry() {
     final M3EThemeData themeData = M3ETheme.of(context);
-    final MediaQueryData mediaQuery = MediaQuery.of(context);
     return OverlayEntry(
       builder: (BuildContext overlayContext) {
         final M3EDropdownMenuTheme menuTheme = themeData.dropdownMenuTheme;
+        _resolveMenuOpensAbove();
         final Offset followerOffset = _menuFollowerOffset(menuTheme);
         return MediaQuery(
-          data: mediaQuery,
+          data: MediaQuery.of(context),
           child: M3ETheme(
             data: themeData,
             child: Stack(
@@ -380,6 +407,7 @@ class _NamedFacetMultiSelectFieldState<T>
                                                 T
                                               >(
                                                 width: _fieldWidth,
+                                                maxHeight: _menuAvailableHeight,
                                                 items: widget.items,
                                                 isLoading: widget.isLoading,
                                                 hasLoadError:
@@ -392,8 +420,8 @@ class _NamedFacetMultiSelectFieldState<T>
                                                     _highlightedIndexNotifier,
                                                 highlightedRowKey:
                                                     _highlightedRowKey,
-                                                onVisibleRemainingChanged:
-                                                    _reportVisibleRemaining,
+                                                onVisibleCandidatesChanged:
+                                                    _reportVisibleCandidates,
                                                 onHighlightIndex: _highlightAt,
                                                 onAdd: _addFromMenu,
                                                 onRetry: widget.onRetry,
@@ -421,9 +449,9 @@ class _NamedFacetMultiSelectFieldState<T>
     );
   }
 
-  void _reportVisibleRemaining(List<String> names) {
-    final bool listChanged = !listEquals(names, _visibleRemainingNames);
-    _visibleRemainingNames = List<String>.of(names);
+  void _reportVisibleCandidates(List<String> names) {
+    final bool listChanged = !listEquals(names, _visibleCandidateNames);
+    _visibleCandidateNames = List<String>.of(names);
     final int? current = _highlightedIndexNotifier.value;
     final int? next;
     if (names.isEmpty) {
@@ -440,7 +468,7 @@ class _NamedFacetMultiSelectFieldState<T>
   }
 
   void _highlightAt(int index, {bool scrollIntoView = false}) {
-    if (index < 0 || index >= _visibleRemainingNames.length) {
+    if (index < 0 || index >= _visibleCandidateNames.length) {
       return;
     }
     if (_highlightedIndexNotifier.value != index) {
@@ -466,14 +494,14 @@ class _NamedFacetMultiSelectFieldState<T>
   }
 
   bool _trySelectHighlightedCandidate() {
-    if (_overlayEntry == null || _visibleRemainingNames.isEmpty) {
+    if (!_menuSessionActive || _visibleCandidateNames.isEmpty) {
       return false;
     }
     final int? index = _highlightedIndexNotifier.value;
-    if (index == null || index < 0 || index >= _visibleRemainingNames.length) {
+    if (index == null || index < 0 || index >= _visibleCandidateNames.length) {
       return false;
     }
-    _addFromMenu(_visibleRemainingNames[index]);
+    _addFromMenu(_visibleCandidateNames[index]);
     return true;
   }
 
@@ -498,18 +526,18 @@ class _NamedFacetMultiSelectFieldState<T>
         return;
       }
       _openMenu();
-      if (_visibleRemainingNames.isNotEmpty) {
+      if (_visibleCandidateNames.isNotEmpty) {
         _highlightAt(0, scrollIntoView: true);
       }
       return;
     }
-    if (_visibleRemainingNames.isEmpty) {
+    if (_visibleCandidateNames.isEmpty) {
       return;
     }
     final int current = _highlightedIndexNotifier.value ?? 0;
     final int next = (current + delta).clamp(
       0,
-      _visibleRemainingNames.length - 1,
+      _visibleCandidateNames.length - 1,
     );
     _highlightAt(next, scrollIntoView: true);
     _highlightMovedByKeyboard = true;
@@ -569,8 +597,13 @@ class _NamedFacetMultiSelectFieldState<T>
       _removeSelected(widget.selectedNames.last);
       return KeyEventResult.handled;
     }
+    if ((key == LogicalKeyboardKey.home || key == LogicalKeyboardKey.end) &&
+        _inputController.text.isNotEmpty &&
+        !_highlightMovedByKeyboard) {
+      return KeyEventResult.ignored;
+    }
     if (key == LogicalKeyboardKey.home) {
-      if (_overlayEntry == null || _visibleRemainingNames.isEmpty) {
+      if (!_menuSessionActive || _visibleCandidateNames.isEmpty) {
         return KeyEventResult.ignored;
       }
       _highlightAt(0, scrollIntoView: true);
@@ -578,10 +611,10 @@ class _NamedFacetMultiSelectFieldState<T>
       return KeyEventResult.handled;
     }
     if (key == LogicalKeyboardKey.end) {
-      if (_overlayEntry == null || _visibleRemainingNames.isEmpty) {
+      if (!_menuSessionActive || _visibleCandidateNames.isEmpty) {
         return KeyEventResult.ignored;
       }
-      _highlightAt(_visibleRemainingNames.length - 1, scrollIntoView: true);
+      _highlightAt(_visibleCandidateNames.length - 1, scrollIntoView: true);
       _highlightMovedByKeyboard = true;
       return KeyEventResult.handled;
     }
@@ -593,7 +626,9 @@ class _NamedFacetMultiSelectFieldState<T>
     if (trimmed.isEmpty) {
       return;
     }
-    widget.onAdd(trimmed);
+    if (!widget.selectedNames.contains(trimmed)) {
+      widget.onAdd(trimmed);
+    }
     _inputController.clear();
     _inputFocusNode.requestFocus();
     _openMenu();
@@ -601,7 +636,11 @@ class _NamedFacetMultiSelectFieldState<T>
 
   void _addFromMenu(String name) {
     _highlightMovedByKeyboard = false;
-    widget.onAdd(inputChipCommitLabel(name));
+    if (widget.selectedNames.contains(name)) {
+      widget.onRemove(name);
+    } else {
+      widget.onAdd(inputChipCommitLabel(name));
+    }
     _inputController.clear();
     _openMenu();
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -638,6 +677,12 @@ class _NamedFacetMultiSelectFieldState<T>
     final DesignSystemLocalizations l10n = DesignSystemLocalizations.of(
       context,
     );
+    MediaQuery.of(context);
+    if (_menuSessionActive) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _markOverlayNeedsBuild();
+      });
+    }
     final bool hasSelectedTags = widget.selectedNames.isNotEmpty;
     final bool showClearAll = hasSelectedTags && widget.onClearAll != null;
 

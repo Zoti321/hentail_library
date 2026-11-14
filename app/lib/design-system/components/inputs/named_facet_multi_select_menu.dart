@@ -19,6 +19,7 @@ class _NamedFacetMultiSelectMenuPanel<T> extends StatefulWidget {
   const _NamedFacetMultiSelectMenuPanel({
     super.key,
     required this.width,
+    required this.maxHeight,
     required this.items,
     required this.isLoading,
     required this.hasLoadError,
@@ -27,7 +28,7 @@ class _NamedFacetMultiSelectMenuPanel<T> extends StatefulWidget {
     required this.scrollController,
     required this.highlightedIndexListenable,
     required this.highlightedRowKey,
-    required this.onVisibleRemainingChanged,
+    required this.onVisibleCandidatesChanged,
     required this.onHighlightIndex,
     required this.onAdd,
     required this.onRetry,
@@ -38,6 +39,7 @@ class _NamedFacetMultiSelectMenuPanel<T> extends StatefulWidget {
   });
 
   final double width;
+  final double maxHeight;
   final List<T> items;
   final bool isLoading;
   final bool hasLoadError;
@@ -46,7 +48,7 @@ class _NamedFacetMultiSelectMenuPanel<T> extends StatefulWidget {
   final ScrollController scrollController;
   final ValueListenable<int?> highlightedIndexListenable;
   final GlobalKey highlightedRowKey;
-  final ValueChanged<List<String>> onVisibleRemainingChanged;
+  final ValueChanged<List<String>> onVisibleCandidatesChanged;
   final void Function(int index, {bool scrollIntoView}) onHighlightIndex;
   final ValueChanged<String> onAdd;
   final VoidCallback onRetry;
@@ -91,11 +93,14 @@ class _NamedFacetMultiSelectMenuPanelState<T>
 
   @override
   Widget build(BuildContext context) {
-    final double panelMaxHeight = namedFacetMenuPanelMaxHeight(context);
+    final double panelMaxHeight = math.min(
+      widget.maxHeight,
+      namedFacetMenuPanelMaxHeight(context),
+    );
     final double bodyMinHeight = namedFacetMenuBodyMinHeight(panelMaxHeight);
     if (widget.isLoading) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        widget.onVisibleRemainingChanged(const <String>[]);
+        widget.onVisibleCandidatesChanged(const <String>[]);
       });
       return _NamedFacetMenuShell(
         width: widget.width,
@@ -116,7 +121,7 @@ class _NamedFacetMultiSelectMenuPanelState<T>
     }
     if (widget.hasLoadError) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        widget.onVisibleRemainingChanged(const <String>[]);
+        widget.onVisibleCandidatesChanged(const <String>[]);
       });
       return _NamedFacetMenuShell(
         width: widget.width,
@@ -158,28 +163,26 @@ class _NamedFacetMultiSelectMenuPanelState<T>
         .toList(growable: false);
     _schedulePinyinIndexBuild(items, catalogNames);
 
-    final Set<String> selected = widget.selectedNames.toSet();
     final NamePinyinIndex? index = _pinyinIndex;
     final bool useIndex = index != null && identical(items, _indexedItems);
-    final List<T> remaining = items
-        .where((T item) => !selected.contains(widget.resolveName(item)))
-        .where((T item) {
-          final String name = widget.resolveName(item);
-          if (useIndex) {
-            return index.matches(name, widget.filterQuery);
-          }
-          return nameMatchesPinyinAssistedFilter(name, widget.filterQuery);
-        })
-        .toList();
+    final List<T> remaining = items.where((T item) {
+      final String name = widget.resolveName(item);
+      if (useIndex) {
+        return index.matches(name, widget.filterQuery);
+      }
+      return nameMatchesPinyinAssistedFilter(name, widget.filterQuery);
+    }).toList();
     final List<String> remainingNames = remaining
         .map(widget.resolveName)
         .toList(growable: false);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      widget.onVisibleRemainingChanged(remainingNames);
+      widget.onVisibleCandidatesChanged(remainingNames);
     });
     return _NamedFacetMenuList<T>(
       width: widget.width,
+      maxHeight: widget.maxHeight,
       items: remaining,
+      selectedNames: widget.selectedNames.toSet(),
       allCatalogEmpty: items.isEmpty,
       scrollController: widget.scrollController,
       highlightedIndexListenable: widget.highlightedIndexListenable,
@@ -236,7 +239,9 @@ class _NamedFacetMenuShell extends StatelessWidget {
 class _NamedFacetMenuList<T> extends StatelessWidget {
   const _NamedFacetMenuList({
     required this.width,
+    required this.maxHeight,
     required this.items,
+    required this.selectedNames,
     required this.allCatalogEmpty,
     required this.scrollController,
     required this.highlightedIndexListenable,
@@ -250,7 +255,9 @@ class _NamedFacetMenuList<T> extends StatelessWidget {
   });
 
   final double width;
+  final double maxHeight;
   final List<T> items;
+  final Set<String> selectedNames;
   final bool allCatalogEmpty;
   final ScrollController scrollController;
   final ValueListenable<int?> highlightedIndexListenable;
@@ -265,7 +272,10 @@ class _NamedFacetMenuList<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final M3EThemeData theme = M3ETheme.of(context);
-    final double panelMaxHeight = namedFacetMenuPanelMaxHeight(context);
+    final double panelMaxHeight = math.min(
+      maxHeight,
+      namedFacetMenuPanelMaxHeight(context),
+    );
     final double bodyMinHeight = namedFacetMenuBodyMinHeight(panelMaxHeight);
 
     return _NamedFacetMenuShell(
@@ -310,6 +320,7 @@ class _NamedFacetMenuList<T> extends StatelessWidget {
                           key: highlighted ? highlightedRowKey : null,
                           displayName: name,
                           isHighlighted: highlighted,
+                          isSelected: selectedNames.contains(name),
                           smartMatched: smartMatched,
                           smartMatchedTooltip: smartMatchedTooltip,
                           onSelect: () => onAdd(name),
@@ -330,6 +341,7 @@ class _NamedFacetMenuRow extends StatelessWidget {
     required this.onSelect,
     required this.onHover,
     this.isHighlighted = false,
+    this.isSelected = false,
     this.smartMatched = false,
     this.smartMatchedTooltip,
   });
@@ -338,6 +350,7 @@ class _NamedFacetMenuRow extends StatelessWidget {
   final VoidCallback onSelect;
   final VoidCallback onHover;
   final bool isHighlighted;
+  final bool isSelected;
   final bool smartMatched;
   final String? smartMatchedTooltip;
 
@@ -375,7 +388,7 @@ class _NamedFacetMenuRow extends StatelessWidget {
       final String? tip = smartMatchedTooltip;
       nameText = Row(
         children: <Widget>[
-          Expanded(child: Text(displayName, style: nameStyle, maxLines: 2)),
+          Expanded(child: nameText),
           SizedBox(width: theme.spacing.sm),
           if (tip == null || tip.isEmpty)
             hint
@@ -389,19 +402,42 @@ class _NamedFacetMenuRow extends StatelessWidget {
         ? scheme.primary.withValues(alpha: 0.12)
         : Colors.transparent;
 
-    return Material(
-      color: fill,
-      borderRadius: optionRadius,
-      child: InkWell(
-        onTap: onSelect,
-        onHover: _handleHover,
+    return Semantics(
+      checked: isSelected,
+      child: Material(
+        color: fill,
         borderRadius: optionRadius,
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: theme.spacing.md,
-            vertical: theme.spacing.sm,
+        child: InkWell(
+          canRequestFocus: false,
+          onTap: onSelect,
+          onHover: _handleHover,
+          borderRadius: optionRadius,
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: theme.spacing.md,
+              vertical: theme.spacing.sm,
+            ),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: 32),
+              child: Row(
+                children: <Widget>[
+                  ExcludeSemantics(
+                    child: Icon(
+                      isSelected
+                          ? Symbols.check_box
+                          : Symbols.check_box_outline_blank,
+                      size: 20,
+                      color: isSelected
+                          ? scheme.primary
+                          : scheme.onSurfaceVariant,
+                    ),
+                  ),
+                  SizedBox(width: theme.spacing.sm),
+                  Expanded(child: nameText),
+                ],
+              ),
+            ),
           ),
-          child: nameText,
         ),
       ),
     );

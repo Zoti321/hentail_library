@@ -117,23 +117,27 @@ void main() {
     expect(selected, ['Algebra']);
   });
 
-  testWidgets('empty catalog and no remaining candidates have distinct copy', (
-    tester,
-  ) async {
-    final candidates = ValueNotifier<_Candidates>((
-      items: [],
-      loading: false,
-      error: false,
-    ));
-    addTearDown(candidates.dispose);
-    await _pumpField(tester, candidates, ['已有']);
-    await tester.tap(find.byType(EditableText));
-    await tester.pumpAndSettle();
-    expect(find.text('目录为空'), findsOneWidget);
-    candidates.value = (items: ['已有'], loading: false, error: false);
-    await tester.pumpAndSettle();
-    expect(find.text('无剩余'), findsOneWidget);
-  });
+  testWidgets(
+    'selected catalog stays visible and unmatched query shows empty copy',
+    (tester) async {
+      final candidates = ValueNotifier<_Candidates>((
+        items: [],
+        loading: false,
+        error: false,
+      ));
+      addTearDown(candidates.dispose);
+      await _pumpField(tester, candidates, ['已有']);
+      await tester.tap(find.byType(EditableText));
+      await tester.pumpAndSettle();
+      expect(find.text('目录为空'), findsOneWidget);
+      candidates.value = (items: ['已有'], loading: false, error: false);
+      await tester.pumpAndSettle();
+      expect(find.text('无剩余'), findsNothing);
+      await tester.enterText(find.byType(EditableText), 'missing');
+      await tester.pumpAndSettle();
+      expect(find.text('无剩余'), findsOneWidget);
+    },
+  );
 
   testWidgets('IME composing keys do not select candidates or remove chips', (
     tester,
