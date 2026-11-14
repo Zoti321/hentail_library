@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/home/presentation/views/home/home_page.dart';
+import 'package:hentai_library/features/home/presentation/views/home/patterns/home_aggregate_stats_section.dart';
 import 'package:hentai_library/features/home/presentation/views/home/patterns/home_page_copy.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/home_library_management_section.dart';
 import 'package:hentai_library/features/reading_stats/public.dart';
@@ -9,6 +10,58 @@ import '../../../../../../widgetbook/preview/md3e_home_page_preview_data.dart';
 import '../../../../../support/pump_app.dart';
 
 void main() {
+  testWidgets(
+    'personal center adapts to available width and keeps navigation',
+    (WidgetTester tester) async {
+      await tester.binding.setSurfaceSize(const Size(1200, 1600));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      for (final double width in <double>[280, 600, 1000]) {
+        bool tagsOpened = false;
+        await pumpApp(
+          tester,
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: Align(
+                alignment: Alignment.topLeft,
+                child: SizedBox(
+                  width: width,
+                  child: HomeAggregateStatsSection(
+                    counts: HomePagePreviewData.sampleAggregateCounts(),
+                    activityStats: const ReadingActivityStats(
+                      finishedCount: 12,
+                      totalDuration: Duration(hours: 3),
+                    ),
+                    onOpenHistory: () {},
+                    onOpenTrash: () {},
+                    onOpenTags: () => tagsOpened = true,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+        expect(find.text('个人中心'), findsOneWidget);
+        expect(tester.takeException(), isNull, reason: 'width: $width');
+        final Offset author = tester.getTopLeft(find.text('作者'));
+        final Offset parody = tester.getTopLeft(find.text('原作'));
+        final Offset character = tester.getTopLeft(find.text('角色'));
+        if (width < 360) {
+          expect(parody.dy, greaterThan(author.dy));
+        } else {
+          expect(parody.dy, author.dy);
+          expect(
+            character.dy,
+            width < 760 ? greaterThan(author.dy) : author.dy,
+          );
+        }
+        await tester.ensureVisible(find.text('标签'));
+        await tester.tap(find.text('标签'));
+        expect(tagsOpened, isTrue);
+        expect(tester.takeException(), isNull);
+      }
+    },
+  );
+
   testWidgets('shows library management section with preview rows', (
     WidgetTester tester,
   ) async {

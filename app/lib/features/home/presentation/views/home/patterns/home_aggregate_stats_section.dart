@@ -14,7 +14,7 @@ import 'package:intl/intl.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-/// 首页「全库统计」：阅读活动胶囊 + Kazumi 风 bento 色块 + 历史 / 垃圾桶入口。
+/// Personal center: reading activity, collection overview, metadata and utilities.
 ///
 /// 读完 / 时长合并为胶囊双指标；作者 / 原作 / 角色 / 标签用 shortcut 跳转管理 tab。
 class HomeAggregateStatsSection extends StatelessWidget {
@@ -57,7 +57,6 @@ class HomeAggregateStatsSection extends StatelessWidget {
       ),
       sizeClass: sizeClass,
       gap: HomePageMetrics.statCardGap(sizeClass),
-      tagsTopGap: HomePageMetrics.statTagsRowTopGap(sizeClass),
       onOpenHistory: _showsShortcutCards ? onOpenHistory : null,
       onOpenTrash: _showsShortcutCards ? onOpenTrash : null,
       onOpenAuthors: onOpenAuthors,
@@ -89,7 +88,6 @@ class _StatsScope {
     required this.numberFormat,
     required this.sizeClass,
     required this.gap,
-    required this.tagsTopGap,
     required this.onOpenHistory,
     required this.onOpenTrash,
     required this.onOpenAuthors,
@@ -105,7 +103,6 @@ class _StatsScope {
   final NumberFormat numberFormat;
   final WindowSizeClass sizeClass;
   final double gap;
-  final double tagsTopGap;
   final VoidCallback? onOpenHistory;
   final VoidCallback? onOpenTrash;
   final VoidCallback? onOpenAuthors;
@@ -123,107 +120,96 @@ class _StatsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return switch (scope.sizeClass) {
-      WindowSizeClass.compact => _CompactStatsGrid(scope: scope),
-      _ => _WideStatsGrid(scope: scope),
-    };
+    return _PersonalCenterGrid(scope: scope);
   }
 }
 
-class _CompactStatsGrid extends StatelessWidget {
-  const _CompactStatsGrid({required this.scope});
+class _PersonalCenterGrid extends StatelessWidget {
+  const _PersonalCenterGrid({required this.scope});
 
   final _StatsScope scope;
 
-  @override
-  Widget build(BuildContext context) {
-    final double gap = scope.gap;
-    return Column(
+  Widget _row(List<Widget> cards) => IntrinsicHeight(
+    child: Row(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        _ActivityCapsule(scope: scope),
-        SizedBox(height: gap),
-        _ComicStatCard(scope: scope, emphasis: HomeBentoStatEmphasis.hero),
-        if (scope.onOpenHistory != null &&
-            scope.onOpenTrash != null) ...<Widget>[
-          SizedBox(height: gap),
-          _ShortcutRow(scope: scope),
+        for (int i = 0; i < cards.length; i++) ...<Widget>[
+          if (i > 0) SizedBox(width: scope.gap),
+          Expanded(child: cards[i]),
         ],
-        SizedBox(height: gap),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Expanded(child: _SeriesStatCard(scope: scope)),
-            SizedBox(width: gap),
-            Expanded(child: _AuthorStatCard(scope: scope)),
-          ],
-        ),
-        SizedBox(height: gap),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Expanded(child: _ParodyStatCard(scope: scope)),
-            SizedBox(width: gap),
-            Expanded(child: _CharacterStatCard(scope: scope)),
-          ],
-        ),
-        SizedBox(height: scope.tagsTopGap),
-        _TagStatCard(scope: scope, wide: false),
       ],
-    );
-  }
-}
-
-class _WideStatsGrid extends StatelessWidget {
-  const _WideStatsGrid({required this.scope});
-
-  final _StatsScope scope;
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
-    final double gap = scope.gap;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        _ActivityCapsule(scope: scope),
-        SizedBox(height: gap),
-        IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              Expanded(
-                flex: 3,
-                child: _ComicStatCard(
-                  scope: scope,
-                  emphasis: HomeBentoStatEmphasis.hero,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final bool compact = constraints.maxWidth < 760;
+        final bool narrow = constraints.maxWidth < 360;
+        final List<Widget> metadata = <Widget>[
+          _AuthorStatCard(scope: scope),
+          _ParodyStatCard(scope: scope),
+          _CharacterStatCard(scope: scope),
+          _TagStatCard(scope: scope),
+        ];
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            _ActivityCapsule(scope: scope),
+            SizedBox(height: scope.gap),
+            if (narrow) ...<Widget>[
+              _ComicStatCard(
+                scope: scope,
+                emphasis: HomeBentoStatEmphasis.hero,
+              ),
+              SizedBox(height: scope.gap),
+              _SeriesStatCard(scope: scope),
+            ] else
+              IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    Expanded(
+                      flex: compact ? 1 : 3,
+                      child: _ComicStatCard(
+                        scope: scope,
+                        emphasis: HomeBentoStatEmphasis.hero,
+                      ),
+                    ),
+                    SizedBox(width: scope.gap),
+                    Expanded(
+                      flex: compact ? 1 : 2,
+                      child: _SeriesStatCard(scope: scope),
+                    ),
+                  ],
                 ),
               ),
-              SizedBox(width: gap),
-              Expanded(flex: 2, child: _SeriesStatCard(scope: scope)),
+            SizedBox(height: scope.gap * 1.5),
+            if (narrow) ...<Widget>[
+              for (int i = 0; i < metadata.length; i++) ...<Widget>[
+                if (i > 0) SizedBox(height: scope.gap),
+                metadata[i],
+              ],
+            ] else if (compact) ...<Widget>[
+              _row(metadata.sublist(0, 2)),
+              SizedBox(height: scope.gap),
+              _row(metadata.sublist(2)),
+            ] else
+              _row(metadata),
+            if (scope.onOpenHistory != null &&
+                scope.onOpenTrash != null) ...<Widget>[
+              SizedBox(height: scope.gap * 1.5),
+              if (narrow) ...<Widget>[
+                _HistoryStatCard(scope: scope),
+                SizedBox(height: scope.gap),
+                _TrashStatCard(scope: scope),
+              ] else
+                _ShortcutRow(scope: scope),
             ],
-          ),
-        ),
-        if (scope.onOpenHistory != null &&
-            scope.onOpenTrash != null) ...<Widget>[
-          SizedBox(height: gap),
-          _ShortcutRow(scope: scope),
-        ],
-        SizedBox(height: gap),
-        IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              Expanded(child: _AuthorStatCard(scope: scope)),
-              SizedBox(width: gap),
-              Expanded(child: _ParodyStatCard(scope: scope)),
-              SizedBox(width: gap),
-              Expanded(child: _CharacterStatCard(scope: scope)),
-            ],
-          ),
-        ),
-        SizedBox(height: scope.tagsTopGap),
-        _TagStatCard(scope: scope, wide: true),
-      ],
+          ],
+        );
+      },
     );
   }
 }
@@ -264,10 +250,10 @@ class _ComicStatCard extends StatelessWidget {
       backgroundColor: palette.comicsBackground,
       onBackgroundColor: palette.comicsForeground,
       borderRadius: const BorderRadius.only(
-        topLeft: Radius.circular(28),
+        topLeft: Radius.circular(40),
         topRight: Radius.circular(12),
         bottomLeft: Radius.circular(12),
-        bottomRight: Radius.circular(28),
+        bottomRight: Radius.circular(40),
       ),
       minHeight: emphasis == HomeBentoStatEmphasis.hero ? 132 : 104,
       emphasis: emphasis,
@@ -290,8 +276,13 @@ class _SeriesStatCard extends StatelessWidget {
       icon: Symbols.collections_bookmark,
       backgroundColor: palette.seriesBackground,
       onBackgroundColor: palette.seriesForeground,
-      borderRadius: const BorderRadius.all(Radius.circular(20)),
-      minHeight: 104,
+      borderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(12),
+        topRight: Radius.circular(40),
+        bottomLeft: Radius.circular(40),
+        bottomRight: Radius.circular(12),
+      ),
+      minHeight: 132,
     );
   }
 }
@@ -370,10 +361,9 @@ class _CharacterStatCard extends StatelessWidget {
 }
 
 class _TagStatCard extends StatelessWidget {
-  const _TagStatCard({required this.scope, required this.wide});
+  const _TagStatCard({required this.scope});
 
   final _StatsScope scope;
-  final bool wide;
 
   @override
   Widget build(BuildContext context) {
@@ -384,16 +374,14 @@ class _TagStatCard extends StatelessWidget {
       icon: Symbols.label,
       backgroundColor: palette.tagsBackground,
       onBackgroundColor: palette.tagsForeground,
-      borderRadius: wide
-          ? const BorderRadius.horizontal(left: Radius.circular(40))
-          : const BorderRadius.all(Radius.circular(40)),
-      minHeight: wide ? 88 : 96,
-      emphasis: HomeBentoStatEmphasis.compact,
-      layout: HomeBentoStatLayout.shortcut,
-      contentPadding: HomePageMetrics.statCardContentPadding(
-        scope.sizeClass,
-        tagPill: true,
+      borderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(32),
+        topRight: Radius.circular(12),
+        bottomLeft: Radius.circular(12),
+        bottomRight: Radius.circular(32),
       ),
+      minHeight: 108,
+      layout: HomeBentoStatLayout.shortcut,
       onPressed: scope.onOpenTags,
     );
   }
@@ -477,15 +465,14 @@ class _HomeStatPalette {
       comicsForeground = scheme.onPrimaryContainer,
       seriesBackground = scheme.secondaryContainer,
       seriesForeground = scheme.onSecondaryContainer,
-      // 浅紫 secondary，避开 tertiary 芥末黄；与系列/垃圾桶同系但不同行。
-      authorsBackground = scheme.secondaryContainer,
-      authorsForeground = scheme.onSecondaryContainer,
+      authorsBackground = scheme.tertiaryContainer,
+      authorsForeground = scheme.onTertiaryContainer,
       parodiesBackground = scheme.surfaceContainerHighest,
       parodiesForeground = scheme.onSurface,
-      charactersBackground = scheme.emphasis,
-      charactersForeground = scheme.onEmphasis,
-      tagsBackground = scheme.surfaceContainerHigh,
-      tagsForeground = scheme.onSurface,
+      charactersBackground = scheme.secondaryContainer,
+      charactersForeground = scheme.onSecondaryContainer,
+      tagsBackground = scheme.emphasis,
+      tagsForeground = scheme.onEmphasis,
       historyBackground = HomeShortcutCardColors.historyBackground(scheme),
       historyForeground = HomeShortcutCardColors.historyForeground(scheme),
       trashBackground = HomeShortcutCardColors.trashBackground(scheme),
