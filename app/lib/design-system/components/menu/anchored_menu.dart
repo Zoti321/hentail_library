@@ -192,7 +192,7 @@ class _AnchoredMenuState extends State<AnchoredMenu> {
     if (!openKey) {
       return KeyEventResult.ignored;
     }
-    _openMenu();
+    unawaited(_openMenu());
     return KeyEventResult.handled;
   }
 

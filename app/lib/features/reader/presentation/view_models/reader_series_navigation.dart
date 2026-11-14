@@ -31,6 +31,8 @@ class ReaderSeriesNavigation extends _$ReaderSeriesNavigation {
     );
     final bool carryAutoPlay =
         ref
+            // One-shot read of an active UI provider; do not retain its snapshot or extend its lifetime.
+            // ignore: riverpod_lint/only_use_keep_alive_inside_keep_alive
             .read(readerViewModelProvider(viewKey))
             .asData
             ?.value
@@ -44,6 +46,8 @@ class ReaderSeriesNavigation extends _$ReaderSeriesNavigation {
     int? currentPageIndex;
     if (!currentSession.incognito) {
       currentPageIndex = ref
+          // One-shot read of an active UI provider; do not retain its snapshot or extend its lifetime.
+          // ignore: riverpod_lint/only_use_keep_alive_inside_keep_alive
           .read(readerViewModelProvider(viewKey))
           .asData
           ?.value

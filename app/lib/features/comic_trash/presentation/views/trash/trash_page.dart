@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -25,7 +27,7 @@ class TrashPage extends ConsumerWidget {
     final ScrollMetrics metrics = notification.metrics;
     if (metrics.maxScrollExtent > 0 &&
         metrics.pixels >= metrics.maxScrollExtent - _kTrashLoadMoreThreshold) {
-      ref.read(trashPageControllerProvider.notifier).loadMore();
+      unawaited(ref.read(trashPageControllerProvider.notifier).loadMore());
     }
     return false;
   }
@@ -258,12 +260,14 @@ class _TrashHeader extends ConsumerWidget {
                         if (state == null) {
                           return;
                         }
-                        restoreTrashedComics(
-                          context,
-                          ref,
-                          state.selectedItems
-                              .map((TrashedComic item) => item.comic.comicId)
-                              .toList(),
+                        unawaited(
+                          restoreTrashedComics(
+                            context,
+                            ref,
+                            state.selectedItems
+                                .map((TrashedComic item) => item.comic.comicId)
+                                .toList(),
+                          ),
                         );
                       }
                     : () => restoreAllTrashedComics(context, ref)
@@ -289,17 +293,21 @@ class _TrashHeader extends ConsumerWidget {
                         if (state == null) {
                           return;
                         }
-                        purgeTrashedComics(context, ref, state.selectedItems);
+                        unawaited(
+                          purgeTrashedComics(context, ref, state.selectedItems),
+                        );
                       }
                     : () {
                         final TrashPageState? state = readState();
                         if (state == null) {
                           return;
                         }
-                        purgeAllTrashedComics(
-                          context,
-                          ref,
-                          state.allPurgeCounts,
+                        unawaited(
+                          purgeAllTrashedComics(
+                            context,
+                            ref,
+                            state.allPurgeCounts,
+                          ),
                         );
                       }
               : null,

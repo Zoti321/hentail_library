@@ -19,6 +19,8 @@ part 'library_comics_catalog_controller.g.dart';
 class LibraryComicsCatalogController extends _$LibraryComicsCatalogController {
   final CatalogPaginationEngine _pagination = CatalogPaginationEngine();
 
+  // Imperative pagination cursor; rendered pagination remains in provider state.
+  // ignore: riverpod_lint/avoid_public_notifier_properties
   int get pageIndex => _pagination.pageIndex;
 
   @override
@@ -42,6 +44,8 @@ class LibraryComicsCatalogController extends _$LibraryComicsCatalogController {
   Future<LibraryComicsCatalogState> _load() async {
     // Comics sort has no `random` field (unlike Series); always watch revision.
     // If random comics sort is added later, exempt revision like Series (P2-8).
+    // Watched revision stays subscribed for this catalog lifetime; no cached one-shot read.
+    // ignore: riverpod_lint/only_use_keep_alive_inside_keep_alive
     ref.watch(libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.comics));
 
     final LibraryRevisionState revisionState = ref.read(

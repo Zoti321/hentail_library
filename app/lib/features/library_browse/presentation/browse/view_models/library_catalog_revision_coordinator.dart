@@ -116,12 +116,14 @@ class LibraryCatalogRevisionCoordinator
       action();
       return;
     }
-    Future<void>.microtask(() {
-      if (!ref.mounted) {
-        return;
-      }
-      action();
-    });
+    unawaited(
+      Future<void>.microtask(() {
+        if (!ref.mounted) {
+          return;
+        }
+        action();
+      }),
+    );
   }
 
   void _onRevisionBumped(int revision) {

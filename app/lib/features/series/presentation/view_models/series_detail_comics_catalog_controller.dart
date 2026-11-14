@@ -19,6 +19,8 @@ class SeriesDetailComicsCatalogController
     extends _$SeriesDetailComicsCatalogController {
   final CatalogPaginationEngine _pagination = CatalogPaginationEngine();
 
+  // Imperative pagination cursor; rendered pagination remains in provider state.
+  // ignore: riverpod_lint/avoid_public_notifier_properties
   int get pageIndex => _pagination.pageIndex;
 
   @override

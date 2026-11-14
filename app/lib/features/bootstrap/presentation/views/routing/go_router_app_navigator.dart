@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'route_transition_pages.dart';
 
 import 'package:go_router/go_router.dart';
@@ -42,7 +44,7 @@ class GoRouterAppNavigator implements AppNavigator {
 
   @override
   void replaceMetadataTab(String tab) =>
-      _router.replace(AppRoutes.metadataTab(tab));
+      _router.replace<void>(AppRoutes.metadataTab(tab));
 
   @override
   void goHistory() => _router.go(AppRoutes.history);
@@ -92,13 +94,15 @@ class GoRouterAppNavigator implements AppNavigator {
     bool keepControlsOpen = false,
     bool startFromFirstPage = false,
   }) {
-    _router.push(
-      AppRoutes.readerLocation(
-        _readerQuery(
-          comicId: comicId,
-          incognito: incognito,
-          keepControlsOpen: keepControlsOpen,
-          startFromFirstPage: startFromFirstPage,
+    unawaited(
+      _router.push(
+        AppRoutes.readerLocation(
+          _readerQuery(
+            comicId: comicId,
+            incognito: incognito,
+            keepControlsOpen: keepControlsOpen,
+            startFromFirstPage: startFromFirstPage,
+          ),
         ),
       ),
     );
@@ -111,13 +115,15 @@ class GoRouterAppNavigator implements AppNavigator {
     bool keepControlsOpen = false,
     bool startFromFirstPage = false,
   }) {
-    _router.pushReplacement(
-      AppRoutes.readerLocation(
-        _readerQuery(
-          comicId: comicId,
-          incognito: incognito,
-          keepControlsOpen: keepControlsOpen,
-          startFromFirstPage: startFromFirstPage,
+    unawaited(
+      _router.pushReplacement(
+        AppRoutes.readerLocation(
+          _readerQuery(
+            comicId: comicId,
+            incognito: incognito,
+            keepControlsOpen: keepControlsOpen,
+            startFromFirstPage: startFromFirstPage,
+          ),
         ),
       ),
     );

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
@@ -189,7 +191,7 @@ class _OutlinedTextFieldShellState extends State<OutlinedTextFieldShell>
       if (instant) {
         _labelMotion.value = float;
       } else {
-        _labelMotion.animateTo(float);
+        unawaited(_labelMotion.animateTo(float));
       }
     }
 
@@ -206,7 +208,7 @@ class _OutlinedTextFieldShellState extends State<OutlinedTextFieldShell>
     if (instant) {
       _effectsMotion.value = 1;
     } else {
-      _effectsMotion.animateTo(1, from: 0);
+      unawaited(_effectsMotion.animateTo(1, from: 0));
     }
   }
 

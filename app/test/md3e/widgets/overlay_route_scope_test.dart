@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_page.dart';
@@ -26,10 +28,12 @@ class _AnchorRemovalHostState extends State<_AnchorRemovalHost> {
               builder: (BuildContext anchorContext) {
                 return TextButton(
                   onPressed: () {
-                    openLabCatalogDetail(
-                      anchorContext,
-                      displayTarget: LibraryDisplayTarget.comics,
-                      catalogIndex: 0,
+                    unawaited(
+                      openLabCatalogDetail(
+                        anchorContext,
+                        displayTarget: LibraryDisplayTarget.comics,
+                        catalogIndex: 0,
+                      ),
                     );
                     // 锚点在路由 builder 执行前被移除，模拟目录刷新后的列表项失效。
                     setState(() => _showAnchor = false);

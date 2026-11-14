@@ -13,6 +13,8 @@ import 'shell/md3e_widgetbook_theme_addon.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await configurePreviewWindow();
+  // Lab use cases supply isolated ProviderScopes; Widgetbook itself reads no providers.
+  // ignore: riverpod_lint/missing_provider_scope
   runApp(
     AppWindowHost(
       child: Widgetbook(

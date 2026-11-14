@@ -22,6 +22,8 @@ part 'library_series_catalog_controller.g.dart';
 class LibrarySeriesCatalogController extends _$LibrarySeriesCatalogController {
   final CatalogPaginationEngine _pagination = CatalogPaginationEngine();
 
+  // Imperative pagination cursor; rendered pagination remains in provider state.
+  // ignore: riverpod_lint/avoid_public_notifier_properties
   int get pageIndex => _pagination.pageIndex;
 
   @override
@@ -52,6 +54,8 @@ class LibrarySeriesCatalogController extends _$LibrarySeriesCatalogController {
     // 随机排序每次查询顺序不同；库 revision 被动刷新不应触发重排。
     if (sortOption.field != LibrarySeriesSortField.random) {
       ref.watch(
+        // Watched revision stays subscribed for this catalog lifetime; no cached one-shot read.
+        // ignore: riverpod_lint/only_use_keep_alive_inside_keep_alive
         libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.series),
       );
     }

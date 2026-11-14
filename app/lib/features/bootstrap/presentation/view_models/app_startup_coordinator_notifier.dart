@@ -115,15 +115,17 @@ class AppStartupCoordinatorNotifier extends _$AppStartupCoordinatorNotifier {
         unawaited(_runStartupScans(targets, token));
         return;
       }
-      SchedulerBinding.instance.scheduleTask<void>(
-        () {
-          if (!_isValidStartupToken(token)) {
-            return;
-          }
-          unawaited(_runStartupScans(targets, token));
-        },
-        Priority.idle,
-        debugLabel: 'startup_library_scan_idle',
+      unawaited(
+        SchedulerBinding.instance.scheduleTask<void>(
+          () {
+            if (!_isValidStartupToken(token)) {
+              return;
+            }
+            unawaited(_runStartupScans(targets, token));
+          },
+          Priority.idle,
+          debugLabel: 'startup_library_scan_idle',
+        ),
       );
     });
   }

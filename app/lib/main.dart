@@ -22,6 +22,8 @@ void main() {
     // Paint a first frame immediately so Android splash is not stuck while
     // loading the Rust cdylib (can be large / slow on emulators).
     final Future<void> prepare = _prepareApp();
+    // ProviderScope is supplied by MyApp after bootstrap completes.
+    // ignore: riverpod_lint/missing_provider_scope
     runApp(AppWindowHost(child: _BootstrapApp(prepare: prepare)));
   }, handleUncaughtFrbZoneError);
 }

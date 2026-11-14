@@ -262,7 +262,9 @@ class _MetadataManagementPageState
     )) {
       return;
     }
-    ref.read(namedFacetManagementViewModelProvider(kind).notifier).loadMore();
+    unawaited(
+      ref.read(namedFacetManagementViewModelProvider(kind).notifier).loadMore(),
+    );
   }
 }
 

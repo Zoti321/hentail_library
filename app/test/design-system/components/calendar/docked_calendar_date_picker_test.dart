@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -28,12 +30,14 @@ void main() {
       ),
     );
 
-    showAnchoredCalendarDatePicker(
-      context: tester.element(find.byType(SizedBox)),
-      layerLink: layerLink,
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2030),
-      onDateChanged: (_) {},
+    unawaited(
+      showAnchoredCalendarDatePicker(
+        context: tester.element(find.byType(SizedBox)),
+        layerLink: layerLink,
+        firstDate: DateTime(2020),
+        lastDate: DateTime(2030),
+        onDateChanged: (_) {},
+      ),
     );
     await tester.pumpAndSettle();
 

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:hentai_library/features/bootstrap/presentation/views/routing/route_transition_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -129,7 +131,7 @@ class LibraryBrowsePage extends HookConsumerWidget {
       final BrowseLibraryId scope = ref.read(browseLibraryIdProvider.notifier);
       // claim/release 必须离开 build；epoch 防止旧页 dispose 清掉新页已 claim 的 id。
       final _LibraryScopeClaim claim = _LibraryScopeClaim();
-      Future<void>.microtask(() => claim.claim(scope, scopedId));
+      unawaited(Future<void>.microtask(() => claim.claim(scope, scopedId)));
       return () => Future<void>.microtask(() => claim.release(scope));
     }, <Object?>[libraryId]);
 

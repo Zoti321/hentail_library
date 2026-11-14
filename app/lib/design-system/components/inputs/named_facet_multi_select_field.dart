@@ -224,7 +224,7 @@ class _NamedFacetMultiSelectFieldState<T>
     if (LabMotion.reduceMotionOf(context)) {
       _panelExpandCtrl.value = 1;
     } else {
-      _panelExpandCtrl.animateTo(1);
+      unawaited(_panelExpandCtrl.animateTo(1));
     }
   }
 
@@ -253,7 +253,7 @@ class _NamedFacetMultiSelectFieldState<T>
       _panelExpandCtrl.value = 0;
       _removeOverlay(immediate: true);
     } else {
-      _panelExpandCtrl.animateTo(0);
+      unawaited(_panelExpandCtrl.animateTo(0));
     }
   }
 

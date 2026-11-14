@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/design-system/design_system.dart';
@@ -42,12 +44,14 @@ class _AnchorlessProbeState extends State<_AnchorlessProbe> {
   @override
   void initState() {
     super.initState();
-    pickAnchoredOption<int>(
-      context,
-      options: const <int>[1],
-      selected: 1,
-      labelOf: (int value) => '$value',
-      onSelected: widget.onSelected,
+    unawaited(
+      pickAnchoredOption<int>(
+        context,
+        options: const <int>[1],
+        selected: 1,
+        labelOf: (int value) => '$value',
+        onSelected: widget.onSelected,
+      ),
     );
   }
 

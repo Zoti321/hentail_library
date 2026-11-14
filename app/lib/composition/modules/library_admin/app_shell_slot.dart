@@ -1,6 +1,8 @@
 /// ADR-0027：library_admin 对 MD3E App shell 的窄插槽实现（bootstrap 经 public re-export 注入）。
 library;
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
@@ -60,9 +62,11 @@ AppShellNavigationSlot buildLibraryAdminAppShellNavigationSlot(
       AppNavigation.goToNavId(context, navId, ref: ref);
     },
     onLibrarySelected: (String libraryId) {
-      ref
-          .read(libraryManagementCommandsProvider)
-          .openLibrary(context, libraryId);
+      unawaited(
+        ref
+            .read(libraryManagementCommandsProvider)
+            .openLibrary(context, libraryId),
+      );
     },
     surfaceRoles: DesktopShellSurfaceRoles.toneBased(scheme),
   );

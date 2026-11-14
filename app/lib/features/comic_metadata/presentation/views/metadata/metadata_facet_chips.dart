@@ -54,30 +54,32 @@ class MetadataFacetChip extends ConsumerWidget {
   void _showMenu(BuildContext context, WidgetRef ref, Offset globalPosition) {
     final AppLocalizations l10n = context.l10n;
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
-    showPointerContextMenu<void>(
-      context: context,
-      globalPosition: globalPosition,
-      children: <M3EMenuNode>[
-        M3EMenuEntry(
-          label: l10n.metadataRename,
-          leading: const Icon(LucideIcons.pencil),
-          onPressed: () =>
-              unawaited(renameNamedFacet(context, ref, kind, name)),
-        ),
-        M3EMenuEntry(
-          label: l10n.metadataMerge,
-          leading: const Icon(LucideIcons.merge),
-          enabled: !_isAuthor,
-          onPressed: () => onMergeTargetSelected?.call(name),
-        ),
-        M3EMenuEntry(
-          label: l10n.metadataDelete,
-          leading: Icon(LucideIcons.trash2, color: scheme.error),
-          isDestructive: true,
-          onPressed: () =>
-              unawaited(deleteNamedFacet(context, ref, kind, name)),
-        ),
-      ],
+    unawaited(
+      showPointerContextMenu<void>(
+        context: context,
+        globalPosition: globalPosition,
+        children: <M3EMenuNode>[
+          M3EMenuEntry(
+            label: l10n.metadataRename,
+            leading: const Icon(LucideIcons.pencil),
+            onPressed: () =>
+                unawaited(renameNamedFacet(context, ref, kind, name)),
+          ),
+          M3EMenuEntry(
+            label: l10n.metadataMerge,
+            leading: const Icon(LucideIcons.merge),
+            enabled: !_isAuthor,
+            onPressed: () => onMergeTargetSelected?.call(name),
+          ),
+          M3EMenuEntry(
+            label: l10n.metadataDelete,
+            leading: Icon(LucideIcons.trash2, color: scheme.error),
+            isDestructive: true,
+            onPressed: () =>
+                unawaited(deleteNamedFacet(context, ref, kind, name)),
+          ),
+        ],
+      ),
     );
   }
 

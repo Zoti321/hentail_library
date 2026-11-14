@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/shared/ui/patterns/home/home_library_dashboard_models.dart';
@@ -94,7 +96,7 @@ class _ShellLibrarySecondaryColumnState
       return;
     }
     _reveal.motion = LabMotion.shellLibrarySecondaryReveal;
-    _reveal.animateTo(widget.open ? 1.0 : 0.0);
+    unawaited(_reveal.animateTo(widget.open ? 1.0 : 0.0));
   }
 
   @override

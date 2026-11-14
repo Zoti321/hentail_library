@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:hentai_library/features/comic/presentation/draft/bulk_metadata_edit_session.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:hentai_library/features/comic/presentation/providers/comic_detail_providers.dart';
@@ -38,14 +40,18 @@ class BulkMetadataEditSessionNotifier
   final BulkMetadataEditSession _session = BulkMetadataEditSession();
 
   /// 当前草稿（仅 Notifier / 同 feature 命令路径读取）。
+  // The edit session mutates only through commands; revision state triggers consumers.
+  // ignore: riverpod_lint/avoid_public_notifier_properties
   BulkMetadataEditSession get session => _session;
 
+  // The edit session mutates only through commands; revision state triggers consumers.
+  // ignore: riverpod_lint/avoid_public_notifier_properties
   bool get showPublishedAtError =>
       state.showValidationErrors && _session.hasInvalidPublishedAt;
 
   @override
   BulkMetadataEditUiState build(List<String> comicIds) {
-    Future<void>.microtask(() => _loadMixedHints(comicIds));
+    unawaited(Future<void>.microtask(() => _loadMixedHints(comicIds)));
     return const BulkMetadataEditUiState(loading: true, revision: 0);
   }
 

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/services.dart';
 import 'package:hentai_library/features/metadata_backup/application/prepare_metadata_import_use_case.dart';
 import 'package:hentai_library/features/metadata_backup/presentation/providers/metadata_backup_use_case_providers.dart';
@@ -253,13 +255,15 @@ void main() {
         builder: (BuildContext context) {
           return FilledButton(
             onPressed: () {
-              showDialog<void>(
-                context: context,
-                builder: (BuildContext context) =>
-                    const MetadataImportConfirmDialog(
-                      manifest: manifest,
-                      preview: previewWithSkips,
-                    ),
+              unawaited(
+                showDialog<void>(
+                  context: context,
+                  builder: (BuildContext context) =>
+                      const MetadataImportConfirmDialog(
+                        manifest: manifest,
+                        preview: previewWithSkips,
+                      ),
+                ),
               );
             },
             child: const Text('open'),
@@ -286,13 +290,15 @@ void main() {
         builder: (BuildContext context) {
           return FilledButton(
             onPressed: () {
-              showDialog<void>(
-                context: context,
-                builder: (BuildContext context) =>
-                    const MetadataImportConfirmDialog(
-                      manifest: manifest,
-                      preview: previewWithSkips,
-                    ),
+              unawaited(
+                showDialog<void>(
+                  context: context,
+                  builder: (BuildContext context) =>
+                      const MetadataImportConfirmDialog(
+                        manifest: manifest,
+                        preview: previewWithSkips,
+                      ),
+                ),
               );
             },
             child: const Text('open'),

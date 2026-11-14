@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -62,7 +64,7 @@ class _ManagementRenameEntityDialogState
 
   void _handleSubmitted(String _) {
     if (!_saving) {
-      _submit();
+      unawaited(_submit());
     }
   }
 

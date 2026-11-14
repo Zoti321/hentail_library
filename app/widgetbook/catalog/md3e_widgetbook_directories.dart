@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:hentai_library/design-system/design_system.dart';
 import 'package:flutter/material.dart';
 
@@ -757,7 +759,7 @@ Widget _md3ePaginationKnobsPreview(BuildContext context) {
 }
 
 Widget _md3eManagementBrowsePageLabHostPreview(BuildContext context) {
-  final String interactionKnob = context.knobs.list(
+  final String interactionKnob = context.knobs.object.dropdown(
     label: '新建交互',
     options: <String>['自动', '移动端 Dialog', '桌面端内联'],
     initialOption: '自动',

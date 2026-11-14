@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/l10n/app_localizations.dart';
@@ -85,33 +87,41 @@ class _WebtoonModeSectionTitle extends StatelessWidget {
 
 /// 把「改成某领域值」编码为持久化原语后经唯一写入口落库。
 void _writeReadingMode(WidgetRef ref, ReadingMode mode) {
-  ref
-      .read(readingPreferencesControllerProvider)
-      .setReadingModeId(
-        ReadingPreferencesAcl.encode(
-          ref.read(readingPreferencesProvider).copyWith(readingMode: mode),
-        ).readingModeId,
-      );
+  unawaited(
+    ref
+        .read(readingPreferencesControllerProvider)
+        .setReadingModeId(
+          ReadingPreferencesAcl.encode(
+            ref.read(readingPreferencesProvider).copyWith(readingMode: mode),
+          ).readingModeId,
+        ),
+  );
 }
 
 void _writeWebtoonZoomMode(WidgetRef ref, WebtoonZoomMode mode) {
-  ref
-      .read(readingPreferencesControllerProvider)
-      .setWebtoonZoomModeId(
-        ReadingPreferencesAcl.encode(
-          ref.read(readingPreferencesProvider).copyWith(webtoonZoomMode: mode),
-        ).webtoonZoomModeId,
-      );
+  unawaited(
+    ref
+        .read(readingPreferencesControllerProvider)
+        .setWebtoonZoomModeId(
+          ReadingPreferencesAcl.encode(
+            ref
+                .read(readingPreferencesProvider)
+                .copyWith(webtoonZoomMode: mode),
+          ).webtoonZoomModeId,
+        ),
+  );
 }
 
 void _writeAutoPlayMode(WidgetRef ref, AutoPlayMode mode) {
-  ref
-      .read(readingPreferencesControllerProvider)
-      .setAutoPlayModeId(
-        ReadingPreferencesAcl.encode(
-          ref.read(readingPreferencesProvider).copyWith(autoPlayMode: mode),
-        ).autoPlayModeId,
-      );
+  unawaited(
+    ref
+        .read(readingPreferencesControllerProvider)
+        .setAutoPlayModeId(
+          ReadingPreferencesAcl.encode(
+            ref.read(readingPreferencesProvider).copyWith(autoPlayMode: mode),
+          ).autoPlayModeId,
+        ),
+  );
 }
 
 class _ReadingModeCategoryTile extends ConsumerWidget {

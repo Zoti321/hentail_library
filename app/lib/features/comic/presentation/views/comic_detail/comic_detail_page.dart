@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
 import 'package:hentai_library/shared/application/errors/app_exception.dart';
@@ -216,25 +218,27 @@ class _ComicDetailContent extends ConsumerWidget {
 
   void _showInExplorer(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
-    ref.read(showInFileExplorerProvider)(comic.path).catchError((
-      Object error,
-      StackTrace stackTrace,
-    ) {
-      if (!context.mounted) {
-        return;
-      }
-      if (error is AppException) {
-        showErrorSnackbar(context, error);
-        return;
-      }
-      showErrorSnackbar(
-        context,
-        AppException(
-          l10n.comicDetailShowInExplorerFailed,
-          cause: error,
-          stackTrace: stackTrace,
-        ),
-      );
-    });
+    unawaited(
+      ref.read(showInFileExplorerProvider)(comic.path).catchError((
+        Object error,
+        StackTrace stackTrace,
+      ) {
+        if (!context.mounted) {
+          return;
+        }
+        if (error is AppException) {
+          showErrorSnackbar(context, error);
+          return;
+        }
+        showErrorSnackbar(
+          context,
+          AppException(
+            l10n.comicDetailShowInExplorerFailed,
+            cause: error,
+            stackTrace: stackTrace,
+          ),
+        );
+      }),
+    );
   }
 }

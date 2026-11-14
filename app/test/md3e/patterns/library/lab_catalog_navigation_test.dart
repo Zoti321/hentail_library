@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_page.dart';
@@ -26,10 +28,12 @@ void main() {
           itemCount: 3,
           totalPages: 1,
           onCatalogItemTap: (int index) {
-            openLabCatalogDetail(
-              tester.element(find.byType(LibraryBrowseLayout)),
-              displayTarget: LibraryDisplayTarget.comics,
-              catalogIndex: index,
+            unawaited(
+              openLabCatalogDetail(
+                tester.element(find.byType(LibraryBrowseLayout)),
+                displayTarget: LibraryDisplayTarget.comics,
+                catalogIndex: index,
+              ),
             );
           },
         ),
@@ -54,10 +58,12 @@ void main() {
           itemCount: 3,
           totalPages: 1,
           onCatalogItemTap: (int index) {
-            openLabCatalogDetail(
-              tester.element(find.byType(LibraryBrowseLayout)),
-              displayTarget: LibraryDisplayTarget.comics,
-              catalogIndex: index,
+            unawaited(
+              openLabCatalogDetail(
+                tester.element(find.byType(LibraryBrowseLayout)),
+                displayTarget: LibraryDisplayTarget.comics,
+                catalogIndex: index,
+              ),
             );
           },
         ),
@@ -85,10 +91,12 @@ void main() {
           itemCount: 2,
           totalPages: 1,
           onCatalogItemTap: (int index) {
-            openLabCatalogDetail(
-              tester.element(find.byType(LibraryBrowseLayout)),
-              displayTarget: LibraryDisplayTarget.series,
-              catalogIndex: index,
+            unawaited(
+              openLabCatalogDetail(
+                tester.element(find.byType(LibraryBrowseLayout)),
+                displayTarget: LibraryDisplayTarget.series,
+                catalogIndex: index,
+              ),
             );
           },
         ),

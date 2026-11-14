@@ -47,13 +47,13 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
       _fetchGeneration++;
       _keywordDebounce?.dispose();
       _refreshDebounce?.dispose();
-      _historyChangesSubscription?.cancel();
+      unawaited(_historyChangesSubscription?.cancel());
       _historyChangesSubscription = null;
     });
     final HistoryPagedFeedState initial = await _loadPage(page: 1);
     if (ref.mounted && generation == _fetchGeneration && _refreshPending) {
       _refreshPending = false;
-      Future<void>.microtask(_silentRefresh);
+      unawaited(Future<void>.microtask(_silentRefresh));
     }
     return initial;
   }

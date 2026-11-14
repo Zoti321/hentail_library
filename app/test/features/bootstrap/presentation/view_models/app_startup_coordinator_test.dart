@@ -56,6 +56,8 @@ typedef _ScanStart = ({
 class _RecordingScanLibraryController extends ScanLibraryController {
   final starts = <_ScanStart>[];
   final events = <String>[];
+  // Test fixture exposes observations/configuration, not reactive application state.
+  // ignore: riverpod_lint/avoid_public_notifier_properties
   Completer<void>? idleHold;
 
   final Completer<void> _firstStart = Completer<void>();
@@ -64,7 +66,11 @@ class _RecordingScanLibraryController extends ScanLibraryController {
   Completer<void>? _hold;
   Future<void>? _future;
 
+  // Test fixture exposes observations/configuration, not reactive application state.
+  // ignore: riverpod_lint/avoid_public_notifier_properties
   Future<void> get firstStart => _firstStart.future;
+  // Test fixture exposes observations/configuration, not reactive application state.
+  // ignore: riverpod_lint/avoid_public_notifier_properties
   Future<void> get allDone => _allDone.future;
 
   void expectStarts(int count) {

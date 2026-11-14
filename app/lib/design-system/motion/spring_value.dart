@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'motion.dart';
@@ -59,7 +61,7 @@ class _SpringValueState extends State<SpringValue>
       _controller.value = 1;
     } else {
       _controller.value = 0;
-      _controller.animateTo(1);
+      unawaited(_controller.animateTo(1));
     }
   }
 

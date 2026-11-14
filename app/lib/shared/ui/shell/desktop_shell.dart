@@ -305,11 +305,13 @@ class DesktopShellState extends State<DesktopShell> {
   }
 
   void _openLibraryPickerSheet(BuildContext context) {
-    ShellLibraryPickerSheet.show(
-      context,
-      libraries: widget.libraries,
-      selectedLibraryId: _effectiveSelectedLibraryId,
-      onLibrarySelected: _onLibrarySelected,
+    unawaited(
+      ShellLibraryPickerSheet.show(
+        context,
+        libraries: widget.libraries,
+        selectedLibraryId: _effectiveSelectedLibraryId,
+        onLibrarySelected: _onLibrarySelected,
+      ),
     );
   }
 

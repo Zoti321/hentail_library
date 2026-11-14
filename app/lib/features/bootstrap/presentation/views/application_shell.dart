@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/app_settings/public.dart';
@@ -22,7 +24,9 @@ class ApplicationShell extends ConsumerWidget {
   final Widget routeChild;
 
   void _handleToggleSidebar(WidgetRef ref, bool expanded) {
-    ref.read(settingsProvider.notifier).setDesktopSidebarExpanded(!expanded);
+    unawaited(
+      ref.read(settingsProvider.notifier).setDesktopSidebarExpanded(!expanded),
+    );
   }
 
   @override

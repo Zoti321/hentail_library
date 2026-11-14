@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:hentai_library/shared/presentation/providers/comic_return_series_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
@@ -243,24 +245,26 @@ Future<void> _refreshMetadata(
 
 void _showInExplorer(BuildContext context, WidgetRef ref, Series series) {
   final AppLocalizations l10n = context.l10n;
-  ref.read(showInFileExplorerProvider)(series.folderPath).catchError((
-    Object error,
-    StackTrace stackTrace,
-  ) {
-    if (!context.mounted) {
-      return;
-    }
-    if (error is AppException) {
-      showErrorSnackbar(context, error);
-      return;
-    }
-    showErrorSnackbar(
-      context,
-      AppException(
-        l10n.comicDetailShowInExplorerFailed,
-        cause: error,
-        stackTrace: stackTrace,
-      ),
-    );
-  });
+  unawaited(
+    ref.read(showInFileExplorerProvider)(series.folderPath).catchError((
+      Object error,
+      StackTrace stackTrace,
+    ) {
+      if (!context.mounted) {
+        return;
+      }
+      if (error is AppException) {
+        showErrorSnackbar(context, error);
+        return;
+      }
+      showErrorSnackbar(
+        context,
+        AppException(
+          l10n.comicDetailShowInExplorerFailed,
+          cause: error,
+          stackTrace: stackTrace,
+        ),
+      );
+    }),
+  );
 }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'motion.dart';
@@ -54,7 +56,7 @@ class _SpringSizeState extends State<SpringSize>
     if (LabMotion.reduceMotionOf(context)) {
       _controller.value = target;
     } else {
-      _controller.animateTo(target);
+      unawaited(_controller.animateTo(target));
     }
   }
 

@@ -114,7 +114,7 @@ class ComicCover extends _$ComicCover {
     if (cached != null && cached.isNotEmpty) {
       return ComicCoverReady(ComicCoverSource.bytes(cached));
     }
-    Future.microtask(() => ensureLoaded(priority: _priority));
+    unawaited(Future.microtask(() => ensureLoaded(priority: _priority)));
     return const ComicCoverLoading();
   }
 
@@ -316,6 +316,8 @@ class ThumbnailEventCoordinator extends _$ThumbnailEventCoordinator {
       ref.read(comicCoverThumbnailCacheProvider(comicId).notifier).set(bytes);
       // 避免为后台批量 Ready 凭空创建 cover provider。
       if (ref.exists(comicCoverProvider(comicId))) {
+        // One-shot read of an active UI provider; do not retain its snapshot or extend its lifetime.
+        // ignore: riverpod_lint/only_use_keep_alive_inside_keep_alive
         ref.read(comicCoverProvider(comicId).notifier).setReady(bytes);
       }
     } on Object catch (error, stackTrace) {

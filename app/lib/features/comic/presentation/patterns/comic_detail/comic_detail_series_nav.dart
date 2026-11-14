@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
@@ -20,11 +22,13 @@ class ComicDetailSeriesNav extends StatelessWidget {
   final ValueChanged<int>? onSelectIndex;
 
   void _openCatalogSheet(BuildContext context) {
-    ComicDetailSeriesCatalogSheet.show(
-      context,
-      catalog: catalog,
-      currentIndex: currentIndex,
-      onSelectIndex: (int index) => onSelectIndex?.call(index),
+    unawaited(
+      ComicDetailSeriesCatalogSheet.show(
+        context,
+        catalog: catalog,
+        currentIndex: currentIndex,
+        onSelectIndex: (int index) => onSelectIndex?.call(index),
+      ),
     );
   }
 

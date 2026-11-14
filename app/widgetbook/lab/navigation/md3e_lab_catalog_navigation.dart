@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_page.dart';
 import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_page_lab_host.dart';
@@ -65,21 +67,27 @@ class _Md3eLabComicDetailRoute extends StatelessWidget {
       onBack: () => Navigator.of(context).maybePop(),
       moreMenuEntries: kMd3eLabComicDetailMoreMenuEntries,
       onRead: () {
-        openLabReader(
-          context,
-          preview: md3eReaderPreviewDataForComicDetail(entry),
+        unawaited(
+          openLabReader(
+            context,
+            preview: md3eReaderPreviewDataForComicDetail(entry),
+          ),
         );
       },
       onReadIncognito: () {
-        openLabReader(
-          context,
-          preview: md3eReaderPreviewDataForComicDetail(entry),
+        unawaited(
+          openLabReader(
+            context,
+            preview: md3eReaderPreviewDataForComicDetail(entry),
+          ),
         );
       },
       onEdit: () {
-        showComicMetadataEditLayout(
-          context: context,
-          initialDraft: ComicMetadataEditDraft.fromEntry(entry),
+        unawaited(
+          showComicMetadataEditLayout(
+            context: context,
+            initialDraft: ComicMetadataEditDraft.fromEntry(entry),
+          ),
         );
       },
     );
@@ -101,9 +109,11 @@ class _Md3eLabSeriesDetailRoute extends StatelessWidget {
       entry: entry,
       onBack: () => Navigator.of(context).maybePop(),
       onEdit: () {
-        showSeriesMetadataEditLayout(
-          context: context,
-          initialDraft: SeriesMetadataEditDraft.fromEntry(entry),
+        unawaited(
+          showSeriesMetadataEditLayout(
+            context: context,
+            initialDraft: SeriesMetadataEditDraft.fromEntry(entry),
+          ),
         );
       },
       onComicTap: (int comicIndex) {
@@ -125,22 +135,32 @@ class _Md3eLabSeriesDetailRoute extends StatelessWidget {
                   onBack: () => Navigator.of(routeContext).maybePop(),
                   moreMenuEntries: kMd3eLabComicDetailMoreMenuEntries,
                   onRead: () {
-                    openLabReader(
-                      routeContext,
-                      preview: md3eReaderPreviewDataForComicDetail(comicEntry),
+                    unawaited(
+                      openLabReader(
+                        routeContext,
+                        preview: md3eReaderPreviewDataForComicDetail(
+                          comicEntry,
+                        ),
+                      ),
                     );
                   },
                   onReadIncognito: () {
-                    openLabReader(
-                      routeContext,
-                      preview: md3eReaderPreviewDataForComicDetail(comicEntry),
+                    unawaited(
+                      openLabReader(
+                        routeContext,
+                        preview: md3eReaderPreviewDataForComicDetail(
+                          comicEntry,
+                        ),
+                      ),
                     );
                   },
                   onEdit: () {
-                    showComicMetadataEditLayout(
-                      context: routeContext,
-                      initialDraft: ComicMetadataEditDraft.fromEntry(
-                        comicEntry,
+                    unawaited(
+                      showComicMetadataEditLayout(
+                        context: routeContext,
+                        initialDraft: ComicMetadataEditDraft.fromEntry(
+                          comicEntry,
+                        ),
                       ),
                     );
                   },

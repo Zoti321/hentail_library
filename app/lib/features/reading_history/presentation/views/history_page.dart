@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
@@ -61,7 +63,7 @@ class _HistoryPageState extends ConsumerState<HistoryPage> {
       return false;
     }
     _lastLoadMoreAttemptAt = now;
-    ref.read(historyPagedFeedControllerProvider.notifier).loadMore();
+    unawaited(ref.read(historyPagedFeedControllerProvider.notifier).loadMore());
     return false;
   }
 

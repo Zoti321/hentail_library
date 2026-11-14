@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:hentai_library/features/library_browse/domain/browse/library_comic_browse_preferences.dart';
 
 import 'package:flutter/material.dart';
@@ -107,13 +109,17 @@ class _AgeRestrictionFilterGroup extends ConsumerWidget {
   ) {
     switch (displayTarget) {
       case LibraryDisplayTarget.comics:
-        ref
-            .read(libraryComicFiltersProvider.notifier)
-            .toggleAgeRestrictionOption(option);
+        unawaited(
+          ref
+              .read(libraryComicFiltersProvider.notifier)
+              .toggleAgeRestrictionOption(option),
+        );
       case LibraryDisplayTarget.series:
-        ref
-            .read(librarySeriesFiltersProvider.notifier)
-            .toggleAgeRestrictionOption(option);
+        unawaited(
+          ref
+              .read(librarySeriesFiltersProvider.notifier)
+              .toggleAgeRestrictionOption(option),
+        );
     }
   }
 }

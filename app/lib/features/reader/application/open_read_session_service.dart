@@ -112,7 +112,8 @@ class OpenReadSessionService {
       await _waitForOperation(previous);
       await _waitForOperation(closing);
       if (identical(_operations[comicId], barrier)) {
-        _operations.remove(comicId);
+        // The operation is already observed; only remove its map entry.
+        final _ = _operations.remove(comicId);
       }
     });
     _operations[comicId] = barrier;
@@ -251,7 +252,8 @@ class OpenReadSessionService {
         return await _openNative(comic, attempt);
       } finally {
         if (identical(_operations[comicId], nativeOperation)) {
-          _operations.remove(comicId);
+          // The operation is already observed; only remove its map entry.
+          final _ = _operations.remove(comicId);
         }
       }
     });

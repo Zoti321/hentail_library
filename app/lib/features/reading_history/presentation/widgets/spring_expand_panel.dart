@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 import 'package:motor/motor.dart';
@@ -66,7 +68,7 @@ class _SpringExpandPanelState extends State<SpringExpandPanel>
     _controller.motion = widget.expanded
         ? widget.expandMotion
         : widget.collapseMotion;
-    _controller.animateTo(target);
+    unawaited(_controller.animateTo(target));
   }
 
   @override

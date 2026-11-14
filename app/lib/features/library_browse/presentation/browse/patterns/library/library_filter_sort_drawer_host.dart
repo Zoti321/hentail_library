@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/patterns/library/library_filter_sort_side_sheet.dart';
 
@@ -62,11 +64,13 @@ class _LibraryFilterSortDrawerHostState
   }
 
   void _openSideSheet() {
-    LibraryFilterSortSideSheet.show(
-      context,
-      state: _state,
-      onStateChanged: _setState,
-      useRootNavigator: widget.useRootNavigator,
+    unawaited(
+      LibraryFilterSortSideSheet.show(
+        context,
+        state: _state,
+        onStateChanged: _setState,
+        useRootNavigator: widget.useRootNavigator,
+      ),
     );
   }
 

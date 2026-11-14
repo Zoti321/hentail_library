@@ -162,19 +162,21 @@ class ReaderPagedViewportKernel extends HookConsumerWidget {
         });
         return;
       }
-      pageController
-          .animateToPage(
-            targetItem,
-            duration: kReaderPageTurnAnimationDuration,
-            curve: Curves.easeInOut,
-          )
-          .whenComplete(() {
-            if (!context.mounted || generation != alignGeneration.value) {
-              return;
-            }
-            resumeSyncGate.value.onVisibleIndex(currentIndex);
-            isProgrammaticScroll.value = false;
-          });
+      unawaited(
+        pageController
+            .animateToPage(
+              targetItem,
+              duration: kReaderPageTurnAnimationDuration,
+              curve: Curves.easeInOut,
+            )
+            .whenComplete(() {
+              if (!context.mounted || generation != alignGeneration.value) {
+                return;
+              }
+              resumeSyncGate.value.onVisibleIndex(currentIndex);
+              isProgrammaticScroll.value = false;
+            }),
+      );
     }
 
     ref.listen<int>(

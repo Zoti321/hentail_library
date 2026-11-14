@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/features/comic_metadata/public/ui/metadata_lab_patterns.dart';
@@ -77,10 +79,12 @@ class _Md3eManagementBrowsePageState extends State<ManagementBrowsePage> {
       setState(() => _showInlineCreateField = true);
       return;
     }
-    showManagementCreateEntityDialog(
-      context: context,
-      facet: widget.facet,
-      onCreate: _handleEntityCreated,
+    unawaited(
+      showManagementCreateEntityDialog(
+        context: context,
+        facet: widget.facet,
+        onCreate: _handleEntityCreated,
+      ),
     );
   }
 

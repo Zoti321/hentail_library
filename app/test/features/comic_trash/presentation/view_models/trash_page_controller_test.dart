@@ -72,6 +72,8 @@ const _purgeResult = (succeeded: 7, failed: 0, errorSamples: <String>[]);
 
 class _Actions extends ComicTrashActions {
   final pending = Completer<void>();
+  // Test fixture exposes observations/configuration, not reactive application state.
+  // ignore: riverpod_lint/avoid_public_notifier_properties
   var calls = 0;
   @override
   void build() {}

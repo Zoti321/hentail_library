@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/shared/application/errors/app_exception.dart';
@@ -78,41 +80,43 @@ class ComicCardActions extends ConsumerWidget {
   void _showMenu(BuildContext context, WidgetRef ref, Offset globalPosition) {
     final AppLocalizations l10n = context.l10n;
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
-    showPointerContextMenu<void>(
-      context: context,
-      globalPosition: globalPosition,
-      children: <M3EMenuNode>[
-        M3EMenuEntry(
-          label: l10n.comicDetailRead,
-          leading: const Icon(LucideIcons.bookOpen),
-          onPressed: () => ComicCardHost.openReader(ref, comicId),
-        ),
-        M3EMenuEntry(
-          label: l10n.comicDetailEditMetadata,
-          leading: const Icon(LucideIcons.squarePen),
-          onPressed: () => showComicMetadataEditById(
-            context: context,
-            ref: ref,
-            comicId: comicId,
+    unawaited(
+      showPointerContextMenu<void>(
+        context: context,
+        globalPosition: globalPosition,
+        children: <M3EMenuNode>[
+          M3EMenuEntry(
+            label: l10n.comicDetailRead,
+            leading: const Icon(LucideIcons.bookOpen),
+            onPressed: () => ComicCardHost.openReader(ref, comicId),
           ),
-        ),
-        M3EMenuEntry(
-          label: l10n.comicDetailShowInExplorer,
-          leading: const Icon(LucideIcons.folderOpen),
-          onPressed: () => _showInExplorer(context, ref, path),
-        ),
-        M3EMenuEntry(
-          label: l10n.comicDetailDelete,
-          leading: Icon(LucideIcons.trash2, color: scheme.error),
-          isDestructive: true,
-          onPressed: () => ComicCardHost.confirmTrashById(
-            context,
-            ref,
-            comicId: comicId,
-            title: title,
+          M3EMenuEntry(
+            label: l10n.comicDetailEditMetadata,
+            leading: const Icon(LucideIcons.squarePen),
+            onPressed: () => showComicMetadataEditById(
+              context: context,
+              ref: ref,
+              comicId: comicId,
+            ),
           ),
-        ),
-      ],
+          M3EMenuEntry(
+            label: l10n.comicDetailShowInExplorer,
+            leading: const Icon(LucideIcons.folderOpen),
+            onPressed: () => _showInExplorer(context, ref, path),
+          ),
+          M3EMenuEntry(
+            label: l10n.comicDetailDelete,
+            leading: Icon(LucideIcons.trash2, color: scheme.error),
+            isDestructive: true,
+            onPressed: () => ComicCardHost.confirmTrashById(
+              context,
+              ref,
+              comicId: comicId,
+              title: title,
+            ),
+          ),
+        ],
+      ),
     );
   }
 

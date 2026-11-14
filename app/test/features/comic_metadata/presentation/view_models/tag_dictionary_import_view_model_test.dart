@@ -264,6 +264,8 @@ class _Management extends NamedFacetManagementViewModel {
   _Management(this.events);
   final List<String> events;
   final entered = Completer<void>();
+  // Test fixture exposes observations/configuration, not reactive application state.
+  // ignore: riverpod_lint/avoid_public_notifier_properties
   Future<void> Function()? respond;
 
   @override

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -34,12 +36,16 @@ void main() {
     test(
       'microtask clear-after-set with setId alone leaves null (legacy race)',
       () async {
-        Future<void>.microtask(() {
-          container.read(browseLibraryIdProvider.notifier).setId('lib-b');
-        });
-        Future<void>.microtask(() {
-          container.read(browseLibraryIdProvider.notifier).setId(null);
-        });
+        unawaited(
+          Future<void>.microtask(() {
+            container.read(browseLibraryIdProvider.notifier).setId('lib-b');
+          }),
+        );
+        unawaited(
+          Future<void>.microtask(() {
+            container.read(browseLibraryIdProvider.notifier).setId(null);
+          }),
+        );
         await Future<void>.delayed(Duration.zero);
 
         expect(container.read(browseLibraryIdProvider), isNull);
@@ -97,21 +103,25 @@ class _BrowseScopeBinder extends HookConsumerWidget {
       final BrowseLibraryId scope = ref.read(browseLibraryIdProvider.notifier);
       var cancelled = false;
       int? epoch;
-      Future<void>.microtask(() {
-        if (cancelled) {
-          return;
-        }
-        epoch = scope.claim(scopedId);
-      });
-      return () {
-        cancelled = true;
+      unawaited(
         Future<void>.microtask(() {
-          final int? claimed = epoch;
-          if (claimed == null) {
+          if (cancelled) {
             return;
           }
-          scope.release(claimed);
-        });
+          epoch = scope.claim(scopedId);
+        }),
+      );
+      return () {
+        cancelled = true;
+        unawaited(
+          Future<void>.microtask(() {
+            final int? claimed = epoch;
+            if (claimed == null) {
+              return;
+            }
+            scope.release(claimed);
+          }),
+        );
       };
     }, <Object?>[libraryId]);
 

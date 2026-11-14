@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
@@ -28,7 +30,7 @@ Future<ComicMetadataEditDraft?> showComicMetadataEditLayout({
         final MetadataEditSaveActions? state =
             pageKey.currentState as MetadataEditSaveActions?;
         if (state != null) {
-          state.saveAndPop();
+          unawaited(state.saveAndPop());
         }
       },
       bottomActions: <Widget>[

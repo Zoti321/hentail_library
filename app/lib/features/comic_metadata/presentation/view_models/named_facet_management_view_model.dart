@@ -103,7 +103,7 @@ class NamedFacetManagementViewModel extends _$NamedFacetManagementViewModel {
     ref.onDispose(() {
       _searchDebounce?.cancel();
     });
-    Future<void>.microtask(refresh);
+    unawaited(Future<void>.microtask(refresh));
     return NamedFacetManagementState.initial();
   }
 

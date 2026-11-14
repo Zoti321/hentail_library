@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:hentai_library/features/reading_history/presentation/models/history_card_item.dart';
 import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_browse_page.dart';
@@ -38,12 +40,14 @@ class _Md3eHistoryBrowsePageLabHostState
   }
 
   void _openReader(BuildContext context, HistoryCardItem item) {
-    openLabReader(
-      context,
-      preview: ReaderPagePreviewData(
-        title: item.title,
-        totalPages: _previewTotalPages,
-        initialPage: item.pageIndex ?? 1,
+    unawaited(
+      openLabReader(
+        context,
+        preview: ReaderPagePreviewData(
+          title: item.title,
+          totalPages: _previewTotalPages,
+          initialPage: item.pageIndex ?? 1,
+        ),
       ),
     );
   }

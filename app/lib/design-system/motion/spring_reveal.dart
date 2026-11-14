@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'motion.dart';
@@ -55,7 +57,7 @@ class _SpringRevealState extends State<SpringReveal>
     if (LabMotion.reduceMotionOf(context)) {
       _controller.value = target;
     } else {
-      _controller.animateTo(target);
+      unawaited(_controller.animateTo(target));
     }
   }
 

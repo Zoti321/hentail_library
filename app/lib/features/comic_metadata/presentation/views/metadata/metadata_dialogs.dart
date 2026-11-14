@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
@@ -173,7 +175,7 @@ class _TagDictionaryImportDialogState
   @override
   void initState() {
     super.initState();
-    _run();
+    unawaited(_run());
   }
 
   Future<void> _run() async {

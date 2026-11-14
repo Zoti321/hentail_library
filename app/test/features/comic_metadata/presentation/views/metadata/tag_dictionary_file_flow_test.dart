@@ -71,6 +71,8 @@ void main() {
 }
 
 class _Importer extends TagDictionaryImportViewModel {
+  // Test fixture exposes observations/configuration, not reactive application state.
+  // ignore: riverpod_lint/avoid_public_notifier_properties
   Uint8List? imported;
   @override
   Future<TagDictionaryImportResult?> importFromBytes(Uint8List bytes) async {

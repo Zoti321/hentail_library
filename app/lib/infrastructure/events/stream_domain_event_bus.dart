@@ -19,7 +19,7 @@ final class StreamDomainEventBus implements DomainEventBus {
 
   void dispose() {
     if (!_controller.isClosed) {
-      _controller.close();
+      unawaited(_controller.close());
     }
   }
 }

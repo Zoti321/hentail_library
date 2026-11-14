@@ -298,7 +298,7 @@ class _ReorderableSplitListGroupState extends State<ReorderableSplitListGroup>
 
     _dragIndex = index;
     _targetIndex = index;
-    HapticFeedback.mediumImpact();
+    unawaited(HapticFeedback.mediumImpact());
 
     _lift.value = 0;
     _springTo(_lift, 1, _liftSpring);
@@ -328,7 +328,7 @@ class _ReorderableSplitListGroupState extends State<ReorderableSplitListGroup>
     final int to = _placementFor(from, center.dy);
     if (to != _targetIndex) {
       _targetIndex = to;
-      HapticFeedback.selectionClick();
+      unawaited(HapticFeedback.selectionClick());
       _retarget(from);
     }
     setState(() {});

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:hentai_library/features/comic/presentation/providers/comic_metadata_use_case_providers.dart';
 import 'package:hentai_library/shared/application/logging/app_log.dart';
 import 'package:hentai_library/features/comic/presentation/patterns/metadata_edit/comic_metadata_edit_draft.dart';
@@ -21,7 +23,7 @@ class ComicMetadataEditSession extends _$ComicMetadataEditSession {
   @override
   ComicMetadataEditUiState build(Comic comic) {
     _original = comic;
-    Future<void>.microtask(_loadSeriesSortMembership);
+    unawaited(Future<void>.microtask(_loadSeriesSortMembership));
     return ComicMetadataEditUiState(
       draft: comicMetadataDraftFromComic(comic),
       locks: comic.locks,

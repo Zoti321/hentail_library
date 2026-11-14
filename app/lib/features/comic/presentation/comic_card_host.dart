@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:hentai_library/features/comic/presentation/comic_delete_flow.dart';
 import 'package:hentai_library/shared/presentation/providers/app_navigator_provider.dart';
@@ -12,7 +14,7 @@ abstract final class ComicCardHost {
       );
 
   static void confirmTrash(BuildContext context, WidgetRef ref, Comic comic) {
-    confirmAndTrashComic(context, ref, comic);
+    unawaited(confirmAndTrashComic(context, ref, comic));
   }
 
   static void confirmTrashById(
@@ -21,6 +23,8 @@ abstract final class ComicCardHost {
     required String comicId,
     required String title,
   }) {
-    confirmAndTrashComicById(context, ref, comicId: comicId, title: title);
+    unawaited(
+      confirmAndTrashComicById(context, ref, comicId: comicId, title: title),
+    );
   }
 }
