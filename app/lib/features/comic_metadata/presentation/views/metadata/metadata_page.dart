@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/shared/application/navigation/app_routes.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/comic_metadata/presentation/view_models/named_facet_management_view_model.dart';
 import 'package:hentai_library/features/comic_metadata/presentation/views/metadata/metadata_dialogs.dart';
@@ -26,7 +25,9 @@ import 'package:hentai_library/features/comic_metadata/presentation/providers/me
 
 /// 元数据管理页（MD3E 生产版）：作者 / 标签 / 原作 / 角色四类命名元数据。
 class MetadataManagementPage extends ConsumerStatefulWidget {
-  const MetadataManagementPage({super.key});
+  const MetadataManagementPage({super.key, this.tab});
+
+  final String? tab;
 
   @override
   ConsumerState<MetadataManagementPage> createState() =>
@@ -61,10 +62,7 @@ class _MetadataManagementPageState
 
   @override
   Widget build(BuildContext context) {
-    final String? tabParam = ref
-        .read(appNavigatorProvider)
-        .queryParameter(AppRoutes.metadataTabQueryKey);
-    final int queryIndex = _tabIndexFromQuery(tabParam);
+    final int queryIndex = _tabIndexFromQuery(widget.tab);
     // 首页统计卡等深链改 query 时，同步本地 tab（保留切换方向）。
     if (_selectedTabIndex != queryIndex) {
       final int previousIndex = _selectedTabIndex ?? queryIndex;

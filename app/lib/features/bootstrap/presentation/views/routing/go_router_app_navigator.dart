@@ -13,7 +13,8 @@ class GoRouterAppNavigator implements AppNavigator {
 
   final GoRouter _router;
 
-  Uri get _uri => _router.routerDelegate.currentConfiguration.uri;
+  // The match-list URI stays on the base route after an imperative push.
+  Uri get _uri => _router.state.uri;
 
   @override
   String currentLocation() => _uri.toString();

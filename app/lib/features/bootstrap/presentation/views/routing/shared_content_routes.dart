@@ -59,7 +59,9 @@ List<RouteBase> buildSharedContentRoutes({
       pageBuilder: (BuildContext context, GoRouterState state) =>
           buildShellNavPage(
             state: state,
-            child: const MetadataManagementPage(),
+            child: MetadataManagementPage(
+              tab: state.uri.queryParameters[AppRoutes.metadataTabQueryKey],
+            ),
           ),
     ),
     GoRoute(
