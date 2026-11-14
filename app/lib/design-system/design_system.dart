@@ -14,6 +14,8 @@ export 'components/actions/popup_menu_panel_shell.dart'
     show PopupMenuPanelShell;
 export 'components/calendar/anchored_calendar_date_picker.dart'
     show showAnchoredCalendarDatePicker;
+export 'components/calendar/calendar_date_picker_surface.dart'
+    show CalendarDatePickerSurface;
 export 'components/calendar/calendar_day_cell.dart' show CalendarDayCell;
 export 'components/calendar/calendar_day_picker.dart' show CalendarDayPicker;
 export 'components/calendar/calendar_month_picker.dart'

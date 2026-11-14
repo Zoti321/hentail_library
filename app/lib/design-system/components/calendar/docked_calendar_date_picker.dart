@@ -16,7 +16,7 @@ class DockedCalendarDatePicker extends StatelessWidget {
     this.initialDate,
     this.firstDate,
     this.lastDate,
-    this.initialCalendarMode = M3EDatePickerMode.year,
+    this.initialCalendarMode = M3EDatePickerMode.day,
   });
 
   final DateTime? initialDate;

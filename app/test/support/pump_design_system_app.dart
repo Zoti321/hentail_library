@@ -9,6 +9,7 @@ Future<void> pumpDesignSystemApp(
   required Widget home,
   Locale locale = const Locale('zh'),
   Brightness brightness = Brightness.light,
+  List<Locale> supportedLocales = const <Locale>[Locale('zh'), Locale('en')],
 }) async {
   final theme = assembleAppTheme(brightness);
   await tester.pumpWidget(
@@ -16,7 +17,7 @@ Future<void> pumpDesignSystemApp(
       data: theme.m3e,
       child: MaterialApp(
         locale: locale,
-        supportedLocales: const <Locale>[Locale('zh'), Locale('en')],
+        supportedLocales: supportedLocales,
         localizationsDelegates: GlobalMaterialLocalizations.delegates,
         theme: theme.material,
         home: home,

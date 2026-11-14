@@ -134,3 +134,4 @@ Accepted | Superseded by ADR-000N | Deprecated
 | [0053](./0053-design-system-portable-interaction-boundary.md) | 完整视觉与交互设计系统、产品适配与可独立成包的依赖边界（修订 ADR-0044/0047/0052） | Accepted |
 | [0054](./0054-verified-path-migration.md) | Verified continuity for automatic Path migration | Accepted; supersedes ADR-0013 weak-fingerprint sync eligibility |
 | [0055](./0055-content-verified-path-migration.md) | Content-verified Path migration | Accepted; extends ADR-0054 |
+| [0056](./0056-localized-date-picker.md) | Localized application-owned date picker | Accepted; supersedes ADR-0053 calendar locale restriction |

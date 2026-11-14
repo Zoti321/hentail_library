@@ -49,6 +49,7 @@ import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 
 import '../preview/md3e_named_facet_multi_select_preview.dart';
+import '../preview/md3e_date_picker_preview.dart';
 
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
@@ -68,6 +69,28 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
         WidgetbookFolder(
           name: 'widgets',
           children: <WidgetbookNode>[
+            WidgetbookComponent(
+              name: 'DatePicker',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Docked',
+                  builder: (_) =>
+                      const Md3eWidgetbookScope(child: Md3eDatePickerPreview()),
+                ),
+                WidgetbookUseCase(
+                  name: 'Modal',
+                  builder: (_) => const Md3eWidgetbookScope(
+                    child: Md3eDatePickerPreview(modal: true),
+                  ),
+                ),
+                WidgetbookUseCase(
+                  name: 'Modal input',
+                  builder: (_) => const Md3eWidgetbookScope(
+                    child: Md3eDatePickerPreview(modal: true, input: true),
+                  ),
+                ),
+              ],
+            ),
             WidgetbookComponent(
               name: 'ComicCard',
               useCases: <WidgetbookUseCase>[

@@ -1,19 +1,15 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import '../../l10n/m3e_material_localizations.dart';
-import 'embeddable_calendar_date_picker.dart';
-
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-const double _kAnchoredCalendarGap = 4;
+import '../../motion/motion.dart';
+import '../overlays/overlay_route_scope.dart';
+import 'calendar_date_picker_surface.dart';
 
-/// 在 [layerLink] 锚点处以浮层展示 [EmbeddableCalendarDatePicker]。
-///
-/// 使用 [CompositedTransformFollower] 对齐字段，避免 Widgetbook / 嵌套滚动下
-/// root overlay 坐标换算错位。点击遮罩或按 Esc 关闭；月历点选某一天后关闭。
+/// Opens a docked picker or compact modal. Only confirmation commits the draft.
 Future<void> showAnchoredCalendarDatePicker({
   required BuildContext context,
   required LayerLink layerLink,
@@ -21,208 +17,221 @@ Future<void> showAnchoredCalendarDatePicker({
   required DateTime lastDate,
   required ValueChanged<DateTime> onDateChanged,
   DateTime? initialDate,
-  M3EDatePickerMode initialCalendarMode = M3EDatePickerMode.year,
+  M3EDatePickerMode initialCalendarMode = M3EDatePickerMode.day,
   BuildContext? placementContext,
-}) {
-  final M3EThemeData themeData = M3ETheme.of(context);
-  final Locale locale = Localizations.localeOf(context);
-  final MediaQueryData mediaQuery = MediaQuery.of(context);
-  final Completer<void> completer = Completer<void>();
-  late OverlayEntry entry;
-  var overlayRemoved = false;
-
-  void dismiss() {
-    if (!overlayRemoved) {
-      overlayRemoved = true;
+}) async {
+  final scope = OverlayRouteScopeSnapshot.capture(context);
+  final anchorContext = placementContext ?? context;
+  if (MediaQuery.sizeOf(context).width >= 600) {
+    final completed = Completer<void>();
+    final previousFocus = FocusManager.instance.primaryFocus;
+    late final OverlayEntry entry;
+    void dismiss() {
+      if (completed.isCompleted) return;
       entry.remove();
+      entry.dispose();
+      previousFocus?.requestFocus();
+      completed.complete();
     }
-    if (!completer.isCompleted) {
-      completer.complete();
-    }
-  }
 
-  entry = OverlayEntry(
-    builder: (BuildContext overlayContext) {
-      return MediaQuery(
-        data: mediaQuery,
-        child: Localizations(
-          locale: locale,
-          delegates: materialLocalizationsDelegates,
-          child: M3ETheme(
-            data: themeData,
-            child: _AnchoredCalendarDatePickerLayer(
-              layerLink: layerLink,
-              placementContext: placementContext ?? context,
+    entry = OverlayEntry(
+      builder: (overlayContext) => OverlayRouteScope(
+        scope: scope,
+        child: SafeArea(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final object = anchorContext.mounted
+                  ? anchorContext.findRenderObject()
+                  : null;
+              final anchor =
+                  object is RenderBox && object.attached && object.hasSize
+                  ? object.localToGlobal(Offset.zero) & object.size
+                  : Rect.zero;
+              return CustomSingleChildLayout(
+                delegate: _DockedCalendarLayout(
+                  anchor: anchor,
+                  padding: MediaQuery.paddingOf(context),
+                  rtl: Directionality.of(context) == TextDirection.rtl,
+                ),
+                child: TapRegion(
+                  onTapOutside: (_) => dismiss(),
+                  child: FocusScope(
+                    autofocus: true,
+                    child: CallbackShortcuts(
+                      bindings: {
+                        const SingleActivator(LogicalKeyboardKey.escape):
+                            dismiss,
+                      },
+                      child: TweenAnimationBuilder<double>(
+                        tween: Tween(begin: 0, end: 1),
+                        duration: LabMotion.motionDurationOf(
+                          context,
+                          LabMotion.durationShort,
+                        ),
+                        builder: (context, opacity, child) =>
+                            Opacity(opacity: opacity, child: child),
+                        child: CalendarDatePickerSurface(
+                          firstDate: firstDate,
+                          lastDate: lastDate,
+                          initialDate: initialDate,
+                          initialCalendarMode: initialCalendarMode,
+                          onCancel: dismiss,
+                          onConfirmed: (date) {
+                            onDateChanged(date);
+                            dismiss();
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+    Overlay.of(context, rootOverlay: true).insert(entry);
+    return completed.future;
+  }
+  await showGeneralDialog<void>(
+    context: context,
+    barrierDismissible: true,
+    barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+    // The responsive scrim is painted inside the route, so resize can switch variants.
+    barrierColor: Colors.transparent,
+    transitionDuration: LabMotion.motionDurationOf(
+      context,
+      LabMotion.durationShort,
+    ),
+    transitionBuilder: (context, animation, secondary, child) => FadeTransition(
+      opacity: animation,
+      child: ScaleTransition(
+        scale: Tween<double>(begin: 0.96, end: 1).animate(
+          CurvedAnimation(
+            parent: animation,
+            curve: LabMotion.curveEmphasizedDecelerate,
+          ),
+        ),
+        child: child,
+      ),
+    ),
+    pageBuilder: (routeContext, animation, secondary) => OverlayRouteScope(
+      scope: scope,
+      child: CallbackShortcuts(
+        bindings: {
+          const SingleActivator(LogicalKeyboardKey.escape): () =>
+              Navigator.of(routeContext).pop(),
+        },
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final media = MediaQuery.of(context);
+            final compact = constraints.maxWidth < 600;
+            final fullscreen =
+                compact &&
+                (constraints.maxWidth < 392 || constraints.maxHeight < 600);
+            final object = anchorContext.mounted
+                ? anchorContext.findRenderObject()
+                : null;
+            final anchor =
+                object is RenderBox && object.hasSize && object.attached
+                ? object.localToGlobal(Offset.zero) & object.size
+                : Rect.zero;
+            final surface = CalendarDatePickerSurface(
+              key: const ValueKey('date-picker-session'),
               firstDate: firstDate,
               lastDate: lastDate,
               initialDate: initialDate,
               initialCalendarMode: initialCalendarMode,
-              onDateChanged: onDateChanged,
-              onDaySelected: dismiss,
-              onDismiss: dismiss,
-            ),
-          ),
+              modal: compact,
+              fullscreen: fullscreen,
+              onCancel: () => Navigator.of(routeContext).pop(),
+              onConfirmed: (date) {
+                onDateChanged(date);
+                Navigator.of(routeContext).pop();
+              },
+            );
+            return Stack(
+              children: [
+                if (compact)
+                  const Positioned.fill(
+                    child: IgnorePointer(
+                      child: ColoredBox(color: Colors.black54),
+                    ),
+                  ),
+                SafeArea(
+                  child: Padding(
+                    padding: EdgeInsets.only(bottom: media.viewInsets.bottom),
+                    child: compact
+                        ? fullscreen
+                              ? SizedBox.expand(child: surface)
+                              : Center(
+                                  child: ConstrainedBox(
+                                    constraints: BoxConstraints(
+                                      maxWidth: 360,
+                                      maxHeight: math.max(
+                                        0,
+                                        constraints.maxHeight - 32,
+                                      ),
+                                    ),
+                                    child: surface,
+                                  ),
+                                )
+                        : CustomSingleChildLayout(
+                            delegate: _DockedCalendarLayout(
+                              anchor: anchor,
+                              padding: media.padding,
+                              rtl:
+                                  Directionality.of(context) ==
+                                  TextDirection.rtl,
+                            ),
+                            child: surface,
+                          ),
+                  ),
+                ),
+              ],
+            );
+          },
         ),
-      );
-    },
+      ),
+    ),
   );
-  Overlay.of(context, rootOverlay: true).insert(entry);
-  return completer.future;
 }
 
-class _AnchoredCalendarDatePickerLayer extends StatefulWidget {
-  const _AnchoredCalendarDatePickerLayer({
-    required this.layerLink,
-    required this.placementContext,
-    required this.firstDate,
-    required this.lastDate,
-    required this.onDateChanged,
-    required this.onDaySelected,
-    required this.onDismiss,
-    this.initialDate,
-    this.initialCalendarMode = M3EDatePickerMode.year,
+/// Uses the actual child height, including dynamic month rows and menu views.
+class _DockedCalendarLayout extends SingleChildLayoutDelegate {
+  const _DockedCalendarLayout({
+    required this.anchor,
+    required this.padding,
+    required this.rtl,
   });
-
-  final LayerLink layerLink;
-  final BuildContext placementContext;
-  final DateTime firstDate;
-  final DateTime lastDate;
-  final DateTime? initialDate;
-  final M3EDatePickerMode initialCalendarMode;
-  final ValueChanged<DateTime> onDateChanged;
-  final VoidCallback onDaySelected;
-  final VoidCallback onDismiss;
-
+  final Rect anchor;
+  final EdgeInsets padding;
+  final bool rtl;
   @override
-  State<_AnchoredCalendarDatePickerLayer> createState() =>
-      _AnchoredCalendarDatePickerLayerState();
-}
-
-class _AnchoredCalendarDatePickerLayerState
-    extends State<_AnchoredCalendarDatePickerLayer> {
-  bool _openBelow = true;
-
+  BoxConstraints getConstraintsForChild(BoxConstraints constraints) =>
+      BoxConstraints(
+        minWidth: math.min(360, math.max(0, constraints.maxWidth - 24)),
+        maxWidth: math.min(360, math.max(0, constraints.maxWidth - 24)),
+        maxHeight: math.max(0, constraints.maxHeight - 24),
+      );
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) => _resolveVerticalPlacement(),
+  Offset getPositionForChild(Size size, Size childSize) {
+    final below = anchor.bottom - padding.top + 4;
+    final top = below + childSize.height <= size.height - 12
+        ? below
+        : anchor.top - padding.top - childSize.height - 4;
+    final left =
+        (rtl ? anchor.right - childSize.width : anchor.left) - padding.left;
+    return Offset(
+      left.clamp(12.0, math.max(12, size.width - childSize.width - 12)),
+      top.clamp(12.0, math.max(12, size.height - childSize.height - 12)),
     );
   }
 
-  void _resolveVerticalPlacement() {
-    if (!mounted) {
-      return;
-    }
-    final RenderObject? object = widget.placementContext.findRenderObject();
-    if (object is! RenderBox || !object.hasSize || !object.attached) {
-      return;
-    }
-    const double estimatedPanelHeight = 360;
-    final double screenHeight = MediaQuery.sizeOf(context).height;
-    final Offset topLeft = object.localToGlobal(Offset.zero);
-    final double spaceBelow =
-        screenHeight - topLeft.dy - object.size.height - _kAnchoredCalendarGap;
-    final double spaceAbove = topLeft.dy - _kAnchoredCalendarGap;
-    final bool openBelow = spaceBelow >= estimatedPanelHeight
-        ? true
-        : spaceAbove >= estimatedPanelHeight
-        ? false
-        : spaceBelow >= spaceAbove;
-    if (openBelow != _openBelow) {
-      setState(() => _openBelow = openBelow);
-    }
-  }
-
-  KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
-    if (event is KeyDownEvent &&
-        event.logicalKey == LogicalKeyboardKey.escape) {
-      widget.onDismiss();
-      return KeyEventResult.handled;
-    }
-    return KeyEventResult.ignored;
-  }
-
   @override
-  Widget build(BuildContext context) {
-    final Alignment targetAnchor = _openBelow
-        ? Alignment.bottomLeft
-        : Alignment.topLeft;
-    final Alignment followerAnchor = _openBelow
-        ? Alignment.topLeft
-        : Alignment.bottomLeft;
-    final double verticalOffset = _openBelow
-        ? _kAnchoredCalendarGap
-        : -_kAnchoredCalendarGap;
-
-    return Focus(
-      autofocus: true,
-      onKeyEvent: _handleKeyEvent,
-      child: Stack(
-        children: <Widget>[
-          Positioned.fill(
-            child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: widget.onDismiss,
-              child: const SizedBox.expand(),
-            ),
-          ),
-          CompositedTransformFollower(
-            link: widget.layerLink,
-            showWhenUnlinked: false,
-            targetAnchor: targetAnchor,
-            followerAnchor: followerAnchor,
-            offset: Offset(0, verticalOffset),
-            child: _CalendarPanel(
-              initialDate: widget.initialDate,
-              firstDate: widget.firstDate,
-              lastDate: widget.lastDate,
-              initialCalendarMode: widget.initialCalendarMode,
-              onDateChanged: widget.onDateChanged,
-              onDaySelected: widget.onDaySelected,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _CalendarPanel extends StatelessWidget {
-  const _CalendarPanel({
-    required this.firstDate,
-    required this.lastDate,
-    required this.onDateChanged,
-    required this.onDaySelected,
-    this.initialDate,
-    this.initialCalendarMode = M3EDatePickerMode.year,
-  });
-
-  final DateTime firstDate;
-  final DateTime lastDate;
-  final DateTime? initialDate;
-  final M3EDatePickerMode initialCalendarMode;
-  final ValueChanged<DateTime> onDateChanged;
-  final VoidCallback onDaySelected;
-
-  @override
-  Widget build(BuildContext context) {
-    final M3EThemeData theme = M3ETheme.of(context);
-    final M3EDatePickerTheme dateTheme = theme.datePickerTheme;
-
-    return Material(
-      elevation: dateTheme.elevation,
-      borderRadius: dateTheme.borderRadius,
-      clipBehavior: Clip.antiAlias,
-      color: Colors.transparent,
-      child: EmbeddableCalendarDatePicker(
-        initialDate: initialDate,
-        firstDate: firstDate,
-        lastDate: lastDate,
-        initialCalendarMode: initialCalendarMode,
-        onDateChanged: onDateChanged,
-        onDaySelected: (_) => onDaySelected(),
-      ),
-    );
-  }
+  bool shouldRelayout(_DockedCalendarLayout oldDelegate) =>
+      oldDelegate.anchor != anchor ||
+      oldDelegate.padding != padding ||
+      oldDelegate.rtl != rtl;
 }

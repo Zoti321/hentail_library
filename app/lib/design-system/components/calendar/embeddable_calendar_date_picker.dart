@@ -1,14 +1,17 @@
-import '../../l10n/m3e_material_localizations.dart';
-import '../../motion/motion.dart';
-import '../../motion/spring_value.dart';
-import 'calendar_month_picker.dart';
-import 'calendar_year_picker.dart';
-
-import 'package:material_3_expressive/components/date_pickers/components/m3e_date_picker_mode_toggle.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:intl/intl.dart' show DateFormat;
 import 'package:material_3_expressive/material_3_expressive.dart';
-import 'package:flutter/material.dart' hide MaterialLocalizations;
 
-/// 可嵌入表单的日历（与 [M3ECalendarDatePicker] 一致，年份模式使用 [CalendarYearPicker]）。
+import '../../motion/motion.dart';
+import 'calendar_date_grid.dart';
+import 'calendar_navigation.dart';
+import 'calendar_size_transition.dart';
+import 'calendar_selection_menu.dart';
+
+enum _CalendarView { days, months, years }
+
+/// The calendar body shared by docked and modal single-date pickers.
 class EmbeddableCalendarDatePicker extends StatefulWidget {
   const EmbeddableCalendarDatePicker({
     required this.onDateChanged,
@@ -22,6 +25,8 @@ class EmbeddableCalendarDatePicker extends StatefulWidget {
     this.selectableDayPredicate,
     this.expandToFit = false,
     this.onDaySelected,
+    this.onDateSubmitted,
+    this.modal = false,
     super.key,
   });
 
@@ -33,9 +38,11 @@ class EmbeddableCalendarDatePicker extends StatefulWidget {
   final ValueChanged<DateTime>? onDisplayedMonthChanged;
   final ValueChanged<M3EDatePickerMode>? onCalendarModeChanged;
   final M3EDatePickerMode initialCalendarMode;
-  final M3ESelectableDayPredicate? selectableDayPredicate;
+  final bool Function(DateTime)? selectableDayPredicate;
   final bool expandToFit;
   final ValueChanged<DateTime>? onDaySelected;
+  final ValueChanged<DateTime>? onDateSubmitted;
+  final bool modal;
 
   @override
   State<EmbeddableCalendarDatePicker> createState() =>
@@ -44,218 +51,322 @@ class EmbeddableCalendarDatePicker extends StatefulWidget {
 
 class _EmbeddableCalendarDatePickerState
     extends State<EmbeddableCalendarDatePicker> {
-  late M3EDatePickerMode _mode;
-  late DateTime _displayedMonth;
-  late DateTime _firstDate;
-  late DateTime _lastDate;
-  late DateTime _currentDate;
-  DateTime? _selectedDate;
+  late DateTime _month;
+  late DateTime _focusedDate;
+  late _CalendarView _view;
+  DateTime? _selected;
+  final _gridFocus = FocusNode();
+  final _monthFocus = FocusNode();
+  final _yearFocus = FocusNode();
+
+  DateTime get _first => DateUtils.dateOnly(widget.firstDate);
+  DateTime get _last => DateUtils.dateOnly(widget.lastDate);
+
+  DateTime _clamp(DateTime value) => value.isBefore(_first)
+      ? _first
+      : value.isAfter(_last)
+      ? _last
+      : value;
 
   @override
   void initState() {
     super.initState();
-    _firstDate = M3EDatePickerUtils.dateOnly(widget.firstDate);
-    _lastDate = M3EDatePickerUtils.dateOnly(widget.lastDate);
-    _currentDate = M3EDatePickerUtils.dateOnly(
-      widget.currentDate ?? DateTime.now(),
-    );
-    _mode = widget.initialCalendarMode;
-    _selectedDate = widget.initialDate == null
+    assert(!_last.isBefore(_first));
+    _selected = widget.initialDate == null
         ? null
-        : M3EDatePickerUtils.dateOnly(widget.initialDate!);
-    final DateTime base = _selectedDate ?? _currentDate;
-    _displayedMonth = M3EDatePickerUtils.getMonth(base.year, base.month);
-    assert(
-      !_lastDate.isBefore(_firstDate),
-      'lastDate must be on or after firstDate',
-    );
-  }
-
-  void _handleModeChanged(M3EDatePickerMode mode) {
-    M3EHaptics.selection();
-    setState(() => _mode = mode);
-    widget.onCalendarModeChanged?.call(mode);
-  }
-
-  void _handleMonthChanged(DateTime month) {
-    setState(() => _displayedMonth = month);
-    widget.onDisplayedMonthChanged?.call(month);
-  }
-
-  void _handleYearChanged(DateTime value) {
-    M3EHaptics.selection();
-    final DateTime clamped = M3EDatePickerUtils.clampDate(
-      value,
-      _firstDate,
-      _lastDate,
-    );
-    setState(() {
-      _mode = M3EDatePickerMode.day;
-      _displayedMonth = M3EDatePickerUtils.getMonth(
-        clamped.year,
-        clamped.month,
-      );
-      if (M3EDatePickerUtils.isSelectable(
-        clamped,
-        _firstDate,
-        _lastDate,
-        predicate: widget.selectableDayPredicate,
-      )) {
-        _selectedDate = clamped;
-        widget.onDateChanged(clamped);
-      }
-    });
-    widget.onDisplayedMonthChanged?.call(_displayedMonth);
-    widget.onCalendarModeChanged?.call(M3EDatePickerMode.day);
-  }
-
-  void _handleDayChanged(DateTime value) {
-    M3EHaptics.selection();
-    setState(() {
-      _selectedDate = value;
-      widget.onDateChanged(value);
-    });
-    widget.onDaySelected?.call(value);
-  }
-
-  double _inlinePickerBodyHeight(BuildContext context) {
-    final int firstDayOfWeekIndex = materialLocalizationsOf(context)
-        .firstDayOfWeekIndex;
-    return switch (_mode) {
-      M3EDatePickerMode.day => M3EDatePickerUtils.calendarDayViewHeight(
-        _displayedMonth,
-        firstDayOfWeekIndex,
-      ),
-      M3EDatePickerMode.year => calendarYearViewHeight(
-        _firstDate,
-        _lastDate,
-        includeSubHeader: false,
-      ),
-    };
+        : DateUtils.dateOnly(widget.initialDate!);
+    _focusedDate = _clamp(_selected ?? widget.currentDate ?? DateTime.now());
+    _month = DateTime(_focusedDate.year, _focusedDate.month);
+    _view = widget.initialCalendarMode == M3EDatePickerMode.year
+        ? _CalendarView.years
+        : _CalendarView.days;
   }
 
   @override
-  Widget build(BuildContext context) {
-    return M3EComponentTheme(
-      builder: (BuildContext context) {
-        return MaterialUiLocalizationsScope(
-          child: Builder(
-            builder: (BuildContext scopedContext) {
-              final M3EThemeData theme = M3ETheme.of(scopedContext);
-              final M3EDatePickerTheme dateTheme = theme.datePickerTheme;
+  void didUpdateWidget(covariant EmbeddableCalendarDatePicker oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialDate != oldWidget.initialDate ||
+        widget.firstDate != oldWidget.firstDate ||
+        widget.lastDate != oldWidget.lastDate) {
+      _selected = widget.initialDate == null
+          ? null
+          : DateUtils.dateOnly(widget.initialDate!);
+      _focusedDate = _clamp(_selected ?? _focusedDate);
+      _month = DateTime(_focusedDate.year, _focusedDate.month);
+    }
+  }
 
-              if (widget.expandToFit) {
-                final Widget picker = switch (_mode) {
-                  M3EDatePickerMode.day => CalendarMonthPicker(
-                    initialMonth: _displayedMonth,
-                    firstDate: _firstDate,
-                    lastDate: _lastDate,
-                    selectedDate: _selectedDate,
-                    currentDate: _currentDate,
-                    onChanged: _handleDayChanged,
-                    onMonthChanged: _handleMonthChanged,
-                    selectableDayPredicate: widget.selectableDayPredicate,
-                    expandToFit: true,
-                    mode: _mode,
-                    onModeChanged: _handleModeChanged,
-                  ),
-                  M3EDatePickerMode.year => Padding(
-                    padding: const EdgeInsets.only(
-                      top: M3EDatePickerConstants.subHeaderHeight,
-                    ),
-                    child: _YearPicker(state: this),
-                  ),
-                };
-                return Stack(
-                  children: <Widget>[
-                    Positioned.fill(child: picker),
-                    if (_mode == M3EDatePickerMode.year)
-                      M3EDatePickerModeToggle(
-                        mode: _mode,
-                        monthDate: _displayedMonth,
-                        onChanged: _handleModeChanged,
-                      ),
-                  ],
-                );
-              }
+  @override
+  void dispose() {
+    _gridFocus.dispose();
+    _monthFocus.dispose();
+    _yearFocus.dispose();
+    super.dispose();
+  }
 
-              final double bodyHeight = _inlinePickerBodyHeight(scopedContext);
-              final Widget content = Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  M3EDatePickerModeToggle(
-                    mode: _mode,
-                    monthDate: _displayedMonth,
-                    onChanged: _handleModeChanged,
-                  ),
-                  SpringValue(
-                    value: bodyHeight,
-                    motion: LabMotion.spatialReveal,
-                    builder:
-                        (BuildContext context, double height, Widget? child) {
-                          return SizedBox(
-                            height: height,
-                            child: ClipRect(
-                              child: OverflowBox(
-                                alignment: Alignment.topCenter,
-                                minHeight: bodyHeight,
-                                maxHeight: bodyHeight,
-                                child: child,
-                              ),
-                            ),
-                          );
-                        },
-                    child: SizedBox(
-                      height: bodyHeight,
-                      child: switch (_mode) {
-                        M3EDatePickerMode.day => CalendarMonthPicker(
-                          initialMonth: _displayedMonth,
-                          firstDate: _firstDate,
-                          lastDate: _lastDate,
-                          selectedDate: _selectedDate,
-                          currentDate: _currentDate,
-                          onChanged: _handleDayChanged,
-                          onMonthChanged: _handleMonthChanged,
-                          selectableDayPredicate: widget.selectableDayPredicate,
-                        ),
-                        M3EDatePickerMode.year => _YearPicker(state: this),
-                      },
-                    ),
-                  ),
-                ],
-              );
-
-              return Container(
-                width: dateTheme.width,
-                padding: dateTheme.padding,
-                decoration: BoxDecoration(
-                  color: dateTheme.containerColor(theme.colorScheme),
-                  borderRadius: dateTheme.borderRadius,
-                ),
-                child: content,
-              );
-            },
+  void _navigate(DateTime month) {
+    final clamped = _clamp(month);
+    setState(() {
+      _month = DateTime(clamped.year, clamped.month);
+      _focusedDate = _clamp(
+        DateTime(
+          _month.year,
+          _month.month,
+          _focusedDate.day.clamp(
+            1,
+            DateUtils.getDaysInMonth(_month.year, _month.month),
           ),
-        );
-      },
+        ),
+      );
+    });
+    widget.onDisplayedMonthChanged?.call(_month);
+  }
+
+  void _show(_CalendarView view) {
+    setState(() => _view = _view == view ? _CalendarView.days : view);
+    widget.onCalendarModeChanged?.call(
+      _view == _CalendarView.years
+          ? M3EDatePickerMode.year
+          : M3EDatePickerMode.day,
     );
   }
-}
 
-class _YearPicker extends StatelessWidget {
-  const _YearPicker({required this.state});
+  bool _enabled(DateTime day) =>
+      !day.isBefore(_first) &&
+      !day.isAfter(_last) &&
+      (widget.selectableDayPredicate?.call(day) ?? true);
 
-  final _EmbeddableCalendarDatePickerState state;
+  void _select(DateTime day) {
+    if (!_enabled(day)) return;
+    setState(() {
+      _selected = day;
+      _focusedDate = day;
+    });
+    widget.onDateChanged(day);
+    widget.onDaySelected?.call(day);
+  }
+
+  KeyEventResult _key(FocusNode node, KeyEvent event) {
+    if (event is! KeyDownEvent && event is! KeyRepeatEvent) {
+      return KeyEventResult.ignored;
+    }
+    final key = event.logicalKey;
+    final shift = HardwareKeyboard.instance.isShiftPressed;
+    if (shift && key == LogicalKeyboardKey.keyM && !widget.modal) {
+      _show(_CalendarView.months);
+      _monthFocus.requestFocus();
+      return KeyEventResult.handled;
+    }
+    if (shift && key == LogicalKeyboardKey.keyY) {
+      _show(_CalendarView.years);
+      _yearFocus.requestFocus();
+      return KeyEventResult.handled;
+    }
+    if (!_gridFocus.hasFocus || _view != _CalendarView.days) {
+      return KeyEventResult.ignored;
+    }
+    if (key == LogicalKeyboardKey.enter || key == LogicalKeyboardKey.space) {
+      _select(_focusedDate);
+      widget.onDateSubmitted?.call(_focusedDate);
+      return KeyEventResult.handled;
+    }
+    final rtl = Directionality.of(context) == TextDirection.rtl;
+    DateTime? target;
+    if (key == LogicalKeyboardKey.arrowLeft) {
+      target = DateUtils.addDaysToDate(_focusedDate, rtl ? 1 : -1);
+    } else if (key == LogicalKeyboardKey.arrowRight) {
+      target = DateUtils.addDaysToDate(_focusedDate, rtl ? -1 : 1);
+    } else if (key == LogicalKeyboardKey.arrowUp) {
+      target = DateUtils.addDaysToDate(_focusedDate, -7);
+    } else if (key == LogicalKeyboardKey.arrowDown) {
+      target = DateUtils.addDaysToDate(_focusedDate, 7);
+    } else if (key == LogicalKeyboardKey.home) {
+      target = DateTime(_month.year, _month.month);
+    } else if (key == LogicalKeyboardKey.end) {
+      target = DateTime(_month.year, _month.month + 1, 0);
+    } else if (key == LogicalKeyboardKey.pageUp ||
+        key == LogicalKeyboardKey.pageDown) {
+      final delta = key == LogicalKeyboardKey.pageUp ? -1 : 1;
+      final month = DateTime(
+        _month.year,
+        _month.month + delta * (shift ? 12 : 1),
+      );
+      target = DateTime(
+        month.year,
+        month.month,
+        _focusedDate.day.clamp(
+          1,
+          DateUtils.getDaysInMonth(month.year, month.month),
+        ),
+      );
+    }
+    if (target == null) return KeyEventResult.ignored;
+    var candidate = _clamp(target);
+    final step = candidate.isBefore(_focusedDate) ? -1 : 1;
+    while (!_enabled(candidate) &&
+        candidate.isAfter(_first) &&
+        candidate.isBefore(_last)) {
+      candidate = DateUtils.addDaysToDate(candidate, step);
+    }
+    if (_enabled(candidate)) {
+      _navigate(candidate);
+      setState(() => _focusedDate = candidate);
+    }
+    return KeyEventResult.handled;
+  }
+
+  void _choose(int value) {
+    _navigate(
+      _view == _CalendarView.months
+          ? DateTime(_month.year, value)
+          : DateTime(value, _month.month),
+    );
+    _show(_view);
+    _gridFocus.requestFocus();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return CalendarYearPicker(
-      selectedDate: state._selectedDate,
-      firstDate: state._firstDate,
-      lastDate: state._lastDate,
-      onChanged: state._handleYearChanged,
-      selectableDayPredicate: state.widget.selectableDayPredicate,
-      displayedMonth: state._displayedMonth,
+    final l10n = MaterialLocalizations.of(context);
+    final locale = Localizations.localeOf(context).toString();
+    final colors = Theme.of(context).colorScheme;
+    final duration = LabMotion.motionDurationOf(
+      context,
+      LabMotion.durationShort,
+    );
+    final monthName = DateFormat.MMM(locale).format(_month);
+    final yearName = l10n.formatYear(_month);
+    final previous = DateTime(_month.year, _month.month - 1);
+    final next = DateTime(_month.year, _month.month + 1);
+    final navigation = Row(
+      children: [
+        if (!widget.modal)
+          Expanded(
+            child: CalendarNavigation(
+              label: monthName,
+              menuKey: const ValueKey('calendar-month-menu'),
+              focusNode: _monthFocus,
+              active: _view == _CalendarView.months,
+              enabled: _view != _CalendarView.years,
+              showArrows: _view == _CalendarView.days,
+              previousLabel: '${l10n.previousMonthTooltip} (Page Up)',
+              nextLabel: '${l10n.nextMonthTooltip} (Page Down)',
+              menuHint: '${l10n.formatMonthYear(_month)} (Shift+M)',
+              onPrevious: previous.isBefore(DateTime(_first.year, _first.month))
+                  ? null
+                  : () => _navigate(previous),
+              onNext: next.isAfter(_last) ? null : () => _navigate(next),
+              onMenu: () => _show(_CalendarView.months),
+            ),
+          ),
+        Expanded(
+          child: CalendarNavigation(
+            label: widget.modal ? l10n.formatMonthYear(_month) : yearName,
+            menuKey: const ValueKey('calendar-year-menu'),
+            focusNode: _yearFocus,
+            active: _view == _CalendarView.years,
+            enabled: _view != _CalendarView.months,
+            showArrows: _view == _CalendarView.days,
+            previousLabel: widget.modal
+                ? l10n.previousMonthTooltip
+                : '${l10n.previousPageTooltip}, ${l10n.formatYear(DateTime(_month.year - 1))} (Shift+Page Up)',
+            nextLabel: widget.modal
+                ? l10n.nextMonthTooltip
+                : '${l10n.nextPageTooltip}, ${l10n.formatYear(DateTime(_month.year + 1))} (Shift+Page Down)',
+            menuHint: '${l10n.selectYearSemanticsLabel} (Shift+Y)',
+            trailingArrows: widget.modal,
+            onPrevious: widget.modal
+                ? (previous.isBefore(DateTime(_first.year, _first.month))
+                      ? null
+                      : () => _navigate(previous))
+                : (_month.year <= _first.year
+                      ? null
+                      : () =>
+                            _navigate(DateTime(_month.year - 1, _month.month))),
+            onNext: widget.modal
+                ? (next.isAfter(_last) ? null : () => _navigate(next))
+                : (_month.year >= _last.year
+                      ? null
+                      : () =>
+                            _navigate(DateTime(_month.year + 1, _month.month))),
+            onMenu: () => _show(_CalendarView.years),
+          ),
+        ),
+      ],
+    );
+    final textScale = MediaQuery.textScalerOf(context).scale(14) / 14;
+    final rowHeight = 48.0 * textScale.clamp(1.0, 2.0);
+    final offset = DateUtils.firstDayOffset(_month.year, _month.month, l10n);
+    final rows = widget.modal
+        ? 6
+        : ((offset + DateUtils.getDaysInMonth(_month.year, _month.month)) / 7)
+              .ceil();
+    final body = _view == _CalendarView.days
+        ? CalendarDateGrid(
+            key: ValueKey(_month),
+            month: _month,
+            rows: rows,
+            rowHeight: rowHeight,
+            selected: _selected,
+            today: widget.currentDate ?? DateTime.now(),
+            focusedDate: _focusedDate,
+            focusNode: _gridFocus,
+            showOutsideMonth: !widget.modal,
+            enabled: _enabled,
+            onSelected: _select,
+            onSwipe: widget.modal
+                ? (delta) =>
+                      _navigate(DateTime(_month.year, _month.month + delta))
+                : null,
+          )
+        : SizedBox(
+            height: rowHeight * (widget.modal ? 7 : 6),
+            child: CalendarSelectionMenu(
+              key: ValueKey(_view),
+              months: _view == _CalendarView.months,
+              year: _month.year,
+              firstDate: _first,
+              lastDate: _last,
+              selected: _view == _CalendarView.months
+                  ? _month.month
+                  : _month.year,
+              columns: widget.modal ? 3 : 1,
+              rowHeight: rowHeight,
+              onSelected: _choose,
+            ),
+          );
+
+    return Focus(
+      onKeyEvent: _key,
+      child: Container(
+        width: widget.expandToFit ? double.infinity : 360,
+        padding: const EdgeInsets.fromLTRB(12, 16, 12, 0),
+        decoration: BoxDecoration(
+          color: colors.surfaceContainerHigh,
+          borderRadius: BorderRadius.circular(widget.modal ? 28 : 16),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            navigation,
+            if (_view != _CalendarView.days)
+              Divider(height: 16, color: colors.outlineVariant),
+            CalendarSizeTransition(
+              duration: duration,
+              curve: LabMotion.curveEmphasized,
+              alignment: Alignment.topCenter,
+              child: TweenAnimationBuilder<double>(
+                key: ValueKey((_month, _view)),
+                tween: Tween(begin: 0, end: 1),
+                duration: duration,
+                builder: (context, opacity, child) =>
+                    Opacity(opacity: opacity, child: child),
+                child: body,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
