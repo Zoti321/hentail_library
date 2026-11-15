@@ -1,11 +1,11 @@
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/comic/infrastructure/comic_frb_mapper.dart';
 import 'package:hentai_library/features/comic/domain/value_objects/library_comic_filter.dart';
 import 'package:hentai_library/features/comic/domain/value_objects/library_comic_sort_option.dart';
 import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/src/rust/api/comic.dart' as rust;
+import 'package:test/test.dart';
 
 void main() {
   test('mapSortOption forwards field and descending to Rust DTO', () {

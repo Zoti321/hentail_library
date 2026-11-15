@@ -1,7 +1,6 @@
 import 'package:hentai_library/features/series/public/serialization_status.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/series/infrastructure/series_frb_mapper.dart';
 import 'package:hentai_library/features/series/domain/library_series_filter.dart';
 import 'package:hentai_library/features/series/domain/library_series_sort_option.dart';
@@ -11,6 +10,7 @@ import 'package:hentai_library/shared/domain/models/value_objects/paged_result.d
 import 'package:hentai_library/features/series/domain/series_comic_page_item.dart';
 import 'package:hentai_library/features/series/domain/value_objects/series_comics_metadata.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/series_item_membership.dart';
+import 'package:test/test.dart';
 import 'package:hentai_library/shared/domain/reading/series_reading_context.dart';
 import 'package:hentai_library/src/rust/api/comic.dart' as rust_comic;
 import 'package:hentai_library/src/rust/api/series.dart' as rust_series;

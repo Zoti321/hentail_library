@@ -4,13 +4,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-import '../../support/pump_app.dart';
+import '../../support/pump_design_system_app.dart';
 
 void main() {
   testWidgets('ComicCard shows title and subtitle', (
     WidgetTester tester,
   ) async {
-    await pumpApp(
+    await pumpDesignSystemApp(
       tester,
       home: Center(
         child: SizedBox(
@@ -33,7 +33,7 @@ void main() {
     WidgetTester tester,
   ) async {
     var tapped = false;
-    await pumpApp(
+    await pumpDesignSystemApp(
       tester,
       home: Center(
         child: SizedBox(
@@ -54,7 +54,7 @@ void main() {
   testWidgets('ComicCard shows checkbox in selection mode', (
     WidgetTester tester,
   ) async {
-    await pumpApp(
+    await pumpDesignSystemApp(
       tester,
       home: Center(
         child: SizedBox(
@@ -86,7 +86,7 @@ void main() {
   testWidgets('ComicCard hides cover progress when readProgress is null', (
     WidgetTester tester,
   ) async {
-    await pumpApp(
+    await pumpDesignSystemApp(
       tester,
       home: Center(
         child: SizedBox(
@@ -104,7 +104,7 @@ void main() {
   testWidgets('ComicCard hides cover progress when readProgress is 0', (
     WidgetTester tester,
   ) async {
-    await pumpApp(
+    await pumpDesignSystemApp(
       tester,
       home: Center(
         child: SizedBox(
@@ -123,7 +123,7 @@ void main() {
   testWidgets('ComicCard shows cover progress strip when readProgress > 0', (
     WidgetTester tester,
   ) async {
-    await pumpApp(
+    await pumpDesignSystemApp(
       tester,
       home: Center(
         child: SizedBox(
@@ -143,7 +143,7 @@ void main() {
     WidgetTester tester,
   ) async {
     var tapped = false;
-    await pumpApp(
+    await pumpDesignSystemApp(
       tester,
       home: Center(
         child: SizedBox(

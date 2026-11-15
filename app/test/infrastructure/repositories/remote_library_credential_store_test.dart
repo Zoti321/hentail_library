@@ -1,5 +1,5 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/library_admin/domain/remote_library_credential_store.dart';
+import 'package:test/test.dart';
 
 class _MemoryCredentialStore implements RemoteLibraryCredentialStore {
   final Map<String, String> _passwords = <String, String>{};

@@ -1,4 +1,4 @@
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 import 'package:hentai_library/features/comic_metadata/application/named_facet_management_service.dart';
 import 'package:hentai_library/features/comic_metadata/domain/named_facet_form_candidate.dart';
 import 'package:hentai_library/features/comic_metadata/domain/named_facet_management_repository.dart';

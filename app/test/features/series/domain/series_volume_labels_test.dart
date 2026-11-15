@@ -1,44 +1,12 @@
-import 'package:hentai_library/features/series/domain/value_objects/series_folder_info.dart';
-import 'package:hentai_library/features/series/domain/value_objects/series_metadata.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/l10n/app_localizations.dart';
+import 'package:hentai_library/l10n/app_localizations_zh.dart';
 import 'package:hentai_library/features/series/presentation/l10n/series_l10n.dart';
-import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
-import 'package:hentai_library/features/series/domain/series.dart';
-import 'package:hentai_library/features/series/domain/series_item.dart';
-
-import '../../../support/pump_localized_app.dart';
-
-Series _series({int itemCount = 3, int? totalCount}) {
-  return Series(
-    id: 'series-1',
-    folderInfo: SeriesFolderInfo(folderPath: '/series'),
-    metadata: SeriesMetadata(name: 'Test Series', totalCount: totalCount),
-    items: List<SeriesItem>.generate(
-      itemCount,
-      (int index) =>
-          SeriesItem(comicId: 'comic-$index', order: index.toDouble()),
-    ),
-  );
-}
+import 'package:test/test.dart';
 
 void main() {
   group('Series volume labels', () {
-    testWidgets('volume count label uses l10n', (WidgetTester tester) async {
-      late AppLocalizations l10n;
-      await pumpLocalizedApp(
-        tester,
-        home: Builder(
-          builder: (BuildContext context) {
-            l10n = context.l10n;
-            return const SizedBox.shrink();
-          },
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      expect(l10n.seriesVolumeCountLabel(_series().items.length), '3 本');
+    test('volume count label uses l10n', () {
+      final l10n = AppLocalizationsZh();
+      expect(l10n.seriesVolumeCountLabel(3), '3 本');
       expect(
         l10n.seriesVolumeProgressLabel(current: 3, total: 12),
         '3 / 共 12 本',

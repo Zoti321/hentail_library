@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-import '../../support/pump_app.dart';
+import '../../support/pump_design_system_app.dart';
 
 Future<void> _pumpWithWindowSize(
   WidgetTester tester, {
@@ -13,7 +13,7 @@ Future<void> _pumpWithWindowSize(
   tester.view.physicalSize = windowSize;
   tester.view.devicePixelRatio = 1.0;
   addTearDown(tester.view.resetPhysicalSize);
-  await pumpApp(tester, home: home);
+  await pumpDesignSystemApp(tester, home: home);
 }
 
 void main() {

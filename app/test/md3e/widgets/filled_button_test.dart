@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 
-import '../../support/pump_app.dart';
+import '../../support/pump_design_system_app.dart';
 
 void main() {
   testWidgets('ExpressiveFilledButton shows label and responds to tap', (
     WidgetTester tester,
   ) async {
     var tapped = false;
-    await pumpApp(
+    await pumpDesignSystemApp(
       tester,
       home: Center(
         child: ExpressiveFilledButton(

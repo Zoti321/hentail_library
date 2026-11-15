@@ -1,6 +1,6 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/comic_metadata/infrastructure/mappers/named_facet_frb_mapper.dart';
 import 'package:hentai_library/features/comic_metadata/domain/named_facet_management_repository.dart';
+import 'package:test/test.dart';
 
 void main() {
   test('author merge refusal copy is the Author-specific message', () {

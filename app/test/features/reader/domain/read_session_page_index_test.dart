@@ -1,6 +1,6 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/reader/domain/value_objects/read_session_page_index.dart';
 import 'package:hentai_library/shared/domain/exceptions/domain_exception.dart';
+import 'package:test/test.dart';
 
 void main() {
   test('ReadSessionPageIndex.tryParse', () {

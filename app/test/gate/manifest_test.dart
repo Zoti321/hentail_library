@@ -30,6 +30,20 @@ void main() {
       expect(entries.toSet().length, entries.length);
     });
 
+    test('directory entries do not also list their descendants', () {
+      final List<String> entries = _readGateManifestEntries();
+      final List<String> directories = entries
+          .where((String entry) => Directory(entry).existsSync())
+          .toList();
+      final List<String> overlapping = <String>[
+        for (final String entry in entries)
+          for (final String directory in directories)
+            if (p.isWithin(directory, entry))
+              '$entry is already covered by $directory',
+      ];
+      expect(overlapping, isEmpty);
+    });
+
     test('covers the thin-edge seams, FRB wire, layout and app smoke', () {
       expect(
         _readGateManifestEntries(),

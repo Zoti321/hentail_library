@@ -1,10 +1,10 @@
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/comic_trash/infrastructure/mappers/comic_trash_frb_mapper.dart';
 import 'package:hentai_library/features/comic_trash/domain/trashed_comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/src/rust/api/comic_trash.dart' as rust;
+import 'package:test/test.dart';
 
 void main() {
   rust.TrashedComicFrbDto trashed({required String kind}) {

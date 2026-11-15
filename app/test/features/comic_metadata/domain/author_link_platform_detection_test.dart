@@ -1,4 +1,4 @@
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 import 'package:hentai_library/features/comic_metadata/domain/author_detail.dart';
 
 void main() {

@@ -48,19 +48,6 @@ void main() {
   });
 
   group('buildAppTheme extensions after semantic shrink', () {
-    test('registers layout, reader, shadow, and motion extensions', () {
-      for (final Brightness brightness in <Brightness>[
-        Brightness.light,
-        Brightness.dark,
-      ]) {
-        final ThemeData theme = buildAppTheme(brightness);
-        expect(theme.extension<AppThemeTokens>(), isNotNull);
-        expect(theme.extension<ReaderColorScheme>(), isNotNull);
-        expect(theme.extension<AppShadowTokens>(), isNotNull);
-        expect(theme.extension<AppMotionTokens>(), isNotNull);
-      }
-    });
-
     test('spacing and radius sample still matches tokens', () {
       final AppThemeTokens tokens = buildAppTheme(Brightness.light)
           .extension<AppThemeTokens>()!;

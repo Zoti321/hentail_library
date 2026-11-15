@@ -1,5 +1,5 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/comic/presentation/cover/comic_cover_load_gate.dart';
+import 'package:test/test.dart';
 
 void main() {
   test('ComicCoverLoadGate limits concurrent executions', () async {

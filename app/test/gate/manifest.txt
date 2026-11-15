@@ -29,7 +29,6 @@ test/project_layout_test.dart
 test/widget_test.dart
 
 # Dart hard-manifest UI（已晋升快轨）
-test/design-system/components/inputs/named_facet_multi_select_field_test.dart
 test/features/comic_metadata/presentation/views/metadata/named_facet_fill_viewport_test.dart
 test/features/comic_metadata/infrastructure/metadata_management_io_test.dart
 test/features/comic_metadata/infrastructure/adapters/author_frb_adapter_test.dart
@@ -53,13 +52,10 @@ test/features/comic/presentation/views/widgets/form/library_facet_multi_select_f
 test/features/comic/presentation/view_models/comic_metadata_smart_facet_providers_test.dart
 test/features/home/presentation/views/home/patterns/home_bento_stat_card_test.dart
 test/features/library_admin/presentation/views/home_library_dashboard/home_library_dashboard_rows_test.dart
-test/core/util/list_edit_test.dart
 
 # Dart hard-manifest UI — 纯逻辑 ViewModel / policy / codec
-test/design-system/motion/app_motion_test.dart
 test/shared/ui/widgets/foundation/pointer_target_test.dart
 test/features/reader/presentation/reader_input_test.dart
-test/design-system/theme/reader_color_scheme_contract_test.dart
 test/features/library_browse/presentation/browse/view_models/stable_page_count_test.dart
 test/features/library_browse/presentation/catalog/view_models/catalog_pagination_engine_test.dart
 test/features/comic/presentation/view_models/comic_detail_return_series_notifier_test.dart
@@ -100,8 +96,6 @@ test/features/reading_history/presentation/view_models/history_paged_feed_contro
 test/features/home/presentation/view_models/home_alert_dismiss_notifier_test.dart
 test/features/home/domain/home_alert_dismissal_test.dart
 test/features/home/infrastructure/repositories/home_alert_dismiss_repository_impl_test.dart
-test/design-system/layout/page_layout_spec_test.dart
-test/design-system/layout/page_viewport_test.dart
 test/features/reading_history/presentation/views/history_page_test.dart
 test/features/home/presentation/views/home/home_page_test.dart
 test/features/library_admin/presentation/views/home_library_dashboard/home_library_management_row_test.dart
@@ -120,7 +114,6 @@ test/features/library_admin/domain/resource_format_category_setting_test.dart
 test/features/library_admin/presentation/view_models/scan_library_controller_sync_test.dart
 test/features/comic/presentation/draft/bulk_metadata_edit_session_test.dart
 test/features/comic/presentation/views/bulk_edit/bulk_edit_metadata_form_test.dart
-test/design-system/filtering/name_pinyin_assisted_filter_test.dart
 test/features/library_admin/presentation/view_models/metadata_refresh_controller_revision_test.dart
 test/features/library_admin/presentation/views/navigation/libraries_routes_test.dart
 test/features/comic_trash/presentation/view_models/trash_page_state_test.dart
@@ -149,7 +142,6 @@ test/features/home/presentation/view_models/home_page_counts_stream_test.dart
 test/features/home/presentation/view_models/reading_activity_stats_stream_test.dart
 test/features/reader/presentation/view_models/series_reader_provider_test.dart
 
-test/infrastructure/platform/shell_file_explorer_test.dart
 
 test/shared/ui/window/app_window_title_test.dart
 
@@ -161,7 +153,6 @@ test/features/app_settings/application/diagnostics/log_redactor_test.dart
 
 test/features/app_settings/infrastructure/diagnostics/log_export_service_test.dart
 
-test/infrastructure/logging/diagnostic_logging_test.dart
 
 # ADR-0053: host adapters retain their existing fast-track coverage.
 test/features/bootstrap/presentation/routing/shared_axis_route_page_test.dart
@@ -169,4 +160,3 @@ test/features/bootstrap/presentation/routing/desktop_page_transition_test.dart
 test/features/app_settings/presentation/mappers/app_font_spec_test.dart
 
 test/shared/ui/widgets/feedback/app_snackbar_test.dart
-test/md3e/widgetbook_design_system_test.dart

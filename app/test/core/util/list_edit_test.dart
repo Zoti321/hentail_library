@@ -1,5 +1,5 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/core/util/list_edit.dart';
+import 'package:test/test.dart';
 
 void main() {
   test('listWithAdded 追加新值且不修改入参', () {

@@ -1,7 +1,7 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/reader/infrastructure/mappers/reader_frb_mapper.dart';
 import 'package:hentai_library/features/reader/application/read_session_page_load_exception.dart';
 import 'package:hentai_library/src/rust/api/init.dart';
+import 'package:test/test.dart';
 
 void main() {
   test('throwReaderException wraps HentaiErrorDto as page load failure', () {

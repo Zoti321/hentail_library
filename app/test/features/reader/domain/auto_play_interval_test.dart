@@ -1,5 +1,5 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/reader/domain/auto_play_interval.dart';
+import 'package:test/test.dart';
 
 void main() {
   group('clampReaderAutoPlayInterval', () {

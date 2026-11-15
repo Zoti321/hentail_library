@@ -1,11 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/l10n/app_localizations.dart';
-import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
+import 'package:hentai_library/l10n/app_localizations_zh.dart';
+import 'package:hentai_library/l10n/app_localizations_en.dart';
 import 'package:hentai_library/features/library_admin/domain/sync_library_types.dart';
-
-import '../../../support/pump_localized_app.dart';
-
+import 'package:test/test.dart';
 import 'package:hentai_library/features/library_admin/public/ui/l10n/library_admin_l10n.dart';
 
 SyncLibraryProgress _doneWithRoots({
@@ -32,61 +29,35 @@ SyncLibraryProgress _doneWithRoots({
 }
 
 void main() {
-  Future<AppLocalizations> pumpL10n(
-    WidgetTester tester, {
-    Locale locale = const Locale('zh'),
-  }) async {
-    late AppLocalizations l10n;
-    await tester.pumpWidget(
-      buildLocalizedTestMaterialApp(
-        locale: locale,
-        home: Builder(
-          builder: (BuildContext context) {
-            l10n = context.l10n;
-            return const SizedBox.shrink();
-          },
-        ),
-      ),
+  test('manual Library sync success toast reports added/removed/migrated without kept', () {
+    final AppLocalizations l10n = AppLocalizationsZh();
+
+    final String message = l10n.libraryScanSuccessToast(
+      mode: ScanMode.incremental,
+      progress: _doneWithRoots(added: 2, removed: 1, migrated: 3, kept: 7),
     );
-    await tester.pumpAndSettle();
-    return l10n;
-  }
 
-  testWidgets(
-    'manual Library sync success toast reports added/removed/migrated without kept',
-    (WidgetTester tester) async {
-      final AppLocalizations l10n = await pumpL10n(tester);
+    expect(message, '扫描完成：新增 2，移除 1，迁移 3');
+    expect(message.toLowerCase(), isNot(contains('kept')));
+    expect(message, isNot(contains('保留')));
+  });
 
-      final String message = l10n.libraryScanSuccessToast(
-        mode: ScanMode.incremental,
-        progress: _doneWithRoots(added: 2, removed: 1, migrated: 3, kept: 7),
-      );
+  test('deep Library sync success toast reports added/removed/migrated without kept', () {
+    final AppLocalizations l10n = AppLocalizationsZh();
 
-      expect(message, '扫描完成：新增 2，移除 1，迁移 3');
-      expect(message.toLowerCase(), isNot(contains('kept')));
-      expect(message, isNot(contains('保留')));
-    },
-  );
+    final String message = l10n.libraryScanSuccessToast(
+      mode: ScanMode.full,
+      progress: _doneWithRoots(added: 0, removed: 0, migrated: 0, kept: 0),
+    );
 
-  testWidgets(
-    'deep Library sync success toast reports added/removed/migrated without kept',
-    (WidgetTester tester) async {
-      final AppLocalizations l10n = await pumpL10n(tester);
+    expect(message, '深度扫描完成：新增 0，移除 0，迁移 0');
+    expect(message, isNot(contains('保留')));
+  });
 
-      final String message = l10n.libraryScanSuccessToast(
-        mode: ScanMode.full,
-        progress: _doneWithRoots(added: 0, removed: 0, migrated: 0, kept: 0),
-      );
-
-      expect(message, '深度扫描完成：新增 0，移除 0，迁移 0');
-      expect(message, isNot(contains('保留')));
-    },
-  );
-
-  testWidgets(
+  test(
     'startup Library sync success toast marks startup source and keeps zeros',
-    (WidgetTester tester) async {
-      final AppLocalizations l10n = await pumpL10n(tester);
+    () {
+      final AppLocalizations l10n = AppLocalizationsZh();
 
       final String message = l10n.libraryScanSuccessToast(
         mode: ScanMode.incremental,
@@ -100,13 +71,8 @@ void main() {
     },
   );
 
-  testWidgets('English manual Library sync success toast omits kept', (
-    WidgetTester tester,
-  ) async {
-    final AppLocalizations l10n = await pumpL10n(
-      tester,
-      locale: const Locale('en'),
-    );
+  test('English manual Library sync success toast omits kept', () {
+    final AppLocalizations l10n = AppLocalizationsEn();
 
     final String message = l10n.libraryScanSuccessToast(
       mode: ScanMode.incremental,
@@ -117,22 +83,16 @@ void main() {
     expect(message.toLowerCase(), isNot(contains('kept')));
   });
 
-  testWidgets(
-    'English startup Library sync success toast marks startup source',
-    (WidgetTester tester) async {
-      final AppLocalizations l10n = await pumpL10n(
-        tester,
-        locale: const Locale('en'),
-      );
+  test('English startup Library sync success toast marks startup source', () {
+    final AppLocalizations l10n = AppLocalizationsEn();
 
-      final String message = l10n.libraryScanSuccessToast(
-        mode: ScanMode.incremental,
-        fromStartup: true,
-        progress: _doneWithRoots(added: 0, removed: 0, migrated: 0),
-      );
+    final String message = l10n.libraryScanSuccessToast(
+      mode: ScanMode.incremental,
+      fromStartup: true,
+      progress: _doneWithRoots(added: 0, removed: 0, migrated: 0),
+    );
 
-      expect(message, 'Startup scan complete: added 0, removed 0, migrated 0');
-      expect(message.toLowerCase(), isNot(contains('kept')));
-    },
-  );
+    expect(message, 'Startup scan complete: added 0, removed 0, migrated 0');
+    expect(message.toLowerCase(), isNot(contains('kept')));
+  });
 }

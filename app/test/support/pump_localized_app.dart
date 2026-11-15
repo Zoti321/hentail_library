@@ -39,13 +39,10 @@ Future<void> pumpLocalizedApp(
   List<Override> overrides = const <Override>[],
   bool wrapProviderScope = false,
 }) async {
-  final config = localizedTestAppConfig(locale: locale);
-  Widget app = MaterialApp(
-    locale: config.locale,
-    localizationsDelegates: config.delegates,
-    supportedLocales: config.locales,
-    theme: theme ?? buildAppTheme(Brightness.light),
+  Widget app = buildLocalizedTestMaterialApp(
     home: home,
+    locale: locale,
+    theme: theme,
   );
   if (wrapProviderScope || overrides.isNotEmpty) {
     app = ProviderScope(overrides: overrides, child: app);

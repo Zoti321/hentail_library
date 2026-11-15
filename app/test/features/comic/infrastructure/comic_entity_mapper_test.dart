@@ -1,12 +1,12 @@
 import 'package:hentai_library/features/comic/public/comic_metadata_types.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/comic/infrastructure/comic_entity_mapper.dart';
 import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/features/comic_metadata/public/comic_metadata_entities.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
 import 'package:hentai_library/src/rust/api/comic.dart' as rust;
+import 'package:test/test.dart';
 
 void main() {
   test('resource fingerprint carries its own source observation through metadata edits', () {

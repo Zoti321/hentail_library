@@ -1,8 +1,8 @@
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/comic/domain/resource_verification.dart';
 import 'package:hentai_library/features/comic/infrastructure/resource_verification_frb_adapter.dart';
 import 'package:hentai_library/src/rust/api/resource_verification.dart' as rust;
+import 'package:test/test.dart';
 
 void main() {
   test('verification mapping preserves distinct evidence outcomes', () {

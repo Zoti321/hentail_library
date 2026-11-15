@@ -1,5 +1,5 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/design-system/design_system.dart';
+import 'package:test/test.dart';
 
 void main() {
   group('WindowSizeClass.fromWidth (M3 five tiers)', () {

@@ -1,8 +1,8 @@
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/reading_history/infrastructure/mappers/history_frb_mapper.dart';
 import 'package:hentai_library/features/reading_history/domain/reading_history.dart';
 import 'package:hentai_library/src/rust/api/history.dart' as rust;
+import 'package:test/test.dart';
 
 void main() {
   test('mapReadingHistoryDto maps Reading history fields and epoch ms', () {

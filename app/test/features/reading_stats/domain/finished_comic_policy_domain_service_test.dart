@@ -1,4 +1,4 @@
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 import 'package:hentai_library/features/reading_stats/domain/finished_comic_policy_domain_service.dart';
 
 void main() {

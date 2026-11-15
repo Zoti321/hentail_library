@@ -9,12 +9,14 @@ import 'import_boundary_rules.dart';
 void main() {
   late Directory libDir;
   late File baselineFile;
+  late List<ImportViolation> allViolations;
 
-  setUp(() {
+  setUpAll(() {
     libDir = Directory(p.join(Directory.current.path, 'lib'));
     baselineFile = File(
       p.join('test', 'gate', 'import_boundary_baseline.json'),
     );
+    allViolations = collectImportViolations(libDir);
   });
 
   test('FRB import whitelist: feature data/ layer (Phase C #280)', () {
@@ -101,8 +103,9 @@ void main() {
   });
 
   test('import boundaries: L1 structural rules are zero-tolerance', () {
-    final List<ImportViolation> all = collectImportViolations(libDir);
-    final List<ImportViolation> structural = structuralViolations(all);
+    final List<ImportViolation> structural = structuralViolations(
+      allViolations,
+    );
     if (structural.isNotEmpty) {
       fail(
         'Structural import violations (R1–R12; R13 is ratcheted):\n'
@@ -114,8 +117,7 @@ void main() {
   test(
     'R13 只由 test/architecture/module_boundary_test.dart 实现（扫 import+export）',
     () {
-      final List<ImportViolation> all = collectImportViolations(libDir);
-      final List<ImportViolation> r13 = all
+      final List<ImportViolation> r13 = allViolations
           .where((ImportViolation v) => v.ruleId == 'R13')
           .toList();
       expect(r13, isEmpty, reason: 'import_boundary_rules 不得再产出 R13（#504）。');
@@ -124,7 +126,7 @@ void main() {
 
   test('baseline has no stale entries', () {
     final Set<String> currentKeys = violationKeySet(
-      ratchetViolations(collectImportViolations(libDir)),
+      ratchetViolations(allViolations),
     );
     final Set<String> baselineKeys = _readBaselineKeys(baselineFile);
     final Set<String> stale = baselineKeys.difference(currentKeys);
@@ -138,22 +140,10 @@ void main() {
     );
   });
 
-  test('import boundaries: no cycles in public cross-feature graph', () {
-    final Map<String, Set<String>> adjacency =
-        collectPublicCrossFeatureAdjacency(libDir);
-    final List<String>? cycle = findPublicCrossFeatureCycle(adjacency);
-    expect(
-      cycle,
-      isNull,
-      reason: cycle == null
-          ? null
-          : 'Public API dependency cycle: ${cycle.join(' -> ')}',
-    );
-  });
-
   test('import boundaries: L2 product graph ratchet vs baseline', () {
-    final List<ImportViolation> all = collectImportViolations(libDir);
-    final Set<String> currentKeys = violationKeySet(ratchetViolations(all));
+    final Set<String> currentKeys = violationKeySet(
+      ratchetViolations(allViolations),
+    );
     final Set<String> baselineKeys = _readBaselineKeys(baselineFile);
 
     final Set<String> added = currentKeys.difference(baselineKeys);

@@ -1,5 +1,5 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/shared/ui/window/app_window_title.dart';
+import 'package:test/test.dart';
 
 void main() {
   test('Release uses base title without [dev]', () {

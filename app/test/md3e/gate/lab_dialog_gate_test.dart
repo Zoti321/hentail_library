@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 
 /// 原 `lib/md3e` 搬迁后的 MD3E 代码所在目录（#413）。Baseline 的 `shared/ui/widgets`
 /// 与 feature 内既有代码不在本门禁范围内。

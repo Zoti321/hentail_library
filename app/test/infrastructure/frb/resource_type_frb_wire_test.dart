@@ -1,6 +1,6 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/infrastructure/frb/resource_type_frb_wire.dart';
+import 'package:test/test.dart';
 
 void main() {
   test('mapResourceType covers every ResourceType wire token', () {

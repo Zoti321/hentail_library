@@ -1,5 +1,5 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/reader/presentation/widgets/viewport/reader_page_crossfade_policy.dart';
+import 'package:test/test.dart';
 
 void main() {
   group('readerPageCrossfadeEnabled', () {

@@ -1,5 +1,5 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/reading_stats/domain/reading_duration_accrual_domain_service.dart';
+import 'package:test/test.dart';
 
 void main() {
   group('ReadingDurationAccrualDomainService.accruedDuration', () {

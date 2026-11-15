@@ -1,4 +1,4 @@
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 import 'package:hentai_library/features/reading_history/domain/reading_history.dart';
 import 'package:hentai_library/features/reading_history/domain/reading_history_exceptions.dart';
 import 'package:hentai_library/features/reading_history/domain/reading_history_search_specification.dart';

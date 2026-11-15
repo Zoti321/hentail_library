@@ -1,6 +1,6 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/features/reader/presentation/layout/reader_chrome_metrics.dart';
+import 'package:test/test.dart';
 
 void main() {
   group('ReaderChromeMetrics.denseChrome', () {

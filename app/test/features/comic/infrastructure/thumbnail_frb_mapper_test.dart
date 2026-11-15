@@ -1,10 +1,10 @@
 import 'dart:typed_data';
 
-import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/comic/infrastructure/thumbnail_frb_mapper.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/comic/domain/thumbnail/thumbnail_event.dart';
 import 'package:hentai_library/src/rust/api/thumbnail.dart' as rust;
+import 'package:test/test.dart';
 
 void main() {
   test('mapThumbnailPriority maps domain priorities to FRB DTOs', () {

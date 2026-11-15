@@ -1,5 +1,5 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/metadata_backup/domain/metadata_export_options.dart';
+import 'package:test/test.dart';
 
 void main() {
   test('MetadataExportOptions accepts all-library export', () {
