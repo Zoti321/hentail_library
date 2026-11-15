@@ -72,6 +72,15 @@ _Avoid_: automatic cleanup, system recycle-bin emptying.
 **Resource**: Original local file/directory or WebDAV file that may be discovered and imported as a Comic. Parsing before import is independent of Comic identity/user metadata; sync, refresh, reading and thumbnails share Resource access rules.
 _Avoid_: file when directory/remote support matters, asset.
 
+**Resource fingerprint**: Versioned SHA-256 evidence captured from a Resource together with its observed type, size and modification time. File fingerprints cover all bytes; image-directory fingerprints cover image bytes in reading order, and neither establishes Comic identity.
+_Avoid_: content ID, current-content proof without a fresh read.
+
+**Quick Resource check**: A comparison of current Resource observations with the saved fingerprint's observations without reading content. No detected change is weaker than content equality; directory observations and unknown modification times may be inconclusive.
+_Avoid_: integrity verification, unchanged-content guarantee.
+
+**Strict Resource verification**: A fresh full-content fingerprint comparison against saved evidence, bypassing the observation cache. Verification reports content equality, change or unavailable evidence without replacing the saved baseline; errors remain errors.
+_Avoid_: metadata refresh, Library sync, baseline renewal.
+
 **Resource access**: Uniform listing, stat and read-only streaming of Resources under a Library root, implemented by filesystem or WebDAV adapters.
 _Avoid_: UI-specific protocol branches, cloud SDK, VFS as the domain name.
 

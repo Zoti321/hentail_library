@@ -16,7 +16,7 @@ import 'sync.dart';
 part 'comic.freezed.dart';
 
 // These functions are ignored because they are not marked as `pub`: `map_bulk_patch`, `map_multi_value_op`, `map_multi_value_patch`, `map_published_at_patch`, `map_scalar_patch`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`
 
 void initDbFrb({required String appDataDir, required String dbFileName}) =>
     RustLib.instance.api.crateApiComicInitDbFrb(
@@ -227,6 +227,7 @@ class ComicDto {
   final String path;
   final String resourceType;
   final PlatformInt64 resourceSize;
+  final ResourceFingerprintDto? resourceFingerprint;
   final PlatformInt64 createdAt;
   final PlatformInt64 lastUpdatedAt;
   final String title;
@@ -248,6 +249,7 @@ class ComicDto {
     required this.path,
     required this.resourceType,
     required this.resourceSize,
+    this.resourceFingerprint,
     required this.createdAt,
     required this.lastUpdatedAt,
     required this.title,
@@ -271,6 +273,7 @@ class ComicDto {
       path.hashCode ^
       resourceType.hashCode ^
       resourceSize.hashCode ^
+      resourceFingerprint.hashCode ^
       createdAt.hashCode ^
       lastUpdatedAt.hashCode ^
       title.hashCode ^
@@ -296,6 +299,7 @@ class ComicDto {
           path == other.path &&
           resourceType == other.resourceType &&
           resourceSize == other.resourceSize &&
+          resourceFingerprint == other.resourceFingerprint &&
           createdAt == other.createdAt &&
           lastUpdatedAt == other.lastUpdatedAt &&
           title == other.title &&
@@ -639,6 +643,37 @@ sealed class PublishedAtPatchFrbDto with _$PublishedAtPatchFrbDto {
   const factory PublishedAtPatchFrbDto.replace(PlatformInt64 field0) =
       PublishedAtPatchFrbDto_Replace;
   const factory PublishedAtPatchFrbDto.clear() = PublishedAtPatchFrbDto_Clear;
+}
+
+class ResourceFingerprintDto {
+  final String digest;
+  final String resourceType;
+  final PlatformInt64 modifiedMs;
+  final PlatformInt64 size;
+
+  const ResourceFingerprintDto({
+    required this.digest,
+    required this.resourceType,
+    required this.modifiedMs,
+    required this.size,
+  });
+
+  @override
+  int get hashCode =>
+      digest.hashCode ^
+      resourceType.hashCode ^
+      modifiedMs.hashCode ^
+      size.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ResourceFingerprintDto &&
+          runtimeType == other.runtimeType &&
+          digest == other.digest &&
+          resourceType == other.resourceType &&
+          modifiedMs == other.modifiedMs &&
+          size == other.size;
 }
 
 @freezed

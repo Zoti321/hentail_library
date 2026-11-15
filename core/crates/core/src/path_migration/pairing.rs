@@ -176,6 +176,7 @@ mod tests {
         resource_size: i64,
     ) -> ComicDto {
         ComicDto {
+            resource_fingerprint: None,
             comic_id: id.to_string(),
             path: path.to_string(),
             resource_type: resource_type.to_string(),

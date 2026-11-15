@@ -25,6 +25,7 @@ import 'api/named_facet_dictionary.dart';
 import 'api/reader.dart';
 import 'api/reading_activity.dart';
 import 'api/resource_metadata.dart';
+import 'api/resource_verification.dart';
 import 'api/series.dart';
 import 'api/shutdown.dart';
 import 'api/sync.dart';
@@ -203,6 +204,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ReadingHistoryDto dco_decode_box_autoadd_reading_history_dto(dynamic raw);
+
+  @protected
+  ResourceFingerprintDto dco_decode_box_autoadd_resource_fingerprint_dto(
+    dynamic raw,
+  );
 
   @protected
   ScalarPatchFrbDto dco_decode_box_autoadd_scalar_patch_frb_dto(dynamic raw);
@@ -527,6 +533,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  ResourceFingerprintDto? dco_decode_opt_box_autoadd_resource_fingerprint_dto(
+    dynamic raw,
+  );
+
+  @protected
   ScalarPatchFrbDto? dco_decode_opt_box_autoadd_scalar_patch_frb_dto(
     dynamic raw,
   );
@@ -622,7 +633,25 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  ResourceFingerprintDto dco_decode_resource_fingerprint_dto(dynamic raw);
+
+  @protected
   ResourceFormatCategoryDto dco_decode_resource_format_category_dto(
+    dynamic raw,
+  );
+
+  @protected
+  ResourceVerificationModeDto dco_decode_resource_verification_mode_dto(
+    dynamic raw,
+  );
+
+  @protected
+  ResourceVerificationResultDto dco_decode_resource_verification_result_dto(
+    dynamic raw,
+  );
+
+  @protected
+  ResourceVerificationStatusDto dco_decode_resource_verification_status_dto(
     dynamic raw,
   );
 
@@ -937,6 +966,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ReadingHistoryDto sse_decode_box_autoadd_reading_history_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  ResourceFingerprintDto sse_decode_box_autoadd_resource_fingerprint_dto(
     SseDeserializer deserializer,
   );
 
@@ -1339,6 +1373,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  ResourceFingerprintDto? sse_decode_opt_box_autoadd_resource_fingerprint_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   ScalarPatchFrbDto? sse_decode_opt_box_autoadd_scalar_patch_frb_dto(
     SseDeserializer deserializer,
   );
@@ -1456,7 +1495,27 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  ResourceFingerprintDto sse_decode_resource_fingerprint_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   ResourceFormatCategoryDto sse_decode_resource_format_category_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  ResourceVerificationModeDto sse_decode_resource_verification_mode_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  ResourceVerificationResultDto sse_decode_resource_verification_result_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  ResourceVerificationStatusDto sse_decode_resource_verification_status_dto(
     SseDeserializer deserializer,
   );
 
@@ -1858,6 +1917,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_box_autoadd_reading_history_dto(
     ReadingHistoryDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_box_autoadd_resource_fingerprint_dto(
+    ResourceFingerprintDto self,
     SseSerializer serializer,
   );
 
@@ -2366,6 +2431,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_opt_box_autoadd_resource_fingerprint_dto(
+    ResourceFingerprintDto? self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_opt_box_autoadd_scalar_patch_frb_dto(
     ScalarPatchFrbDto? self,
     SseSerializer serializer,
@@ -2510,8 +2581,32 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_resource_fingerprint_dto(
+    ResourceFingerprintDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_resource_format_category_dto(
     ResourceFormatCategoryDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_resource_verification_mode_dto(
+    ResourceVerificationModeDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_resource_verification_result_dto(
+    ResourceVerificationResultDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_resource_verification_status_dto(
+    ResourceVerificationStatusDto self,
     SseSerializer serializer,
   );
 

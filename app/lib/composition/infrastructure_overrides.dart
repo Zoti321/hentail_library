@@ -41,6 +41,9 @@ List<Override> infrastructureOverrides() => <Override>[
   comicLookupRepositoryProvider.overrideWith(
     (Ref ref) => createComicRepository(),
   ),
+  comicResourceVerificationQueryProvider.overrideWith(
+    (Ref ref) => createComicResourceVerificationQuery(),
+  ),
   comicReadQueryProvider.overrideWith(
     (Ref ref) => createComicReadQuery(ref.read(comicLookupRepositoryProvider)),
   ),

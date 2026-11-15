@@ -1,3 +1,4 @@
+import 'package:hentai_library/features/comic/domain/value_objects/resource_fingerprint.dart';
 import 'package:hentai_library/features/comic/domain/value_objects/content_rating.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hentai_library/features/comic/domain/value_objects/comic_meta_locks.dart';
@@ -69,6 +70,7 @@ abstract class Comic with _$Comic {
     DateTime? publishedAt,
     DateTime? lastReadTime,
     ComicMetaLocks locks = ComicMetaLocks.unlocked,
+    ResourceFingerprint? fingerprint,
   }) {
     return Comic(
       comicId: comicId,
@@ -77,6 +79,7 @@ abstract class Comic with _$Comic {
         resourceType: resourceType,
         resourceSize: resourceSize,
         pageCount: pageCount,
+        fingerprint: fingerprint,
       ),
       metadata: ComicMetadata(
         title: title,
@@ -116,6 +119,7 @@ abstract class Comic with _$Comic {
     List<String> characters = const <String>[],
     DateTime? lastReadTime,
     ComicMetaLocks locks = ComicMetaLocks.unlocked,
+    ResourceFingerprint? fingerprint,
   }) {
     final String trimmedTitle = title.trim();
     if (trimmedTitle.isEmpty) {
@@ -140,6 +144,7 @@ abstract class Comic with _$Comic {
       characters: normalizeOrderedFacetNames(characters),
       lastReadTime: lastReadTime,
       locks: locks,
+      fingerprint: fingerprint,
     );
   }
 

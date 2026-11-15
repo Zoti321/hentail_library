@@ -40,7 +40,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.13.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1726611550;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -249903069;
 
 // Section: executor
 
@@ -4720,6 +4720,51 @@ fn wire__crate__api__series__update_series_user_meta_frb_impl(
         },
     )
 }
+fn wire__crate__api__resource_verification__verify_comic_resource_frb_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "verify_comic_resource_frb",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_comic_id = <String>::sse_decode(&mut deserializer);
+            let api_mode =
+                <crate::api::resource_verification::ResourceVerificationModeDto>::sse_decode(
+                    &mut deserializer,
+                );
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, crate::api::init::HentaiErrorDto>(
+                    (move || async move {
+                        let output_ok =
+                            crate::api::resource_verification::verify_comic_resource_frb(
+                                api_comic_id,
+                                api_mode,
+                            )
+                            .await?;
+                        std::result::Result::Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
 fn wire__crate__api__author__watch_authors_frb_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -5603,6 +5648,8 @@ impl SseDecode for crate::api::comic::ComicDto {
         let mut var_path = <String>::sse_decode(deserializer);
         let mut var_resourceType = <String>::sse_decode(deserializer);
         let mut var_resourceSize = <i64>::sse_decode(deserializer);
+        let mut var_resourceFingerprint =
+            <Option<crate::api::comic::ResourceFingerprintDto>>::sse_decode(deserializer);
         let mut var_createdAt = <i64>::sse_decode(deserializer);
         let mut var_lastUpdatedAt = <i64>::sse_decode(deserializer);
         let mut var_title = <String>::sse_decode(deserializer);
@@ -5623,6 +5670,7 @@ impl SseDecode for crate::api::comic::ComicDto {
             path: var_path,
             resource_type: var_resourceType,
             resource_size: var_resourceSize,
+            resource_fingerprint: var_resourceFingerprint,
             created_at: var_createdAt,
             last_updated_at: var_lastUpdatedAt,
             title: var_title,
@@ -6730,6 +6778,19 @@ impl SseDecode for Option<crate::api::history::ReadingHistoryDto> {
     }
 }
 
+impl SseDecode for Option<crate::api::comic::ResourceFingerprintDto> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<crate::api::comic::ResourceFingerprintDto>::sse_decode(
+                deserializer,
+            ));
+        } else {
+            return None;
+        }
+    }
+}
+
 impl SseDecode for Option<crate::api::comic::ScalarPatchFrbDto> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -7106,6 +7167,22 @@ impl SseDecode for crate::api::sync::RemoteLibraryCredentialDto {
     }
 }
 
+impl SseDecode for crate::api::comic::ResourceFingerprintDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_digest = <String>::sse_decode(deserializer);
+        let mut var_resourceType = <String>::sse_decode(deserializer);
+        let mut var_modifiedMs = <i64>::sse_decode(deserializer);
+        let mut var_size = <i64>::sse_decode(deserializer);
+        return crate::api::comic::ResourceFingerprintDto {
+            digest: var_digest,
+            resource_type: var_resourceType,
+            modified_ms: var_modifiedMs,
+            size: var_size,
+        };
+    }
+}
+
 impl SseDecode for crate::api::sync::ResourceFormatCategoryDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -7116,6 +7193,52 @@ impl SseDecode for crate::api::sync::ResourceFormatCategoryDto {
             2 => crate::api::sync::ResourceFormatCategoryDto::Epub,
             3 => crate::api::sync::ResourceFormatCategoryDto::Archive,
             _ => unreachable!("Invalid variant for ResourceFormatCategoryDto: {}", inner),
+        };
+    }
+}
+
+impl SseDecode for crate::api::resource_verification::ResourceVerificationModeDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <i32>::sse_decode(deserializer);
+        return match inner {
+            0 => crate::api::resource_verification::ResourceVerificationModeDto::Quick,
+            1 => crate::api::resource_verification::ResourceVerificationModeDto::Strict,
+            _ => unreachable!("Invalid variant for ResourceVerificationModeDto: {}", inner),
+        };
+    }
+}
+
+impl SseDecode for crate::api::resource_verification::ResourceVerificationResultDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_status =
+            <crate::api::resource_verification::ResourceVerificationStatusDto>::sse_decode(
+                deserializer,
+            );
+        let mut var_observedModifiedMs = <Option<i64>>::sse_decode(deserializer);
+        let mut var_observedSize = <Option<i64>>::sse_decode(deserializer);
+        return crate::api::resource_verification::ResourceVerificationResultDto {
+            status: var_status,
+            observed_modified_ms: var_observedModifiedMs,
+            observed_size: var_observedSize,
+        };
+    }
+}
+
+impl SseDecode for crate::api::resource_verification::ResourceVerificationStatusDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <i32>::sse_decode(deserializer);
+        return match inner {
+            0 => crate::api::resource_verification::ResourceVerificationStatusDto::NotDetected,
+1 => crate::api::resource_verification::ResourceVerificationStatusDto::ObservationChanged,
+2 => crate::api::resource_verification::ResourceVerificationStatusDto::ContentMatches,
+3 => crate::api::resource_verification::ResourceVerificationStatusDto::ContentChanged,
+4 => crate::api::resource_verification::ResourceVerificationStatusDto::Missing,
+5 => crate::api::resource_verification::ResourceVerificationStatusDto::BaselineUnavailable,
+6 => crate::api::resource_verification::ResourceVerificationStatusDto::Indeterminate,
+            _ => unreachable!("Invalid variant for ResourceVerificationStatusDto: {}", inner),
         };
     }
 }
@@ -8106,57 +8229,63 @@ fn pde_ffi_dispatcher_primary_impl(
             rust_vec_len,
             data_len,
         ),
-        128 => wire__crate__api__author__watch_authors_frb_impl(port, ptr, rust_vec_len, data_len),
-        129 => wire__crate__api__comic__watch_comic_changes_impl(port, ptr, rust_vec_len, data_len),
-        130 => wire__crate__api__home__watch_continue_reading_top5_frb_impl(
+        128 => wire__crate__api__resource_verification__verify_comic_resource_frb_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        131 => wire__crate__api__home__watch_home_library_alerts_frb_impl(
+        129 => wire__crate__api__author__watch_authors_frb_impl(port, ptr, rust_vec_len, data_len),
+        130 => wire__crate__api__comic__watch_comic_changes_impl(port, ptr, rust_vec_len, data_len),
+        131 => wire__crate__api__home__watch_continue_reading_top5_frb_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        132 => wire__crate__api__home__watch_home_page_counts_frb_impl(
+        132 => wire__crate__api__home__watch_home_library_alerts_frb_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        133 => wire__crate__api__series__watch_home_series_comic_order_map_frb_impl(
+        133 => wire__crate__api__home__watch_home_page_counts_frb_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        134 => wire__crate__api__home__watch_library_home_stats_frb_impl(
+        134 => wire__crate__api__series__watch_home_series_comic_order_map_frb_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        135 => wire__crate__api__reading_activity__watch_reading_activity_stats_frb_impl(
+        135 => wire__crate__api__home__watch_library_home_stats_frb_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        136 => wire__crate__api__history__watch_reading_history_changes_frb_impl(
+        136 => wire__crate__api__reading_activity__watch_reading_activity_stats_frb_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        137 => wire__crate__api__home__watch_recently_added_on_home_frb_impl(
+        137 => wire__crate__api__history__watch_reading_history_changes_frb_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        138 => wire__crate__api__thumbnail__watch_thumbnail_events_frb_impl(
+        138 => wire__crate__api__home__watch_recently_added_on_home_frb_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        139 => wire__crate__api__thumbnail__watch_thumbnail_events_frb_impl(
             port,
             ptr,
             rust_vec_len,
@@ -8664,6 +8793,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::comic::ComicDto {
             self.path.into_into_dart().into_dart(),
             self.resource_type.into_into_dart().into_dart(),
             self.resource_size.into_into_dart().into_dart(),
+            self.resource_fingerprint.into_into_dart().into_dart(),
             self.created_at.into_into_dart().into_dart(),
             self.last_updated_at.into_into_dart().into_dart(),
             self.title.into_into_dart().into_dart(),
@@ -9815,6 +9945,29 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::sync::RemoteLibraryCredential
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::comic::ResourceFingerprintDto {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.digest.into_into_dart().into_dart(),
+            self.resource_type.into_into_dart().into_dart(),
+            self.modified_ms.into_into_dart().into_dart(),
+            self.size.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::comic::ResourceFingerprintDto
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::comic::ResourceFingerprintDto>
+    for crate::api::comic::ResourceFingerprintDto
+{
+    fn into_into_dart(self) -> crate::api::comic::ResourceFingerprintDto {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::api::sync::ResourceFormatCategoryDto {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         match self {
@@ -9834,6 +9987,87 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::sync::ResourceFormatCategoryD
     for crate::api::sync::ResourceFormatCategoryDto
 {
     fn into_into_dart(self) -> crate::api::sync::ResourceFormatCategoryDto {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart
+    for crate::api::resource_verification::ResourceVerificationModeDto
+{
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self {
+            Self::Quick => 0.into_dart(),
+            Self::Strict => 1.into_dart(),
+            _ => unreachable!(),
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::resource_verification::ResourceVerificationModeDto
+{
+}
+impl
+    flutter_rust_bridge::IntoIntoDart<
+        crate::api::resource_verification::ResourceVerificationModeDto,
+    > for crate::api::resource_verification::ResourceVerificationModeDto
+{
+    fn into_into_dart(self) -> crate::api::resource_verification::ResourceVerificationModeDto {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart
+    for crate::api::resource_verification::ResourceVerificationResultDto
+{
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.status.into_into_dart().into_dart(),
+            self.observed_modified_ms.into_into_dart().into_dart(),
+            self.observed_size.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::resource_verification::ResourceVerificationResultDto
+{
+}
+impl
+    flutter_rust_bridge::IntoIntoDart<
+        crate::api::resource_verification::ResourceVerificationResultDto,
+    > for crate::api::resource_verification::ResourceVerificationResultDto
+{
+    fn into_into_dart(self) -> crate::api::resource_verification::ResourceVerificationResultDto {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart
+    for crate::api::resource_verification::ResourceVerificationStatusDto
+{
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self {
+            Self::NotDetected => 0.into_dart(),
+            Self::ObservationChanged => 1.into_dart(),
+            Self::ContentMatches => 2.into_dart(),
+            Self::ContentChanged => 3.into_dart(),
+            Self::Missing => 4.into_dart(),
+            Self::BaselineUnavailable => 5.into_dart(),
+            Self::Indeterminate => 6.into_dart(),
+            _ => unreachable!(),
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::resource_verification::ResourceVerificationStatusDto
+{
+}
+impl
+    flutter_rust_bridge::IntoIntoDart<
+        crate::api::resource_verification::ResourceVerificationStatusDto,
+    > for crate::api::resource_verification::ResourceVerificationStatusDto
+{
+    fn into_into_dart(self) -> crate::api::resource_verification::ResourceVerificationStatusDto {
         self
     }
 }
@@ -10911,6 +11145,10 @@ impl SseEncode for crate::api::comic::ComicDto {
         <String>::sse_encode(self.path, serializer);
         <String>::sse_encode(self.resource_type, serializer);
         <i64>::sse_encode(self.resource_size, serializer);
+        <Option<crate::api::comic::ResourceFingerprintDto>>::sse_encode(
+            self.resource_fingerprint,
+            serializer,
+        );
         <i64>::sse_encode(self.created_at, serializer);
         <i64>::sse_encode(self.last_updated_at, serializer);
         <String>::sse_encode(self.title, serializer);
@@ -11741,6 +11979,16 @@ impl SseEncode for Option<crate::api::history::ReadingHistoryDto> {
     }
 }
 
+impl SseEncode for Option<crate::api::comic::ResourceFingerprintDto> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <crate::api::comic::ResourceFingerprintDto>::sse_encode(value, serializer);
+        }
+    }
+}
+
 impl SseEncode for Option<crate::api::comic::ScalarPatchFrbDto> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -12012,6 +12260,16 @@ impl SseEncode for crate::api::sync::RemoteLibraryCredentialDto {
     }
 }
 
+impl SseEncode for crate::api::comic::ResourceFingerprintDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.digest, serializer);
+        <String>::sse_encode(self.resource_type, serializer);
+        <i64>::sse_encode(self.modified_ms, serializer);
+        <i64>::sse_encode(self.size, serializer);
+    }
+}
+
 impl SseEncode for crate::api::sync::ResourceFormatCategoryDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -12027,6 +12285,48 @@ impl SseEncode for crate::api::sync::ResourceFormatCategoryDto {
             },
             serializer,
         );
+    }
+}
+
+impl SseEncode for crate::api::resource_verification::ResourceVerificationModeDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(
+            match self {
+                crate::api::resource_verification::ResourceVerificationModeDto::Quick => 0,
+                crate::api::resource_verification::ResourceVerificationModeDto::Strict => 1,
+                _ => {
+                    unimplemented!("");
+                }
+            },
+            serializer,
+        );
+    }
+}
+
+impl SseEncode for crate::api::resource_verification::ResourceVerificationResultDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <crate::api::resource_verification::ResourceVerificationStatusDto>::sse_encode(
+            self.status,
+            serializer,
+        );
+        <Option<i64>>::sse_encode(self.observed_modified_ms, serializer);
+        <Option<i64>>::sse_encode(self.observed_size, serializer);
+    }
+}
+
+impl SseEncode for crate::api::resource_verification::ResourceVerificationStatusDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(match self {crate::api::resource_verification::ResourceVerificationStatusDto::NotDetected => { 0 }
+crate::api::resource_verification::ResourceVerificationStatusDto::ObservationChanged => { 1 }
+crate::api::resource_verification::ResourceVerificationStatusDto::ContentMatches => { 2 }
+crate::api::resource_verification::ResourceVerificationStatusDto::ContentChanged => { 3 }
+crate::api::resource_verification::ResourceVerificationStatusDto::Missing => { 4 }
+crate::api::resource_verification::ResourceVerificationStatusDto::BaselineUnavailable => { 5 }
+crate::api::resource_verification::ResourceVerificationStatusDto::Indeterminate => { 6 }
+ _ => { unimplemented!(""); }}, serializer);
     }
 }
 

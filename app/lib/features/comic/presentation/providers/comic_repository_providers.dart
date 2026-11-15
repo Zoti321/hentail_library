@@ -1,3 +1,4 @@
+import 'package:hentai_library/features/comic/domain/resource_verification.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/comic/domain/repositories/comic_catalog_repository.dart';
 import 'package:hentai_library/features/comic/domain/repositories/comic_lookup_repository.dart';
@@ -27,4 +28,10 @@ final Provider<ComicLookupRepository> comicLookupRepositoryProvider =
 final Provider<ComicThumbnailRepository> comicThumbnailRepoProvider =
     Provider<ComicThumbnailRepository>(
       (Ref ref) => _unimplemented('comicThumbnailRepoProvider'),
+    );
+
+final Provider<ComicResourceVerificationQuery>
+comicResourceVerificationQueryProvider =
+    Provider<ComicResourceVerificationQuery>(
+      (Ref ref) => _unimplemented('comicResourceVerificationQueryProvider'),
     );

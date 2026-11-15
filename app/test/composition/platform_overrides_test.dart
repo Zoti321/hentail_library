@@ -1,4 +1,5 @@
 import 'package:hentai_library/features/comic_metadata/presentation/providers/metadata_management_preferences_providers.dart';
+import 'package:hentai_library/features/comic/public/providers/comic_repository_providers.dart';
 import 'package:hentai_library/features/comic_metadata/presentation/providers/tag_dictionary_file_provider.dart';
 import 'package:hentai_library/features/series/presentation/providers/series_page_size_storage_providers.dart';
 import 'package:hentai_library/features/library_admin/application/library_migration_store.dart';
@@ -62,6 +63,7 @@ void main() {
         isA<TagDictionaryDownloadGateway>(),
       );
       for (final Object? Function() read in <Object? Function()>[
+        () => container.read(comicResourceVerificationQueryProvider),
         () => container.read(openAuthorLinkCommandProvider),
         () => container.read(readerWindowFullscreenCommandProvider),
         () => container.read(mergeConfirmationSkippedQueryProvider),

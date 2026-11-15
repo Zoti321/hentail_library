@@ -196,6 +196,7 @@ fn sync_does_not_regenerate_user_set_comic_thumbnail_after_source_change() {
         write_solid_jpeg(&comic_dir.join("003.jpg"), 255, 255, 0);
 
         let comic = ComicDto {
+            resource_fingerprint: None,
             comic_id: comic_id.to_string(),
             path: path.clone(),
             resource_type: "dir".to_string(),

@@ -26,6 +26,7 @@ pub mod reader;
 pub mod reading_activity;
 pub mod resource;
 pub mod resource_metadata;
+pub mod resource_verification;
 pub mod revision;
 pub mod runtime;
 pub mod series;

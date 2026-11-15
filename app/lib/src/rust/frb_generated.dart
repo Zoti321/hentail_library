@@ -22,6 +22,7 @@ import 'api/named_facet_dictionary.dart';
 import 'api/reader.dart';
 import 'api/reading_activity.dart';
 import 'api/resource_metadata.dart';
+import 'api/resource_verification.dart';
 import 'api/series.dart';
 import 'api/shutdown.dart';
 import 'api/sync.dart';
@@ -92,7 +93,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.13.0';
 
   @override
-  int get rustContentHash => -1726611550;
+  int get rustContentHash => -249903069;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -636,6 +637,12 @@ abstract class RustLibApi extends BaseApi {
   void crateApiSeriesUpdateSeriesUserMetaFrb({
     required String seriesId,
     required UpdateSeriesUserMetaDto meta,
+  });
+
+  Future<ResourceVerificationResultDto>
+  crateApiResourceVerificationVerifyComicResourceFrb({
+    required String comicId,
+    required ResourceVerificationModeDto mode,
   });
 
   Stream<List<AuthorIdentityFrbDto>> crateApiAuthorWatchAuthorsFrb();
@@ -4904,6 +4911,43 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<ResourceVerificationResultDto>
+  crateApiResourceVerificationVerifyComicResourceFrb({
+    required String comicId,
+    required ResourceVerificationModeDto mode,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(comicId, serializer);
+          sse_encode_resource_verification_mode_dto(mode, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 128,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_resource_verification_result_dto,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        ),
+        constMeta: kCrateApiResourceVerificationVerifyComicResourceFrbConstMeta,
+        argValues: [comicId, mode],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta
+  get kCrateApiResourceVerificationVerifyComicResourceFrbConstMeta =>
+      const TaskConstMeta(
+        debugName: "verify_comic_resource_frb",
+        argNames: ["comicId", "mode"],
+      );
+
+  @override
   Stream<List<AuthorIdentityFrbDto>> crateApiAuthorWatchAuthorsFrb() {
     final sink = RustStreamSink<List<AuthorIdentityFrbDto>>();
     unawaited(
@@ -4918,7 +4962,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 128,
+              funcId: 129,
               port: port_,
             );
           },
@@ -4950,7 +4994,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 129,
+              funcId: 130,
               port: port_,
             );
           },
@@ -4988,7 +5032,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 130,
+              funcId: 131,
               port: port_,
             );
           },
@@ -5026,7 +5070,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 131,
+              funcId: 132,
               port: port_,
             );
           },
@@ -5064,7 +5108,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 132,
+              funcId: 133,
               port: port_,
             );
           },
@@ -5103,7 +5147,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 133,
+              funcId: 134,
               port: port_,
             );
           },
@@ -5144,7 +5188,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 134,
+              funcId: 135,
               port: port_,
             );
           },
@@ -5183,7 +5227,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 135,
+              funcId: 136,
               port: port_,
             );
           },
@@ -5220,7 +5264,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 136,
+              funcId: 137,
               port: port_,
             );
           },
@@ -5261,7 +5305,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 137,
+              funcId: 138,
               port: port_,
             );
           },
@@ -5296,7 +5340,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 138,
+              funcId: 139,
               port: port_,
             );
           },
@@ -5678,6 +5722,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ResourceFingerprintDto dco_decode_box_autoadd_resource_fingerprint_dto(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_resource_fingerprint_dto(raw);
+  }
+
+  @protected
   ScalarPatchFrbDto dco_decode_box_autoadd_scalar_patch_frb_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_scalar_patch_frb_dto(raw);
@@ -5799,28 +5851,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ComicDto dco_decode_comic_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 19)
-      throw Exception('unexpected arr length: expect 19 but see ${arr.length}');
+    if (arr.length != 20)
+      throw Exception('unexpected arr length: expect 20 but see ${arr.length}');
     return ComicDto(
       comicId: dco_decode_String(arr[0]),
       path: dco_decode_String(arr[1]),
       resourceType: dco_decode_String(arr[2]),
       resourceSize: dco_decode_i_64(arr[3]),
-      createdAt: dco_decode_i_64(arr[4]),
-      lastUpdatedAt: dco_decode_i_64(arr[5]),
-      title: dco_decode_String(arr[6]),
-      contentRating: dco_decode_String(arr[7]),
-      pageCount: dco_decode_i_32(arr[8]),
-      description: dco_decode_opt_String(arr[9]),
-      publishedAt: dco_decode_opt_box_autoadd_i_64(arr[10]),
-      lastReadTimeMs: dco_decode_opt_box_autoadd_i_64(arr[11]),
-      authors: dco_decode_list_comic_author_dto(arr[12]),
-      tags: dco_decode_list_String(arr[13]),
-      languages: dco_decode_list_String(arr[14]),
-      parodies: dco_decode_list_String(arr[15]),
-      characters: dco_decode_list_String(arr[16]),
-      locks: dco_decode_comic_meta_locks_dto(arr[17]),
-      libraryId: dco_decode_String(arr[18]),
+      resourceFingerprint: dco_decode_opt_box_autoadd_resource_fingerprint_dto(
+        arr[4],
+      ),
+      createdAt: dco_decode_i_64(arr[5]),
+      lastUpdatedAt: dco_decode_i_64(arr[6]),
+      title: dco_decode_String(arr[7]),
+      contentRating: dco_decode_String(arr[8]),
+      pageCount: dco_decode_i_32(arr[9]),
+      description: dco_decode_opt_String(arr[10]),
+      publishedAt: dco_decode_opt_box_autoadd_i_64(arr[11]),
+      lastReadTimeMs: dco_decode_opt_box_autoadd_i_64(arr[12]),
+      authors: dco_decode_list_comic_author_dto(arr[13]),
+      tags: dco_decode_list_String(arr[14]),
+      languages: dco_decode_list_String(arr[15]),
+      parodies: dco_decode_list_String(arr[16]),
+      characters: dco_decode_list_String(arr[17]),
+      locks: dco_decode_comic_meta_locks_dto(arr[18]),
+      libraryId: dco_decode_String(arr[19]),
     );
   }
 
@@ -6585,6 +6640,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ResourceFingerprintDto? dco_decode_opt_box_autoadd_resource_fingerprint_dto(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null
+        ? null
+        : dco_decode_box_autoadd_resource_fingerprint_dto(raw);
+  }
+
+  @protected
   ScalarPatchFrbDto? dco_decode_opt_box_autoadd_scalar_patch_frb_dto(
     dynamic raw,
   ) {
@@ -6900,11 +6965,56 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ResourceFingerprintDto dco_decode_resource_fingerprint_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    return ResourceFingerprintDto(
+      digest: dco_decode_String(arr[0]),
+      resourceType: dco_decode_String(arr[1]),
+      modifiedMs: dco_decode_i_64(arr[2]),
+      size: dco_decode_i_64(arr[3]),
+    );
+  }
+
+  @protected
   ResourceFormatCategoryDto dco_decode_resource_format_category_dto(
     dynamic raw,
   ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return ResourceFormatCategoryDto.values[raw as int];
+  }
+
+  @protected
+  ResourceVerificationModeDto dco_decode_resource_verification_mode_dto(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return ResourceVerificationModeDto.values[raw as int];
+  }
+
+  @protected
+  ResourceVerificationResultDto dco_decode_resource_verification_result_dto(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return ResourceVerificationResultDto(
+      status: dco_decode_resource_verification_status_dto(arr[0]),
+      observedModifiedMs: dco_decode_opt_box_autoadd_i_64(arr[1]),
+      observedSize: dco_decode_opt_box_autoadd_i_64(arr[2]),
+    );
+  }
+
+  @protected
+  ResourceVerificationStatusDto dco_decode_resource_verification_status_dto(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return ResourceVerificationStatusDto.values[raw as int];
   }
 
   @protected
@@ -7768,6 +7878,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ResourceFingerprintDto sse_decode_box_autoadd_resource_fingerprint_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_resource_fingerprint_dto(deserializer));
+  }
+
+  @protected
   ScalarPatchFrbDto sse_decode_box_autoadd_scalar_patch_frb_dto(
     SseDeserializer deserializer,
   ) {
@@ -7905,6 +8023,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_path = sse_decode_String(deserializer);
     var var_resourceType = sse_decode_String(deserializer);
     var var_resourceSize = sse_decode_i_64(deserializer);
+    var var_resourceFingerprint =
+        sse_decode_opt_box_autoadd_resource_fingerprint_dto(deserializer);
     var var_createdAt = sse_decode_i_64(deserializer);
     var var_lastUpdatedAt = sse_decode_i_64(deserializer);
     var var_title = sse_decode_String(deserializer);
@@ -7925,6 +8045,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       path: var_path,
       resourceType: var_resourceType,
       resourceSize: var_resourceSize,
+      resourceFingerprint: var_resourceFingerprint,
       createdAt: var_createdAt,
       lastUpdatedAt: var_lastUpdatedAt,
       title: var_title,
@@ -9022,6 +9143,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ResourceFingerprintDto? sse_decode_opt_box_autoadd_resource_fingerprint_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_resource_fingerprint_dto(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
   ScalarPatchFrbDto? sse_decode_opt_box_autoadd_scalar_patch_frb_dto(
     SseDeserializer deserializer,
   ) {
@@ -9406,12 +9540,62 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ResourceFingerprintDto sse_decode_resource_fingerprint_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_digest = sse_decode_String(deserializer);
+    var var_resourceType = sse_decode_String(deserializer);
+    var var_modifiedMs = sse_decode_i_64(deserializer);
+    var var_size = sse_decode_i_64(deserializer);
+    return ResourceFingerprintDto(
+      digest: var_digest,
+      resourceType: var_resourceType,
+      modifiedMs: var_modifiedMs,
+      size: var_size,
+    );
+  }
+
+  @protected
   ResourceFormatCategoryDto sse_decode_resource_format_category_dto(
     SseDeserializer deserializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_i_32(deserializer);
     return ResourceFormatCategoryDto.values[inner];
+  }
+
+  @protected
+  ResourceVerificationModeDto sse_decode_resource_verification_mode_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return ResourceVerificationModeDto.values[inner];
+  }
+
+  @protected
+  ResourceVerificationResultDto sse_decode_resource_verification_result_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_status = sse_decode_resource_verification_status_dto(deserializer);
+    var var_observedModifiedMs = sse_decode_opt_box_autoadd_i_64(deserializer);
+    var var_observedSize = sse_decode_opt_box_autoadd_i_64(deserializer);
+    return ResourceVerificationResultDto(
+      status: var_status,
+      observedModifiedMs: var_observedModifiedMs,
+      observedSize: var_observedSize,
+    );
+  }
+
+  @protected
+  ResourceVerificationStatusDto sse_decode_resource_verification_status_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return ResourceVerificationStatusDto.values[inner];
   }
 
   @protected
@@ -10445,6 +10629,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_resource_fingerprint_dto(
+    ResourceFingerprintDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_resource_fingerprint_dto(self, serializer);
+  }
+
+  @protected
   void sse_encode_box_autoadd_scalar_patch_frb_dto(
     ScalarPatchFrbDto self,
     SseSerializer serializer,
@@ -10585,6 +10778,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.path, serializer);
     sse_encode_String(self.resourceType, serializer);
     sse_encode_i_64(self.resourceSize, serializer);
+    sse_encode_opt_box_autoadd_resource_fingerprint_dto(
+      self.resourceFingerprint,
+      serializer,
+    );
     sse_encode_i_64(self.createdAt, serializer);
     sse_encode_i_64(self.lastUpdatedAt, serializer);
     sse_encode_String(self.title, serializer);
@@ -11513,6 +11710,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_opt_box_autoadd_resource_fingerprint_dto(
+    ResourceFingerprintDto? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_resource_fingerprint_dto(self, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_opt_box_autoadd_scalar_patch_frb_dto(
     ScalarPatchFrbDto? self,
     SseSerializer serializer,
@@ -11822,8 +12032,49 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_resource_fingerprint_dto(
+    ResourceFingerprintDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.digest, serializer);
+    sse_encode_String(self.resourceType, serializer);
+    sse_encode_i_64(self.modifiedMs, serializer);
+    sse_encode_i_64(self.size, serializer);
+  }
+
+  @protected
   void sse_encode_resource_format_category_dto(
     ResourceFormatCategoryDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
+  void sse_encode_resource_verification_mode_dto(
+    ResourceVerificationModeDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
+  void sse_encode_resource_verification_result_dto(
+    ResourceVerificationResultDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_resource_verification_status_dto(self.status, serializer);
+    sse_encode_opt_box_autoadd_i_64(self.observedModifiedMs, serializer);
+    sse_encode_opt_box_autoadd_i_64(self.observedSize, serializer);
+  }
+
+  @protected
+  void sse_encode_resource_verification_status_dto(
+    ResourceVerificationStatusDto self,
     SseSerializer serializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs

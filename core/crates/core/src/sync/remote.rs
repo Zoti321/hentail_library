@@ -158,6 +158,7 @@ fn register_remote_file(
         now
     };
     let comic = ComicDto {
+        resource_fingerprint: None,
         comic_id: comic_id_for_remote_location(&path),
         path: path.clone(),
         resource_type: resource_type.to_string(),

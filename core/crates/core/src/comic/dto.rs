@@ -138,6 +138,8 @@ impl ComicAuthorDto {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ComicDto {
+    #[serde(default)]
+    pub resource_fingerprint: Option<crate::resource_verification::ResourceFingerprint>,
     pub comic_id: String,
     pub path: String,
     pub resource_type: String,

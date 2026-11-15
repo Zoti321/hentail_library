@@ -9,6 +9,47 @@ import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dar
 import 'package:hentai_library/src/rust/api/comic.dart' as rust;
 
 void main() {
+  test('resource fingerprint carries its own source observation through metadata edits', () {
+    final mapped = mapRustComic(
+      _comicDto(
+        fingerprint: rust.ResourceFingerprintDto(
+          digest: 'sha256-file-v1:abc',
+          resourceType: 'cbz',
+          modifiedMs: PlatformInt64Util.from(1600000000000),
+          size: PlatformInt64Util.from(2048),
+        ),
+      ),
+    );
+    expect(mapped.resourceInfo.fingerprint?.digest, 'sha256-file-v1:abc');
+    expect(mapped.resourceInfo.fingerprint?.resourceType, ResourceType.cbz);
+    expect(mapped.resourceInfo.fingerprint?.observedSize, 2048);
+    expect(
+      mapped.resourceInfo.sourceModifiedAt,
+      DateTime.fromMillisecondsSinceEpoch(1600000000000, isUtc: true),
+    );
+    expect(mapped.resourceInfo.sourceModifiedAt, isNot(mapped.lastUpdatedAt));
+    final edited = mapped.copyWith(
+      metadata: mapped.metadata.copyWith(title: 'Edited'),
+    );
+    expect(edited.resourceInfo.fingerprint, mapped.resourceInfo.fingerprint);
+  });
+
+  test('missing or unknown fingerprint observations stay optional', () {
+    expect(mapRustComic(_comicDto()).resourceInfo.fingerprint, isNull);
+    final mapped = mapRustComic(
+      _comicDto(
+        fingerprint: rust.ResourceFingerprintDto(
+          digest: 'sha256-file-v1:abc',
+          resourceType: 'cbz',
+          modifiedMs: PlatformInt64Util.from(0),
+          size: PlatformInt64Util.from(2048),
+        ),
+      ),
+    );
+    expect(mapped.resourceInfo.fingerprint?.digest, 'sha256-file-v1:abc');
+    expect(mapped.resourceInfo.sourceModifiedAt, isNull);
+  });
+
   test('mapRustComic maps identity facets UTC timestamps and locks', () {
     final rust.ComicDto dto = _comicDto(
       description: '简介',
@@ -78,12 +119,14 @@ void main() {
 }
 
 rust.ComicDto _comicDto({
+  rust.ResourceFingerprintDto? fingerprint,
   String? description,
   PlatformInt64? publishedAt,
   PlatformInt64? lastReadTimeMs,
 }) {
   return rust.ComicDto(
     comicId: 'c1',
+    resourceFingerprint: fingerprint,
     path: '/lib/c1.cbz',
     resourceType: 'cbz',
     resourceSize: PlatformInt64Util.from(2048),

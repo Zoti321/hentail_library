@@ -485,6 +485,7 @@ mod tests {
         assert!(size > 0);
 
         let existing = ComicDto {
+            resource_fingerprint: None,
             comic_id: comic_id.clone(),
             path: path_str,
             resource_type: "cbz".to_string(),

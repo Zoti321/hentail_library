@@ -110,6 +110,7 @@ fn merge_scan_with_existing(
     };
     let locks = existing.locks.clone();
     ComicDto {
+        resource_fingerprint: None,
         comic_id: existing.comic_id.clone(),
         path: scanned.path.clone(),
         resource_type: scanned.resource_type.clone(),

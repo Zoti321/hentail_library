@@ -253,6 +253,7 @@ async fn load_comics_ordered_for_connection<C: ConnectionTrait>(
             continue;
         };
         out.push(ComicDto {
+            resource_fingerprint: None,
             comic_id: model.comic_id.clone(),
             path: model.path,
             resource_type: model.resource_type,

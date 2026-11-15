@@ -614,6 +614,7 @@ pub fn parsed_to_comic(parsed: &ParsedResource) -> crate::comic::ComicDto {
     let now = now_ms();
     let metadata = parsed.metadata.clone().unwrap_or_default();
     crate::comic::ComicDto {
+        resource_fingerprint: None,
         comic_id: comic_id_for_path(&parsed.path),
         path: parsed.path.clone(),
         resource_type: parsed.resource_type.clone(),

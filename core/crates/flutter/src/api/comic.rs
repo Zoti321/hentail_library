@@ -65,11 +65,20 @@ pub struct ComicAuthorDto {
 }
 
 #[derive(Debug, Clone)]
+pub struct ResourceFingerprintDto {
+    pub digest: String,
+    pub resource_type: String,
+    pub modified_ms: i64,
+    pub size: i64,
+}
+
+#[derive(Debug, Clone)]
 pub struct ComicDto {
     pub comic_id: String,
     pub path: String,
     pub resource_type: String,
     pub resource_size: i64,
+    pub resource_fingerprint: Option<ResourceFingerprintDto>,
     pub created_at: i64,
     pub last_updated_at: i64,
     pub title: String,
@@ -126,6 +135,14 @@ impl From<hentai_core::ComicDto> for ComicDto {
             path: value.path,
             resource_type: value.resource_type,
             resource_size: value.resource_size,
+            resource_fingerprint: value.resource_fingerprint.map(|fingerprint| {
+                ResourceFingerprintDto {
+                    digest: fingerprint.digest,
+                    resource_type: fingerprint.resource_type,
+                    modified_ms: fingerprint.modified_ms,
+                    size: fingerprint.size,
+                }
+            }),
             created_at: value.created_at,
             last_updated_at: value.last_updated_at,
             title: value.title,

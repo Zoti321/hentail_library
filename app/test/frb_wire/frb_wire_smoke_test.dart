@@ -8,6 +8,7 @@ import 'package:hentai_library/src/rust/api/init.dart';
 import 'package:hentai_library/src/rust/api/metadata_backup.dart';
 import 'package:hentai_library/src/rust/api/reader.dart';
 import 'package:hentai_library/src/rust/api/reading_activity.dart';
+import 'package:hentai_library/src/rust/api/resource_verification.dart';
 import 'package:path/path.dart' as p;
 
 import 'frb_wire_harness.dart';
@@ -45,6 +46,13 @@ void main() {
       initDbFrb(appDataDir: appDataDir.path, dbFileName: 'frb_wire');
 
       expect(await countAllComicsFrb(), 0);
+      await expectLater(
+        verifyComicResourceFrb(
+          comicId: 'wire-missing-resource',
+          mode: ResourceVerificationModeDto.strict,
+        ),
+        throwsA(isA<HentaiErrorDto>()),
+      );
       final AuthorIdentityFrbDto author = await addAuthorFrb(
         name: 'Wire Author',
       );

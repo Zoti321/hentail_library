@@ -158,8 +158,11 @@ impl ResourceAccess for WebDavResourceAccess {
     fn stat(&self, location: &str) -> Result<Option<ResourceStat>, HentaiError> {
         let location = location.trim().trim_end_matches('/');
         let path = self.path_for_request(location);
-        let entities =
-            block_on(self.client.list(&path, Depth::Number(0))).map_err(|e| map_dav_error(&e))?;
+        let entities = match block_on(self.client.list(&path, Depth::Number(0))) {
+            Ok(entities) => entities,
+            Err(error) if is_missing_dav_resource(&error) => return Ok(None),
+            Err(error) => return Err(map_dav_error(&error)),
+        };
         for entity in entities {
             match entity {
                 ListEntity::File(ListFile {
@@ -239,4 +242,55 @@ fn map_dav_error(err: &reqwest_dav::Error) -> HentaiError {
         return HentaiError::timed_out(format!("WebDAV 超时: {msg}"));
     }
     HentaiError::remote_unreachable(format!("WebDAV 不可达: {msg}"))
+}
+
+fn is_missing_dav_resource(err: &reqwest_dav::Error) -> bool {
+    matches!(err,
+        reqwest_dav::types::Error::Decode(
+            reqwest_dav::types::DecodeError::StatusMismatched(status)
+        ) if status.response_code == 404
+    )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::io::{Read, Write};
+    use std::net::TcpListener;
+
+    #[test]
+    fn stat_distinguishes_missing_from_auth_and_server_failures() {
+        for status in [404, 401, 500] {
+            let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+            let root = format!("http://{}", listener.local_addr().unwrap());
+            let server = std::thread::spawn(move || {
+                let (mut stream, _) = listener.accept().unwrap();
+                let mut request = Vec::new();
+                let mut byte = [0];
+                while !request.ends_with(b"\r\n\r\n") {
+                    stream.read_exact(&mut byte).unwrap();
+                    request.push(byte[0]);
+                }
+                write!(
+                    stream,
+                    "HTTP/1.1 {status} Error\r\nContent-Length: 0\r\nConnection: close\r\n\r\n"
+                )
+                .unwrap();
+            });
+            let access = WebDavResourceAccess::connect(&root, "user", "pass").unwrap();
+            let result = access.stat(&format!("{root}/book.cbz"));
+            if status == 404 {
+                assert!(result.unwrap().is_none());
+            } else {
+                assert!(result.is_err());
+            }
+            server.join().unwrap();
+        }
+        let error = reqwest_dav::types::Error::Decode(
+            reqwest_dav::types::DecodeError::FieldNotFound(reqwest_dav::types::FieldError {
+                field: "404 not found".into(),
+            }),
+        );
+        assert!(!is_missing_dav_resource(&error));
+    }
 }

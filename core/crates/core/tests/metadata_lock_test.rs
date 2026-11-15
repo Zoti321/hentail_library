@@ -6,6 +6,7 @@ use hentai_core::metadata_lock::{
 
 fn comic(id: &str, path: &str, resource_type: &str, title: &str, page_count: i32) -> ComicDto {
     ComicDto {
+        resource_fingerprint: None,
         comic_id: id.to_string(),
         path: path.to_string(),
         resource_type: resource_type.to_string(),

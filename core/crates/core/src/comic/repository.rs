@@ -521,6 +521,7 @@ pub async fn load_comics_ordered(
     let parody_map = load_parody_names(db, &comic_ids).await?;
     let character_map = load_character_names(db, &comic_ids).await?;
     let last_read_map = load_last_read_times(db, &comic_ids).await?;
+    let mut fingerprints = crate::resource_verification::load_fingerprints(db, &comic_ids).await?;
     let mut result = Vec::with_capacity(comic_ids.len());
     for id in comic_ids {
         let Some(model) = by_id.remove(&id) else {
@@ -530,6 +531,7 @@ pub async fn load_comics_ordered(
             continue;
         };
         result.push(ComicDto {
+            resource_fingerprint: fingerprints.remove(&id),
             comic_id: model.comic_id.clone(),
             path: model.path,
             resource_type: model.resource_type,

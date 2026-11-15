@@ -123,8 +123,17 @@ pub(crate) fn content_digest(
     item: &ScanItem,
     handle: &SyncHandle,
 ) -> Result<Option<String>, HentaiError> {
-    if item.resource_type != "dir" {
-        return hash_file(access, &item.path, handle).map(|digest| {
+    resource_content_digest(access, &item.path, &item.resource_type, handle)
+}
+
+pub(crate) fn resource_content_digest(
+    access: &dyn ResourceAccess,
+    path: &str,
+    resource_type: &str,
+    handle: &SyncHandle,
+) -> Result<Option<String>, HentaiError> {
+    if resource_type != "dir" {
+        return hash_file(access, path, handle).map(|digest| {
             digest.map(|digest| {
                 format!(
                     "sha256-file-v1:{}",
@@ -137,7 +146,7 @@ pub(crate) fn content_digest(
         });
     }
     let mut pages: Vec<_> = access
-        .list(&item.path)?
+        .list(path)?
         .into_iter()
         .filter(|entry| {
             entry.kind == ResourceKind::File
@@ -170,7 +179,7 @@ pub(crate) fn content_digest(
         hasher.update(digest);
     }
     let mut after: Vec<_> = access
-        .list(&item.path)?
+        .list(path)?
         .into_iter()
         .filter(|entry| {
             entry.kind == ResourceKind::File

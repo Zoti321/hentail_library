@@ -1,3 +1,4 @@
+import 'package:hentai_library/features/comic/domain/value_objects/resource_fingerprint.dart';
 import 'package:hentai_library/features/comic/domain/value_objects/content_rating.dart';
 import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/features/comic/domain/value_objects/comic_meta_locks.dart';
@@ -13,6 +14,9 @@ Comic mapRustComic(rust.ComicDto dto) {
     path: dto.path,
     resourceType: ResourceType.values.byName(dto.resourceType),
     resourceSize: dto.resourceSize.toInt(),
+    fingerprint: dto.resourceFingerprint == null
+        ? null
+        : mapResourceFingerprint(dto.resourceFingerprint!),
     createdAt: comicTimestampFromMs(dto.createdAt.toInt()),
     lastUpdatedAt: comicTimestampFromMs(dto.lastUpdatedAt.toInt()),
     title: dto.title,
@@ -47,3 +51,13 @@ Comic mapRustComic(rust.ComicDto dto) {
     ),
   );
 }
+
+ResourceFingerprint mapResourceFingerprint(rust.ResourceFingerprintDto dto) =>
+    ResourceFingerprint(
+      digest: dto.digest,
+      resourceType: ResourceType.values.byName(dto.resourceType),
+      observedSize: dto.size.toInt(),
+      sourceModifiedAt: dto.modifiedMs.toInt() <= 0
+          ? null
+          : comicTimestampFromMs(dto.modifiedMs.toInt()),
+    );
