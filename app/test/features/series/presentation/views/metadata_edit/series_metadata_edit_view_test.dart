@@ -1,3 +1,5 @@
+import 'package:hentai_library/features/series/domain/value_objects/series_folder_info.dart';
+import 'package:hentai_library/features/series/domain/value_objects/series_metadata.dart';
 import 'package:hentai_library/features/series/application/series_metadata_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -43,7 +45,11 @@ class _RecordingSeriesMetadataEditor extends SeriesMetadataEditorNotifier {
 }
 
 Series _series() {
-  return Series(id: 'series-1', name: '系列甲', folderPath: '/library/series-1');
+  return Series(
+    id: 'series-1',
+    folderInfo: SeriesFolderInfo(folderPath: '/library/series-1'),
+    metadata: SeriesMetadata(name: '系列甲'),
+  );
 }
 
 /// 在路由中打开整页（与生产 push 行为一致，保存后可 pop 回来）。

@@ -1,3 +1,5 @@
+import 'package:hentai_library/features/series/domain/value_objects/series_folder_info.dart';
+import 'package:hentai_library/features/series/domain/value_objects/series_metadata.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/l10n/app_localizations.dart';
@@ -11,9 +13,8 @@ import '../../../support/pump_localized_app.dart';
 Series _series({int itemCount = 3, int? totalCount}) {
   return Series(
     id: 'series-1',
-    name: 'Test Series',
-    folderPath: '/series',
-    totalCount: totalCount,
+    folderInfo: SeriesFolderInfo(folderPath: '/series'),
+    metadata: SeriesMetadata(name: 'Test Series', totalCount: totalCount),
     items: List<SeriesItem>.generate(
       itemCount,
       (int index) =>

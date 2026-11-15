@@ -7,6 +7,9 @@ import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/comic_metadata/public/comic_metadata_entities.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
 
+import 'package:hentai_library/features/comic/domain/value_objects/comic_resource_info.dart';
+import 'package:hentai_library/features/comic/domain/value_objects/comic_metadata.dart';
+
 part 'comic.freezed.dart';
 
 /// Comic 投影型实体（ADR-0041）：Dart 侧只持构造不变式、状态迁移与规约。
@@ -20,34 +23,29 @@ abstract class Comic with _$Comic {
   /// [Comic.createMetadata]（校验后创建）。
   factory Comic({
     required String comicId,
-    required String path,
-    required ResourceType resourceType,
-    required int resourceSize,
+    required ComicResourceInfo resourceInfo,
+    required ComicMetadata metadata,
     required DateTime createdAt,
     required DateTime lastUpdatedAt,
-    required String title,
-
-    /// Author 引用投影（id + 显示名）；**不是** Author 聚合（ADR-0024/ADR-0034）。
-    @Default(<AuthorRef>[]) List<AuthorRef> authors,
-    @Default(ContentRating.unknown) ContentRating contentRating,
-    @Default(<Tag>[]) List<Tag> tags,
-
-    /// Optional Language encoded as a zero-or-one list for wire compatibility.
-    @Default(<String>[]) List<String> languages,
-
-    /// Parody (IP / franchise) names; empty = none.
-    @Default(<String>[]) List<String> parodies,
-
-    /// Character names; empty = none.
-    @Default(<String>[]) List<String> characters,
-    required int pageCount,
-    String? description,
-    DateTime? publishedAt,
     DateTime? lastReadTime,
-    @Default(ComicMetaLocks.unlocked) ComicMetaLocks locks,
   }) = _Comic;
 
   const Comic._();
+
+  String get path => resourceInfo.path;
+  ResourceType get resourceType => resourceInfo.resourceType;
+  int get resourceSize => resourceInfo.resourceSize;
+  int get pageCount => resourceInfo.pageCount;
+  String get title => metadata.title;
+  List<AuthorRef> get authors => metadata.authors;
+  ContentRating get contentRating => metadata.contentRating;
+  List<Tag> get tags => metadata.tags;
+  List<String> get languages => metadata.languages;
+  List<String> get parodies => metadata.parodies;
+  List<String> get characters => metadata.characters;
+  String? get description => metadata.description;
+  DateTime? get publishedAt => metadata.publishedAt;
+  ComicMetaLocks get locks => metadata.locks;
 
   /// 恢复入口：FRB 映射与测试夹具。
   ///
@@ -74,23 +72,27 @@ abstract class Comic with _$Comic {
   }) {
     return Comic(
       comicId: comicId,
-      path: path,
-      resourceType: resourceType,
-      resourceSize: resourceSize,
+      resourceInfo: ComicResourceInfo(
+        path: path,
+        resourceType: resourceType,
+        resourceSize: resourceSize,
+        pageCount: pageCount,
+      ),
+      metadata: ComicMetadata(
+        title: title,
+        authors: authors,
+        contentRating: contentRating,
+        tags: tags,
+        languages: normalizeSingleLanguage(languages),
+        parodies: parodies,
+        characters: characters,
+        description: description,
+        publishedAt: publishedAt,
+        locks: locks,
+      ),
       createdAt: createdAt,
       lastUpdatedAt: lastUpdatedAt,
-      title: title,
-      pageCount: pageCount,
-      authors: authors,
-      contentRating: contentRating,
-      tags: tags,
-      languages: normalizeSingleLanguage(languages),
-      parodies: parodies,
-      characters: characters,
-      description: description,
-      publishedAt: publishedAt,
       lastReadTime: lastReadTime,
-      locks: locks,
     );
   }
 
@@ -149,15 +151,17 @@ abstract class Comic with _$Comic {
       throw ArgumentError.value(draft.title, 'draft', validation.titleError);
     }
     return copyWith(
-      title: ready.title,
-      description: ready.description,
-      publishedAt: ready.publishedAt,
-      contentRating: ready.isR18 ? ContentRating.r18 : ContentRating.safe,
-      authors: ready.authors,
-      tags: ready.tags,
-      languages: ready.languages,
-      parodies: ready.parodies,
-      characters: ready.characters,
+      metadata: metadata.copyWith(
+        title: ready.title,
+        description: ready.description,
+        publishedAt: ready.publishedAt,
+        contentRating: ready.isR18 ? ContentRating.r18 : ContentRating.safe,
+        authors: ready.authors,
+        tags: ready.tags,
+        languages: ready.languages,
+        parodies: ready.parodies,
+        characters: ready.characters,
+      ),
     );
   }
 

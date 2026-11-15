@@ -1,3 +1,5 @@
+import 'package:hentai_library/features/series/domain/value_objects/series_folder_info.dart';
+import 'package:hentai_library/features/series/domain/value_objects/series_metadata.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -27,10 +29,12 @@ void main() {
     test('maps series and current page only', () {
       final Series series = Series(
         id: 's1',
-        name: '系列甲',
-        folderPath: '/lib/s1',
-        serializationStatus: SerializationStatus.hiatus,
-        totalCount: 5,
+        folderInfo: SeriesFolderInfo(folderPath: '/lib/s1'),
+        metadata: SeriesMetadata(
+          name: '系列甲',
+          serializationStatus: SerializationStatus.hiatus,
+          totalCount: 5,
+        ),
       );
       final entry = seriesDetailEntry(
         series: series,
@@ -66,8 +70,8 @@ void main() {
     test('hides metadata block when metadata is absent', () {
       final Series series = Series(
         id: 's2',
-        name: '系列乙',
-        folderPath: '/lib/s2',
+        folderInfo: SeriesFolderInfo(folderPath: '/lib/s2'),
+        metadata: SeriesMetadata(name: '系列乙'),
       );
       final entry = seriesDetailEntry(
         series: series,

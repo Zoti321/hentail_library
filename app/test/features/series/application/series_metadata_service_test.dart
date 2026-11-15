@@ -1,3 +1,5 @@
+import 'package:hentai_library/features/series/domain/value_objects/series_folder_info.dart';
+import 'package:hentai_library/features/series/domain/value_objects/series_metadata.dart';
 import 'package:test/test.dart';
 import 'package:hentai_library/features/series/domain/value_objects/serialization_status.dart';
 import 'package:hentai_library/features/series/domain/series.dart';
@@ -42,10 +44,12 @@ Series _series({
 }) {
   return Series(
     id: 'series-1',
-    name: name,
-    folderPath: '/library/series-1',
-    serializationStatus: status,
-    totalCount: totalCount,
+    folderInfo: SeriesFolderInfo(folderPath: '/library/series-1'),
+    metadata: SeriesMetadata(
+      name: name,
+      serializationStatus: status,
+      totalCount: totalCount,
+    ),
   );
 }
 

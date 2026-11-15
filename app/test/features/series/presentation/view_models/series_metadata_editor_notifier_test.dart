@@ -1,3 +1,5 @@
+import 'package:hentai_library/features/series/domain/value_objects/series_folder_info.dart';
+import 'package:hentai_library/features/series/domain/value_objects/series_metadata.dart';
 import 'package:hentai_library/features/series/application/series_metadata_service.dart';
 import 'package:hentai_library/features/series/domain/series.dart';
 import 'package:hentai_library/features/series/domain/value_objects/series_metadata_form.dart';
@@ -55,8 +57,8 @@ void main() {
     () async {
       final Series series = Series(
         id: 'series-1',
-        name: '系列',
-        folderPath: '/library/series-1',
+        folderInfo: SeriesFolderInfo(folderPath: '/library/series-1'),
+        metadata: SeriesMetadata(name: '系列'),
       );
 
       final SeriesMetadataApplyResult result = await editor().apply(

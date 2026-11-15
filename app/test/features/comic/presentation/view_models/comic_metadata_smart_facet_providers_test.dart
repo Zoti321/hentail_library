@@ -274,7 +274,11 @@ void main() {
         calls.add('new:$id');
         return id == 'missing'
             ? null
-            : _sibling().copyWith(tags: [Tag(name: 'Popular')]);
+            : _sibling().copyWith(
+                metadata: _sibling().metadata.copyWith(
+                  tags: [Tag(name: 'Popular')],
+                ),
+              );
       });
       ComicLookupRepository repository = oldRepository;
       final container = _container([

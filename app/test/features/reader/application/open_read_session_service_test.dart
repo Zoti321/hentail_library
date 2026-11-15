@@ -774,7 +774,9 @@ void main() {
       final OpenReadSessionService service = OpenReadSessionService(
         comicLookup: createComicReadQuery(
           _FakeComicRepository(
-            comic: _inputComic().copyWith(resourceType: ResourceType.dir),
+            comic: _inputComic().copyWith.resourceInfo(
+              resourceType: ResourceType.dir,
+            ),
           ),
         ),
         pageSource: pageSource,

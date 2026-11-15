@@ -62,6 +62,8 @@ void main() {
 
     expect(mapped.id, 's1');
     expect(mapped.name, 'Series A');
+    expect(mapped.metadata.name, 'Series A');
+    expect(mapped.folderInfo.folderPath, '/lib/series-a');
     expect(mapped.folderPath, '/lib/series-a');
     expect(mapped.serializationStatus, SerializationStatus.ongoing);
     expect(mapped.totalCount, 12);

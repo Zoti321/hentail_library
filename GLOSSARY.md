@@ -75,6 +75,12 @@ _Avoid_: file when directory/remote support matters, asset.
 **Resource access**: Uniform listing, stat and read-only streaming of Resources under a Library root, implemented by filesystem or WebDAV adapters.
 _Avoid_: UI-specific protocol branches, cloud SDK, VFS as the domain name.
 
+**Comic resource information**: Facts describing a Comic's Resource: its location, format, byte size and page count. Distinct from descriptive metadata, catalog timestamps and reading activity.
+_Avoid_: physical file information when directories or WebDAV Resources are included.
+
+**Comic metadata**: Descriptive catalog information about a Comic, including its title, description, publication date, content rating and descriptive facets, together with their field locks. It may originate from Resource parsing or user edits; provenance does not make it Resource information.
+_Avoid_: digital-world metadata, user-only metadata.
+
 **Scan**: Root traversal and Resource discovery/registration/parsing. User-triggered Scan and Library sync refer to the same operation; domain documentation prefers Library sync.
 _Avoid_: import/index when reconciliation semantics matter.
 
@@ -112,6 +118,12 @@ _Avoid_: album, cross-Library collection.
 
 **Folder series**: Series derived from a Comic's immediate parent directory, including root-level Comics. Identity derives from normalized local/remote `folder_path` within its Library.
 _Avoid_: title inference, automatic title grouping.
+
+**Series folder information**: The folder location anchoring a Folder series. It does not describe a readable Comic Resource or the Series membership and order.
+_Avoid_: Series file, Series Resource.
+
+**Series metadata**: A Series' descriptive name, serialization status and planned volume count, together with their field locks. Membership and member order are separate facts.
+_Avoid_: Series contents, actual volume count as a synonym for planned volume count.
 
 **Library root series**: Folder series whose folder path equals its Library root.
 _Avoid_: pinned Series, separate isRoot entity.

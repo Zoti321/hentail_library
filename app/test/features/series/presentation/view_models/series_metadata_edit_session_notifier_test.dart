@@ -1,3 +1,6 @@
+import 'package:hentai_library/features/series/domain/value_objects/series_folder_info.dart';
+import 'package:hentai_library/features/series/domain/value_objects/series_metadata.dart';
+
 import 'dart:async';
 
 import 'package:hentai_library/features/series/domain/series.dart';
@@ -44,8 +47,8 @@ class _Repository implements SeriesRepository {
 
 Series _series() => Series(
   id: 'series-1',
-  name: 'Original series',
-  folderPath: '/library/series',
+  folderInfo: SeriesFolderInfo(folderPath: '/library/series'),
+  metadata: SeriesMetadata(name: 'Original series'),
 );
 
 void main() {

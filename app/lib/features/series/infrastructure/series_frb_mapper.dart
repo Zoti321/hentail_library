@@ -1,3 +1,5 @@
+import 'package:hentai_library/features/series/domain/value_objects/series_folder_info.dart';
+import 'package:hentai_library/features/series/domain/value_objects/series_metadata.dart';
 import 'package:hentai_library/features/series/domain/value_objects/serialization_status.dart';
 import 'package:hentai_library/features/comic/public/infrastructure/comic_entity_mapper.dart';
 import 'package:hentai_library/features/series/domain/library_series_filter.dart';
@@ -20,14 +22,18 @@ import 'package:hentai_library/src/rust/api/series.dart' as rust_series;
 Series mapRustSeries(rust_series.SeriesDto dto) {
   return Series(
     id: dto.seriesId,
-    name: dto.name,
-    folderPath: dto.folderPath,
-    serializationStatus: SerializationStatus.fromRust(dto.serializationStatus),
-    totalCount: dto.totalCount?.toInt(),
-    locks: SeriesMetaLocks(
-      name: dto.locks.name,
-      serializationStatus: dto.locks.serializationStatus,
-      totalCount: dto.locks.totalCount,
+    folderInfo: SeriesFolderInfo(folderPath: dto.folderPath),
+    metadata: SeriesMetadata(
+      name: dto.name,
+      serializationStatus: SerializationStatus.fromRust(
+        dto.serializationStatus,
+      ),
+      totalCount: dto.totalCount?.toInt(),
+      locks: SeriesMetaLocks(
+        name: dto.locks.name,
+        serializationStatus: dto.locks.serializationStatus,
+        totalCount: dto.locks.totalCount,
+      ),
     ),
     items: dto.items.map(mapRustSeriesItem).toList(),
   );

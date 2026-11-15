@@ -1,5 +1,6 @@
 import 'package:hentai_library/features/comic/public/comic_metadata_types.dart';
 import 'package:hentai_library/features/comic/domain/comic.dart';
+import 'package:hentai_library/features/comic/domain/value_objects/comic_meta_locks.dart';
 import 'package:hentai_library/features/comic/domain/value_objects/comic_metadata_form.dart';
 import 'package:hentai_library/features/comic_metadata/public/comic_metadata_entities.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
@@ -16,6 +17,8 @@ Comic _comic({
   List<String> languages = const <String>[],
   List<String> parodies = const <String>[],
   List<String> characters = const <String>[],
+  ComicMetaLocks locks = ComicMetaLocks.unlocked,
+  DateTime? lastReadTime,
 }) {
   final DateTime now = DateTime.utc(2024, 1, 1);
   return Comic.restore(
@@ -35,6 +38,8 @@ Comic _comic({
     parodies: parodies,
     characters: characters,
     pageCount: 1,
+    locks: locks,
+    lastReadTime: lastReadTime,
   );
 }
 
@@ -44,6 +49,58 @@ ComicMetadataDraftChanges _changedFields(ComicMetadataDraftDiff diff) {
 }
 
 void main() {
+  test('metadata snapshots isolate input and replacement collections', () {
+    final tags = <Tag>[Tag(name: 'Original')];
+    final original = _comic(tags: tags);
+    tags.add(Tag(name: 'External change'));
+    expect(original.metadata.tags.map((t) => t.name), ['Original']);
+    expect(() => original.metadata.tags.clear(), throwsUnsupportedError);
+    final replacements = <Tag>[Tag(name: 'Replacement')];
+    final edited = original.copyWith(
+      metadata: original.metadata.copyWith(tags: replacements),
+    );
+    replacements.clear();
+    expect(edited.metadata.tags.map((t) => t.name), ['Replacement']);
+    expect(original.metadata.tags.map((t) => t.name), ['Original']);
+    expect(edited.metadata, _comic(tags: [Tag(name: 'Replacement')]).metadata);
+    expect(
+      edited.metadata.hashCode,
+      _comic(tags: [Tag(name: 'Replacement')]).metadata.hashCode,
+    );
+  });
+
+  test(
+    'metadata editing and resource replacement preserve independent facts',
+    () {
+      final original = _comic(
+        locks: const ComicMetaLocks(title: true, tags: true),
+        lastReadTime: DateTime.utc(2025, 2, 3),
+      );
+      final edited = original.applyMetadataDraft(
+        ComicMetadataForm.fromComic(original).copyWith(title: 'Edited'),
+      );
+      expect(edited.resourceInfo, original.resourceInfo);
+      expect(edited.metadata.title, 'Edited');
+      expect(
+        edited.metadata.locks,
+        const ComicMetaLocks(title: true, tags: true),
+      );
+      final replaced = edited.copyWith(
+        resourceInfo: edited.resourceInfo.copyWith(
+          resourceSize: 42,
+          pageCount: 7,
+        ),
+      );
+      expect(replaced.metadata, edited.metadata);
+      expect(replaced.comicId, 'comic-1');
+      expect(replaced.createdAt, DateTime.utc(2024, 1, 1));
+      expect(replaced.lastUpdatedAt, original.lastUpdatedAt);
+      expect(replaced.lastReadTime, original.lastReadTime);
+      expect(replaced.resourceSize, 42);
+      expect(replaced.pageCount, 7);
+    },
+  );
+
   group('Comic.createMetadata', () {
     test('rejects blank title', () {
       expect(

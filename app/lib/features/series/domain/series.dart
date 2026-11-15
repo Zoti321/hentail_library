@@ -2,6 +2,8 @@ import 'package:hentai_library/features/series/domain/value_objects/serializatio
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hentai_library/features/series/domain/series_item.dart';
 import 'package:hentai_library/features/series/domain/value_objects/series_meta_locks.dart';
+import 'package:hentai_library/features/series/domain/value_objects/series_folder_info.dart';
+import 'package:hentai_library/features/series/domain/value_objects/series_metadata.dart';
 
 part 'series.freezed.dart';
 
@@ -14,12 +16,16 @@ const int maxSeriesTotalCount = 2147483647;
 abstract class Series with _$Series {
   factory Series({
     required String id,
-    required String name,
-    required String folderPath,
-    @Default(SerializationStatus.unknown)
-    SerializationStatus serializationStatus,
-    int? totalCount,
-    @Default(SeriesMetaLocks.unlocked) SeriesMetaLocks locks,
+    required SeriesFolderInfo folderInfo,
+    required SeriesMetadata metadata,
     @Default(<SeriesItem>[]) List<SeriesItem> items,
   }) = _Series;
+
+  const Series._();
+
+  String get folderPath => folderInfo.folderPath;
+  String get name => metadata.name;
+  SerializationStatus get serializationStatus => metadata.serializationStatus;
+  int? get totalCount => metadata.totalCount;
+  SeriesMetaLocks get locks => metadata.locks;
 }

@@ -19,25 +19,25 @@ void main() {
     final Comic mapped = mapRustComic(dto);
 
     expect(mapped.comicId, 'c1');
-    expect(mapped.path, '/lib/c1.cbz');
-    expect(mapped.resourceType, ResourceType.cbz);
-    expect(mapped.resourceSize, 2048);
-    expect(mapped.title, 'Title');
-    expect(mapped.contentRating, ContentRating.r18);
-    expect(mapped.pageCount, 12);
-    expect(mapped.description, '简介');
-    expect(mapped.authors.map((AuthorRef a) => a.name), <String>[
+    expect(mapped.resourceInfo.path, '/lib/c1.cbz');
+    expect(mapped.resourceInfo.resourceType, ResourceType.cbz);
+    expect(mapped.resourceInfo.resourceSize, 2048);
+    expect(mapped.metadata.title, 'Title');
+    expect(mapped.metadata.contentRating, ContentRating.r18);
+    expect(mapped.resourceInfo.pageCount, 12);
+    expect(mapped.metadata.description, '简介');
+    expect(mapped.metadata.authors.map((AuthorRef a) => a.name), <String>[
       'Alice',
       'Bob',
     ]);
-    expect(mapped.authors.map((AuthorRef a) => a.id), <int?>[
+    expect(mapped.metadata.authors.map((AuthorRef a) => a.id), <int?>[
       1,
       2,
     ], reason: 'Author 引用必须携带稳定 id（ADR-0024）');
-    expect(mapped.tags.map((Tag t) => t.name), <String>['tag-a']);
-    expect(mapped.languages, <String>['zh']);
-    expect(mapped.parodies, <String>['p']);
-    expect(mapped.characters, <String>['c']);
+    expect(mapped.metadata.tags.map((Tag t) => t.name), <String>['tag-a']);
+    expect(mapped.metadata.languages, <String>['zh']);
+    expect(mapped.metadata.parodies, <String>['p']);
+    expect(mapped.metadata.characters, <String>['c']);
 
     expect(
       mapped.createdAt,
@@ -49,7 +49,7 @@ void main() {
       DateTime.fromMillisecondsSinceEpoch(1700000600000, isUtc: true),
     );
     expect(
-      mapped.publishedAt,
+      mapped.metadata.publishedAt,
       DateTime.fromMillisecondsSinceEpoch(1600000000000, isUtc: true),
     );
     expect(
@@ -57,22 +57,22 @@ void main() {
       DateTime.fromMillisecondsSinceEpoch(1700000900000, isUtc: true),
     );
 
-    expect(mapped.locks.title, isTrue);
-    expect(mapped.locks.description, isFalse);
-    expect(mapped.locks.publishedAt, isTrue);
-    expect(mapped.locks.contentRating, isFalse);
-    expect(mapped.locks.authors, isTrue);
-    expect(mapped.locks.tags, isFalse);
-    expect(mapped.locks.languages, isTrue);
-    expect(mapped.locks.parodies, isFalse);
-    expect(mapped.locks.characters, isTrue);
+    expect(mapped.metadata.locks.title, isTrue);
+    expect(mapped.metadata.locks.description, isFalse);
+    expect(mapped.metadata.locks.publishedAt, isTrue);
+    expect(mapped.metadata.locks.contentRating, isFalse);
+    expect(mapped.metadata.locks.authors, isTrue);
+    expect(mapped.metadata.locks.tags, isFalse);
+    expect(mapped.metadata.locks.languages, isTrue);
+    expect(mapped.metadata.locks.parodies, isFalse);
+    expect(mapped.metadata.locks.characters, isTrue);
   });
 
   test('mapRustComic keeps absent optional metadata null', () {
     final Comic mapped = mapRustComic(_comicDto());
 
-    expect(mapped.description, isNull);
-    expect(mapped.publishedAt, isNull);
+    expect(mapped.metadata.description, isNull);
+    expect(mapped.metadata.publishedAt, isNull);
     expect(mapped.lastReadTime, isNull);
   });
 }

@@ -1,3 +1,5 @@
+import 'package:hentai_library/features/series/domain/value_objects/series_folder_info.dart';
+import 'package:hentai_library/features/series/domain/value_objects/series_metadata.dart';
 import 'package:hentai_library/features/series/domain/series.dart';
 import 'package:hentai_library/features/series/domain/value_objects/series_metadata_form.dart';
 import 'package:hentai_library/features/series/presentation/mappers/series_metadata_edit_mappers.dart';
@@ -25,10 +27,12 @@ void main() {
         () {
           final original = Series(
             id: 'series',
-            name: 'Original',
-            folderPath: '/series',
-            serializationStatus: status,
-            totalCount: total,
+            folderInfo: SeriesFolderInfo(folderPath: '/series'),
+            metadata: SeriesMetadata(
+              name: 'Original',
+              serializationStatus: status,
+              totalCount: total,
+            ),
           );
           final draft = seriesMetadataDraftFromSeries(original);
           expect(draft.name, original.name);
