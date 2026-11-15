@@ -185,7 +185,7 @@ _Avoid_: automatic tagging, suggested values written without selection.
 **Comic catalog query**: Shared Library/search query: Dart assembles filter intent; core owns SQL predicates and typed facet helpers.
 _Avoid_: duplicate Flutter WHERE implementation, in-memory matches.
 
-**Language**: Ordered canonical English Comic text-language names: Chinese, Japanese, English, Korean, Spanish, Other. Empty means unknown. Localize known names for display, preserve unknown strings and join multiple values with `|`; unrelated to interface locale.
+**Language**: A single Comic text-language value, canonically Chinese, Japanese, English, Korean, Spanish or Other; absence means unknown. Localize known names for display and preserve unrecognized imported values; unrelated to interface locale. ADR-0057.
 _Avoid_: UI language, translation language, free-form Tag.
 
 **Content rating**: User-set unknown/safe/r18 Comic classification. Path-based automatic detection is retired. Healthy mode filters visibility without changing the rating.
@@ -217,6 +217,12 @@ _Avoid_: read-only flag, freeze, lock preventing explicit user edits.
 
 **Metadata refresh**: Reparse a Comic, Series members or Library through Resource access and merge under field locks. Update Comic physical metadata without rebuilding thumbnails; Series refresh may update an unlocked folder name but not status/planned volumes/member order. Skip/report individual failures and retain writes on cancellation. Unreachable remote roots preserve data. Core shares a global single-flight library write lock with sync, failing immediately when busy. UI shows busy/completion summary, not live progress. No orphan cleanup or membership rebuilding.
 _Avoid_: UI catalog reload, Library sync, rescan.
+
+**Resource metadata embedding**: Persisting in-app Comic metadata into its original Local Resource for use outside the application. Distinct from Metadata refresh, which reads Resource metadata into the catalog, and Metadata backup, which creates a separate restore snapshot.
+_Avoid_: Metadata refresh, Library sync, metadata backup as synonyms for source modification.
+
+**Media page**: A Home-linked view of Local Comic metadata and automatic Resource metadata embedding state, scoped by Library and embedding status. Its initial scope excludes Library management and Comic trash; it does not imply live comparison with source metadata. ADR-0057.
+_Avoid_: global Library manager, metadata dictionary management, manual export queue.
 
 **Metadata backup**: JSON snapshot of Comic user metadata, locks and orphan dictionary entries (`.hlmeta.json` / `.hlmeta.json.gz`), manually or automatically exported for external storage/restoration.
 _Avoid_: database backup, Resource snapshot.

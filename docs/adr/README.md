@@ -135,3 +135,4 @@ Accepted | Superseded by ADR-000N | Deprecated
 | [0054](./0054-verified-path-migration.md) | Verified continuity for automatic Path migration | Accepted; supersedes ADR-0013 weak-fingerprint sync eligibility |
 | [0055](./0055-content-verified-path-migration.md) | Content-verified Path migration | Accepted; extends ADR-0054 |
 | [0056](./0056-localized-date-picker.md) | Localized application-owned date picker | Accepted; supersedes ADR-0053 calendar locale restriction |
+| [0057](./0057-automatic-local-metadata-writeback.md) | Automatic Resource metadata embedding | Accepted; supersedes ADR-0007 Language cardinality and affected scan-source assumptions |
