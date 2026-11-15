@@ -17,6 +17,5 @@ class WritebackRevision extends Notifier<int> {
 
 final writebackEnabledProvider = FutureProvider.autoDispose
     .family<bool, String>((ref, id) {
-      ref.watch(writebackRevisionProvider);
       return ref.watch(writebackGatewayProvider).isEnabled(id);
     });

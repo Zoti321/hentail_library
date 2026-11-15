@@ -39,21 +39,23 @@ class _WritebackLifecycleState extends ConsumerState<WritebackLifecycle>
       return;
     }
     _running = true;
+    var changed = false;
+    final revision = ref.read(writebackRevisionProvider.notifier);
     try {
       final gateway = ref.read(writebackGatewayProvider);
-      final revision = ref.read(writebackRevisionProvider.notifier);
       for (var count = 0; count < 10 && mounted && _active; count++) {
         if (!await gateway.processNext()) {
           break;
         }
-        if (mounted) {
-          revision.changed();
-        }
+        changed = true;
       }
     } catch (_) {
       // Busy/uninitialized core is retried on the next lifecycle tick.
     } finally {
       _running = false;
+      if (changed && mounted) {
+        revision.changed();
+      }
     }
   }
 

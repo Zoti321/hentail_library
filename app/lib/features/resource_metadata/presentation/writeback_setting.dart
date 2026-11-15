@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/features/resource_metadata/presentation/writeback_providers.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 
 class WritebackSetting extends ConsumerStatefulWidget {
-  const WritebackSetting({super.key, required this.libraryId});
+  const WritebackSetting({
+    super.key,
+    required this.libraryId,
+    this.libraryName,
+  });
   final String libraryId;
+  final String? libraryName;
   @override
   ConsumerState<WritebackSetting> createState() => _WritebackSettingState();
 }
@@ -20,24 +26,13 @@ class _WritebackSettingState extends ConsumerState<WritebackSetting> {
     }
     final l10n = context.l10n;
     if (enabled) {
-      final confirmed = await showDialog<bool>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text(l10n.writebackConfirmTitle),
-          content: Text(l10n.writebackDescription),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: Text(l10n.commonCancel),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: Text(l10n.writebackEnable),
-            ),
-          ],
-        ),
+      final confirmed = await showConfirmDialog(
+        context,
+        title: l10n.writebackConfirmTitle,
+        content: Text(l10n.writebackDescription),
+        confirmLabel: l10n.writebackEnable,
       );
-      if (confirmed != true || !mounted) {
+      if (!confirmed || !mounted) {
         return;
       }
     }
@@ -50,6 +45,7 @@ class _WritebackSettingState extends ConsumerState<WritebackSetting> {
     try {
       await gateway.setEnabled(widget.libraryId, enabled);
       if (mounted) {
+        ref.invalidate(writebackEnabledProvider(widget.libraryId));
         revision.changed();
       }
     } catch (_) {
@@ -71,14 +67,22 @@ class _WritebackSettingState extends ConsumerState<WritebackSetting> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         value.when(
+          skipLoadingOnReload: true,
           data: (enabled) => SettingsSwitchTile(
-            title: Text(l10n.writebackTitle),
-            description: Text(l10n.writebackDescription),
+            title: Text(widget.libraryName ?? l10n.writebackTitle),
+            description: Text(
+              widget.libraryName == null
+                  ? l10n.writebackDescription
+                  : l10n.writebackTitle,
+            ),
             value: enabled,
             enabled: !_saving,
             onChanged: _change,
           ),
-          loading: () => const LinearProgressIndicator(),
+          loading: () => const Padding(
+            padding: EdgeInsets.all(16),
+            child: M3EProgressIndicator.linear(),
+          ),
           error: (error, stack) => Text(l10n.writebackFailure),
         ),
         if (_error != null)
