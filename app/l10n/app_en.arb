@@ -1339,15 +1339,7 @@
   "authorDetailInvalidUrl": "Enter a URL starting with http:// or https://",
   "authorDetailOpenLinkFailed": "Could not open the link",
   "mediaTitle": "Media",
-  "mediaSubtitle": "Comic resource metadata and automatic file writing",
-  "mediaAllLibraries": "All local libraries",
-  "mediaAllStates": "All file writing states",
-  "mediaEmpty": "No matching Comic resources",
-  "mediaMetadata": "Resource metadata",
-  "mediaEdit": "Edit metadata",
-  "mediaResource": "Resource",
-  "mediaLastSuccess": "Last successful file write",
-  "mediaNeverWritten": "No successful file write yet",
+  "mediaSubtitle": "An overview of metadata stored in your local Comic resources.",
   "writebackTitle": "Automatically write metadata to original files",
   "writebackDescription": "Write in-app metadata into original Comic resources. Enabling also processes existing Comics. Archives may be rewritten and other software can read this information. Failures retry automatically.",
   "writebackConfirmTitle": "Allow changes to original resources?",
@@ -1359,6 +1351,37 @@
   "writebackFailed": "Failed",
   "writebackUnsupported": "Unsupported on this build",
   "writebackFailure": "Could not save file metadata writing setting",
-  "mediaPrevious": "Previous page",
-  "mediaNext": "Next page"
+  "mediaResourceTotal": "Comic resources",
+  "mediaLocalScope": "Across {count} local libraries",
+  "mediaWritten": "Written to files",
+  "mediaWrittenCaption": "Current metadata saved to original resources",
+  "mediaNotEnabled": "Automatic writing off",
+  "mediaNotEnabledCaption": "Resources in libraries with automatic writing disabled",
+  "mediaWritingOverview": "Automatic file writing",
+  "mediaEnabledScope": "Enabled for {enabled} of {total} local libraries",
+  "mediaPendingCaption": "Waiting for automatic writing",
+  "mediaProcessingCaption": "Writing metadata to original resources",
+  "mediaFailedCaption": "Will retry automatically while the app is active",
+  "mediaUnsupportedCaption": "Resources the current version cannot write to",
+  "mediaLibrarySettings": "Write settings by library",
+  "mediaAutomaticInfo": "Off by default. Enabling also writes existing metadata to original resources. Writing and retries run while the app is active.",
+  "mediaNoLocalLibraries": "Add a local library to enable automatic file writing.",
+  "mediaRefreshFailed": "Could not update the overview. Showing the last available counts.",
+  "@mediaLocalScope": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@mediaEnabledScope": {
+    "placeholders": {
+      "enabled": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  }
 }

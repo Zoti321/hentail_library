@@ -2585,31 +2585,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mediaTitle => '媒体';
 
   @override
-  String get mediaSubtitle => '漫画资源元数据与自动文件写入';
-
-  @override
-  String get mediaAllLibraries => '所有本地库';
-
-  @override
-  String get mediaAllStates => '全部文件写入状态';
-
-  @override
-  String get mediaEmpty => '没有符合条件的漫画资源';
-
-  @override
-  String get mediaMetadata => '资源元数据';
-
-  @override
-  String get mediaEdit => '编辑元数据';
-
-  @override
-  String get mediaResource => '资源';
-
-  @override
-  String get mediaLastSuccess => '最近成功写入';
-
-  @override
-  String get mediaNeverWritten => '尚未成功写入';
+  String get mediaSubtitle => '查看本地漫画资源的元数据写入概况。';
 
   @override
   String get writebackTitle => '自动将元数据写入原文件';
@@ -2646,8 +2622,54 @@ class AppLocalizationsZh extends AppLocalizations {
   String get writebackFailure => '文件元数据写入设置保存失败';
 
   @override
-  String get mediaPrevious => '上一页';
+  String get mediaResourceTotal => '漫画资源';
 
   @override
-  String get mediaNext => '下一页';
+  String mediaLocalScope(int count) {
+    return '来自 $count 个本地库';
+  }
+
+  @override
+  String get mediaWritten => '已写入原文件';
+
+  @override
+  String get mediaWrittenCaption => '当前元数据已保存到原始资源';
+
+  @override
+  String get mediaNotEnabled => '未开启自动写入';
+
+  @override
+  String get mediaNotEnabledCaption => '所属库尚未开启自动写入的资源';
+
+  @override
+  String get mediaWritingOverview => '自动写入概况';
+
+  @override
+  String mediaEnabledScope(int enabled, int total) {
+    return '已在 $enabled / $total 个本地库开启';
+  }
+
+  @override
+  String get mediaPendingCaption => '等待自动写入';
+
+  @override
+  String get mediaProcessingCaption => '正在将元数据写入原始资源';
+
+  @override
+  String get mediaFailedCaption => '应用运行期间会自动重试';
+
+  @override
+  String get mediaUnsupportedCaption => '当前版本无法写入的资源';
+
+  @override
+  String get mediaLibrarySettings => '各库写入设置';
+
+  @override
+  String get mediaAutomaticInfo => '默认关闭。开启后也会将已有元数据写入原始资源；写入与失败重试在应用运行期间自动进行。';
+
+  @override
+  String get mediaNoLocalLibraries => '添加本地库后，可开启文件元数据自动写入。';
+
+  @override
+  String get mediaRefreshFailed => '概况更新失败，当前显示上次获取的统计。';
 }

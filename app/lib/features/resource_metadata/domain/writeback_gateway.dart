@@ -1,26 +1,18 @@
-typedef MediaResource = ({
-  String comicId,
-  String libraryId,
-  String libraryName,
-  String path,
-  String title,
-  String format,
-  String state,
-  String? error,
-  DateTime? lastSuccessAt,
-  Map<String, String> metadata,
+typedef MediaOverview = ({
+  int total,
+  int disabled,
+  int pending,
+  int processing,
+  int completed,
+  int failed,
+  int unsupported,
+  int localLibraries,
+  int enabledLibraries,
 });
-
-typedef MediaResult = ({List<MediaResource> items, int total});
 
 abstract interface class WritebackGateway {
   Future<bool> isEnabled(String libraryId);
   Future<void> setEnabled(String libraryId, bool enabled);
   Future<bool> processNext();
-  Future<MediaResult> query({
-    String? libraryId,
-    String? state,
-    required bool showR18,
-    required int offset,
-  });
+  Future<MediaOverview> overview({required bool showR18});
 }

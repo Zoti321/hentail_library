@@ -1,18 +1,16 @@
-use super::{comic::ComicDto, init::HentaiErrorDto};
+use super::init::HentaiErrorDto;
 
 #[derive(Debug, Clone)]
-pub struct MediaResourceDto {
-    pub comic: ComicDto,
-    pub library_name: String,
-    pub state: String,
-    pub error: Option<String>,
-    pub last_success_at: Option<i64>,
-}
-
-#[derive(Debug, Clone)]
-pub struct MediaPageDto {
-    pub items: Vec<MediaResourceDto>,
+pub struct MediaOverviewDto {
     pub total: i64,
+    pub disabled: i64,
+    pub pending: i64,
+    pub processing: i64,
+    pub completed: i64,
+    pub failed: i64,
+    pub unsupported: i64,
+    pub local_libraries: i64,
+    pub enabled_libraries: i64,
 }
 
 pub async fn get_resource_metadata_enabled(library_id: String) -> Result<bool, HentaiErrorDto> {
@@ -36,28 +34,17 @@ pub async fn process_resource_metadata_tick() -> Result<bool, HentaiErrorDto> {
         .map_err(Into::into)
 }
 
-pub async fn query_media_resources(
-    library_id: Option<String>,
-    state: Option<String>,
-    show_r18: bool,
-    offset: i64,
-    limit: i64,
-) -> Result<MediaPageDto, HentaiErrorDto> {
-    let page =
-        hentai_core::resource_metadata::query_media(library_id, state, show_r18, offset, limit)
-            .await?;
-    Ok(MediaPageDto {
-        total: page.total,
-        items: page
-            .items
-            .into_iter()
-            .map(|item| MediaResourceDto {
-                comic: item.comic.into(),
-                library_name: item.library_name,
-                state: item.state,
-                error: item.error,
-                last_success_at: item.last_success_at,
-            })
-            .collect(),
+pub async fn query_media_overview(show_r18: bool) -> Result<MediaOverviewDto, HentaiErrorDto> {
+    let summary = hentai_core::resource_metadata::query_media_overview(show_r18).await?;
+    Ok(MediaOverviewDto {
+        total: summary.total,
+        disabled: summary.disabled,
+        pending: summary.pending,
+        processing: summary.processing,
+        completed: summary.completed,
+        failed: summary.failed,
+        unsupported: summary.unsupported,
+        local_libraries: summary.local_libraries,
+        enabled_libraries: summary.enabled_libraries,
     })
 }

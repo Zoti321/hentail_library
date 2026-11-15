@@ -2712,31 +2712,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get mediaSubtitle =>
-      'Comic resource metadata and automatic file writing';
-
-  @override
-  String get mediaAllLibraries => 'All local libraries';
-
-  @override
-  String get mediaAllStates => 'All file writing states';
-
-  @override
-  String get mediaEmpty => 'No matching Comic resources';
-
-  @override
-  String get mediaMetadata => 'Resource metadata';
-
-  @override
-  String get mediaEdit => 'Edit metadata';
-
-  @override
-  String get mediaResource => 'Resource';
-
-  @override
-  String get mediaLastSuccess => 'Last successful file write';
-
-  @override
-  String get mediaNeverWritten => 'No successful file write yet';
+      'An overview of metadata stored in your local Comic resources.';
 
   @override
   String get writebackTitle => 'Automatically write metadata to original files';
@@ -2773,8 +2749,61 @@ class AppLocalizationsEn extends AppLocalizations {
   String get writebackFailure => 'Could not save file metadata writing setting';
 
   @override
-  String get mediaPrevious => 'Previous page';
+  String get mediaResourceTotal => 'Comic resources';
 
   @override
-  String get mediaNext => 'Next page';
+  String mediaLocalScope(int count) {
+    return 'Across $count local libraries';
+  }
+
+  @override
+  String get mediaWritten => 'Written to files';
+
+  @override
+  String get mediaWrittenCaption =>
+      'Current metadata saved to original resources';
+
+  @override
+  String get mediaNotEnabled => 'Automatic writing off';
+
+  @override
+  String get mediaNotEnabledCaption =>
+      'Resources in libraries with automatic writing disabled';
+
+  @override
+  String get mediaWritingOverview => 'Automatic file writing';
+
+  @override
+  String mediaEnabledScope(int enabled, int total) {
+    return 'Enabled for $enabled of $total local libraries';
+  }
+
+  @override
+  String get mediaPendingCaption => 'Waiting for automatic writing';
+
+  @override
+  String get mediaProcessingCaption => 'Writing metadata to original resources';
+
+  @override
+  String get mediaFailedCaption =>
+      'Will retry automatically while the app is active';
+
+  @override
+  String get mediaUnsupportedCaption =>
+      'Resources the current version cannot write to';
+
+  @override
+  String get mediaLibrarySettings => 'Write settings by library';
+
+  @override
+  String get mediaAutomaticInfo =>
+      'Off by default. Enabling also writes existing metadata to original resources. Writing and retries run while the app is active.';
+
+  @override
+  String get mediaNoLocalLibraries =>
+      'Add a local library to enable automatic file writing.';
+
+  @override
+  String get mediaRefreshFailed =>
+      'Could not update the overview. Showing the last available counts.';
 }

@@ -4573,56 +4573,8 @@ abstract class AppLocalizations {
   /// No description provided for @mediaSubtitle.
   ///
   /// In zh, this message translates to:
-  /// **'漫画资源元数据与自动文件写入'**
+  /// **'查看本地漫画资源的元数据写入概况。'**
   String get mediaSubtitle;
-
-  /// No description provided for @mediaAllLibraries.
-  ///
-  /// In zh, this message translates to:
-  /// **'所有本地库'**
-  String get mediaAllLibraries;
-
-  /// No description provided for @mediaAllStates.
-  ///
-  /// In zh, this message translates to:
-  /// **'全部文件写入状态'**
-  String get mediaAllStates;
-
-  /// No description provided for @mediaEmpty.
-  ///
-  /// In zh, this message translates to:
-  /// **'没有符合条件的漫画资源'**
-  String get mediaEmpty;
-
-  /// No description provided for @mediaMetadata.
-  ///
-  /// In zh, this message translates to:
-  /// **'资源元数据'**
-  String get mediaMetadata;
-
-  /// No description provided for @mediaEdit.
-  ///
-  /// In zh, this message translates to:
-  /// **'编辑元数据'**
-  String get mediaEdit;
-
-  /// No description provided for @mediaResource.
-  ///
-  /// In zh, this message translates to:
-  /// **'资源'**
-  String get mediaResource;
-
-  /// No description provided for @mediaLastSuccess.
-  ///
-  /// In zh, this message translates to:
-  /// **'最近成功写入'**
-  String get mediaLastSuccess;
-
-  /// No description provided for @mediaNeverWritten.
-  ///
-  /// In zh, this message translates to:
-  /// **'尚未成功写入'**
-  String get mediaNeverWritten;
 
   /// No description provided for @writebackTitle.
   ///
@@ -4690,17 +4642,101 @@ abstract class AppLocalizations {
   /// **'文件元数据写入设置保存失败'**
   String get writebackFailure;
 
-  /// No description provided for @mediaPrevious.
+  /// No description provided for @mediaResourceTotal.
   ///
   /// In zh, this message translates to:
-  /// **'上一页'**
-  String get mediaPrevious;
+  /// **'漫画资源'**
+  String get mediaResourceTotal;
 
-  /// No description provided for @mediaNext.
+  /// No description provided for @mediaLocalScope.
   ///
   /// In zh, this message translates to:
-  /// **'下一页'**
-  String get mediaNext;
+  /// **'来自 {count} 个本地库'**
+  String mediaLocalScope(int count);
+
+  /// No description provided for @mediaWritten.
+  ///
+  /// In zh, this message translates to:
+  /// **'已写入原文件'**
+  String get mediaWritten;
+
+  /// No description provided for @mediaWrittenCaption.
+  ///
+  /// In zh, this message translates to:
+  /// **'当前元数据已保存到原始资源'**
+  String get mediaWrittenCaption;
+
+  /// No description provided for @mediaNotEnabled.
+  ///
+  /// In zh, this message translates to:
+  /// **'未开启自动写入'**
+  String get mediaNotEnabled;
+
+  /// No description provided for @mediaNotEnabledCaption.
+  ///
+  /// In zh, this message translates to:
+  /// **'所属库尚未开启自动写入的资源'**
+  String get mediaNotEnabledCaption;
+
+  /// No description provided for @mediaWritingOverview.
+  ///
+  /// In zh, this message translates to:
+  /// **'自动写入概况'**
+  String get mediaWritingOverview;
+
+  /// No description provided for @mediaEnabledScope.
+  ///
+  /// In zh, this message translates to:
+  /// **'已在 {enabled} / {total} 个本地库开启'**
+  String mediaEnabledScope(int enabled, int total);
+
+  /// No description provided for @mediaPendingCaption.
+  ///
+  /// In zh, this message translates to:
+  /// **'等待自动写入'**
+  String get mediaPendingCaption;
+
+  /// No description provided for @mediaProcessingCaption.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在将元数据写入原始资源'**
+  String get mediaProcessingCaption;
+
+  /// No description provided for @mediaFailedCaption.
+  ///
+  /// In zh, this message translates to:
+  /// **'应用运行期间会自动重试'**
+  String get mediaFailedCaption;
+
+  /// No description provided for @mediaUnsupportedCaption.
+  ///
+  /// In zh, this message translates to:
+  /// **'当前版本无法写入的资源'**
+  String get mediaUnsupportedCaption;
+
+  /// No description provided for @mediaLibrarySettings.
+  ///
+  /// In zh, this message translates to:
+  /// **'各库写入设置'**
+  String get mediaLibrarySettings;
+
+  /// No description provided for @mediaAutomaticInfo.
+  ///
+  /// In zh, this message translates to:
+  /// **'默认关闭。开启后也会将已有元数据写入原始资源；写入与失败重试在应用运行期间自动进行。'**
+  String get mediaAutomaticInfo;
+
+  /// No description provided for @mediaNoLocalLibraries.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加本地库后，可开启文件元数据自动写入。'**
+  String get mediaNoLocalLibraries;
+
+  /// No description provided for @mediaRefreshFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'概况更新失败，当前显示上次获取的统计。'**
+  String get mediaRefreshFailed;
 }
 
 class _AppLocalizationsDelegate

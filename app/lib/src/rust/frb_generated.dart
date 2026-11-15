@@ -92,7 +92,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.13.0';
 
   @override
-  int get rustContentHash => -472401856;
+  int get rustContentHash => -1726611550;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -416,12 +416,8 @@ abstract class RustLibApi extends BaseApi {
     required List<String> comicIds,
   });
 
-  Future<MediaPageDto> crateApiResourceMetadataQueryMediaResources({
-    String? libraryId,
-    String? state,
+  Future<MediaOverviewDto> crateApiResourceMetadataQueryMediaOverview({
     required bool showR18,
-    required PlatformInt64 offset,
-    required PlatformInt64 limit,
   });
 
   Future<void> crateApiReadingActivityRecordReadingActivityFrb({
@@ -3242,22 +3238,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<MediaPageDto> crateApiResourceMetadataQueryMediaResources({
-    String? libraryId,
-    String? state,
+  Future<MediaOverviewDto> crateApiResourceMetadataQueryMediaOverview({
     required bool showR18,
-    required PlatformInt64 offset,
-    required PlatformInt64 limit,
   }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_opt_String(libraryId, serializer);
-          sse_encode_opt_String(state, serializer);
           sse_encode_bool(showR18, serializer);
-          sse_encode_i_64(offset, serializer);
-          sse_encode_i_64(limit, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
@@ -3266,20 +3254,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
         },
         codec: SseCodec(
-          decodeSuccessData: sse_decode_media_page_dto,
+          decodeSuccessData: sse_decode_media_overview_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
         ),
-        constMeta: kCrateApiResourceMetadataQueryMediaResourcesConstMeta,
-        argValues: [libraryId, state, showR18, offset, limit],
+        constMeta: kCrateApiResourceMetadataQueryMediaOverviewConstMeta,
+        argValues: [showR18],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta get kCrateApiResourceMetadataQueryMediaResourcesConstMeta =>
+  TaskConstMeta get kCrateApiResourceMetadataQueryMediaOverviewConstMeta =>
       const TaskConstMeta(
-        debugName: "query_media_resources",
-        argNames: ["libraryId", "state", "showR18", "offset", "limit"],
+        debugName: "query_media_overview",
+        argNames: ["showR18"],
       );
 
   @override
@@ -6283,12 +6271,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  List<MediaResourceDto> dco_decode_list_media_resource_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>).map(dco_decode_media_resource_dto).toList();
-  }
-
-  @protected
   List<NamedFacetFormEntryFrbDto>
   dco_decode_list_named_facet_form_entry_frb_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
@@ -6425,29 +6407,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  MediaPageDto dco_decode_media_page_dto(dynamic raw) {
+  MediaOverviewDto dco_decode_media_overview_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 2)
-      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
-    return MediaPageDto(
-      items: dco_decode_list_media_resource_dto(arr[0]),
-      total: dco_decode_i_64(arr[1]),
-    );
-  }
-
-  @protected
-  MediaResourceDto dco_decode_media_resource_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 5)
-      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
-    return MediaResourceDto(
-      comic: dco_decode_comic_dto(arr[0]),
-      libraryName: dco_decode_String(arr[1]),
-      state: dco_decode_String(arr[2]),
-      error: dco_decode_opt_String(arr[3]),
-      lastSuccessAt: dco_decode_opt_box_autoadd_i_64(arr[4]),
+    if (arr.length != 9)
+      throw Exception('unexpected arr length: expect 9 but see ${arr.length}');
+    return MediaOverviewDto(
+      total: dco_decode_i_64(arr[0]),
+      disabled: dco_decode_i_64(arr[1]),
+      pending: dco_decode_i_64(arr[2]),
+      processing: dco_decode_i_64(arr[3]),
+      completed: dco_decode_i_64(arr[4]),
+      failed: dco_decode_i_64(arr[5]),
+      unsupported: dco_decode_i_64(arr[6]),
+      localLibraries: dco_decode_i_64(arr[7]),
+      enabledLibraries: dco_decode_i_64(arr[8]),
     );
   }
 
@@ -8590,20 +8564,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  List<MediaResourceDto> sse_decode_list_media_resource_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <MediaResourceDto>[];
-    for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(sse_decode_media_resource_dto(deserializer));
-    }
-    return ans_;
-  }
-
-  @protected
   List<NamedFacetFormEntryFrbDto>
   sse_decode_list_named_facet_form_entry_frb_dto(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -8817,27 +8777,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  MediaPageDto sse_decode_media_page_dto(SseDeserializer deserializer) {
+  MediaOverviewDto sse_decode_media_overview_dto(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_items = sse_decode_list_media_resource_dto(deserializer);
     var var_total = sse_decode_i_64(deserializer);
-    return MediaPageDto(items: var_items, total: var_total);
-  }
-
-  @protected
-  MediaResourceDto sse_decode_media_resource_dto(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_comic = sse_decode_comic_dto(deserializer);
-    var var_libraryName = sse_decode_String(deserializer);
-    var var_state = sse_decode_String(deserializer);
-    var var_error = sse_decode_opt_String(deserializer);
-    var var_lastSuccessAt = sse_decode_opt_box_autoadd_i_64(deserializer);
-    return MediaResourceDto(
-      comic: var_comic,
-      libraryName: var_libraryName,
-      state: var_state,
-      error: var_error,
-      lastSuccessAt: var_lastSuccessAt,
+    var var_disabled = sse_decode_i_64(deserializer);
+    var var_pending = sse_decode_i_64(deserializer);
+    var var_processing = sse_decode_i_64(deserializer);
+    var var_completed = sse_decode_i_64(deserializer);
+    var var_failed = sse_decode_i_64(deserializer);
+    var var_unsupported = sse_decode_i_64(deserializer);
+    var var_localLibraries = sse_decode_i_64(deserializer);
+    var var_enabledLibraries = sse_decode_i_64(deserializer);
+    return MediaOverviewDto(
+      total: var_total,
+      disabled: var_disabled,
+      pending: var_pending,
+      processing: var_processing,
+      completed: var_completed,
+      failed: var_failed,
+      unsupported: var_unsupported,
+      localLibraries: var_localLibraries,
+      enabledLibraries: var_enabledLibraries,
     );
   }
 
@@ -11130,18 +11090,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_list_media_resource_dto(
-    List<MediaResourceDto> self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    for (final item in self) {
-      sse_encode_media_resource_dto(item, serializer);
-    }
-  }
-
-  @protected
   void sse_encode_list_named_facet_form_entry_frb_dto(
     List<NamedFacetFormEntryFrbDto> self,
     SseSerializer serializer,
@@ -11348,23 +11296,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_media_page_dto(MediaPageDto self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_list_media_resource_dto(self.items, serializer);
-    sse_encode_i_64(self.total, serializer);
-  }
-
-  @protected
-  void sse_encode_media_resource_dto(
-    MediaResourceDto self,
+  void sse_encode_media_overview_dto(
+    MediaOverviewDto self,
     SseSerializer serializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_comic_dto(self.comic, serializer);
-    sse_encode_String(self.libraryName, serializer);
-    sse_encode_String(self.state, serializer);
-    sse_encode_opt_String(self.error, serializer);
-    sse_encode_opt_box_autoadd_i_64(self.lastSuccessAt, serializer);
+    sse_encode_i_64(self.total, serializer);
+    sse_encode_i_64(self.disabled, serializer);
+    sse_encode_i_64(self.pending, serializer);
+    sse_encode_i_64(self.processing, serializer);
+    sse_encode_i_64(self.completed, serializer);
+    sse_encode_i_64(self.failed, serializer);
+    sse_encode_i_64(self.unsupported, serializer);
+    sse_encode_i_64(self.localLibraries, serializer);
+    sse_encode_i_64(self.enabledLibraries, serializer);
   }
 
   @protected

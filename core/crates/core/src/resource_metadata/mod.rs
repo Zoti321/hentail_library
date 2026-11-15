@@ -17,7 +17,7 @@ pub use executor::process_next;
 pub use local::read_sevenz_metadata;
 pub use pdf::read_pdf_metadata;
 pub use protocol::{MetadataSnapshot, MetadataWriteIntent, EXTENSION_NAMESPACE, EXTENSION_VERSION};
-pub use query::{query_media, MediaPage, MediaResource};
+pub use query::{query_media_overview, MediaOverview};
 pub(crate) use store::reschedule_in;
 pub(crate) use store::{capture_affected_in, record_affected_in};
 pub(crate) use store::{capture_before_in, record_change_in};

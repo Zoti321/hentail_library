@@ -1355,15 +1355,7 @@
   "authorDetailInvalidUrl": "请输入以 http:// 或 https:// 开头的链接",
   "authorDetailOpenLinkFailed": "无法打开链接",
   "mediaTitle": "媒体",
-  "mediaSubtitle": "漫画资源元数据与自动文件写入",
-  "mediaAllLibraries": "所有本地库",
-  "mediaAllStates": "全部文件写入状态",
-  "mediaEmpty": "没有符合条件的漫画资源",
-  "mediaMetadata": "资源元数据",
-  "mediaEdit": "编辑元数据",
-  "mediaResource": "资源",
-  "mediaLastSuccess": "最近成功写入",
-  "mediaNeverWritten": "尚未成功写入",
+  "mediaSubtitle": "查看本地漫画资源的元数据写入概况。",
   "writebackTitle": "自动将元数据写入原文件",
   "writebackDescription": "将应用内元数据写入原始漫画资源。开启后自动处理已有漫画；压缩包可能重写，其他软件可以读取这些信息。失败会自动重试。",
   "writebackConfirmTitle": "允许修改原始资源？",
@@ -1375,6 +1367,37 @@
   "writebackFailed": "失败",
   "writebackUnsupported": "当前版本不支持",
   "writebackFailure": "文件元数据写入设置保存失败",
-  "mediaPrevious": "上一页",
-  "mediaNext": "下一页"
+  "mediaResourceTotal": "漫画资源",
+  "mediaLocalScope": "来自 {count} 个本地库",
+  "mediaWritten": "已写入原文件",
+  "mediaWrittenCaption": "当前元数据已保存到原始资源",
+  "mediaNotEnabled": "未开启自动写入",
+  "mediaNotEnabledCaption": "所属库尚未开启自动写入的资源",
+  "mediaWritingOverview": "自动写入概况",
+  "mediaEnabledScope": "已在 {enabled} / {total} 个本地库开启",
+  "mediaPendingCaption": "等待自动写入",
+  "mediaProcessingCaption": "正在将元数据写入原始资源",
+  "mediaFailedCaption": "应用运行期间会自动重试",
+  "mediaUnsupportedCaption": "当前版本无法写入的资源",
+  "mediaLibrarySettings": "各库写入设置",
+  "mediaAutomaticInfo": "默认关闭。开启后也会将已有元数据写入原始资源；写入与失败重试在应用运行期间自动进行。",
+  "mediaNoLocalLibraries": "添加本地库后，可开启文件元数据自动写入。",
+  "mediaRefreshFailed": "概况更新失败，当前显示上次获取的统计。",
+  "@mediaLocalScope": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@mediaEnabledScope": {
+    "placeholders": {
+      "enabled": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  }
 }

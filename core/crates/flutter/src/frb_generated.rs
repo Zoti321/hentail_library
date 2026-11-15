@@ -40,7 +40,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.13.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -472401856;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1726611550;
 
 // Section: executor
 
@@ -2956,7 +2956,7 @@ fn wire__crate__api__comic_trash__purge_comics_frb_impl(
         },
     )
 }
-fn wire__crate__api__resource_metadata__query_media_resources_impl(
+fn wire__crate__api__resource_metadata__query_media_overview_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -2964,7 +2964,7 @@ fn wire__crate__api__resource_metadata__query_media_resources_impl(
 ) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
         flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "query_media_resources",
+            debug_name: "query_media_overview",
             port: Some(port_),
             mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
         },
@@ -2978,23 +2978,14 @@ fn wire__crate__api__resource_metadata__query_media_resources_impl(
             };
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_library_id = <Option<String>>::sse_decode(&mut deserializer);
-            let api_state = <Option<String>>::sse_decode(&mut deserializer);
             let api_show_r18 = <bool>::sse_decode(&mut deserializer);
-            let api_offset = <i64>::sse_decode(&mut deserializer);
-            let api_limit = <i64>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, crate::api::init::HentaiErrorDto>(
                     (move || async move {
-                        let output_ok = crate::api::resource_metadata::query_media_resources(
-                            api_library_id,
-                            api_state,
-                            api_show_r18,
-                            api_offset,
-                            api_limit,
-                        )
-                        .await?;
+                        let output_ok =
+                            crate::api::resource_metadata::query_media_overview(api_show_r18)
+                                .await?;
                         std::result::Result::Ok(output_ok)
                     })()
                     .await,
@@ -6276,18 +6267,6 @@ impl SseDecode for Vec<crate::api::library::LibrarySidebarPlacementDto> {
     }
 }
 
-impl SseDecode for Vec<crate::api::resource_metadata::MediaResourceDto> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut len_ = <i32>::sse_decode(deserializer);
-        let mut ans_ = Vec::with_capacity(len_ as usize);
-        for idx_ in 0..len_ {
-            ans_.push(<crate::api::resource_metadata::MediaResourceDto>::sse_decode(deserializer));
-        }
-        return ans_;
-    }
-}
-
 impl SseDecode for Vec<crate::api::named_facet::types::NamedFacetFormEntryFrbDto> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -6502,33 +6481,28 @@ impl SseDecode for crate::api::metadata_backup::MatchTierDto {
     }
 }
 
-impl SseDecode for crate::api::resource_metadata::MediaPageDto {
+impl SseDecode for crate::api::resource_metadata::MediaOverviewDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_items =
-            <Vec<crate::api::resource_metadata::MediaResourceDto>>::sse_decode(deserializer);
         let mut var_total = <i64>::sse_decode(deserializer);
-        return crate::api::resource_metadata::MediaPageDto {
-            items: var_items,
+        let mut var_disabled = <i64>::sse_decode(deserializer);
+        let mut var_pending = <i64>::sse_decode(deserializer);
+        let mut var_processing = <i64>::sse_decode(deserializer);
+        let mut var_completed = <i64>::sse_decode(deserializer);
+        let mut var_failed = <i64>::sse_decode(deserializer);
+        let mut var_unsupported = <i64>::sse_decode(deserializer);
+        let mut var_localLibraries = <i64>::sse_decode(deserializer);
+        let mut var_enabledLibraries = <i64>::sse_decode(deserializer);
+        return crate::api::resource_metadata::MediaOverviewDto {
             total: var_total,
-        };
-    }
-}
-
-impl SseDecode for crate::api::resource_metadata::MediaResourceDto {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_comic = <crate::api::comic::ComicDto>::sse_decode(deserializer);
-        let mut var_libraryName = <String>::sse_decode(deserializer);
-        let mut var_state = <String>::sse_decode(deserializer);
-        let mut var_error = <Option<String>>::sse_decode(deserializer);
-        let mut var_lastSuccessAt = <Option<i64>>::sse_decode(deserializer);
-        return crate::api::resource_metadata::MediaResourceDto {
-            comic: var_comic,
-            library_name: var_libraryName,
-            state: var_state,
-            error: var_error,
-            last_success_at: var_lastSuccessAt,
+            disabled: var_disabled,
+            pending: var_pending,
+            processing: var_processing,
+            completed: var_completed,
+            failed: var_failed,
+            unsupported: var_unsupported,
+            local_libraries: var_localLibraries,
+            enabled_libraries: var_enabledLibraries,
         };
     }
 }
@@ -7982,7 +7956,7 @@ fn pde_ffi_dispatcher_primary_impl(
         80 => {
             wire__crate__api__comic_trash__purge_comics_frb_impl(port, ptr, rust_vec_len, data_len)
         }
-        81 => wire__crate__api__resource_metadata__query_media_resources_impl(
+        81 => wire__crate__api__resource_metadata__query_media_overview_impl(
             port,
             ptr,
             rust_vec_len,
@@ -9258,47 +9232,30 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::metadata_backup::MatchTierDto
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::resource_metadata::MediaPageDto {
+impl flutter_rust_bridge::IntoDart for crate::api::resource_metadata::MediaOverviewDto {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
-            self.items.into_into_dart().into_dart(),
             self.total.into_into_dart().into_dart(),
+            self.disabled.into_into_dart().into_dart(),
+            self.pending.into_into_dart().into_dart(),
+            self.processing.into_into_dart().into_dart(),
+            self.completed.into_into_dart().into_dart(),
+            self.failed.into_into_dart().into_dart(),
+            self.unsupported.into_into_dart().into_dart(),
+            self.local_libraries.into_into_dart().into_dart(),
+            self.enabled_libraries.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
 }
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::api::resource_metadata::MediaPageDto
+    for crate::api::resource_metadata::MediaOverviewDto
 {
 }
-impl flutter_rust_bridge::IntoIntoDart<crate::api::resource_metadata::MediaPageDto>
-    for crate::api::resource_metadata::MediaPageDto
+impl flutter_rust_bridge::IntoIntoDart<crate::api::resource_metadata::MediaOverviewDto>
+    for crate::api::resource_metadata::MediaOverviewDto
 {
-    fn into_into_dart(self) -> crate::api::resource_metadata::MediaPageDto {
-        self
-    }
-}
-// Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::resource_metadata::MediaResourceDto {
-    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        [
-            self.comic.into_into_dart().into_dart(),
-            self.library_name.into_into_dart().into_dart(),
-            self.state.into_into_dart().into_dart(),
-            self.error.into_into_dart().into_dart(),
-            self.last_success_at.into_into_dart().into_dart(),
-        ]
-        .into_dart()
-    }
-}
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::api::resource_metadata::MediaResourceDto
-{
-}
-impl flutter_rust_bridge::IntoIntoDart<crate::api::resource_metadata::MediaResourceDto>
-    for crate::api::resource_metadata::MediaResourceDto
-{
-    fn into_into_dart(self) -> crate::api::resource_metadata::MediaResourceDto {
+    fn into_into_dart(self) -> crate::api::resource_metadata::MediaOverviewDto {
         self
     }
 }
@@ -11425,16 +11382,6 @@ impl SseEncode for Vec<crate::api::library::LibrarySidebarPlacementDto> {
     }
 }
 
-impl SseEncode for Vec<crate::api::resource_metadata::MediaResourceDto> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <i32>::sse_encode(self.len() as _, serializer);
-        for item in self {
-            <crate::api::resource_metadata::MediaResourceDto>::sse_encode(item, serializer);
-        }
-    }
-}
-
 impl SseEncode for Vec<crate::api::named_facet::types::NamedFacetFormEntryFrbDto> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -11603,22 +11550,18 @@ impl SseEncode for crate::api::metadata_backup::MatchTierDto {
     }
 }
 
-impl SseEncode for crate::api::resource_metadata::MediaPageDto {
+impl SseEncode for crate::api::resource_metadata::MediaOverviewDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <Vec<crate::api::resource_metadata::MediaResourceDto>>::sse_encode(self.items, serializer);
         <i64>::sse_encode(self.total, serializer);
-    }
-}
-
-impl SseEncode for crate::api::resource_metadata::MediaResourceDto {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <crate::api::comic::ComicDto>::sse_encode(self.comic, serializer);
-        <String>::sse_encode(self.library_name, serializer);
-        <String>::sse_encode(self.state, serializer);
-        <Option<String>>::sse_encode(self.error, serializer);
-        <Option<i64>>::sse_encode(self.last_success_at, serializer);
+        <i64>::sse_encode(self.disabled, serializer);
+        <i64>::sse_encode(self.pending, serializer);
+        <i64>::sse_encode(self.processing, serializer);
+        <i64>::sse_encode(self.completed, serializer);
+        <i64>::sse_encode(self.failed, serializer);
+        <i64>::sse_encode(self.unsupported, serializer);
+        <i64>::sse_encode(self.local_libraries, serializer);
+        <i64>::sse_encode(self.enabled_libraries, serializer);
     }
 }
 

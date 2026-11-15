@@ -7,12 +7,11 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../frb_generated.dart';
-import 'comic.dart';
 import 'init.dart';
 
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `fmt`, `fmt`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `fmt`
 
 Future<bool> getResourceMetadataEnabled({required String libraryId}) => RustLib
     .instance
@@ -30,69 +29,58 @@ Future<void> setResourceMetadataEnabled({
 Future<bool> processResourceMetadataTick() =>
     RustLib.instance.api.crateApiResourceMetadataProcessResourceMetadataTick();
 
-Future<MediaPageDto> queryMediaResources({
-  String? libraryId,
-  String? state,
-  required bool showR18,
-  required PlatformInt64 offset,
-  required PlatformInt64 limit,
-}) => RustLib.instance.api.crateApiResourceMetadataQueryMediaResources(
-  libraryId: libraryId,
-  state: state,
-  showR18: showR18,
-  offset: offset,
-  limit: limit,
-);
+Future<MediaOverviewDto> queryMediaOverview({required bool showR18}) => RustLib
+    .instance
+    .api
+    .crateApiResourceMetadataQueryMediaOverview(showR18: showR18);
 
-class MediaPageDto {
-  final List<MediaResourceDto> items;
+class MediaOverviewDto {
   final PlatformInt64 total;
+  final PlatformInt64 disabled;
+  final PlatformInt64 pending;
+  final PlatformInt64 processing;
+  final PlatformInt64 completed;
+  final PlatformInt64 failed;
+  final PlatformInt64 unsupported;
+  final PlatformInt64 localLibraries;
+  final PlatformInt64 enabledLibraries;
 
-  const MediaPageDto({required this.items, required this.total});
-
-  @override
-  int get hashCode => items.hashCode ^ total.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is MediaPageDto &&
-          runtimeType == other.runtimeType &&
-          items == other.items &&
-          total == other.total;
-}
-
-class MediaResourceDto {
-  final ComicDto comic;
-  final String libraryName;
-  final String state;
-  final String? error;
-  final PlatformInt64? lastSuccessAt;
-
-  const MediaResourceDto({
-    required this.comic,
-    required this.libraryName,
-    required this.state,
-    this.error,
-    this.lastSuccessAt,
+  const MediaOverviewDto({
+    required this.total,
+    required this.disabled,
+    required this.pending,
+    required this.processing,
+    required this.completed,
+    required this.failed,
+    required this.unsupported,
+    required this.localLibraries,
+    required this.enabledLibraries,
   });
 
   @override
   int get hashCode =>
-      comic.hashCode ^
-      libraryName.hashCode ^
-      state.hashCode ^
-      error.hashCode ^
-      lastSuccessAt.hashCode;
+      total.hashCode ^
+      disabled.hashCode ^
+      pending.hashCode ^
+      processing.hashCode ^
+      completed.hashCode ^
+      failed.hashCode ^
+      unsupported.hashCode ^
+      localLibraries.hashCode ^
+      enabledLibraries.hashCode;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is MediaResourceDto &&
+      other is MediaOverviewDto &&
           runtimeType == other.runtimeType &&
-          comic == other.comic &&
-          libraryName == other.libraryName &&
-          state == other.state &&
-          error == other.error &&
-          lastSuccessAt == other.lastSuccessAt;
+          total == other.total &&
+          disabled == other.disabled &&
+          pending == other.pending &&
+          processing == other.processing &&
+          completed == other.completed &&
+          failed == other.failed &&
+          unsupported == other.unsupported &&
+          localLibraries == other.localLibraries &&
+          enabledLibraries == other.enabledLibraries;
 }

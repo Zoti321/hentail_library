@@ -397,9 +397,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   dco_decode_list_library_sidebar_placement_dto(dynamic raw);
 
   @protected
-  List<MediaResourceDto> dco_decode_list_media_resource_dto(dynamic raw);
-
-  @protected
   List<NamedFacetFormEntryFrbDto>
   dco_decode_list_named_facet_form_entry_frb_dto(dynamic raw);
 
@@ -462,10 +459,7 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   MatchTierDto dco_decode_match_tier_dto(dynamic raw);
 
   @protected
-  MediaPageDto dco_decode_media_page_dto(dynamic raw);
-
-  @protected
-  MediaResourceDto dco_decode_media_resource_dto(dynamic raw);
+  MediaOverviewDto dco_decode_media_overview_dto(dynamic raw);
 
   @protected
   MetadataBackupManifestDto dco_decode_metadata_backup_manifest_dto(
@@ -1191,11 +1185,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   sse_decode_list_library_sidebar_placement_dto(SseDeserializer deserializer);
 
   @protected
-  List<MediaResourceDto> sse_decode_list_media_resource_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
   List<NamedFacetFormEntryFrbDto>
   sse_decode_list_named_facet_form_entry_frb_dto(SseDeserializer deserializer);
 
@@ -1272,10 +1261,7 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   MatchTierDto sse_decode_match_tier_dto(SseDeserializer deserializer);
 
   @protected
-  MediaPageDto sse_decode_media_page_dto(SseDeserializer deserializer);
-
-  @protected
-  MediaResourceDto sse_decode_media_resource_dto(SseDeserializer deserializer);
+  MediaOverviewDto sse_decode_media_overview_dto(SseDeserializer deserializer);
 
   @protected
   MetadataBackupManifestDto sse_decode_metadata_backup_manifest_dto(
@@ -2179,12 +2165,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  void sse_encode_list_media_resource_dto(
-    List<MediaResourceDto> self,
-    SseSerializer serializer,
-  );
-
-  @protected
   void sse_encode_list_named_facet_form_entry_frb_dto(
     List<NamedFacetFormEntryFrbDto> self,
     SseSerializer serializer,
@@ -2287,11 +2267,8 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_match_tier_dto(MatchTierDto self, SseSerializer serializer);
 
   @protected
-  void sse_encode_media_page_dto(MediaPageDto self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_media_resource_dto(
-    MediaResourceDto self,
+  void sse_encode_media_overview_dto(
+    MediaOverviewDto self,
     SseSerializer serializer,
   );
 

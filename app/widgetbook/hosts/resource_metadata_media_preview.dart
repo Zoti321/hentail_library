@@ -4,7 +4,10 @@ import 'package:hentai_library/features/media/public/widgets.dart';
 import 'package:hentai_library/features/resource_metadata/public/contracts.dart';
 import 'package:hentai_library/features/resource_metadata/public/providers.dart';
 import 'package:hentai_library/features/library_admin/public/providers.dart';
+import 'package:hentai_library/features/library_admin/public/contracts.dart';
 import 'package:hentai_library/features/app_settings/public.dart';
+
+import '../preview/md3e_library_edit_preview_data.dart';
 
 class ResourceMetadataMediaPreview extends StatelessWidget {
   const ResourceMetadataMediaPreview({super.key});
@@ -15,13 +18,33 @@ class ResourceMetadataMediaPreview extends StatelessWidget {
       librariesProvider.overrideWith(_PreviewLibraries.new),
       settingsProvider.overrideWith(_PreviewSettings.new),
     ],
-    child: MediaPage(onEdit: (context, ref, id) async {}),
+    child: const MediaPage(),
   );
 }
 
 class _PreviewLibraries extends LibrariesNotifier {
   @override
-  Future<LibrariesState> build() async => const LibrariesState(libraries: []);
+  Future<LibrariesState> build() async {
+    final library = LibraryEditPreviewData.sampleLocalLibrary;
+    return LibrariesState(
+      libraries: [
+        library,
+        (
+          libraryId: 'local-2',
+          kind: 'local',
+          rootPath: '/Comics',
+          name: '本地漫画库',
+          enabledResourceFormatCategories: ResourceFormatCategory.all,
+          username: '',
+          allowHttp: false,
+          scanOnStartup: false,
+          scanInterval: ScanInterval.disabled,
+          pinned: false,
+          sidebarOrder: 1,
+        ),
+      ],
+    );
+  }
 }
 
 class _PreviewSettings extends SettingsNotifier {
@@ -30,50 +53,25 @@ class _PreviewSettings extends SettingsNotifier {
 }
 
 class _PreviewGateway implements WritebackGateway {
+  final Map<String, bool> _enabled = {'lab-local-1': true};
   @override
-  Future<bool> isEnabled(String libraryId) async => true;
+  Future<bool> isEnabled(String libraryId) async =>
+      _enabled[libraryId] ?? false;
   @override
-  Future<void> setEnabled(String libraryId, bool enabled) async {}
+  Future<void> setEnabled(String libraryId, bool enabled) async =>
+      _enabled[libraryId] = enabled;
   @override
   Future<bool> processNext() async => false;
   @override
-  Future<MediaResult> query({
-    String? libraryId,
-    String? state,
-    required bool showR18,
-    required int offset,
-  }) async {
-    final items =
-        [
-              'disabled',
-              'pending',
-              'processing',
-              'completed',
-              'failed',
-              'unsupported',
-            ]
-            .where((value) => state == null || state == value)
-            .map(
-              (value) => (
-                comicId: value,
-                libraryId: 'local',
-                libraryName: 'Local library',
-                path: '/Comics/$value.cbz',
-                title: '漫画资源 · $value',
-                format: 'cbz',
-                state: value,
-                error: value == 'failed' ? 'Resource is read-only' : null,
-                lastSuccessAt: value == 'completed'
-                    ? DateTime.utc(2026, 11, 15)
-                    : null,
-                metadata: <String, String>{
-                  'title': '漫画资源',
-                  'authors': 'Author',
-                  'languages': 'Japanese',
-                },
-              ),
-            )
-            .toList();
-    return (items: items, total: items.length);
-  }
+  Future<MediaOverview> overview({required bool showR18}) async => (
+    total: 1280,
+    disabled: 320,
+    pending: 104,
+    processing: 1,
+    completed: 842,
+    failed: 5,
+    unsupported: 8,
+    localLibraries: 2,
+    enabledLibraries: _enabled.values.where((enabled) => enabled).length,
+  );
 }
