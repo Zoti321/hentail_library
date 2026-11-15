@@ -118,7 +118,7 @@ fn hash_file(
     Ok(Some(hasher.finalize().into()))
 }
 
-fn content_digest(
+pub(crate) fn content_digest(
     access: &dyn ResourceAccess,
     item: &ScanItem,
     handle: &SyncHandle,

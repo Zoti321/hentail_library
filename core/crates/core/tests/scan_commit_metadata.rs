@@ -27,6 +27,7 @@ fn resource_comic(path: &str, title: &str) -> ComicDto {
         authors: vec!["Source author".into()],
         description: Some("Source summary".into()),
         published_at: None,
+        metadata: None,
     })
 }
 

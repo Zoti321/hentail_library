@@ -25,6 +25,7 @@ pub mod probe;
 pub mod reader;
 pub mod reading_activity;
 pub mod resource;
+pub mod resource_metadata;
 pub mod revision;
 pub mod runtime;
 pub mod series;

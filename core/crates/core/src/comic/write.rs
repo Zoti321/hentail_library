@@ -131,6 +131,7 @@ pub(crate) async fn update_comic_user_meta_in<C: ConnectionTrait>(
             "Language accepts at most one value",
         ));
     }
+    let writeback_before = crate::resource_metadata::capture_before_in(db, comic_id).await?;
     let auto_locks = ComicAutoLocks::from_written(|field| meta.is_written(field));
     let mut meta_touched = false;
     if auto_locks.any() {
@@ -187,6 +188,7 @@ pub(crate) async fn update_comic_user_meta_in<C: ConnectionTrait>(
     }
     if meta_touched {
         touch_comic(db, comic_id).await?;
+        crate::resource_metadata::record_change_in(db, comic_id, writeback_before).await?;
     }
     Ok(())
 }

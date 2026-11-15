@@ -2,8 +2,6 @@ use std::io::{BufReader, Read};
 use std::path::{Path, PathBuf};
 use std::time::{Duration, UNIX_EPOCH};
 
-use quick_xml::events::Event;
-use quick_xml::Reader;
 use zip::ZipArchive;
 
 use crate::comic::now_ms;
@@ -31,6 +29,7 @@ pub struct ParsedResource {
     pub description: Option<String>,
     pub published_at: Option<i64>,
     pub resource_size: i64,
+    pub metadata: Option<crate::resource_metadata::MetadataSnapshot>,
 }
 
 pub fn comic_id_for_path(path: &str) -> String {
@@ -63,6 +62,7 @@ fn finalize_parsed_with(
         description,
         published_at,
         resource_size,
+        metadata: None,
     }))
 }
 
@@ -81,11 +81,26 @@ pub fn parse_directory_with(
         return Ok(None);
     }
     let mut files = Vec::new();
+    let mut metadata = None;
     for entry in access.list(location)? {
         if entry.kind == ResourceKind::Dir {
             return Ok(None);
         }
         if entry.kind == ResourceKind::File {
+            if entry.name.eq_ignore_ascii_case("ComicInfo.xml") {
+                if metadata.is_some() {
+                    return Err(HentaiError::validation(
+                        "Conflicting directory ComicInfo files",
+                    ));
+                }
+                let mut xml = String::new();
+                access
+                    .open_stream(&entry.location)?
+                    .read_to_string(&mut xml)
+                    .map_err(|err| HentaiError::validation(err.to_string()))?;
+                metadata = Some(parse_comic_info_xml(&xml));
+                continue;
+            }
             files.push(entry);
         }
     }
@@ -98,7 +113,7 @@ pub fn parse_directory_with(
     {
         return Ok(None);
     }
-    finalize_parsed_with(
+    let mut parsed = finalize_parsed_with(
         access,
         location,
         "dir",
@@ -107,7 +122,19 @@ pub fn parse_directory_with(
         files.len() as i32,
         None,
         None,
-    )
+    )?;
+    if let Some(parsed) = &mut parsed {
+        if let Some(meta) = metadata {
+            if !meta.title.trim().is_empty() {
+                parsed.title = meta.title.clone();
+            }
+            parsed.authors = meta.authors.clone();
+            parsed.description = meta.description.clone();
+            parsed.published_at = meta.published_at;
+            parsed.metadata = Some(meta);
+        }
+    }
+    Ok(parsed)
 }
 
 pub fn parse_zip_archive(
@@ -129,6 +156,8 @@ pub fn parse_zip_archive_with(
     };
     let mut page_count = 0i32;
     let mut comic_info_xml: Option<String> = None;
+    let mut root_info = None;
+    let mut nested_count = 0;
     for i in 0..archive.len() {
         let mut entry = match archive.by_index(i) {
             Ok(entry) => entry,
@@ -141,7 +170,12 @@ pub fn parse_zip_archive_with(
         if is_comic_info_entry(&name) {
             let mut buf = String::new();
             if entry.read_to_string(&mut buf).is_ok() {
-                comic_info_xml = Some(buf);
+                if name.contains('/') {
+                    nested_count += 1;
+                    comic_info_xml = Some(buf);
+                } else if root_info.replace(buf).is_some() {
+                    return Err(HentaiError::validation("Conflicting root ComicInfo files"));
+                }
             }
             continue;
         }
@@ -154,25 +188,35 @@ pub fn parse_zip_archive_with(
             page_count += 1;
         }
     }
-    let meta = comic_info_xml
+    if root_info.is_none() && nested_count > 1 {
+        return Err(HentaiError::validation(
+            "Conflicting nested ComicInfo files",
+        ));
+    }
+    let meta = root_info
+        .or(comic_info_xml)
         .as_deref()
         .map(parse_comic_info_xml)
         .unwrap_or_default();
     let title = if meta.title.trim().is_empty() {
         basename_without_extension(Path::new(location))
     } else {
-        meta.title
+        meta.title.clone()
     };
-    finalize_parsed_with(
+    let mut parsed = finalize_parsed_with(
         access,
         location,
         resource_type,
         title,
-        meta.authors,
+        meta.authors.clone(),
         page_count,
-        meta.description,
+        meta.description.clone(),
         meta.published_at,
-    )
+    )?;
+    if let Some(parsed) = &mut parsed {
+        parsed.metadata = Some(meta);
+    }
+    Ok(parsed)
 }
 
 fn is_comic_info_entry(name: &str) -> bool {
@@ -181,71 +225,8 @@ fn is_comic_info_entry(name: &str) -> bool {
         .is_some_and(|base| base.eq_ignore_ascii_case("ComicInfo.xml"))
 }
 
-#[derive(Debug, Default)]
-struct ComicInfoMetadata {
-    title: String,
-    authors: Vec<String>,
-    description: Option<String>,
-    published_at: Option<i64>,
-    year: Option<i32>,
-    month: Option<u32>,
-    day: Option<u32>,
-}
-
-fn parse_comic_info_xml(xml: &str) -> ComicInfoMetadata {
-    let mut reader = Reader::from_str(xml);
-    reader.config_mut().trim_text(true);
-    let mut buf = Vec::new();
-    let mut meta = ComicInfoMetadata::default();
-    let mut current_field: Option<&'static str> = None;
-
-    loop {
-        match reader.read_event_into(&mut buf) {
-            Ok(Event::Start(e)) => {
-                let local = String::from_utf8_lossy(e.local_name().as_ref()).into_owned();
-                current_field = match local.as_str() {
-                    "Title" => Some("title"),
-                    "Writer" | "Penciller" | "Colorist" | "Letterer" | "CoverArtist" => {
-                        Some("author")
-                    }
-                    "Summary" => Some("summary"),
-                    "Year" => Some("year"),
-                    "Month" => Some("month"),
-                    "Day" => Some("day"),
-                    _ => None,
-                };
-            }
-            Ok(Event::Text(e)) => {
-                let text = e
-                    .unescape()
-                    .map(|s| s.into_owned())
-                    .unwrap_or_default()
-                    .trim()
-                    .to_string();
-                if text.is_empty() {
-                    buf.clear();
-                    continue;
-                }
-                match current_field {
-                    Some("title") => meta.title = text,
-                    Some("author") => extend_authors(&mut meta.authors, &text),
-                    Some("summary") => meta.description = Some(text),
-                    Some("year") => meta.year = text.parse().ok(),
-                    Some("month") => meta.month = text.parse().ok(),
-                    Some("day") => meta.day = text.parse().ok(),
-                    _ => {}
-                }
-            }
-            Ok(Event::End(_)) => current_field = None,
-            Ok(Event::Eof) => break,
-            Err(_) => break,
-            _ => {}
-        }
-        buf.clear();
-    }
-
-    meta.published_at = comic_info_date_to_ms(meta.year, meta.month, meta.day);
-    meta
+fn parse_comic_info_xml(xml: &str) -> crate::resource_metadata::MetadataSnapshot {
+    crate::resource_metadata::read_comic_info(xml).unwrap_or_default()
 }
 
 fn extend_authors(authors: &mut Vec<String>, raw: &str) {
@@ -258,13 +239,6 @@ fn extend_authors(authors: &mut Vec<String>, raw: &str) {
             authors.push(name.to_string());
         }
     }
-}
-
-fn comic_info_date_to_ms(year: Option<i32>, month: Option<u32>, day: Option<u32>) -> Option<i64> {
-    let year = year?;
-    let month = month?;
-    let day = day?;
-    date_to_utc_ms(year, month, day, 0, 0, 0)
 }
 
 pub fn parse_file(file: &Path) -> Result<Option<ParsedResource>, HentaiError> {
@@ -333,7 +307,7 @@ fn parse_image_archive_with(
     let Some(page_count) = parse_path_bound_with(access, location, count_pages)? else {
         return Ok(None);
     };
-    finalize_parsed_with(
+    let mut parsed = finalize_parsed_with(
         access,
         location,
         resource_type,
@@ -342,7 +316,24 @@ fn parse_image_archive_with(
         page_count,
         None,
         None,
-    )
+    )?;
+    if matches!(resource_type, "sevenz" | "cb7") {
+        let metadata = parse_path_bound_with(
+            access,
+            location,
+            crate::resource_metadata::read_sevenz_metadata,
+        )?;
+        if let (Some(parsed), Some(metadata)) = (&mut parsed, metadata) {
+            if !metadata.title.trim().is_empty() {
+                parsed.title = metadata.title.clone();
+            }
+            parsed.authors = metadata.authors.clone();
+            parsed.description = metadata.description.clone();
+            parsed.published_at = metadata.published_at;
+            parsed.metadata = Some(metadata);
+        }
+    }
+    Ok(parsed)
 }
 
 pub fn parse_rar_archive(
@@ -383,7 +374,7 @@ fn parse_pdf_with(
         };
         let (title, authors, description, published_at) =
             read_pdf_embedded_meta(file).unwrap_or((None, vec![], None, None));
-        finalize_parsed_with(
+        let mut parsed = finalize_parsed_with(
             access,
             location,
             "pdf",
@@ -392,7 +383,26 @@ fn parse_pdf_with(
             page_count,
             description,
             published_at,
-        )
+        )?;
+        if let (Some(parsed), Ok(Some(metadata))) = (
+            &mut parsed,
+            crate::resource_metadata::read_pdf_metadata(file),
+        ) {
+            if !metadata.title.is_empty() {
+                parsed.title = metadata.title.clone();
+            }
+            if !metadata.authors.is_empty() {
+                parsed.authors = metadata.authors.clone();
+            }
+            if metadata.description.is_some() {
+                parsed.description = metadata.description.clone();
+            }
+            if metadata.published_at.is_some() {
+                parsed.published_at = metadata.published_at;
+            }
+            parsed.metadata = Some(metadata);
+        }
+        Ok(parsed)
     })
 }
 
@@ -418,13 +428,14 @@ pub fn parse_epub_with(
         Err(_) => return Ok(None),
     };
     let meta = parse_opf_metadata(&opf_content);
+    let embedded = crate::resource_metadata::read_opf(&opf_content).ok();
     let page_count = count_epub_images(&mut archive)?;
     let title = if meta.title.trim().is_empty() {
         basename_without_extension(Path::new(location))
     } else {
         meta.title
     };
-    finalize_parsed_with(
+    let mut parsed = finalize_parsed_with(
         access,
         location,
         "epub",
@@ -433,7 +444,23 @@ pub fn parse_epub_with(
         page_count,
         meta.description,
         meta.published_at,
-    )
+    )?;
+    if let (Some(parsed), Some(metadata)) = (&mut parsed, embedded) {
+        if !metadata.title.is_empty() {
+            parsed.title = metadata.title.clone();
+        }
+        if !metadata.authors.is_empty() {
+            parsed.authors = metadata.authors.clone();
+        }
+        if metadata.description.is_some() {
+            parsed.description = metadata.description.clone();
+        }
+        if metadata.published_at.is_some() {
+            parsed.published_at = metadata.published_at;
+        }
+        parsed.metadata = Some(metadata);
+    }
+    Ok(parsed)
 }
 
 fn find_opf_path<R: std::io::Read + std::io::Seek>(
@@ -446,11 +473,8 @@ fn find_opf_path<R: std::io::Read + std::io::Seek>(
 }
 
 fn extract_container_opf_path(container_xml: &str) -> Option<String> {
-    let needle = "full-path=\"";
-    let start = container_xml.find(needle)? + needle.len();
-    let rest = &container_xml[start..];
-    let end = rest.find('"')?;
-    Some(rest[..end].replace('\\', "/"))
+    crate::resource_metadata::container_package_path(container_xml)
+        .map(|path| path.replace('\\', "/"))
 }
 
 fn read_zip_entry_string<R: std::io::Read + std::io::Seek>(
@@ -588,6 +612,7 @@ fn count_epub_images<R: std::io::Read + std::io::Seek>(
 
 pub fn parsed_to_comic(parsed: &ParsedResource) -> crate::comic::ComicDto {
     let now = now_ms();
+    let metadata = parsed.metadata.clone().unwrap_or_default();
     crate::comic::ComicDto {
         comic_id: comic_id_for_path(&parsed.path),
         path: parsed.path.clone(),
@@ -596,16 +621,20 @@ pub fn parsed_to_comic(parsed: &ParsedResource) -> crate::comic::ComicDto {
         created_at: now,
         last_updated_at: now,
         title: crate::util::decode_basic_html_entities(&parsed.title),
-        content_rating: "unknown".to_string(),
+        content_rating: if metadata.content_rating.is_empty() {
+            "unknown".to_owned()
+        } else {
+            metadata.content_rating
+        },
         page_count: parsed.page_count,
         description: parsed.description.clone(),
         published_at: parsed.published_at,
         last_read_time_ms: None,
         authors: crate::comic::author_refs_from_names(&parsed.authors),
-        tags: vec![],
-        languages: vec![],
-        parodies: vec![],
-        characters: vec![],
+        tags: metadata.tags,
+        languages: metadata.language.into_iter().collect(),
+        parodies: metadata.parodies,
+        characters: metadata.characters,
         locks: crate::comic::ComicMetaLocks::default(),
         library_id: String::new(),
     }
@@ -684,6 +713,7 @@ mod tests {
             description: None,
             published_at: None,
             resource_size: 1024,
+            metadata: None,
         });
         assert_eq!(comic.title, "Fate╱Stay Night Heaven's Feel - 卷04");
     }

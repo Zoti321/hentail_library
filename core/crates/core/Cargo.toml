@@ -66,6 +66,7 @@ scraper = "0.24"
 # PDF 后端跨平台共用：桌面/Android/iOS 均经 pdfium-render 运行时绑定 vendored pdfium。
 pdfium-render = "0.8"
 rusqlite = { version = "0.32", features = ["backup"] }
+lopdf = { version = "0.47.0", default-features = false, features = ["rayon"] }
 
 [dev-dependencies]
 serde_json = "1"

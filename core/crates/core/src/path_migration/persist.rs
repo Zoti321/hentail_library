@@ -20,6 +20,7 @@ use super::pairing::{ComicMigration, SeriesMigrationPair};
 /// `comic_child_tables_cover_all_comic_id_columns` 断言 schema 中任何带 `comic_id`
 /// 列的表都被覆盖，新增子表若漏登记会红灯。
 const COMIC_CHILD_TABLES: &[&str] = &[
+    "resource_metadata_jobs",
     "comic_content_fingerprints",
     "comic_tags",
     "comic_authors",
