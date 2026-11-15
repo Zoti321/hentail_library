@@ -7,7 +7,7 @@
 - `run-gate.sh`：本地、PR Gate 和 Release 共用的检查入口；子命令见 `--help`。
 - `run-rust-coverage.sh`：Nightly 与本地共用的 Rust 覆盖率报告；环境变量见 `--help`。
 - `normalize-changelog-bullets.sh`、`strip-changelog-bullets.sh`：Release 生成说明时分别提取简洁条目与非条目部分，从标准输入读取 Markdown。
-- `audit_dart_tests.py`：重复盘点 Dart 测试与 manifest 覆盖，支持 `--summary-json`、`--json`；分类仅供审计，不决定删除。
+- `audit_dart_tests.py`：盘点 Dart 测试与 manifest 覆盖，支持 `--summary-json`、`--json`、`--compile-smoke-only`；分类仅供审计，不决定删除。
 - `test_audit_dart_tests.py`：盘存工具的单元测试：`python -m unittest discover -s scripts -p test_audit_dart_tests.py`。
 
 原生依赖下载、校验和平台嵌入仍由 `core/vendor/` 的脚本维护；不在本目录复制。测试策略见 [gate.md](../docs/engineering/gate.md)，开发流程见 [贡献指南](../CONTRIBUTING.md)。

@@ -11,11 +11,26 @@ from audit_dart_tests import (
     build_inventory,
     classify_rubric,
     expand_manifest_to_test_paths,
+    is_compile_smoke,
     read_manifest_entries,
 )
 
 
 class AuditDartTestsTest(unittest.TestCase):
+    def test_compile_smoke_only_flags_symbol_existence_assertions(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp) / "exports_test.dart"
+            source.write_text(
+                "test('exports', () { expect(Foo, isNotNull); });",
+                encoding="utf-8",
+            )
+            self.assertTrue(is_compile_smoke(source))
+            source.write_text(
+                "test('behavior', () { expect(foo(), 1); });",
+                encoding="utf-8",
+            )
+            self.assertFalse(is_compile_smoke(source))
+
     def test_read_manifest_entries_strips_comments(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             manifest = Path(tmp) / "manifest.txt"

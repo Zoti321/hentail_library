@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
@@ -92,6 +93,19 @@ def classify_rubric(relative_path: str, in_manifest: bool) -> Rubric:
     return "candidate-retire"
 
 
+def is_compile_smoke(path: Path) -> bool:
+    """Flag files whose only runtime assertions check imported symbols exist."""
+    source = path.read_text(encoding="utf-8")
+    assertions = re.findall(r"\bexpect\s*\((.*?)\)", source, re.DOTALL)
+    if not assertions:
+        return False
+    return all(
+        re.fullmatch(r"\s*[A-Za-z_]\w*\s*,\s*isNotNull\s*", assertion)
+        is not None
+        for assertion in assertions
+    )
+
+
 def bucket_slow_track(relative_path: str) -> str:
     p = relative_path.replace("\\", "/")
     parts = Path(p).parts
@@ -108,6 +122,7 @@ class InventoryReport:
     manifest_covered: int
     slow_track: int
     rubric_counts: dict[str, int]
+    compile_smoke: list[str]
     slow_track_buckets: dict[str, int]
     files: list[dict[str, object]]
 
@@ -117,6 +132,7 @@ class InventoryReport:
             "manifest_covered": self.manifest_covered,
             "slow_track": self.slow_track,
             "rubric_counts": self.rubric_counts,
+            "compile_smoke": self.compile_smoke,
             "slow_track_buckets": self.slow_track_buckets,
         }
 
@@ -137,10 +153,13 @@ def build_inventory(
     rubric_counts: Counter[str] = Counter()
     file_rows: list[dict[str, object]] = []
     slow_buckets: Counter[str] = Counter()
+    compile_smoke: list[str] = []
 
     for path in all_tests:
         in_manifest = path in covered
         rubric = classify_rubric(path, in_manifest)
+        if is_compile_smoke(app_root / path):
+            compile_smoke.append(path)
         rubric_counts[rubric] += 1
         tier = "gate-fast" if in_manifest else "slow-track"
         row = {
@@ -158,6 +177,7 @@ def build_inventory(
         manifest_covered=len(covered),
         slow_track=len(slow),
         rubric_counts=dict(sorted(rubric_counts.items())),
+        compile_smoke=compile_smoke,
         slow_track_buckets=dict(slow_buckets.most_common()),
         files=file_rows,
     )
@@ -202,9 +222,18 @@ def main() -> None:
         action="store_true",
         help="With --rubric, only slow-track paths",
     )
+    parser.add_argument(
+        "--compile-smoke-only",
+        action="store_true",
+        help="List tests whose only runtime assertions check imported symbols",
+    )
     args = parser.parse_args()
 
     report = build_inventory()
+
+    if args.compile_smoke_only:
+        print("\n".join(report.compile_smoke))
+        return
 
     if args.rubric:
         for row in report.files:
