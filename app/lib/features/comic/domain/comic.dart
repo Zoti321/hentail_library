@@ -32,7 +32,7 @@ abstract class Comic with _$Comic {
     @Default(ContentRating.unknown) ContentRating contentRating,
     @Default(<Tag>[]) List<Tag> tags,
 
-    /// Ordered canonical English Language names; empty = unset.
+    /// Optional Language encoded as a zero-or-one list for wire compatibility.
     @Default(<String>[]) List<String> languages,
 
     /// Parody (IP / franchise) names; empty = none.
@@ -84,7 +84,7 @@ abstract class Comic with _$Comic {
       authors: authors,
       contentRating: contentRating,
       tags: tags,
-      languages: languages,
+      languages: normalizeSingleLanguage(languages),
       parodies: parodies,
       characters: characters,
       description: description,
@@ -133,7 +133,7 @@ abstract class Comic with _$Comic {
       contentRating: contentRating,
       authors: List<AuthorRef>.unmodifiable(authors),
       tags: List<Tag>.unmodifiable(tags),
-      languages: normalizeOrderedFacetNames(languages),
+      languages: normalizeSingleLanguage(languages),
       parodies: normalizeOrderedFacetNames(parodies),
       characters: normalizeOrderedFacetNames(characters),
       lastReadTime: lastReadTime,

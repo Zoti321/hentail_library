@@ -80,7 +80,7 @@ fn update_comic_user_meta_persists_languages_and_auto_locks() {
             update_comic_user_meta(
                 "c1",
                 UpdateComicUserMetaDto {
-                    languages: Some(vec!["Chinese".to_string(), "Japanese".to_string()]),
+                    languages: Some(vec!["Chinese".to_string()]),
                     ..Default::default()
                 },
             )
@@ -88,10 +88,7 @@ fn update_comic_user_meta_persists_languages_and_auto_locks() {
             .expect("update");
 
             let comic = find_comic_by_id("c1").await.expect("find").expect("exists");
-            assert_eq!(
-                comic.languages,
-                vec!["Chinese".to_string(), "Japanese".to_string()]
-            );
+            assert_eq!(comic.languages, vec!["Chinese".to_string()]);
             assert!(comic.locks.languages);
             assert!(!comic.locks.title);
 

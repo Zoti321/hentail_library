@@ -408,7 +408,7 @@ async fn apply_comic_record(
             published_at: Some(record.meta.published_at.unwrap_or(-1)),
             authors: Some(record.authors.clone()),
             tags: Some(record.tags.clone()),
-            languages: Some(record.meta.languages.clone()),
+            languages: Some(crate::comic::single_language(&record.meta.languages)),
             parodies: Some(record.parodies.clone()),
             characters: Some(record.characters.clone()),
         },

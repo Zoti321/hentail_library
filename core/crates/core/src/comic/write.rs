@@ -5,7 +5,7 @@ use crate::comic::dto::{now_ms, serialize_languages};
 use crate::db::{connection, map_db_err};
 use crate::entity::{comic_meta, comics};
 use crate::error::HentaiError;
-use crate::metadata_lock::{normalize_names, ComicAutoLocks, ComicMetaField};
+use crate::metadata_lock::{ComicAutoLocks, ComicMetaField};
 use crate::named_facet::{replace_comic_named_facet, JunctionNamedFacet};
 use crate::util::{compute_sort_key, decode_basic_html_entities};
 
@@ -122,6 +122,15 @@ pub(crate) async fn update_comic_user_meta_in<C: ConnectionTrait>(
     meta: UpdateComicUserMetaDto,
 ) -> Result<(), HentaiError> {
     // A written field is auto-locked; the field table decides which fields and locks exist.
+    if meta
+        .languages
+        .as_ref()
+        .is_some_and(|values| values.len() > 1)
+    {
+        return Err(HentaiError::validation(
+            "Language accepts at most one value",
+        ));
+    }
     let auto_locks = ComicAutoLocks::from_written(|field| meta.is_written(field));
     let mut meta_touched = false;
     if auto_locks.any() {
@@ -152,7 +161,7 @@ pub(crate) async fn update_comic_user_meta_in<C: ConnectionTrait>(
             });
         }
         if let Some(languages) = meta.languages {
-            active.languages = Set(serialize_languages(&normalize_names(&languages)));
+            active.languages = Set(serialize_languages(&languages));
         }
         for field in auto_locks.written() {
             apply_comic_lock(&mut active, field, true);

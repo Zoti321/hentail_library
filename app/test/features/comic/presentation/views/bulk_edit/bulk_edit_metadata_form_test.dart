@@ -42,6 +42,31 @@ Future<void> _pumpForm(WidgetTester tester, List<String> ids) async {
 }
 
 void main() {
+  for (final clear in [false, true]) {
+    testWidgets('language selection submits replace with clear=$clear', (
+      tester,
+    ) async {
+      final h = await _openEditor(tester);
+      final japanese = find.text(h.l10n.comicLanguageJapanese).first;
+      await tester.ensureVisible(japanese);
+      await tester.tap(japanese);
+      await tester.pumpAndSettle();
+      final chinese = find.text(h.l10n.comicLanguageChinese).first;
+      await tester.tap(chinese);
+      await tester.pumpAndSettle();
+      if (clear) {
+        await tester.tap(chinese);
+        await tester.pumpAndSettle();
+      }
+      await _save(tester, h.l10n);
+      await _save(tester, h.l10n);
+      expect(h.results, hasLength(1));
+      final language = h.results.single!.languages!;
+      expect(language.op, ComicMetadataBulkMultiValueOp.replace);
+      expect(language.values, clear ? <String>[] : <String>['Chinese']);
+    });
+  }
+
   testWidgets(
     'missing and invalid replacements stay visible and block confirmation until corrected',
     (tester) async {

@@ -19,6 +19,10 @@ List<String> normalizeOrderedFacetNames(Iterable<String> source) {
   return out;
 }
 
+List<String> normalizeSingleLanguage(Iterable<String> source) {
+  return normalizeOrderedFacetNames(source.take(1));
+}
+
 bool sameOrderedFacetNames(Iterable<String> a, Iterable<String> b) {
   final List<String> left = a.toList();
   final List<String> right = b.toList();

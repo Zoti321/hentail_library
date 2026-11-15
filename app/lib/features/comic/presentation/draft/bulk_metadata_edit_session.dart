@@ -1,6 +1,7 @@
 import 'package:hentai_library/features/comic/domain/value_objects/content_rating.dart';
 import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
+import 'package:hentai_library/features/comic/domain/comic_metadata_normalization.dart';
 
 enum BulkMetadataEditFieldKind {
   description,
@@ -134,8 +135,8 @@ class BulkMetadataEditSession {
           : null,
       languages: dirtyFields.contains(BulkMetadataEditFieldKind.languages)
           ? ComicMetadataBulkMultiValuePatch(
-              op: languages.op,
-              values: languages.values,
+              op: ComicMetadataBulkMultiValueOp.replace,
+              values: normalizeSingleLanguage(languages.values),
             )
           : null,
       parodies: dirtyFields.contains(BulkMetadataEditFieldKind.parodies)

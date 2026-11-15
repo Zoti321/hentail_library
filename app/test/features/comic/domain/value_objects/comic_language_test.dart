@@ -12,23 +12,23 @@ void main() {
   };
 
   group('formatComicLanguagesDisplay', () {
-    test('joins localized closed-set names with pipe', () {
+    test('displays only the first localized language', () {
       expect(
         formatComicLanguagesDisplay(<String>[
           'Chinese',
           'Japanese',
         ], closedLabels: zhLabels),
-        '中文|日语',
+        '中文',
       );
     });
 
     test('passes unknown tokens through verbatim', () {
       expect(
         formatComicLanguagesDisplay(<String>[
-          'Chinese',
           'Esperanto',
+          'Chinese',
         ], closedLabels: zhLabels),
-        '中文|Esperanto',
+        'Esperanto',
       );
     });
 

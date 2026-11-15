@@ -111,7 +111,7 @@ extension ComicMetadataFormOps on ComicMetadataForm {
     return copyWith(
       title: title.trim(),
       description: normalizeOptionalMetadataText(description),
-      languages: normalizeOrderedFacetNames(languages),
+      languages: normalizeSingleLanguage(languages),
       parodies: normalizeOrderedFacetNames(parodies),
       characters: normalizeOrderedFacetNames(characters),
     );
@@ -164,7 +164,7 @@ extension ComicMetadataFormOps on ComicMetadataForm {
     if (languages.contains(trimmed)) {
       return this;
     }
-    return copyWith(languages: <String>[...languages, trimmed]);
+    return copyWith(languages: <String>[trimmed]);
   }
 
   ComicMetadataForm removeLanguage(String canonical) {

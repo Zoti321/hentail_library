@@ -468,7 +468,7 @@ fn bulk_patch_m2_languages_parodies_characters_merge() {
                 vec!["c1".to_string(), "c2".to_string()],
                 ComicMetadataBulkPatch {
                     languages: Some(MultiValuePatch {
-                        op: MultiValueOp::Add,
+                        op: MultiValueOp::Replace,
                         values: vec!["Japanese".to_string()],
                     }),
                     parodies: Some(MultiValuePatch {

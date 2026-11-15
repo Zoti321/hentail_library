@@ -152,7 +152,7 @@ pub struct ComicDto {
     pub last_read_time_ms: Option<i64>,
     pub authors: Vec<ComicAuthorDto>,
     pub tags: Vec<String>,
-    /// Ordered canonical English language names; empty = unset.
+    /// Optional Language represented as a zero-or-one list for wire compatibility.
     #[serde(default)]
     pub languages: Vec<String>,
     /// Parody (IP / franchise) names attached to this Comic; empty = none.
@@ -182,9 +182,20 @@ pub fn author_refs_from_names(names: &[String]) -> Vec<ComicAuthorDto> {
         .collect()
 }
 
-/// Serialize Language list for `comic_meta.languages` JSON column.
+/// Keep the first stored Language; the list shape preserves backup/wire compatibility.
+pub fn single_language(languages: &[String]) -> Vec<String> {
+    languages
+        .first()
+        .map(|value| value.trim())
+        .filter(|value| !value.is_empty())
+        .map(str::to_owned)
+        .into_iter()
+        .collect()
+}
+
+/// Serialize the optional Language for the legacy JSON-list column.
 pub fn serialize_languages(languages: &[String]) -> String {
-    serde_json::to_string(languages).unwrap_or_else(|_| "[]".to_string())
+    serde_json::to_string(&single_language(languages)).unwrap_or_else(|_| "[]".to_string())
 }
 
 /// Parse Language list; invalid JSON → empty (unset).
@@ -192,11 +203,7 @@ pub fn parse_languages_json(raw: &str) -> Vec<String> {
     let Ok(values) = serde_json::from_str::<Vec<String>>(raw) else {
         return Vec::new();
     };
-    values
-        .into_iter()
-        .map(|s| s.trim().to_string())
-        .filter(|s| !s.is_empty())
-        .collect()
+    single_language(&values)
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

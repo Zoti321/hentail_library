@@ -79,7 +79,7 @@ void main() {
 
       expect(comic.title, '标题');
       expect(comic.description, isNull);
-      expect(comic.languages, <String>['Chinese', 'Japanese']);
+      expect(comic.languages, <String>['Chinese']);
       expect(comic.parodies, <String>['Fate']);
       expect(comic.characters, <String>['Saber']);
     });
@@ -210,7 +210,7 @@ void main() {
       expect(changes.tags, isNull);
     });
 
-    test('submits languages when their order changes', () {
+    test('submits only the new single language', () {
       final Comic original = _comic(languages: <String>['Chinese', 'Japanese']);
       final ComicMetadataDraftChanges changes = _changedFields(
         original.metadataDiffAgainst(
@@ -219,7 +219,7 @@ void main() {
         ),
       );
 
-      expect(changes.languages, <String>['Japanese', 'Chinese']);
+      expect(changes.languages, <String>['Japanese']);
       expect(changes.title, isNull);
     });
 

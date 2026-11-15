@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/core/util/list_edit.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
@@ -14,7 +15,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:hentai_library/shared/ui/catalog/metadata_edit/metadata_lock_callbacks.dart';
-import 'package:hentai_library/core/util/list_edit.dart';
 
 /// 漫画元数据编辑表单主体（常规 + 作者&标签），字段对齐生产 [EditMetadataDialog]。
 class ComicMetadataEditForm extends StatefulWidget {
@@ -69,12 +69,10 @@ class _ComicMetadataEditFormState extends State<ComicMetadataEditForm> {
             onPublishedChanged: (String v) =>
                 _update((d) => d.copyWith(publishedLabel: v)),
             onR18Changed: (bool v) => _update((d) => d.copyWith(isR18: v)),
-            onLanguageAdded: (String v) => _update(
-              (d) => d.copyWith(languages: listWithAdded(d.languages, v)),
-            ),
-            onLanguageRemoved: (String v) => _update(
-              (d) => d.copyWith(languages: listWithRemoved(d.languages, v)),
-            ),
+            onLanguageAdded: (String v) =>
+                _update((d) => d.copyWith(languages: <String>[v])),
+            onLanguageRemoved: (String v) =>
+                _update((d) => d.copyWith(languages: const <String>[])),
             onSortOrderChanged: (String v) =>
                 _update((d) => d.copyWith(seriesSortOrderText: v)),
           ),

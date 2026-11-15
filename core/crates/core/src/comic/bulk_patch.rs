@@ -103,7 +103,7 @@ async fn apply_patch_to_one(
         }
     }
     if let Some(languages_patch) = &patch.languages {
-        let merged = merge_multi_value(&comic.languages, languages_patch);
+        let merged = crate::comic::dto::single_language(&languages_patch.values);
         if merged != comic.languages {
             meta.languages = Some(merged);
             changed = true;
@@ -182,6 +182,13 @@ pub async fn apply_comic_metadata_bulk_patch(
     }
     if !patch.has_fields() {
         return Err(HentaiError::validation("批量 patch 未包含任何字段"));
+    }
+    if let Some(language) = &patch.languages {
+        if !matches!(language.op, MultiValueOp::Replace) || language.values.len() > 1 {
+            return Err(HentaiError::validation(
+                "Language bulk editing only supports replacing one value or clearing it",
+            ));
+        }
     }
     if let Some(rating) = &patch.content_rating {
         if rating != "safe" && rating != "r18" {

@@ -28,13 +28,14 @@ String comicLanguageDisplayLabel(
   return closedLabels[canonical] ?? canonical;
 }
 
-/// 多项以 [separator] 拼接（默认 `|`）。
+/// Display the optional first Language from the compatible list representation.
 String formatComicLanguagesDisplay(
   Iterable<String> canonical, {
   required Map<String, String> closedLabels,
   String separator = '|',
 }) {
   return canonical
+      .take(1)
       .map(
         (String name) =>
             comicLanguageDisplayLabel(name, closedLabels: closedLabels),

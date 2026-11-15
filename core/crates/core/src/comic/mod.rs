@@ -14,6 +14,7 @@ pub use bulk_patch::{
     apply_comic_metadata_bulk_patch, BulkPatchResultDto, ComicMetadataBulkPatch, MultiValueOp,
     MultiValuePatch, PublishedAtPatch, ScalarPatch, BULK_PATCH_MAX_IDS,
 };
+pub(crate) use dto::single_language;
 pub use dto::{
     author_refs_from_names, now_ms, parse_languages_json, serialize_languages, ComicAuthorDto,
     ComicBrowseItemDto, ComicDto, ComicFilterDto, ComicMetaLocks, ComicSortFieldDto,

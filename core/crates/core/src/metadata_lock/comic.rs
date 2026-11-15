@@ -136,7 +136,11 @@ fn merge_scan_with_existing(
         last_read_time_ms: existing.last_read_time_ms.or(scanned.last_read_time_ms),
         authors: merge_author_refs(locks.authors, &existing.authors, &scanned.authors),
         tags: merge_list(locks.tags, &existing.tags, &scanned.tags),
-        languages: merge_list(locks.languages, &existing.languages, &scanned.languages),
+        languages: crate::comic::single_language(&merge_list(
+            locks.languages,
+            &existing.languages,
+            &scanned.languages,
+        )),
         parodies: merge_list(locks.parodies, &existing.parodies, &scanned.parodies),
         characters: merge_list(locks.characters, &existing.characters, &scanned.characters),
         locks: ComicMetaLocks {

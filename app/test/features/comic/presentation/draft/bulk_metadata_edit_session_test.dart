@@ -28,6 +28,18 @@ Comic _comic({
 }
 
 void main() {
+  test('language patch always replaces one value and supports clearing', () {
+    final session = BulkMetadataEditSession();
+    final field = session.multiFields[BulkMetadataEditFieldKind.languages]!;
+    field.values = <String>['Esperanto', 'Japanese'];
+    session.markDirty(BulkMetadataEditFieldKind.languages);
+    final language = session.buildPatch()!.languages!;
+    expect(language.op, ComicMetadataBulkMultiValueOp.replace);
+    expect(language.values, <String>['Esperanto']);
+    field.values = <String>[];
+    expect(session.buildPatch()!.languages!.values, isEmpty);
+  });
+
   for (final text in ['', '   ', 'not a date']) {
     test(
       'dirty replacement with "$text" cannot build even another field patch',

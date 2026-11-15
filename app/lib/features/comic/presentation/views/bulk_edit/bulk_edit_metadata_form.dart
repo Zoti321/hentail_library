@@ -460,7 +460,6 @@ class _BulkLanguageBody extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        _BulkOpBar(kind: _kind, notifier: notifier),
         ComicLanguageQuickPick(
           selected: notifier.session.multiFields[_kind]!.values,
           onCanonicalToggled: _handleCanonicalToggled,
@@ -490,7 +489,7 @@ class _BulkLanguageBody extends StatelessWidget {
       if (field.values.contains(canonical)) {
         return;
       }
-      field.values = <String>[...field.values, canonical];
+      field.values = <String>[canonical];
       session.markDirty(_kind);
     });
   }
@@ -612,7 +611,9 @@ class _BulkTagInput extends StatelessWidget {
       if (field.values.contains(name)) {
         return;
       }
-      field.values = <String>[...field.values, name];
+      field.values = kind == BulkMetadataEditFieldKind.languages
+          ? <String>[name]
+          : <String>[...field.values, name];
       session.markDirty(kind);
     });
   }

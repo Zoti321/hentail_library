@@ -83,12 +83,20 @@ void main() {
       expect(ready.description, isNull);
     });
 
-    test('normalized trims and dedupes languages in order', () {
+    test('normalized language keeps only the first stored value', () {
       final ComicMetadataForm ready = ComicMetadataForm(
         title: '标题',
         languages: <String>[' Chinese ', 'Japanese', 'Chinese', ''],
       ).normalized;
-      expect(ready.languages, <String>['Chinese', 'Japanese']);
+      expect(ready.languages, <String>['Chinese']);
+    });
+
+    test('selecting a language replaces it and removing it clears it', () {
+      final form = ComicMetadataForm(title: 't')
+          .addLanguage('Chinese')
+          .addLanguage(' Unrecognized language ');
+      expect(form.languages, <String>['Unrecognized language']);
+      expect(form.removeLanguage('Unrecognized language').languages, isEmpty);
     });
   });
 
