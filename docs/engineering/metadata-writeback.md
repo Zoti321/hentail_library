@@ -33,3 +33,9 @@ Canonical language codes are Chinese `zh`, Japanese `ja`, English `en`, Korean `
 ## Verification
 
 Public Rust use cases with real temporary Resources and the shared database harness own end-to-end correctness. Codec tests check lossless field intent and format-specific compatibility. Dart tests check presentation and adapters rather than repeat business flows. Source-writing acceptance includes retained page/content bytes/order, original preservation on failure, interruption recovery, revision races and resource observation/Reader reconciliation.
+
+## Media overview
+
+ADR-0058 limits Media to an aggregate dashboard and per-Library opt-in. There is no resource list, detail dialog, editing callback, state filter or pagination in this page. The core overview query aggregates visible Local Resources directly; it excludes trash and applies Healthy mode before counting. Empty Local libraries count towards Library totals.
+
+Timed refresh invalidates only the overview query and retains its last data. Revision-triggered reloads also retain data. Refresh failures show feedback alongside the last counts; initial failures expose a read-only retry. Library opt-in providers refresh only after setting changes, and executor notifications coalesce once per batch. Overview polling pauses while the app is inactive and cancels on page disposal. Widgetbook hosts realistic aggregate fixtures using the production page.

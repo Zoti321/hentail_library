@@ -4,6 +4,8 @@
 
 Accepted. Implementation is tracked by the Resource metadata embedding issue family. This supersedes only the multi-value Language semantics and the absence of the newly supported Comic metadata scan sources in ADR-0007; its field-lock and nonempty scan-merge policies remain authoritative. The legacy language-list storage/wire shape remains compatible but contains at most one value.
 
+> ADR-0058 supersedes only the Media page scope below: it delivers aggregate overview and Library opt-in settings, deferring individual Comic inspection.
+
 ## Context
 
 User-edited Comic metadata currently remains in the catalog or a separate Metadata backup. Users need metadata to travel with original Local Resources and be recoverable on re-import. ComicInfo, EPUB package metadata and PDF XMP have different vocabularies and cannot faithfully express every application concept. Modifying original files also changes content evidence used by Path migration and cannot be atomic with a SQLite commit.

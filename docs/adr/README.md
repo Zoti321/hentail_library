@@ -136,3 +136,4 @@ Accepted | Superseded by ADR-000N | Deprecated
 | [0055](./0055-content-verified-path-migration.md) | Content-verified Path migration | Accepted; extends ADR-0054 |
 | [0056](./0056-localized-date-picker.md) | Localized application-owned date picker | Accepted; supersedes ADR-0053 calendar locale restriction |
 | [0057](./0057-automatic-local-metadata-writeback.md) | Automatic Resource metadata embedding | Accepted; supersedes ADR-0007 Language cardinality and affected scan-source assumptions |
+| [0058](./0058-media-metadata-dashboard.md) | Media metadata dashboard | Accepted; supersedes ADR-0057 individual Comic inspection scope |

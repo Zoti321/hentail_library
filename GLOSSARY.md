@@ -221,7 +221,7 @@ _Avoid_: UI catalog reload, Library sync, rescan.
 **Resource metadata embedding**: Persisting in-app Comic metadata into its original Local Resource for use outside the application. Distinct from Metadata refresh, which reads Resource metadata into the catalog, and Metadata backup, which creates a separate restore snapshot.
 _Avoid_: Metadata refresh, Library sync, metadata backup as synonyms for source modification.
 
-**Media page**: A Home-linked view of Local Comic metadata and automatic Resource metadata embedding state, scoped by Library and embedding status. Its initial scope excludes Library management and Comic trash; it does not imply live comparison with source metadata. ADR-0057.
+**Media page**: A Home-linked dashboard summarizing Local Comic Resources and automatic Resource metadata embedding, with per-Library opt-in settings. Individual Comic metadata inspection, Library management and Comic trash are deferred. ADR-0058.
 _Avoid_: global Library manager, metadata dictionary management, manual export queue.
 
 **Metadata backup**: JSON snapshot of Comic user metadata, locks and orphan dictionary entries (`.hlmeta.json` / `.hlmeta.json.gz`), manually or automatically exported for external storage/restoration.
