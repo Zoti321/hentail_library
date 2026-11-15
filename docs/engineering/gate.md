@@ -25,18 +25,19 @@ For focused Flutter checks, run `flutter test <path>` from `app/`. For full UI r
 
 ## Manifest and nightly
 
-`app/test/gate/manifest.txt` is the single fast-track selection source; `manifest_test.dart` checks paths and duplication. Promote a test only when it asserts an observable contract, uses the shared harness, and passes three consecutive focused runs. Inject time when needed. Add its path to the appropriate manifest section and list additions in the PR; do not add another workflow.
+`app/test/gate/manifest.txt` is the single fast-track selection source; `manifest_test.dart` checks paths and duplication. A directory entry includes all tests below it; do not also list its descendants. Promote a test only when it asserts an observable contract, uses the shared harness, and passes three consecutive focused runs. Inject time when needed. Add its path to the appropriate manifest section and list additions in the PR; do not add another workflow.
 
-The inventory's slow track is every test outside the expanded manifest. Nightly's UI job actually runs `test/shared/ui` and `test/features`; those directories overlap the fast track and do not cover every possible non-manifest path. Nightly also collects full Dart coverage and hentai-core Rust coverage; see `.github/workflows/nightly.yml`. Do not describe it as an exact manifest complement.
+The inventory's slow track is every test outside the expanded manifest. Nightly's `nightly-dart-coverage` job runs all `app/test` tests once with coverage, including both fast and slow tracks. ADR-0059 replaces the separate `nightly-dart-ui` run described in ADR-0018; no UI assertions are dropped. Nightly also collects hentai-core Rust coverage; see `.github/workflows/nightly.yml`. Platform integration tests remain in Watch and are outside this Dart coverage run.
 
 ```bash
 python scripts/audit_dart_tests.py --summary-json
 python scripts/audit_dart_tests.py --json
 python scripts/audit_dart_tests.py --rubric candidate-retire --slow-only
+python scripts/audit_dart_tests.py --compile-smoke-only
 python -m unittest discover -s scripts -p test_audit_dart_tests.py
 ```
 
-The rubric is an audit heuristic, not permission to delete tests: architecture-guard protects structural rules, thin-edge protects adapter/contract seams, ui-contract covers observable behavior, candidate-retire flags slow-track files for review. The script reports live counts; do not copy count snapshots into this guide.
+The rubric is an audit heuristic, not permission to delete tests: architecture-guard protects structural rules, thin-edge protects adapter/contract seams, ui-contract covers observable behavior, candidate-retire flags slow-track files for review. `--compile-smoke-only` flags files whose assertions only check imported symbols with `isNotNull`; verify each result manually because compilation already checks names, but a test may intentionally document its public API. The script reports live counts; do not copy count snapshots into this guide.
 
 Demotion requires a PR listing each path, rubric and reason, plus manifest/self-test updates. Protect architecture/layout, FRB wire, thin-edge and minimum App/Lab smoke coverage unless paired with the corresponding rule/ADR migration. Keep a demoted test until a successful focused run or nightly validates it; retire it in a later PR linked to that decision. Check actual nightly path selection before claiming coverage. Moves retain existing assertions and fast-track coverage.
 

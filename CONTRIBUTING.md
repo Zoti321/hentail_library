@@ -7,6 +7,8 @@
 3. 提交前运行 `./scripts/run-gate.sh`。UI 变更补跑受影响的组件或页面测试；需要排查整体回归时运行 `cd app && flutter test`。
 4. 使用 [PR 模板](.github/pull_request_template.md)，写明行为变化、验证证据和未验证项。
 
+PR 测试范围由 `app/test/gate/manifest.txt` 统一维护；目录项已覆盖的测试文件不重复列出。Nightly 用一次全量 `flutter test --coverage` 同时完成快慢轨回归和覆盖率采集；平台集成冒烟仍走 Watch。
+
 `codegen-drift` 会就地生成并比较 `app/`、`core/` 与 HEAD 的差异，运行前先保存并提交相关改动。Agent 在当前 clone 和分支工作，新分支或 worktree 需要用户明确允许。
 
 ## 文档入口
