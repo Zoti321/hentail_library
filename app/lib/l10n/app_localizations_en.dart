@@ -2706,4 +2706,75 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get authorDetailOpenLinkFailed => 'Could not open the link';
+
+  @override
+  String get mediaTitle => 'Media';
+
+  @override
+  String get mediaSubtitle =>
+      'Comic resource metadata and automatic file writing';
+
+  @override
+  String get mediaAllLibraries => 'All local libraries';
+
+  @override
+  String get mediaAllStates => 'All file writing states';
+
+  @override
+  String get mediaEmpty => 'No matching Comic resources';
+
+  @override
+  String get mediaMetadata => 'Resource metadata';
+
+  @override
+  String get mediaEdit => 'Edit metadata';
+
+  @override
+  String get mediaResource => 'Resource';
+
+  @override
+  String get mediaLastSuccess => 'Last successful file write';
+
+  @override
+  String get mediaNeverWritten => 'No successful file write yet';
+
+  @override
+  String get writebackTitle => 'Automatically write metadata to original files';
+
+  @override
+  String get writebackDescription =>
+      'Write in-app metadata into original Comic resources. Enabling also processes existing Comics. Archives may be rewritten and other software can read this information. Failures retry automatically.';
+
+  @override
+  String get writebackConfirmTitle => 'Allow changes to original resources?';
+
+  @override
+  String get writebackEnable => 'Enable automatic writing';
+
+  @override
+  String get writebackDisabled => 'Disabled';
+
+  @override
+  String get writebackPending => 'Pending';
+
+  @override
+  String get writebackProcessing => 'Processing';
+
+  @override
+  String get writebackCompleted => 'Completed';
+
+  @override
+  String get writebackFailed => 'Failed';
+
+  @override
+  String get writebackUnsupported => 'Unsupported on this build';
+
+  @override
+  String get writebackFailure => 'Could not save file metadata writing setting';
+
+  @override
+  String get mediaPrevious => 'Previous page';
+
+  @override
+  String get mediaNext => 'Next page';
 }

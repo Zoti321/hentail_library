@@ -6,6 +6,8 @@ abstract final class AppRoutes {
   // ---- paths ----
 
   static const String home = '/home';
+  static const String media = '/media';
+  static const String mediaName = '媒体';
   static const String local = '/local';
   static const String history = '/history';
   static const String trash = '/trash';

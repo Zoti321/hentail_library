@@ -20,6 +20,7 @@ class HomeLayout extends StatelessWidget {
     this.onOpenNavigation,
     this.onOpenHistory,
     this.onOpenTrash,
+    this.onOpenMedia,
     this.onOpenAuthors,
     this.onOpenParodies,
     this.onOpenCharacters,
@@ -32,6 +33,7 @@ class HomeLayout extends StatelessWidget {
   final VoidCallback? onOpenNavigation;
   final VoidCallback? onOpenHistory;
   final VoidCallback? onOpenTrash;
+  final VoidCallback? onOpenMedia;
   final VoidCallback? onOpenAuthors;
   final VoidCallback? onOpenParodies;
   final VoidCallback? onOpenCharacters;
@@ -87,6 +89,16 @@ class HomeLayout extends StatelessWidget {
                     onOpenCharacters: onOpenCharacters,
                     onOpenTags: onOpenTags,
                   ),
+                  if (onOpenMedia != null)
+                    Card(
+                      child: ListTile(
+                        leading: const Icon(Icons.perm_media_outlined),
+                        title: Text(l10n.mediaTitle),
+                        subtitle: Text(l10n.mediaSubtitle),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: onOpenMedia,
+                      ),
+                    ),
                   SizedBox(
                     height: HomePageMetrics.sectionVerticalSpacing(sizeClass),
                   ),

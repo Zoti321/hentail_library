@@ -4563,6 +4563,144 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'无法打开链接'**
   String get authorDetailOpenLinkFailed;
+
+  /// No description provided for @mediaTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'媒体'**
+  String get mediaTitle;
+
+  /// No description provided for @mediaSubtitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'漫画资源元数据与自动文件写入'**
+  String get mediaSubtitle;
+
+  /// No description provided for @mediaAllLibraries.
+  ///
+  /// In zh, this message translates to:
+  /// **'所有本地库'**
+  String get mediaAllLibraries;
+
+  /// No description provided for @mediaAllStates.
+  ///
+  /// In zh, this message translates to:
+  /// **'全部文件写入状态'**
+  String get mediaAllStates;
+
+  /// No description provided for @mediaEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'没有符合条件的漫画资源'**
+  String get mediaEmpty;
+
+  /// No description provided for @mediaMetadata.
+  ///
+  /// In zh, this message translates to:
+  /// **'资源元数据'**
+  String get mediaMetadata;
+
+  /// No description provided for @mediaEdit.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑元数据'**
+  String get mediaEdit;
+
+  /// No description provided for @mediaResource.
+  ///
+  /// In zh, this message translates to:
+  /// **'资源'**
+  String get mediaResource;
+
+  /// No description provided for @mediaLastSuccess.
+  ///
+  /// In zh, this message translates to:
+  /// **'最近成功写入'**
+  String get mediaLastSuccess;
+
+  /// No description provided for @mediaNeverWritten.
+  ///
+  /// In zh, this message translates to:
+  /// **'尚未成功写入'**
+  String get mediaNeverWritten;
+
+  /// No description provided for @writebackTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'自动将元数据写入原文件'**
+  String get writebackTitle;
+
+  /// No description provided for @writebackDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'将应用内元数据写入原始漫画资源。开启后自动处理已有漫画；压缩包可能重写，其他软件可以读取这些信息。失败会自动重试。'**
+  String get writebackDescription;
+
+  /// No description provided for @writebackConfirmTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'允许修改原始资源？'**
+  String get writebackConfirmTitle;
+
+  /// No description provided for @writebackEnable.
+  ///
+  /// In zh, this message translates to:
+  /// **'开启自动写入'**
+  String get writebackEnable;
+
+  /// No description provided for @writebackDisabled.
+  ///
+  /// In zh, this message translates to:
+  /// **'已关闭'**
+  String get writebackDisabled;
+
+  /// No description provided for @writebackPending.
+  ///
+  /// In zh, this message translates to:
+  /// **'待处理'**
+  String get writebackPending;
+
+  /// No description provided for @writebackProcessing.
+  ///
+  /// In zh, this message translates to:
+  /// **'处理中'**
+  String get writebackProcessing;
+
+  /// No description provided for @writebackCompleted.
+  ///
+  /// In zh, this message translates to:
+  /// **'已完成'**
+  String get writebackCompleted;
+
+  /// No description provided for @writebackFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'失败'**
+  String get writebackFailed;
+
+  /// No description provided for @writebackUnsupported.
+  ///
+  /// In zh, this message translates to:
+  /// **'当前版本不支持'**
+  String get writebackUnsupported;
+
+  /// No description provided for @writebackFailure.
+  ///
+  /// In zh, this message translates to:
+  /// **'文件元数据写入设置保存失败'**
+  String get writebackFailure;
+
+  /// No description provided for @mediaPrevious.
+  ///
+  /// In zh, this message translates to:
+  /// **'上一页'**
+  String get mediaPrevious;
+
+  /// No description provided for @mediaNext.
+  ///
+  /// In zh, this message translates to:
+  /// **'下一页'**
+  String get mediaNext;
 }
 
 class _AppLocalizationsDelegate

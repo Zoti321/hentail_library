@@ -117,6 +117,10 @@ class _PublishedDateTextFieldState extends State<PublishedDateTextField> {
     setState(() {});
   }
 
+  void _handleTextChanged(String value) {
+    if (!_applyingDate) widget.onChanged(value);
+  }
+
   @override
   Widget build(BuildContext context) {
     final M3EThemeData theme = M3ETheme.of(context);
@@ -137,9 +141,7 @@ class _PublishedDateTextFieldState extends State<PublishedDateTextField> {
             hintText: 'yyyy-MM-dd',
             onSubmitted: (_) => _normalizeInput(),
             keyboardType: TextInputType.datetime,
-            onChanged: (value) {
-              if (!_applyingDate) widget.onChanged(value);
-            },
+            onChanged: _handleTextChanged,
             errorText: widget.errorText,
             showClearButton: true,
             clearButtonSemanticsLabel: MaterialLocalizations.of(context)

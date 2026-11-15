@@ -14,6 +14,7 @@ import 'package:hentai_library/features/metadata_backup/public.dart';
 import 'package:hentai_library/features/bootstrap/presentation/view_models/app_startup_coordinator_notifier.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/routing/app_router.dart';
 import 'package:riverpod/misc.dart' show Override;
+import 'package:hentai_library/features/resource_metadata/public/widgets.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key, this.overrides = const <Override>[]});
@@ -22,7 +23,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ProviderScope(overrides: overrides, child: const _AppRoot());
+    return ProviderScope(
+      overrides: overrides,
+      child: const WritebackLifecycle(child: _AppRoot()),
+    );
   }
 }
 

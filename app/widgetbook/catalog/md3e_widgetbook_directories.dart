@@ -13,6 +13,7 @@ import 'package:hentai_library/features/comic/presentation/patterns/comic_detail
 import 'package:hentai_library/shared/ui/shell/desktop_shell.dart';
 
 import '../hosts/md3e_home_page_lab_host.dart';
+import '../hosts/resource_metadata_media_preview.dart';
 
 import 'package:hentai_library/features/comic_trash/presentation/views/trash/trash_purge_dialog.dart';
 
@@ -69,6 +70,17 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
         WidgetbookFolder(
           name: 'widgets',
           children: <WidgetbookNode>[
+            WidgetbookComponent(
+              name: 'Media metadata',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Resource writing states',
+                  builder: (_) => const Md3eWidgetbookScope(
+                    child: ResourceMetadataMediaPreview(),
+                  ),
+                ),
+              ],
+            ),
             WidgetbookComponent(
               name: 'DatePicker',
               useCases: [

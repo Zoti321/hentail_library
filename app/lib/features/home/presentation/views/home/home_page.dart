@@ -5,6 +5,7 @@ import 'package:hentai_library/features/reading_stats/public.dart';
 import 'package:hentai_library/shared/ui/layout/app_shell_navigation.dart';
 import 'package:hentai_library/shared/ui/patterns/home/home_aggregate_counts.dart';
 import 'package:hentai_library/shared/presentation/providers/app_navigator_provider.dart';
+import 'package:hentai_library/shared/application/navigation/app_routes.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 export 'package:hentai_library/features/home/presentation/views/home/home_layout.dart';
@@ -55,6 +56,8 @@ class HomePage extends ConsumerWidget {
       // 与历史 / 垃圾桶同款：push + Shell fade-through，返回可走 reverse。
       onOpenHistory: () => ref.read(appNavigatorProvider).pushHistory(),
       onOpenTrash: () => ref.read(appNavigatorProvider).pushTrash(),
+      onOpenMedia: () =>
+          ref.read(appNavigatorProvider).goLocation(AppRoutes.media),
       onOpenAuthors: () =>
           ref.read(appNavigatorProvider).pushMetadata(tab: 'authors'),
       onOpenParodies: () =>

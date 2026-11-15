@@ -2580,4 +2580,74 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get authorDetailOpenLinkFailed => '无法打开链接';
+
+  @override
+  String get mediaTitle => '媒体';
+
+  @override
+  String get mediaSubtitle => '漫画资源元数据与自动文件写入';
+
+  @override
+  String get mediaAllLibraries => '所有本地库';
+
+  @override
+  String get mediaAllStates => '全部文件写入状态';
+
+  @override
+  String get mediaEmpty => '没有符合条件的漫画资源';
+
+  @override
+  String get mediaMetadata => '资源元数据';
+
+  @override
+  String get mediaEdit => '编辑元数据';
+
+  @override
+  String get mediaResource => '资源';
+
+  @override
+  String get mediaLastSuccess => '最近成功写入';
+
+  @override
+  String get mediaNeverWritten => '尚未成功写入';
+
+  @override
+  String get writebackTitle => '自动将元数据写入原文件';
+
+  @override
+  String get writebackDescription =>
+      '将应用内元数据写入原始漫画资源。开启后自动处理已有漫画；压缩包可能重写，其他软件可以读取这些信息。失败会自动重试。';
+
+  @override
+  String get writebackConfirmTitle => '允许修改原始资源？';
+
+  @override
+  String get writebackEnable => '开启自动写入';
+
+  @override
+  String get writebackDisabled => '已关闭';
+
+  @override
+  String get writebackPending => '待处理';
+
+  @override
+  String get writebackProcessing => '处理中';
+
+  @override
+  String get writebackCompleted => '已完成';
+
+  @override
+  String get writebackFailed => '失败';
+
+  @override
+  String get writebackUnsupported => '当前版本不支持';
+
+  @override
+  String get writebackFailure => '文件元数据写入设置保存失败';
+
+  @override
+  String get mediaPrevious => '上一页';
+
+  @override
+  String get mediaNext => '下一页';
 }

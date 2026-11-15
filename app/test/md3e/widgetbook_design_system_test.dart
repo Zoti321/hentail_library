@@ -44,13 +44,14 @@ void main() {
         await tester.pumpAndSettle();
         switch (state) {
           case 'Loaded':
-            expect(find.text('深海'), findsOneWidget);
+            // Selected names remain visible in both the chip and candidate list.
+            expect(find.text('深海'), findsNWidgets(2));
             await tester.enterText(find.byType(EditableText), 'tsg');
             await tester.pumpAndSettle();
             expect(find.text('图书馆'), findsOneWidget);
             await tester.sendKeyEvent(LogicalKeyboardKey.tab);
             await tester.pumpAndSettle();
-            expect(find.text('图书馆'), findsOneWidget);
+            expect(find.text('图书馆'), findsNWidgets(2));
             await tester.tap(
               find.byKey(FacetMultiSelectField.clearAllButtonKey),
             );

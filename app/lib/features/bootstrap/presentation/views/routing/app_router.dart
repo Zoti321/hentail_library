@@ -18,6 +18,8 @@ import 'package:hentai_library/features/comic_trash/public.dart';
 import 'package:hentai_library/shared/presentation/providers/browse_library_scope_providers.dart';
 import 'package:hentai_library/shared/ui/navigation/app_root_navigator_key.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:hentai_library/features/media/public/widgets.dart';
+import 'package:hentai_library/features/comic/public/ui/comic_metadata_edit_presenters.dart';
 
 /// 设置页分区组合根（ADR-0046 §6）：`app_settings` 自有分类 + owner 分区。
 ///
@@ -49,6 +51,20 @@ final GoRouter appRouter = GoRouter(
         return ApplicationShell(routeChild: child);
       },
       routes: <RouteBase>[
+        GoRoute(
+          path: AppRoutes.media,
+          name: AppRoutes.mediaName,
+          pageBuilder: (context, state) => buildShellNavPage(
+            state: state,
+            child: MediaPage(
+              onEdit: (context, ref, comicId) => showComicMetadataEditById(
+                context: context,
+                ref: ref,
+                comicId: comicId,
+              ),
+            ),
+          ),
+        ),
         GoRoute(
           path: AppRoutes.home,
           name: AppRoutes.homeName,

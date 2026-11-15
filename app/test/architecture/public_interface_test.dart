@@ -104,11 +104,12 @@ void main() {
           continue;
         }
         final String tail = match.group(2)!.trim();
-        if (!tail.startsWith('show ')) {
+        final Match? showClause = RegExp(r'^show\s+').firstMatch(tail);
+        if (showClause == null) {
           offenders.add('$source must explicitly select symbols from $target');
         } else if (source.endsWith('/public/providers.dart')) {
           final List<String> names = tail
-              .substring(5)
+              .substring(showClause.end)
               .split(',')
               .map((name) => name.trim())
               .toList();

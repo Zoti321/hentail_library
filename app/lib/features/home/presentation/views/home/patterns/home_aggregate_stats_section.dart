@@ -129,18 +129,6 @@ class _PersonalCenterGrid extends StatelessWidget {
 
   final _StatsScope scope;
 
-  Widget _row(List<Widget> cards) => IntrinsicHeight(
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        for (int i = 0; i < cards.length; i++) ...<Widget>[
-          if (i > 0) SizedBox(width: scope.gap),
-          Expanded(child: cards[i]),
-        ],
-      ],
-    ),
-  );
-
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -192,11 +180,11 @@ class _PersonalCenterGrid extends StatelessWidget {
                 metadata[i],
               ],
             ] else if (compact) ...<Widget>[
-              _row(metadata.sublist(0, 2)),
+              _MetadataCardRow(cards: metadata.sublist(0, 2), gap: scope.gap),
               SizedBox(height: scope.gap),
-              _row(metadata.sublist(2)),
+              _MetadataCardRow(cards: metadata.sublist(2), gap: scope.gap),
             ] else
-              _row(metadata),
+              _MetadataCardRow(cards: metadata, gap: scope.gap),
             if (scope.onOpenHistory != null &&
                 scope.onOpenTrash != null) ...<Widget>[
               SizedBox(height: scope.gap * 1.5),
@@ -212,6 +200,24 @@ class _PersonalCenterGrid extends StatelessWidget {
       },
     );
   }
+}
+
+class _MetadataCardRow extends StatelessWidget {
+  const _MetadataCardRow({required this.cards, required this.gap});
+  final List<Widget> cards;
+  final double gap;
+  @override
+  Widget build(BuildContext context) => IntrinsicHeight(
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (var i = 0; i < cards.length; i++) ...[
+          if (i > 0) SizedBox(width: gap),
+          Expanded(child: cards[i]),
+        ],
+      ],
+    ),
+  );
 }
 
 class _ActivityCapsule extends StatelessWidget {

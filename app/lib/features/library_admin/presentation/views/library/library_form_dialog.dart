@@ -16,6 +16,7 @@ import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:path/path.dart' as p;
+import 'package:hentai_library/features/resource_metadata/public/widgets.dart';
 
 enum LibraryFormMode { createLocal, createRemote, edit }
 
@@ -245,13 +246,19 @@ class _LibraryFormState extends ConsumerState<_LibraryFormFields> {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
 
-    final Widget form = LibraryEditForm(
-      form: _form,
-      isCreate: _isCreate,
-      validation: _validation,
-      enabled: !_saving,
-      onFormChanged: _handleFormChanged,
-      onBrowseRoot: _isRemote ? null : _browseLocalRoot,
+    final Widget form = Column(
+      children: [
+        LibraryEditForm(
+          form: _form,
+          isCreate: _isCreate,
+          validation: _validation,
+          enabled: !_saving,
+          onFormChanged: _handleFormChanged,
+          onBrowseRoot: _isRemote ? null : _browseLocalRoot,
+        ),
+        if (!_isRemote && widget.library != null)
+          WritebackSetting(libraryId: widget.library!.libraryId),
+      ],
     );
 
     if (widget.formOnly) {
