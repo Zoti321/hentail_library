@@ -27,10 +27,12 @@ class TrashPageState {
 
   bool get isEmpty => items.isEmpty;
 
-  List<TrashedComic> get selectedItems => items.where((TrashedComic item) {
-    final String comicId = item.comic.comicId;
-    return selectedIds.contains(comicId);
-  }).toList(growable: false);
+  List<TrashedComic> get selectedItems => items
+      .where((TrashedComic item) {
+        final String comicId = item.comic.comicId;
+        return selectedIds.contains(comicId);
+      })
+      .toList(growable: false);
 
   bool get allLoadedSelected =>
       items.isNotEmpty && selectedIds.length == items.length;
