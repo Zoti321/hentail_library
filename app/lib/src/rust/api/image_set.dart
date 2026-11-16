@@ -11,7 +11,7 @@ import 'init.dart';
 
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `fmt`, `fmt`, `from`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`
 
 Future<List<ImageSetDto>> listImageSetsFrb({required String libraryId}) =>
     RustLib.instance.api.crateApiImageSetListImageSetsFrb(libraryId: libraryId);
@@ -22,6 +22,26 @@ Future<List<ImageSetImageDto>> listImageSetImagesFrb({
 }) => RustLib.instance.api.crateApiImageSetListImageSetImagesFrb(
   libraryId: libraryId,
   imageSetId: imageSetId,
+);
+
+/// Opens an Image set Read session in catalog order; `start_index` is 0-based.
+Future<ImageSetReaderSessionDto> openImageSetReaderFrb({
+  required String libraryId,
+  required String imageSetId,
+  required int startIndex,
+}) => RustLib.instance.api.crateApiImageSetOpenImageSetReaderFrb(
+  libraryId: libraryId,
+  imageSetId: imageSetId,
+  startIndex: startIndex,
+);
+
+/// Raw bytes of one page; `image` is a page from the opened session.
+Future<Uint8List> loadImageSetPageBytesFrb({
+  required String libraryId,
+  required ImageSetImageDto image,
+}) => RustLib.instance.api.crateApiImageSetLoadImageSetPageBytesFrb(
+  libraryId: libraryId,
+  image: image,
 );
 
 class ImageSetDto {
@@ -100,4 +120,35 @@ class ImageSetImageDto {
           memberPath == other.memberPath &&
           carrierKind == other.carrierKind &&
           name == other.name;
+}
+
+class ImageSetReaderSessionDto {
+  final String libraryId;
+  final String imageSetId;
+  final List<ImageSetImageDto> pages;
+  final int startIndex;
+
+  const ImageSetReaderSessionDto({
+    required this.libraryId,
+    required this.imageSetId,
+    required this.pages,
+    required this.startIndex,
+  });
+
+  @override
+  int get hashCode =>
+      libraryId.hashCode ^
+      imageSetId.hashCode ^
+      pages.hashCode ^
+      startIndex.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ImageSetReaderSessionDto &&
+          runtimeType == other.runtimeType &&
+          libraryId == other.libraryId &&
+          imageSetId == other.imageSetId &&
+          pages == other.pages &&
+          startIndex == other.startIndex;
 }

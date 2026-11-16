@@ -89,7 +89,7 @@ pub(crate) fn list_rar_image_names(file: &Path) -> Result<Vec<String>, HentaiErr
     Ok(sort_archive_entry_names(names))
 }
 
-fn read_rar_entry(file: &Path, target_name: &str) -> Result<Vec<u8>, HentaiError> {
+pub(crate) fn read_rar_entry(file: &Path, target_name: &str) -> Result<Vec<u8>, HentaiError> {
     let mut archive = Archive::new(file)
         .open_for_processing()
         .map_err(|e| map_reader_err("rar 打开失败", e))?;

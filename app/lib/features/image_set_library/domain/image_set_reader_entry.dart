@@ -1,4 +1,4 @@
-/// 从 Image set 缩略图发起 Reader 的入口参数（Reader session 由 #586 实现）。
+/// 从 Image set 缩略图发起 Reader 的入口参数（catalog 顺序的 index 即起始页）。
 class ImageSetReaderEntry {
   const ImageSetReaderEntry({
     required this.libraryId,

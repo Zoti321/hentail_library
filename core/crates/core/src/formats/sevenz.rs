@@ -79,7 +79,7 @@ pub(crate) fn list_sevenz_image_names(file: &Path) -> Result<Vec<String>, Hentai
     Ok(sort_archive_entry_names(names))
 }
 
-fn read_sevenz_entry(file: &Path, target_name: &str) -> Result<Vec<u8>, HentaiError> {
+pub(crate) fn read_sevenz_entry(file: &Path, target_name: &str) -> Result<Vec<u8>, HentaiError> {
     let mut reader = SevenZReader::open(file, Password::empty())
         .map_err(|e| map_reader_err("7z 打开失败", e))?;
     let mut found = None;

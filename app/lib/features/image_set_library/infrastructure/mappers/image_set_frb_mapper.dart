@@ -19,3 +19,14 @@ ImageSetImage imageSetImageFromFrb(rust.ImageSetImageDto dto) => ImageSetImage(
   carrierKind: dto.carrierKind,
   name: dto.name,
 );
+
+rust.ImageSetImageDto imageSetImageToFrb(ImageSetImage image) =>
+    rust.ImageSetImageDto(
+      imageSetImageId: image.imageSetImageId,
+      imageSetId: image.imageSetId,
+      libraryId: image.libraryId,
+      carrierRelativePath: image.carrierRelativePath,
+      memberPath: image.memberPath,
+      carrierKind: image.carrierKind,
+      name: image.name,
+    );

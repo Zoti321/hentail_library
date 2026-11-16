@@ -108,6 +108,7 @@ pub use named_facet::{
 pub use parody::{list_all_parodies, list_distinct_parodies};
 pub use probe::rebuild_snapshot_from_scan_items;
 pub use reader::{
+    load_image_set_page_bytes, open_image_set_reader, ImageSetReaderSessionDto,
     clear_reader_page_cache, clear_reader_sessions, close_reader, load_page_bytes, load_page_list,
     load_reader_page, open_reader, open_reader_with, prefetch_reader_pages, session_path_and_type,
     writeback_after_open, writeback_with_access, ReaderPageCacheRequest, ReaderPageDto,

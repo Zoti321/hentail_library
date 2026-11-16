@@ -188,6 +188,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PlatformInt64 dco_decode_box_autoadd_i_64(dynamic raw);
 
   @protected
+  ImageSetImageDto dco_decode_box_autoadd_image_set_image_dto(dynamic raw);
+
+  @protected
   MatchTierDto dco_decode_box_autoadd_match_tier_dto(dynamic raw);
 
   @protected
@@ -330,6 +333,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ImageSetImageDto dco_decode_image_set_image_dto(dynamic raw);
+
+  @protected
+  ImageSetReaderSessionDto dco_decode_image_set_reader_session_dto(dynamic raw);
 
   @protected
   ImportComicMetadataResultDto dco_decode_import_comic_metadata_result_dto(
@@ -958,6 +964,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PlatformInt64 sse_decode_box_autoadd_i_64(SseDeserializer deserializer);
 
   @protected
+  ImageSetImageDto sse_decode_box_autoadd_image_set_image_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   MatchTierDto sse_decode_box_autoadd_match_tier_dto(
     SseDeserializer deserializer,
   );
@@ -1140,6 +1151,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ImageSetImageDto sse_decode_image_set_image_dto(SseDeserializer deserializer);
+
+  @protected
+  ImageSetReaderSessionDto sse_decode_image_set_reader_session_dto(
+    SseDeserializer deserializer,
+  );
 
   @protected
   ImportComicMetadataResultDto sse_decode_import_comic_metadata_result_dto(
@@ -1918,6 +1934,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_box_autoadd_image_set_image_dto(
+    ImageSetImageDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_box_autoadd_match_tier_dto(
     MatchTierDto self,
     SseSerializer serializer,
@@ -2145,6 +2167,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_image_set_image_dto(
     ImageSetImageDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_image_set_reader_session_dto(
+    ImageSetReaderSessionDto self,
     SseSerializer serializer,
   );
 

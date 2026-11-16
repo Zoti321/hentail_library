@@ -1,7 +1,10 @@
+import 'dart:typed_data';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_image.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_reader_entry.dart';
+import 'package:hentai_library/features/image_set_library/domain/image_set_reader_session.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_sync_outcome.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:hentai_library/shared/presentation/providers/required_provider.dart';
@@ -11,6 +14,7 @@ typedef ImageSetSyncCommand = Future<ImageSetSyncOutcome> Function(
 );
 typedef ImageSetReaderEntryCommand = void Function(ImageSetReaderEntry entry);
 typedef ImageSetImagesKey = ({String libraryId, String imageSetId});
+typedef ImageSetPageBytesKey = ({String libraryId, ImageSetImage image});
 
 /// Image set 目录读取 query（由 composition 绑定 use case）。
 final Provider<Future<List<ImageSet>> Function(String libraryId)>
@@ -25,7 +29,23 @@ imageSetImagesQueryProvider = requiredProvider('imageSetImagesQueryProvider');
 final Provider<ImageSetSyncCommand> syncImageSetLibraryCommandProvider =
     requiredProvider('syncImageSetLibraryCommandProvider');
 
-/// 缩略图选中后的 Reader 入口回调；Reader session 由 #586 绑定。
+/// Read session 打开 query（composition 绑定 use case）。
+final Provider<
+  Future<ImageSetReaderSession> Function(ImageSetReaderEntry entry)
+>
+imageSetReaderSessionQueryProvider = requiredProvider(
+  'imageSetReaderSessionQueryProvider',
+);
+
+/// 单页原始字节 query（composition 绑定 use case）。
+final Provider<
+  Future<Uint8List> Function(String libraryId, ImageSetImage image)
+>
+imageSetPageBytesQueryProvider = requiredProvider(
+  'imageSetPageBytesQueryProvider',
+);
+
+/// 缩略图选中后的 Reader 入口回调（composition 绑定为打开 Image set Reader 页）。
 final Provider<ImageSetReaderEntryCommand> imageSetReaderEntryCommandProvider =
     requiredProvider('imageSetReaderEntryCommandProvider');
 
@@ -47,3 +67,15 @@ final imageSetImagesProvider = FutureProvider.autoDispose
         key.imageSetId,
       );
     });
+
+final imageSetReaderSessionProvider = FutureProvider.autoDispose
+    .family<ImageSetReaderSession, ImageSetReaderEntry>(
+      (Ref ref, ImageSetReaderEntry entry) =>
+          ref.watch(imageSetReaderSessionQueryProvider)(entry),
+    );
+
+final imageSetPageBytesProvider = FutureProvider.autoDispose
+    .family<Uint8List, ImageSetPageBytesKey>(
+      (Ref ref, ImageSetPageBytesKey key) =>
+          ref.watch(imageSetPageBytesQueryProvider)(key.libraryId, key.image),
+    );

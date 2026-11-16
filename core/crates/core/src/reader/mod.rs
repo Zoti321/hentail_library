@@ -1,6 +1,7 @@
 pub mod backend;
 pub mod cache;
 pub mod dto;
+pub mod image_set_session;
 pub mod manager;
 pub mod open;
 pub mod page;
@@ -9,6 +10,7 @@ pub mod writeback;
 
 pub use cache::ReaderPageCacheRequest;
 pub use dto::{ReaderPageDto, ReaderPageListDto};
+pub use image_set_session::{load_image_set_page_bytes, open_image_set_reader, ImageSetReaderSessionDto};
 pub use manager::{
     clear_reader_sessions, close_reader, open_reader, open_reader_with, session_path_and_type,
     with_ephemeral_reader, ReaderSessionRead,
