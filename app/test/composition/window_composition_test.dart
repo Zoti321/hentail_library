@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -118,7 +120,7 @@ void main() {
         'maximize',
         'setPreventClose',
         'close',
-        'isFullScreen',
+        if (Platform.isWindows) 'isFullScreen',
         'startDragging',
       ]);
       await tester.pumpWidget(const SizedBox.shrink());

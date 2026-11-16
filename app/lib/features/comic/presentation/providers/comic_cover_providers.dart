@@ -167,11 +167,12 @@ class ComicCover extends _$ComicCover {
 
   /// 解码失败后点按重试：清 Error 并重新 ensure。
   void retryLoad() {
-    if (state is! ComicCoverError) {
+    if (state case ComicCoverError()) {
+      state = const ComicCoverLoading();
+      unawaited(_load());
+    } else {
       return;
     }
-    state = const ComicCoverLoading();
-    unawaited(_load());
   }
 
   Future<void> _ensurePriorityUpgrade() async {

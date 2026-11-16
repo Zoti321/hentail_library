@@ -174,12 +174,12 @@ class _TrashBody extends ConsumerWidget {
             itemCount: items.length,
             itemBuilder: (BuildContext context, int index) {
               final TrashedComic item = items[index];
+              final String comicId = item.comic.comicId;
               return TrashListItem(
-                key: ValueKey<String>(item.comic.comicId),
+                key: ValueKey<String>(comicId),
                 item: item,
-                selected: selectedIds.contains(item.comic.comicId),
-                onToggleSelected: () =>
-                    controller.toggleSelected(item.comic.comicId),
+                selected: selectedIds.contains(comicId),
+                onToggleSelected: () => controller.toggleSelected(comicId),
               );
             },
           ),
