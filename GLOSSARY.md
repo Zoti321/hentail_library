@@ -15,8 +15,29 @@ _Avoid_: cross-feature deep imports, shared code importing feature public APIs.
 
 ## Libraries and resources
 
-**Library**: A user's collection associated with one Library root, containing imported Comics and Folder series. Each has its own display name and sync configuration. Multiple Libraries coexist, with global status on Home and browsing scoped to a Library.
+**Library**: A user's collection associated with one Library root. A Comic library holds imported Comics and Folder series; an Image set library holds Image sets. Each Library has its own display name and sync configuration. Multiple Libraries coexist, with global status on Home and browsing scoped to a Library.
 _Avoid_: bookshelf as a domain term, merged Library, global catalog browsing.
+
+**Catalog kind**: Whether a Library's catalog is a Comic library or an Image set library. Chosen at creation, orthogonal to local/remote access, and immutable afterwards.
+_Avoid_: overloading `libraries.kind` local/remote to mean Comic vs Image set.
+
+**Comic library**: A catalog kind whose catalog is Comics and Folder series. May be Local or Remote.
+_Avoid_: calling every Library a Comic library when Image set libraries exist.
+
+**Image set library**: A catalog kind whose catalog is Image sets rather than Comics or Folder series. Initial delivery is Local-only; its Local root cannot be remapped in the first iteration (delete and recreate instead), and it has manual sync only.
+_Avoid_: album library, treating Image sets as Comics or Series, WebDAV Image set library in the first iteration.
+
+**Image set**: An ordered collection of images in an Image set library. It corresponds either to one first-level subdirectory of the Library root that yields discoverable images, or to the Library root image set. Nested directories and archives under a set are physical carriers, not separate Image sets.
+_Avoid_: album, Series, Comic, treating each archive as its own Image set by default.
+
+**Library root image set**: The Image set that holds only images discovered at the Library root—loose image files and image members of root-level archives—without entering first-level subdirectories. Presented as unclassified and not bound to an Author.
+_Avoid_: Library root series for image collections, dumping author-directory contents into the root set.
+
+**Image set image**: One catalogued image occurrence inside an Image set, anchored to its physical location (loose relative path, or archive relative path plus entry path). Byte-identical copies at different locations are distinct Image set images until a later content-identity decision says otherwise.
+_Avoid_: Set image as content-hash identity in the first iteration, Comic page as the Image set catalog entity.
+
+**Image set sync**: User-triggered reconciliation of an Image set library with its Library root: discover Image sets and Image set images, then remove catalog records only where a complete observation confirms absence. An inaccessible root, cancelled sync or failed write preserves all records. A still-present archive or directory tree that cannot be fully listed preserves its prior images and may warn without counting as deletion evidence. Unchanged carriers may skip re-listing. Successful commits are library-scoped and atomic; warnings on incomplete carriers do not block success for fully observed carriers.
+_Avoid_: applying Comic orphan deletion when archive parse returns empty, treating an unreadable root as an empty library.
 
 **Home page**: Default `/home` route with continue-reading, Recently added on Home, Home page counts, Reading activity stats and dismissible Home library alerts. Presentation belongs to home; counts/activity belong to reading_stats. It has no permanent global sync action. ADR-0020.
 _Avoid_: current-Library dashboard, Home scan, Home dashboard.
