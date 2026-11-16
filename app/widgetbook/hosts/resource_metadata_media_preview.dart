@@ -13,14 +13,11 @@ class ResourceMetadataMediaPreview extends StatelessWidget {
   const ResourceMetadataMediaPreview({super.key});
   @override
   Widget build(BuildContext context) => ProviderScope(
-    dependencies: [
-      writebackGatewayProvider,
-      librariesProvider,
-      settingsProvider,
-    ],
     overrides: [
       writebackGatewayProvider.overrideWithValue(_PreviewGateway()),
+      // ignore: scoped_providers_should_specify_dependencies
       librariesProvider.overrideWith(_PreviewLibraries.new),
+      // ignore: scoped_providers_should_specify_dependencies
       settingsProvider.overrideWith(_PreviewSettings.new),
     ],
     child: const MediaPage(),
