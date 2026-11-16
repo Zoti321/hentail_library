@@ -15,8 +15,9 @@ use crate::library_write::with_library_write;
 use crate::sync::resource_format_category::ResourceFormatCategory;
 
 use super::dto::{
-    library_id_from_root, library_name_from_root, library_name_from_webdav_root, model_to_dto,
-    serialize_resource_format_categories, LibraryDto, LibrarySidebarPlacement, ScanInterval,
+    is_image_set_catalog, library_id_from_root, library_name_from_root,
+    library_name_from_webdav_root, model_to_dto, serialize_resource_format_categories, LibraryDto,
+    LibrarySidebarPlacement, ScanInterval, CATALOG_KIND_COMIC, CATALOG_KIND_IMAGE_SET,
     DEFAULT_RESOURCE_FORMAT_CATEGORIES, KIND_LOCAL, KIND_REMOTE,
     REMOTE_DEFAULT_RESOURCE_FORMAT_CATEGORIES,
 };
@@ -103,6 +104,22 @@ pub async fn create_local_library(
     root_path: &str,
     name: Option<&str>,
 ) -> Result<LibraryDto, HentaiError> {
+    create_local_library_with_catalog(root_path, name, CATALOG_KIND_COMIC).await
+}
+
+/// Create a Local Image set library. Catalog kind is immutable afterwards.
+pub async fn create_image_set_local_library(
+    root_path: &str,
+    name: Option<&str>,
+) -> Result<LibraryDto, HentaiError> {
+    create_local_library_with_catalog(root_path, name, CATALOG_KIND_IMAGE_SET).await
+}
+
+async fn create_local_library_with_catalog(
+    root_path: &str,
+    name: Option<&str>,
+    catalog_kind: &str,
+) -> Result<LibraryDto, HentaiError> {
     let root = root_path.trim();
     if root.is_empty() {
         return Err(HentaiError::validation("Library root 不能为空"));
@@ -114,7 +131,7 @@ pub async fn create_local_library(
         .await
         .map_err(map_db_err)?
     {
-        return Ok(model_to_dto(existing));
+        return existing_local_or_conflict(existing, catalog_kind);
     }
     // Also treat same root_path as idempotent (different normalization edge cases).
     if let Some(existing) = Libraries::find()
@@ -123,19 +140,26 @@ pub async fn create_local_library(
         .await
         .map_err(map_db_err)?
     {
-        return Ok(model_to_dto(existing));
+        return existing_local_or_conflict(existing, catalog_kind);
     }
 
     let existing_libs = list_libraries().await?;
     ensure_local_root_not_nested(root, None, &existing_libs)?;
 
     let sidebar_order = next_pinned_sidebar_order(&existing_libs);
+    let is_image_set = is_image_set_catalog(catalog_kind);
+    let format_categories = if is_image_set {
+        Vec::new()
+    } else {
+        DEFAULT_RESOURCE_FORMAT_CATEGORIES.to_vec()
+    };
     let dto = LibraryDto {
         library_id: library_id.clone(),
         kind: KIND_LOCAL.to_string(),
+        catalog_kind: catalog_kind.to_string(),
         root_path: root.to_string(),
         name: resolve_library_name(name, library_name_from_root(root)),
-        enabled_resource_format_categories: DEFAULT_RESOURCE_FORMAT_CATEGORIES.to_vec(),
+        enabled_resource_format_categories: format_categories,
         created_at: now_ms(),
         username: String::new(),
         allow_http: false,
@@ -147,6 +171,7 @@ pub async fn create_local_library(
     let active = libraries::ActiveModel {
         library_id: Set(dto.library_id.clone()),
         kind: Set(dto.kind.clone()),
+        catalog_kind: Set(dto.catalog_kind.clone()),
         root_path: Set(dto.root_path.clone()),
         name: Set(dto.name.clone()),
         enabled_resource_format_categories: Set(serialize_resource_format_categories(
@@ -167,6 +192,19 @@ pub async fn create_local_library(
         .await
         .map_err(map_db_err)?;
     crate::revision::notify_committed();
+    Ok(dto)
+}
+
+fn existing_local_or_conflict(
+    existing: libraries::Model,
+    requested_catalog_kind: &str,
+) -> Result<LibraryDto, HentaiError> {
+    let dto = model_to_dto(existing);
+    if dto.catalog_kind != requested_catalog_kind {
+        return Err(HentaiError::validation(
+            "Library root 已被其他 catalog kind 的 Library 使用",
+        ));
+    }
     Ok(dto)
 }
 
@@ -202,6 +240,7 @@ pub async fn create_remote_library(
     let dto = LibraryDto {
         library_id: library_id.clone(),
         kind: KIND_REMOTE.to_string(),
+        catalog_kind: CATALOG_KIND_COMIC.to_string(),
         root_path: root.clone(),
         name: resolve_library_name(name, library_name_from_webdav_root(&root)),
         enabled_resource_format_categories: REMOTE_DEFAULT_RESOURCE_FORMAT_CATEGORIES.to_vec(),
@@ -216,6 +255,7 @@ pub async fn create_remote_library(
     let active = libraries::ActiveModel {
         library_id: Set(dto.library_id.clone()),
         kind: Set(dto.kind.clone()),
+        catalog_kind: Set(dto.catalog_kind.clone()),
         root_path: Set(dto.root_path.clone()),
         name: Set(dto.name.clone()),
         enabled_resource_format_categories: Set(serialize_resource_format_categories(
@@ -355,6 +395,11 @@ pub async fn update_library_resource_format_categories(
     else {
         return Err(HentaiError::validation(format!("Library 不存在: {id}")));
     };
+    if is_image_set_catalog(&model.catalog_kind) {
+        return Err(HentaiError::validation(
+            "Image set library 不支持 Comic 格式多选",
+        ));
+    }
     // Empty list is intentional (user may disable all groups until next sync).
     let mut active: libraries::ActiveModel = model.into();
     active.enabled_resource_format_categories = Set(serialize_resource_format_categories(&groups));
@@ -386,11 +431,25 @@ pub async fn update_library_settings(
     else {
         return Err(HentaiError::validation(format!("Library 不存在: {id}")));
     };
-    let mut active: libraries::ActiveModel = model.into();
+    let mut active: libraries::ActiveModel = model.clone().into();
     active.name = Set(trimmed_name.to_string());
-    active.enabled_resource_format_categories = Set(serialize_resource_format_categories(&groups));
-    active.scan_on_startup = Set(if scan_on_startup { 1 } else { 0 });
-    active.scan_interval = Set(scan_interval.as_str().to_string());
+    if is_image_set_catalog(&model.catalog_kind) {
+        if scan_on_startup || scan_interval != ScanInterval::Disabled {
+            return Err(HentaiError::validation(
+                "Image set library 仅支持手动同步",
+            ));
+        }
+        if !groups.is_empty() {
+            return Err(HentaiError::validation(
+                "Image set library 不支持 Comic 格式多选",
+            ));
+        }
+    } else {
+        active.enabled_resource_format_categories =
+            Set(serialize_resource_format_categories(&groups));
+        active.scan_on_startup = Set(if scan_on_startup { 1 } else { 0 });
+        active.scan_interval = Set(scan_interval.as_str().to_string());
+    }
     let updated = active.update(&db).await.map_err(map_db_err)?;
     crate::revision::notify_committed();
     Ok(model_to_dto(updated))

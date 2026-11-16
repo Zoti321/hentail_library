@@ -19,6 +19,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sidebarAddLocalLibrary => 'Add local library';
 
   @override
+  String get sidebarAddImageSetLibrary => 'Add image set library';
+
+  @override
+  String get dialogCreateImageSetLibraryTitle => 'Add image set library';
+
+  @override
+  String get libraryImageSetAddedToast => 'Image set library added';
+
+  @override
+  String get imageSetLibraryKindLabel => 'Image set library';
+
+  @override
+  String get imageSetLibraryPlaceholder => 'Image set browsing is coming soon';
+
+  @override
   String get sidebarAddRemoteLibrary => 'Add remote library';
 
   @override

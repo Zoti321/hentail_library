@@ -14,6 +14,7 @@ void main() {
     return (
       libraryId: id,
       kind: 'local',
+      catalogKind: 'comic',
       rootPath: '/$id',
       name: id,
       enabledResourceFormatCategories: const [],

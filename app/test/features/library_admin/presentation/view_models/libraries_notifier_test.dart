@@ -78,6 +78,7 @@ LibrariesState _state(String name) => LibrariesState(
     (
       libraryId: name,
       kind: 'local',
+      catalogKind: 'comic',
       rootPath: '/$name',
       name: name,
       enabledResourceFormatCategories: ResourceFormatCategory.all,

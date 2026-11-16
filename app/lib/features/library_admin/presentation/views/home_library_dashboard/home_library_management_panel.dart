@@ -98,6 +98,8 @@ class HomeLibraryManagementPanel extends HookConsumerWidget {
           unawaited(management.openLibrary(context, libraryId)),
       onLibraryAction: handleAction,
       onAddLocalLibrary: () => unawaited(management.addLocalLibrary(context)),
+      onAddImageSetLibrary: () =>
+          unawaited(management.addImageSetLibrary(context)),
       onAddRemoteLibrary: () => unawaited(management.addRemoteLibrary(context)),
       onLibrariesReorder: handleReorder,
     );

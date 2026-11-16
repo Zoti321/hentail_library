@@ -11,6 +11,8 @@ import 'package:hentai_library/features/library_admin/domain/local_library.dart'
 abstract interface class LibraryManagementCommands {
   Future<void> addLocalLibrary(BuildContext context);
 
+  Future<void> addImageSetLibrary(BuildContext context);
+
   Future<void> addRemoteLibrary(BuildContext context);
 
   Future<void> editRemoteLibrary(BuildContext context, LocalLibrary library);

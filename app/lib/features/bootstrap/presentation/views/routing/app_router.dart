@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hentai_library/features/library_browse/public.dart';
 import 'package:hentai_library/features/app_settings/public.dart';
 import 'package:hentai_library/features/home/public.dart';
+import 'package:hentai_library/features/image_set_library/public.dart';
 import 'package:hentai_library/features/metadata_backup/public.dart';
 import 'package:hentai_library/features/reader/public.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
@@ -124,7 +125,7 @@ final GoRouter appRouter = GoRouter(
   ],
 );
 
-/// 单库浏览页：注入 [browseLibraryIdProvider] 作用域后展示目录。
+/// 单库浏览页：Comic 库注入 [browseLibraryIdProvider] 作用域后展示目录；Image set 库走专用占位。
 class LibraryBrowsePage extends HookConsumerWidget {
   const LibraryBrowsePage({super.key, required this.libraryId});
 
@@ -132,16 +133,26 @@ class LibraryBrowsePage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final LocalLibrary? library = ref
+        .watch(librariesStateProvider)
+        .asData
+        ?.value
+        .findById(libraryId);
+    final bool imageSet = library != null && isImageSetLibrary(library);
+
     useEffect(() {
-      final String? scopedId = libraryId.isEmpty ? null : libraryId;
+      final String? scopedId = libraryId.isEmpty || imageSet ? null : libraryId;
       // 先抓住 notifier：dispose 后不能再用 ref。
       final BrowseLibraryId scope = ref.read(browseLibraryIdProvider.notifier);
       // claim/release 必须离开 build；epoch 防止旧页 dispose 清掉新页已 claim 的 id。
       final _LibraryScopeClaim claim = _LibraryScopeClaim();
       unawaited(Future<void>.microtask(() => claim.claim(scope, scopedId)));
       return () => Future<void>.microtask(() => claim.release(scope));
-    }, <Object?>[libraryId]);
+    }, <Object?>[libraryId, imageSet]);
 
+    if (library != null && imageSet) {
+      return ImageSetLibraryPage(displayName: localLibraryDisplayName(library));
+    }
     return const LibraryPage();
   }
 }

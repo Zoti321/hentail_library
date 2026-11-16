@@ -92,6 +92,7 @@ class _FixedSeriesCatalog extends LibrarySeriesCatalogController {
 const LocalLibrary _libraryA = (
   libraryId: 'lib-a',
   kind: 'local',
+  catalogKind: 'comic',
   rootPath: '/a',
   name: 'Library A',
   enabledResourceFormatCategories: <ResourceFormatCategory>[],

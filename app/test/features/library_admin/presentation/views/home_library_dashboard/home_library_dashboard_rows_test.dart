@@ -11,6 +11,7 @@ final DateTime _now = DateTime(2026, 11, 12, 12);
 LocalLibrary _library({
   required String id,
   String kind = 'local',
+  String catalogKind = 'comic',
   String name = '',
   String rootPath = '/lib/a',
   ScanInterval scanInterval = ScanInterval.disabled,
@@ -18,6 +19,7 @@ LocalLibrary _library({
   return (
     libraryId: id,
     kind: kind,
+    catalogKind: catalogKind,
     rootPath: rootPath,
     name: name,
     enabledResourceFormatCategories: const <ResourceFormatCategory>[],
@@ -60,6 +62,27 @@ void main() {
     expect(rows[0].comicCount, 0);
     expect(rows[1].comicCount, 7);
     expect(rows[1].seriesCount, 3);
+  });
+
+  test('图集库不展示漫画聚合且不产生健康提示', () {
+    final List<HomeLibraryDashboardRow> rows = buildHomeLibraryDashboardRows(
+      libraries: <LocalLibrary>[
+        _library(
+          id: 'img',
+          catalogKind: 'image_set',
+          scanInterval: ScanInterval.daily,
+        ),
+      ],
+      stats: const <HomeLibraryStat>[
+        HomeLibraryStat(libraryId: 'img', comicCount: 9, seriesCount: 2),
+      ],
+      now: _now,
+    );
+
+    expect(rows.single.catalogKind, HomeLibraryCatalogKind.imageSet);
+    expect(rows.single.comicCount, 0);
+    expect(rows.single.seriesCount, 0);
+    expect(rows.single.hint, HomeLibraryRowHint.none);
   });
 
   test('远程库标记为 remote', () {

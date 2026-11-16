@@ -15,7 +15,7 @@ use crate::db::{connection, map_db_err};
 use crate::entity::{libraries, prelude::*};
 use crate::error::HentaiError;
 use crate::history::reading_history_retention_cutoff_ms;
-use crate::library::dto::{model_to_dto, LibraryDto, KIND_LOCAL};
+use crate::library::dto::{is_image_set_catalog, model_to_dto, LibraryDto, KIND_LOCAL};
 use crate::library_write::with_library_write;
 use crate::path_migration::{
     apply_comic_rekeys, apply_series_rekeys, ComicMigration, SeriesMigrationPair,
@@ -56,6 +56,11 @@ async fn update_local_library_root_locked(id: &str, root: &str) -> Result<Librar
     if model.kind != KIND_LOCAL {
         return Err(HentaiError::validation(
             "仅 Local library 可更新本地 Library root",
+        ));
+    }
+    if is_image_set_catalog(&model.catalog_kind) {
+        return Err(HentaiError::validation(
+            "Image set library 不支持更改 Local root",
         ));
     }
 

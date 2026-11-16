@@ -34,6 +34,19 @@ class LibraryRepositoryImpl implements LibraryRepository {
   }
 
   @override
+  Future<LocalLibrary> createImageSetLocal(
+    String rootPath, {
+    String? name,
+  }) async {
+    return guardFrbSync(
+      () => _mapLibrary(
+        rust.createImageSetLocalLibraryFrb(rootPath: rootPath, name: name),
+      ),
+      fallbackMessage: '创建图集库失败',
+    );
+  }
+
+  @override
   Future<LocalLibrary> createRemote({
     required String rootUrl,
     required String username,
@@ -197,6 +210,7 @@ LocalLibrary _mapLibrary(rust.LibraryDto dto) {
   return (
     libraryId: dto.libraryId,
     kind: dto.kind,
+    catalogKind: dto.catalogKind,
     rootPath: dto.rootPath,
     name: dto.name,
     enabledResourceFormatCategories: dto.enabledResourceFormatCategories

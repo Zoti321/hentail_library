@@ -255,6 +255,7 @@ LocalLibrary _library(
 }) => (
   libraryId: id,
   kind: 'local',
+  catalogKind: 'comic',
   rootPath: '/$id',
   name: name,
   enabledResourceFormatCategories: const [],

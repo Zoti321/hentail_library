@@ -6,7 +6,9 @@ import 'package:hentai_library/features/library_admin/presentation/views/library
 import 'package:hentai_library/features/library_admin/presentation/views/library/library_form_dialog.dart';
 import 'package:hentai_library/features/library_admin/public/providers/library_admin_state_providers.dart';
 import 'package:hentai_library/features/library_admin/domain/local_library.dart';
+import 'package:hentai_library/features/library_admin/domain/resource_format_category.dart';
 import 'package:hentai_library/features/library_admin/domain/value_objects/library_form.dart';
+import 'package:hentai_library/features/library_admin/domain/value_objects/scan_interval.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:riverpod/misc.dart' show Override;
 
@@ -104,6 +106,58 @@ void main() {
     expect(find.text('Library root 不能为空'), findsOneWidget);
     expect(notifier.submitCalls, isEmpty);
     expect(find.byType(M3EDialog), findsOneWidget);
+  });
+
+  testWidgets('image set create shows image set title without scanner tab', (
+    WidgetTester tester,
+  ) async {
+    final _RecordingLibrariesNotifier notifier = _RecordingLibrariesNotifier();
+    await _pumpForm(
+      tester,
+      mode: LibraryFormMode.createImageSetLocal,
+      notifier: notifier,
+    );
+
+    expect(find.text('添加图集库'), findsWidgets);
+    expect(find.text('扫描'), findsNothing);
+    expect(find.text('WebDAV'), findsNothing);
+  });
+
+  testWidgets('image set edit locks root and hides scanner tab', (
+    WidgetTester tester,
+  ) async {
+    final _RecordingLibrariesNotifier notifier = _RecordingLibrariesNotifier();
+    const LocalLibrary library = (
+      libraryId: 'img',
+      kind: 'local',
+      catalogKind: 'image_set',
+      rootPath: r'D:\images',
+      name: 'Gallery',
+      enabledResourceFormatCategories: <ResourceFormatCategory>[],
+      username: '',
+      allowHttp: false,
+      scanOnStartup: false,
+      scanInterval: ScanInterval.disabled,
+      pinned: false,
+      sidebarOrder: 0,
+    );
+    await _pumpForm(
+      tester,
+      mode: LibraryFormMode.edit,
+      library: library,
+      notifier: notifier,
+    );
+
+    expect(find.text('扫描'), findsNothing);
+    expect(find.text(r'D:\images'), findsOneWidget);
+    expect(find.text('浏览'), findsNothing);
+    final EditableText root = tester.widget<EditableText>(
+      find.byWidgetPredicate(
+        (Widget widget) =>
+            widget is EditableText && widget.controller.text == r'D:\images',
+      ),
+    );
+    expect(root.readOnly, isTrue);
   });
 
   testWidgets('remote create without password switches to WebDAV tab', (

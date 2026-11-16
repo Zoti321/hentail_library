@@ -27,28 +27,32 @@ class HomeLibraryRowMoreMenu extends StatelessWidget {
       onAction?.call(action);
     }
 
+    final bool comicCatalog = row.catalogKind == HomeLibraryCatalogKind.comic;
     final List<M3EMenuEntry> entries = <M3EMenuEntry>[
-      M3EMenuEntry(
-        label: l10n.sidebarScanLibrary,
-        enabled: scanEnabled,
-        onPressed: scanEnabled
-            ? () => emit(HomeLibraryManagementAction.scan)
-            : null,
-      ),
-      M3EMenuEntry(
-        label: l10n.sidebarDeepScanLibrary,
-        enabled: scanEnabled,
-        onPressed: scanEnabled
-            ? () => emit(HomeLibraryManagementAction.deepScan)
-            : null,
-      ),
-      M3EMenuEntry(
-        label: l10n.refreshMetadata,
-        enabled: menuEnabled && !row.metadataRefreshInProgress,
-        onPressed: menuEnabled && !row.metadataRefreshInProgress
-            ? () => emit(HomeLibraryManagementAction.refreshMetadata)
-            : null,
-      ),
+      if (comicCatalog)
+        M3EMenuEntry(
+          label: l10n.sidebarScanLibrary,
+          enabled: scanEnabled,
+          onPressed: scanEnabled
+              ? () => emit(HomeLibraryManagementAction.scan)
+              : null,
+        ),
+      if (comicCatalog)
+        M3EMenuEntry(
+          label: l10n.sidebarDeepScanLibrary,
+          enabled: scanEnabled,
+          onPressed: scanEnabled
+              ? () => emit(HomeLibraryManagementAction.deepScan)
+              : null,
+        ),
+      if (comicCatalog)
+        M3EMenuEntry(
+          label: l10n.refreshMetadata,
+          enabled: menuEnabled && !row.metadataRefreshInProgress,
+          onPressed: menuEnabled && !row.metadataRefreshInProgress
+              ? () => emit(HomeLibraryManagementAction.refreshMetadata)
+              : null,
+        ),
       M3EMenuEntry(
         label: row.kind == HomeLibraryKind.remote
             ? l10n.sidebarEditLibraryConnection

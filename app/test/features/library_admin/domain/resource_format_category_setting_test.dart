@@ -41,6 +41,7 @@ class _Libraries implements LibraryRepository {
       (
         libraryId: id,
         kind: id,
+        catalogKind: 'comic',
         rootPath: id == 'local' ? '/books' : 'https://example.invalid/books',
         name: id,
         enabledResourceFormatCategories:

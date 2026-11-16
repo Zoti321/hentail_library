@@ -19,6 +19,7 @@ class _FakeLibrariesNotifier extends LibrariesNotifier {
   static const LocalLibrary _libraryA = (
     libraryId: 'lib-a',
     kind: 'local',
+    catalogKind: 'comic',
     rootPath: '/a',
     name: 'A',
     enabledResourceFormatCategories: <ResourceFormatCategory>[],
@@ -33,6 +34,7 @@ class _FakeLibrariesNotifier extends LibrariesNotifier {
   static const LocalLibrary _libraryB = (
     libraryId: 'lib-b',
     kind: 'local',
+    catalogKind: 'comic',
     rootPath: '/b',
     name: 'B',
     enabledResourceFormatCategories: <ResourceFormatCategory>[],

@@ -34,6 +34,7 @@ class _PreviewLibraries extends LibrariesNotifier {
         (
           libraryId: 'local-2',
           kind: 'local',
+          catalogKind: 'comic',
           rootPath: '/Comics',
           name: '本地漫画库',
           enabledResourceFormatCategories: ResourceFormatCategory.all,

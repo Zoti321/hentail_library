@@ -440,6 +440,7 @@ mod tests {
             library_id: "lib-1".to_string(),
             name: "Test".to_string(),
             kind: "local".to_string(),
+            catalog_kind: "comic".to_string(),
             root_path: "/tmp/lib".to_string(),
             username: String::new(),
             allow_http: 0,

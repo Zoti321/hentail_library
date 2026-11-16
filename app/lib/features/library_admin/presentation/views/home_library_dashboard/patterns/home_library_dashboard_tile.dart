@@ -91,7 +91,7 @@ class _HomeLibraryRowContent extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.only(top: 2),
           child: Icon(
-            homeLibraryKindIcon(row.kind),
+            homeLibraryRowIcon(row),
             size: 24,
             color: homeLibraryHintColor(scheme, row.hint),
           ),

@@ -26,6 +26,23 @@ class _RecordingLibraryRepository implements LibraryRepository {
   }
 
   @override
+  Future<LocalLibrary> createImageSetLocal(
+    String rootPath, {
+    String? name,
+  }) async {
+    calls.add('createImageSetLocal');
+    lastRoot = rootPath;
+    lastName = name;
+    return _lib(
+      kind: 'local',
+      catalogKind: 'image_set',
+      root: rootPath,
+      name: name ?? 'derived',
+      groups: const <ResourceFormatCategory>[],
+    );
+  }
+
+  @override
   Future<LocalLibrary> createRemote({
     required String rootUrl,
     required String username,
@@ -39,6 +56,7 @@ class _RecordingLibraryRepository implements LibraryRepository {
     lastPassword = password;
     return _lib(
       kind: 'remote',
+      catalogKind: 'comic',
       root: rootUrl,
       name: name ?? 'derived',
       username: username,
@@ -69,6 +87,7 @@ class _RecordingLibraryRepository implements LibraryRepository {
     lastPassword = password;
     return _lib(
       kind: 'remote',
+      catalogKind: 'comic',
       root: rootUrl,
       name: lastName ?? 'Remote',
       username: username,
@@ -99,6 +118,7 @@ class _RecordingLibraryRepository implements LibraryRepository {
 
 LocalLibrary _lib({
   required String kind,
+  String catalogKind = 'comic',
   required String root,
   required String name,
   String username = '',
@@ -110,6 +130,7 @@ LocalLibrary _lib({
   return (
     libraryId: 'lib-1',
     kind: kind,
+    catalogKind: catalogKind,
     rootPath: root,
     name: name,
     enabledResourceFormatCategories:
@@ -201,6 +222,7 @@ void main() {
     test('no-op when unchanged', () async {
       final LocalLibrary original = _lib(
         kind: 'local',
+        catalogKind: 'comic',
         root: r'D:\comics',
         name: 'Alpha',
       );
@@ -212,9 +234,47 @@ void main() {
       expect(repo.calls, isEmpty);
     });
 
+    test('image set root change is ignored without updateLocalRoot', () async {
+      final LocalLibrary original = _lib(
+        kind: 'local',
+        catalogKind: 'image_set',
+        root: r'D:\images',
+        name: 'Alpha',
+        groups: const <ResourceFormatCategory>[],
+      );
+      final _RecordingLibraryRepository repo = _RecordingLibraryRepository();
+      final LibraryFormApplyResult result =
+          await LibraryForm.fromLibrary(original)
+              .copyWith(rootPath: r'D:\images2', name: 'Beta')
+              .submit(repo, original: original);
+      expect(result, isA<LibraryFormApplySucceeded>());
+      expect((result as LibraryFormApplySucceeded).rootChanged, isFalse);
+      expect(repo.calls, <String>['updateSettings']);
+      expect(repo.lastName, 'Beta');
+    });
+
+    test(
+      'image set create uses image set repository without settings write',
+      () async {
+        final _RecordingLibraryRepository repo = _RecordingLibraryRepository();
+        final LibraryFormApplyResult result =
+            await LibraryForm.createImageSetLocal()
+                .copyWith(
+                  name: 'Gallery',
+                  rootPath: r'D:\images',
+                  scanOnStartup: true,
+                )
+                .submit(repo);
+        expect(result, isA<LibraryFormApplySucceeded>());
+        expect(repo.calls, <String>['createImageSetLocal']);
+        expect(repo.lastGroups, isNull);
+      },
+    );
+
     test('local root change calls updateLocalRoot', () async {
       final LocalLibrary original = _lib(
         kind: 'local',
+        catalogKind: 'comic',
         root: r'D:\comics',
         name: 'Alpha',
       );
@@ -231,6 +291,7 @@ void main() {
     test('remote password empty does not pass password override', () async {
       final LocalLibrary original = _lib(
         kind: 'remote',
+        catalogKind: 'comic',
         root: 'https://a.example/dav',
         name: 'Nas',
         username: 'u',

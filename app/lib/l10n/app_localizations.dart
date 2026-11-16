@@ -116,6 +116,36 @@ abstract class AppLocalizations {
   /// **'添加本地库'**
   String get sidebarAddLocalLibrary;
 
+  /// No description provided for @sidebarAddImageSetLibrary.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加图集库'**
+  String get sidebarAddImageSetLibrary;
+
+  /// No description provided for @dialogCreateImageSetLibraryTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加图集库'**
+  String get dialogCreateImageSetLibraryTitle;
+
+  /// No description provided for @libraryImageSetAddedToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'已添加图集库'**
+  String get libraryImageSetAddedToast;
+
+  /// No description provided for @imageSetLibraryKindLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'图集库'**
+  String get imageSetLibraryKindLabel;
+
+  /// No description provided for @imageSetLibraryPlaceholder.
+  ///
+  /// In zh, this message translates to:
+  /// **'图集浏览即将推出'**
+  String get imageSetLibraryPlaceholder;
+
   /// No description provided for @sidebarAddRemoteLibrary.
   ///
   /// In zh, this message translates to:

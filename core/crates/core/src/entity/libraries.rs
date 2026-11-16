@@ -6,6 +6,8 @@ pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub library_id: String,
     pub kind: String,
+    /// Catalog kind: `comic` | `image_set` (orthogonal to local/remote `kind`).
+    pub catalog_kind: String,
     #[sea_orm(unique)]
     pub root_path: String,
     pub name: String,

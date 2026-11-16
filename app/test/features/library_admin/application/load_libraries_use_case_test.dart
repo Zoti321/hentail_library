@@ -291,6 +291,7 @@ void main() {
 LocalLibrary _library(String id) => (
   libraryId: id,
   kind: 'local',
+  catalogKind: 'comic',
   rootPath: '/books',
   name: id,
   enabledResourceFormatCategories: ResourceFormatCategory.all,

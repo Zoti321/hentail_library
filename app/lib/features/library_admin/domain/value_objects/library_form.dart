@@ -10,6 +10,7 @@ part 'library_form.freezed.dart';
 abstract class LibraryForm with _$LibraryForm {
   factory LibraryForm({
     required bool isRemote,
+    @Default(false) bool isImageSet,
     required String name,
     required String rootPath,
     @Default('') String username,
@@ -33,6 +34,19 @@ abstract class LibraryForm with _$LibraryForm {
     );
   }
 
+  /// Image set 仅名称可编辑；无格式多选、无扫描、根路径创建后锁定。
+  factory LibraryForm.createImageSetLocal() {
+    return LibraryForm(
+      isRemote: false,
+      isImageSet: true,
+      name: '',
+      rootPath: '',
+      enabledResourceFormatCategories: const <ResourceFormatCategory>[],
+      scanOnStartup: false,
+      scanInterval: ScanInterval.disabled,
+    );
+  }
+
   factory LibraryForm.createRemote() {
     return LibraryForm(
       isRemote: true,
@@ -50,9 +64,13 @@ abstract class LibraryForm with _$LibraryForm {
 
   factory LibraryForm.fromLibrary(LocalLibrary library) {
     final bool remote = isRemoteLibrary(library);
+    final bool imageSet = isImageSetLibrary(library);
     List<ResourceFormatCategory> groups = List<ResourceFormatCategory>.of(
       library.enabledResourceFormatCategories,
     );
+    if (imageSet) {
+      groups = <ResourceFormatCategory>[];
+    }
     if (remote) {
       groups = groups
           .where(
@@ -62,6 +80,7 @@ abstract class LibraryForm with _$LibraryForm {
     }
     return LibraryForm(
       isRemote: remote,
+      isImageSet: imageSet,
       name: library.name,
       rootPath: library.rootPath,
       username: library.username,
@@ -132,6 +151,15 @@ extension LibraryFormOps on LibraryForm {
   }
 
   LibraryForm get normalized {
+    if (isImageSet) {
+      return copyWith(
+        name: name.trim(),
+        rootPath: rootPath.trim(),
+        enabledResourceFormatCategories: const <ResourceFormatCategory>[],
+        scanOnStartup: false,
+        scanInterval: ScanInterval.disabled,
+      );
+    }
     final Set<ResourceFormatCategory> unique = enabledResourceFormatCategories
         .toSet();
     if (isRemote) {

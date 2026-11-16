@@ -14,7 +14,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'sync.dart';
 
 // These functions are ignored because they are not marked as `pub`: `map_resource_format_category_core`, `map_resource_format_category`, `map_scan_interval_core`, `map_scan_interval`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `eq`, `fmt`, `fmt`, `fmt`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `clone`, `clone`, `clone`, `eq`, `fmt`, `fmt`, `fmt`, `from`
 
 Future<List<LibraryDto>> listLibrariesFrb() =>
     RustLib.instance.api.crateApiLibraryListLibrariesFrb();
@@ -24,6 +24,14 @@ LibraryDto createLocalLibraryFrb({required String rootPath, String? name}) =>
       rootPath: rootPath,
       name: name,
     );
+
+LibraryDto createImageSetLocalLibraryFrb({
+  required String rootPath,
+  String? name,
+}) => RustLib.instance.api.crateApiLibraryCreateImageSetLocalLibraryFrb(
+  rootPath: rootPath,
+  name: name,
+);
 
 LibraryDto createRemoteLibraryFrb({
   required String rootUrl,
@@ -97,6 +105,7 @@ List<LibraryDto> updateLibrarySidebarLayoutFrb({
 class LibraryDto {
   final String libraryId;
   final String kind;
+  final String catalogKind;
   final String rootPath;
   final String name;
   final List<ResourceFormatCategoryDto> enabledResourceFormatCategories;
@@ -111,6 +120,7 @@ class LibraryDto {
   const LibraryDto({
     required this.libraryId,
     required this.kind,
+    required this.catalogKind,
     required this.rootPath,
     required this.name,
     required this.enabledResourceFormatCategories,
@@ -127,6 +137,7 @@ class LibraryDto {
   int get hashCode =>
       libraryId.hashCode ^
       kind.hashCode ^
+      catalogKind.hashCode ^
       rootPath.hashCode ^
       name.hashCode ^
       enabledResourceFormatCategories.hashCode ^
@@ -145,6 +156,7 @@ class LibraryDto {
           runtimeType == other.runtimeType &&
           libraryId == other.libraryId &&
           kind == other.kind &&
+          catalogKind == other.catalogKind &&
           rootPath == other.rootPath &&
           name == other.name &&
           enabledResourceFormatCategories ==

@@ -8,6 +8,7 @@ abstract final class LibraryEditPreviewData {
   static LocalLibrary get sampleLocalLibrary => (
     libraryId: 'lab-local-1',
     kind: 'local',
+    catalogKind: 'comic',
     rootPath: r'D:\library\NAS 漫画库',
     name: 'NAS 漫画库',
     enabledResourceFormatCategories: List<ResourceFormatCategory>.from(
@@ -24,6 +25,7 @@ abstract final class LibraryEditPreviewData {
   static LocalLibrary get sampleRemoteLibrary => (
     libraryId: 'lab-remote-1',
     kind: 'remote',
+    catalogKind: 'comic',
     rootPath: 'https://nas.example/dav/comics',
     name: 'WebDAV 同步库',
     enabledResourceFormatCategories: ResourceFormatCategory.all

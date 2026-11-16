@@ -41,12 +41,19 @@ class _LibraryEditFormState extends State<LibraryEditForm> {
 
   bool get _isRemote => widget.form.isRemote;
 
+  bool get _isImageSet => widget.form.isImageSet;
+
+  /// Image set 编辑时根路径只读（创建后锁定）。
+  bool get _rootLocked => _isImageSet && !widget.isCreate;
+
   List<_LibraryEditTab> get _tabs => _isRemote
       ? const <_LibraryEditTab>[
           _LibraryEditTab.general,
           _LibraryEditTab.webDav,
           _LibraryEditTab.scanner,
         ]
+      : _isImageSet
+      ? const <_LibraryEditTab>[_LibraryEditTab.general]
       : const <_LibraryEditTab>[
           _LibraryEditTab.general,
           _LibraryEditTab.scanner,
@@ -138,10 +145,12 @@ class _LibraryEditFormState extends State<LibraryEditForm> {
         rootPath: _isRemote ? null : form.rootPath,
         rootError: _isRemote ? null : validation?.rootError,
         enabled: widget.enabled,
-        onBrowseRoot: _isRemote ? null : () => widget.onBrowseRoot?.call(),
+        onBrowseRoot: _isRemote || _rootLocked
+            ? null
+            : () => widget.onBrowseRoot?.call(),
         onNameChanged: (String value) =>
             _patch((LibraryForm f) => f.copyWith(name: value)),
-        onRootChanged: _isRemote
+        onRootChanged: _isRemote || _rootLocked
             ? null
             : (String value) =>
                   _patch((LibraryForm f) => f.copyWith(rootPath: value)),
@@ -336,7 +345,7 @@ class _GeneralTab extends StatelessWidget {
     final AppLocalizations l10n = context.l10n;
     final M3EThemeData theme = M3ETheme.of(context);
     final M3ESpacing spacing = theme.spacing;
-    final bool showRoot = rootPath != null && onRootChanged != null;
+    final bool showRoot = rootPath != null;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -358,16 +367,18 @@ class _GeneralTab extends StatelessWidget {
                   label: l10n.formLibraryRootLabel,
                   initialValue: rootPath,
                   errorText: rootError,
-                  enabled: enabled,
-                  onChanged: onRootChanged!,
+                  enabled: enabled && onRootChanged != null,
+                  onChanged: onRootChanged ?? (String value) {},
                 ),
               ),
-              SizedBox(width: spacing.sm),
-              M3EButton(
-                onPressed: enabled ? onBrowseRoot : null,
-                style: M3EButtonStyle.tonal,
-                label: Text(l10n.formLibraryRootBrowse),
-              ),
+              if (onBrowseRoot != null) ...<Widget>[
+                SizedBox(width: spacing.sm),
+                M3EButton(
+                  onPressed: enabled ? onBrowseRoot : null,
+                  style: M3EButtonStyle.tonal,
+                  label: Text(l10n.formLibraryRootBrowse),
+                ),
+              ],
             ],
           ),
         ],

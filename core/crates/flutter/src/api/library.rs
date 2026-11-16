@@ -1,4 +1,5 @@
 use hentai_core::{
+    create_image_set_local_library as core_create_image_set,
     create_local_library as core_create_local, create_remote_library as core_create_remote,
     delete_library as core_delete, list_libraries as core_list,
     set_all_libraries_scan_on_startup as core_set_all_scan_on_startup,
@@ -28,6 +29,7 @@ pub enum ScanIntervalDto {
 pub struct LibraryDto {
     pub library_id: String,
     pub kind: String,
+    pub catalog_kind: String,
     pub root_path: String,
     pub name: String,
     pub enabled_resource_format_categories: Vec<ResourceFormatCategoryDto>,
@@ -45,6 +47,7 @@ impl From<CoreLibrary> for LibraryDto {
         Self {
             library_id: value.library_id,
             kind: value.kind,
+            catalog_kind: value.catalog_kind,
             root_path: value.root_path,
             name: value.name,
             enabled_resource_format_categories: value
@@ -126,6 +129,16 @@ pub fn create_local_library_frb(
     name: Option<String>,
 ) -> Result<LibraryDto, HentaiErrorDto> {
     hentai_core::runtime::block_on(core_create_local(&root_path, name.as_deref()))
+        .map(LibraryDto::from)
+        .map_err(HentaiErrorDto::from)
+}
+
+#[flutter_rust_bridge::frb(sync)]
+pub fn create_image_set_local_library_frb(
+    root_path: String,
+    name: Option<String>,
+) -> Result<LibraryDto, HentaiErrorDto> {
+    hentai_core::runtime::block_on(core_create_image_set(&root_path, name.as_deref()))
         .map(LibraryDto::from)
         .map_err(HentaiErrorDto::from)
 }

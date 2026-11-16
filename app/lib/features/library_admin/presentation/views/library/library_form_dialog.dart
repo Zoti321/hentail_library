@@ -18,7 +18,7 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:path/path.dart' as p;
 import 'package:hentai_library/features/resource_metadata/public/widgets.dart';
 
-enum LibraryFormMode { createLocal, createRemote, edit }
+enum LibraryFormMode { createLocal, createImageSetLocal, createRemote, edit }
 
 /// 打开 Library 创建 / 编辑：[M3EDialog.showAdaptive]（宽 < 840 全屏，否则基础弹窗）。
 Future<void> showLibraryFormDialog({
@@ -59,6 +59,8 @@ Future<void> showLibraryFormDialog({
 String _titleFor(AppLocalizations l10n, LibraryFormMode mode) {
   return switch (mode) {
     LibraryFormMode.createLocal => l10n.dialogCreateLocalLibraryTitle,
+    LibraryFormMode.createImageSetLocal =>
+      l10n.dialogCreateImageSetLibraryTitle,
     LibraryFormMode.createRemote => l10n.dialogCreateRemoteLibraryTitle,
     LibraryFormMode.edit => l10n.dialogEditLibraryTitle,
   };
@@ -83,6 +85,7 @@ class _LibraryFormFields extends ConsumerStatefulWidget {
 class _LibraryFormState extends ConsumerState<_LibraryFormFields> {
   late LibraryForm _form = switch (widget.mode) {
     LibraryFormMode.createLocal => LibraryForm.createLocal(),
+    LibraryFormMode.createImageSetLocal => LibraryForm.createImageSetLocal(),
     LibraryFormMode.createRemote => LibraryForm.createRemote(),
     LibraryFormMode.edit => LibraryForm.fromLibrary(widget.library!),
   };
@@ -122,9 +125,10 @@ class _LibraryFormState extends ConsumerState<_LibraryFormFields> {
       return;
     }
 
-    if (requiresDisableAllResourceFormatCategoriesConfirm(
-      _form.enabledResourceFormatCategories,
-    )) {
+    if (!_form.isImageSet &&
+        requiresDisableAllResourceFormatCategoriesConfirm(
+          _form.enabledResourceFormatCategories,
+        )) {
       final bool confirmed = await showLibraryConfirmDialog(
         context,
         title: l10n.settingsDisableAllFormatsConfirmTitle,
@@ -178,6 +182,8 @@ class _LibraryFormState extends ConsumerState<_LibraryFormFields> {
         case LibraryFormApplySucceeded():
           final String toast = switch (widget.mode) {
             LibraryFormMode.createLocal => l10n.libraryLocalAddedToast,
+            LibraryFormMode.createImageSetLocal =>
+              l10n.libraryImageSetAddedToast,
             LibraryFormMode.createRemote => l10n.remoteLibraryAddedToast,
             LibraryFormMode.edit => l10n.commonSavedToast,
           };
@@ -256,7 +262,7 @@ class _LibraryFormState extends ConsumerState<_LibraryFormFields> {
           onFormChanged: _handleFormChanged,
           onBrowseRoot: _isRemote ? null : _browseLocalRoot,
         ),
-        if (!_isRemote && widget.library != null)
+        if (!_isRemote && !_form.isImageSet && widget.library != null)
           WritebackSetting(libraryId: widget.library!.libraryId),
       ],
     );

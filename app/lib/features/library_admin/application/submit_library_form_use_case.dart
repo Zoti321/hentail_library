@@ -35,7 +35,9 @@ class SubmitLibraryFormUseCase {
     }
 
     final LocalLibrary created;
-    created = ready.isRemote
+    created = ready.isImageSet
+        ? await repository.createImageSetLocal(ready.rootPath, name: ready.name)
+        : ready.isRemote
         ? await repository.createRemote(
             rootUrl: ready.rootPath,
             username: ready.username,
@@ -54,7 +56,10 @@ class SubmitLibraryFormUseCase {
     LibraryForm form,
     LocalLibrary original,
   ) async {
-    final LibraryForm ready = form.normalized;
+    // Image set 根路径创建后锁定：忽略表单中的路径变更，不走 updateLocalRoot。
+    final LibraryForm ready =
+        (form.isImageSet ? form.copyWith(rootPath: original.rootPath) : form)
+            .normalized;
     final LibraryFormValidation validation = ready.validate(isCreate: false);
     if (!validation.isValid) {
       return LibraryFormApplyInvalid(validation);

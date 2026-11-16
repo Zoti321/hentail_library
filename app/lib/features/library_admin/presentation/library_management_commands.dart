@@ -26,6 +26,13 @@ class _LibraryManagementAdapter implements LibraryManagementCommands {
   );
 
   @override
+  Future<void> addImageSetLibrary(BuildContext context) =>
+      showLibraryFormDialog(
+        context: context,
+        mode: LibraryFormMode.createImageSetLocal,
+      );
+
+  @override
   Future<void> addRemoteLibrary(BuildContext context) => showLibraryFormDialog(
     context: context,
     mode: LibraryFormMode.createRemote,

@@ -8,6 +8,7 @@ LocalLibrary _lib(String id, {bool pinned = true, int sidebarOrder = 0}) {
   return (
     libraryId: id,
     kind: 'local',
+    catalogKind: 'comic',
     rootPath: '/$id',
     name: id,
     enabledResourceFormatCategories: ResourceFormatCategory.all,

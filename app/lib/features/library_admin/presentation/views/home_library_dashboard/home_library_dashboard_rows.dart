@@ -17,23 +17,28 @@ List<HomeLibraryDashboardRow> buildHomeLibraryDashboardRows({
   return libraries
       .map((LocalLibrary library) {
         final HomeLibraryStat? stat = statsById[library.libraryId];
-        final int comicCount = stat?.comicCount ?? 0;
+        final bool imageSet = isImageSetLibrary(library);
+        final int comicCount = imageSet ? 0 : stat?.comicCount ?? 0;
         final DateTime? lastSyncedAt = stat?.lastSuccessfulSyncAt;
-        final ({HomeLibraryRowHint hint, int? staleDays}) health =
-            resolveHomeLibraryRowHealth(
-              now: now,
-              scanInterval: library.scanInterval,
-              lastSuccessfulSyncAt: lastSyncedAt,
-              comicCount: comicCount,
-            );
+        final ({HomeLibraryRowHint hint, int? staleDays}) health = imageSet
+            ? (hint: HomeLibraryRowHint.none, staleDays: null)
+            : resolveHomeLibraryRowHealth(
+                now: now,
+                scanInterval: library.scanInterval,
+                lastSuccessfulSyncAt: lastSyncedAt,
+                comicCount: comicCount,
+              );
         return HomeLibraryDashboardRow(
           libraryId: library.libraryId,
           displayName: localLibraryDisplayName(library),
           kind: isRemoteLibrary(library)
               ? HomeLibraryKind.remote
               : HomeLibraryKind.local,
+          catalogKind: imageSet
+              ? HomeLibraryCatalogKind.imageSet
+              : HomeLibraryCatalogKind.comic,
           comicCount: comicCount,
-          seriesCount: stat?.seriesCount ?? 0,
+          seriesCount: imageSet ? 0 : stat?.seriesCount ?? 0,
           lastSyncedAt: lastSyncedAt,
           hint: health.hint,
           staleDays: health.staleDays,

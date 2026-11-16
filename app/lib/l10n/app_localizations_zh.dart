@@ -19,6 +19,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sidebarAddLocalLibrary => '添加本地库';
 
   @override
+  String get sidebarAddImageSetLibrary => '添加图集库';
+
+  @override
+  String get dialogCreateImageSetLibraryTitle => '添加图集库';
+
+  @override
+  String get libraryImageSetAddedToast => '已添加图集库';
+
+  @override
+  String get imageSetLibraryKindLabel => '图集库';
+
+  @override
+  String get imageSetLibraryPlaceholder => '图集浏览即将推出';
+
+  @override
   String get sidebarAddRemoteLibrary => '添加远程库';
 
   @override

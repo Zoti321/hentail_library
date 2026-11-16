@@ -30,6 +30,7 @@ mod m20261109_000027_backfill_finished_from_history;
 mod m20261114_000028_comic_content_fingerprints;
 mod m20261114_000029_single_comic_language;
 mod m20261114_000030_resource_metadata;
+mod m20261116_000031_library_catalog_kind;
 
 pub struct Migrator;
 
@@ -66,6 +67,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20261114_000028_comic_content_fingerprints::Migration),
             Box::new(m20261114_000029_single_comic_language::Migration),
             Box::new(m20261114_000030_resource_metadata::Migration),
+            Box::new(m20261116_000031_library_catalog_kind::Migration),
         ]
     }
 }

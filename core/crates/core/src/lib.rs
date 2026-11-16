@@ -77,8 +77,9 @@ pub use home::{
     LibraryHomeStatDto,
 };
 pub use library::{
-    clear_remote_library_credentials, create_local_library, create_remote_library, delete_library,
-    library_id_from_root, library_id_from_webdav_root, list_libraries, normalize_webdav_root,
+    clear_remote_library_credentials, create_image_set_local_library, create_local_library,
+    create_remote_library, delete_library, is_image_set_catalog, library_id_from_root,
+    library_id_from_webdav_root, list_libraries, normalize_webdav_root,
     parse_resource_format_categories_json, parse_scan_interval, record_library_sync_failure,
     record_library_sync_success, resolve_access_for_comic, resolve_browse_library_id,
     serialize_resource_format_categories, set_all_libraries_scan_on_startup,

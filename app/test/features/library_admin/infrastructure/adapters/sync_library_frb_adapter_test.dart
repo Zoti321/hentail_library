@@ -95,6 +95,7 @@ class _SyncApi implements RustLibApi {
 LocalLibrary _lib({required String id, required String kind}) => (
   libraryId: id,
   kind: kind,
+  catalogKind: 'comic',
   rootPath: kind == 'remote' ? 'https://example/dav' : 'C:/lib',
   name: id,
   enabledResourceFormatCategories: ResourceFormatCategory.all,

@@ -5,14 +5,15 @@ mod remote_access;
 mod webdav_root;
 
 pub use crud::{
-    create_local_library, create_remote_library, delete_library, find_library_by_id,
-    list_libraries, resolve_browse_library_id, set_all_libraries_scan_on_startup,
-    update_library_resource_format_categories, update_library_settings,
-    update_library_sidebar_layout, update_remote_library,
+    create_image_set_local_library, create_local_library, create_remote_library, delete_library,
+    find_library_by_id, list_libraries, resolve_browse_library_id,
+    set_all_libraries_scan_on_startup, update_library_resource_format_categories,
+    update_library_settings, update_library_sidebar_layout, update_remote_library,
 };
 pub use dto::{
-    library_id_from_root, parse_resource_format_categories_json, parse_scan_interval,
-    serialize_resource_format_categories, LibraryDto, LibrarySidebarPlacement, ScanInterval,
+    is_image_set_catalog, library_id_from_root, parse_resource_format_categories_json,
+    parse_scan_interval, serialize_resource_format_categories, LibraryDto,
+    LibrarySidebarPlacement, ScanInterval,
 };
 pub use local_root_update::update_local_library_root;
 pub use remote_access::{

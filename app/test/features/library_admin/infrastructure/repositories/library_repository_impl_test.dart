@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
+import 'package:hentai_library/features/library_admin/domain/local_library.dart';
 import 'package:hentai_library/features/library_admin/domain/remote_library_credential_store.dart';
 import 'package:hentai_library/features/library_admin/infrastructure/repositories/library_repository_impl.dart';
 import 'package:hentai_library/shared/application/errors/app_exception.dart';
@@ -45,6 +46,7 @@ class _LibraryApi implements RustLibApi {
     return registration = LibraryDto(
       libraryId: 'remote',
       kind: 'remote',
+      catalogKind: 'comic',
       rootPath: rootUrl,
       name: existing ? 'Existing Library' : name ?? 'Remote',
       enabledResourceFormatCategories: const [],
@@ -54,6 +56,29 @@ class _LibraryApi implements RustLibApi {
       scanOnStartup: false,
       scanInterval: ScanIntervalDto.disabled,
       pinned: true,
+      sidebarOrder: 0,
+    );
+  }
+
+  @override
+  LibraryDto crateApiLibraryCreateImageSetLocalLibraryFrb({
+    required String rootPath,
+    String? name,
+  }) {
+    calls.add('image-set:$rootPath');
+    return LibraryDto(
+      libraryId: 'image-set',
+      kind: 'local',
+      catalogKind: 'image_set',
+      rootPath: rootPath,
+      name: name ?? 'Gallery',
+      enabledResourceFormatCategories: const [],
+      createdAt: PlatformInt64Util.from(456),
+      username: '',
+      allowHttp: false,
+      scanOnStartup: false,
+      scanInterval: ScanIntervalDto.disabled,
+      pinned: false,
       sidebarOrder: 0,
     );
   }
@@ -112,6 +137,17 @@ void main() {
     RustLib.initMock(api: api);
     addTearDown(RustLib.dispose);
     repository = LibraryRepositoryImpl(credentials: credentials);
+  });
+
+  test('image set create maps catalogKind from core projection', () async {
+    final LocalLibrary library = await repository.createImageSetLocal(
+      '/images',
+      name: 'Gallery',
+    );
+    expect(library.catalogKind, 'image_set');
+    expect(library.kind, 'local');
+    expect(library.rootPath, '/images');
+    expect(calls, ['image-set:/images']);
   });
 
   for (final existing in [false, true]) {

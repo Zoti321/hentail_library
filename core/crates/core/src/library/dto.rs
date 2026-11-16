@@ -11,6 +11,8 @@ use crate::sync::resource_format_category::ResourceFormatCategory;
 
 pub(crate) const KIND_LOCAL: &str = "local";
 pub(crate) const KIND_REMOTE: &str = "remote";
+pub(crate) const CATALOG_KIND_COMIC: &str = "comic";
+pub(crate) const CATALOG_KIND_IMAGE_SET: &str = "image_set";
 pub(crate) const DEFAULT_RESOURCE_FORMAT_CATEGORIES: [ResourceFormatCategory; 4] =
     ResourceFormatCategory::ALL;
 pub(crate) const REMOTE_DEFAULT_RESOURCE_FORMAT_CATEGORIES: [ResourceFormatCategory; 3] = [
@@ -76,6 +78,7 @@ pub(crate) fn scan_interval_from_stored(raw: &str) -> ScanInterval {
 pub struct LibraryDto {
     pub library_id: String,
     pub kind: String,
+    pub catalog_kind: String,
     pub root_path: String,
     pub name: String,
     pub enabled_resource_format_categories: Vec<ResourceFormatCategory>,
@@ -86,6 +89,26 @@ pub struct LibraryDto {
     pub scan_interval: ScanInterval,
     pub pinned: bool,
     pub sidebar_order: i32,
+}
+
+pub(crate) fn parse_catalog_kind(raw: &str) -> Result<&'static str, HentaiError> {
+    match raw.trim().to_ascii_lowercase().as_str() {
+        CATALOG_KIND_COMIC => Ok(CATALOG_KIND_COMIC),
+        CATALOG_KIND_IMAGE_SET => Ok(CATALOG_KIND_IMAGE_SET),
+        other => Err(HentaiError::validation(format!(
+            "无效的 catalog kind: {other}"
+        ))),
+    }
+}
+
+pub(crate) fn catalog_kind_from_stored(raw: &str) -> String {
+    parse_catalog_kind(raw)
+        .unwrap_or(CATALOG_KIND_COMIC)
+        .to_string()
+}
+
+pub fn is_image_set_catalog(catalog_kind: &str) -> bool {
+    catalog_kind.trim().eq_ignore_ascii_case(CATALOG_KIND_IMAGE_SET)
 }
 
 /// One Library's pin group and Library sidebar order.
@@ -185,6 +208,7 @@ pub(crate) fn model_to_dto(model: libraries::Model) -> LibraryDto {
     LibraryDto {
         library_id: model.library_id,
         kind: model.kind,
+        catalog_kind: catalog_kind_from_stored(&model.catalog_kind),
         root_path: model.root_path,
         name: model.name,
         enabled_resource_format_categories: parse_resource_format_categories_json(

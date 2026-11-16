@@ -19,7 +19,9 @@ class ShellLibraryPickerRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final M3EThemeData theme = M3ETheme.of(context);
     final M3EColorScheme scheme = theme.colorScheme;
-    final IconData icon = row.kind == HomeLibraryKind.local
+    final IconData icon = row.catalogKind == HomeLibraryCatalogKind.imageSet
+        ? Icons.photo_library_outlined
+        : row.kind == HomeLibraryKind.local
         ? Icons.folder_outlined
         : Icons.cloud_outlined;
 

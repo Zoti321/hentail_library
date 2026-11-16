@@ -84,6 +84,7 @@ final _rootsProvider = NotifierProvider<_Roots, LibrariesState>(_Roots.new);
 LocalLibrary _library(String root) => (
   libraryId: 'library',
   kind: 'local',
+  catalogKind: 'comic',
   rootPath: root,
   name: 'library',
   enabledResourceFormatCategories: ResourceFormatCategory.all,

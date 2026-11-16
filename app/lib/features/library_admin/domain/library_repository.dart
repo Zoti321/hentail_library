@@ -8,6 +8,9 @@ abstract class LibraryRepository {
 
   Future<LocalLibrary> createLocal(String rootPath, {String? name});
 
+  /// Local Image set library；catalog kind 创建后不可变。
+  Future<LocalLibrary> createImageSetLocal(String rootPath, {String? name});
+
   Future<LocalLibrary> createRemote({
     required String rootUrl,
     required String username,

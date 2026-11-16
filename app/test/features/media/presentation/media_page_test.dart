@@ -24,6 +24,7 @@ class _Libraries extends LibrariesNotifier {
       (
         libraryId: 'lib',
         kind: 'local',
+        catalogKind: 'comic',
         rootPath: '/Comics',
         name: '本地漫画库',
         enabledResourceFormatCategories: [],
@@ -37,6 +38,7 @@ class _Libraries extends LibrariesNotifier {
       (
         libraryId: 'remote',
         kind: 'remote',
+        catalogKind: 'comic',
         rootPath: 'https://example.test',
         name: 'Remote library',
         enabledResourceFormatCategories: [],

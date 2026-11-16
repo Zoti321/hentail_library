@@ -1,6 +1,9 @@
 /// 首页「我的漫画库」列表行模型（生产 Panel / Lab 预览共用）。
 enum HomeLibraryKind { local, remote }
 
+/// 库的 catalog kind（与 [HomeLibraryKind] 正交）。
+enum HomeLibraryCatalogKind { comic, imageSet }
+
 /// 与行 overflow 菜单顺序一致的操作项。
 enum HomeLibraryManagementAction {
   scan,
@@ -17,6 +20,7 @@ class HomeLibraryDashboardRow {
     required this.libraryId,
     required this.displayName,
     required this.kind,
+    this.catalogKind = HomeLibraryCatalogKind.comic,
     required this.comicCount,
     required this.seriesCount,
     this.lastSyncedAt,
@@ -29,6 +33,7 @@ class HomeLibraryDashboardRow {
   final String libraryId;
   final String displayName;
   final HomeLibraryKind kind;
+  final HomeLibraryCatalogKind catalogKind;
   final int comicCount;
   final int seriesCount;
   final DateTime? lastSyncedAt;
@@ -45,6 +50,7 @@ class HomeLibraryDashboardRow {
     String? libraryId,
     String? displayName,
     HomeLibraryKind? kind,
+    HomeLibraryCatalogKind? catalogKind,
     int? comicCount,
     int? seriesCount,
     DateTime? lastSyncedAt,
@@ -57,6 +63,7 @@ class HomeLibraryDashboardRow {
       libraryId: libraryId ?? this.libraryId,
       displayName: displayName ?? this.displayName,
       kind: kind ?? this.kind,
+      catalogKind: catalogKind ?? this.catalogKind,
       comicCount: comicCount ?? this.comicCount,
       seriesCount: seriesCount ?? this.seriesCount,
       lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,

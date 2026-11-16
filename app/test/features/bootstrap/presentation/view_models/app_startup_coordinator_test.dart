@@ -17,6 +17,7 @@ LocalLibrary _lib({
   return (
     libraryId: id,
     kind: 'local',
+    catalogKind: 'comic',
     rootPath: '/$id',
     name: id,
     enabledResourceFormatCategories: const <ResourceFormatCategory>[],

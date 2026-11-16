@@ -22,10 +22,20 @@ Color homeLibraryHintColor(M3EColorScheme scheme, HomeLibraryRowHint hint) {
   };
 }
 
+IconData homeLibraryRowIcon(HomeLibraryDashboardRow row) {
+  if (row.catalogKind == HomeLibraryCatalogKind.imageSet) {
+    return Symbols.photo_library;
+  }
+  return homeLibraryKindIcon(row.kind);
+}
+
 String homeLibraryStatsLine(
   AppLocalizations l10n,
   HomeLibraryDashboardRow row,
 ) {
+  if (row.catalogKind == HomeLibraryCatalogKind.imageSet) {
+    return l10n.imageSetLibraryKindLabel;
+  }
   return '${l10n.comicCount(row.comicCount)} · ${l10n.librarySeriesCount(row.seriesCount)}';
 }
 

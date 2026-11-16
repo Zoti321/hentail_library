@@ -21,6 +21,7 @@ class HomeLibraryManagementSection extends StatelessWidget {
     this.onLibraryOpen,
     this.onLibraryAction,
     this.onAddLocalLibrary,
+    this.onAddImageSetLibrary,
     this.onAddRemoteLibrary,
     this.onLibrariesReorder,
   });
@@ -30,6 +31,7 @@ class HomeLibraryManagementSection extends StatelessWidget {
   final void Function(String libraryId, HomeLibraryManagementAction action)?
   onLibraryAction;
   final VoidCallback? onAddLocalLibrary;
+  final VoidCallback? onAddImageSetLibrary;
   final VoidCallback? onAddRemoteLibrary;
 
   /// 传入时启用长按拖拽排序（[ReorderableSplitListGroup]，Flutter [ReorderCallback] 约定）；
@@ -84,6 +86,7 @@ class HomeLibraryManagementSection extends StatelessWidget {
             _AddLibraryMenuButton(
               l10n: l10n,
               onAddLocalLibrary: onAddLocalLibrary,
+              onAddImageSetLibrary: onAddImageSetLibrary,
               onAddRemoteLibrary: onAddRemoteLibrary,
             ),
           ],
@@ -126,18 +129,22 @@ class _AddLibraryMenuButton extends StatelessWidget {
   const _AddLibraryMenuButton({
     required this.l10n,
     this.onAddLocalLibrary,
+    this.onAddImageSetLibrary,
     this.onAddRemoteLibrary,
   });
 
   final AppLocalizations l10n;
   final VoidCallback? onAddLocalLibrary;
+  final VoidCallback? onAddImageSetLibrary;
   final VoidCallback? onAddRemoteLibrary;
 
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     final bool enabled =
-        onAddLocalLibrary != null || onAddRemoteLibrary != null;
+        onAddLocalLibrary != null ||
+        onAddImageSetLibrary != null ||
+        onAddRemoteLibrary != null;
 
     return AnchoredMenu(
       enabled: enabled,
@@ -147,6 +154,11 @@ class _AddLibraryMenuButton extends StatelessWidget {
           label: l10n.sidebarAddLocalLibrary,
           enabled: onAddLocalLibrary != null,
           onPressed: onAddLocalLibrary,
+        ),
+        M3EMenuEntry(
+          label: l10n.sidebarAddImageSetLibrary,
+          enabled: onAddImageSetLibrary != null,
+          onPressed: onAddImageSetLibrary,
         ),
         M3EMenuEntry(
           label: l10n.sidebarAddRemoteLibrary,

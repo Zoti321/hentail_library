@@ -7,6 +7,9 @@ typedef LocalLibrary = ({
 
   /// `local` | `remote`
   String kind,
+
+  /// `comic` | `image_set`；创建后不可变，与 [kind] 正交。
+  String catalogKind,
   String rootPath,
   String name,
   List<ResourceFormatCategory> enabledResourceFormatCategories,
@@ -25,6 +28,11 @@ typedef LocalLibrary = ({
 bool isRemoteLibrary(LocalLibrary library) => library.kind == 'remote';
 
 bool isLocalLibrary(LocalLibrary library) => library.kind != 'remote';
+
+bool isImageSetLibrary(LocalLibrary library) =>
+    library.catalogKind == 'image_set';
+
+bool isComicLibrary(LocalLibrary library) => !isImageSetLibrary(library);
 
 String localLibraryDisplayName(LocalLibrary library) {
   final String trimmed = library.name.trim();
