@@ -31,7 +31,43 @@ class AppLocalizationsEn extends AppLocalizations {
   String get imageSetLibraryKindLabel => 'Image set library';
 
   @override
-  String get imageSetLibraryPlaceholder => 'Image set browsing is coming soon';
+  String get imageSetLibrarySync => 'Sync image sets';
+
+  @override
+  String get imageSetLibrarySyncing => 'Syncing image sets…';
+
+  @override
+  String imageSetLibrarySyncSuccess(int added, int removed) {
+    return 'Sync complete: $added added, $removed removed';
+  }
+
+  @override
+  String imageSetLibrarySyncWarning(String message) {
+    return 'Sync complete, but some content needs attention: $message';
+  }
+
+  @override
+  String imageSetLibrarySyncFailed(String message) {
+    return 'Image set sync failed: $message';
+  }
+
+  @override
+  String get imageSetLibrarySyncCancelled => 'Image set sync cancelled';
+
+  @override
+  String get imageSetListEmpty =>
+      'No image sets yet. Sync to discover them in this library.';
+
+  @override
+  String imageSetListLoadFailed(String message) {
+    return 'Failed to load image sets: $message';
+  }
+
+  @override
+  String get imageSetRootName => 'Library root';
+
+  @override
+  String get imageSetDetailEmpty => 'This image set has no images';
 
   @override
   String get sidebarAddRemoteLibrary => 'Add remote library';

@@ -151,7 +151,10 @@ class LibraryBrowsePage extends HookConsumerWidget {
     }, <Object?>[libraryId, imageSet]);
 
     if (library != null && imageSet) {
-      return ImageSetLibraryPage(displayName: localLibraryDisplayName(library));
+      return ImageSetLibraryPage(
+        libraryId: library.libraryId,
+        displayName: localLibraryDisplayName(library),
+      );
     }
     return const LibraryPage();
   }

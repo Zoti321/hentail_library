@@ -11,4 +11,5 @@ export 'package:hentai_library/features/library_admin/domain/resource_format_cat
 export 'package:hentai_library/features/library_admin/domain/value_objects/scan_interval.dart';
 export 'package:hentai_library/features/library_admin/domain/library_scan_domain_service.dart';
 export 'package:hentai_library/features/library_admin/domain/library_scan_interval_schedule.dart';
+export 'package:hentai_library/features/library_admin/domain/library_sync_state.dart';
 export 'package:hentai_library/features/library_admin/domain/sync_library_types.dart';

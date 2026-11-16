@@ -31,7 +31,42 @@ class AppLocalizationsZh extends AppLocalizations {
   String get imageSetLibraryKindLabel => '图集库';
 
   @override
-  String get imageSetLibraryPlaceholder => '图集浏览即将推出';
+  String get imageSetLibrarySync => '同步图集';
+
+  @override
+  String get imageSetLibrarySyncing => '正在同步图集…';
+
+  @override
+  String imageSetLibrarySyncSuccess(int added, int removed) {
+    return '同步完成：新增 $added，移除 $removed';
+  }
+
+  @override
+  String imageSetLibrarySyncWarning(String message) {
+    return '同步完成，但有内容需要关注：$message';
+  }
+
+  @override
+  String imageSetLibrarySyncFailed(String message) {
+    return '图集同步失败：$message';
+  }
+
+  @override
+  String get imageSetLibrarySyncCancelled => '已取消图集同步';
+
+  @override
+  String get imageSetListEmpty => '暂无图集。同步后将显示库中发现的图集。';
+
+  @override
+  String imageSetListLoadFailed(String message) {
+    return '读取图集失败：$message';
+  }
+
+  @override
+  String get imageSetRootName => '库根目录';
+
+  @override
+  String get imageSetDetailEmpty => '该图集没有图片';
 
   @override
   String get sidebarAddRemoteLibrary => '添加远程库';

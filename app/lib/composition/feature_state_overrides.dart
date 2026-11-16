@@ -7,11 +7,13 @@ import 'package:hentai_library/composition/overrides/reading_history_shared_stat
 import 'package:hentai_library/composition/overrides/reading_stats_shared_state_overrides.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:hentai_library/composition/modules/resource_metadata/writeback_overrides.dart';
+import 'package:hentai_library/composition/modules/image_set_library/image_set_library_overrides.dart';
 
 /// 将模块状态适配器绑定到共享 Provider。
 List<Override> featureStateOverrides() => <Override>[
   ...writebackOverrides(),
   ...libraryAdminSharedStateOverrides(),
+  ...imageSetLibraryOverrides(),
   ...libraryBrowseSharedStateOverrides(),
   ...comicSeriesSharedStateOverrides(),
   ...metadataAndDictionarySharedStateOverrides(),

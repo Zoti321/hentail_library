@@ -7,7 +7,47 @@
   "dialogCreateImageSetLibraryTitle": "添加图集库",
   "libraryImageSetAddedToast": "已添加图集库",
   "imageSetLibraryKindLabel": "图集库",
-  "imageSetLibraryPlaceholder": "图集浏览即将推出",
+  "imageSetLibrarySync": "同步图集",
+  "imageSetLibrarySyncing": "正在同步图集…",
+  "imageSetLibrarySyncSuccess": "同步完成：新增 {added}，移除 {removed}",
+  "@imageSetLibrarySyncSuccess": {
+    "placeholders": {
+      "added": {
+        "type": "int"
+      },
+      "removed": {
+        "type": "int"
+      }
+    }
+  },
+  "imageSetLibrarySyncWarning": "同步完成，但有内容需要关注：{message}",
+  "@imageSetLibrarySyncWarning": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "imageSetLibrarySyncFailed": "图集同步失败：{message}",
+  "@imageSetLibrarySyncFailed": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "imageSetLibrarySyncCancelled": "已取消图集同步",
+  "imageSetListEmpty": "暂无图集。同步后将显示库中发现的图集。",
+  "imageSetListLoadFailed": "读取图集失败：{message}",
+  "@imageSetListLoadFailed": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "imageSetRootName": "库根目录",
+  "imageSetDetailEmpty": "该图集没有图片",
   "sidebarAddRemoteLibrary": "添加远程库",
   "sidebarReorderLibraries": "重新排序",
   "sidebarExitReorder": "退出排序",

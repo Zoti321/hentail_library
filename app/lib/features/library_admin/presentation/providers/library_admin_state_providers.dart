@@ -5,6 +5,7 @@ import 'package:hentai_library/features/library_admin/domain/libraries_state.dar
 import 'package:hentai_library/features/library_admin/domain/library_metadata_refresh_commands.dart';
 import 'package:hentai_library/features/library_admin/domain/library_repository.dart';
 import 'package:hentai_library/features/library_admin/domain/library_scan_activity_state.dart';
+import 'package:hentai_library/features/library_admin/domain/library_sync_state.dart';
 import 'package:hentai_library/features/library_admin/domain/library_revision_state.dart';
 import 'package:hentai_library/features/library_admin/domain/library_scan_commands.dart';
 import 'package:hentai_library/features/library_admin/presentation/contracts/library_management_commands.dart';
@@ -24,6 +25,11 @@ final Provider<LibraryRevisionState> libraryRevisionStateProvider =
 
 final Provider<LibraryScanActivityState> libraryScanActivityStateProvider =
     requiredProvider('libraryScanActivityStateProvider');
+
+/// 最近一次库同步的运行中 / 取消 / 错误 / 进度投影（原 `scanLibraryControllerProvider`）。
+final Provider<LibrarySyncState> librarySyncStateProvider = requiredProvider(
+  'librarySyncStateProvider',
+);
 
 /// library_admin 扫描是否进行中（原 `scanLibraryControllerProvider.running`）。
 final Provider<bool> libraryScanRunningStateProvider = requiredProvider(

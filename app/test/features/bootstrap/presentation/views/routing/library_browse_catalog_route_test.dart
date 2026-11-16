@@ -3,10 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:hentai_library/features/bootstrap/presentation/views/routing/app_router.dart';
-import 'package:hentai_library/features/image_set_library/public.dart';
-import 'package:hentai_library/features/library_admin/domain/libraries_state.dart';
-import 'package:hentai_library/features/library_admin/domain/local_library.dart';
-import 'package:hentai_library/features/library_admin/domain/value_objects/scan_interval.dart';
+import 'package:hentai_library/features/image_set_library/domain/image_set.dart';
+import 'package:hentai_library/features/image_set_library/presentation/providers/image_set_library_providers.dart';
+import 'package:hentai_library/features/image_set_library/presentation/views/image_set_library_page.dart';
+import 'package:hentai_library/features/library_admin/public/contracts.dart';
 import 'package:hentai_library/features/library_admin/public/providers/library_admin_state_providers.dart';
 
 import '../../../../../support/pump_localized_app.dart';
@@ -28,13 +28,25 @@ const LocalLibrary _imageSetLibrary = (
 
 void main() {
   testWidgets(
-    'image set library opens the image set stub instead of comic browse',
+    'image set library opens the image set browse page instead of comic browse',
     (WidgetTester tester) async {
       final List<Override> overrides = <Override>[
         librariesStateProvider.overrideWithValue(
           const AsyncData<LibrariesState>(
             LibrariesState(libraries: <LocalLibrary>[_imageSetLibrary]),
           ),
+        ),
+        libraryRevisionStateProvider.overrideWithValue(
+          const LibraryRevisionState(),
+        ),
+        librarySyncStateProvider.overrideWithValue((
+          running: false,
+          cancelled: false,
+          error: null,
+          progress: null,
+        )),
+        imageSetListQueryProvider.overrideWithValue(
+          (String libraryId) async => const <ImageSet>[],
         ),
       ];
       Widget app(Widget home) => ProviderScope(
@@ -43,11 +55,11 @@ void main() {
       );
 
       await tester.pumpWidget(app(const LibraryBrowsePage(libraryId: 'img-1')));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       expect(find.byType(ImageSetLibraryPage), findsOneWidget);
       expect(find.text('Gallery'), findsOneWidget);
-      expect(find.text('图集浏览即将推出'), findsOneWidget);
+      expect(find.text('暂无图集。同步后将显示库中发现的图集。'), findsOneWidget);
 
       await tester.pumpWidget(app(const SizedBox()));
       await tester.pump();

@@ -71,6 +71,15 @@ List<Override> libraryAdminSharedStateOverrides() => <Override>[
     final ScanLibraryState scan = ref.watch(scanLibraryControllerProvider);
     return (running: scan.running, scanMode: scan.scanMode);
   }),
+  librarySyncStateProvider.overrideWith((Ref ref) {
+    final ScanLibraryState scan = ref.watch(scanLibraryControllerProvider);
+    return (
+      running: scan.running,
+      cancelled: scan.cancelled,
+      error: scan.error,
+      progress: scan.progress,
+    );
+  }),
   libraryMetadataRefreshRunningStateProvider.overrideWith(
     (Ref ref) =>
         ref.watch(metadataRefreshControllerProvider.select((s) => s.running)),

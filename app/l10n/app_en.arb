@@ -7,7 +7,47 @@
   "dialogCreateImageSetLibraryTitle": "Add image set library",
   "libraryImageSetAddedToast": "Image set library added",
   "imageSetLibraryKindLabel": "Image set library",
-  "imageSetLibraryPlaceholder": "Image set browsing is coming soon",
+  "imageSetLibrarySync": "Sync image sets",
+  "imageSetLibrarySyncing": "Syncing image sets…",
+  "imageSetLibrarySyncSuccess": "Sync complete: {added} added, {removed} removed",
+  "@imageSetLibrarySyncSuccess": {
+    "placeholders": {
+      "added": {
+        "type": "int"
+      },
+      "removed": {
+        "type": "int"
+      }
+    }
+  },
+  "imageSetLibrarySyncWarning": "Sync complete, but some content needs attention: {message}",
+  "@imageSetLibrarySyncWarning": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "imageSetLibrarySyncFailed": "Image set sync failed: {message}",
+  "@imageSetLibrarySyncFailed": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "imageSetLibrarySyncCancelled": "Image set sync cancelled",
+  "imageSetListEmpty": "No image sets yet. Sync to discover them in this library.",
+  "imageSetListLoadFailed": "Failed to load image sets: {message}",
+  "@imageSetListLoadFailed": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "imageSetRootName": "Library root",
+  "imageSetDetailEmpty": "This image set has no images",
   "sidebarAddRemoteLibrary": "Add remote library",
   "sidebarReorderLibraries": "Reorder",
   "sidebarExitReorder": "Done reordering",

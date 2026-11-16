@@ -140,11 +140,65 @@ abstract class AppLocalizations {
   /// **'图集库'**
   String get imageSetLibraryKindLabel;
 
-  /// No description provided for @imageSetLibraryPlaceholder.
+  /// No description provided for @imageSetLibrarySync.
   ///
   /// In zh, this message translates to:
-  /// **'图集浏览即将推出'**
-  String get imageSetLibraryPlaceholder;
+  /// **'同步图集'**
+  String get imageSetLibrarySync;
+
+  /// No description provided for @imageSetLibrarySyncing.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在同步图集…'**
+  String get imageSetLibrarySyncing;
+
+  /// No description provided for @imageSetLibrarySyncSuccess.
+  ///
+  /// In zh, this message translates to:
+  /// **'同步完成：新增 {added}，移除 {removed}'**
+  String imageSetLibrarySyncSuccess(int added, int removed);
+
+  /// No description provided for @imageSetLibrarySyncWarning.
+  ///
+  /// In zh, this message translates to:
+  /// **'同步完成，但有内容需要关注：{message}'**
+  String imageSetLibrarySyncWarning(String message);
+
+  /// No description provided for @imageSetLibrarySyncFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'图集同步失败：{message}'**
+  String imageSetLibrarySyncFailed(String message);
+
+  /// No description provided for @imageSetLibrarySyncCancelled.
+  ///
+  /// In zh, this message translates to:
+  /// **'已取消图集同步'**
+  String get imageSetLibrarySyncCancelled;
+
+  /// No description provided for @imageSetListEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无图集。同步后将显示库中发现的图集。'**
+  String get imageSetListEmpty;
+
+  /// No description provided for @imageSetListLoadFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'读取图集失败：{message}'**
+  String imageSetListLoadFailed(String message);
+
+  /// No description provided for @imageSetRootName.
+  ///
+  /// In zh, this message translates to:
+  /// **'库根目录'**
+  String get imageSetRootName;
+
+  /// No description provided for @imageSetDetailEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'该图集没有图片'**
+  String get imageSetDetailEmpty;
 
   /// No description provided for @sidebarAddRemoteLibrary.
   ///
