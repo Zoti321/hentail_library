@@ -1,9 +1,9 @@
-import 'package:hentai_library/core/errors/app_exception.dart';
+import 'package:hentai_library/shared/application/errors/app_exception.dart';
 import 'package:hentai_library/features/comic_trash/application/comic_trash_service.dart';
 import 'package:hentai_library/features/comic_trash/domain/trashed_comic.dart';
-import 'package:hentai_library/features/comic_trash/di/comic_trash.dart';
-import 'package:hentai_library/features/comic/public/di/comic_cover_providers.dart';
-import 'package:hentai_library/shared/di/library_state_providers.dart';
+import 'package:hentai_library/features/comic_trash/presentation/providers/comic_trash_use_case_provider.dart';
+import 'package:hentai_library/features/comic/public/providers/comic_cover_providers.dart';
+import 'package:hentai_library/features/library_admin/public/providers/library_admin_state_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'comic_trash_actions.g.dart';
@@ -23,61 +23,40 @@ class ComicTrashActions extends _$ComicTrashActions {
   Future<void> trash(List<String> comicIds) async {
     _ensureLibraryIdle();
     await _service.trashComics(comicIds);
-    _notifyChanged();
   }
 
   Future<void> restore(List<String> comicIds) async {
     _ensureLibraryIdle();
     await _service.restoreComics(comicIds);
-    _notifyChanged();
   }
 
-  Future<int> restoreAll() async {
+  Future<int> restoreAll() {
     _ensureLibraryIdle();
-    final int restored = await _service.restoreAll();
-    if (restored > 0) {
-      _notifyChanged();
-    }
-    return restored;
+    return _service.restoreAll();
   }
 
   Future<ComicPurgeResult> purge(List<String> comicIds) async {
     _ensureLibraryIdle();
-    final ComicPurgeResult result = await _service.purgeComics(comicIds);
-    await _afterPurge(comicIds, result);
-    return result;
+    return _afterPurge(await _service.purgeComics(comicIds));
   }
 
   Future<ComicPurgeResult> purgeAll() async {
     _ensureLibraryIdle();
-    final List<String> ids = await _service.listTrashedIds();
-    final ComicPurgeResult result = await _service.purgeComics(ids);
-    await _afterPurge(ids, result);
-    return result;
+    return _afterPurge(await _service.purgeAll());
   }
 
-  Future<void> _afterPurge(
-    List<String> requested,
-    ComicPurgeResult result,
-  ) async {
-    if (result.succeeded > 0) {
-      final Set<String> remaining = (await _service.listTrashedIds()).toSet();
+  ComicPurgeResult _afterPurge(ComicPurgeOutcome outcome) {
+    if (outcome.purgedIds.isNotEmpty) {
       ref
           .read(comicCoverCacheManagerProvider.notifier)
-          .clearForComics(
-            requested.where((String id) => !remaining.contains(id)),
-          );
+          .clearForComics(outcome.purgedIds);
     }
-    _notifyChanged();
+    return outcome.result;
   }
 
   void _ensureLibraryIdle() {
     if (ref.read(libraryMutationBusyStateProvider)) {
       throw AppException(kLibraryBusyMessage);
     }
-  }
-
-  void _notifyChanged() {
-    ref.read(libraryRevisionSignalPortProvider).notifyExternalChange();
   }
 }

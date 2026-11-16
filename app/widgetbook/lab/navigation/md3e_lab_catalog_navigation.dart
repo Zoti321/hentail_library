@@ -1,15 +1,21 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_page.dart';
 import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_page_lab_host.dart';
-import 'package:hentai_library/shared/ui/motion/shared_axis_route.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 
 import '../data/md3e_lab_catalog_detail_preview_data.dart';
 
-import 'package:hentai_library/features/library_browse/presentation/catalog/patterns/metadata_edit/metadata_edit_navigation.dart';
+import 'package:hentai_library/features/comic/public/ui/comic_metadata_edit_draft.dart';
+import 'package:hentai_library/features/comic/public/ui/comic_metadata_edit_layout.dart';
+import 'package:hentai_library/features/comic/public/ui/comic_metadata_edit_present.dart';
+import 'package:hentai_library/features/series/public/ui/series_metadata_edit_draft.dart';
+import 'package:hentai_library/features/series/public/ui/series_metadata_edit_layout.dart';
+import 'package:hentai_library/features/series/public/ui/series_metadata_edit_present.dart';
 
 import 'md3e_lab_reader_navigation.dart';
 
-import 'package:hentai_library/shared/ui/widgets/sheets/overlay_route_scope.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -24,13 +30,14 @@ Future<void> openLabCatalogDetail(
   required LibraryDisplayTarget displayTarget,
   required int catalogIndex,
 }) {
-  final OverlayRouteScopeSnapshot scope =
-      OverlayRouteScopeSnapshot.capture(context);
+  final OverlayRouteScopeSnapshot scope = OverlayRouteScopeSnapshot.capture(
+    context,
+  );
   return Navigator.of(context, rootNavigator: false).push<void>(
     sharedAxisRoute<void>(
       context,
       builder: (BuildContext routeContext) {
-        return overlayRouteScope(
+        return OverlayRouteScope(
           scope: scope,
           child: switch (displayTarget) {
             LibraryDisplayTarget.comics => _Md3eLabComicDetailRoute(
@@ -60,21 +67,27 @@ class _Md3eLabComicDetailRoute extends StatelessWidget {
       onBack: () => Navigator.of(context).maybePop(),
       moreMenuEntries: kMd3eLabComicDetailMoreMenuEntries,
       onRead: () {
-        openLabReader(
-          context,
-          preview: md3eReaderPreviewDataForComicDetail(entry),
+        unawaited(
+          openLabReader(
+            context,
+            preview: md3eReaderPreviewDataForComicDetail(entry),
+          ),
         );
       },
       onReadIncognito: () {
-        openLabReader(
-          context,
-          preview: md3eReaderPreviewDataForComicDetail(entry),
+        unawaited(
+          openLabReader(
+            context,
+            preview: md3eReaderPreviewDataForComicDetail(entry),
+          ),
         );
       },
       onEdit: () {
-        showComicMetadataEditLayout(
-          context: context,
-          initialDraft: ComicMetadataEditDraft.fromEntry(entry),
+        unawaited(
+          showComicMetadataEditLayout(
+            context: context,
+            initialDraft: ComicMetadataEditDraft.fromEntry(entry),
+          ),
         );
       },
     );
@@ -96,9 +109,11 @@ class _Md3eLabSeriesDetailRoute extends StatelessWidget {
       entry: entry,
       onBack: () => Navigator.of(context).maybePop(),
       onEdit: () {
-        showSeriesMetadataEditLayout(
-          context: context,
-          initialDraft: SeriesMetadataEditDraft.fromEntry(entry),
+        unawaited(
+          showSeriesMetadataEditLayout(
+            context: context,
+            initialDraft: SeriesMetadataEditDraft.fromEntry(entry),
+          ),
         );
       },
       onComicTap: (int comicIndex) {
@@ -113,29 +128,39 @@ class _Md3eLabSeriesDetailRoute extends StatelessWidget {
           sharedAxisRoute<void>(
             context,
             builder: (BuildContext routeContext) {
-              return overlayRouteScope(
+              return OverlayRouteScope(
                 scope: scope,
                 child: ComicDetailLayout(
                   entry: comicEntry,
                   onBack: () => Navigator.of(routeContext).maybePop(),
                   moreMenuEntries: kMd3eLabComicDetailMoreMenuEntries,
                   onRead: () {
-                    openLabReader(
-                      routeContext,
-                      preview: md3eReaderPreviewDataForComicDetail(comicEntry),
+                    unawaited(
+                      openLabReader(
+                        routeContext,
+                        preview: md3eReaderPreviewDataForComicDetail(
+                          comicEntry,
+                        ),
+                      ),
                     );
                   },
                   onReadIncognito: () {
-                    openLabReader(
-                      routeContext,
-                      preview: md3eReaderPreviewDataForComicDetail(comicEntry),
+                    unawaited(
+                      openLabReader(
+                        routeContext,
+                        preview: md3eReaderPreviewDataForComicDetail(
+                          comicEntry,
+                        ),
+                      ),
                     );
                   },
                   onEdit: () {
-                    showComicMetadataEditLayout(
-                      context: routeContext,
-                      initialDraft: ComicMetadataEditDraft.fromEntry(
-                        comicEntry,
+                    unawaited(
+                      showComicMetadataEditLayout(
+                        context: routeContext,
+                        initialDraft: ComicMetadataEditDraft.fromEntry(
+                          comicEntry,
+                        ),
                       ),
                     );
                   },

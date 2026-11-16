@@ -1,30 +1,23 @@
-import 'package:hentai_library/features/named_metadata/public/named_metadata_form.dart';
+import 'package:hentai_library/features/comic/application/load_comic_smart_facet_candidates_use_case.dart';
 import 'package:hentai_library/features/comic/domain/smart_facet_match.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/series_item.dart';
-import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
-import 'package:hentai_library/features/comic/domain/comic_lookup_repository.dart';
-import 'package:hentai_library/features/comic/presentation/view_models/smart_facet_match_preference_notifier.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
-import 'package:hentai_library/shared/di/library_state_providers.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:hentai_library/features/comic/domain/repositories/comic_lookup_repository.dart';
+import 'package:hentai_library/features/comic/presentation/providers/comic_repository_providers.dart';
+import 'package:hentai_library/features/comic_metadata/public/providers.dart';
+import 'package:hentai_library/features/comic_metadata/public/comic_metadata_form.dart';
+import 'package:hentai_library/features/app_settings/public/providers/app_settings_providers.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
+import 'package:hentai_library/shared/presentation/providers/series_reading_context_providers.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-/// Scope for Smart facet match on Comic metadata form.
-typedef ComicMetadataSmartFacetScope = ({
-  String comicId,
-  String title,
-  String resourcePath,
-  String? seriesId,
-});
+export 'package:hentai_library/features/comic/application/load_comic_smart_facet_candidates_use_case.dart'
+    show ComicMetadataSmartFacetScope;
 
 /// Author candidates with Smart facet match ranking for the open form.
 final authorsSmartForComicMetadataFormProvider = FutureProvider.autoDispose
     .family<List<SmartFacetMatchCandidate>, ComicMetadataSmartFacetScope>((
       Ref ref,
       ComicMetadataSmartFacetScope scope,
-    ) async {
+    ) {
       return _rankFacet(
         ref: ref,
         scope: scope,
@@ -37,7 +30,7 @@ final tagsSmartForComicMetadataFormProvider = FutureProvider.autoDispose
     .family<List<SmartFacetMatchCandidate>, ComicMetadataSmartFacetScope>((
       Ref ref,
       ComicMetadataSmartFacetScope scope,
-    ) async {
+    ) {
       return _rankFacet(ref: ref, scope: scope, kind: NamedFacetFormKind.tag);
     });
 
@@ -46,7 +39,7 @@ final parodiesSmartForComicMetadataFormProvider = FutureProvider.autoDispose
     .family<List<SmartFacetMatchCandidate>, ComicMetadataSmartFacetScope>((
       Ref ref,
       ComicMetadataSmartFacetScope scope,
-    ) async {
+    ) {
       return _rankFacet(
         ref: ref,
         scope: scope,
@@ -59,7 +52,7 @@ final charactersSmartForComicMetadataFormProvider = FutureProvider.autoDispose
     .family<List<SmartFacetMatchCandidate>, ComicMetadataSmartFacetScope>((
       Ref ref,
       ComicMetadataSmartFacetScope scope,
-    ) async {
+    ) {
       return _rankFacet(
         ref: ref,
         scope: scope,
@@ -71,155 +64,25 @@ Future<List<SmartFacetMatchCandidate>> _rankFacet({
   required Ref ref,
   required ComicMetadataSmartFacetScope scope,
   required NamedFacetFormKind kind,
-}) async {
-  final List<NamedFacetFormCandidate> catalog =
-      await listNamedFacetForMetadataForm(kind);
-  final bool enabled = await ref.watch(
-    smartFacetMatchPreferenceProvider.future,
-  );
-
-  if (!enabled) {
-    return applySmartFacetMatch(
-      candidates: catalog,
-      matchedSourceCounts: const <String, int>{},
-      enabled: false,
-    );
-  }
-
-  final Map<String, int> matched = await _matchedSourceCountsForKind(
-    ref: ref,
-    scope: scope,
-    kind: kind,
-    catalog: catalog,
-  );
-  return applySmartFacetMatch(
-    candidates: catalog,
-    matchedSourceCounts: matched,
-    enabled: true,
-  );
-}
-
-Future<Map<String, int>> _matchedSourceCountsForKind({
-  required Ref ref,
-  required ComicMetadataSmartFacetScope scope,
-  required NamedFacetFormKind kind,
-  required List<NamedFacetFormCandidate> catalog,
-}) async {
-  switch (kind) {
-    case NamedFacetFormKind.author:
-      final String? libraryRoot = _libraryRootForPath(ref, scope.resourcePath);
-      final String? relative = libraryRoot == null
-          ? null
-          : relativeResourcePathUnderRoot(
-              resourcePath: scope.resourcePath,
-              libraryRoot: libraryRoot,
-            );
-      final AuthorSmartMatchPathSources pathSources =
-          resolveAuthorSmartMatchPathSources(
-            resourcePath: scope.resourcePath,
-            relativeUnderLibraryRoot: relative,
-            libraryRootKnown: libraryRoot != null,
-          );
-      return authorSmartMatchNames(
-        dictionary: catalog,
-        title: scope.title,
-        filenameStem: pathSources.filenameStem,
-        parentDirectorySegments: pathSources.parentDirectorySegments,
-      );
-    case NamedFacetFormKind.tag:
-    case NamedFacetFormKind.parody:
-    case NamedFacetFormKind.character:
-      return _siblingMatchedNames(
-        ref: ref,
-        scope: scope,
-        kind: kind,
-        catalog: catalog,
-      );
-  }
-}
-
-String? _libraryRootForPath(Ref ref, String resourcePath) {
-  final LibrariesState? state = ref.watch(librariesStateProvider).asData?.value;
-  if (state == null) {
-    return null;
-  }
-  return resolveLibraryRootForResourcePath(
-    resourcePath: resourcePath,
-    libraryRoots: state.libraries.map((LocalLibrary l) => l.rootPath),
-  );
-}
-
-Future<Map<String, int>> _siblingMatchedNames({
-  required Ref ref,
-  required ComicMetadataSmartFacetScope scope,
-  required NamedFacetFormKind kind,
-  required List<NamedFacetFormCandidate> catalog,
-}) async {
-  final String? seriesId = scope.seriesId;
-  if (seriesId == null || seriesId.isEmpty) {
-    return _siblingMatchSourceCounts(
-      siblingSmartMatchNames(
-        dictionary: catalog,
-        siblingAttachedNames: const <String>{},
-        isLibraryRootSeries: false,
-      ),
-    );
-  }
-
-  final seriesRepo = ref.read(seriesRepoProvider);
-  final Series? series = await seriesRepo.findById(seriesId);
-  if (series == null) {
-    return const <String, int>{};
-  }
-
-  final String? libraryRoot = _libraryRootForPath(ref, scope.resourcePath);
-  final bool rootSeries = isLibraryRootSeriesFolder(
-    seriesFolderPath: series.folderPath,
-    libraryRoot: libraryRoot,
-  );
-  if (rootSeries) {
-    return _siblingMatchSourceCounts(
-      siblingSmartMatchNames(
-        dictionary: catalog,
-        siblingAttachedNames: const <String>{},
-        isLibraryRootSeries: true,
-      ),
-    );
-  }
-
-  final ComicLookupRepository comicRepo = ref.read(
+}) {
+  late final ComicLookupRepository comicRepository = ref.read(
     comicLookupRepositoryProvider,
   );
-  final Set<String> siblingNames = <String>{};
-  for (final SeriesItem item in series.items) {
-    if (item.comicId == scope.comicId) {
-      continue;
-    }
-    final Comic? comic = await comicRepo.findById(item.comicId);
-    if (comic == null) {
-      continue;
-    }
-    switch (kind) {
-      case NamedFacetFormKind.tag:
-        siblingNames.addAll(comic.tags.map((t) => t.name));
-      case NamedFacetFormKind.parody:
-        siblingNames.addAll(comic.parodies);
-      case NamedFacetFormKind.character:
-        siblingNames.addAll(comic.characters);
-      case NamedFacetFormKind.author:
-        break;
-    }
-  }
-
-  return _siblingMatchSourceCounts(
-    siblingSmartMatchNames(
-      dictionary: catalog,
-      siblingAttachedNames: siblingNames,
-      isLibraryRootSeries: false,
-    ),
+  final useCase = LoadComicSmartFacetCandidatesUseCase(
+    listing: ref.read(namedFacetFormListingProvider),
+    isEnabled: () async =>
+        (await ref.watch(appSettingsProvider.future)).smartFacetMatchEnabled,
+    libraryRoots: () =>
+        ref
+            .watch(librariesStateProvider)
+            .asData
+            ?.value
+            .libraries
+            .map((LocalLibrary library) => library.rootPath) ??
+        const <String>[],
+    findSeriesReadingContext: (comicId) =>
+        ref.read(findSeriesReadingContextQueryProvider)(comicId),
+    findComicById: (comicId) => comicRepository.findById(comicId),
   );
-}
-
-Map<String, int> _siblingMatchSourceCounts(Set<String> matchedNames) {
-  return <String, int>{for (final String name in matchedNames) name: 1};
+  return useCase(scope: scope, kind: kind);
 }

@@ -1,8 +1,8 @@
+import 'package:hentai_library/features/comic/domain/value_objects/content_rating.dart';
 import 'package:flutter/widgets.dart';
 import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_format.dart';
 import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_view_object.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/shared/domain/models/enums.dart';
+import 'package:hentai_library/features/comic/domain/comic.dart';
 
 /// 将领域 [Comic] 映射为 MD3E 漫画详情数据（纯函数，便于测试）。
 ///
@@ -24,7 +24,7 @@ ComicDetailViewObject comicDetailEntry({
     pageCount: pageCount == null || pageCount == 0 ? null : pageCount,
     publishedLabel: publishedLabel,
     parodies: comic.parodies,
-    authors: <String>[for (final author in comic.authors) author.name],
+    authors: comic.authors,
     characters: comic.characters,
     tags: <String>[for (final tag in comic.tags) tag.name],
     resourceFormat: comic.resourceType.name.toUpperCase(),

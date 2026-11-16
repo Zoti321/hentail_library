@@ -333,6 +333,7 @@ pub async fn add_named_facet_name(
     ))
     .await
     .map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(())
 }
 
@@ -351,6 +352,7 @@ async fn delete_named_facet_by_names_locked(
     names: Vec<String>,
 ) -> Result<(), HentaiError> {
     let db = connection()?;
+    let txn = db.begin().await.map_err(map_db_err)?;
     let dict = facet.dict_table();
     let placeholders = std::iter::repeat_n("?", names.len())
         .collect::<Vec<_>>()
@@ -359,13 +361,17 @@ async fn delete_named_facet_by_names_locked(
         .into_iter()
         .map(|name| Value::String(Some(Box::new(name))))
         .collect::<Vec<_>>();
-    db.execute(Statement::from_sql_and_values(
+    let captured = capture_facet_writeback(&txn, facet, &placeholders, values.clone()).await?;
+    txn.execute(Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
         format!("DELETE FROM {dict} WHERE name IN ({placeholders})"),
         values,
     ))
     .await
     .map_err(map_db_err)?;
+    crate::resource_metadata::record_affected_in(&txn, captured).await?;
+    txn.commit().await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(())
 }
 
@@ -387,6 +393,7 @@ async fn rename_named_facet_name_locked(
     let dict = facet.dict_table();
     let junction = facet.junction_table();
     let name_col = facet.junction_name_column();
+    let captured = capture_facet_writeback(&txn, facet, "?", vec![old_name.into()]).await?;
 
     txn.execute(Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
@@ -415,7 +422,9 @@ async fn rename_named_facet_name_locked(
     .await
     .map_err(map_db_err)?;
 
+    crate::resource_metadata::record_affected_in(&txn, captured).await?;
     txn.commit().await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(())
 }
 
@@ -447,6 +456,7 @@ async fn merge_named_facet_name_locked(
     let dict = facet.dict_table();
     let junction = facet.junction_table();
     let name_col = facet.junction_name_column();
+    let captured = capture_facet_writeback(&txn, facet, "?", vec![source.into()]).await?;
 
     for (name, label) in [(source, "源名称"), (target, "目标名称")] {
         let rows = txn
@@ -489,11 +499,38 @@ async fn merge_named_facet_name_locked(
     ))
     .await
     .map_err(map_db_err)?;
+    crate::resource_metadata::record_affected_in(&txn, captured).await?;
     txn.commit().await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(())
 }
 
 /// Dictionary names with Named facet attachment count for Comic metadata form pickers.
+async fn capture_facet_writeback(
+    db: &impl ConnectionTrait,
+    facet: JunctionNamedFacet,
+    placeholders: &str,
+    values: Vec<Value>,
+) -> Result<Vec<(String, crate::resource_metadata::MetadataSnapshot)>, HentaiError> {
+    let rows = db
+        .query_all(Statement::from_sql_and_values(
+            sea_orm::DatabaseBackend::Sqlite,
+            format!(
+                "SELECT DISTINCT comic_id FROM {} WHERE {} IN ({placeholders})",
+                facet.junction_table(),
+                facet.junction_name_column()
+            ),
+            values,
+        ))
+        .await
+        .map_err(map_db_err)?;
+    let ids = rows
+        .into_iter()
+        .map(|row| row.try_get("", "comic_id").map_err(map_db_err))
+        .collect::<Result<Vec<String>, _>>()?;
+    crate::resource_metadata::capture_affected_in(db, ids).await
+}
+
 ///
 /// Sorted by attachment count descending, then name ascending. Does not mutate
 /// existing `list_all_named_facet_names` (name ASC) used by management UIs.

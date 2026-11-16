@@ -1,28 +1,33 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:hentai_library/core/errors/app_exception.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/core/util/utils.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
+import 'package:hentai_library/shared/application/errors/app_exception.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/presentation/providers/file_explorer_providers.dart';
 import 'package:hentai_library/features/comic/presentation/comic_delete_flow.dart';
 import 'package:hentai_library/features/comic/presentation/view_models/comic_detail_series_nav_provider.dart';
 import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_format.dart';
 import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_cover.dart';
 import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_entry.dart';
 import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_layout.dart';
-import 'package:hentai_library/shared/ui/motion/catalog_detail_page.dart';
-import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
-import 'package:hentai_library/shared/di/comic_detail_providers.dart';
-import 'package:hentai_library/shared/di/library_command_providers.dart';
-import 'package:hentai_library/features/library_admin/public.dart';
-import 'package:hentai_library/shared/di/library_state_providers.dart';
-import 'package:hentai_library/shared/di/read_session_launch_providers.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/design-system/design_system.dart';
+import 'package:hentai_library/features/library_admin/public/providers/library_admin_state_providers.dart';
+import 'package:hentai_library/shared/presentation/providers/app_navigator_provider.dart';
+import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
-import 'package:hentai_library/features/library_browse/public/catalog/for_comic_and_series.dart';
+import 'package:hentai_library/features/comic/presentation/providers/comic_detail_providers.dart';
+import 'package:hentai_library/features/comic/presentation/navigation/comic_detail_back_location.dart';
+import 'package:hentai_library/features/comic/presentation/actions/comic_metadata_edit_presenters.dart';
+import 'package:hentai_library/shared/presentation/providers/author_detail_providers.dart';
+import 'package:hentai_library/shared/ui/catalog/detail/detail_back_header.dart';
+import 'package:hentai_library/shared/ui/catalog/detail/detail_status_scaffold.dart';
+import 'package:hentai_library/shared/ui/navigation/app_navigator_context.dart';
+import 'package:hentai_library/shared/ui/navigation/library_browse_navigation.dart';
 
 export 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_layout.dart';
 export 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_view_object.dart';
@@ -36,17 +41,13 @@ class ComicDetailPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AsyncValue<Comic?> comicAsync = ref.watch(
-      libraryComicDetailProvider(comicId),
+      comicDetailProvider(comicId),
     );
 
     return PopScope(
-      canPop: context.canPop(),
-      onPopInvokedWithResult: (bool didPop, Object? result) {
-        if (didPop) {
-          return;
-        }
-        DetailBackHeader.popOrGoLibrary(context);
-      },
+      canPop: appNavigatorOf(context).canPop(),
+      onPopInvokedWithResult: (bool didPop, Object? result) =>
+          _handlePopInvoked(context, didPop),
       child: M3ETheme(
         data: withAppFontFamily(M3ETheme.of(context)),
         child: ColoredBox(
@@ -65,13 +66,23 @@ class ComicDetailPage extends ConsumerWidget {
             loading: () => const DetailLoadingStatus(),
             error: (Object error, StackTrace stackTrace) => DetailErrorStatus(
               label: context.l10n.comicDetailLoadFailedRetry,
-              onRetry: ref.read(libraryRefreshActionProvider),
+              onRetry: () => ref.invalidate(comicDetailProvider(comicId)),
             ),
             skipLoadingOnReload: true,
             skipLoadingOnRefresh: true,
           ),
         ),
       ),
+    );
+  }
+
+  void _handlePopInvoked(BuildContext context, bool didPop) {
+    if (didPop) {
+      return;
+    }
+    DetailBackHeader.popOrGoLibrary(
+      context,
+      locationResolver: resolveComicDetailBackLocationFromContext,
     );
   }
 }
@@ -115,7 +126,10 @@ class _ComicDetailContent extends ConsumerWidget {
     final ColorScheme scheme = Theme.of(context).colorScheme;
     return ComicDetailLayout(
       entry: entry,
-      onBack: () => DetailBackHeader.popOrGoLibrary(context),
+      onBack: () => DetailBackHeader.popOrGoLibrary(
+        context,
+        locationResolver: resolveComicDetailBackLocationFromContext,
+      ),
       onEdit: () => showComicMetadataEdit(context: context, comic: comic),
       moreMenuEntries: <M3EMenuNode>[
         M3EMenuEntry(
@@ -127,7 +141,7 @@ class _ComicDetailContent extends ConsumerWidget {
         M3EMenuEntry(
           label: l10n.comicDetailShowInExplorer,
           leading: const Icon(LucideIcons.folderOpen),
-          onPressed: () => _showInExplorer(context),
+          onPressed: () => _showInExplorer(context, ref),
         ),
         M3EMenuEntry(
           label: l10n.comicDetailDelete,
@@ -141,8 +155,9 @@ class _ComicDetailContent extends ConsumerWidget {
               if (!context.mounted) {
                 return;
               }
-              if (context.canPop()) {
-                context.pop();
+              final navigator = appNavigatorOf(context);
+              if (navigator.canPop()) {
+                navigator.pop();
               } else {
                 goDefaultLibraryBrowseFromContext(context);
               }
@@ -152,36 +167,44 @@ class _ComicDetailContent extends ConsumerWidget {
       ],
       onRead: () => _openReader(ref, incognito: false),
       onReadIncognito: () => _openReader(ref, incognito: true),
-      onAuthorTap: (String name) =>
-          openAuthorDetailByName(context: context, ref: ref, name: name),
-      onSeriesSelect: (int index) {
-        final List<ComicDetailSeriesNavItem>? items = seriesNav?.items;
-        if (items == null || index < 0 || index >= items.length) {
-          return;
-        }
-        final int current = seriesNav?.currentIndex ?? 0;
-        // 同级切卷：只替换当前漫画详情，保留库浏览 → 系列详情 栈。
-        // 勿用 go：会清空底层路由，系列返回只能落到 /home。
-        context.pushReplacement(
-          '/comic/${Uri.encodeComponent(items[index].comicId)}',
-          extra: CatalogSeriesNavExtra(reverse: index < current),
-        );
-      },
+      onAuthorTap: (AuthorRef author) => author.hasIdentity
+          ? ref.read(openAuthorByIdCommandProvider)(context, author.id!)
+          : ref.read(openAuthorByNameCommandProvider)(context, author.name),
+      onSeriesSelect: (int index) =>
+          _handleSeriesSelect(context, seriesNav, index),
     );
   }
 
-  Future<void> _openReader(WidgetRef ref, {required bool incognito}) async {
-    await ref
-        .read(readSessionLaunchPortProvider)
-        .openComic(comicId: comic.comicId, incognito: incognito);
+  void _handleSeriesSelect(
+    BuildContext context,
+    ComicDetailSeriesNavData? seriesNav,
+    int index,
+  ) {
+    final List<ComicDetailSeriesNavItem>? items = seriesNav?.items;
+    if (items == null || index < 0 || index >= items.length) {
+      return;
+    }
+    final int current = seriesNav?.currentIndex ?? 0;
+    // 同级切卷：只替换当前漫画详情，保留库浏览 → 系列详情 栈。
+    // 勿用 go：会清空底层路由，系列返回只能落到 /home。
+    appNavigatorOf(context)
+        .replaceComicDetail(items[index].comicId, reverse: index < current);
   }
+
+  Future<void> _openReader(WidgetRef ref, {required bool incognito}) =>
+      Future<void>.sync(
+        () => ref
+            .read(appNavigatorProvider)
+            .openReader(comicId: comic.comicId, incognito: incognito),
+      );
 
   Future<void> _refreshMetadata(BuildContext context, WidgetRef ref) async {
     final AppLocalizations l10n = context.l10n;
     try {
-      await ref
-          .read(libraryMetadataRefreshCommandPortProvider)
-          .refreshComic(comicId: comic.comicId, title: comic.title);
+      await ref.read(refreshComicMetadataCommandProvider)(
+        comicId: comic.comicId,
+        title: comic.title,
+      );
       if (!context.mounted) {
         return;
       }
@@ -193,25 +216,29 @@ class _ComicDetailContent extends ConsumerWidget {
     }
   }
 
-  void _showInExplorer(BuildContext context) {
+  void _showInExplorer(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
-    showInFileExplorer(comic.path)
-        .catchError((Object error, StackTrace stackTrace) {
-          if (!context.mounted) {
-            return;
-          }
-          if (error is AppException) {
-            showErrorSnackbar(context, error);
-            return;
-          }
-          showErrorSnackbar(
-            context,
-            AppException(
-              l10n.comicDetailShowInExplorerFailed,
-              cause: error,
-              stackTrace: stackTrace,
-            ),
-          );
-        });
+    unawaited(
+      ref.read(showInFileExplorerProvider)(comic.path).catchError((
+        Object error,
+        StackTrace stackTrace,
+      ) {
+        if (!context.mounted) {
+          return;
+        }
+        if (error is AppException) {
+          showErrorSnackbar(context, error);
+          return;
+        }
+        showErrorSnackbar(
+          context,
+          AppException(
+            l10n.comicDetailShowInExplorerFailed,
+            cause: error,
+            stackTrace: stackTrace,
+          ),
+        );
+      }),
+    );
   }
 }

@@ -1,4 +1,4 @@
-# Nightly：不挡 PR 的慢轨。全量 test/shared/ui + test/features（原 test/ui）、Dart/Rust 覆盖率趋势（Step Summary + lcov/HTML artifact，非门禁）。
+# Nightly：不挡 PR。Dart 全量测试只执行一次并收集覆盖率；Rust 覆盖率独立执行。
 # 触发：每天 UTC 18:00（仅默认分支 main 会跑定时任务）；也可手动 workflow_dispatch。
 name: Nightly
 
@@ -16,25 +16,6 @@ env:
   FRB_CODEGEN_VERSION: "2.13.0"
 
 jobs:
-  nightly-dart-ui:
-    name: nightly · dart ui (slow track)
-    runs-on: ubuntu-latest
-    timeout-minutes: 45
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-
-      - name: Setup Flutter FRB toolchain
-        uses: ./.github/actions/setup-flutter-frb
-        with:
-          flutter-version: ${{ env.FLUTTER_VERSION }}
-          frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
-          run-build-runner: "true"
-
-      - name: Run Dart slow-track UI tests
-        working-directory: app
-        run: flutter test test/shared/ui test/features
-
   nightly-dart-coverage:
     name: nightly · dart test coverage
     runs-on: ubuntu-latest
@@ -54,7 +35,8 @@ jobs:
       - name: Run hentai_flutter cdylib build
         run: cargo build --manifest-path core/Cargo.toml -p hentai_flutter
 
-      - name: Run Dart tests with coverage
+      # Includes the slow-track UI tests; do not run them again in a separate job.
+      - name: Run all Dart tests with coverage
         working-directory: app
         run: flutter test --coverage
 

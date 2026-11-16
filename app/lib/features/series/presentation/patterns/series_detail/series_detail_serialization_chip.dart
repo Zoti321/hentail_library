@@ -1,6 +1,7 @@
+import 'package:hentai_library/features/series/domain/value_objects/serialization_status.dart';
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_view_object.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -8,11 +9,11 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 class SeriesDetailSerializationChip extends StatelessWidget {
   const SeriesDetailSerializationChip({super.key, required this.status});
 
-  final SeriesSerializationStatus status;
+  final SerializationStatus status;
 
   @override
   Widget build(BuildContext context) {
-    if (status == SeriesSerializationStatus.unknown) {
+    if (status == SerializationStatus.unknown) {
       return const SizedBox.shrink();
     }
     final AppLocalizations l10n = context.l10n;
@@ -44,27 +45,21 @@ class SeriesDetailSerializationChip extends StatelessWidget {
     );
   }
 
-  static Color _accentColor(
-    M3EColorScheme scheme,
-    SeriesSerializationStatus status,
-  ) {
+  static Color _accentColor(M3EColorScheme scheme, SerializationStatus status) {
     return switch (status) {
-      SeriesSerializationStatus.ongoing => scheme.primary,
-      SeriesSerializationStatus.ended => scheme.onSurfaceVariant,
-      SeriesSerializationStatus.hiatus => scheme.error,
-      SeriesSerializationStatus.unknown => scheme.onSurfaceVariant,
+      SerializationStatus.ongoing => scheme.primary,
+      SerializationStatus.ended => scheme.onSurfaceVariant,
+      SerializationStatus.hiatus => scheme.error,
+      SerializationStatus.unknown => scheme.onSurfaceVariant,
     };
   }
 
-  static String _label(
-    AppLocalizations l10n,
-    SeriesSerializationStatus status,
-  ) {
+  static String _label(AppLocalizations l10n, SerializationStatus status) {
     return switch (status) {
-      SeriesSerializationStatus.ongoing => l10n.serializationStatusOngoing,
-      SeriesSerializationStatus.ended => l10n.serializationStatusEnded,
-      SeriesSerializationStatus.hiatus => l10n.serializationStatusHiatus,
-      SeriesSerializationStatus.unknown => l10n.serializationStatusUnknown,
+      SerializationStatus.ongoing => l10n.serializationStatusOngoing,
+      SerializationStatus.ended => l10n.serializationStatusEnded,
+      SerializationStatus.hiatus => l10n.serializationStatusHiatus,
+      SerializationStatus.unknown => l10n.serializationStatusUnknown,
     };
   }
 }

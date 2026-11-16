@@ -1,16 +1,18 @@
-import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
-import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/comic_metadata/public/comic_metadata_entities.dart';
+import 'package:hentai_library/features/comic/public/comic_metadata_types.dart';
+import 'package:hentai_library/composition/overrides/domain_event_bus_overrides.dart';
+import 'package:hentai_library/composition/feature_state_overrides.dart';
+import 'package:hentai_library/composition/composition_overrides.dart';
+import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/form/comic_metadata_form.dart';
+import 'package:hentai_library/features/comic/domain/value_objects/comic_metadata_form.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/series_item_membership.dart';
-import 'package:hentai_library/shared/domain/ports/library_revision_port.dart';
-import 'package:hentai_library/features/comic/domain/comic_user_metadata_repository.dart';
-import 'package:hentai_library/features/comic/di/comic_repository_providers.dart';
+import 'package:hentai_library/features/comic/domain/repositories/comic_user_metadata_repository.dart';
+import 'package:hentai_library/features/comic/presentation/providers/comic_repository_providers.dart';
 import 'package:hentai_library/features/series/domain/series_repository.dart';
 import 'package:hentai_library/features/comic/application/comic_metadata_service.dart';
 import 'package:hentai_library/features/comic/presentation/view_models/comic_metadata_editor_notifier.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/features/series/public/providers/series_repository_providers.dart';
 import 'package:hentai_library/features/bootstrap/presentation/view_models/aggregates.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:riverpod/riverpod.dart';
@@ -28,9 +30,9 @@ class _RecordingComicRepository implements ComicUserMetadataRepository {
     String? description,
     DateTime? publishedAt,
     bool clearPublishedAt = false,
-    List? authors,
+    List<String>? authors,
     ContentRating? contentRating,
-    List? tags,
+    List<Tag>? tags,
     List<String>? languages,
     List<String>? parodies,
     List<String>? characters,
@@ -79,14 +81,9 @@ class _RecordingSeriesRepository implements SeriesRepository {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-class _SilentRevisionPort implements LibraryRevisionPort {
-  @override
-  Stream<void> watchRevision() => const Stream<void>.empty();
-}
-
 Comic _comic() {
   final DateTime now = DateTime.utc(2024, 1, 1);
-  return Comic(
+  return Comic.restore(
     comicId: 'comic-1',
     path: '/library/comic-1',
     resourceType: ResourceType.dir,
@@ -120,11 +117,11 @@ void main() {
     seriesRepo = _RecordingSeriesRepository();
     container = ProviderContainer(
       overrides: <Override>[
-        ...sharedLibraryStateOverrides(),
+        ...domainEventBusOverrides(),
+        ...featureStateOverrides(),
         ...bootstrapCompositionOverrides(),
         comicUserMetadataRepositoryProvider.overrideWithValue(comicRepo),
         seriesRepoProvider.overrideWithValue(seriesRepo),
-        libraryRevisionPortProvider.overrideWithValue(_SilentRevisionPort()),
       ],
     );
   });

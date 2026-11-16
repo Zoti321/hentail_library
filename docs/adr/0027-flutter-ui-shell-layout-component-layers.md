@@ -4,6 +4,8 @@
 
 Accepted
 
+> **ADR-0051 修订（2026-11-12）**：组合根迁到 `lib/composition/`；owner `data/` 迁为 `infrastructure/`；共享协作签名在 `shared/application/contracts/`，Riverpod 适配在 `shared/presentation/providers/`。内层以递归 import/export 门禁为准；下文旧目录是历史语境。
+
 ## Context
 
 Flutter 侧已有单响应式 App shell、Fluent 风格设计系统（`shared/ui/widgets`）与 MVVM（ADR-0017）。实践中 Shell 编排、Layout 辅助与 feature 侧栏逻辑分散在 bootstrap、shared navigation 与 library_admin；部分 shared 组件反向 import feature（导航表、库排序控件、卡片删除流等），导致设计系统无法独立门禁测试，且 Agent 难以判断新 UI 应落在哪一层。
@@ -30,7 +32,7 @@ MVVM 规则不变：View 不直接调 Repository。Shell/Layout/纯 Component **
 - **UI models**：`app/lib/shared/ui/models/` — 组件入参/展示用纯值（封面图源、封面 UI 状态等），**不是** FRB 或 domain 的 DTO
 - **Motion（实现）**：`app/lib/shared/ui/motion/` — 路由过渡、reduced-motion 运行时辅助；**时长/曲线 token** 仍在 `shared/ui/theme/tokens`（`AppMotionTokens`、`context.motion`，ADR-0028）
 - **Foundation pointer**：`app/lib/shared/ui/widgets/foundation/` — 最小点击区域、tooltip 等待、指针激活后 unfocus 等，**不属于** motion
-- **跨 feature UI 命令类型**：`shared/domain/ports/`（含 `BuildContext` 的契约，如 `AuthorDetailPort`）及 `shared/domain/library/*_port.dart`；**不再**使用 `shared/application/ports/`（#434）。其他 feature **import** owner `features/<id>/public.dart`；`shared/di` 声明 Provider token，bootstrap 注入实现（ADR-0034）
+- **跨 feature UI 命令类型**：`shared/domain/ports/`（含 `BuildContext` 的契约，如 `AuthorDetailPort`）及 `shared/domain/library/comic_detail_return_series_port.dart`；**不再**使用 `shared/application/ports/`（#434）。`library_admin` 的库管理命令（`LibraryManagementPort`）真源在其 `public/ui/`，`shared` 侧只留仅含 `BuildContext` 的 `LibraryBrowseFallbackPort`（#530）。其他 feature **import** owner `features/<id>/public.dart`；`shared/di` 声明 Provider token，bootstrap 注入实现（ADR-0034）
 - **Component**：`app/lib/shared/ui/widgets/`（按类目）
 - **bootstrap**：应用入口、路由表、将 feature 实现注入 Shell 插槽的**组合根**（composition root）
 - **库管理 UI** 留在 **library_admin**（`HomeLibraryManagementPanel` @ Home；`production_shell_adapters` 供 rail flyout）；**不**再使用 legacy `LibrariesAppSidebar` 注入 `DesktopSidebar`。

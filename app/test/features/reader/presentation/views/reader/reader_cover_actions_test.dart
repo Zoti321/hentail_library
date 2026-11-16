@@ -1,0 +1,16 @@
+import 'package:hentai_library/features/reader/presentation/views/reader/reader_cover_actions.dart';
+import 'package:test/test.dart';
+
+void main() {
+  group('readerCoverPageIndex', () {
+    test('converts 1-based currentIndex to 0-based page index', () {
+      expect(readerCoverPageIndex(1), 0);
+      expect(readerCoverPageIndex(10), 9);
+    });
+
+    test('never returns a negative index', () {
+      expect(readerCoverPageIndex(0), 0);
+      expect(readerCoverPageIndex(-5), 0);
+    });
+  });
+}

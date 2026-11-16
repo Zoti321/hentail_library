@@ -1,13 +1,15 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/library_browse/presentation/author/view_models/author_detail_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/author/views/author_detail/author_detail_links.dart';
 import 'package:hentai_library/features/library_browse/presentation/author/views/author_detail/author_image_view.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/author_detail.dart';
+import 'package:hentai_library/features/comic_metadata/public/comic_metadata_entities.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
-import 'package:hentai_library/shared/ui/widgets/settings/tonal_surface.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -162,7 +164,7 @@ class _AuthorNameRow extends HookConsumerWidget {
       try {
         await ref
             .read(authorDetailCommandsProvider)
-            .rename(authorId: detail.id, oldName: detail.name, newName: value);
+            .rename(authorId: detail.id, newName: value);
         if (context.mounted) {
           editing.value = false;
         }
@@ -179,7 +181,7 @@ class _AuthorNameRow extends HookConsumerWidget {
     useEffect(() {
       void onFocusChange() {
         if (!focusNode.hasFocus) {
-          submit();
+          unawaited(submit());
         }
       }
 
@@ -247,16 +249,21 @@ class _AuthorNameRow extends HookConsumerWidget {
           size: M3EIconButtonSize.sm,
           tooltip: l10n.authorDetailRename,
           semanticLabel: l10n.authorDetailRename,
-          onPressed: () {
-            controller.text = detail.name;
-            controller.selection = TextSelection(
-              baseOffset: 0,
-              extentOffset: detail.name.length,
-            );
-            editing.value = true;
-          },
+          onPressed: () => _startEditing(controller, editing),
         ),
       ],
     );
+  }
+
+  void _startEditing(
+    TextEditingController controller,
+    ValueNotifier<bool> editing,
+  ) {
+    controller.text = detail.name;
+    controller.selection = TextSelection(
+      baseOffset: 0,
+      extentOffset: detail.name.length,
+    );
+    editing.value = true;
   }
 }

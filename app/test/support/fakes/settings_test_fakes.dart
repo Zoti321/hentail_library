@@ -1,32 +1,20 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
+import 'package:hentai_library/composition/composition_overrides.dart';
 import 'package:hentai_library/features/app_settings/public.dart';
-import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
-import 'package:hentai_library/features/library_admin/domain/resource_format_category.dart';
-import 'package:package_info_plus/package_info_plus.dart';
+import 'package:hentai_library/composition/feature_state_overrides.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 /// Shared Settings overrides for shell/settings widget tests.
 List<Override> settingsViewTestOverrides({
   AppSetting Function()? settingBuilder,
-  PackageInfo? packageInfo,
+  String version = '1.0.0',
 }) {
   return <Override>[
-    ...sharedLibraryStateOverrides(),
+    ...featureStateOverrides(),
     ...bootstrapCompositionOverrides(),
     settingsProvider.overrideWith(
       () => FakeSettingsNotifier(settingBuilder: settingBuilder),
     ),
-    packageInfoProvider.overrideWith(
-      (Ref ref) async =>
-          packageInfo ??
-          PackageInfo(
-            appName: 'Hentai Library',
-            packageName: 'hentai_library',
-            version: '1.0.0',
-            buildNumber: '1',
-          ),
-    ),
+    installedAppVersionQueryProvider.overrideWithValue(() async => version),
   ];
 }
 
@@ -49,7 +37,7 @@ class MemoryAppSettingRepository implements AppSettingRepository {
   }) : _setting = initial ?? AppSetting();
 
   final bool? legacyAutoScan;
-  final List<ResourceFormatCategory>? legacyEnabledResourceFormatCategories;
+  final Object? legacyEnabledResourceFormatCategories;
   final bool roundTripJsonOnSave;
 
   AppSetting _setting;
@@ -69,9 +57,11 @@ class MemoryAppSettingRepository implements AppSettingRepository {
   Future<bool?> peekLegacyAutoScan() async => legacyAutoScan;
 
   @override
-  Future<List<ResourceFormatCategory>?>
-  peekLegacyEnabledResourceFormatCategories() async =>
-      legacyEnabledResourceFormatCategories;
+  Future<({Object? enabledFormatGroups})?>
+  peekLegacyResourceFormatPayload() async =>
+      legacyEnabledResourceFormatCategories == null
+      ? null
+      : (enabledFormatGroups: legacyEnabledResourceFormatCategories);
 
   @override
   Future<void> clearLegacyImportPayload() async {

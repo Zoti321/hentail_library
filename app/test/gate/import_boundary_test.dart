@@ -9,18 +9,20 @@ import 'import_boundary_rules.dart';
 void main() {
   late Directory libDir;
   late File baselineFile;
+  late List<ImportViolation> allViolations;
 
-  setUp(() {
+  setUpAll(() {
     libDir = Directory(p.join(Directory.current.path, 'lib'));
     baselineFile = File(
       p.join('test', 'gate', 'import_boundary_baseline.json'),
     );
+    allViolations = collectImportViolations(libDir);
   });
 
   test('FRB import whitelist: feature data/ layer (Phase C #280)', () {
     expect(
       isFrbImportAllowedSource(
-        'features/library_admin/data/adapters/sync_library_frb_adapter.dart',
+        'features/library_admin/infrastructure/adapters/sync_library_frb_adapter.dart',
       ),
       isTrue,
     );
@@ -30,14 +32,17 @@ void main() {
     );
     expect(
       isFrbImportAllowedSource(
-        'features/read_session/application/reader_session_service.dart',
+        'features/reader/application/open_read_session_service.dart',
       ),
       isFalse,
     );
-    expect(isFrbImportAllowedSource('shared/data/adapters/foo.dart'), isTrue);
+    expect(
+      isFrbImportAllowedSource('infrastructure/adapters/foo.dart'),
+      isTrue,
+    );
     expect(
       isFrbImportAllowedSource(
-        'features/comic_trash/data/adapters/comic_trash_frb_adapter.dart',
+        'features/comic_trash/infrastructure/adapters/comic_trash_frb_adapter.dart',
       ),
       isTrue,
     );
@@ -79,7 +84,7 @@ void main() {
     );
     expect(
       isPublicPresentationExportAllowlisted(
-        'features/library_browse/public/catalog/for_comic_and_series.dart',
+        'features/library_browse/public/ui/library_page.dart',
       ),
       isTrue,
     );
@@ -98,32 +103,47 @@ void main() {
   });
 
   test('import boundaries: L1 structural rules are zero-tolerance', () {
-    final List<ImportViolation> all = collectImportViolations(libDir);
-    final List<ImportViolation> structural = structuralViolations(all);
+    final List<ImportViolation> structural = structuralViolations(
+      allViolations,
+    );
     if (structural.isNotEmpty) {
       fail(
-        'Structural import violations (R1–R12):\n'
+        'Structural import violations (R1–R12; R13 is ratcheted):\n'
         '${_formatViolations(structural)}',
       );
     }
   });
 
-  test('import boundaries: no cycles in public cross-feature graph', () {
-    final Map<String, Set<String>> adjacency =
-        collectPublicCrossFeatureAdjacency(libDir);
-    final List<String>? cycle = findPublicCrossFeatureCycle(adjacency);
+  test(
+    'R13 只由 test/architecture/module_boundary_test.dart 实现（扫 import+export）',
+    () {
+      final List<ImportViolation> r13 = allViolations
+          .where((ImportViolation v) => v.ruleId == 'R13')
+          .toList();
+      expect(r13, isEmpty, reason: 'import_boundary_rules 不得再产出 R13（#504）。');
+    },
+  );
+
+  test('baseline has no stale entries', () {
+    final Set<String> currentKeys = violationKeySet(
+      ratchetViolations(allViolations),
+    );
+    final Set<String> baselineKeys = _readBaselineKeys(baselineFile);
+    final Set<String> stale = baselineKeys.difference(currentKeys);
+    final List<String> sorted = stale.toList()..sort();
     expect(
-      cycle,
-      isNull,
-      reason: cycle == null
-          ? null
-          : 'Public API dependency cycle: ${cycle.join(' -> ')}',
+      stale,
+      isEmpty,
+      reason:
+          'baseline 存在失效条目（当前扫描已产不出该边，请删除）：\n'
+          '${sorted.join('\n')}',
     );
   });
 
   test('import boundaries: L2 product graph ratchet vs baseline', () {
-    final List<ImportViolation> all = collectImportViolations(libDir);
-    final Set<String> currentKeys = violationKeySet(ratchetViolations(all));
+    final Set<String> currentKeys = violationKeySet(
+      ratchetViolations(allViolations),
+    );
     final Set<String> baselineKeys = _readBaselineKeys(baselineFile);
 
     final Set<String> added = currentKeys.difference(baselineKeys);

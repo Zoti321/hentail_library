@@ -1,5 +1,5 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/comic/presentation/view_models/comic_read_progress.dart';
+import 'package:test/test.dart';
 
 void main() {
   test('comicReadProgressFor returns null without a reading record', () {

@@ -1,4 +1,5 @@
 import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_view_object.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
 
 /// Widgetbook / 预览用示例漫画详情。
 abstract final class ComicDetailPagePreviewData {
@@ -11,7 +12,10 @@ abstract final class ComicDetailPagePreviewData {
       pageCount: 128,
       publishedLabel: '2019-04-17',
       parodies: <String>['迷宫饭'],
-      authors: <String>['示例作者甲', '示例作者乙'],
+      authors: <AuthorRef>[
+        AuthorRef(id: 101, name: '示例作者甲'),
+        AuthorRef(id: 102, name: '示例作者乙'),
+      ],
       characters: <String>['芙莉莲', '费伦', '修塔尔克'],
       tags: <String>['奇幻', '冒险', '长篇', '连载中', '图书馆'],
       resourceFormat: 'ZIP',

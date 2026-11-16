@@ -162,6 +162,45 @@
   "homeStatSeries": "Series",
   "homeStatTags": "Tags",
   "homeStatAuthors": "Authors",
+  "homeStatFinishedComics": "Finished",
+  "homeFinishedComicCount": "{count, plural, one{1 comic} other{{count} comics}}",
+  "@homeFinishedComicCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeStatReadingDuration": "Reading duration",
+  "homeReadingDurationZero": "Under 1 minute",
+  "homeReadingDurationMinutes": "{minutes, plural, one{1 minute} other{{minutes} minutes}}",
+  "@homeReadingDurationMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "homeReadingDurationHoursMinutes": "{hours, plural, one{1 hour} other{{hours} hours}} {minutes, plural, one{1 min} other{{minutes} min}}",
+  "@homeReadingDurationHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "homeReadingDurationHours": "{hours, plural, one{1 hour} other{{hours} hours}}",
+  "@homeReadingDurationHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+
   "homeComicTotal": "{count, plural, one{1 comic total} other{{count} comics total}}",
   "@homeComicTotal": {
     "placeholders": {
@@ -1298,5 +1337,51 @@
   "authorDetailAliases": "Aliases: {aliases}",
   "@authorDetailAliases": { "placeholders": { "aliases": { "type": "String" } } },
   "authorDetailInvalidUrl": "Enter a URL starting with http:// or https://",
-  "authorDetailOpenLinkFailed": "Could not open the link"
+  "authorDetailOpenLinkFailed": "Could not open the link",
+  "mediaTitle": "Media",
+  "mediaSubtitle": "An overview of metadata stored in your local Comic resources.",
+  "writebackTitle": "Automatically write metadata to original files",
+  "writebackDescription": "Write in-app metadata into original Comic resources. Enabling also processes existing Comics. Archives may be rewritten and other software can read this information. Failures retry automatically.",
+  "writebackConfirmTitle": "Allow changes to original resources?",
+  "writebackEnable": "Enable automatic writing",
+  "writebackDisabled": "Disabled",
+  "writebackPending": "Pending",
+  "writebackProcessing": "Processing",
+  "writebackCompleted": "Completed",
+  "writebackFailed": "Failed",
+  "writebackUnsupported": "Unsupported on this build",
+  "writebackFailure": "Could not save file metadata writing setting",
+  "mediaResourceTotal": "Comic resources",
+  "mediaLocalScope": "Across {count} local libraries",
+  "mediaWritten": "Written to files",
+  "mediaWrittenCaption": "Current metadata saved to original resources",
+  "mediaNotEnabled": "Automatic writing off",
+  "mediaNotEnabledCaption": "Resources in libraries with automatic writing disabled",
+  "mediaWritingOverview": "Automatic file writing",
+  "mediaEnabledScope": "Enabled for {enabled} of {total} local libraries",
+  "mediaPendingCaption": "Waiting for automatic writing",
+  "mediaProcessingCaption": "Writing metadata to original resources",
+  "mediaFailedCaption": "Will retry automatically while the app is active",
+  "mediaUnsupportedCaption": "Resources the current version cannot write to",
+  "mediaLibrarySettings": "Write settings by library",
+  "mediaAutomaticInfo": "Off by default. Enabling also writes existing metadata to original resources. Writing and retries run while the app is active.",
+  "mediaNoLocalLibraries": "Add a local library to enable automatic file writing.",
+  "mediaRefreshFailed": "Could not update the overview. Showing the last available counts.",
+  "@mediaLocalScope": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@mediaEnabledScope": {
+    "placeholders": {
+      "enabled": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  }
 }

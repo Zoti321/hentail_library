@@ -1,7 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hentai_library/composition/overrides/domain_event_bus_overrides.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_filter_metadata_names_providers.dart';
-import 'package:hentai_library/features/named_metadata/domain/named_facet_dictionary_repository.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/features/comic_metadata/domain/named_facet_dictionary_repository.dart';
+import 'package:hentai_library/features/comic_metadata/public/providers/comic_metadata_repository_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;
 
@@ -23,6 +24,7 @@ void main() {
   test('libraryFilterParodyNamesProvider reads sorted listAll', () async {
     final ProviderContainer container = ProviderContainer(
       overrides: <Override>[
+        ...domainEventBusOverrides(),
         parodyRepoProvider.overrideWithValue(
           _FakeNamedFacetDictionaryRepository(all: <String>['Touhou', 'Fate']),
         ),
@@ -39,6 +41,7 @@ void main() {
   test('libraryFilterCharacterNamesProvider reads sorted listAll', () async {
     final ProviderContainer container = ProviderContainer(
       overrides: <Override>[
+        ...domainEventBusOverrides(),
         characterRepoProvider.overrideWithValue(
           _FakeNamedFacetDictionaryRepository(all: <String>['Reimu', 'Marisa']),
         ),
@@ -55,6 +58,7 @@ void main() {
   test('empty dictionary yields empty candidate list', () async {
     final ProviderContainer container = ProviderContainer(
       overrides: <Override>[
+        ...domainEventBusOverrides(),
         parodyRepoProvider.overrideWithValue(
           _FakeNamedFacetDictionaryRepository(),
         ),

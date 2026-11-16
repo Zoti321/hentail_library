@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/ui/layout/metadata_edit_form_metrics.dart';
-import 'package:hentai_library/shared/ui/motion/motion.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/features/comic/presentation/patterns/metadata_edit/comic_metadata_edit_draft.dart';
 import 'package:hentai_library/features/comic/presentation/patterns/metadata_edit/comic_metadata_smart_facet_scope.dart';
 import 'package:hentai_library/features/comic/presentation/patterns/metadata_edit/comic_metadata_edit_form.dart';
-import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_surface.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/comic_meta_locks.dart';
+import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_actions.dart';
+import 'package:hentai_library/features/comic/domain/value_objects/comic_meta_locks.dart';
 
 export 'package:hentai_library/features/comic/presentation/patterns/metadata_edit/comic_metadata_edit_draft.dart';
 
@@ -32,7 +31,8 @@ class ComicMetadataEditLayout extends StatefulWidget {
   State<ComicMetadataEditLayout> createState() => _ComicMetadataEditPageState();
 }
 
-class _ComicMetadataEditPageState extends State<ComicMetadataEditLayout> {
+class _ComicMetadataEditPageState extends State<ComicMetadataEditLayout>
+    implements MetadataEditSaveActions {
   late ComicMetadataEditDraft _draft = widget.initialDraft;
   String? _titleError;
   bool _saving = false;
@@ -86,6 +86,7 @@ class _ComicMetadataEditPageState extends State<ComicMetadataEditLayout> {
     }
   }
 
+  @override
   Future<void> saveAndPop() => _handleSave();
 
   Future<void> _handleSave() async {
@@ -125,15 +126,17 @@ class _ComicMetadataEditPageState extends State<ComicMetadataEditLayout> {
         onLockChanged: _onLockChanged,
         titleError: _titleError,
         smartFacetScope: labComicMetadataSmartFacetScope(title: _draft.title),
-        onDraftChanged: (ComicMetadataEditDraft value) {
-          setState(() {
-            _draft = value;
-            if (_titleError != null && value.validateTitle() == null) {
-              _titleError = null;
-            }
-          });
-        },
+        onDraftChanged: _handleDraftChanged,
       ),
     );
+  }
+
+  void _handleDraftChanged(ComicMetadataEditDraft value) {
+    setState(() {
+      _draft = value;
+      if (_titleError != null && value.validateTitle() == null) {
+        _titleError = null;
+      }
+    });
   }
 }

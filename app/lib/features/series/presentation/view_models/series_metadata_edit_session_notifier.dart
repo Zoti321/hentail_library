@@ -1,9 +1,10 @@
-import 'package:hentai_library/features/library_browse/public/catalog/for_comic_and_series.dart';
+import 'package:hentai_library/features/series/application/series_metadata_service.dart';
+import 'package:hentai_library/features/series/presentation/mappers/series_metadata_edit_mappers.dart';
 import 'package:hentai_library/features/series/presentation/patterns/metadata_edit/series_metadata_edit_draft.dart';
 import 'package:hentai_library/features/series/presentation/view_models/series_metadata_edit_ui_state.dart';
 import 'package:hentai_library/features/series/presentation/view_models/series_metadata_editor_notifier.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/form/series_metadata_form.dart';
+import 'package:hentai_library/features/series/domain/series.dart';
+import 'package:hentai_library/features/series/domain/value_objects/series_metadata_form.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'series_metadata_edit_session_notifier.g.dart';
@@ -46,13 +47,15 @@ class SeriesMetadataEditSession extends _$SeriesMetadataEditSession {
           serializationStatus: serializationStatus,
           totalCount: totalCount,
         );
-    state = state.copyWith(
-      locks: state.locks.copyWith(
-        name: name,
-        serializationStatus: serializationStatus,
-        totalCount: totalCount,
-      ),
-    );
+    if (ref.mounted) {
+      state = state.copyWith(
+        locks: state.locks.copyWith(
+          name: name,
+          serializationStatus: serializationStatus,
+          totalCount: totalCount,
+        ),
+      );
+    }
   }
 
   Future<SeriesMetadataEditSaveResult> save() async {
@@ -64,24 +67,25 @@ class SeriesMetadataEditSession extends _$SeriesMetadataEditSession {
     try {
       final SeriesMetadataApplyResult result = await ref
           .read(seriesMetadataEditorProvider.notifier)
-          .apply(
-            seriesMetadataFormFromDraft(state.draft, _original),
-            _original,
-          );
+          .apply(state.draft.toForm(), _original);
       switch (result) {
         case SeriesMetadataApplyInvalid(
           :final SeriesMetadataFormValidation validation,
         ):
-          state = state.copyWith(
-            nameError: validation.nameError,
-            totalCountError: validation.totalCountError,
-          );
+          if (ref.mounted) {
+            state = state.copyWith(
+              nameError: validation.nameError,
+              totalCountError: validation.totalCountError,
+            );
+          }
           outcome = SeriesMetadataEditSaveResult.validationFailed;
         case SeriesMetadataApplySucceeded():
           outcome = SeriesMetadataEditSaveResult.succeeded;
       }
     } finally {
-      state = state.copyWith(saving: false);
+      if (ref.mounted) {
+        state = state.copyWith(saving: false);
+      }
     }
     return outcome;
   }

@@ -1,13 +1,6 @@
-/// series feature public API（ADR-0034 / ADR-0036 / #457）。
-///
-/// browse 壳集成走 `library_browse` 本地 `series_presentation_bridge`，
-/// 不再经本 barrel re-export presentation 壳桶。
+/// series 的模块入口；纯 Dart 消费者使用 public/contracts.dart。
 library;
 
-export 'public/di/series_cover_providers.dart';
-export 'public/di/series_reading_context_port_factory.dart';
-export 'public/di/series_repository_factory.dart';
-export 'public/library_series_browse_rules.dart';
-export 'public/series_item_sort_persist.dart';
-export 'public/ui/series_cover_content.dart';
-export 'public/ui/series_detail_page.dart';
+export 'public/contracts.dart';
+export 'public/providers.dart';
+export 'public/widgets.dart';

@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/features/library_browse/public/catalog/for_comic_and_series.dart';
-import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/ui/catalog/selection/catalog_selection_notifier.dart';
+import 'package:hentai_library/shared/ui/catalog/selection/library_selection_header.dart';
+import 'package:hentai_library/design-system/design_system.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_view_object.dart';
-import 'package:hentai_library/shared/ui/motion/mode_chrome_transition.dart';
-import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
-import 'package:hentai_library/shared/ui/patterns/shared/page_header.dart';
+import 'package:hentai_library/shared/presentation/providers/series_slot_providers.dart';
 import 'package:hentai_library/features/series/presentation/patterns/series_detail/series_detail_comics_section.dart';
 import 'package:hentai_library/features/series/presentation/patterns/series_detail/series_detail_intro_section.dart';
 import 'package:hentai_library/features/series/presentation/patterns/series_detail/series_detail_page_header.dart';
-import 'package:hentai_library/shared/ui/widgets/navigation/expressive_library_scroll_to_top_button.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -46,7 +45,7 @@ class SeriesDetailLayout extends ConsumerStatefulWidget {
   final ValueChanged<int>? onComicTap;
 
   /// 作者 chip 点击（生产：打开作者详情）；为空时作者 chip 走 [onMetadataChipTap]。
-  final ValueChanged<String>? onAuthorTap;
+  final ValueChanged<AuthorRef>? onAuthorTap;
   final ScrollController? scrollController;
 
   final int page;
@@ -130,6 +129,12 @@ class _SeriesDetailPageState extends ConsumerState<SeriesDetailLayout> {
     _scrollToComicsSection();
   }
 
+  void _handlePopInvoked(bool didPop, bool seriesSelection) {
+    if (!didPop && seriesSelection) {
+      ref.read(catalogSelectionProvider.notifier).exit();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
@@ -150,7 +155,10 @@ class _SeriesDetailPageState extends ConsumerState<SeriesDetailLayout> {
     ];
 
     final Widget modeHeader = seriesSelection
-        ? LibrarySelectionHeader(pageComicIds: pageComicIds)
+        ? LibrarySelectionHeader(
+            pageComicIds: pageComicIds,
+            onEditMetadata: ref.watch(seriesMemberSelectionActionsSlotProvider),
+          )
         : SeriesDetailPageHeader(
             onBack: _resolveVoid(widget.onBack),
             onEdit: _resolveVoid(widget.onEdit),
@@ -167,11 +175,8 @@ class _SeriesDetailPageState extends ConsumerState<SeriesDetailLayout> {
 
     return PopScope(
       canPop: !seriesSelection,
-      onPopInvokedWithResult: (bool didPop, Object? result) {
-        if (!didPop && seriesSelection) {
-          ref.read(catalogSelectionProvider.notifier).exit();
-        }
-      },
+      onPopInvokedWithResult: (bool didPop, Object? result) =>
+          _handlePopInvoked(didPop, seriesSelection),
       child: ColoredBox(
         color: labBrowseCanvasColor(scheme),
         child: Stack(

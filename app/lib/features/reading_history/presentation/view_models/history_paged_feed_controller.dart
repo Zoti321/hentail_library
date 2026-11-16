@@ -2,12 +2,12 @@ import 'dart:async';
 
 import 'package:hentai_library/core/util/debouncer.dart';
 
-import 'package:hentai_library/core/logging/app_log.dart';
+import 'package:hentai_library/shared/application/logging/app_log.dart';
 import 'package:hentai_library/features/reading_history/public.dart' as entity;
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/features/reading_history/presentation/models/history_card_item.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/features/reading_history/public/providers/reading_history_repository_providers.dart';
 import 'package:hentai_library/features/reading_history/presentation/view_models/history_paged_feed_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -27,10 +27,15 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
   bool _isRefreshing = false;
   bool _refreshPending = false;
   int _fetchGeneration = 0;
+  int _queryGeneration = 0;
   StreamSubscription<void>? _historyChangesSubscription;
 
   @override
   Future<HistoryPagedFeedState> build() async {
+    _queryGeneration++;
+    final generation = ++_fetchGeneration;
+    _isRefreshing = false;
+    _refreshPending = false;
     _keywordDebounce ??= Debouncer(duration: _kHistoryKeywordDebounce);
     _refreshDebounce ??= Debouncer(duration: _kHistoryRefreshDebounce);
     _historyChangesSubscription ??= ref
@@ -38,15 +43,17 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
         .watchHistoryChanges()
         .listen((_) => _scheduleSilentRefresh());
     ref.onDispose(() {
+      _queryGeneration++;
+      _fetchGeneration++;
       _keywordDebounce?.dispose();
       _refreshDebounce?.dispose();
-      _historyChangesSubscription?.cancel();
+      unawaited(_historyChangesSubscription?.cancel());
       _historyChangesSubscription = null;
     });
     final HistoryPagedFeedState initial = await _loadPage(page: 1);
-    if (_refreshPending) {
+    if (ref.mounted && generation == _fetchGeneration && _refreshPending) {
       _refreshPending = false;
-      Future<void>.microtask(_silentRefresh);
+      unawaited(Future<void>.microtask(_silentRefresh));
     }
     return initial;
   }
@@ -73,11 +80,11 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
             pageRequest(page: nextPage, pageSize: _pageSize),
             keyword: _keywordOrNull(),
           );
-      if (generation != _fetchGeneration) {
+      if (!ref.mounted || generation != _fetchGeneration) {
         return;
       }
       final HistoryPagedFeedState? latest = state.asData?.value;
-      if (latest == null || latest.isLoadingMore != true) {
+      if (latest == null || !latest.isLoadingMore) {
         return;
       }
       final HistoryPagedFeedState merged = _mergePage(
@@ -89,7 +96,7 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
         merged.copyWith(isLoadingMore: false),
       );
     } catch (error, stackTrace) {
-      if (generation != _fetchGeneration) {
+      if (!ref.mounted || generation != _fetchGeneration) {
         return;
       }
       logError(AppLog.ui('history'), '加载更多阅读历史失败', error, stackTrace);
@@ -127,14 +134,39 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
 
   /// 删除单本漫画的阅读历史；失败时抛出，本地列表保持不变。
   Future<void> deleteHistory(String comicId) async {
+    final queryGeneration = _queryGeneration;
     await ref.read(readingHistoryRepoProvider).deleteByComicId(comicId);
+    if (!_finishHistoryWrite(queryGeneration)) {
+      return;
+    }
     _removeItem(comicId);
   }
 
   /// 清空全部阅读历史；失败时抛出，本地列表保持不变。
   Future<void> clearAllHistory() async {
+    final queryGeneration = _queryGeneration;
     await ref.read(readingHistoryRepoProvider).clearAllHistory();
+    if (!_finishHistoryWrite(queryGeneration)) {
+      return;
+    }
     _clearAllLocal();
+  }
+
+  bool _finishHistoryWrite(int queryGeneration) {
+    if (!ref.mounted || queryGeneration != _queryGeneration) {
+      return false;
+    }
+    if (state.isLoading) {
+      ref.invalidateSelf();
+      return false;
+    }
+    _fetchGeneration++;
+    _isRefreshing = false;
+    if (_refreshPending) {
+      _refreshPending = false;
+      _scheduleSilentRefresh();
+    }
+    return true;
   }
 
   void _removeItem(String comicId) {
@@ -148,7 +180,10 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
     state = AsyncData<HistoryPagedFeedState>(
       current.copyWith(
         items: items,
-        totalCount: (current.totalCount - 1).clamp(0, current.totalCount),
+        totalCount: items.length == current.items.length
+            ? current.totalCount
+            : (current.totalCount - 1).clamp(0, current.totalCount),
+        isLoadingMore: false,
       ),
     );
   }
@@ -166,10 +201,15 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
   }
 
   void _scheduleSilentRefresh() {
-    _refreshDebounce?.run(_silentRefresh);
+    if (ref.mounted) {
+      _refreshDebounce?.run(_silentRefresh);
+    }
   }
 
   Future<void> _silentRefresh() async {
+    if (!ref.mounted) {
+      return;
+    }
     final HistoryPagedFeedState? current = state.asData?.value;
     if (current == null) {
       _refreshPending = true;
@@ -186,29 +226,35 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
 
     try {
       final HistoryPagedFeedState refreshed = await _loadPage(page: 1);
-      if (generation != _fetchGeneration) {
+      if (!ref.mounted || generation != _fetchGeneration) {
         return;
       }
       state = AsyncData<HistoryPagedFeedState>(refreshed);
     } catch (error, stackTrace) {
+      if (!ref.mounted || generation != _fetchGeneration) {
+        return;
+      }
       logError(AppLog.ui('history'), '静默刷新阅读历史失败', error, stackTrace);
     } finally {
-      _isRefreshing = false;
-      if (_refreshPending) {
-        _refreshPending = false;
-        _scheduleSilentRefresh();
+      if (ref.mounted && generation == _fetchGeneration) {
+        _isRefreshing = false;
+        if (_refreshPending) {
+          _refreshPending = false;
+          _scheduleSilentRefresh();
+        }
       }
     }
   }
 
   Future<HistoryPagedFeedState> _loadPage({required int page}) async {
+    final keyword = _effectiveKeyword;
     final PagedResult<entity.ReadingHistory> result = await ref
         .read(readingHistoryRepoProvider)
         .fetchHistoryPage(
           pageRequest(page: page, pageSize: _pageSize),
-          keyword: _keywordOrNull(),
+          keyword: keyword.isEmpty ? null : keyword,
         );
-    return _stateFromPage(result, loadedPage: result.page);
+    return _stateFromPage(result, loadedPage: result.page, keyword: keyword);
   }
 
   String? _keywordOrNull() {
@@ -218,6 +264,7 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
   HistoryPagedFeedState _stateFromPage(
     PagedResult<entity.ReadingHistory> page, {
     required int loadedPage,
+    required String keyword,
   }) {
     final List<HistoryCardItem> items = page.items
         .map(_mapHistoryItem)
@@ -227,7 +274,7 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
       totalCount: page.totalCount,
       loadedPage: loadedPage,
       hasReachedEnd: !page.hasNextPage,
-      keyword: _effectiveKeyword,
+      keyword: keyword,
     );
   }
 
@@ -248,7 +295,7 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
       totalCount: page.totalCount,
       loadedPage: loadedPage,
       hasReachedEnd: !page.hasNextPage,
-      keyword: _effectiveKeyword,
+      keyword: current.keyword,
     );
   }
 

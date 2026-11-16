@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
+import 'package:hentai_library/design-system/design_system.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_view_object.dart';
 import 'package:hentai_library/features/comic/presentation/patterns/comic_detail/comic_detail_page_header.dart';
 import 'package:hentai_library/features/comic/presentation/patterns/comic_detail/comic_detail_scroll_content.dart';
-import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
-import 'package:hentai_library/shared/ui/patterns/shared/page_header.dart';
-import 'package:hentai_library/shared/ui/widgets/list_detail/list_detail_detail_transition.dart';
-import 'package:hentai_library/shared/ui/widgets/navigation/expressive_library_scroll_to_top_button.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -42,7 +39,7 @@ class ComicDetailLayout extends StatefulWidget {
   final ValueChanged<int>? onSeriesSelect;
 
   /// 作者 chip 点击（生产：打开作者详情）；为空时作者 chip 走 [onMetadataChipTap]。
-  final ValueChanged<String>? onAuthorTap;
+  final ValueChanged<AuthorRef>? onAuthorTap;
   final ScrollController? scrollController;
 
   @override
@@ -121,25 +118,6 @@ class _ComicDetailPageState extends State<ComicDetailLayout> {
     });
   }
 
-  Widget _buildScrollBody() {
-    final Widget content = ComicDetailScrollContent(
-      entry: _entry,
-      onRead: _resolveVoid(widget.onRead),
-      onReadIncognito: _resolveVoid(widget.onReadIncognito),
-      onMetadataChipTap: widget.onMetadataChipTap ?? (_) {},
-      onAuthorTap: widget.onAuthorTap,
-    );
-    // 生产走路由 Shared Axis；Lab 无页内切换时在此做同款过渡。
-    if (widget.onSeriesSelect != null) {
-      return content;
-    }
-    return ListDetailDetailTransition(
-      switchKey: '${_entry.seriesCurrentIndex}:${_entry.title}',
-      reverse: _seriesNavReverse,
-      child: content,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
@@ -157,6 +135,22 @@ class _ComicDetailPageState extends State<ComicDetailLayout> {
       onSeriesSelectIndex: _selectSeriesIndex,
     );
 
+    final Widget content = ComicDetailScrollContent(
+      entry: _entry,
+      onRead: _resolveVoid(widget.onRead),
+      onReadIncognito: _resolveVoid(widget.onReadIncognito),
+      onMetadataChipTap: widget.onMetadataChipTap ?? (_) {},
+      onAuthorTap: widget.onAuthorTap,
+    );
+    // 生产走路由 Shared Axis；Lab 无页内切换时在此做同款过渡。
+    final Widget scrollBody = widget.onSeriesSelect != null
+        ? content
+        : ListDetailDetailTransition(
+            switchKey: '${_entry.seriesCurrentIndex}:${_entry.title}',
+            reverse: _seriesNavReverse,
+            child: content,
+          );
+
     return ColoredBox(
       color: labBrowseCanvasColor(scheme),
       child: Stack(
@@ -171,7 +165,7 @@ class _ComicDetailPageState extends State<ComicDetailLayout> {
               ),
               SliverPadding(
                 padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                sliver: SliverToBoxAdapter(child: _buildScrollBody()),
+                sliver: SliverToBoxAdapter(child: scrollBody),
               ),
             ],
           ),

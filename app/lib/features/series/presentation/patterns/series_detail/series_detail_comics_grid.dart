@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/features/library_browse/public/catalog/for_comic_and_series.dart';
+import 'package:hentai_library/shared/ui/catalog/selection/catalog_selection_notifier.dart';
 import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_view_object.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/shared/ui/layout/catalog_grid.dart';
-import 'package:hentai_library/shared/ui/layout/catalog_grid_metrics.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/ui/widgets/catalog/comic_card.dart';
+import 'package:hentai_library/shared/presentation/providers/series_slot_providers.dart';
+import 'package:hentai_library/shared/ui/slots/series_slots.dart';
+import 'package:hentai_library/features/comic/public/comic.dart';
+import 'package:hentai_library/design-system/design_system.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 系列内漫画网格（复用书库 [CatalogGridSliver] 布局）。
@@ -21,6 +21,21 @@ class SeriesDetailComicsGrid extends ConsumerWidget {
   final List<SeriesDetailComicItem> items;
   final ValueChanged<int>? onComicTap;
 
+  void _handleTap({
+    required bool selectionActive,
+    required String? comicId,
+    required CatalogSelectionNotifier selectionNotifier,
+    required int index,
+  }) {
+    if (selectionActive) {
+      if (comicId != null) {
+        selectionNotifier.toggle(comicId);
+      }
+      return;
+    }
+    onComicTap?.call(index);
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
@@ -30,6 +45,11 @@ class SeriesDetailComicsGrid extends ConsumerWidget {
     final CatalogSelectionNotifier selectionNotifier = ref.read(
       catalogSelectionProvider.notifier,
     );
+    final SeriesMemberCardSlot? cardSlot =
+        !selectionActive &&
+            items.any((SeriesDetailComicItem i) => i.comic != null)
+        ? ref.watch(seriesMemberCardSlotProvider)
+        : null;
 
     if (items.isEmpty) {
       return SliverToBoxAdapter(
@@ -74,24 +94,25 @@ class SeriesDetailComicsGrid extends ConsumerWidget {
           onSelectionChanged: comicId == null
               ? null
               : (_) => selectionNotifier.toggle(comicId),
-          onTap: () {
-            if (selectionActive) {
-              if (comicId != null) {
-                selectionNotifier.toggle(comicId);
-              }
-              return;
-            }
-            onComicTap?.call(index);
-          },
+          onTap: () => _handleTap(
+            selectionActive: selectionActive,
+            comicId: comicId,
+            selectionNotifier: selectionNotifier,
+            index: index,
+          ),
         );
-        if (comic == null) {
+        final SeriesMemberCardSlot? slot = cardSlot;
+        if (comic == null || slot == null) {
           return card;
         }
-        return ComicCardActions(
+        return KeyedSubtree(
           key: ValueKey<String>(comic.comicId),
-          comic: comic,
-          enabled: !selectionActive,
-          child: card,
+          child: slot((
+            comicId: comic.comicId,
+            title: item.title,
+            pageCount: item.pageCount,
+            path: comic.path,
+          ), card),
         );
       },
     );

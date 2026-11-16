@@ -48,19 +48,10 @@ Future<void> runPdfReaderPlatformSmoke() async {
     fail('openReaderFrb failed: ${e.code} | ${e.message} | ${e.context}');
   }
 
-  final list = await loadPageListFrb(
-    comicId: comicId,
-    path: pdfPath,
-    resourceType: 'pdf',
-  );
+  final list = await loadPageListFrb(comicId: comicId);
   expect(list.pageCount, 1);
 
-  final page0 = await loadPageBytesFrb(
-    comicId: comicId,
-    path: pdfPath,
-    resourceType: 'pdf',
-    pageIndex: 0,
-  );
+  final page0 = await loadPageBytesFrb(comicId: comicId, pageIndex: 0);
   expect(page0.length, greaterThanOrEqualTo(3));
   expect(page0[0], 0xFF);
   expect(page0[1], 0xD8);

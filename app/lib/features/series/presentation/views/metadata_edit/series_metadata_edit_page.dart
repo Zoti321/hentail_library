@@ -1,15 +1,17 @@
+import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
+import 'package:hentai_library/design-system/design_system.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/core/logging/app_log.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/application/logging/app_log.dart';
 import 'package:hentai_library/features/series/presentation/patterns/metadata_edit/series_metadata_edit_form.dart';
 import 'package:hentai_library/features/series/presentation/view_models/series_metadata_edit_session_notifier.dart';
 import 'package:hentai_library/features/series/presentation/view_models/series_metadata_edit_ui_state.dart';
-import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_surface.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
-import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
+import 'package:hentai_library/features/series/domain/series.dart';
+
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 export 'package:hentai_library/features/series/presentation/views/metadata_edit/series_metadata_edit_layout.dart';
@@ -60,6 +62,29 @@ class SeriesMetadataEditViewState
     }
   }
 
+  void _handleLockChanged({
+    required SeriesMetadataEditSession notifier,
+    required AppLocalizations l10n,
+    required bool? name,
+    required bool? serializationStatus,
+    required bool? totalCount,
+  }) {
+    unawaited(() async {
+      try {
+        await notifier.setLock(
+          name: name,
+          serializationStatus: serializationStatus,
+          totalCount: totalCount,
+        );
+      } catch (error, stackTrace) {
+        logError(AppLog.ui('editSeries'), '设置系列元数据字段锁失败', error, stackTrace);
+        if (mounted) {
+          showErrorSnackbar(context, l10n.commonSaveFailedToast);
+        }
+      }
+    }());
+  }
+
   void _leave() {
     final NavigatorState navigator = Navigator.of(context);
     if (navigator.canPop()) {
@@ -88,27 +113,14 @@ class SeriesMetadataEditViewState
         draft: session.draft,
         locks: session.locks,
         onLockChanged:
-            ({bool? name, bool? serializationStatus, bool? totalCount}) {
-              unawaited(() async {
-                try {
-                  await notifier.setLock(
-                    name: name,
-                    serializationStatus: serializationStatus,
-                    totalCount: totalCount,
-                  );
-                } catch (error, stackTrace) {
-                  logError(
-                    AppLog.ui('editSeries'),
-                    '设置系列元数据字段锁失败',
-                    error,
-                    stackTrace,
-                  );
-                  if (mounted) {
-                    showErrorSnackbar(context, l10n.commonSaveFailedToast);
-                  }
-                }
-              }());
-            },
+            ({bool? name, bool? serializationStatus, bool? totalCount}) =>
+                _handleLockChanged(
+                  notifier: notifier,
+                  l10n: l10n,
+                  name: name,
+                  serializationStatus: serializationStatus,
+                  totalCount: totalCount,
+                ),
         nameError: session.nameError,
         totalCountError: session.totalCountError,
         onDraftChanged: notifier.updateDraft,

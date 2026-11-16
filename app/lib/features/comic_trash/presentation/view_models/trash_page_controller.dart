@@ -1,11 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/core/logging/app_log.dart';
+import 'package:hentai_library/shared/application/logging/app_log.dart';
 import 'package:hentai_library/features/comic_trash/domain/trashed_comic.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
-import 'package:hentai_library/features/comic_trash/di/comic_trash.dart';
+import 'package:hentai_library/features/comic_trash/presentation/providers/comic_trash_use_case_provider.dart';
 import 'package:hentai_library/features/comic_trash/presentation/view_models/comic_trash_actions.dart';
-import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/features/comic_trash/presentation/view_models/trash_page_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
@@ -18,9 +17,19 @@ class TrashPageController extends _$TrashPageController {
   static const int _pageSize = kDefaultPageSize;
 
   int _fetchGeneration = 0;
+  int _selectionGeneration = 0;
+  int? _activeRefreshGeneration;
 
   @override
   Future<TrashPageState> build() async {
+    _fetchGeneration++;
+    _activeRefreshGeneration = null;
+    _selectionGeneration++;
+    ref.onDispose(() {
+      _fetchGeneration++;
+      _selectionGeneration++;
+      _activeRefreshGeneration = null;
+    });
     ref.listen(
       libraryRevisionStateProvider.select(
         (LibraryRevisionState s) => s.revision,
@@ -37,19 +46,45 @@ class TrashPageController extends _$TrashPageController {
       return;
     }
     final int generation = ++_fetchGeneration;
+    _activeRefreshGeneration = generation;
+    if (current.isLoadingMore) {
+      state = AsyncData<TrashPageState>(current.copyWith(isLoadingMore: false));
+    }
     try {
       final TrashPageState next = await _reload(current);
-      if (generation == _fetchGeneration) {
-        state = AsyncData<TrashPageState>(next);
+      if (ref.mounted && generation == _fetchGeneration) {
+        final latest = state.asData?.value;
+        if (latest != null) {
+          state = AsyncData<TrashPageState>(
+            latest.withItems(
+              items: next.items,
+              totalCount: next.totalCount,
+              counts: next.counts,
+              loadedPage: next.loadedPage,
+              hasReachedEnd: next.hasReachedEnd,
+            ),
+          );
+        }
       }
     } catch (error, stackTrace) {
+      if (!ref.mounted || generation != _fetchGeneration) {
+        return;
+      }
       logError(AppLog.ui('trash'), '刷新已删除漫画失败', error, stackTrace);
+    } finally {
+      if (_activeRefreshGeneration == generation) {
+        _activeRefreshGeneration = null;
+      }
     }
   }
 
   Future<void> loadMore() async {
     final TrashPageState? current = state.asData?.value;
-    if (current == null || current.isLoadingMore || current.hasReachedEnd) {
+    if (current == null ||
+        current.isLoadingMore ||
+        current.hasReachedEnd ||
+        state.isLoading ||
+        _activeRefreshGeneration != null) {
       return;
     }
     final int generation = _fetchGeneration;
@@ -59,7 +94,7 @@ class TrashPageController extends _$TrashPageController {
       final PagedResult<TrashedComic> page = await ref
           .read(comicTrashServiceProvider)
           .fetchTrashedPage(pageRequest(page: nextPage, pageSize: _pageSize));
-      if (generation != _fetchGeneration) {
+      if (!ref.mounted || generation != _fetchGeneration) {
         return;
       }
       final TrashPageState latest = state.asData?.value ?? current;
@@ -73,6 +108,9 @@ class TrashPageController extends _$TrashPageController {
         ),
       );
     } catch (error, stackTrace) {
+      if (!ref.mounted || generation != _fetchGeneration) {
+        return;
+      }
       logError(AppLog.ui('trash'), '加载更多已删除漫画失败', error, stackTrace);
       final TrashPageState? latest = state.asData?.value;
       if (latest != null) {
@@ -83,48 +121,68 @@ class TrashPageController extends _$TrashPageController {
     }
   }
 
-  void enterSelection() => _update((TrashPageState s) => s.enterSelection());
+  void enterSelection() =>
+      _editSelection((TrashPageState s) => s.enterSelection());
 
-  void exitSelection() => _update((TrashPageState s) => s.exitSelection());
+  void exitSelection() =>
+      _editSelection((TrashPageState s) => s.exitSelection());
 
   void toggleSelected(String comicId) =>
-      _update((TrashPageState s) => s.toggleSelected(comicId));
+      _editSelection((TrashPageState s) => s.toggleSelected(comicId));
 
   void toggleSelectAllLoaded() =>
-      _update((TrashPageState s) => s.toggleSelectAllLoaded());
+      _editSelection((TrashPageState s) => s.toggleSelectAllLoaded());
 
   /// 恢复给定漫画并退出多选；列表随 library revision 刷新。返回恢复数量。
   Future<int> restore(List<String> comicIds) async {
+    final generation = _selectionGeneration;
     await ref.read(comicTrashActionsProvider.notifier).restore(comicIds);
-    _update((TrashPageState s) => s.clearSelection());
+    _clearCompletedSelection(generation);
     return comicIds.length;
   }
 
   Future<int> restoreAll() async {
+    final generation = _selectionGeneration;
     final int restored = await ref
         .read(comicTrashActionsProvider.notifier)
         .restoreAll();
-    _update((TrashPageState s) => s.clearSelection());
+    _clearCompletedSelection(generation);
     return restored;
   }
 
   Future<ComicPurgeResult> purge(List<String> comicIds) async {
+    final generation = _selectionGeneration;
     final ComicPurgeResult result = await ref
         .read(comicTrashActionsProvider.notifier)
         .purge(comicIds);
-    _update((TrashPageState s) => s.clearSelection());
+    _clearCompletedSelection(generation);
     return result;
   }
 
   Future<ComicPurgeResult> purgeAll() async {
+    final generation = _selectionGeneration;
     final ComicPurgeResult result = await ref
         .read(comicTrashActionsProvider.notifier)
         .purgeAll();
-    _update((TrashPageState s) => s.clearSelection());
+    _clearCompletedSelection(generation);
     return result;
   }
 
+  void _editSelection(TrashPageState Function(TrashPageState) transform) {
+    _selectionGeneration++;
+    _update(transform);
+  }
+
+  void _clearCompletedSelection(int generation) {
+    if (generation == _selectionGeneration) {
+      _update((TrashPageState s) => s.clearSelection());
+    }
+  }
+
   void _update(TrashPageState Function(TrashPageState) transform) {
+    if (!ref.mounted) {
+      return;
+    }
     final TrashPageState? current = state.asData?.value;
     if (current != null) {
       state = AsyncData<TrashPageState>(transform(current));

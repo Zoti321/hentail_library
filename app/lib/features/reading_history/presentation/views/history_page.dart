@@ -1,18 +1,19 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/reading_history/presentation/models/history_card_item.dart';
 import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_browse_page.dart';
 import 'package:hentai_library/features/reading_history/presentation/view_models/history_load_more_throttle.dart';
 import 'package:hentai_library/features/reading_history/presentation/view_models/history_paged_feed_controller.dart';
 import 'package:hentai_library/features/reading_history/presentation/view_models/history_paged_feed_state.dart';
 import 'package:hentai_library/features/reading_history/presentation/views/history_page_actions.dart';
-import 'package:hentai_library/features/comic/public/di/comic_cover_providers.dart';
+import 'package:hentai_library/features/comic/public/providers/comic_cover_providers.dart';
 import 'package:hentai_library/features/reading_history/presentation/widgets/history_list_item.dart';
 import 'package:hentai_library/shared/ui/layout/app_shell_navigation.dart';
-import 'package:hentai_library/shared/ui/patterns/shared/page_header_back_button.dart';
-import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
-import 'package:hentai_library/shared/ui/widgets/inputs/app_dense_search_bar.dart';
+import 'package:hentai_library/shared/ui/navigation/pop_or_go_home.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 const double _kHistoryLoadMoreThreshold = 400;
@@ -62,7 +63,7 @@ class _HistoryPageState extends ConsumerState<HistoryPage> {
       return false;
     }
     _lastLoadMoreAttemptAt = now;
-    ref.read(historyPagedFeedControllerProvider.notifier).loadMore();
+    unawaited(ref.read(historyPagedFeedControllerProvider.notifier).loadMore());
     return false;
   }
 
@@ -105,6 +106,10 @@ class _HistoryBrowseFeed extends ConsumerWidget {
   const _HistoryBrowseFeed({required this.searchController});
 
   final TextEditingController searchController;
+
+  void _handleSearchChanged(WidgetRef ref, String value) {
+    ref.read(historyPagedFeedControllerProvider.notifier).setKeyword(value);
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -154,11 +159,7 @@ class _HistoryBrowseFeed extends ConsumerWidget {
         matchCountLabel: hasSearchQuery
             ? context.l10n.filterResultCount(totalCount)
             : null,
-        onChanged: (String value) {
-          ref
-              .read(historyPagedFeedControllerProvider.notifier)
-              .setKeyword(value);
-        },
+        onChanged: (String value) => _handleSearchChanged(ref, value),
       ),
       itemBuilder: (BuildContext context, HistoryCardItem item) {
         return HistoryListItem(

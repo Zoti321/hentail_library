@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/patterns/dialog/confirm_dialog.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 
 /// Library 相关的 MD3E 确认对话框（委托共享 [showConfirmDialog]）。
 Future<bool> showLibraryConfirmDialog(

@@ -1,32 +1,34 @@
-import 'dart:io';
-import 'dart:typed_data';
+import 'dart:async';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/core/logging/app_log.dart';
-import 'package:hentai_library/features/metadata_backup/application/metadata_import_use_case.dart';
-import 'package:hentai_library/features/metadata_backup/data/repositories/metadata_backup_repository_impl.dart';
-import 'package:hentai_library/features/metadata_backup/domain/metadata_backup_bytes.dart';
-import 'package:hentai_library/features/metadata_backup/domain/metadata_backup_manifest.dart';
-import 'package:hentai_library/features/metadata_backup/domain/metadata_import_preview.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/application/logging/app_log.dart';
+import 'package:hentai_library/features/metadata_backup/application/prepare_metadata_import_use_case.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/features/metadata_backup/presentation/providers/metadata_backup_use_case_providers.dart';
+import 'package:hentai_library/features/metadata_backup/domain/metadata_backup_file_format.dart';
 import 'package:hentai_library/features/metadata_backup/domain/metadata_import_result.dart';
 import 'package:hentai_library/features/metadata_backup/presentation/widgets/metadata_import_dialogs.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
-import 'package:hentai_library/shared/ui/widgets/overlays/dialog/hentai_dialog.dart';
+import 'package:hentai_library/design-system/design_system.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
 
 export 'widgets/metadata_import_dialogs.dart';
 
 /// 手动导入 Comic 用户元数据：选文件 → peek → 预演 → 确认 → import → 结果摘要。
 Future<void> runMetadataImportFlow(
   BuildContext context, {
-  MetadataImportUseCase? importUseCase,
+  PrepareMetadataImportUseCase? importUseCase,
 }) async {
   final AppLocalizations l10n = context.l10n;
-  final MetadataImportUseCase useCase =
+  final PrepareMetadataImportUseCase useCase =
       importUseCase ??
-      MetadataImportUseCase(const MetadataBackupRepositoryImpl());
+      ProviderScope.containerOf(
+        context,
+        listen: false,
+      ).read(prepareMetadataImportUseCaseProvider);
 
   final FilePickerResult? picked = await FilePicker.pickFiles(
     dialogTitle: l10n.settingsMetadataBackupImportPickDialogTitle,
@@ -47,27 +49,12 @@ Future<void> runMetadataImportFlow(
   }
 
   try {
-    final List<int> rawBytes = file.bytes ?? await File(path).readAsBytes();
-    final Uint8List jsonBytes = await useCase.decodeBackupFileBytes(
-      rawBytes,
-      path,
-    );
-    final MetadataBackupManifest manifest = useCase.peekManifest(jsonBytes);
-
-    if (!context.mounted) {
-      return;
-    }
-
     await _showBlockingProgressDialog(
       context,
       title: l10n.settingsMetadataBackupImportPreviewRunningTitle,
       body: l10n.settingsMetadataBackupImportPreviewRunningBody,
     );
-
-    final MetadataImportPreview previewResult = useCase.previewImport(
-      jsonBytes,
-    );
-
+    final PreparedMetadataImport prepared = await useCase(file.bytes, path);
     if (context.mounted) {
       Navigator.of(context, rootNavigator: true).pop();
     }
@@ -76,11 +63,11 @@ Future<void> runMetadataImportFlow(
       return;
     }
 
-    final bool? confirmed = await showDialog<bool>(
-      context: context,
-      builder: (BuildContext context) => MetadataImportConfirmDialog(
-        manifest: manifest,
-        preview: previewResult,
+    final bool? confirmed = await LabDialogPresenter.showBasic<bool>(
+      context,
+      dialog: MetadataImportConfirmDialog(
+        manifest: prepared.manifest,
+        preview: prepared.preview,
       ),
     );
     if (confirmed != true || !context.mounted) {
@@ -97,7 +84,7 @@ Future<void> runMetadataImportFlow(
       body: l10n.settingsMetadataBackupImportRunningBody,
     );
 
-    final MetadataImportResult result = useCase.importMetadata(jsonBytes);
+    final MetadataImportResult result = prepared.commit();
 
     if (context.mounted) {
       Navigator.of(context, rootNavigator: true).pop();
@@ -107,10 +94,9 @@ Future<void> runMetadataImportFlow(
       return;
     }
 
-    await showDialog<void>(
-      context: context,
-      builder: (BuildContext context) =>
-          MetadataImportResultDialog(result: result),
+    await LabDialogPresenter.showBasic<void>(
+      context,
+      dialog: MetadataImportResultDialog(result: result),
     );
   } catch (e, st) {
     logError(AppLog.core('metadata_backup'), '导入元数据失败', e, st);
@@ -125,25 +111,26 @@ Future<void> _showBlockingProgressDialog(
   BuildContext context, {
   required String title,
   required String body,
-}) {
-  return showDialog<void>(
-    context: context,
-    barrierDismissible: false,
-    builder: (BuildContext context) => PopScope(
-      canPop: false,
-      child: HentaiDialog(
-        title: title,
-        content: Row(
-          children: <Widget>[
-            const CircularProgressIndicator(),
-            const SizedBox(width: 16),
-            Expanded(child: Text(body)),
-          ],
+}) async {
+  // Awaiting dialog dismissal here would prevent the operation that closes it.
+  unawaited(
+    LabDialogPresenter.showBasic<void>(
+      context,
+      barrierDismissible: false,
+      dialog: PopScope(
+        canPop: false,
+        child: M3EDialog(
+          title: title,
+          content: Row(
+            children: <Widget>[
+              const CircularProgressIndicator(),
+              const SizedBox(width: 16),
+              Expanded(child: Text(body)),
+            ],
+          ),
         ),
-        actions: const <Widget>[],
-        scrollableContent: false,
-        showFooterDivider: false,
       ),
     ),
   );
+  await Future<void>.delayed(Duration.zero);
 }

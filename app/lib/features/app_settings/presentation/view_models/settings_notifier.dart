@@ -1,14 +1,7 @@
 import 'dart:async';
 
-import 'package:hentai_library/shared/domain/models/models.dart'
-    show
-        AppColorSchemePreference,
-        AppFontPreference,
-        AppLocalePreference,
-        AppSetting,
-        AppThemePreference;
-import 'package:hentai_library/features/app_settings/domain/reader_session_preference_types.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/features/app_settings/presentation/providers/app_setting_repository_provider.dart';
+import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -16,23 +9,60 @@ part 'settings_notifier.g.dart';
 
 @Riverpod(keepAlive: true)
 class SettingsNotifier extends _$SettingsNotifier {
+  Future<void>? _saveTail;
+  AppSetting? _lastSuccessful;
+  int _saveRevision = 0;
+
   @override
   Future<AppSetting> build() async {
-    return ref.read(appSettingRepoProvider).load();
+    return ref.read(appSettingRepositoryProvider).load();
   }
 
-  Future<void> updateSettings(AppSetting newSetting) async {
-    final AppSetting? rollback = state.asData?.value;
-    state = AsyncData<AppSetting>(newSetting);
-    try {
-      await ref.read(appSettingRepoProvider).save(newSetting);
-    } catch (error, stackTrace) {
-      if (rollback != null) {
-        state = AsyncData<AppSetting>(rollback);
-      } else {
-        state = AsyncError<AppSetting>(error, stackTrace);
-      }
+  Future<void> updateSettings(AppSetting newSetting) =>
+      _saveSettings(newSetting);
+
+  Future<void> _saveSettings(
+    AppSetting newSetting, {
+    bool rollbackOnError = true,
+  }) {
+    final Future<void>? previous = _saveTail;
+    final bool canRollback = state.asData != null;
+    if (previous == null) {
+      _lastSuccessful = state.asData?.value;
     }
+    late final Future<void> Function() save;
+    try {
+      final repository = ref.read(appSettingRepositoryProvider);
+      save = () => repository.save(newSetting);
+    } catch (error, stackTrace) {
+      save = () => Error.throwWithStackTrace(error, stackTrace);
+    }
+    final int revision = ++_saveRevision;
+    final Completer<void> completion = Completer<void>();
+    final Future<void> pending = completion.future;
+    _saveTail = pending;
+    state = AsyncData<AppSetting>(newSetting);
+    completion.complete(() async {
+      try {
+        if (previous != null) {
+          await previous;
+        }
+        await save();
+        _lastSuccessful = newSetting;
+      } catch (error, stackTrace) {
+        if (ref.mounted && revision == _saveRevision) {
+          final AppSetting? rollback = _lastSuccessful;
+          state = rollbackOnError && canRollback && rollback != null
+              ? AsyncData<AppSetting>(rollback)
+              : AsyncError<AppSetting>(error, stackTrace);
+        }
+      } finally {
+        if (identical(_saveTail, pending)) {
+          _saveTail = null;
+        }
+      }
+    }());
+    return pending;
   }
 
   Future<void> setThemePreference(AppThemePreference value) async {
@@ -97,40 +127,31 @@ class SettingsNotifier extends _$SettingsNotifier {
     await updateSettings(current.withDismissedUpdateVersion(value));
   }
 
-  Future<void> setReadingMode(ReadingMode value) async {
+  Future<void> setSmartFacetMatchEnabled(bool value) async {
     final AppSetting? current = state.asData?.value;
     if (current == null) return;
-    final AppSetting newSetting = current.copyWith(readingMode: value);
-    state = AsyncData(newSetting);
-    try {
-      await ref.read(appSettingRepoProvider).save(newSetting);
-    } catch (error, stackTrace) {
-      state = AsyncError(error, stackTrace);
-    }
+    await updateSettings(current.copyWith(smartFacetMatchEnabled: value));
+  }
+
+  Future<void> setReadingModeId(String id) async {
+    final AppSetting? current = state.asData?.value;
+    if (current == null) return;
+    final AppSetting newSetting = current.copyWith(readingModeId: id);
+    await _saveSettings(newSetting, rollbackOnError: false);
   }
 
   Future<void> setWebtoonMarginPercent(int value) async {
     final AppSetting? current = state.asData?.value;
     if (current == null) return;
     final AppSetting newSetting = current.withWebtoonMarginPercent(value);
-    state = AsyncData(newSetting);
-    try {
-      await ref.read(appSettingRepoProvider).save(newSetting);
-    } catch (error, stackTrace) {
-      state = AsyncError(error, stackTrace);
-    }
+    await _saveSettings(newSetting, rollbackOnError: false);
   }
 
-  Future<void> setWebtoonZoomMode(WebtoonZoomMode value) async {
+  Future<void> setWebtoonZoomModeId(String id) async {
     final AppSetting? current = state.asData?.value;
     if (current == null) return;
-    final AppSetting newSetting = current.copyWith(webtoonZoomMode: value);
-    state = AsyncData(newSetting);
-    try {
-      await ref.read(appSettingRepoProvider).save(newSetting);
-    } catch (error, stackTrace) {
-      state = AsyncError(error, stackTrace);
-    }
+    final AppSetting newSetting = current.copyWith(webtoonZoomModeId: id);
+    await _saveSettings(newSetting, rollbackOnError: false);
   }
 
   Future<void> setReaderAutoPlayIntervalSeconds(int value) async {
@@ -139,24 +160,14 @@ class SettingsNotifier extends _$SettingsNotifier {
     final AppSetting newSetting = current.withReaderAutoPlayIntervalSeconds(
       value,
     );
-    state = AsyncData(newSetting);
-    try {
-      await ref.read(appSettingRepoProvider).save(newSetting);
-    } catch (error, stackTrace) {
-      state = AsyncError(error, stackTrace);
-    }
+    await _saveSettings(newSetting, rollbackOnError: false);
   }
 
-  Future<void> setAutoPlayMode(AutoPlayMode value) async {
+  Future<void> setAutoPlayModeId(String id) async {
     final AppSetting? current = state.asData?.value;
     if (current == null) return;
-    final AppSetting newSetting = current.copyWith(autoPlayMode: value);
-    state = AsyncData(newSetting);
-    try {
-      await ref.read(appSettingRepoProvider).save(newSetting);
-    } catch (error, stackTrace) {
-      state = AsyncError(error, stackTrace);
-    }
+    final AppSetting newSetting = current.copyWith(autoPlayModeId: id);
+    await _saveSettings(newSetting, rollbackOnError: false);
   }
 
   Future<void> setDesktopSidebarExpanded(bool value) async {
@@ -165,12 +176,7 @@ class SettingsNotifier extends _$SettingsNotifier {
     final AppSetting newSetting = current.copyWith(
       desktopSidebarExpanded: value,
     );
-    state = AsyncData(newSetting);
-    try {
-      await ref.read(appSettingRepoProvider).save(newSetting);
-    } catch (error, stackTrace) {
-      state = AsyncError(error, stackTrace);
-    }
+    await _saveSettings(newSetting, rollbackOnError: false);
   }
 
   Future<void> resetToDefaults() async {

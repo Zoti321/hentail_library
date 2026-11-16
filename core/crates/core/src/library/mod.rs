@@ -30,16 +30,25 @@ use crate::error::HentaiError;
 
 pub async fn record_library_sync_success(library_id: &str) -> Result<(), HentaiError> {
     let db = connection()?;
+    record_library_sync_success_in(&db, library_id).await?;
+    crate::revision::notify_committed();
+    Ok(())
+}
+
+pub(crate) async fn record_library_sync_success_in(
+    db: &impl sea_orm::ConnectionTrait,
+    library_id: &str,
+) -> Result<(), HentaiError> {
     let now = now_ms();
     let mut active: libraries::ActiveModel = Libraries::find_by_id(library_id.to_string())
-        .one(&db)
+        .one(db)
         .await
         .map_err(map_db_err)?
         .ok_or_else(|| HentaiError::validation(format!("Library 不存在: {library_id}")))?
         .into();
     active.last_successful_sync_at = Set(Some(now));
     active.last_sync_error = Set(None);
-    active.update(&db).await.map_err(map_db_err)?;
+    active.update(db).await.map_err(map_db_err)?;
     Ok(())
 }
 
@@ -60,5 +69,6 @@ pub async fn record_library_sync_failure(
         .into();
     active.last_sync_error = Set(Some(trimmed.to_string()));
     active.update(&db).await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(())
 }

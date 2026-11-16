@@ -113,6 +113,28 @@ Accepted | Superseded by ADR-000N | Deprecated
 | [0032](./0032-single-theme-source-after-md3e-cutover.md) | MD3E Cutover 后 `shared/ui/theme` 只保留一套主题 | Accepted |
 | [0033](./0033-flutter-feature-application-layer.md) | Flutter feature Application 层（Wayfinder） | Accepted |
 | [0034](./0034-feature-public-api-only-cross-imports.md) | Cross-feature 协作 — public API only | Accepted |
-| [0035](./0035-catalog-shared-kernel.md) | Catalog Shared Kernel 保留于 `shared/domain` | Accepted |
-| [0036](./0036-comic-series-wayfinder-modules.md) | Comic / Series Wayfinder 模块切分（#457） | Accepted |
+| [0035](./0035-catalog-shared-kernel.md) | Catalog Shared Kernel 保留于 `shared/domain`（Comic / Series 部分分别由 ADR-0041 / ADR-0042 取代） | Accepted |
+| [0036](./0036-comic-series-wayfinder-modules.md) | Comic / Series Wayfinder 模块切分（#457；Series 边由 ADR-0042 收紧） | Accepted |
 | [0037](./0037-tone-based-color-system-m3e-roles.md) | Tone-based color system 与 M3E roles 为主（#470） | Accepted |
+| [0038](./0038-reader-module-rename.md) | Product module `read_session` 更名为 `reader` | Accepted |
+| [0039](./0039-domain-events-for-cross-feature-notification.md) | 跨 feature 协作 — 命令走 Port，事实走领域事件 | Accepted |
+| [0040](./0040-record-projections-for-cross-module-readonly.md) | 跨模块只读投影使用匿名 record | Accepted |
+| [0041](./0041-comic-entity-ownership.md) | Comic 实体迁入漫画模块（Dart 投影型实体，#489） | Accepted |
+| [0042](./0042-series-entity-ownership-and-cross-module-contracts.md) | Series 实体迁入系列模块与跨模块契约（ACL / Slot / data 映射，#490） | Accepted |
+| [0043](./0043-navigation-routing-decoupling.md) | 导航与路由解耦（抽象导航契约 + 集中式路由表） | Accepted |
+| [0044](./0044-shared-ui-ownership-and-design-system-lane.md) | shared/ui 模块所有权判据与 Design System 层（#495） | Accepted |
+| [0045](./0045-port-and-read-model-ownership.md) | Port 与读模型按可达性归属（生产者拥有，#503） | Accepted |
+| [0046](./0046-reading-preferences-acl-and-schema-partitioning.md) | 偏好 schema 与领域类型的 ACL 分层（#517） | Accepted |
+| [0047](./0047-design-system-owns-presentation-scaffold.md) | Design System 承接纯外观页级 scaffold（修订 ADR-0044 §1 判据） | Accepted |
+| [0048](./0048-comic-metadata-module-and-author-tag-ownership.md) | `comic_metadata` 模块（原 `named_metadata`）与 Author / Tag 归属（收缩 Catalog Shared Kernel，#533） | Accepted |
+| [0049](./0049-remaining-model-and-port-cohesion.md) | 剩余 models / ports 按 owner 与可达性内聚 | Accepted |
+| [0050](./0050-riverpod-module-communication-and-use-case-cohesion.md) | Riverpod 模块通信与具体应用用例内聚 | Accepted |
+| [0051](./0051-clean-architecture-composition-and-infrastructure.md) | 整洁架构组合根、基础设施与内层依赖 | Accepted |
+| [0052](./0052-pure-dart-core-and-platform-boundaries.md) | 纯 Dart core、共享协作与平台实现边界 | Accepted |
+| [0053](./0053-design-system-portable-interaction-boundary.md) | 完整视觉与交互设计系统、产品适配与可独立成包的依赖边界（修订 ADR-0044/0047/0052） | Accepted |
+| [0054](./0054-verified-path-migration.md) | Verified continuity for automatic Path migration | Accepted; supersedes ADR-0013 weak-fingerprint sync eligibility |
+| [0055](./0055-content-verified-path-migration.md) | Content-verified Path migration | Accepted; extends ADR-0054 |
+| [0056](./0056-localized-date-picker.md) | Localized application-owned date picker | Accepted; supersedes ADR-0053 calendar locale restriction |
+| [0057](./0057-automatic-local-metadata-writeback.md) | Automatic Resource metadata embedding | Accepted; supersedes ADR-0007 Language cardinality and affected scan-source assumptions |
+| [0058](./0058-media-metadata-dashboard.md) | Media metadata dashboard | Accepted; supersedes ADR-0057 individual Comic inspection scope |
+| [0059](./0059-single-nightly-dart-test-run.md) | Single nightly Dart test run | Accepted; supersedes ADR-0018 separate nightly UI job |

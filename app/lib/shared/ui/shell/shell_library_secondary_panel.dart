@@ -27,19 +27,21 @@ class ShellLibrarySecondaryPanel extends StatelessWidget {
       color: backgroundColor ?? scheme.surfaceContainer,
       child: SafeArea(
         right: false,
-        child: ListView(
+        child: ListView.builder(
           padding: EdgeInsets.symmetric(
             horizontal: theme.spacing.md,
             vertical: theme.spacing.sm,
           ),
-          children: <Widget>[
-            for (final HomeLibraryDashboardRow row in libraries)
-              ShellLibraryPickerRow(
-                row: row,
-                selected: row.libraryId == selectedLibraryId,
-                onTap: () => onLibrarySelected(row.libraryId),
-              ),
-          ],
+          itemCount: libraries.length,
+          itemBuilder: (context, index) {
+            final row = libraries[index];
+            return ShellLibraryPickerRow(
+              key: ValueKey(row.libraryId),
+              row: row,
+              selected: row.libraryId == selectedLibraryId,
+              onTap: () => onLibrarySelected(row.libraryId),
+            );
+          },
         ),
       ),
     );

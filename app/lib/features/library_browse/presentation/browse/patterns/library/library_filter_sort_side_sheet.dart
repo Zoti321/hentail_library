@@ -1,23 +1,25 @@
+import 'package:hentai_library/features/library_browse/domain/browse/library_comic_browse_preferences.dart';
+
 import 'dart:math' as math;
 
-import 'package:hentai_library/features/library_browse/presentation/integrations/comic_presentation_bridge.dart';
+import 'package:hentai_library/features/comic/public.dart';
 
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/ui/motion/motion.dart';
-import 'package:hentai_library/shared/ui/motion/spring_size.dart';
-import 'package:hentai_library/shared/ui/motion/spring_value.dart';
-import 'package:hentai_library/shared/ui/patterns/library/library_filter_sort_metrics.dart';
-import 'package:hentai_library/shared/ui/widgets/sheets/overlay_route_scope.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/features/library_browse/domain/browse/library_age_restriction_filter.dart';
-import 'package:hentai_library/shared/domain/library/library_media_type_filter.dart';
+import 'package:hentai_library/features/library_browse/domain/browse/library_media_type_filter.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:hentai_library/features/library_browse/presentation/l10n/library_browse_l10n.dart';
+import 'package:hentai_library/features/comic/public/l10n/comic_l10n.dart';
+
+export 'library_filter_sort_drawer_host.dart';
 
 /// 筛选排序抽屉的本地状态（Widgetbook / 测试用，不绑 Riverpod）。
 ///
-/// 字段与生产 [LibraryComicFiltersState] 的抽屉子集一致。
+/// 字段与生产 [LibraryComicBrowsePreferences] 的抽屉子集一致。
 class LibraryFilterSortState {
   LibraryFilterSortState({
     this.ageRestriction = LibraryAgeRestrictionFilter.unrestricted,
@@ -126,7 +128,7 @@ abstract final class LibraryFilterSortSideSheet {
     final OverlayRouteScopeSnapshot scope = OverlayRouteScopeSnapshot.capture(
       context,
     );
-    final Widget modalBody = overlayRouteScope(
+    final Widget modalBody = OverlayRouteScope(
       scope: scope,
       child: _LibraryFilterSortSideSheetModalBody(
         initialState: state,
@@ -162,23 +164,6 @@ abstract final class LibraryFilterSortSideSheet {
       body: modalBody,
     );
   }
-}
-
-/// 由 [LibraryFilterSortDrawerHost] 注入；[body] 子树内用 [LibraryFilterSortDrawerHost.openDrawer]。
-class _LibraryFilterSortHostScope extends InheritedWidget {
-  const _LibraryFilterSortHostScope({
-    required this.openSideSheet,
-    required super.child,
-  });
-
-  final VoidCallback openSideSheet;
-
-  static _LibraryFilterSortHostScope? maybeOf(BuildContext context) {
-    return context.getInheritedWidgetOfExactType<_LibraryFilterSortHostScope>();
-  }
-
-  @override
-  bool updateShouldNotify(_LibraryFilterSortHostScope oldWidget) => false;
 }
 
 /// 模态内自持状态，便于在 sheet 打开期间即时更新筛选。
@@ -352,84 +337,6 @@ class LibraryFilterSortSideSheetContent extends StatelessWidget {
           }),
         ],
       ),
-    );
-  }
-}
-
-/// 持有筛选状态并调用 [LibraryFilterSortSideSheet.show]，供 Lab 预览与测试。
-class LibraryFilterSortDrawerHost extends StatefulWidget {
-  LibraryFilterSortDrawerHost({
-    super.key,
-    required this.body,
-    LibraryFilterSortState? initialState,
-    this.onStateChanged,
-    this.openSideSheetOnMount = false,
-    this.useRootNavigator = true,
-  }) : initialState = initialState ?? LibraryFilterSortState.defaults;
-
-  final Widget body;
-  final LibraryFilterSortState initialState;
-  final ValueChanged<LibraryFilterSortState>? onStateChanged;
-
-  /// 首帧后自动弹出 side sheet（Widgetbook 专用场景）。
-  final bool openSideSheetOnMount;
-
-  /// 传给 [M3ESideSheet.show]；Widgetbook 预览区宜为 `false`。
-  final bool useRootNavigator;
-
-  /// [context] 须为 [body] 子树（或 Host 注入的 [InheritedWidget] 之下）。
-  static void openDrawer(BuildContext context) {
-    _LibraryFilterSortHostScope.maybeOf(context)?.openSideSheet();
-  }
-
-  @override
-  State<LibraryFilterSortDrawerHost> createState() =>
-      _LibraryFilterSortDrawerHostState();
-}
-
-class _LibraryFilterSortDrawerHostState
-    extends State<LibraryFilterSortDrawerHost> {
-  late LibraryFilterSortState _state = widget.initialState;
-
-  @override
-  void initState() {
-    super.initState();
-    if (widget.openSideSheetOnMount) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          _openSideSheet();
-        }
-      });
-    }
-  }
-
-  @override
-  void didUpdateWidget(covariant LibraryFilterSortDrawerHost oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.initialState != widget.initialState) {
-      _state = widget.initialState;
-    }
-  }
-
-  void _setState(LibraryFilterSortState next) {
-    setState(() => _state = next);
-    widget.onStateChanged?.call(next);
-  }
-
-  void _openSideSheet() {
-    LibraryFilterSortSideSheet.show(
-      context,
-      state: _state,
-      onStateChanged: _setState,
-      useRootNavigator: widget.useRootNavigator,
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return _LibraryFilterSortHostScope(
-      openSideSheet: _openSideSheet,
-      child: widget.body,
     );
   }
 }
@@ -615,11 +522,13 @@ class _GroupingRadioRow extends StatelessWidget {
                 SizedBox(
                   width: 24,
                   height: 24,
-                  child: Radio<bool>(
-                    value: true,
+                  child: RadioGroup<bool>(
                     groupValue: selected,
                     onChanged: (_) => onSelected(),
-                    fillColor: WidgetStatePropertyAll<Color>(cs.primary),
+                    child: Radio<bool>(
+                      value: true,
+                      fillColor: WidgetStatePropertyAll<Color>(cs.primary),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 8),

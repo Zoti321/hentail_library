@@ -1,6 +1,7 @@
 import 'package:hentai_library/features/comic/presentation/patterns/metadata_edit/comic_metadata_edit_draft.dart';
-import 'package:hentai_library/features/comic/presentation/view_models/comic_metadata_smart_facet_providers.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/comic_meta_locks.dart';
+import 'package:hentai_library/features/comic/application/load_comic_smart_facet_candidates_use_case.dart'
+    show ComicMetadataSmartFacetScope;
+import 'package:hentai_library/features/comic/domain/value_objects/comic_meta_locks.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/series_item_membership.dart';
 
 /// [ComicMetadataEditSession.save] 结果。
@@ -16,7 +17,8 @@ class ComicMetadataEditUiState {
   const ComicMetadataEditUiState({
     required this.draft,
     required this.locks,
-    required this.smartFacetScope,
+    required this.comicId,
+    required this.resourcePath,
     this.seed,
     this.titleError,
     this.saving = false,
@@ -24,15 +26,22 @@ class ComicMetadataEditUiState {
 
   final ComicMetadataEditDraft draft;
   final ComicMetaLocks locks;
-  final ComicMetadataSmartFacetScope smartFacetScope;
+  final String comicId;
+  final String resourcePath;
   final SeriesItemMembership? seed;
   final String? titleError;
   final bool saving;
 
+  ComicMetadataSmartFacetScope get smartFacetScope => (
+    comicId: comicId,
+    title: draft.title,
+    resourcePath: resourcePath,
+    seriesId: seed?.seriesId,
+  );
+
   ComicMetadataEditUiState copyWith({
     ComicMetadataEditDraft? draft,
     ComicMetaLocks? locks,
-    ComicMetadataSmartFacetScope? smartFacetScope,
     SeriesItemMembership? seed,
     bool clearSeed = false,
     String? titleError,
@@ -42,7 +51,8 @@ class ComicMetadataEditUiState {
     return ComicMetadataEditUiState(
       draft: draft ?? this.draft,
       locks: locks ?? this.locks,
-      smartFacetScope: smartFacetScope ?? this.smartFacetScope,
+      comicId: comicId,
+      resourcePath: resourcePath,
       seed: clearSeed ? null : (seed ?? this.seed),
       titleError: clearTitleError ? null : (titleError ?? this.titleError),
       saving: saving ?? this.saving,

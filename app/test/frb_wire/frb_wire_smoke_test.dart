@@ -6,6 +6,9 @@ import 'package:hentai_library/src/rust/api/author.dart';
 import 'package:hentai_library/src/rust/api/comic.dart';
 import 'package:hentai_library/src/rust/api/init.dart';
 import 'package:hentai_library/src/rust/api/metadata_backup.dart';
+import 'package:hentai_library/src/rust/api/reader.dart';
+import 'package:hentai_library/src/rust/api/reading_activity.dart';
+import 'package:hentai_library/src/rust/api/resource_verification.dart';
 import 'package:path/path.dart' as p;
 
 import 'frb_wire_harness.dart';
@@ -40,20 +43,31 @@ void main() {
       final Directory appDataDir = Directory.systemTemp.createTempSync(
         'frb_wire_',
       );
-      addTearDown(() {
-        try {
-          appDataDir.deleteSync(recursive: true);
-        } on FileSystemException {
-          // Windows 下 SQLite 连接在进程结束前仍持有文件句柄。
-        }
-      });
-
       initDbFrb(appDataDir: appDataDir.path, dbFileName: 'frb_wire');
 
       expect(await countAllComicsFrb(), 0);
+      await expectLater(
+        verifyComicResourceFrb(
+          comicId: 'wire-missing-resource',
+          mode: ResourceVerificationModeDto.strict,
+        ),
+        throwsA(isA<HentaiErrorDto>()),
+      );
       final AuthorIdentityFrbDto author = await addAuthorFrb(
         name: 'Wire Author',
       );
+      await renameAuthorByIdFrb(authorId: author.id, newName: 'Wire Renamed');
+      final renamed = (await listAllAuthorsFrb()).single;
+      expect(renamed.id, author.id);
+      expect(renamed.name, 'Wire Renamed');
+      await recordReadingActivityFrb(
+        comicId: 'wire-comic',
+        addDurationMs: 10000,
+        markFinished: false,
+      );
+      final activity = await watchReadingActivityStatsFrb().first;
+      expect(activity.finishedCount, 0);
+      expect(activity.totalDurationMs.toInt(), 10000);
       final AuthorImageRefFrbDto image = await resolveAuthorImageFrb(
         authorId: author.id,
         showR18: false,
@@ -73,14 +87,6 @@ void main() {
     final Directory appDataDir = Directory.systemTemp.createTempSync(
       'frb_wire_export_',
     );
-    addTearDown(() {
-      try {
-        appDataDir.deleteSync(recursive: true);
-      } on FileSystemException {
-        // Windows 下 SQLite 连接在进程结束前仍持有文件句柄。
-      }
-    });
-
     initDbFrb(appDataDir: appDataDir.path, dbFileName: 'frb_wire_export');
 
     final List<int> bytes = exportComicMetadataFrb(
@@ -105,4 +111,32 @@ void main() {
       ),
     );
   });
+
+  test(
+    'Reader session errors cross the wire while prefetch stays best effort',
+    () async {
+      const comicId = 'wire-missing-reader-session';
+      final missingSession = throwsA(
+        isA<HentaiErrorDto>().having(
+          (error) => error.code,
+          'code',
+          'ReaderSessionNotOpen',
+        ),
+      );
+      await expectLater(loadPageListFrb(comicId: comicId), missingSession);
+      await expectLater(
+        loadPageBytesFrb(comicId: comicId, pageIndex: 0),
+        missingSession,
+      );
+      await expectLater(
+        loadReaderPageFrb(comicId: comicId, pageIndex: 0),
+        missingSession,
+      );
+      await prefetchReaderPagesFrb(
+        comicId: comicId,
+        pageIndexes: [0],
+        generation: BigInt.one,
+      );
+    },
+  );
 }

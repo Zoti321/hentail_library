@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_page.dart';
@@ -10,7 +12,7 @@ import '../../../../widgetbook/hosts/md3e_reader_page_lab_host.dart';
 import '../../../../widgetbook/lab/navigation/md3e_lab_catalog_navigation.dart';
 
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/shared/ui/widgets/actions/catalog_view_mode_button_group.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 
 import '../../../support/pump_app.dart';
 
@@ -26,10 +28,12 @@ void main() {
           itemCount: 3,
           totalPages: 1,
           onCatalogItemTap: (int index) {
-            openLabCatalogDetail(
-              tester.element(find.byType(LibraryBrowseLayout)),
-              displayTarget: LibraryDisplayTarget.comics,
-              catalogIndex: index,
+            unawaited(
+              openLabCatalogDetail(
+                tester.element(find.byType(LibraryBrowseLayout)),
+                displayTarget: LibraryDisplayTarget.comics,
+                catalogIndex: index,
+              ),
             );
           },
         ),
@@ -54,10 +58,12 @@ void main() {
           itemCount: 3,
           totalPages: 1,
           onCatalogItemTap: (int index) {
-            openLabCatalogDetail(
-              tester.element(find.byType(LibraryBrowseLayout)),
-              displayTarget: LibraryDisplayTarget.comics,
-              catalogIndex: index,
+            unawaited(
+              openLabCatalogDetail(
+                tester.element(find.byType(LibraryBrowseLayout)),
+                displayTarget: LibraryDisplayTarget.comics,
+                catalogIndex: index,
+              ),
             );
           },
         ),
@@ -85,10 +91,12 @@ void main() {
           itemCount: 2,
           totalPages: 1,
           onCatalogItemTap: (int index) {
-            openLabCatalogDetail(
-              tester.element(find.byType(LibraryBrowseLayout)),
-              displayTarget: LibraryDisplayTarget.series,
-              catalogIndex: index,
+            unawaited(
+              openLabCatalogDetail(
+                tester.element(find.byType(LibraryBrowseLayout)),
+                displayTarget: LibraryDisplayTarget.series,
+                catalogIndex: index,
+              ),
             );
           },
         ),

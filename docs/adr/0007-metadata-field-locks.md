@@ -4,6 +4,8 @@
 
 Accepted
 
+> ADR-0057 supersedes only the multi-value Language model and the absence of its newly supported Comic metadata scan sources; the field-lock and nonempty scan-merge policies below remain authoritative.
+
 ## Context
 
 Library sync 原先对已存在 Comic 采用「库内元数据优先」：`title` / `content_rating` / `authors` / `tags` 始终保留，`description` / `published_at` 仅在空值时回填。这无法区分「用户刻意保留」与「首次扫描写入」，也无法在解锁后接受 ComicInfo / EPUB 等解析修正。

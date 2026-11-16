@@ -1,83 +1,41 @@
 //! 库变更通知的单一来源。
 //!
-//! 一条后台 poller 观测 `PRAGMA data_version`，变化时通过 [`tokio::sync::watch`]
-//! 广播给全部订阅者。各 watch 循环订阅它而非自行轮询——否则轮询频率会随订阅者
-//! 数量线性增长（稳态 5 条循环即 12.5 次查询/秒）。
+//! 写路径在事务提交（或 autocommit 语句）成功后调用 [`notify_committed`]，
+//! 由 [`tokio::sync::watch`] 把单调递增的 generation 广播给全部订阅者。
 //!
-//! 为何不做成写路径显式 bump：实测轮询的空闲开销约 0.13% CPU
-//! （见 `tests/data_version_polling_cost.rs`），不足以支撑「所有写路径都必须
-//! 记得 bump」的正确性风险——漏一处会导致长期陈旧，比漏一拍严重。
+//! 历史实现轮询 `PRAGMA data_version`（400ms）作为外部事实流；那意味着同一份
+//! 事实有两个来源（轮询 + 领域事件），且需要专用连接、连接代号与空闲开销。
+//! 现收敛为「写路径显式通知」：跨进程/外部工具直接改库不再被自动感知，
+//! 需要感知的入口（如 metadata import）须在完成处显式通知。
 
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::OnceLock;
-use std::time::Duration;
 
 use tokio::sync::watch;
 
-/// poller 的观测间隔。
-pub const POLL_INTERVAL: Duration = Duration::from_millis(400);
-
 static SENDER: OnceLock<watch::Sender<u64>> = OnceLock::new();
-static POLLER: OnceLock<()> = OnceLock::new();
-static POLL_COUNT: AtomicU64 = AtomicU64::new(0);
+static NOTIFY_COUNT: AtomicU64 = AtomicU64::new(0);
 
-/// 订阅库变更。返回的接收端在库发生变更时被唤醒；首次订阅会启动 poller。
+/// 订阅库变更。返回的接收端在写入提交后被唤醒。
 ///
-/// 广播的是单调递增的代号（generation），仅表示「变了」——不要把它当成
-/// `data_version` 本身，后者是连接局部计数器，跨连接比较无意义。
+/// 广播值只是单调递增的代号，仅表示「变了」。
 pub fn subscribe() -> watch::Receiver<u64> {
-    let sender = sender();
-    start_poller();
-    sender.subscribe()
+    sender().subscribe()
 }
 
-/// 诊断用：poller 迄今真正查询 `data_version` 的次数（无订阅者时不计）。
-pub fn poll_count() -> u64 {
-    POLL_COUNT.load(Ordering::Relaxed)
+/// 写路径提交成功后调用：唤醒全部订阅者。
+///
+/// 重复调用是安全的（只多一次重新查询），因此可以在嵌套写路径中宽松调用。
+pub fn notify_committed() {
+    NOTIFY_COUNT.fetch_add(1, Ordering::Relaxed);
+    sender().send_modify(|generation| *generation = generation.wrapping_add(1));
+}
+
+/// 诊断用：迄今发生通知的次数。
+pub fn notify_count() -> u64 {
+    NOTIFY_COUNT.load(Ordering::Relaxed)
 }
 
 fn sender() -> &'static watch::Sender<u64> {
     SENDER.get_or_init(|| watch::channel(0).0)
-}
-
-fn start_poller() {
-    POLLER.get_or_init(|| {
-        crate::runtime::runtime().spawn(poll_loop());
-    });
-}
-
-/// 读取 `(连接代号, data_version)`；读取期间版本连接被替换则视为无效。
-async fn read_versioned() -> Option<(u64, i32)> {
-    let epoch = crate::db::version_connection_epoch();
-    let version = crate::comic::read_data_version().await.ok()?;
-    (crate::db::version_connection_epoch() == epoch).then_some((epoch, version))
-}
-
-async fn poll_loop() {
-    let sender = sender();
-    // init_db 可能尚未调用，此时先记 None，待首次读成功再作为基线（不视为变更）。
-    // 版本连接被替换（重新 init_db）时同样重设基线：跨连接的计数器不可比较。
-    let mut last: Option<(u64, i32)> = read_versioned().await;
-
-    loop {
-        tokio::time::sleep(POLL_INTERVAL).await;
-
-        // 无人监听时不查库；下次有订阅者再恢复。
-        if sender.receiver_count() == 0 {
-            continue;
-        }
-        POLL_COUNT.fetch_add(1, Ordering::Relaxed);
-
-        let Some(current) = read_versioned().await else {
-            continue;
-        };
-        match last {
-            Some((epoch, previous)) if epoch == current.0 && previous != current.1 => {
-                last = Some(current);
-                sender.send_modify(|generation| *generation = generation.wrapping_add(1));
-            }
-            Some(previous) if previous == current => {}
-            _ => last = Some(current),
-        }
-    }
 }

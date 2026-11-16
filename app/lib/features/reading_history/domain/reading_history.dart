@@ -1,5 +1,4 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hentai_library/features/reading_history/domain/reading_history_events.dart';
 import 'package:hentai_library/features/reading_history/domain/reading_history_exceptions.dart';
 
 part 'reading_history.freezed.dart';
@@ -19,9 +18,8 @@ abstract class ReadingHistory with _$ReadingHistory {
 
   const ReadingHistory._();
 
-  /// 阅读会话落库：校验不变式并返回待持久化快照与领域事件。
-  static ({ReadingHistory snapshot, ReadingHistoryProgressRecorded event})
-  recordSessionProgress({
+  /// 阅读会话落库：校验不变式并返回待持久化快照。
+  static ReadingHistory recordSessionProgress({
     required String comicId,
     required String title,
     required DateTime lastReadTime,
@@ -46,19 +44,13 @@ abstract class ReadingHistory with _$ReadingHistory {
       );
     }
 
-    final ReadingHistory snapshot = ReadingHistory(
+    return ReadingHistory(
       comicId: id,
       title: snapshotTitle,
       lastReadTime: lastReadTime,
       pageIndex: pageIndex,
       pageCount: pageCount,
     );
-    final ReadingHistoryProgressRecorded event = ReadingHistoryProgressRecorded(
-      comicId: id,
-      pageIndex: pageIndex,
-      lastReadTime: lastReadTime,
-    );
-    return (snapshot: snapshot, event: event);
   }
 
   /// 封面/列表进度条比例；缺少页码或总页数时返回 null。

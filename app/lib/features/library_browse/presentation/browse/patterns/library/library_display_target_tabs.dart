@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
-import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
-import 'package:hentai_library/shared/ui/patterns/library/library_page_header_metrics.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:hentai_library/shared/ui/l10n/library_display_target_l10n.dart';
 
 /// 漫画 / 系列切换：[`M3ETabs`] primary + 局部 [`M3ETabTheme`]（动画指示条、state layer）。
 ///
@@ -73,13 +72,7 @@ class LibraryDisplayTargetTabs extends StatelessWidget {
             for (final String label in tabLabels) M3ETab(label: label),
           ],
           selectedIndex: selectedIndex,
-          onTabSelected: (int index) {
-            onChanged(
-              index == 0
-                  ? LibraryDisplayTarget.comics
-                  : LibraryDisplayTarget.series,
-            );
-          },
+          onTabSelected: _handleTabSelected,
         ),
       ),
     );
@@ -88,5 +81,11 @@ class LibraryDisplayTargetTabs extends StatelessWidget {
       return Center(child: tabs);
     }
     return Align(alignment: Alignment.centerLeft, child: tabs);
+  }
+
+  void _handleTabSelected(int index) {
+    onChanged(
+      index == 0 ? LibraryDisplayTarget.comics : LibraryDisplayTarget.series,
+    );
   }
 }

@@ -1,395 +1,346 @@
 # Glossary
 
-领域术语与 _Avoid_ 别名。产品能力概述见根目录 `README.md`；架构见 `docs/adr/`。
+Use these English terms in issues, PRs and code. Definitions describe product semantics; procedures belong in [engineering guides](docs/engineering/README.md), decisions in [ADRs](docs/adr/README.md), and user-facing capabilities in [README](README.md). Avoid entries identify misleading synonyms, not forbidden UI translations.
 
-## Language
+## Application and boundaries
 
-### Application data
+**App data profile**: The local application data tree (database, preferences, logs and caches) tied to application identity. Release uses `default`; Debug/Profile use isolated `dev`. A profile is not a Library. ADR-0010.
+_Avoid_: development Library, release Library, database environment.
 
-**App data profile**:
-与应用身份绑定的一整份本机应用数据树（含库文件、本地设置、日志与缓存等）。日常发布使用 `default`；非正式构建（Debug / Profile）使用独立的 `dev`，二者互不共享。与 Library（同一库文件内的多根集合）无关。详见 ADR-0010。
-_Avoid_: 开发库、发布库、数据库环境（易与 Library 混淆）
+**Application layer**: Optional pure Dart use-case orchestration in `features/*/application/`. It is unrelated to on-disk application data. ADR-0033/0051.
+_Avoid_: application data directory, presentation/FRB logic in application.
 
-**Application layer**（Dart 应用层）:
-Wayfinder feature 内可选目录 `features/*/application/`：无 Flutter 的用例编排（Service / Coordinator）。与上文 **Application data**（磁盘上的应用数据）无关。Gate L1 R6–R10。详见 ADR-0033。
-_Avoid_: 把 Application data 目录称为 Application 层；在 application 层 import presentation / FRB
+**Feature public API**: Exported contracts, observable state and UI capabilities consumed by other modules, with concrete dependencies bound by the host. ADR-0034/0051.
+_Avoid_: cross-feature deep imports, shared code importing feature public APIs.
 
-**Feature public API**:
-跨 feature 协作时，消费方只 `import` owner 的 `features/<id>/public/**` 或 `public.dart`；仍通过 `shared/di` 的 Provider token + bootstrap override 拿实现。详见 ADR-0034。
-_Avoid_: deep import 其他 feature 的 presentation / data / di；让 `shared/**` import feature public
+## Libraries and resources
 
-### Library & resources
+**Library**: A user's collection associated with one Library root, containing imported Comics and Folder series. Each has its own display name and sync configuration. Multiple Libraries coexist, with global status on Home and browsing scoped to a Library.
+_Avoid_: bookshelf as a domain term, merged Library, global catalog browsing.
 
-**Library**:
-用户的一份漫画集合（趋近 Komga：一个 Library root 对应一个 Library），由该根下 Library sync 导入的 Comic 与 Folder series 组成；可有独立配置（Supported resource formats、Scan on startup、Scan interval），以及可独立于 Library root 编辑的显示名。应用内可同时存在多个 Library。多库态势与入口在 Home page；不提供跨库聚合浏览面。
-_Avoid_: 书架（UI 可用）；全部库浏览、合并库、全局书架（产品不做）
+**Home page**: Default `/home` route with continue-reading, Recently added on Home, Home page counts, Reading activity stats and dismissible Home library alerts. Presentation belongs to home; counts/activity belong to reading_stats. It has no permanent global sync action. ADR-0020.
+_Avoid_: current-Library dashboard, Home scan, Home dashboard.
 
-**Home page**:
-应用启动后的默认路由（`/home`）：全局阅读入口与多库态势摘要。展示继续阅读、Recently added on Home、全库聚合统计、Home library alert；**不**提供常驻 Library sync 入口。详见 ADR-0020。
-_Avoid_: 当前库仪表盘、首页扫描、Home dashboard（口语可用；文档与 issue 用 Home page）
+**Home page counts**: Cross-Library catalog counts for Comics, Series and global Author/Parody/Character/Tag dictionaries, reflecting visibility after Comic trash. Distinct from reading behavior metrics; owned by reading_stats.
+_Avoid_: read count, Reading activity stats.
 
-**Home library alert**:
-Home page 上可 dismiss 的、按 Library 粒度的态势条：远程根不可达、上次 Library sync 失败、距上次成功 sync 过久而建议再次 sync、Library resource probe 发现待同步 Resource 等。用户可从 alert 对该 Library 触发 Library sync；非常驻全局扫描按钮。
-_Avoid_: 首页扫描按钮、当前库健康面板、库通知中心
+**Home library alert**: Dismissible status for a particular Library: unreachable root, failed/stale sync or resources detected by a probe. An alert may offer sync for that Library.
+_Avoid_: permanent Home scan button, notification center.
 
-**Library resource probe**:
-对某 Library 的 Library root 做只读枚举，与 **Library resource snapshot** diff，得到新增/变更/移除 Resource 计数；不解析 archive、不写 Comic/Series、不持 library 写锁。结果供 Home library alert 等 UI；用户确认后再执行 Library sync。详见 ADR-0021。
-_Avoid_: 轻量扫描、预扫描、自动 sync、文件监听（口语可用；领域与 issue 用 Library resource probe）
+**Library resource probe**: Read-only root enumeration compared with the last successful Library resource snapshot to count added/changed/removed Resources. It does not parse archives, write catalog entities or acquire the library write lock. Sync follows user confirmation. ADR-0021.
+_Avoid_: automatic sync, file watcher, lightweight scan.
 
-**Library resource snapshot**:
-某 Library 在 **上次成功 Library sync 结束** 时持久化的 Resource 索引（规范化 location_key + modified_ms + size + resource_type）；供 Library resource probe diff。sync 失败或取消不更新；不是 Metadata backup，也不是 Comic 身份。
-_Avoid_: 扫描缓存、thumbnail stat、内容哈希索引
+**Library resource snapshot**: Persisted normalized location key, modified time, size and resource type from the end of the last successful sync. Failed/cancelled sync does not replace it; it is neither a backup nor Comic identity.
+_Avoid_: scan cache, content hash index.
 
-**Recently added on Home**:
-Home page 横滑区块：跨全部 Library 取最近入库的 Comic（按库内记录时间降序，Top N），卡片标注来源 Library 显示名；点击进 Comic 详情或 Read session。不是推荐算法流。
-_Avoid_: 首页推荐、发现流、For you
+**Recently added on Home**: A cross-Library horizontal list of recently imported Comics ordered by catalog insertion time, labelled with source Library; opens details or a Read session.
+_Avoid_: recommendations, discovery feed, For you.
 
-**Local library**:
-Library root 为本机目录的 Library；Resource 来自本地文件系统；入库后可离线阅读。
-_Avoid_: 本地书架、磁盘库（口语可用，文档用 Local library）
+**Local library**: A Library rooted in a local directory; imported Resources can be read offline.
+_Avoid_: local bookshelf, disk collection as a separate domain type.
 
-**Remote library**:
-Library root 为 WebDAV 根的 Library；Resource 经 WebDAV 发现与流式读取；不整本落盘。
-_Avoid_: 云库、网盘库、在线书架（无官方云账号语义）
+**Remote library**: A Library rooted in WebDAV, discovered and read through streaming Resource access without caching a whole Comic to disk.
+_Avoid_: official cloud account, online bookshelf.
 
-**Library root**:
-一个 Library 的唯一根位置：Local（本机目录）或 Remote（WebDAV 根 URL）。扫描与对齐均相对该根。
-_Avoid_: 扫描路径、挂载点；Saved path（旧称，仅指 Local 根）
+**Library root**: A Library's unique local directory or WebDAV root URL; discovery and reconciliation are relative to it.
+_Avoid_: Saved path in new designs, mount point.
 
-**Saved path**:
-Local library 的 Library root 之旧称。UI 与 FRB 的 Path 面已按 ADR-0014 退役（`/paths` 现重定向至 Home，`PathRepository` 与 Rust `path` 模块已删除）；仅 `saved_paths` 表与迁移代码保留该名。新表述一律用 Library root / Local library。用户侧创建与管理 Library 仅经 Library form 与 **Home「我的漫画库」**（及 shell 库 flyout 建库快捷方式）。
-_Avoid_: 在新设计中把 Saved path 扩成远程 URI；选中路径页、Selected Paths、路径管理页
+**Saved path**: Retired name for a Local library root. The old Path UI/API is removed; only legacy schema/migrations retain the name. Library creation uses Library form through Home or the shell flyout. ADR-0014.
+_Avoid_: Selected Paths page, extending Saved path to remote URIs.
 
-**Comic**:
-某个 Library 中一条可阅读的独立作品，对应一个 Resource（本地文件/目录，或远程 WebDAV 上的文件）。身份由规范化后的资源位置键派生（`comicId`）；同一位置键始终是同一 Comic。
-_Avoid_: 本子、作品、条目（口语可用，文档与 issue 中用 Comic）
+**Comic**: An independently readable work in a Library, corresponding to one Resource. Its ID derives from the normalized resource location. Dart Comic is an owner projection entity with invariants, draft application and metadata diffs; Rust owns transactional writes. ADR-0041.
+_Avoid_: item/work as an ambiguous replacement, Dart transaction aggregate.
 
-**Comic identity**:
-Comic 与资源位置键绑定，而非内容哈希。本地为规范化磁盘路径；远程为规范化 WebDAV 资源 URL。位置变化（移动/重命名/改 URL）生成新 `comicId`；连续性靠 Path migration，而非内容哈希身份。详见 ADR-0001、ADR-0013。
-_Avoid_: 内容 ID、文件指纹
+**Comic identity**: Identity anchored to a normalized local path or WebDAV resource URL, not content hashes. Moving/renaming changes `comicId`; Path migration preserves continuity when eligible. ADR-0001/0013.
+_Avoid_: content ID, file fingerprint identity.
 
-**Path migration**:
-位置键变化后仍判定为同一 Comic（或同一 Series）时，将库记录 rekey 到新身份并保留用户元数据、Metadata field lock、阅读历史等，而不是 orphan 删除后再当新条目导入。Library sync 内对 Comic 用资源弱指纹（类型 + 大小 + 页数）在 removed/added 间做 1:1 唯一配对；若某 Folder series 的全部成员均因此迁到同一新父路径，则将该 Series 一并 rekey（保留连载状态、计划总卷数、字段锁、自定义名与系列封面等；未锁的显示名可随新文件夹名更新）。Local 改 Library root 且新根可读时，按相对旧根的路径前缀 remapping（含 Series 的 `folder_path` / `seriesId`）。指纹歧义、成员未全部迁到同一新父、相对路径对不上、或新根不可读则不迁，交由后续 Library sync 对齐。不是 Metadata refresh，也不改变 Comic / Series identity 的位置锚定，也不引入文件夹内容哈希身份。详见 ADR-0013。
-_Avoid_: 自动迁移身份、内容指纹身份、系列内容哈希、搬家、重命名保留、rekey（实现用语）
+**Path migration**: Rekeying an existing Comic/Series after a verified location change while preserving its user state; explicit readable Local root changes retain eligible relative-path continuity. Unique matches of previously recorded full-content fingerprints also permit automatic continuity; weak fingerprints and ambiguous copies do not, and records without prior content evidence cannot be matched retroactively (ADR-0001/0013/0054/0055).
+_Avoid_: content-hash identity, unconditional rename preservation, Metadata refresh.
 
-**Comic deletion**:
-用户主动删除 Comic 的两段式流程之旧称：先 Comic trash，再（由用户在「已删除」页）Comic purge。新表述按具体阶段用 Comic trash / Comic restore / Comic purge。不是 Library sync 的 orphan 清理，也不是删除整个 Library（后两者仍只动库记录、不删 Resource）。详见 ADR-0012（部分被 ADR-0023 取代）、ADR-0023。
-_Avoid_: 删文件、从库移除（若暗示不删 Local Resource）、自动 orphan 删盘
+**Comic deletion**: Historical umbrella for the user-driven trash-then-purge lifecycle. Use the specific stage in new text. Sync orphan cleanup and Library removal delete records, not Resources. ADR-0012/0023.
+_Avoid_: automatic disk deletion, removal implying local files are always retained.
 
-**Comic trash**:
-用户主动删除 Comic 的第一段：Comic 从所有浏览面（Library、Home、搜索、Series、阅读历史）隐藏且不可打开阅读，但库记录、用户元数据、Metadata field lock、阅读历史与 Resource 均原样保留，可 Comic restore。Local 与 Remote library 一致。Library sync 不会使其复活或重新导入；其 Resource 消失时按 orphan 清理移除。界面称「已删除」。详见 ADR-0023。
-_Avoid_: 回收站（易与系统回收站混淆）、隐藏、归档
+**Comic trash**: Hide a Comic from all browse/search/Series/history surfaces and prevent reading while retaining records, metadata, locks, history and Resource for restore. Local/Remote behavior is the same. Sync never resurrects it; a vanished Resource may still be orphan-cleaned. ADR-0023.
+_Avoid_: operating-system recycle bin, archive, simple visibility toggle.
 
-**Comic restore**:
-将处于 Comic trash 的 Comic 恢复为正常可见、可阅读状态，用户元数据与阅读历史随之回来。详见 ADR-0023。
-_Avoid_: 撤销删除、还原文件
+**Comic restore**: Restore visibility/readability of a trashed Comic together with its retained metadata/history. ADR-0023.
+_Avoid_: restoring a deleted file.
 
-**Comic purge**:
-用户在「已删除」页对处于 Comic trash 的 Comic 执行的永久删除：对 Local library 在路径安全校验后永久删除其 Resource（成功或路径已不存在后再清库；删盘失败则该 Comic 不改库、留在 Comic trash）；对 Remote library 仅清库、不删远程 Resource。仅作用于已 trash 的 Comic，不自动触发。详见 ADR-0012、ADR-0023。
-_Avoid_: 清空回收站、彻底删除（口语可用，不作领域词）、自动清理
+**Comic purge**: Explicit permanent removal of an already-trashed Comic. Local purge validates paths and deletes its Resource before clearing records; missing Resources count as success, disk deletion failure leaves records trashed. Remote purge removes records only. It is never automatic. ADR-0012/0023.
+_Avoid_: automatic cleanup, system recycle-bin emptying.
 
-**Resource**:
-可被发现并（校验后）入库为 Comic 的原始载体：本地文件/目录，或 WebDAV 上的文件。解析中间结果在入库前独立于 Comic 身份与用户元数据；Library sync / Metadata refresh / 阅读与缩略图共用同一套 Resource 访问与解析规则（经 Resource access）。
-_Avoid_: 文件、素材
+**Resource**: Original local file/directory or WebDAV file that may be discovered and imported as a Comic. Parsing before import is independent of Comic identity/user metadata; sync, refresh, reading and thumbnails share Resource access rules.
+_Avoid_: file when directory/remote support matters, asset.
 
-**Resource access**:
-对 Library root 下资源的统一访问能力（列举、属性、打开只读流）；Local 走文件系统，Remote 走 WebDAV。Scan、阅读与缩略图生成均经此端口，不在 UI 层分叉协议。
-_Avoid_: VFS、存储驱动、网盘 SDK
+**Resource fingerprint**: Versioned SHA-256 evidence captured from a Resource together with its observed type, size and modification time. File fingerprints cover all bytes; image-directory fingerprints cover image bytes in reading order, and neither establishes Comic identity.
+_Avoid_: content ID, current-content proof without a fresh read.
 
-**Scan**:
-遍历当前（或指定）Library 的 Library root、发现 Resource 并做轻量登记或解析的过程；用户与 UI 中常用的说法（如「扫描库」）。
-_Avoid_: 导入、索引（未体现与根对齐的删除语义）
+**Quick Resource check**: A comparison of current Resource observations with the saved fingerprint's observations without reading content. No detected change is weaker than content equality; directory observations and unknown modification times may be inconclusive.
+_Avoid_: integrity verification, unchanged-content guarantee.
 
-**Library sync**:
-让某个 Library 与其 Library root 下内容对齐的完整操作：包含 Scan，并写库——新增缺失 Comic、按字段锁合并后更新仍存在的 Comic、对可配对的位置变化执行 Path migration、删除根上已消失且未迁走的 Comic。UI 触发的单次 sync 需指定目标 Library，或使用 sync all。Remote library 在根不可达（网络/鉴权失败）时跳过该库且不删除其已有 Comic。若某 Library 被移除，则清除该库及其 Comic/Series。元数据合并见 Metadata field lock。写库后由 core 使相关阅读会话失效；与 Metadata refresh、Local 改根（含 Path migration）共用库级写锁。
-_Avoid_: 同步、刷新（太泛，未体现镜像语义）
+**Strict Resource verification**: A fresh full-content fingerprint comparison against saved evidence, bypassing the observation cache. Verification reports content equality, change or unavailable evidence without replacing the saved baseline; errors remain errors.
+_Avoid_: metadata refresh, Library sync, baseline renewal.
 
-_Scan_ 与 _Library sync_ 在用户触发的场景中指同一操作；领域文档与 issue 优先使用 Library sync。
+**Resource access**: Uniform listing, stat and read-only streaming of Resources under a Library root, implemented by filesystem or WebDAV adapters.
+_Avoid_: UI-specific protocol branches, cloud SDK, VFS as the domain name.
 
-**Supported resource formats**:
-按 Library 配置的、Library sync 会收录的 Resource 格式范围；按 Resource format category 勾选。未启用分组下的 Resource 不进入该次扫描结果，库中对应 Comic 按 orphan 删除。默认值与 Local / Remote 首版能力见产品定位；取消勾选仅在下次 sync 生效。
-_Avoid_: 媒体类型（库页浏览筛选用语）、导入格式、全局唯一一份格式设置（已改为每库）
+**Comic resource information**: Facts describing a Comic's Resource: its location, format, byte size and page count. Distinct from descriptive metadata, catalog timestamps and reading activity.
+_Avoid_: physical file information when directories or WebDAV Resources are included.
 
-**Resource format category**（资源格式类别）:
-Supported resource formats 的勾选单位：`folder`（`dir`）、`pdf`、`epub`、`archive`（zip/cbz/rar/cbr/7z/cb7）。归类到 `resource_type` 的展开由 core 维护。Remote library 首版不收录 `folder`。
-_Avoid_: 扩展名列表（用户设置层用分组）
+**Comic metadata**: Descriptive catalog information about a Comic, including its title, description, publication date, content rating and descriptive facets, together with their field locks. It may originate from Resource parsing or user edits; provenance does not make it Resource information.
+_Avoid_: digital-world metadata, user-only metadata.
 
-**Scan on startup**:
-某 Library 的布尔配置：应用启动后是否对该库自动执行一次 incremental Library sync。按库独立；与 Scan interval 无关。
-_Avoid_: 自动扫描（易与全局旧设置或间隔扫混淆）、autoScan（已移除的应用级设置）
+**Scan**: Root traversal and Resource discovery/registration/parsing. User-triggered Scan and Library sync refer to the same operation; domain documentation prefers Library sync.
+_Avoid_: import/index when reconciliation semantics matter.
 
-**Scan interval**:
-某 Library 的周期自动 Library sync 档位：`disabled`、`hourly`、`every_6_hours`、`every_12_hours`、`daily`、`weekly`。按库独立计时；锚点为应用本次启动或该库本档被改为非 `disabled` 之时；到期对该库做 incremental Library sync。应用未运行时不调度。
-_Avoid_: 自动扫描间隔（口语可用）、cron、全局扫描周期
+**Library sync**: Reconcile a selected Library with its root: discover/add, merge unlocked metadata, perform eligible Path migration and remove remaining orphans. Unreachable remote roots preserve existing records. Removing a Library clears its Comic/Series records. Core invalidates affected reading sessions and shares the library write seam with Metadata refresh and local-root migration.
+_Avoid_: refresh, generic synchronization without mirror/removal semantics.
 
-**Pinned library**:
-Pinned 组在 **Home 库列表**与 shell 库 flyout 中排在 Unpinned 之前；新建 Library 默认为 Pinned，并排在已固定组末尾。详见 ADR-0009。
-_Avoid_: 置顶库、收藏库、固定库（易与 sticky header 的 pinned 混淆）；文档用 Pinned library，UI 文案可用「已固定」
+**Supported resource formats**: Per-Library Resource format categories included in the next sync. Disabling a category excludes those Resources and makes corresponding catalog Comics orphans on that sync.
+_Avoid_: browse media filter, global import-format setting.
 
-**Unpinned library**:
-`pinned = false` 的 Library；在 Home 库列表中位于已固定组之后（无 legacy 侧栏「更多」折叠）。拖拽排序时仍可跨组改变 Pinned/Unpinned。
-_Avoid_: 隐藏库、折叠库、次要库
+**Resource format category**: Selection groups `folder` (`dir`), `pdf`, `epub`, `archive` (zip/cbz/rar/cbr/7z/cb7), expanded to resource types by core. Remote libraries do not initially import folders.
+_Avoid_: raw extension list as the preference model.
 
-**Library sidebar order**:
-Pinned 组内与 Unpinned 组内各自的用户顺序；与 Series 成员的 `order` / `sortOrderLocked` 无关。`list_libraries` 按「Pinned 再 Unpinned、组内按该顺序」返回。
-_Avoid_: 库排序（太泛）、sortOrder（Series 用语）
+**Scan on startup**: Per-Library switch for one incremental sync after application startup, independent of Scan interval.
+_Avoid_: retired global autoScan preference, generic automatic scan.
 
-**Library reorder mode**:
-历史侧栏「重新排序」全栏模式的领域名；**生产 UI 已退役**（2026-11-03）。Home 库列表支持长按拖拽排序（无需单独模式）。`LibraryReorderModePort` 仍供 browse 多选与排序态互斥（`exit()`）。
-_Avoid_: 编辑模式、排序页、固定开关（pin 只能在此模式用拖拽改，没有单独菜单项）
+**Scan interval**: Per-Library incremental sync schedule: disabled/hourly/every_6_hours/every_12_hours/daily/weekly. Its anchor is application startup or enabling/changing the interval; scheduling runs only while the application runs.
+_Avoid_: cron, global scan interval.
 
-### Organization & metadata
+**Pinned library**: Library listed before unpinned Libraries on Home and the shell flyout. New Libraries start pinned at the end of the pinned group. ADR-0009.
+_Avoid_: favorite Library, sticky-header semantics.
 
-**Series**:
-同一 Library 内有名、有顺序的 Comic 集合；由 Library sync 根据 Comic 所在文件夹（直接父目录）自动生成与更新。不跨 Library。用户可编辑连载状态与计划总卷数（各字段可有 Metadata field lock）；成员默认顺序由 sync 按文件名自然排序写入。用户可手动编辑单本排序值（`SeriesItem.order`，浮点数）；手动保存后会锁定该成员（`sortOrderLocked`），后续 sync 保留锁定项的排序值，未锁定项仍按文件名自然排序更新；也可解锁排序以在下次 sync 恢复文件名序。顺序由 SeriesItem 的 order 决定，与 Comic 本身解耦。任一时刻一本 Comic 最多属于一个 Series。Library sync 成功重建后，凡能解析出父路径的 Comic 恰好属于一个 Folder series（含 Library root series）；无父路径以致无归属视为异常/非常态，仍可容忍。
-_Avoid_: 合集、专辑、套系
+**Unpinned library**: Library with `pinned = false`, following the pinned group. Drag reorder may move it between groups; it is not hidden/collapsed.
+_Avoid_: secondary Library, hidden Library.
 
-**Folder series**:
-Comic 的直接父目录对应一个 Series；Library root 下直接存放的 Comic 也会形成以根名命名的 Series。Series 身份由规范化 `folder_path`（含远程位置键时的父路径）派生（`seriesId`），且隶属于所属 Library。
-_Avoid_: 标题推断、自动分组
+**Library sidebar order**: User order within each pinned/unpinned group. Library listing returns pinned first, then group order; unrelated to Series member order/locks.
+_Avoid_: Series sortOrder, unspecified Library sorting.
 
-**Library root series**:
-某 Library 中 `folder_path` 等于该库 Library root 的 Folder series（根下散落 Comic 所归属的那一条）。
-_Avoid_: 根系列置顶实体、isRoot 标志、Pinned series
+**Library reorder mode**: Retired sidebar-wide mode. Home now supports long-press drag reorder without a separate mode; the exit command remains for exclusion with browse selection/sorting state.
+_Avoid_: current sorting page, standalone pin toggle.
 
-**Prefer library root series**:
-Library browse preference（现由设置页读写，默认开启）：Series 浏览列表中，开启时若 Library root series 仍落在当前筛选结果中，则固定排在列表最前；其余条目仍按当前排序字段与分组排列。不是 Series 分组项。
-_Avoid_: 置顶系列、pin series（易与 Pinned library 混淆）
+## Organization and metadata
 
-**Group by serialization status**（按连载状态分组）:
-Library browse preference（分组方式 `bySerializationStatus`）：Series 浏览列表保持扁平，按连载状态块顺序（ongoing → completed → hiatus → cancelled → unknown）排列；块内仍按当前 Series 排序字段排列。与排序正交；默认不分组（`none`）。
-_Avoid_: 连载筛选（那是 Filter）、折叠分组标题
+**Series**: Named ordered Comic collection within one Library, maintained from immediate parent folders by sync. A Comic belongs to at most one Series; after successful rebuild, every resolvable parent yields a Folder series, including the Library root. Members use natural filename order unless a manually saved floating-point order is locked; unlocking restores filename order on the next sync. Status/planned volumes have metadata locks. Rust owns membership/order writes.
+_Avoid_: album, cross-Library collection.
 
-**Group by series**（按系列分组）:
-Library browse preference（分组方式 `bySeries`）：Comics 浏览列表保持扁平（无分组标题、无折叠），按「Library root series 成员块优先 → 其余 Folder series 按名称升序成块 → 无 Series 归属的 Comic 整块垫底」决定系列块顺序；**块内仍按当前 Comics 排序字段**排列。默认开启；与排序正交，不是视觉分组或折叠，也不共用 Prefer library root series 开关。
-_Avoid_: 按系列展开、expand by series、按系列折叠、系列模式列表
+**Folder series**: Series derived from a Comic's immediate parent directory, including root-level Comics. Identity derives from normalized local/remote `folder_path` within its Library.
+_Avoid_: title inference, automatic title grouping.
 
-**Default library display target**:
-App preference：进入库浏览时默认打开的 Library display target（Comics 或 Series）；默认 Comics。不是会话内临时 Tab 切换，也不是 Library browse preference。
-_Avoid_: 默认库 Tab（口语可用；领域与 issue 用本词）、默认界面、homepage tab
+**Series folder information**: The folder location anchoring a Folder series. It does not describe a readable Comic Resource or the Series membership and order.
+_Avoid_: Series file, Series Resource.
 
-**App preference**:
-应用级偏好，跨所有 Library 生效；由设置页与阅读器设置对话框读写。包括主题、语言、阅读模式、Webtoon 参数、自动播放、桌面侧栏展开、应用更新偏好、Healthy mode、**Prefer library root series**（Series 浏览列表置顶库根系列，默认开启）、Smart facet match（Comic metadata form 候选排序，默认开启）、**Default library display target** 等。持久化在 Dart 侧（SharedPreferences）；不进入 Rust SQLite。与 Library browse preference、Library property 区分。
-_Avoid_: 全局设置、settings.json（实现用语）、AppSetting DTO（实现用语）
+**Series metadata**: A Series' descriptive name, serialization status and planned volume count, together with their field locks. Membership and member order are separate facts.
+_Avoid_: Series contents, actual volume count as a synonym for planned volume count.
 
-**Library browse preference**:
-库浏览 UI 偏好，跨所有 Library 共享；由库页筛选/排序/分页控件读写。包括排序字段、分页大小、Tag/Author 筛选、Comic/Series **分组方式**（含「不分组」）、年龄限制筛选等。其中 Author 筛选按 Author 稳定身份持久化，UI 渲染当前显示名；Tag 等名字 facet 仍按名称。持久化在 SharedPreferences；不进入 Rust SQLite，也不经设置页（**Prefer library root series** 除外，见 App preference）。
-_Avoid_: 库设置、client settings（Komga 用语）、筛选状态（口语）
+**Library root series**: Folder series whose folder path equals its Library root.
+_Avoid_: pinned Series, separate isRoot entity.
 
-**Library property**:
-绑定某一 Library 实体的配置，由 Library form 或侧栏操作读写，经 FRB 落入 Rust SQLite。包括 Scan on startup、Scan interval、Supported resource formats（per-library）、Pinned、sidebar order 等。与 App preference、Library browse preference 区分。
-_Avoid_: 库偏好、Library settings form（旧称）
+**Prefer library root series**: Default-enabled browse preference exposed in Settings: place the root Series first if it survives filtering; retain current ordering/grouping for the rest.
+_Avoid_: pin Series, a Series grouping mode.
 
-**Settings list–detail**:
-设置页在隐藏应用侧栏后的响应式主从：宽屏（≥ compact 断点）左侧设置主栏与右侧分类 detail 并排且默认选中第一项；窄屏先全宽主列表，再进入分类 detail。顶栏标题为「设置」并提供返回：宽屏或窄屏主列表时离开设置；窄屏 detail 时先回到主列表。不是 Libraries 应用侧栏，也不是 Library form / 阅读器设置对话框。设置页所改项属于 App preference。
-_Avoid_: 设置侧边栏（易与应用侧栏混淆）、AdaptiveScaffold、settings split view（实现用语）
+**Group by serialization status**: Flat Series ordering in status blocks: ongoing, completed, hiatus, cancelled, unknown, with the current sort inside each block. Independent of filtering/sorting; default grouping is none.
+_Avoid_: serialization filter, collapsible headings.
 
-**Tag**:
-全局标签字典中的名称，用于筛选与归类；可来自用户创建或外部词库导入，再附着到 Comic。
-_Avoid_: 分类、关键词、Eh 标签（口语可用；领域与 issue 用 Tag）
+**Group by series**: Default flat Comics grouping: root-Series members first, other Folder series by ascending name, unassigned Comics last; preserve current Comic sort within blocks. No headers/collapse, and independent of Prefer library root series.
+_Avoid_: expand by Series, Series mode list.
 
-**Tag dictionary import**:
-从外部 JSON 标签字典（经网络下载或本地字节）将标签名幂等写入全局 Tag 字典的操作；不附着到 Comic，不删除本机已有 Tag。JSON 格式见 `docs/engineering/maintainer.md` § Tag dictionary import。生产入口：元数据管理页（`/metadata`）更多菜单「导入标签字典」（本地 JSON）。
-_Avoid_: ehentai 导入、EhTagTranslation、标签同步、画廊导入（易被理解成给 Comic 打标或镜像删除）
+**Default library display target**: Application preference selecting Comics (default) or Series on entering Library browsing, distinct from a temporary tab change.
+_Avoid_: homepage tab, default interface.
 
-**Author**:
-具有稳定身份的署名实体，可多值附着到 Comic；有可变显示名，并可含用户维护的 Author link 等资料。社团、画师、原作者等均记为 Author，不区分类型。现有「仅名字」的作者数据迁移为 Author（尚无外链者即为非认证）。
-_Avoid_: 画师、创作者、社团、Circle；把 Author 仅当成无身份的名字字符串；Author profile（口语可用；领域词用 Author）
+**App preference**: Application-wide preferences persisted by Dart SharedPreferences, including theme/locale, reading options, updates, Healthy mode, root-Series preference, Smart facet match and default browse target. app_settings owns storage schema/defaults/clamps; Reader owns reading enums/semantics. They communicate through primitive ReadingPreferencesRecord with total decode fallback/reporting and exhaustive encode, with one readingPreferencesControllerProvider write entry. ADR-0016/0046.
+_Avoid_: Library property, settings.json, AppSetting DTO as a domain term.
 
-**Verified author**:
-至少拥有一条创作平台（Creative platform）Author link 的 Author；否则为非认证 Author。仅表示应用内资料完备度，不是任何外部平台的官方认证同步。
-_Avoid_: 官方认证、平台 verified、蓝V
+**Library browse preference**: Shared-across-Libraries browse state: filters, sort/group settings and page size, persisted in SharedPreferences. Author filters store stable IDs; name facets store names. Usually edited in browse, with the root-Series preference exposed in Settings.
+_Avoid_: per-Library database settings, Library property.
 
-**Author alias**:
-某 Author 在其 Creative platform 外链上的平台显示名中，与该 Author 当前显示名不一致者；比较与去重均大小写敏感；展示时按 Creative platform 优先级排序，以英文逗号拼接；与显示名一致则不展示。平台显示名由后续平台资料解析写入，非用户手建的独立别名表。
-_Avoid_: 又名、昵称字典、手填别名列表
+**Library property**: Configuration attached to one Library and persisted through FRB/Rust SQLite: root/display name, startup/interval sync, formats, pinning and sidebar order.
+_Avoid_: application preference, Library settings form.
 
-**Creative platform**:
-Author link 的创作平台闭集，优先级为 Pixiv > X > Patreon > FANBOX > Discord；用于 Verified author 判定、Author alias 排序，以及 Author image 解析顺序。另有 Other 外链平台，但不属 Creative platform。
-_Avoid_: 社交平台（太泛）、把 Other 算进认证或形象优先级
+**Settings list–detail**: Responsive Settings navigation: wide screens show a primary settings list and selected category detail, defaulting to the first item; narrow screens navigate from a full-width list into detail. The app sidebar is hidden. Back exits Settings on wide screens and returns to the list from narrow detail.
+_Avoid_: app navigation rail, nested global sidebar.
 
-**Author link**:
-用户为 Author 手填的外链 URL；平台按 URL 主机名推断（无法识别者为 Other），不由用户选择。同一 Author 可有多条。Creative platform 上的链接参与 Verified author 与 Author image 解析；Other 仅供打开访问。
-_Avoid_: 社交账号绑定、OAuth、平台登录、手选平台
+**Tag**: Global named descriptive metadata attached to Comics and usable for filtering. Independent of Author, Parody, Character and Language.
+_Avoid_: all metadata facets collectively called Tags.
 
-**Author image**:
-Author 的视觉形象，分头像（avatar）与背景（background）两个位置，各自解析来源：先按 Creative platform 优先级取平台资料图，全部不可用时回退为该 Author 全库可见作品中自然序第一本 Comic 的封面（Comic 有用户指定封面页时以该页为准），再无则为空。Author 详情以高清位图显示 Author image，不复用为网格性能压缩的库缩略图规格；库缩略图只可作高清就绪前的过渡。平台图片地址已确认、文件尚未就绪时，详情可在该位置保留当前过渡图并叠加轻量加载提示；资料解析尚未得到图片地址时不进入该加载态。
-_Avoid_: Cover preview、作者封面、作者缩略图、Author profile picture
+**Tag dictionary import**: Idempotent import of a JSON name array or `{ "tags": [...] }` into the global dictionary: trim/discard empty names, skip exact-name matches, preserve existing Tags and do not attach Comics. ADR-0011.
+_Avoid_: EhTagTranslation integration, Comic metadata import.
 
-**Parody**:
-Comic 所同人化的原作 / IP 名（可多值）；无所属 IP 时可用字面值如「原创」。与 Folder series（本库 Series）无关。
-_Avoid_: Series、IP 系列、原作系列（易与 Folder series 混淆）；work（`djm` 旧 Kind 名）
+**Author**: Credited entity with a stable ID, mutable unique case-sensitive display name and optional links/details. Artists, circles and original creators share this type; legacy name-only data becomes an unverified Author. ADR-0024.
+_Avoid_: name-only string identity, separate Circle entity, Author profile as the domain name.
 
-**Character**:
-Comic 中出场人物名（可多值）；用于展示与筛选，与 Tag / Author 分列。
-_Avoid_: 角色标签（并入 Tag）、actor（`djm` 旧 Kind 名）
+**Verified author**: Author with at least one Creative platform link. Indicates in-app information completeness, not external official verification.
+_Avoid_: verified platform account, official badge.
 
-**Named metadata facet**:
-Comic 上可筛选的元数据面：Tag / Parody / Character 以「名称字符串」字典 + junction 全量 replace；Author 为稳定身份实体 + junction（显示名可变），管理入口仍与其它 facet 并列；Language 为 `comic_meta.languages` JSON 闭集特例。名字字典类 facet（Tag / Parody / Character）与 Author 稳定身份管线分开实现、各自演进，不强迫 Author 塞回纯名字字典模型。
-_Avoid_: 元数据字段（太泛）、标签族（易漏 Author / Language）
+**Author alias**: Platform display name differing from the Author's current display name; comparison/deduplication is case-sensitive. Derived from platform profiles, ordered by Creative platform priority and comma-joined; equal names are omitted.
+_Avoid_: manually maintained nickname dictionary.
 
-**Named facet attachment count**:
-某个 Named metadata facet 当前附着到多少 Comic（跨全部 Library 的可见附着；Author 按稳定身份计）。未附着的字典项 / Author 为 0。用于 Comic metadata form 候选排序、元数据管理页 Tag / Parody / Character chip 右侧计数等，不是阅读器 session 引用计数。
-_Avoid_: 引用次数、usage count、ref_count、热度
+**Creative platform**: Closed priority order Pixiv, X, Patreon, FANBOX, Discord for author verification, aliases and image resolution. Other links are excluded.
+_Avoid_: any social platform, Other contributing to verification.
 
-**Pinyin-assisted name match**:
-对 Named metadata facet 显示名的客户端名称过滤增强：拉丁查询除大小写不敏感 substring 外，还可按无调全拼或拼音首字母命中中文名；含汉字的查询仍只做显示名 substring。适用于元数据 MultiSelect、库页 metadata 筛选抽屉、元数据管理 Author/Tag 列表搜索；不适用于图书馆搜索栏的 facet token 精确匹配。
-_Avoid_: 拼音搜索引擎、fuzzy search、拼音索引、全文检索
+**Author link**: User-entered external URL, with platform inferred from its hostname. Multiple links are allowed; recognized creative links contribute to verification/images, Other links are navigation only.
+_Avoid_: OAuth binding, platform login, manually chosen platform.
 
-**Smart facet match**:
-Comic metadata form 候选列表的排序增强：在对应 Named metadata facet 全局字典内，将信号命中的名字排在 Named facet attachment count 之前，并在下拉候选行提示来源；不自动写入表单已选值，不从信号发明典外新名。Author 信号为三个独立来源的字典名 whole-string、大小写不敏感 substring 命中：Comic 标题、Resource 文件名（去扩展名）、相对 Library root 的 Resource 路径中全部父目录段；三源各自独立计分，同一名字命中源越多排序越靠前（标题与文件名相同时只计一次）；不解析方括号等命名惯例、不拆分括号内子串。Tag / Parody / Character 信号为同一非根 Folder series 内其它成员已附着的名字。是否启用由 **App preference** 在 MD3E 设置页开关（`smart_facet_match_enabled`，默认开启）；不在 Comic metadata form 内重复提供开关。
-_Avoid_: 智能匹配、自动打标、建议填充、引用次数排序（后者仅指 attachment count）
+**Author image**: Independently resolved avatar/background: use platform profile images by Creative platform priority, then the natural-order first visible Comic's cover across Libraries (respecting its selected cover page), otherwise empty. Details use high-resolution bitmaps; thumbnails are interim only. Show an image-loading indication after a URL is known, not while profile discovery is still pending. ADR-0025.
+_Avoid_: cover preview, Author thumbnail.
 
-**Comic catalog query**:
-库页 / 搜索共用的 Comic 目录查询：Dart 只组装筛选 intent（`LibraryComicFilter` / metadata expression）；谓词 SQL 集中在 core `comic/filter_predicate`（catalog 分桶与跨 facet 表达式共用 typed facet helpers）。
-_Avoid_: 内存 matches、在 Flutter 再写一份 WHERE
+**Parody**: Original work/IP referenced by a Comic, allowing multiple values or a literal original-work value. Unrelated to Folder series.
+_Avoid_: Series, legacy work kind.
 
-**Language**（Comic language）:
-Comic 文本所用语言的规范英文名有序列表（闭集首批：`Chinese`、`Japanese`、`English`、`Korean`、`Spanish`、`Other`）；空列表表示未知/未设。展示时按**界面语言**译为本地文案（如中文界面下 `Chinese`→「中文」、`Japanese`→「日语」），多项以 `|` 拼接；未在展示表中的值原样显示。与应用「界面语言」设置不是同一概念。
-_Avoid_: 界面语言、locale、译文语言；把 Language 做成自由 Tag
+**Character**: Character name attached to a Comic for display/filtering, separate from Tag and Author.
+_Avoid_: character Tag, legacy actor kind.
 
-**Content rating**:
-Comic 的内容分级：`unknown`、`safe`、`r18`；由用户设定。路径关键词自动检测（`auto_detect_content_rating`）已移除，勿恢复。浏览层隐藏 r18 用 **Healthy mode**，不改 Comic 自身分级。
-_Avoid_: 分级、年龄限制、路径自动标 r18
+**Named metadata facet**: Filterable Comic metadata: Tag/Parody/Character use name dictionaries and replace-all junctions; Author uses stable identity/junctions; Language is a closed JSON-list exception. Author and name-dictionary pipelines remain separate.
+_Avoid_: metadata field when facet identity matters, tag family.
 
-**Comic metadata form**:
-编辑 Comic 用户元数据（标题、概要、发布日期、Content rating、Author、Tag、Parody、Character、Language）时的可提交草稿；校验与 normalize、多值名增减与落库规则集中在此，非法结果以字段级返回由 UI 展示。保存时只提交相对打开时**值变化**的字段，这些字段会自动加上 Metadata field lock；无变化则不写库。表单旁可单独切换锁而不改值。
-_Avoid_: 漫画表单、元数据 DTO
+**Named facet attachment count**: Number of currently visible Comics attached to a facet across Libraries (by stable identity for Author), including zero for unused entries; used in candidate ordering and metadata chips.
+_Avoid_: session reference count, popularity, ref_count.
 
-**Needs metadata**:
-Comic 当前除标题外没有任何用户元数据的状态：无 Tag、Author、Parody、Character，Language 为空，无概要、无发布日期，Content rating 为 `unknown`。由现值派生，不是编辑历史；元数据来自用户还是扫描都不区分，Metadata field lock 不参与判定。库页 Comics Tab 用它筛出待整理的 Comic。
-_Avoid_: untagged、unstaged、未编辑、未整理（口语可用）
+**Pinyin-assisted name match**: Client-side name filtering: Latin input matches case-insensitive substrings or toneless full/initial pinyin; Han input uses display-name substrings only. Applies to facet selection and Author/Tag management search, not exact facet-token catalog search.
+_Avoid_: fuzzy/full-text search engine, pinyin catalog index.
 
-**Catalog selection mode**:
-库页 Comics Tab 漫画网格上短暂多选 Comic 的 UI 模式；跨页 `Set<comicId>` 供 **Comic metadata bulk patch** 编排；与 **Library reorder mode**、Series reorder mode 互斥。换库、筛选/排序变化或离库页路由时清空。不含搜索页。
-_Avoid_: 多选模式（口语可用）、批量选择（易与 bulk patch 混淆）
+**Smart facet match**: Default-enabled application preference improving metadata-form candidate order, never auto-selecting or inventing names. Author signals use whole dictionary names as case-insensitive substrings in title, filename without extension and relative parent path segments; independent matching sources raise rank, identical title/filename count once, and brackets are not specially parsed. Other name facets use attachments of sibling Comics in the same non-root Folder series. Signal matches precede attachment count and show their source; the toggle lives in Settings only.
+_Avoid_: automatic tagging, suggested values written without selection.
 
-**Comic metadata bulk patch**:
-对同一 Library 内 Comic 集合的一次稀疏用户元数据变更：用户仅启用需要修改的字段（多值字段可为添加、移除或整字段替换；标量字段可为替换或清除）。core 逐本 merge 后写库，实际写入的字段自动加上 Metadata field lock。Metadata field lock 不阻挡本次写入（锁防的是 Library sync / Metadata refresh 覆盖）。单次 batch 不可跨 Library。用户入口：**库页**（经 Catalog selection mode）与 **Series 详情**（成员快捷入口，跳过选择模式）。不是 Metadata refresh、Library sync，也不是单本 Comic metadata form。详见 ADR-0022。
-_Avoid_: 批量编辑（口语可用）、批量刷新、批量表单
+**Comic catalog query**: Shared Library/search query: Dart assembles filter intent; core owns SQL predicates and typed facet helpers.
+_Avoid_: duplicate Flutter WHERE implementation, in-memory matches.
 
-**Series metadata form**:
-编辑 Series 用户元数据（名称、连载状态、计划总卷数）时的可提交草稿；计划总卷数以原始文本持有，空串表示清除、正整数表示设置；校验失败以字段级结果返回，由 UI 在字段下方展示。保存时只提交相对打开时**值变化**的字段，这些字段会自动加上 Metadata field lock；无变化则不写库。表单旁可单独切换锁而不改值。
-_Avoid_: 系列表单、SeriesForm、编辑系列 DTO
+**Language**: A single Comic text-language value, canonically Chinese, Japanese, English, Korean, Spanish or Other; absence means unknown. Localize known names for display and preserve unrecognized imported values; unrelated to interface locale. ADR-0057.
+_Avoid_: UI language, translation language, free-form Tag.
 
-**Library form**:
-创建或编辑 Library 时的可提交草稿：显示名（必填）、Library root（Local 目录或 Remote WebDAV URL）、Remote 凭证（用户名/密码/allow HTTP；编辑时密码空表示保留）、Scan on startup、Scan interval、Supported resource formats。校验与落库规则集中在此；非法结果以字段级返回由 UI 展示。Local root 之间禁止相等或互相嵌套（对齐 Komga）。改 Local root 时保留 `libraryId`；若新根可读则按相对路径做 Path migration（含 Series），否则只写新根、不立刻迁移。不自动触发 Library sync。无变化则不写库。用户侧新建 Local / Remote library 均经此草稿（及 **Home / flyout 入口**），不以裸选目录或路径页捷径代替。详见 ADR-0014。
-_Avoid_: 库表单、LibraryForm DTO、Library settings form（旧称）、编辑库元数据；选中路径页作为建库入口
+**Content rating**: User-set unknown/safe/r18 Comic classification. Path-based automatic detection is retired. Healthy mode filters visibility without changing the rating.
+_Avoid_: automatic r18 path marking, age filter as stored rating.
 
-**Metadata field lock**:
-Comic / Series 元数据字段上的布尔锁（Komga 式）。未锁定且 Library sync 或 Metadata refresh 解析出有值时用扫描结果覆盖；已锁定则保留库内值；扫描空/缺不清除。编辑某字段并保存会自动锁定该字段（仅变更字段）；也可不改值单独上锁/解锁。解锁不自动触发 sync / refresh。Series 成员排序锁（`sortOrderLocked`）同属此策略（见 ADR-0006）。合并与自动上锁规则集中一处，供 Library sync、Metadata refresh 与用户元数据写入共用。详见 ADR-0007。
-_Avoid_: 只读标记、冻结、保护位（口语可用，领域用 Metadata field lock）
+**Comic metadata form**: Validated/normalized editable draft for title, summary, release date, rating and facets/languages. Save only values changed from the opening snapshot and automatically lock those fields; unchanged drafts do not write. Locks may also be toggled without value changes; report validation per field.
+_Avoid_: metadata DTO, generic Comic form.
 
-**Metadata refresh**:
-从 Resource 重解析元数据并按 Metadata field lock 写回的操作（对齐 Komga「Refresh metadata」），作用对象可为单个 Comic、单个 Series，或指定 Library（**Home 库列表行内**对该库 `libraryId`）。Comic：经 Resource access 重解析，更新物理字段，不动缩略图。Series：对每个成员执行 Comic 刷新，并在 `name` 未锁定时用文件夹名覆盖；不改连载状态、计划总卷数、成员排序与缩略图。Library：对该库全部 Comic 执行 Comic 刷新，并对该库 Series 在 `name` 未锁定时用文件夹名覆盖（其余 Series 字段规则同 Series 级）。部分成员失败则跳过并汇总；可取消（已写回保留、不回滚）。Remote library 根不可达时跳过该库且不改已有数据。与 Library sync 共用 core 库级写锁（全局单飞，占用则立即失败不排队）；互斥不在 Flutter 编排层重复实现。UI 不展示实时进度，仅 busy 态与结束汇总。不是库页工具栏的「刷新」（后者仅重载 UI catalog），也不是 Library sync（不 orphan 删除、不重建成员排序、不再生缩略图）。
-_Avoid_: 刷新、重新扫描、同步（易与 UI catalog refresh / Library sync 混淆）
+**Comic aggregate write set**: Comic row, metadata/field locks and facet junctions committed in one Rust transaction. Core owns partial updates, merging and atomicity; Dart only projects values and computes draft diffs. ADR-0002/0026/0041.
+_Avoid_: ComicAggregate class in Dart, frontend transaction.
 
-**Metadata backup**:
-Comic 用户元数据（含 Metadata field lock 状态与 orphan 字典项）的 JSON 快照文件（`.hlmeta.json` / `.hlmeta.json.gz`），由用户手动导出或自动备份产生，用于外置保存与跨库恢复。
-_Avoid_: 元数据导出文件（口语可用，领域与 UI 用 Metadata backup）
+**Needs metadata**: No user metadata other than title: no facet attachments, languages, summary or release date, and rating unknown. Derived from current values regardless of provenance or field locks, not editing history.
+_Avoid_: untagged, unedited, unstaged.
 
-**Metadata backup import**:
-从 Metadata backup 文件恢复 Comic 用户元数据的手动操作：按三级匹配（comic_id → normalized_path → library_id+relative_path）定位库内 Comic，匹配成功则覆盖元数据并强制全部 Metadata field lock；未匹配或歧义项跳过。设置页单行入口。
-_Avoid_: 导入备份、dry-run（用户文案不用；代码内部可用 preview）
+**Catalog selection mode**: Temporary cross-page Comics-tab multi-selection supplying IDs for bulk patch; excludes Library/Series reorder modes. Clears on Library/filter/sort/route changes and is absent from search.
+_Avoid_: bulk patch itself, generic batch mode.
 
-**Metadata backup import preview**:
-Metadata backup import 写入前的只读预演：执行与 import 相同的匹配规划，返回将恢复 / 未找到 / 歧义计数与示例摘要，不写入 SQLite（含 orphan 字典项）。确认 dialog 展示预演结果后再决定是否 import。
-_Avoid_: dry-run（用户文案用「导入预演」）
+**Comic metadata bulk patch**: Sparse update of selected fields for Comics in one Library. Multi-value fields add/remove/replace; scalars replace/clear. Core merges per Comic and locks written fields; existing locks do not block user writes. Enter from Library selection or Series member shortcuts. ADR-0022.
+_Avoid_: batch refresh, single-Comic form, Library sync.
 
-**Healthy mode**:
-应用级浏览过滤：开启后库、搜索、历史等视图隐藏 `contentRating == r18` 的 Comic；不修改 Comic 自身的分级。
-_Avoid_: 安全模式、青少年模式、R18 过滤
+**Series metadata form**: Validated draft for name/status/planned volumes. Planned volumes retain raw text (empty clears, positive integer sets). Save changed values only and auto-lock them; locks can change independently; validation is per field.
+_Avoid_: SeriesForm DTO, Series metadata entity.
 
-### Design & UI
+**Library form**: Validated creation/edit draft for required display name, local/WebDAV root, remote credentials (blank edit password preserves it), allow-HTTP and sync/formats settings. Local roots cannot equal/nest each other. Changing a readable local root preserves libraryId and migrates relative Comic/Series paths; an unreadable root is saved without immediate migration. No automatic sync or unchanged-draft write; all creation uses this form. ADR-0014.
+_Avoid_: bare directory selection as creation, Library settings form.
 
-**MD3E design system**:
-生产主壳的 Material 3 Expressive 取向设计系统（Cutover 主体已完成）。实现落在 `shared/ui` 与各 feature 的 MD3E 页；主题经 `buildAppTheme` 单源装配。壳层与组件色消费以 **M3E color roles** 为主；品牌 seed 定稿为配色方案「紫罗兰色」（`kBrandSeedColor` / 与偏好 `violet` 同色）。不替代 Rust 业务真值。
-_Avoid_: M3 皮肤（太泛）、新主题（未指明 MD3E）、仍称并行于 Baseline
+**Metadata field lock**: Per-field protection from sync/refresh overwrite. Unlocked values are replaced only by parsed nonempty values; absent scan values never clear data. User-changed saved fields auto-lock; independent lock/unlock does not trigger sync/refresh. Series member ordering follows the same policy. Core centralizes merging. ADR-0006/0007.
+_Avoid_: read-only flag, freeze, lock preventing explicit user edits.
 
-**Tone-based color system**:
-以 HCT 的 tone（感知亮度）与角色间 tone 差为骨架、从 seed 派生整套颜色角色的约定；是 MD3E design system 的色真源模型，不绑定某个固定 hex。
-_Avoid_: toneBased（壳层 surface 配对 API）、HCT 系统（单指色空间时）
+**Metadata refresh**: Reparse a Comic, Series members or Library through Resource access and merge under field locks. Update Comic physical metadata without rebuilding thumbnails; Series refresh may update an unlocked folder name but not status/planned volumes/member order. Skip/report individual failures and retain writes on cancellation. Unreachable remote roots preserve data. Core shares a global single-flight library write lock with sync, failing immediately when busy. UI shows busy/completion summary, not live progress. No orphan cleanup or membership rebuilding.
+_Avoid_: UI catalog reload, Library sync, rescan.
 
-**动态配色**:
-系统壁纸 / 系统强调色取色；开启后以平台 `ColorScheme.primary` 为 seed 进入 Tone-based 装配，并禁用手动配色方案设置项。
-_Avoid_: Monet（Android 实现绰号）、dynamic scheme variant（MCU 的 fidelity/tonalSpot 等）
+**Resource metadata embedding**: Persisting in-app Comic metadata into its original Local Resource for use outside the application. Distinct from Metadata refresh, which reads Resource metadata into the catalog, and Metadata backup, which creates a separate restore snapshot.
+_Avoid_: Metadata refresh, Library sync, metadata backup as synonyms for source modification.
 
-**Reader color extension**:
-阅读器沉浸场景专用的小范围主题色扩展；画布等沉浸底恒暗、不随应用浅色主题变浅；强调色（滑块/激活钮）从当前壳层 `ColorScheme` 派生以跟配色 / 品牌 seed。
-_Avoid_: HentaiColorScheme（整表语义扩展）、阅读器跟主题（指跟壳层明暗把阅读底变浅时）
+**Media page**: A Home-linked dashboard summarizing Local Comic Resources and automatic Resource metadata embedding, with per-Library opt-in settings. Individual Comic metadata inspection, Library management and Comic trash are deferred. ADR-0058.
+_Avoid_: global Library manager, metadata dictionary management, manual export queue.
 
-**Baseline UI**:
-历史 Fluent 取向共享 UI / 主题装配；Cutover 主体完成后**不再**是生产功能视图主壳。残余命名或个别遗留控件属收尾债，不表示双轨仍在。
-_Avoid_: 旧主题、老 UI、legacy 皮肤（作现行主壳时）
+**Metadata backup**: JSON snapshot of Comic user metadata, locks and orphan dictionary entries (`.hlmeta.json` / `.hlmeta.json.gz`), manually or automatically exported for external storage/restoration.
+_Avoid_: database backup, Resource snapshot.
 
-**MD3E preview page**:
-仅在 MD3E 设计系统内、用假数据或 Widgetbook 组装的整页预览，用于设计验收；不是带 ViewModel 的**功能视图**。
-_Avoid_: 预览 View、md3e 功能页
+**Metadata backup import**: Manual restore matching comic_id, then normalized_path, then library_id+relative_path. Matched entries overwrite metadata and force all field locks; missing/ambiguous entries are skipped. Enter through Settings.
+_Avoid_: implicit restore, dry-run as user-facing terminology.
 
-**MD3E Lab**:
-Cutover 前在独立模块与 Widgetbook 中建设 MD3E 栈、不改生产 feature 的阶段。生产 Lab 包路径 `app/lib/md3e/` 已删除；预览面留在 `app/widgetbook/`。
-_Avoid_: 全仓换肤阶段、仍存在的生产 Lab 双轨
+**Metadata backup import preview**: Read-only use of the same matching plan to report restore/missing/ambiguous counts and examples before confirmation. Writes nothing, including orphan dictionary entries.
+_Avoid_: committing import, dry-run in user copy.
 
-**MD3E Pilot**:
-Cutover 前单个 feature（首选应用设置）可选接入 MD3E 组件与主题、做真数据与路由验证的阶段；主体已完成，条目保留供读 ADR/历史 PR。
-_Avoid_: Beta 换肤
+**Healthy mode**: Application-wide browse filter hiding r18 Comics from Library/search/history without altering stored Content rating.
+_Avoid_: youth/safety mode, rating mutation.
 
-**MD3E Cutover**:
-按 feature 将生产 UI 从 Baseline UI 迁到 MD3E 并收缩双轨。主体已完成（路由 MD3E 化、Lab 删除、主题单源）；生产库管理路径文件名已去 `md3e_` 前缀（如 `production_shell_adapters`）。剩余主要为 Widgetbook/Lab 目录与个别文档命名收尾。完成判定与 spec 分批规则见 ADR-0031。
-_Avoid_: 大重构（无阶段含义时）
+## Design and UI
 
-**MD3E pattern**:
-MD3E 内按产品场景命名的 UI 组合块（如设置分组列表），仅通过通用 props 与 callback 交互，不 import 领域类型或 feature。
-_Avoid_: 业务组件（若指 feature 内编排）、设计 pattern 混指 Figma 帧
+**Module ownership**: Complete visual/interaction behavior belongs to the design system; product workflows, domain presentation and collaboration belong to feature owners/shared product UI. For domain contracts, the producer owns them unless importing it violates a forbidden edge, creates a public cycle or is required by shared code. Shared domain vocabulary, application signatures, UI contracts and provider tokens use their corresponding shared layers, with implementations bound in composition. ADR-0045/0051/0053.
+_Avoid_: most consumers determine ownership, all Ports in shared, unspecified shared component.
 
-**ViewObject**:
-屏级 UI 展示用的聚合只读数据，类名后缀 `ViewObject`（如 `ComicDetailViewObject`）。由 Route page / Display layout 消费；不是 FRB/传输载荷，也不是菜单碎件。
-_Avoid_: Entry（指屏级聚合时）、View、Dto、ViewModel（状态/命令见 ADR-0017）
+**Design system**: The application's complete visual/interaction system: theme/tokens, layout/motion, keyboard/focus/accessibility, component state and complex inputs. Uses presentation data/callbacks rather than business queries/navigation. Application dependencies stay within `app/lib/design-system/`; sole public entry is `design_system.dart`. ADR-0053.
+_Avoid_: style collection only, every shared UI element, M3E wrapper layer only, root documentation archive.
 
-**Route page**:
-生产路由绑定的功能页 Widget；去 `Md3e` 前缀后类名以 `Page` 结尾（如 `ComicDetailPage`，原 `ComicDetailMd3ePage`）。持 ViewModel / Facade，组装真数据进 ViewObject。不是 MD3E preview page，也不是无路由的展示壳。
-_Avoid_: Md3ePage（新代码）、View（作路由页类名时）、把 Lab 展示壳叫 Page
+**MD3E design system**: Material 3 Expressive direction of the production UI, assembled through the single buildAppTheme source. Design-system components use M3E color roles and the violet brand seed; product adapters remain with shared UI/features.
+_Avoid_: parallel Baseline theme, new skin without naming the system.
 
-**Display layout**:
-展示壳或 Lab / 预览用布局 Widget，类名以 `Layout` 结尾（如 `ComicDetailLayout`）。消费 ViewObject 拼视觉结构；故意不用 `*View`，以免与 ViewObject、MVVM View 抢名。不是阅读器的 Scroll layout / Paged layout，也不是 ADR-0027 shared Layout 层的泛称。
-_Avoid_: View（展示壳类名）、Page（无生产路由绑定时）
+**Tone-based color system**: Seed-derived color-role system based on HCT perceptual tone and role tone differences, not a fixed hex palette.
+_Avoid_: toneBased surface-pair API, HCT color space alone.
 
-菜单碎件可继续 `*Entry`；FRB / 跨边界传输仍 `*Dto`。二者都不是 ViewObject。
+**Dynamic color**: Platform wallpaper/accent color used as the seed of tone-based theme assembly; enabling it disables manual palette selection.
+_Avoid_: MCU dynamic scheme variant, Monet as the cross-platform domain name.
 
-### Reading
+**Reader color extension**: Focused Reader theme extension whose immersive canvas remains dark even in light application themes; accent roles follow the current shell ColorScheme.
+_Avoid_: HentaiColorScheme, making the reading canvas follow shell brightness.
 
-**Read session**:
-由 comicId 打开的阅读会话；不区分「单本 / 系列」两种模式。进度只写入 Reading history。入口参数仅为 comicId（及无痕等开关），不传 seriesId。退出阅读器一律回到该 Comic 的详情页。Local library 可读本地文件；Remote library 经 Resource access 流式读取，不整本缓存到磁盘。详见 ADR-0005。
-_Avoid_: Standalone read、Series read、单本模式、系列模式、Comic read（易与 Comic 实体混淆）
+**Baseline UI**: Historical Fluent-oriented UI/theme, replaced as the production shell by MD3E Cutover. Residual names/components do not imply two active production systems.
+_Avoid_: current legacy shell, parallel production skin.
 
-**Series reading context**:
-由 comicId 在 core 侧派生的可选系列信息（seriesId、系列名、有序成员 comicId 列表、当前下标）；供阅读器展示位置、上一卷/下一卷与卷列表跳转。不是会话模式，也不持久化进度。无系列归属时为空。卷列表项展示标题由 Flutter 用现有 Comic 标题格式拼出（如 `{序号}-{title}`）。详见 ADR-0005。
-_Avoid_: 系列阅读模式、Series read、系列会话
+**MD3E preview page**: Whole-page mock-data/Widgetbook composition for visual acceptance, separate from a production route with a ViewModel.
+_Avoid_: production feature view, route page.
 
-**Reading history**:
-用户对某 Comic 最近一次阅读的时间与页码记录；跨 Library 全局保留与展示。从库/详情/历史等重新打开该 Comic 时恢复页码；阅读器内切到同系列另一卷时，先落盘当前 Comic 进度（无痕除外），目标卷从第 1 页打开。无痕 Read session 不读写 Reading history。
-_Avoid_: 阅读记录、系列进度、Series reading history
+**MD3E Lab**: Historical pre-Cutover development stage. The production `app/lib/md3e/` package is retired; previews remain under `app/widgetbook/`.
+_Avoid_: current production Lab module, active dual UI tracks.
 
-**Reading progress (history list)**:
-历史列表等界面展示的「当前页 / 总页数」。当前页来自 Reading history；总页数对应该 Comic 的编目页数，不是 Reading history 的持久化字段。
-_Avoid_: 进度条数据、page count 字段（口语）
+**MD3E Pilot**: Completed stage connecting one feature (initially Settings) to MD3E components/theme with real data/navigation; retained for historical ADRs/PRs.
+_Avoid_: beta skin.
 
-**Scroll layout**:
-阅读器纵向连续滚动的版式；适用于长条阅读体验。
-_Avoid_: Webtoon 模式（易与作品类型混淆）、卷轴模式
+**MD3E Cutover**: Feature-by-feature replacement of Baseline UI with MD3E and consolidation to one theme. The main cutover is complete; remaining preview/historical names do not reopen dual tracks. ADR-0031.
+_Avoid_: unspecified large refactor.
 
-**Paged layout**:
-阅读器分页翻页的版式；逐页切换而非连续滚动。
-_Avoid_: 翻页模式、单页模式
+**MD3E pattern**: UI composition named for a product scenario, communicating through ordinary data/callbacks without importing domain or feature code.
+_Avoid_: feature orchestration, Figma frame as implementation truth.
 
-**Page image fidelity**:
-Read session 中页图按源位图保真显示：不为滚动帧率升降 `FilterQuality`、不做锐化/美颜类「画质升级」，也不为性能故意降采样算法档位。为适配视口与内存可做 `cacheWidth` 等布局约束解码，但 GPU 采样须稳定、利于正确下采样（实现上固定 `FilterQuality.medium`；禁止静止态升到 `high`——网点漫画易出摩尔纹）。**本策略优先于**阅读器 UI 性能优化建议。库封面/缩略图不在此约束内。
-_Avoid_: 滚动降画质、静止升画质、FilterQuality.high 页图、锐化增强阅读
+**ViewObject**: Aggregate immutable screen presentation data, named `*ViewObject`, consumed by route pages/display layouts. Not a transport DTO or a state/command ViewModel.
+_Avoid_: Entry for a screen aggregate, View, Dto, ViewModel.
 
-**Page image copy**:
-用户在 Read session 中，将某一页的位图写入系统剪贴板的动作（便于粘贴分享）；对象是页的位图，不是 Comic 封面或库缩略图。
-_Avoid_: 复制图片、分享图片、导出页面、保存图片（口语可用；领域与 issue 用 Page image copy）
+**Route page**: Production route-bound `*Page` Widget that consumes a ViewModel and assembles real data into presentation inputs.
+_Avoid_: Md3ePage in new production code, View as the route class suffix, preview shell called Page.
 
-**Auto-play mode**:
-应用级阅读偏好：末 spread 满间隔后的边界行为（单本播放 / 单本循环 / 系列播放 / 系列循环）。默认单本播放并持久化；自动播放开关本身是会话态、不持久化。系列能力派生自 Series reading context，不改变 Read session 模型。
-_Avoid_: 单本模式、系列模式、Series read、自动翻页模式（口语可用；领域与 issue 用 Auto-play mode）
+**Display layout**: Presentation/preview `*Layout` Widget consuming ViewObject data to assemble visuals. Distinct from reading layout modes and the general layout layer. Menu fragments may retain `*Entry`; boundary payloads use `*Dto`.
+_Avoid_: View as the display-shell suffix, Page without a production route.
+
+## Reading
+
+**Reader**: Product module `features/reader/`: page IO, viewport/chrome, settings, Series volume navigation and Read session orchestration. ADR-0038; names in [reader-ddd-lexicon.md](docs/engineering/reader-ddd-lexicon.md).
+_Avoid_: read_session module, Reading module ambiguous with history/stats.
+
+**Read session**: Lifecycle opened by comicId (plus options such as incognito), with no separate standalone/Series modes or seriesId input. Progress belongs only to Reading history. Exit returns to the Comic detail page. Remote Resources stream without whole-book disk caching. Entity/orchestration belong to Reader. ADR-0005/0038.
+_Avoid_: Standalone read, Series read, Comic read, Read session as the module name.
+
+**Series reading context**: Optional core-derived seriesId/name/ordered Comic IDs/current index for volume navigation. Not a session mode or progress record. Absent when no Series applies; Flutter formats member titles using the existing indexed Comic title convention.
+_Avoid_: Series session, Series reading mode.
+
+**Reading history**: Global per-Comic last-read time/page across Libraries, used when reopening. Switching volumes flushes the current Comic's progress and opens the target at page one. Incognito sessions neither read nor write history. Clearing history leaves activity statistics intact.
+_Avoid_: Series progress, Reading activity stats.
+
+**Reading progress (history list)**: Current history page divided by catalog Comic page count; total pages are not a persisted history field.
+_Avoid_: independent history page-count storage.
+
+**Reading activity stats**: Lifetime Finished comic count and Reading duration, persisted by reading_stats and shown on Home, independent of catalog counts/history.
+_Avoid_: Home page counts, history statistics.
+
+**Finished comic**: A Comic whose non-incognito session first reaches its last catalog page (page count must be positive). The distinct-Comic mark is sticky across later page-count changes; visibility excludes trashed/missing Comics, restore re-enables retained marks, purge/Library deletion removes them, and Path migration rekeys them. Existing completed history can backfill marks. No ten-second requirement or manual mark-as-read action.
+_Avoid_: viewed Comic, manual mark as read.
+
+**Reading duration**: Foreground time from non-incognito sessions qualifying at ten seconds; once qualified, all elapsed reading time including the first ten seconds counts. Stop on exit/background. Lifetime accumulated duration is neither backfilled nor reduced by trash/purge; no daily aggregation, idle cap or user reset in the initial scope.
+_Avoid_: estimated reading time, Time to Read, remaining duration.
+
+**Scroll layout**: Continuous vertical Reader layout.
+_Avoid_: Webtoon as a work classification or ambiguous mode name.
+
+**Paged layout**: Reader layout advancing through discrete pages rather than continuous scrolling.
+_Avoid_: single-page-only mode.
+
+**Page image fidelity**: Preserve source bitmap appearance in a Read session. Keep GPU sampling fixed at `FilterQuality.medium` for stable downsampling; do not change quality for scrolling/idle state, sharpen/beautify, or switch to high at rest (moire risk in screened artwork). Viewport/memory-constrained decoding such as cacheWidth is allowed. This rule overrides Reader performance-tuning advice and excludes catalog covers/thumbnails.
+_Avoid_: scroll quality reduction, idle quality boost, FilterQuality.high for page images, enhanced/sharpened reading.
+
+**Page image copy**: Copy a page bitmap from a Read session to the system clipboard, distinct from Comic covers/thumbnails or saving/exporting files.
+_Avoid_: share image, export page, save image.
+
+**Auto-play mode**: Persisted application preference for end-spread behavior after a full interval: single Comic, Comic loop, Series play, Series loop (default: single Comic). The enabled switch is session-only. Series capability derives from Series reading context and does not create a new session model.
+_Avoid_: single/Series session modes, Series read.

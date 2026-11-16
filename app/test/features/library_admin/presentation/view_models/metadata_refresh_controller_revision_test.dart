@@ -1,16 +1,15 @@
 import 'dart:async';
 
-import 'package:hentai_library/features/library_admin/di/metadata_refresh.dart';
+import 'package:hentai_library/features/library_admin/presentation/providers/metadata_refresh_providers.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/metadata_refresh_controller.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/scan_library_controller.dart';
 import 'package:hentai_library/features/library_admin/domain/metadata_refresh_port.dart';
 import 'package:hentai_library/features/library_admin/domain/metadata_refresh_types.dart';
-import 'package:hentai_library/shared/domain/ports/library_revision_port.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:riverpod/riverpod.dart';
 import 'package:test/test.dart';
+import 'package:hentai_library/composition/overrides/domain_event_bus_overrides.dart';
 
 class _ScriptedRefreshAdapter implements MetadataRefreshPort {
   _ScriptedRefreshAdapter({this.onRefreshComic, this.onRefreshLibrary});
@@ -51,15 +50,6 @@ class _ScriptedRefreshAdapter implements MetadataRefreshPort {
   }
 }
 
-class _FakeLibraryRevisionPort implements LibraryRevisionPort {
-  _FakeLibraryRevisionPort(this._events);
-
-  final StreamController<void> _events;
-
-  @override
-  Stream<void> watchRevision() => _events.stream;
-}
-
 class _IdleScanLibraryController extends ScanLibraryController {
   @override
   ScanLibraryState build() => const ScanLibraryState();
@@ -67,7 +57,6 @@ class _IdleScanLibraryController extends ScanLibraryController {
 
 void main() {
   test('refreshComic bumps library revision after success', () async {
-    final StreamController<void> events = StreamController<void>.broadcast();
     final ProviderContainer container = ProviderContainer(
       overrides: <Override>[
         metadataRefreshPortProvider.overrideWithValue(
@@ -77,9 +66,7 @@ void main() {
             },
           ),
         ),
-        libraryRevisionPortProvider.overrideWithValue(
-          _FakeLibraryRevisionPort(events),
-        ),
+        ...domainEventBusOverrides(),
         scanLibraryControllerProvider.overrideWith(
           _IdleScanLibraryController.new,
         ),
@@ -97,7 +84,6 @@ void main() {
   });
 
   test('refreshLibrary does not bump revision when skipped', () async {
-    final StreamController<void> events = StreamController<void>.broadcast();
     final ProviderContainer container = ProviderContainer(
       overrides: <Override>[
         metadataRefreshPortProvider.overrideWithValue(
@@ -113,9 +99,7 @@ void main() {
             },
           ),
         ),
-        libraryRevisionPortProvider.overrideWithValue(
-          _FakeLibraryRevisionPort(events),
-        ),
+        ...domainEventBusOverrides(),
         scanLibraryControllerProvider.overrideWith(
           _IdleScanLibraryController.new,
         ),

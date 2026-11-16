@@ -1,198 +1,111 @@
-# Gate 与测试缝
+# Tests and CI
 
-**决策**：ADR-0018（三层缝、CI tier 词汇）、ADR-0002（业务真值在 Rust）、**ADR-0033**（feature `application/`）、**ADR-0034**（cross-feature `public/`）。**Job 列表以** `.github/workflows/gate.yml` **为准**；本地与 CI 同源：`./scripts/run-gate.sh`。
+ADR-0018 defines the test seams. Rust owns sync/read/database business truth (ADR-0002). `.github/workflows/gate.yml` owns the PR job list and SDK/codegen versions; `scripts/run-gate.sh` supplies the same commands locally and in CI.
 
-**Wayfinder `lib/` 顶层目录**（Phase A/B）：`app/test/gate/lib_layout_scan_helpers.dart` · `project_layout_test.dart`。产品 feature 之间 **仅允许** import `features/<owner>/public/**` 或 `features/<owner>/public.dart`（M1）；`shared/**` **禁止** import feature public（R11）。
+## Run checks
 
-**工具链**：CI 固定 **Flutter 3.47.8**（`gate.yml` → `FLUTTER_VERSION`）。本地请用同 major/minor 的 stable；`flutter analyze` 在 GitHub Actions（`CI=true`）下会将 info 级 lint 也计为失败。`riverpod_lint` 为可选 dev 依赖（不依赖 `custom_lint`）；**Gate 的 `flutter analyze` 暂未挂 `plugins: riverpod_lint`**，避免未偿还的 Riverpod 风格债挡合并。本地可在 `analysis_options.yaml` 临时启用做增量清理。SDK 升级记录见 `docs/engineering/flutter-3.47-migration.md`。
+From the repository root, run `./scripts/run-gate.sh` for all hard gates, or pass relevant steps:
 
-## 命令
+```bash
+./scripts/run-gate.sh rust-lint rust-test
+./scripts/run-gate.sh dart-static dart-lint dart-test
+./scripts/run-gate.sh codegen-drift
+```
 
-| 场景 | 命令 |
-|------|------|
-| PR 硬门禁（全量） | `./scripts/run-gate.sh` |
-| 子集 | `./scripts/run-gate.sh rust-test dart-static dart-test` |
-| 合并前 UI 怀疑回归 | 再跑 `cd app && flutter test`（含慢轨，**不进 Gate**） |
-| Import 边界 | `cd app && flutter test test/gate/import_boundary_test.dart` |
-| Shared UI 无 feature import | `cd app && flutter test test/gate/shared_ui_no_feature_import_test.dart` |
-| Dart 测试盘存（inventory + rubric） | `python scripts/audit_dart_tests.py`（可选 `--summary-json` / `--json`；见下节） |
+Use `./scripts/run-gate.sh --help` for step details. `dart-test` first builds the host hentai_flutter cdylib, then runs `app/test/gate/manifest.txt`. `codegen-drift` regenerates FRB/build_runner outputs in place and compares all tracked/untracked changes under app/core with HEAD; commit relevant work before running it. Use a local SDK aligned with CI; CI treats analyzer info diagnostics as failures.
 
-`codegen-drift` 会就地重生成；跑前请先提交或 stash。
+For focused Flutter checks, run `flutter test <path>` from `app/`. For full UI regression checks, run `flutter test` after building the host cdylib. Regenerate localization with `flutter gen-l10n` when ARB inputs change. Platform smoke tests under `integration_test/` use `*_smoke_test.dart`, run through Watch/Release, and stay outside the hard manifest. Sync/WebDAV end-to-end business tests belong in Rust.
 
-## 三层缝（测什么）
+## Test seams and harnesses
 
-| 缝 | 位置 |
-|----|------|
-| Rust 业务 | `core/` + `tests/common/` harness → `gate-rust-test` |
-| FRB 线缝 | `app/test/frb_wire/`（`frb_wire_harness.dart`）→ manifest |
-| Dart 薄边 | mapper/guard/adapters → `app/test/shared/data/{frb,mappers}/`、`test/features/*/data/` · 见 [`feature-data-layout.md`](./feature-data-layout.md) |
-| UI 快轨 | 列入 `app/test/gate/manifest.txt` 的 UI/逻辑 |
-| UI 慢轨 | `test/shared/ui`、`test/features` 未进 manifest 部分 → `nightly-dart-ui` |
+- Rust business/DB tests: `core/crates/core/tests/`, shared harness `tests/common/`.
+- FRB wire contracts: `app/test/frb_wire/`; the harness finds the host cdylib in `core/target/{debug,release}` or `HENTAI_FLUTTER_LIB`. Wire smoke databases remain in the OS temporary directory (`frb_wire_*`) for manual cleanup, following the repository's file-removal policy.
+- Dart thin edges: owner domain/application/infrastructure, mappers, guards and injected capabilities. Do not repeat Rust business flows against real FRB repository implementations.
+- Observable UI contracts: use `test/support/pump_localized_app.dart` (pumpLocalizedApp) for product UI; `pump_design_system_app.dart` for independent design-system components. Existing `pumpApp`, fakes and `configureTestView` cover host/provider/view setup. Avoid copying MaterialApp/localization boilerplate; calendar tests may need their specialized localization host.
 
-业务 sync/read/DB：**信任 `cargo test`**。Dart **不要**对真 FRB / `*_repository_impl` 写全流程集成测。
+## Manifest and nightly
 
-## Gate manifest（唯一扩门禁入口）
+`app/test/gate/manifest.txt` is the single fast-track selection source; `manifest_test.dart` checks paths and duplication. A directory entry includes all tests below it; do not also list its descendants. Promote a test only when it asserts an observable contract, uses the shared harness, and passes three consecutive focused runs. Inject time when needed. Add its path to the appropriate manifest section and list additions in the PR; do not add another workflow.
 
-- 路径表：`app/test/gate/manifest.txt`（`manifest_test.dart` 自检存在、无重复）。
-- 新增快轨 data 契约测或 UI：只改 manifest + PR 说明列出路径；**不要**新 workflow 软门禁。
+The inventory's slow track is every test outside the expanded manifest. Nightly's `nightly-dart-coverage` job runs all `app/test` tests once with coverage, including both fast and slow tracks. ADR-0059 replaces the separate `nightly-dart-ui` run described in ADR-0018; no UI assertions are dropped. Nightly also collects hentai-core Rust coverage; see `.github/workflows/nightly.yml`. Platform integration tests remain in Watch and are outside this Dart coverage run.
 
-### 快轨晋升检查清单
+```bash
+python scripts/audit_dart_tests.py --summary-json
+python scripts/audit_dart_tests.py --json
+python scripts/audit_dart_tests.py --rubric candidate-retire --slow-only
+python scripts/audit_dart_tests.py --compile-smoke-only
+python -m unittest discover -s scripts -p test_audit_dart_tests.py
+```
 
-1. 可观察契约，不绑私有结构。
-2. 本地连续 3 遍稳定；时间逻辑注入 clock。
-3. 用 `app/test/support/`（`pumpLocalizedApp` 等），不复制 MaterialApp 样板。
-4. 路径写入 manifest 对应分节。
+The rubric is an audit heuristic, not permission to delete tests: architecture-guard protects structural rules, thin-edge protects adapter/contract seams, ui-contract covers observable behavior, candidate-retire flags slow-track files for review. `--compile-smoke-only` flags files whose assertions only check imported symbols with `isNotNull`; verify each result manually because compilation already checks names, but a test may intentionally document its public API. The script reports live counts; do not copy count snapshots into this guide.
 
-## Dart 测试盘存与分类 rubric
+Demotion requires a PR listing each path, rubric and reason, plus manifest/self-test updates. Protect architecture/layout, FRB wire, thin-edge and minimum App/Lab smoke coverage unless paired with the corresponding rule/ADR migration. Keep a demoted test until a successful focused run or nightly validates it; retire it in a later PR linked to that decision. Check actual nightly path selection before claiming coverage. Moves retain existing assertions and fast-track coverage.
 
-Epic [#447](https://github.com/Zoti321/hentail_library/issues/447) 清理 Flutter 侧测试时，用 **`scripts/audit_dart_tests.py`** 做可重复盘存（**不进 gate CI**；nightly 或 maintainer 本地可选附带 `--summary-json` 输出）。
+## Dart analysis
 
-### 运行
+The package analysis options inherit Flutter's recommended lints, enable strict
+casts, inference and raw types, and check discarded/unawaited futures. Context
+usage across asynchronous gaps and deprecated API diagnostics are not globally
+suppressed. Await dependent work, return its future, or explicitly mark independent
+work with `unawaited`; the latter does not handle errors. Preserve the existing
+error recipient or add one at the owning boundary when needed.
 
-| 命令 | 输出 |
-|------|------|
-| `python scripts/audit_dart_tests.py` | 总数、manifest 展开覆盖数、慢轨数、rubric 计数、慢轨分桶 |
-| `python scripts/audit_dart_tests.py --summary-json` | 同上（JSON，无逐文件列表） |
-| `python scripts/audit_dart_tests.py --json` | 含每个 `*_test.dart` 的 tier + rubric |
-| `python scripts/audit_dart_tests.py --rubric candidate-retire --slow-only` | 仅列出慢轨且标记为 candidate-retire 的路径 |
+Riverpod lint runs as a top-level analyzer plugin through `dart-static`, using the
+version declared in the analysis options. Keep it compatible with the dependency
+and CI SDK. Plugin ignores use the `riverpod_lint/` diagnostic prefix and must be
+local with an adjacent reason. Existing exceptions cover imperative edit/cursor
+observations, test fixture instrumentation, bootstrap scopes hidden behind host
+widgets, and deliberate short-lived reads/subscriptions. They do not authorize
+blanket exceptions for new code or extending provider lifetimes to silence lints.
+UI context and image decoding stay in UI adapters; providers receive callbacks.
 
-单元测：`cd scripts && python -m unittest test_audit_dart_tests.py -v`。
+Analyzer still checks generated code for type errors. FRB 2.13 emits an opaque
+`RustArcStaticData` without inferable generic arguments. Its generator preamble
+suppresses only `inference_failure_on_instance_creation` in generated FRB output;
+remove that workaround when the generator supplies the type. Do not hand-edit
+generated output or exclude all generated files from Analyzer.
 
-### tier 与 nightly
+## DCL
 
-| tier | 含义 | CI |
-|------|------|-----|
-| **gate-fast** | 路径落在 `manifest.txt` 展开集合内 | `gate-dart-test` |
-| **slow-track** | `app/test/**/*_test.dart` 中未进 manifest 的文件 | `nightly-dart-ui` 扫描 `test/shared/ui` + `test/features`（与 manifest 互补；盘存脚本的慢轨计数 = 全树减 manifest） |
+`dart-lint` runs dart_code_linter on production and tests in one CLI invocation;
+generated files are excluded. Every diagnostic severity fails. The single package analysis
+options file owns all rules. Per-rule `include` patterns keep production rules
+on `lib/**`, assertion/file-name rules on `test/**`, and private-test-declaration
+rules on `test/**/*_test.dart` (shared support helpers stay importable). This keeps Widget organization
+rules out of test fixtures without disabling test lint coverage. The registered
+color assertion helper performs actual channel assertions, rather than bypassing
+the missing-assertion rule. The shared `rules-exclude` list stays empty; exemptions
+may only shrink. Enable a new rule only after a clean local run. Metrics are
+currently outside the hard gate.
 
-**Epic #447 清理后基线（2026-11-03，`python scripts/audit_dart_tests.py`）**：共 **253** 个 `*_test.dart`；manifest 展开 **175**；慢轨 **78**。典型慢轨分桶：`library_browse` 26、`read_session` 11、`shared/ui` 2（主题装配契约）、其余 feature 见盘存 JSON。
+Keep DCL out of top-level analyzer plugins to avoid duplicate/fatal analyzer
+diagnostics. Deliberately excluded rules include non-ASCII/comment punctuation
+requirements (Chinese source text), trailing commas (formatter conflict),
+newline-before-return (format churn), and prefer-first-or-null (conflicts with
+prefer-first). Rules requiring mandatory configuration remain disabled until
+configured. Existing Widget-factory name exceptions implement route, composition
+slot or Settings section callback contracts. DCL matches names, not owners: audit
+all matching declarations when adding or renaming a function, remove stale names,
+and do not reuse an exempt name to bypass the rule.
 
-### nightly-dart-ui（`.github/workflows/nightly.yml`）
+DCL's installed rule implementation may be smaller than its presets; validate new rule names with `dart run dart_code_linter:metrics analyze lib -c`. The current DCL fixer can corrupt overlapping replacements: apply at most one rule at a time, inspect the diff and verify Dart formatting/parsing afterward.
 
-| 项 | 说明 |
-|----|------|
-| 命令 | `cd app && flutter test test/shared/ui test/features` |
-| 与 manifest 关系 | 与 gate-fast **互补**，非子集相等；大量 presentation 测已删除，nightly 失败应优先查 **仍存在的 MD3E 页级 / data·domain 薄边** |
-| 失败 triage | ① 对照 `gate.md` 降级/删除表是否预期移除 ② 时序/动画 → 移出 manifest 或删 ③ 业务断言 → 改 Rust 缝 ④ `frb_wire`/gate 失败 → 另开 issue，不算 nightly 债 |
+## Architecture checks
 
-盘存脚本输出与上表不一致时，以脚本为准并更新本段（#456）。
+Run affected tests from `app/`; current rules and baselines are the source of truth:
 
-### rubric 四层（启发式，供审计 #450–#454；非 gate 断言）
+- `test/project_layout_test.dart`: allowed directories and module structure.
+- `test/gate/import_boundary_test.dart`, `test/architecture/module_boundary_test.dart`: public-only/forbidden edges, import/export graphs, acyclicity and shrink-only baselines.
+- `test/architecture/clean_architecture_dependency_test.dart`, `dart_dependency_graph_test.dart`: recursive core/inner-layer purity, including third-party runtime dependencies; outer-layer direction through application import/export/part graphs, with conditional-branch and scanner bypass regressions. Violations report the dependency chain from the original consumer.
+- `test/architecture/public_interface_test.dart`, `test/gate/shared_di_override_coverage_test.dart`: export-only public surfaces and required-provider binding.
+- Entity ownership, slot, navigation and `test/gate/shared_*_no_feature_import_test.dart` checks: preserve owner and shared boundaries.
+- `test/gate/domain_event_rules_test.dart`: shared event vocabulary, permitted publishers and one bus implementation.
+- `test/design-system/design_system_boundary_test.dart`, `design_system_dependency_policy_test.dart`: independent UI dependencies and the sole explicit public entry.
 
-脚本对每个测试文件打 **一个主标签**（优先级自上而下）：
+Regenerate a boundary baseline only for an intentional, reviewed architecture change; remove stale entries rather than expanding an exemption to make a move pass. See [layout](feature-data-layout.md), [collaboration](cross-feature-collaboration.md) and [design system](design-system.md) for the relevant decisions.
 
-| rubric | 典型路径 | 清理 epic 中的含义 |
-|--------|----------|-------------------|
-| **architecture-guard** | `test/gate/**`、`project_layout_test.dart` | **禁止**批量删除；仅随 ADR/规则 drift 修改 |
-| **thin-edge** | `frb_wire`、`shared/data|domain|di`、`core`、feature `data/` / `domain/` / `application/`、`test/support/` | 保留并加强；业务真值仍在 Rust |
-| **ui-contract** | manifest 内其余项（MD3E entry、confirm 对话框、ViewModel persist/policy、motion/theme 等） | manifest 反向审计 (#450)；不合格则降级 |
-| **candidate-retire** | 慢轨下的 `shared/ui`、feature `presentation/` 等 | 优先删/改 (#451–#454)；与 #447 决策一致：MD3E entry + 可观察结果为主缝 |
+## Core consistency regressions
 
-降级流程见下节 **[测试退役与 manifest 降级 / 晋升](#测试退役与-manifest-降级--晋升)**。
+Run `cargo test -p hentai-core --test content_path_migration --test comic_metadata_bulk_patch --test path_migration_sync_test --test series_path_migration_sync_test --test scan_commit_metadata --test sync_coherent_commit --test update_local_library_root` from `core/` for the transactional metadata, conservative migration, coherent sync and Reader invalidation seams. These fixtures are retained for manual cleanup. Reader lifetime and decode isolation regressions are selected with `cargo test -p hentai-core --lib reader::manager::tests`, `reader::page::` and `reader::prefetch::`.
 
-## 测试退役与 manifest 降级 / 晋升
-
-与 ADR-0018、Epic [#447](https://github.com/Zoti321/hentail_library/issues/447) 一致：**业务真值在 Rust**；Dart gate 只挡 **架构护栏、薄边、可观察 UI 契约**。盘存用 `python scripts/audit_dart_tests.py`；降级/晋升只改 `app/test/gate/manifest.txt`（+ 本段记录），**不要**新 workflow。
-
-### Protected 路径（禁止批量删除）
-
-以下目录/条目是架构或线缝护栏，清理 epic 中 **不得** 整目录删除或移出 manifest（除非配套 ADR + 规则迁移）：
-
-| 类别 | manifest / 路径 |
-|------|-----------------|
-| Gate 自检 | `test/gate/**`（import boundary、L3、strangler、manifest 自检） |
-| 布局 ratchet | `test/project_layout_test.dart` |
-| FRB 线缝 | `test/frb_wire/**` |
-| Dart 薄边（目录级） | `test/shared/domain`、`test/shared/data`、`test/core`、`test/shared/di` |
-| App / Lab 最小冒烟 | `test/widget_test.dart`、`test/md3e/**`（Lab 契约，非 Figma CI） |
-
-单文件是否 protected 以盘存 rubric **`architecture-guard`** / **`thin-edge`** 为准；**`ui-contract`** 在 manifest 内仍可 **降级**（移出 manifest，非立即删文件）。
-
-### 降级（manifest → nightly）
-
-适用：晋升清单未通过、绑定私有实现、与 Rust Reader/sync 重复、或时序不稳定。
-
-1. **PR 必须**在描述中列出每个路径、**rubric 标签**、一句话理由（可参考下表模板）。
-2. 从 `manifest.txt` **删除对应行**（目录展开条目删单行即可）；**不要**删 `test/gate/manifest_test.dart` 对固定 seam 的 `containsAll` 断言，除非同步改该测试。
-3. 测试文件 **保留**在树中 → 进入 **slow-track**，由 `nightly-dart-ui`（`test/shared/ui` + `test/features`）覆盖。
-4. **至少一轮 nightly 绿**（或 maintainer 本地 `cd app && flutter test <path>`）后，才可在后续 PR（#451–#454）中 **删除文件**。
-5. 不得无声消失：降级 PR 引用 #447；删除 PR 引用原降级 PR 或 issue。
-
-### 晋升（slow-track / 新建 → manifest）
-
-1. 满足上文 **快轨晋升检查清单** 全部 4 条。
-2. 本地 **连续 3 遍** `flutter test <path>` 稳定；含时钟逻辑则注入 fake clock。
-3. PR 说明列出新增 manifest 路径；合并前 `./scripts/run-gate.sh dart-test` 绿。
-
-### Manifest 降级记录
-
-| 日期 | 路径（相对 `app/`） | rubric | 理由 |
-|------|---------------------|--------|------|
-| 2026-11-03 | `test/features/read_session/presentation/reader_image_cache_test.dart` | candidate-retire | 断言 `ResizeImage`/命名缓存等解码实现细节，非 MD3E/用户可观察契约（#450） |
-| 2026-11-03 | `test/features/read_session/presentation/reader_prefetch_generation_test.dart` | candidate-retire | 预取 generation 窗口纯算法，与 Reader 性能策略强耦合，留 nightly/#452 审计（#450） |
-| 2026-11-03 | `test/shared/ui/layout/reading_history_list_layout_lazy_test.dart` | candidate-retire | 断言 sliver 构建条数等布局实现，未用 `test/support/` harness（#450） |
-
-### 慢轨删除记录（#451 / #452）
-
-在 #450 降级后，按 #447 决策删除以下慢轨文件（不再参与 nightly；薄边与 MD3E 页级契约保留）。
-
-**#452 read_session（−14）** — rubric `candidate-retire`：视口/图片管线/预取 widget 或实现细节；`reader_page_shell_select_test` 仅测文件内重复 helper。保留：`data/`、`domain/**`、`public/**`、`reader_controller_test`、`reader_page_facade_test`、`series_reader_provider_test`（thin-edge / 编排薄边）。
-
-**#451 library_browse（−7）** — rubric `candidate-retire`：MD3E 子块测（filter/sort/header/sheet）由 `library_md3e_page_test` 覆盖；flicker 时序测；`detail_status` 私有 scaffold。保留：`data/**`、`domain/**`、VM 薄边、`library_md3e_page_test`、`searched_md3e_page_test`、删除/批量/元数据 MD3E 流、`public/**`。
-
-**#453 shared/ui（−26）** — rubric `candidate-retire`：叶子 widget / form / 封面 / 分页 / context menu 等；`reading_history_list_layout_lazy`（#450 降级后删除）。**保留（thin-edge）**：`theme/build_app_theme_md3e_test.dart`、`theme/build_app_theme_preferences_contract_test.dart`（ADR-0032 主题装配契约）。快轨仍覆盖 `destructive_filled_button`、`dialog/confirm`、motion、token、md3e layout spec。
-
-**#454 其余 feature（−13）** — rubric `candidate-retire`  unless noted:
-
-| Feature | 删除 | 保留要点 |
-|---------|------|----------|
-| bootstrap | `responsive_app_shell*`×2、`app_locale_preference`、`series_detail_route_page` | `di/**` override 装配、`application_shell_import_contract`、`retired_paths_route`（ADR-0014）、`app_startup_coordinator` |
-| home | `home_md3e_page_test`（与快轨 `md3e_home_page_test` 重复） | `public/**` |
-| reading_history | `history_list_progress_test` | `data/mappers`；快轨 `history_page_test` |
-| library_admin | `libraries_sidebar_navigation`、`library_management_port_delete`（大壳路由） | `data/`、`di/` 契约、`domain/`、`public/**`；快轨 dashboard/dialog |
-| app_settings | `app_update_check`、`theme_preference_l10n` | `domain/**`、`data/`、`public/**`；快轨 settings MD3E / persist VM |
-| named_metadata | `metadata_md3e_page_test` | mappers、controller、`public/**`；快轨 `named_facet_fill_viewport` |
-| comic_trash / metadata_backup | — | 慢轨全保留（application / data / flow 薄边） |
-
-## Import / 布局（规范在测试里）
-
-|  concern | 测试 / 文件 |
-|----------|-------------|
-| L1 domain↔data、FRB 面、application 依赖、shared→feature public、public→presentation（含 `export`，R12 allowlist） | `import_boundary_test.dart`（R1–R12）；`public_presentation_export_allowlist.txt`（只缩不扩） |
-| L2 product 图 ratchet（M1 非 public 边、M2/M3） | `import_boundary_baseline.json` → `dart run tool/generate_import_boundary_baseline.dart` |
-| Cross-feature 协作约定 | [`cross-feature-collaboration.md`](cross-feature-collaboration.md) |
-| public 图无环 | `import_boundary_test.dart`（`collectPublicCrossFeatureAdjacency`） |
-| bootstrap shared 注入 | `features/bootstrap/di/overrides/*` + `shared_state_overrides.dart`（#435） |
-| L3a shared/ui → features | `shared_ui_no_feature_import_test.dart` |
-| L3b shared/domain → features ratchet | `shared_domain_no_feature_import_test.dart` + baseline 生成器；归属见 [`shared-domain-ownership.md`](./shared-domain-ownership.md) |
-| FRB allowlist | `import_boundary_rules.dart`、`shared_feature_import_rules.dart` |
-| `lib/` 顶层目录、public barrel、presentation/state | `project_layout_test.dart`、`lib_layout_scan_helpers.dart` |
-| Strangler export shim | `strangler_shims.txt` + `strangler_shims_test.dart` |
-
-启发式模块边（非门禁）：`python scripts/research/cross_feature_import_audit.py`。
-
-## integration_test
-
-仅 **平台冒烟**（cdylib + 原生依赖 + 最小 Reader 链），命名 `*_smoke_test.dart`，走 `watch.yml` / Release 调用，**不**写入 manifest。Library sync / WebDAV 全流程：**仅 Rust 集成测**。
-
-## Harness
-
-| 侧 | 入口 |
-|----|------|
-| Flutter | `app/test/support/`（见下表） |
-| Rust DB 集成 | `core/crates/core/tests/common/` |
-
-### Flutter widget / 页级测试入口（#455）
-
-| API | 文件 | 何时用 |
-|-----|------|--------|
-| `pumpLocalizedApp` | `pump_localized_app.dart` | 产品主题 + zh/en l10n + 可选 `ProviderScope` overrides（**默认首选**） |
-| `pumpMd3eApp` | `pump_md3e_app.dart` | MD3E lab 主题 + `Md3eThemeScope`；可选 overrides |
-| `buildLocalizedTestMaterialApp` | `pump_localized_app.dart` | 自定义外壳（`UncontrolledProviderScope`、GoRouter）内嵌 MaterialApp |
-| `localizedTestAppConfig` | `localized_test_app.dart` | 仅 delegates/locale 元组（少见） |
-| `configureTestView` | `test_view.dart` | 统一 viewport physicalSize / DPR |
-| Fakes | `support/fakes/*` | 覆盖/仓库/port 复用（author、cover、settings、revision throttle） |
-
-**例外**：需 `GlobalMaterialLocalizations` 的日历类 widget 测（如 `md3e_docked_calendar_date_picker_test`）仍自建 `M3ETheme` + `MaterialApp`；新测勿复制该模式除非测 Material 日历本地化。
-
-新 widget 测 **禁止** 复制 `MaterialApp` + `AppLocalizations` 样板；晋升快轨前须用上表 harness（`gate.md` 快轨清单第 3 条）。
+Library sync permits unique full-content fingerprint matches (ADR-0055), while rejecting weak-fingerprint-only automatic rekeys (ADR-0054). Unverified or ambiguous renames follow orphan removal plus new import. Initial hashing fully reads Resources, including WebDAV downloads; file hashes are cached by source observations and image directories are rehashed. Old records must first sync at their existing location to establish content evidence. Explicit Local root remapping retains its separate eligibility checks. Sync prepares resource observations before opening its write transaction, then commits catalog reconciliation, probe baseline and success metadata together. Reader invalidation precedes revision publication and thumbnail queue follow-up. Thumbnail maintenance errors use the existing progress warning and failed-thumbnail fields without implying rollback of committed catalog state.

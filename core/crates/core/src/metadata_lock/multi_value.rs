@@ -1,4 +1,4 @@
-//! Multi-value Metadata patch algebra: Tags / Authors / Languages / Parodies / Characters.
+//! Multi-value Metadata patch algebra: Tags / Authors / Parodies / Characters.
 //!
 //! The single implementation of add / remove / replace for list-valued Metadata. The bulk patch
 //! (`comic/bulk_patch.rs`) merges through this module, and any single-Comic partial patch should

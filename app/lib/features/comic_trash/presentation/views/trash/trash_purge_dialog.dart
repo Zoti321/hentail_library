@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/ui/patterns/dialog/lab_dialog_presenter.dart';
-import 'package:hentai_library/shared/ui/theme/lab_text.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/features/comic_trash/domain/comic_purge_strategy.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -40,10 +39,6 @@ class _TrashPurgeConfirmDialogState extends State<TrashPurgeConfirmDialog> {
     final AppLocalizations l10n = context.l10n;
     final M3EThemeData theme = M3ETheme.of(context);
     final M3EColorScheme scheme = theme.colorScheme;
-    final TextStyle actionLabelStyle = labButtonLabelStyle(
-      theme,
-      M3EButtonSize.sm,
-    );
     final bool needsAcknowledgement = purgeRequiresAcknowledgement(
       widget.counts,
     );
@@ -64,7 +59,7 @@ class _TrashPurgeConfirmDialogState extends State<TrashPurgeConfirmDialog> {
           if (needsAcknowledgement) ...<Widget>[
             const SizedBox(height: 12),
             InkWell(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: const BorderRadius.all(Radius.circular(12)),
               onTap: () => setState(() => _acknowledged = !_acknowledged),
               child: Row(
                 children: <Widget>[
@@ -91,23 +86,13 @@ class _TrashPurgeConfirmDialogState extends State<TrashPurgeConfirmDialog> {
       ),
       bottomDivider: true,
       actions: <Widget>[
-        M3EButton(
-          onPressed: () => Navigator.of(context).pop(false),
-          style: M3EButtonStyle.text,
-          decoration: M3EButtonDecoration(textStyle: actionLabelStyle),
-          label: Text(l10n.commonCancel),
-        ),
-        M3EButton(
-          onPressed: canConfirm ? () => Navigator.of(context).pop(true) : null,
-          style: M3EButtonStyle.filled,
-          decoration: M3EButtonDecoration.styleFrom(
-            textStyle: actionLabelStyle,
-            backgroundColor: scheme.error,
-            foregroundColor: scheme.onError,
-            disabledBackgroundColor: scheme.onSurface.withValues(alpha: 0.12),
-            disabledForegroundColor: scheme.onSurface.withValues(alpha: 0.38),
-          ),
-          label: Text(l10n.trashPurge),
+        DialogActionBar(
+          onCancel: () => Navigator.of(context).pop(false),
+          onConfirm: () => Navigator.of(context).pop(true),
+          cancelLabel: l10n.commonCancel,
+          confirmLabel: l10n.trashPurge,
+          destructive: true,
+          confirmEnabled: canConfirm,
         ),
       ],
     );

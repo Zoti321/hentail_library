@@ -1,7 +1,7 @@
 use sea_orm::sea_query::{Expr, Func};
 use sea_orm::{
     ActiveModelTrait, ColumnTrait, ConnectionTrait, EntityTrait, PaginatorTrait, QueryFilter,
-    QueryOrder, Set,
+    QueryOrder, Set, TransactionTrait,
 };
 
 use crate::comic::now_ms;
@@ -19,6 +19,7 @@ use super::retention::reading_history_within_retention;
 
 pub async fn record_reading(dto: &ReadingHistoryDto) -> Result<(), HentaiError> {
     let db = connection()?;
+    let txn = db.begin().await.map_err(map_db_err)?;
     let model = comic_reading_histories::ActiveModel {
         comic_id: Set(dto.comic_id.clone()),
         title: Set(decode_basic_html_entities(&dto.title)),
@@ -35,10 +36,12 @@ pub async fn record_reading(dto: &ReadingHistoryDto) -> Result<(), HentaiError> 
                 ])
                 .to_owned(),
         )
-        .exec(&db)
+        .exec(&txn)
         .await
         .map_err(map_db_err)?;
-    purge_expired_reading_histories(&db).await?;
+    purge_expired_reading_histories(&txn).await?;
+    txn.commit().await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(())
 }
 
@@ -197,6 +200,7 @@ pub async fn delete_reading_by_comic_id(comic_id: &str) -> Result<i32, HentaiErr
         .exec(&db)
         .await
         .map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(res.rows_affected as i32)
 }
 
@@ -210,6 +214,7 @@ pub async fn delete_reading_by_comic_ids(comic_ids: &[String]) -> Result<i32, He
         .exec(&db)
         .await
         .map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(res.rows_affected as i32)
 }
 
@@ -224,6 +229,7 @@ async fn clear_all_reading_locked() -> Result<i32, HentaiError> {
         .exec(&db)
         .await
         .map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(res.rows_affected as i32)
 }
 

@@ -1,4 +1,4 @@
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 import 'package:hentai_library/features/library_browse/domain/browse/library_page_request_specification.dart';
 import 'package:hentai_library/shared/domain/exceptions/domain_exception.dart';
 

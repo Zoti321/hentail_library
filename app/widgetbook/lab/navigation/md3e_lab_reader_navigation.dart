@@ -4,11 +4,9 @@ import 'package:hentai_library/features/comic/presentation/views/comic_detail/co
 
 import '../../hosts/md3e_reader_page_lab_host.dart';
 
-import 'package:hentai_library/shared/ui/motion/shared_axis_route.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 
 import '../../preview/md3e_reader_page_preview_data.dart';
-
-import 'package:hentai_library/shared/ui/widgets/sheets/overlay_route_scope.dart';
 
 /// Lab：详情 / 目录 → [ReaderPageLabHost]（preview 会话；不接 read_session FRB）。
 ///
@@ -17,17 +15,17 @@ Future<void> openLabReader(
   BuildContext context, {
   ReaderPagePreviewData? preview,
 }) {
-  final ReaderPagePreviewData data =
-      preview ?? ReaderPagePreviewData.sample();
-  final OverlayRouteScopeSnapshot scope =
-      OverlayRouteScopeSnapshot.capture(context);
+  final ReaderPagePreviewData data = preview ?? ReaderPagePreviewData.sample();
+  final OverlayRouteScopeSnapshot scope = OverlayRouteScopeSnapshot.capture(
+    context,
+  );
 
   return Navigator.of(context, rootNavigator: false).push<void>(
     sharedAxisRoute<void>(
       context,
       transitionType: SharedAxisTransitionType.scaled,
       builder: (BuildContext routeContext) {
-        return overlayRouteScope(
+        return OverlayRouteScope(
           scope: scope,
           child: ReaderPageLabHost(
             preview: data,

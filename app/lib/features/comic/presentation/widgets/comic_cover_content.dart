@@ -1,7 +1,9 @@
+import 'package:hentai_library/design-system/design_system.dart';
+import 'package:hentai_library/features/comic/presentation/widgets/cover_viewport_sensor.dart';
 import 'package:flutter/material.dart';
-import 'package:hentai_library/features/comic/di/comic_cover_providers.dart';
-import 'package:hentai_library/features/comic/di/cover_viewport.dart';
-import 'package:hentai_library/shared/ui/widgets/element/image/comic_cover_renderer.dart';
+import 'package:hentai_library/features/comic/presentation/providers/comic_cover_providers.dart';
+import 'package:hentai_library/features/comic/presentation/providers/cover_viewport.dart';
+import 'package:hentai_library/features/comic/presentation/widgets/comic_cover_renderer.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/ui/models/comic_cover_state.dart';
 import 'package:hentai_library/shared/ui/widgets/catalog/catalog_cover_hero.dart';
@@ -19,6 +21,7 @@ class ComicCoverContent extends ConsumerWidget {
     this.fit,
     this.alignment = Alignment.center,
     this.enableHero = true,
+    this.paintVariant = ComicCoverPaintVariant.card,
   });
 
   /// 非空时强制拟合（如横幅 [BoxFit.cover]）；默认软裁切 letterbox。
@@ -43,6 +46,9 @@ class ComicCoverContent extends ConsumerWidget {
   /// 为 false 时不包 [Hero]（例如系列封面回退到成员漫画图，避免嵌套 Hero）。
   final bool enableHero;
 
+  /// 卡片（默认）或详情页封面绘制。
+  final ComicCoverPaintVariant paintVariant;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ThumbnailPriority effectivePriority = _effectivePriority(ref);
@@ -56,12 +62,12 @@ class ComicCoverContent extends ConsumerWidget {
     }
     final ComicCoverState state = ref.watch(comicCoverProvider(comicId));
 
-    Widget result = CatalogCoverHero.wrap(
+    Widget result = CoverHero.wrap(
       tag: CatalogCoverHero.comicTag(comicId),
       enabled: enableHero,
       child: ComicCoverRenderer(
         state: state,
-        variant: ComicCoverPaintVariant.card,
+        variant: paintVariant,
         fit: fit,
         alignment: alignment,
         onDecodeError: notifier.markDecodeError,

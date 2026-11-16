@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
 import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_layout.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -26,7 +27,7 @@ class SeriesDetailPageLabHost extends StatefulWidget {
   final List<M3EMenuNode>? moreMenuEntries;
   final ValueChanged<String>? onMetadataChipTap;
   final ValueChanged<int>? onComicTap;
-  final ValueChanged<String>? onAuthorTap;
+  final ValueChanged<AuthorRef>? onAuthorTap;
   final ScrollController? scrollController;
 
   @override

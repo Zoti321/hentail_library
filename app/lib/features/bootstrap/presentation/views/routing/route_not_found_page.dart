@@ -1,9 +1,8 @@
-import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/ui/theme/theme.dart';
-import 'package:hentai_library/shared/ui/widgets/actions/ghost_button.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/ui/navigation/app_navigator_context.dart';
+import 'package:hentai_library/shared/ui/navigation/library_browse_navigation.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// ???? 404 ??????????????
@@ -50,7 +49,7 @@ class RouteNotFoundPage extends StatelessWidget {
                 GhostButton.iconText(
                   icon: LucideIcons.house,
                   text: l10n.notFoundGoHome,
-                  onPressed: () => context.go('/home'),
+                  onPressed: () => appNavigatorOf(context).goHome(),
                 ),
                 GhostButton.iconText(
                   icon: LucideIcons.library,

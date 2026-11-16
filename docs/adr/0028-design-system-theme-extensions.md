@@ -4,6 +4,8 @@
 
 Accepted
 
+> **实现修订（2026-11-11，#495 / ADR-0044）**：主题仍单源，仍由 `buildAppTheme` 装配；物理位置从 `shared/ui/theme` 迁到 `design-system/theme`（`lib/design-system/`）。下文 `shared/ui/theme/` 路径按此阅读。
+
 ## Context
 
 应用需要可演进的桌面风格定制 UI，但间距、语义色、阴影与动效 token 分散在主题与组件中；手写 `ThemeExtension` 的 `copyWith` / `lerp` 随字段增多易漏改。产品仍以单壳响应式 shell 为主（见 `design-system/hentai-library/MASTER.md`），不引入整包 M3 UI Kit，也不在阶段一抽取独立 `packages/design_system`（与 #227 一致）。

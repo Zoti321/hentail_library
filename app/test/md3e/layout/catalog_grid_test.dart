@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/shared/ui/layout/catalog_grid.dart';
-import 'package:hentai_library/shared/ui/widgets/catalog/comic_card.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 
-import '../../support/pump_app.dart';
+import '../../support/pump_design_system_app.dart';
 
 void main() {
   testWidgets('CatalogGridSliver uses fixed cross axis count delegate', (
     WidgetTester tester,
   ) async {
-    await pumpApp(
+    await pumpDesignSystemApp(
       tester,
       home: SizedBox(
         width: 800,

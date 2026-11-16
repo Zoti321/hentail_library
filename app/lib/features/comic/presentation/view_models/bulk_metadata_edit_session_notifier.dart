@@ -1,7 +1,9 @@
+import 'dart:async';
+
 import 'package:hentai_library/features/comic/presentation/draft/bulk_metadata_edit_session.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
-import 'package:hentai_library/features/library_browse/public/catalog/for_comic_and_series.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/comic/presentation/providers/comic_detail_providers.dart';
+import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'bulk_metadata_edit_session_notifier.g.dart';
@@ -11,15 +13,22 @@ class BulkMetadataEditUiState {
   const BulkMetadataEditUiState({
     required this.loading,
     required this.revision,
+    this.showValidationErrors = false,
   });
 
   final bool loading;
   final int revision;
+  final bool showValidationErrors;
 
-  BulkMetadataEditUiState copyWith({bool? loading, int? revision}) {
+  BulkMetadataEditUiState copyWith({
+    bool? loading,
+    int? revision,
+    bool? showValidationErrors,
+  }) {
     return BulkMetadataEditUiState(
       loading: loading ?? this.loading,
       revision: revision ?? this.revision,
+      showValidationErrors: showValidationErrors ?? this.showValidationErrors,
     );
   }
 }
@@ -31,11 +40,18 @@ class BulkMetadataEditSessionNotifier
   final BulkMetadataEditSession _session = BulkMetadataEditSession();
 
   /// 当前草稿（仅 Notifier / 同 feature 命令路径读取）。
+  // The edit session mutates only through commands; revision state triggers consumers.
+  // ignore: riverpod_lint/avoid_public_notifier_properties
   BulkMetadataEditSession get session => _session;
+
+  // The edit session mutates only through commands; revision state triggers consumers.
+  // ignore: riverpod_lint/avoid_public_notifier_properties
+  bool get showPublishedAtError =>
+      state.showValidationErrors && _session.hasInvalidPublishedAt;
 
   @override
   BulkMetadataEditUiState build(List<String> comicIds) {
-    Future<void>.microtask(() => _loadMixedHints(comicIds));
+    unawaited(Future<void>.microtask(() => _loadMixedHints(comicIds)));
     return const BulkMetadataEditUiState(loading: true, revision: 0);
   }
 
@@ -54,19 +70,19 @@ class BulkMetadataEditSessionNotifier
     if (!ref.mounted) {
       return;
     }
-    state = BulkMetadataEditUiState(
-      loading: false,
-      revision: state.revision + 1,
-    );
+    state = state.copyWith(loading: false, revision: state.revision + 1);
   }
 
   void mutate(void Function(BulkMetadataEditSession session) update) {
     update(_session);
-    state = BulkMetadataEditUiState(
-      loading: false,
-      revision: state.revision + 1,
-    );
+    state = state.copyWith(loading: false, revision: state.revision + 1);
   }
 
-  ComicMetadataBulkPatch? buildPatch() => _session.buildPatch();
+  ComicMetadataBulkPatch? buildPatch() {
+    state = state.copyWith(
+      showValidationErrors: true,
+      revision: state.revision + 1,
+    );
+    return _session.buildPatch();
+  }
 }

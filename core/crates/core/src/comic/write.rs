@@ -1,13 +1,12 @@
 use sea_orm::{ActiveModelTrait, ConnectionTrait, Set, TransactionTrait};
 
+use crate::author::replace_comic_authors;
 use crate::comic::dto::{now_ms, serialize_languages};
 use crate::db::{connection, map_db_err};
 use crate::entity::{comic_meta, comics};
 use crate::error::HentaiError;
-use crate::metadata_lock::{normalize_names, ComicAutoLocks, ComicMetaField};
-use crate::sync::writer::{
-    replace_comic_authors, replace_comic_characters, replace_comic_parodies, replace_comic_tags,
-};
+use crate::metadata_lock::{ComicAutoLocks, ComicMetaField};
+use crate::named_facet::{replace_comic_named_facet, JunctionNamedFacet};
 use crate::util::{compute_sort_key, decode_basic_html_entities};
 
 #[derive(Debug, Clone, Default)]
@@ -112,6 +111,7 @@ pub async fn update_comic_user_meta(
     let txn = db.begin().await.map_err(map_db_err)?;
     update_comic_user_meta_in(&txn, comic_id, meta).await?;
     txn.commit().await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(())
 }
 
@@ -122,6 +122,16 @@ pub(crate) async fn update_comic_user_meta_in<C: ConnectionTrait>(
     meta: UpdateComicUserMetaDto,
 ) -> Result<(), HentaiError> {
     // A written field is auto-locked; the field table decides which fields and locks exist.
+    if meta
+        .languages
+        .as_ref()
+        .is_some_and(|values| values.len() > 1)
+    {
+        return Err(HentaiError::validation(
+            "Language accepts at most one value",
+        ));
+    }
+    let writeback_before = crate::resource_metadata::capture_before_in(db, comic_id).await?;
     let auto_locks = ComicAutoLocks::from_written(|field| meta.is_written(field));
     let mut meta_touched = false;
     if auto_locks.any() {
@@ -152,7 +162,7 @@ pub(crate) async fn update_comic_user_meta_in<C: ConnectionTrait>(
             });
         }
         if let Some(languages) = meta.languages {
-            active.languages = Set(serialize_languages(&normalize_names(&languages)));
+            active.languages = Set(serialize_languages(&languages));
         }
         for field in auto_locks.written() {
             apply_comic_lock(&mut active, field, true);
@@ -165,19 +175,20 @@ pub(crate) async fn update_comic_user_meta_in<C: ConnectionTrait>(
         meta_touched = true;
     }
     if let Some(tags) = meta.tags {
-        replace_comic_tags(db, comic_id, &tags).await?;
+        replace_comic_named_facet(db, JunctionNamedFacet::Tag, comic_id, &tags).await?;
         meta_touched = true;
     }
     if let Some(parodies) = meta.parodies {
-        replace_comic_parodies(db, comic_id, &parodies).await?;
+        replace_comic_named_facet(db, JunctionNamedFacet::Parody, comic_id, &parodies).await?;
         meta_touched = true;
     }
     if let Some(characters) = meta.characters {
-        replace_comic_characters(db, comic_id, &characters).await?;
+        replace_comic_named_facet(db, JunctionNamedFacet::Character, comic_id, &characters).await?;
         meta_touched = true;
     }
     if meta_touched {
         touch_comic(db, comic_id).await?;
+        crate::resource_metadata::record_change_in(db, comic_id, writeback_before).await?;
     }
     Ok(())
 }
@@ -203,6 +214,7 @@ pub async fn set_comic_meta_locks(
     active.update(&txn).await.map_err(map_db_err)?;
     touch_comic(&txn, comic_id).await?;
     txn.commit().await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(())
 }
 

@@ -6,7 +6,7 @@ use sea_orm::{
     Statement, Value,
 };
 
-use crate::db::{connection, map_db_err, version_connection};
+use crate::db::{connection, map_db_err};
 use crate::entity::{
     comic_characters, comic_meta, comic_parodies, comic_reading_histories, comic_tags, comics,
     prelude::*,
@@ -151,6 +151,24 @@ pub async fn find_comic_by_id(comic_id: &str) -> Result<Option<ComicDto>, Hentai
     let db = connection()?;
     let comics = load_comics_ordered(&db, vec![comic_id.to_string()]).await?;
     Ok(comics.into_iter().next())
+}
+
+pub(crate) async fn find_visible_comic_by_id_in(
+    db: &impl ConnectionTrait,
+    comic_id: &str,
+) -> Result<Option<ComicDto>, HentaiError> {
+    let visible = Comics::find_by_id(comic_id)
+        .filter(comics::Column::DeletedAt.is_null())
+        .one(db)
+        .await
+        .map_err(map_db_err)?;
+    if visible.is_none() {
+        return Ok(None);
+    }
+    Ok(load_comics_ordered(db, vec![comic_id.to_string()])
+        .await?
+        .into_iter()
+        .next())
 }
 
 /// Load full Comic records for the given ids, preserving request order among found rows.
@@ -432,20 +450,6 @@ pub async fn search_by_tag_expression_page(
     })
 }
 
-pub async fn read_data_version() -> Result<i32, HentaiError> {
-    let db = version_connection()?;
-    let row = db
-        .query_one(Statement::from_string(
-            sea_orm::DatabaseBackend::Sqlite,
-            "PRAGMA data_version".to_string(),
-        ))
-        .await
-        .map_err(map_db_err)?
-        .ok_or_else(|| HentaiError::db_query_failed("data_version 无结果", None))?;
-    row.try_get_by_index::<i32>(0)
-        .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))
-}
-
 async fn count_filtered(
     db: &DatabaseConnection,
     filter: &ComicFilterDto,
@@ -488,7 +492,7 @@ async fn query_ids_from_stmt(
 }
 
 pub async fn load_comics_ordered(
-    db: &DatabaseConnection,
+    db: &impl ConnectionTrait,
     comic_ids: Vec<String>,
 ) -> Result<Vec<ComicDto>, HentaiError> {
     if comic_ids.is_empty() {
@@ -513,10 +517,11 @@ pub async fn load_comics_ordered(
         .map(|m| (m.comic_id.clone(), m))
         .collect();
     let tag_map = load_tag_names(db, &comic_ids).await?;
-    let author_map = crate::author::load_author_names_for_comics(db, &comic_ids).await?;
+    let author_map = crate::author::load_comic_authors_for_comics(db, &comic_ids).await?;
     let parody_map = load_parody_names(db, &comic_ids).await?;
     let character_map = load_character_names(db, &comic_ids).await?;
     let last_read_map = load_last_read_times(db, &comic_ids).await?;
+    let mut fingerprints = crate::resource_verification::load_fingerprints(db, &comic_ids).await?;
     let mut result = Vec::with_capacity(comic_ids.len());
     for id in comic_ids {
         let Some(model) = by_id.remove(&id) else {
@@ -526,6 +531,7 @@ pub async fn load_comics_ordered(
             continue;
         };
         result.push(ComicDto {
+            resource_fingerprint: fingerprints.remove(&id),
             comic_id: model.comic_id.clone(),
             path: model.path,
             resource_type: model.resource_type,
@@ -608,7 +614,7 @@ async fn load_comics_browse_ordered(
 }
 
 async fn load_last_read_times(
-    db: &DatabaseConnection,
+    db: &impl ConnectionTrait,
     comic_ids: &[String],
 ) -> Result<HashMap<String, i64>, HentaiError> {
     if comic_ids.is_empty() {
@@ -628,7 +634,7 @@ async fn load_last_read_times(
 }
 
 async fn load_tag_names(
-    db: &DatabaseConnection,
+    db: &impl ConnectionTrait,
     comic_ids: &[String],
 ) -> Result<HashMap<String, Vec<String>>, HentaiError> {
     let rows = ComicTags::find()
@@ -645,7 +651,7 @@ async fn load_tag_names(
 }
 
 async fn load_parody_names(
-    db: &DatabaseConnection,
+    db: &impl ConnectionTrait,
     comic_ids: &[String],
 ) -> Result<HashMap<String, Vec<String>>, HentaiError> {
     let rows = ComicParodies::find()
@@ -662,7 +668,7 @@ async fn load_parody_names(
 }
 
 async fn load_character_names(
-    db: &DatabaseConnection,
+    db: &impl ConnectionTrait,
     comic_ids: &[String],
 ) -> Result<HashMap<String, Vec<String>>, HentaiError> {
     let rows = ComicCharacters::find()

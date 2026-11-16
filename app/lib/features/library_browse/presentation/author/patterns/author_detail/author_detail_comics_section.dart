@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/author_detail.dart';
-import 'package:hentai_library/shared/ui/patterns/comic_detail/comic_detail_meta_chip_row.dart';
-import 'package:hentai_library/shared/ui/widgets/settings/content_section.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
+import 'package:hentai_library/features/comic_metadata/public/comic_metadata_entities.dart';
+import 'package:hentai_library/shared/ui/navigation/app_navigator_context.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
-import 'package:hentai_library/features/library_browse/presentation/integrations/comic_presentation_bridge.dart';
+import 'package:hentai_library/features/comic/public.dart';
 
 const double kAuthorDetailComicCardWidth = 96;
 const double kAuthorDetailComicCardHeight = 144;
@@ -76,7 +75,7 @@ class _AuthorComicCoverCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final BorderRadius radius = BorderRadius.circular(12);
+    final BorderRadius radius = const BorderRadius.all(Radius.circular(12));
     return Tooltip(
       message: comic.title,
       waitDuration: const Duration(milliseconds: 600),
@@ -91,10 +90,7 @@ class _AuthorComicCoverCard extends StatelessWidget {
             child: Material(
               type: MaterialType.transparency,
               child: InkWell(
-                onTap: () {
-                  GoRouter.of(context)
-                      .push('/comic/${Uri.encodeComponent(comic.comicId)}');
-                },
+                onTap: () => _handleTap(context),
                 child: ComicCoverContent(comicId: comic.comicId),
               ),
             ),
@@ -102,5 +98,9 @@ class _AuthorComicCoverCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _handleTap(BuildContext context) {
+    appNavigatorOf(context).pushComicDetail(comic.comicId);
   }
 }

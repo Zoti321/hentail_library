@@ -1,13 +1,12 @@
+import 'package:hentai_library/features/home/presentation/l10n/home_l10n.dart';
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
-import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/features/home/presentation/views/home/home_page_metrics.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/patterns/home/home_aggregate_counts.dart';
 import 'package:hentai_library/features/home/presentation/views/home/patterns/home_aggregate_stats_section.dart';
-import 'package:hentai_library/shared/ui/patterns/shared/page_header.dart';
+import 'package:hentai_library/features/reading_stats/public.dart';
 import 'package:hentai_library/features/home/presentation/views/home/patterns/home_page_header.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -16,10 +15,12 @@ class HomeLayout extends StatelessWidget {
   const HomeLayout({
     super.key,
     required this.aggregateCounts,
+    required this.activityStats,
     required this.libraryManagementSection,
     this.onOpenNavigation,
     this.onOpenHistory,
     this.onOpenTrash,
+    this.onOpenMedia,
     this.onOpenAuthors,
     this.onOpenParodies,
     this.onOpenCharacters,
@@ -27,10 +28,12 @@ class HomeLayout extends StatelessWidget {
   });
 
   final HomeAggregateCounts aggregateCounts;
+  final ReadingActivityStats activityStats;
   final Widget libraryManagementSection;
   final VoidCallback? onOpenNavigation;
   final VoidCallback? onOpenHistory;
   final VoidCallback? onOpenTrash;
+  final VoidCallback? onOpenMedia;
   final VoidCallback? onOpenAuthors;
   final VoidCallback? onOpenParodies;
   final VoidCallback? onOpenCharacters;
@@ -78,6 +81,7 @@ class HomeLayout extends StatelessWidget {
                   ),
                   HomeAggregateStatsSection(
                     counts: aggregateCounts,
+                    activityStats: activityStats,
                     onOpenHistory: onOpenHistory,
                     onOpenTrash: onOpenTrash,
                     onOpenAuthors: onOpenAuthors,
@@ -85,6 +89,16 @@ class HomeLayout extends StatelessWidget {
                     onOpenCharacters: onOpenCharacters,
                     onOpenTags: onOpenTags,
                   ),
+                  if (onOpenMedia != null)
+                    Card(
+                      child: ListTile(
+                        leading: const Icon(Icons.perm_media_outlined),
+                        title: Text(l10n.mediaTitle),
+                        subtitle: Text(l10n.mediaSubtitle),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: onOpenMedia,
+                      ),
+                    ),
                   SizedBox(
                     height: HomePageMetrics.sectionVerticalSpacing(sizeClass),
                   ),

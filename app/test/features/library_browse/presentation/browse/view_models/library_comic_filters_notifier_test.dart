@@ -1,23 +1,27 @@
+import 'package:hentai_library/composition/modules/library_browse/library_browse_preferences_overrides.dart';
+import 'package:hentai_library/features/library_browse/domain/browse/library_comic_browse_preferences.dart';
+
+import 'package:hentai_library/features/comic/public/comic_metadata_types.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/library_browse/domain/browse/library_age_restriction_filter.dart';
-import 'package:hentai_library/features/comic/domain/library_comic_filter.dart';
-import 'package:hentai_library/features/comic/domain/library_comic_sort_option.dart';
-import 'package:hentai_library/features/comic/domain/library_comic_grouping.dart';
-import 'package:hentai_library/shared/domain/library/library_media_type_filter.dart';
+import 'package:hentai_library/features/comic/domain/value_objects/library_comic_filter.dart';
+import 'package:hentai_library/features/comic/domain/value_objects/library_comic_sort_option.dart';
+import 'package:hentai_library/features/comic/domain/value_objects/library_comic_grouping.dart';
+import 'package:hentai_library/features/library_browse/domain/browse/library_media_type_filter.dart';
 import 'package:hentai_library/features/library_browse/domain/browse/library_needs_metadata_only.dart';
 import 'package:hentai_library/features/library_browse/domain/browse/library_tri_state_pick.dart';
-import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_comic_filters_notifier.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/features/comic_metadata/public/providers/comic_metadata_repository_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../../support/fakes/author_repository_test_fakes.dart';
 
-ProviderContainer createContainer() {
+ProviderContainer _createContainer() {
   final ProviderContainer container = ProviderContainer(
     overrides: <Override>[
+      ...libraryBrowsePreferencesOverrides(),
       authorRepoProvider.overrideWithValue(const EmptyAuthorRepository()),
     ],
   );
@@ -35,7 +39,7 @@ void main() {
   test(
     'selecting readAt for the first time defaults to descending, then toggles',
     () async {
-      final ProviderContainer container = createContainer();
+      final ProviderContainer container = _createContainer();
       await container.read(libraryComicFiltersProvider.future);
 
       await container
@@ -60,7 +64,7 @@ void main() {
   );
 
   test('selecting a non-readAt field for the first time still defaults to ascending', () async {
-    final ProviderContainer container = createContainer();
+    final ProviderContainer container = _createContainer();
     await container.read(libraryComicFiltersProvider.future);
 
     await container
@@ -75,7 +79,7 @@ void main() {
   });
 
   test('resetAll restores every comics filter and sort to defaults', () async {
-    final ProviderContainer container = createContainer();
+    final ProviderContainer container = _createContainer();
     await container.read(libraryComicFiltersProvider.future);
     final LibraryComicFiltersNotifier notifier = container.read(
       libraryComicFiltersProvider.notifier,
@@ -94,7 +98,7 @@ void main() {
 
     await notifier.resetAll();
 
-    final LibraryComicFiltersState state = await container.read(
+    final LibraryComicBrowsePreferences state = await container.read(
       libraryComicFiltersProvider.future,
     );
     expect(state.ageRestriction, LibraryAgeRestrictionFilter.unrestricted);
@@ -111,7 +115,7 @@ void main() {
   });
 
   test('preferences persist across containers', () async {
-    final ProviderContainer first = createContainer();
+    final ProviderContainer first = _createContainer();
     await first.read(libraryComicFiltersProvider.future);
     final LibraryComicFiltersNotifier notifier = first.read(
       libraryComicFiltersProvider.notifier,
@@ -123,8 +127,8 @@ void main() {
     await notifier.setSortField(LibraryComicSortField.fileSize);
     first.dispose();
 
-    final ProviderContainer second = createContainer();
-    final LibraryComicFiltersState state = await second.read(
+    final ProviderContainer second = _createContainer();
+    final LibraryComicBrowsePreferences state = await second.read(
       libraryComicFiltersProvider.future,
     );
     expect(state.ageRestriction, LibraryAgeRestrictionFilter.allAges);
@@ -137,22 +141,22 @@ void main() {
   });
 
   test('session include-sets do not persist across containers', () async {
-    final ProviderContainer first = createContainer();
+    final ProviderContainer first = _createContainer();
     await first.read(libraryComicFiltersProvider.future);
     await first
         .read(libraryComicFiltersProvider.notifier)
         .toggleIncludeSet(LibraryIncludeSetKind.language, 'zh');
     first.dispose();
 
-    final ProviderContainer second = createContainer();
-    final LibraryComicFiltersState state = await second.read(
+    final ProviderContainer second = _createContainer();
+    final LibraryComicBrowsePreferences state = await second.read(
       libraryComicFiltersProvider.future,
     );
     expect(state.languageFilter, isEmpty);
   });
 
   test('derived query filter and isCustomized reflect current state', () async {
-    final ProviderContainer container = createContainer();
+    final ProviderContainer container = _createContainer();
     await container.read(libraryComicFiltersProvider.future);
     expect(container.read(libraryComicFiltersIsCustomizedProvider), isFalse);
 
@@ -171,7 +175,7 @@ void main() {
   test(
     'tag and author tri-state toggles survive to the query filter',
     () async {
-      final ProviderContainer container = createContainer();
+      final ProviderContainer container = _createContainer();
       await container.read(libraryComicFiltersProvider.future);
       final LibraryComicFiltersNotifier notifier = container.read(
         libraryComicFiltersProvider.notifier,
@@ -180,7 +184,7 @@ void main() {
       await notifier.setTagIncludeMode(LibraryMetadataIncludeMode.all);
       await notifier.toggleAuthor('42');
 
-      final LibraryComicFiltersState state = await container.read(
+      final LibraryComicBrowsePreferences state = await container.read(
         libraryComicFiltersProvider.future,
       );
       expect(
@@ -193,7 +197,7 @@ void main() {
   );
 
   test('parody and character tri-state stay session-scoped', () async {
-    final ProviderContainer first = createContainer();
+    final ProviderContainer first = _createContainer();
     await first.read(libraryComicFiltersProvider.future);
     final LibraryComicFiltersNotifier notifier = first.read(
       libraryComicFiltersProvider.notifier,
@@ -203,7 +207,7 @@ void main() {
     await notifier.toggleCharacter('Saber');
     await notifier.toggleCharacter('Saber');
 
-    LibraryComicFiltersState state = await first.read(
+    LibraryComicBrowsePreferences state = await first.read(
       libraryComicFiltersProvider.future,
     );
     expect(
@@ -223,7 +227,7 @@ void main() {
     expect(filter.charactersExclude, <String>{'Saber'});
     first.dispose();
 
-    final ProviderContainer second = createContainer();
+    final ProviderContainer second = _createContainer();
     state = await second.read(libraryComicFiltersProvider.future);
     expect(state.parodyFilter.isActive, isFalse);
     expect(state.characterFilter.isActive, isFalse);

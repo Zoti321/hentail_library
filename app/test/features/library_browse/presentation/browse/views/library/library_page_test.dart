@@ -2,26 +2,23 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/core/l10n/app_localizations_zh.dart';
-import 'package:hentai_library/features/library_browse/presentation/catalog/view_models/catalog_selection_notifier.dart';
+import 'package:hentai_library/l10n/app_localizations_zh.dart';
+import 'package:hentai_library/shared/ui/catalog/selection/catalog_selection_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/models/browse_view_object_mappers.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/models/comic_browse_view_object.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/models/series_browse_view_object.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_state.dart';
-import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_page_snapshot.dart';
-import 'package:hentai_library/shared/di/library_state_providers.dart';
+import 'package:hentai_library/shared/ui/catalog/pagination/library_pagination.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_comics_catalog_controller.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_page_facade_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_series_catalog_controller.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/views/library/library_page.dart';
-import 'package:hentai_library/features/library_browse/presentation/browse/views/library/library_selection_header.dart';
+import 'package:hentai_library/shared/ui/catalog/selection/library_selection_header.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/patterns/library/library_page_header.dart';
-import 'package:hentai_library/shared/ui/widgets/catalog/comic_card.dart';
-import 'package:hentai_library/features/comic/di/comic_cover_providers.dart';
-import 'package:hentai_library/features/series/di/series_cover_providers.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
-import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
+import 'package:hentai_library/design-system/design_system.dart';
+import 'package:hentai_library/features/comic/presentation/providers/comic_cover_providers.dart';
+import 'package:hentai_library/features/series/presentation/providers/series_cover_providers.dart';
+import 'package:hentai_library/features/comic/public/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/thumbnail/series_cover_source.dart';
 import 'package:hentai_library/shared/ui/models/comic_cover_state.dart';
@@ -33,7 +30,7 @@ import '../../../../../../support/pump_localized_app.dart';
 
 Comic _comic(String id, String title) {
   final DateTime now = DateTime.utc(2026, 1, 1);
-  return Comic(
+  return Comic.restore(
     comicId: id,
     path: '/$id',
     resourceType: ResourceType.zip,
@@ -50,9 +47,7 @@ ComicBrowseViewObject _comicViewObject(String id, String title) {
 }
 
 SeriesBrowseViewObject _seriesViewObject(String id, String name) {
-  return seriesBrowseViewObjectFromSeries(
-    Series(id: id, name: name, folderPath: '/$id'),
-  );
+  return (id: id, name: name, volumeCount: 0);
 }
 
 const LibraryPagination _onePage = LibraryPagination(

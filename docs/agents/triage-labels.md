@@ -1,20 +1,11 @@
-# Triage Labels
+# Triage labels
 
-The skills speak in terms of five canonical triage **state** roles. This file maps those roles to the label strings used in this repo's GitHub Issues.
+Each issue has exactly one state label:
 
-| Role in skills | Label in this repo | Meaning |
-| -------------- | ------------------ | ------- |
-| `needs-triage` | `needs-triage` | Maintainer needs to evaluate this issue |
-| `needs-info` | `needs-info` | Waiting on reporter for more information |
-| `ready-for-agent` | `ready-for-agent` | Fully specified, ready for an AFK agent |
-| `ready-for-human` | `ready-for-human` | Requires human implementation |
-| `wontfix` | `wontfix` | Will not be actioned |
+- `needs-triage`: awaiting maintainer assessment.
+- `needs-info`: awaiting reporter information.
+- `ready-for-agent`: specified and ready for agent implementation.
+- `ready-for-human`: requires human implementation.
+- `wontfix`: will not be implemented.
 
-**Category** roles (one per issue, alongside exactly one state role):
-
-| Role in skills | Typical label | Meaning |
-| -------------- | ------------- | ------- |
-| `bug` | `bug` | Something isn't working |
-| `enhancement` | `enhancement` | New feature or improvement |
-
-When a skill says to apply the AFK-ready triage label, use `ready-for-agent`. Human maintainer triage commands: `docs/engineering/maintainer.md` (恰好一个 state 标签的约定与上表一致).
+Add one category label, `bug` or `enhancement`, alongside the state. When a skill requests an AFK-ready label, use `ready-for-agent`. Change state by removing the previous state and adding its replacement; do not accumulate state labels. Tracker operations are documented in [issue-tracker.md](issue-tracker.md).

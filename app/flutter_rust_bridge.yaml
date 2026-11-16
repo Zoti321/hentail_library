@@ -2,3 +2,8 @@ auto_upgrade_dependency: false
 rust_input: crate::api
 rust_root: ../core/crates/flutter/
 dart_output: lib/src/rust
+# FRB 2.13 emits RustArcStaticData without inferable generic arguments.
+# Remove this diagnostic-only workaround when the generator supplies the type.
+dart_preamble: |
+  // FRB 2.13 RustArcStaticData has no inferable generic argument.
+  // ignore_for_file: inference_failure_on_instance_creation

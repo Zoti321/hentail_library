@@ -71,8 +71,8 @@ async fn seed_cross_library_comics() {
 #[test]
 fn bulk_patch_add_tags_merges_and_auto_locks() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let db_path = common::create_fixture_db(temp.path());
+        let temp = TempDir::new().expect("tempdir").keep();
+        let db_path = common::create_fixture_db(&temp);
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -122,8 +122,8 @@ fn bulk_patch_add_tags_merges_and_auto_locks() {
 #[test]
 fn bulk_patch_remove_tags_noop_counts_unchanged() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let db_path = common::create_fixture_db(temp.path());
+        let temp = TempDir::new().expect("tempdir").keep();
+        let db_path = common::create_fixture_db(&temp);
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -163,8 +163,8 @@ fn bulk_patch_remove_tags_noop_counts_unchanged() {
 #[test]
 fn bulk_patch_replace_authors_overwrites_list() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let db_path = common::create_fixture_db(temp.path());
+        let temp = TempDir::new().expect("tempdir").keep();
+        let db_path = common::create_fixture_db(&temp);
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -196,7 +196,7 @@ fn bulk_patch_replace_authors_overwrites_list() {
             .expect("bulk patch");
 
             let c1 = find_comic_by_id("c1").await.expect("find").expect("exists");
-            assert_eq!(c1.authors, vec!["New"]);
+            assert_eq!(c1.author_names(), vec!["New"]);
             assert!(c1.locks.authors);
         });
     });
@@ -205,8 +205,8 @@ fn bulk_patch_replace_authors_overwrites_list() {
 #[test]
 fn bulk_patch_rejects_cross_library_ids() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let db_path = common::create_fixture_db(temp.path());
+        let temp = TempDir::new().expect("tempdir").keep();
+        let db_path = common::create_fixture_db(&temp);
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -235,8 +235,8 @@ fn bulk_patch_rejects_cross_library_ids() {
 #[test]
 fn bulk_patch_cancel_stops_after_first_comic() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let db_path = common::create_fixture_db(temp.path());
+        let temp = TempDir::new().expect("tempdir").keep();
+        let db_path = common::create_fixture_db(&temp);
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -284,8 +284,8 @@ fn bulk_patch_cancel_stops_after_first_comic() {
 #[test]
 fn bulk_patch_cancel_before_loop_processes_nothing() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let db_path = common::create_fixture_db(temp.path());
+        let temp = TempDir::new().expect("tempdir").keep();
+        let db_path = common::create_fixture_db(&temp);
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -320,8 +320,8 @@ fn bulk_patch_cancel_before_loop_processes_nothing() {
 #[test]
 fn bulk_patch_modifies_locked_fields() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let db_path = common::create_fixture_db(temp.path());
+        let temp = TempDir::new().expect("tempdir").keep();
+        let db_path = common::create_fixture_db(&temp);
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -364,8 +364,8 @@ fn bulk_patch_modifies_locked_fields() {
 #[test]
 fn bulk_patch_write_lock_is_exclusive() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let db_path = common::create_fixture_db(temp.path());
+        let temp = TempDir::new().expect("tempdir").keep();
+        let db_path = common::create_fixture_db(&temp);
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -395,8 +395,8 @@ fn bulk_patch_write_lock_is_exclusive() {
 #[test]
 fn bulk_patch_missing_id_counts_failed() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let db_path = common::create_fixture_db(temp.path());
+        let temp = TempDir::new().expect("tempdir").keep();
+        let db_path = common::create_fixture_db(&temp);
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -427,8 +427,8 @@ fn bulk_patch_missing_id_counts_failed() {
 #[test]
 fn bulk_patch_rejects_over_cap_ids() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let db_path = common::create_fixture_db(temp.path());
+        let temp = TempDir::new().expect("tempdir").keep();
+        let db_path = common::create_fixture_db(&temp);
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -456,8 +456,8 @@ fn bulk_patch_rejects_over_cap_ids() {
 #[test]
 fn bulk_patch_m2_languages_parodies_characters_merge() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let db_path = common::create_fixture_db(temp.path());
+        let temp = TempDir::new().expect("tempdir").keep();
+        let db_path = common::create_fixture_db(&temp);
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -468,7 +468,7 @@ fn bulk_patch_m2_languages_parodies_characters_merge() {
                 vec!["c1".to_string(), "c2".to_string()],
                 ComicMetadataBulkPatch {
                     languages: Some(MultiValuePatch {
-                        op: MultiValueOp::Add,
+                        op: MultiValueOp::Replace,
                         values: vec!["Japanese".to_string()],
                     }),
                     parodies: Some(MultiValuePatch {
@@ -501,8 +501,8 @@ fn bulk_patch_m2_languages_parodies_characters_merge() {
 #[test]
 fn bulk_patch_m2_content_rating_description_published_at() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let db_path = common::create_fixture_db(temp.path());
+        let temp = TempDir::new().expect("tempdir").keep();
+        let db_path = common::create_fixture_db(&temp);
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -547,8 +547,8 @@ fn bulk_patch_m2_content_rating_description_published_at() {
 #[test]
 fn bulk_patch_m2_rejects_invalid_content_rating() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let db_path = common::create_fixture_db(temp.path());
+        let temp = TempDir::new().expect("tempdir").keep();
+        let db_path = common::create_fixture_db(&temp);
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -569,4 +569,61 @@ fn bulk_patch_m2_rejects_invalid_content_rating() {
             assert!(err.to_string().contains("safe / r18"));
         });
     });
+}
+
+#[test]
+fn bulk_patch_reads_current_target_and_deduplicates_ids() {
+    common::with_global_db(|| {
+        let temp = TempDir::new().unwrap().keep();
+        let db_path = common::create_fixture_db(&temp);
+        let runtime = tokio::runtime::Runtime::new().unwrap();
+        runtime.block_on(async {
+            init_db_at_path(&db_path).await.unwrap();
+            seed_two_comics_in_one_library().await;
+            let db = connection().unwrap();
+            // The first committed target changes the second after batch discovery.
+            db.execute(Statement::from_string(sea_orm::DatabaseBackend::Sqlite,
+                "CREATE TRIGGER edit_next_target AFTER UPDATE ON comic_meta WHEN NEW.comic_id = 'c1' BEGIN UPDATE comic_meta SET description = 'latest' WHERE comic_id = 'c2'; END".to_string())).await.unwrap();
+            let result = apply_comic_metadata_bulk_patch(
+                vec!["c1".into(), "c2".into(), "c2".into()],
+                ComicMetadataBulkPatch { description: Some(ScalarPatch::Replace("latest".into())), ..Default::default() },
+                &create_sync_handle()).await.unwrap();
+            assert_eq!(result.succeeded, 1);
+            assert_eq!(result.unchanged, 1);
+            assert_eq!(result.failed, 0);
+            let current = find_comic_by_id("c2").await.unwrap().unwrap();
+            assert_eq!(current.description.as_deref(), Some("latest"));
+            assert!(!current.locks.description);
+        });
+    });
+}
+
+#[test]
+fn bulk_add_remove_merge_values_committed_after_discovery() {
+    for op in [MultiValueOp::Add, MultiValueOp::Remove] {
+        common::with_global_db(|| {
+            let temp = TempDir::new().unwrap().keep();
+            let db_path = common::create_fixture_db(&temp);
+            let runtime = tokio::runtime::Runtime::new().unwrap();
+            runtime.block_on(async {
+                init_db_at_path(&db_path).await.unwrap();
+                seed_two_comics_in_one_library().await;
+                for id in ["c1", "c2"] {
+                    update_comic_user_meta(id, UpdateComicUserMetaDto { tags: Some(vec!["requested".into()]), ..Default::default() }).await.unwrap();
+                }
+                let db = connection().unwrap();
+                db.execute(Statement::from_string(sea_orm::DatabaseBackend::Sqlite,
+                    "CREATE TRIGGER edit_next_tags AFTER UPDATE ON comic_meta WHEN NEW.comic_id = 'c1' BEGIN INSERT OR IGNORE INTO tags (name) VALUES ('latest'); INSERT OR IGNORE INTO comic_tags (comic_id, tag_name) VALUES ('c2', 'latest'); END".to_string())).await.unwrap();
+                let result = apply_comic_metadata_bulk_patch(vec!["c1".into(), "c2".into()], ComicMetadataBulkPatch {
+                    description: Some(ScalarPatch::Replace("changed".into())),
+                    tags: Some(MultiValuePatch { op, values: vec!["requested".into()] }),
+                    ..Default::default()
+                }, &create_sync_handle()).await.unwrap();
+                assert_eq!(result.succeeded, 2);
+                let current = find_comic_by_id("c2").await.unwrap().unwrap();
+                assert!(current.tags.contains(&"latest".into()));
+                assert_eq!(current.tags.contains(&"requested".into()), matches!(op, MultiValueOp::Add));
+            });
+        });
+    }
 }

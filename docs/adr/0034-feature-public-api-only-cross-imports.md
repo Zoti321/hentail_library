@@ -4,6 +4,8 @@
 
 Accepted
 
+> **ADR-0051 修订（2026-11-12）**：组合根迁到 `lib/composition/`；owner `data/` 迁为 `infrastructure/`；共享协作签名在 `shared/application/contracts/`，Riverpod 适配在 `shared/presentation/providers/`。内层以递归 import/export 门禁为准；下文旧目录是历史语境。
+
 ## Context
 
 Wayfinder 落地后，产品 feature 之间仍采用「零 cross-feature import + `shared/application/ports` + bootstrap override」协作（ADR-0027、import boundary M1）。该模式可行但编排面分散，与 NestJS 式「模块只 export public」心智不一致。
@@ -34,8 +36,11 @@ Epic [#425](https://github.com/Zoti321/hentail_library/issues/425) 与 implement
 
 ### 3. Riverpod 与 DI
 
-- Consumer 仍 `ref.read` **`shared/di`** 声明的 Provider token（#426）。
+- **Token 归属（2026-11-11 修订，#488）**：能力所有者把自家 Provider token 声明在 `features/<owner>/public/di/**`，消费方直接 `ref.watch/read` owner 的 public token；`shared/di` **只保留跨模块命令 Port 与全局状态** token。
 - 工厂经 owner **`public/di`** 暴露；bootstrap 在 `features/bootstrap/di/overrides/` 按 owner 拆分 override（#435）。
+- 禁止把模块私有 token 再抄到 `shared/di` 转发；`shared/di` 声明仍必须被 override 覆盖（`app/test/architecture/di_inversion_test.dart`）。
+
+> **实现修订（2026-11-09）**：`shared/di` 的占位 token 统一用 `app/lib/shared/di/injected_di.dart` 的 `injectedDi` / `injectedFutureDi` / `injectedFutureDiFamily` 声明，保留显式类型标注；不再手写 `throw UnimplementedError`。组合根收敛为 `features/bootstrap/di/bootstrap_overrides.dart` 的 `bootstrapDiOverrides()`（data → shared state → composition），`main.dart` 只调用它。**新增 token 必须补齐 override**，由 `app/test/gate/shared_di_override_coverage_test.dart` 静态校验「`shared/di` 声明 ⊆ 应用内 override」。
 
 ### 4. Wayfinder 布局
 
@@ -47,7 +52,7 @@ Epic [#425](https://github.com/Zoti321/hentail_library/issues/425) 与 implement
 - **M2**：presentation cross-feature 规则 **不变**。
 - **M3**：product→bootstrap **不变**。
 - **R11**：`shared` → `features/*/public/**`，L1 零 tolerance。
-- **public 依赖环**：仅 public 边构成有向图；**禁止环**（零 tolerance，见 `import_boundary_test`）。
+- **public 依赖环**：仅 public 边构成有向图；**禁止环**（零 tolerance）。2026-11-11 起由 `app/test/architecture/module_boundary_test.dart` 同时扫描 `import` 与 `export`（bridge 式 `export` 后门不再隐形）。
 
 ### 6. `public/` 宪章（Spec 2 / #430）
 
@@ -72,7 +77,7 @@ Epic [#425](https://github.com/Zoti321/hentail_library/issues/425) 与 implement
 ### Positive
 
 - Cross-feature 边界可扫描、可文档化；与模块 export 心智一致。
-- #429–#435 已落地：admin / browse / read_session / comic_trash 等 owner `public/` 与 Gate 同步。
+- #429–#435 已落地：admin / browse / reader / comic_trash 等 owner `public/` 与 Gate 同步。
 
 > **实现修订（2026-11-02）**：移除 `shared/application/ports/`；UI 命令契约在 `shared/domain/ports/`（如 `AuthorDetailPort`、`LibraryManagementPort`）。跨 feature **import 类型**请用 owner `public.dart`；`shared/di` 仍自 shared 层 import 契约（R11 禁止 shared→feature public）。
 
@@ -82,9 +87,15 @@ Epic [#425](https://github.com/Zoti321/hentail_library/issues/425) 与 implement
 
 - 每个对外能力需维护 public barrel；部分契约真值仍在 shared/domain（UI 命令 + kernel），与 public re-export 需同步 review。
 
+### 实现修订（2026-11-11，#488）
+
+- 删除 `library_browse/presentation/integrations/{comic,series}_presentation_bridge.dart` 与 `public/catalog/for_comic_and_series.dart`：bridge 用 `export` 绕过旧门禁，已在 `test/architecture` 中补 `export` 扫描后清零。
+- 消费方向固定为 `library_browse → comic/series`；`comic` 不 import `library_browse` / `series` / `reader`，`series` 不 import `library_browse`。禁止边表由测试执行，不靠文档约定。
+- 新增 owner `public/ui`（comic/series 的 card host、metadata edit draft/present/layout）与 owner `public/l10n`、`public/di`；R12 allowlist 只登记确实需要转发自身 `presentation/` 的 public UI 入口。
+
 ## References
 
 - ADR-0017、ADR-0027、ADR-0033
 - #425–#435（epic + implementation spec，已关闭）
 - `app/test/gate/import_boundary_rules.dart`、`docs/engineering/gate.md`
-- Owner public 示例：`features/library_admin/public.dart`、`library_browse/public.dart`、`read_session/public.dart`、`comic_trash/public.dart`
+- Owner public 示例：`features/library_admin/public.dart`、`library_browse/public.dart`、`reader/public.dart`、`comic_trash/public.dart`

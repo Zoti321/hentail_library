@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:hentai_library/features/reading_history/presentation/models/history_card_item.dart';
-import 'package:hentai_library/shared/ui/widgets/history/reading_history_list_item.dart';
+import 'package:hentai_library/features/reading_history/presentation/widgets/reading_history_list_item.dart';
 
 /// Widgetbook / 预览用阅读历史示例数据。
 abstract final class Md3eHistoryBrowsePagePreviewData {
@@ -17,10 +17,7 @@ abstract final class Md3eHistoryBrowsePagePreviewData {
     VoidCallback? onDeleteRecord,
   }) {
     return <ReadingHistoryMoreMenuEntry>[
-      ReadingHistoryMoreMenuEntry(
-        label: '删除记录',
-        onSelected: onDeleteRecord,
-      ),
+      ReadingHistoryMoreMenuEntry(label: '删除记录', onSelected: onDeleteRecord),
       const ReadingHistoryMoreMenuEntry(label: '在资源管理器中显示'),
     ];
   }

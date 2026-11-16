@@ -1,0 +1,63 @@
+import 'package:hentai_library/features/comic/domain/value_objects/resource_fingerprint.dart';
+import 'package:hentai_library/features/comic/domain/value_objects/content_rating.dart';
+import 'package:hentai_library/features/comic/domain/comic.dart';
+import 'package:hentai_library/features/comic/domain/value_objects/comic_meta_locks.dart';
+import 'package:hentai_library/features/comic_metadata/public/comic_metadata_entities.dart';
+import 'package:hentai_library/shared/domain/models/enums.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
+import 'package:hentai_library/src/rust/api/comic.dart' as rust;
+
+/// FRB `ComicDto` → comic 领域 [Comic]（ADR-0041 恢复入口）。
+Comic mapRustComic(rust.ComicDto dto) {
+  return Comic.restore(
+    comicId: dto.comicId,
+    path: dto.path,
+    resourceType: ResourceType.values.byName(dto.resourceType),
+    resourceSize: dto.resourceSize.toInt(),
+    fingerprint: dto.resourceFingerprint == null
+        ? null
+        : mapResourceFingerprint(dto.resourceFingerprint!),
+    createdAt: comicTimestampFromMs(dto.createdAt.toInt()),
+    lastUpdatedAt: comicTimestampFromMs(dto.lastUpdatedAt.toInt()),
+    title: dto.title,
+    authors: dto.authors
+        .map(
+          (rust.ComicAuthorDto a) => AuthorRef(id: a.id?.toInt(), name: a.name),
+        )
+        .toList(),
+    contentRating: ContentRating.values.byName(dto.contentRating),
+    tags: dto.tags.map((String n) => Tag(name: n)).toList(),
+    languages: List<String>.of(dto.languages),
+    parodies: List<String>.of(dto.parodies),
+    characters: List<String>.of(dto.characters),
+    pageCount: dto.pageCount,
+    description: dto.description,
+    publishedAt: dto.publishedAt == null
+        ? null
+        : comicTimestampFromMs(dto.publishedAt!.toInt()),
+    lastReadTime: dto.lastReadTimeMs == null
+        ? null
+        : comicTimestampFromMs(dto.lastReadTimeMs!.toInt()),
+    locks: ComicMetaLocks(
+      title: dto.locks.title,
+      description: dto.locks.description,
+      publishedAt: dto.locks.publishedAt,
+      contentRating: dto.locks.contentRating,
+      authors: dto.locks.authors,
+      tags: dto.locks.tags,
+      languages: dto.locks.languages,
+      parodies: dto.locks.parodies,
+      characters: dto.locks.characters,
+    ),
+  );
+}
+
+ResourceFingerprint mapResourceFingerprint(rust.ResourceFingerprintDto dto) =>
+    ResourceFingerprint(
+      digest: dto.digest,
+      resourceType: ResourceType.values.byName(dto.resourceType),
+      observedSize: dto.size.toInt(),
+      sourceModifiedAt: dto.modifiedMs.toInt() <= 0
+          ? null
+          : comicTimestampFromMs(dto.modifiedMs.toInt()),
+    );

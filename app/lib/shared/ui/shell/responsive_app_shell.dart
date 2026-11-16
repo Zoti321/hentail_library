@@ -1,11 +1,8 @@
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:hentai_library/core/util/utils.dart';
-import 'package:hentai_library/shared/ui/widgets/desktop/desktop_title_bar.dart';
-import 'package:hentai_library/shared/ui/widgets/desktop/desktop_title_bar_metrics.dart';
-import 'package:hentai_library/shared/ui/widgets/desktop/window_close_listener.dart';
+import 'package:hentai_library/shared/application/navigation/app_routes.dart';
+import 'package:hentai_library/shared/ui/navigation/app_navigator_context.dart';
 import 'package:hentai_library/shared/ui/shell/desktop_shell.dart';
-import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
 import 'package:hentai_library/shared/ui/shell/app_shell_slot.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -68,9 +65,9 @@ class ResponsiveAppShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String path = GoRouterState.of(context).uri.path;
+    final String path = appNavigatorOf(context).currentPath();
     // 阅读器路由不显示壳层导航；其余路由（含设置）都运行在 MD3E 壳内。
-    final bool isReaderRoute = path.startsWith('/reader');
+    final bool isReaderRoute = AppRoutes.isReaderPath(path);
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
@@ -78,25 +75,25 @@ class ResponsiveAppShell extends StatelessWidget {
             constraints.maxHeight >= DesktopTitleBarMetrics.height;
 
         final Widget body = isReaderRoute
-            ? Column(
-                children: <Widget>[
-                  if (showShellChrome &&
-                      !isReaderFullscreen &&
-                      supportsDesktopWindowChrome)
-                    const DesktopTitleBar(),
-                  if (showShellChrome) ...shellFeedbackBelowTitleBar,
-                  Expanded(child: routeChild),
-                ],
+            ? ShellContentLayout(
+                titleBar:
+                    showShellChrome &&
+                        !isReaderFullscreen &&
+                        supportsDesktopWindowChrome
+                    ? const DesktopTitleBar()
+                    : null,
+                feedback: showShellChrome
+                    ? shellFeedbackBelowTitleBar
+                    : const <Widget>[],
+                pane: routeChild,
               )
             : _buildDesktopShell(context, navigationSlotBuilder(context));
 
-        return WindowCloseListener(
-          child: Scaffold(
-            backgroundColor: labBrowseCanvasColor(
-              M3ETheme.of(context).colorScheme,
-            ),
-            body: body,
+        return Scaffold(
+          backgroundColor: labBrowseCanvasColor(
+            M3ETheme.of(context).colorScheme,
           ),
+          body: body,
         );
       },
     );

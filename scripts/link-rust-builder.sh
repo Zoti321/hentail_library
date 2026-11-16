@@ -12,7 +12,14 @@ if [[ ! -f "$TARGET/Cargo.toml" ]]; then
   exit 1
 fi
 
-rm -rf "$JUNCTION"
+if [[ -e "$JUNCTION" || -L "$JUNCTION" ]]; then
+  if [[ "$JUNCTION" -ef "$TARGET" ]]; then
+    echo "Rust 链接已就绪: $JUNCTION"
+    exit 0
+  fi
+  echo "error: 路径已存在且不是目标链接，请人工核对: $JUNCTION" >&2
+  exit 1
+fi
 
 is_windows() {
   case "$(uname -s 2>/dev/null || true)" in
@@ -32,8 +39,9 @@ if is_windows; then
   junction_win="$(to_win "$JUNCTION")"
   target_win="$(to_win "$TARGET")"
   # cmd mklink 在 Git Bash 下引号易被错误拆分；用 PowerShell 更稳妥。
-  powershell.exe -NoProfile -Command \
-    "New-Item -ItemType Junction -Path '$junction_win' -Target '$target_win' | Out-Null"
+  HENTAI_RUST_LINK_PATH="$junction_win" HENTAI_RUST_LINK_TARGET="$target_win" \
+    powershell.exe -NoProfile -Command \
+      '$ErrorActionPreference = "Stop"; New-Item -ItemType Junction -Path $env:HENTAI_RUST_LINK_PATH -Target $env:HENTAI_RUST_LINK_TARGET | Out-Null'
 else
   ln -s ../../core/crates/flutter "$JUNCTION"
 fi

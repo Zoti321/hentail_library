@@ -12,6 +12,7 @@ use sea_orm::{
 };
 
 use crate::comic::visibility::{visible_comic_id_sql, visible_comic_sql};
+use crate::comic::ComicAuthorDto;
 use crate::db::{connection, map_db_err};
 use crate::entity::{author_links, authors, prelude::*};
 use crate::error::HentaiError;
@@ -246,6 +247,7 @@ pub async fn add_author(name: &str) -> Result<AuthorIdentity, HentaiError> {
     let trimmed = validate_author_name(name)?;
     let db = connection()?;
     let id = ensure_author_id(&db, &trimmed).await?;
+    crate::revision::notify_committed();
     Ok(AuthorIdentity {
         id,
         name: trimmed,
@@ -268,6 +270,7 @@ pub(crate) async fn delete_authors_by_names_locked(names: Vec<String>) -> Result
     let ids = author_ids_for_names(&txn, &names).await?;
     delete_authors_by_ids(&txn, &ids).await?;
     txn.commit().await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(())
 }
 
@@ -282,6 +285,20 @@ pub async fn delete_authors_by_ids<C: ConnectionTrait>(
         .collect::<Vec<_>>()
         .join(", ");
     let values: Vec<Value> = ids.iter().copied().map(Value::from).collect();
+    let affected = db
+        .query_all(Statement::from_sql_and_values(
+            sea_orm::DatabaseBackend::Sqlite,
+            format!(
+                "SELECT DISTINCT comic_id FROM comic_authors WHERE author_id IN ({placeholders})"
+            ),
+            values.clone(),
+        ))
+        .await
+        .map_err(map_db_err)?
+        .into_iter()
+        .map(|row| row.try_get("", "comic_id").map_err(map_db_err))
+        .collect::<Result<Vec<String>, _>>()?;
+    let captured = crate::resource_metadata::capture_affected_in(db, affected).await?;
     db.execute(Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
         format!("DELETE FROM author_links WHERE author_id IN ({placeholders})"),
@@ -303,11 +320,26 @@ pub async fn delete_authors_by_ids<C: ConnectionTrait>(
     ))
     .await
     .map_err(map_db_err)?;
+    crate::resource_metadata::record_affected_in(db, captured).await?;
     Ok(())
 }
 
 pub async fn rename_author(old_name: &str, new_name: &str) -> Result<(), HentaiError> {
     with_library_write(|| rename_author_locked(old_name, new_name)).await
+}
+
+/// Rename the selected Author by stable identity, preserving links and Comic attachments.
+pub async fn rename_author_identity(author_id: i64, new_name: &str) -> Result<(), HentaiError> {
+    with_library_write(|| async {
+        let db = connection()?;
+        let txn = db.begin().await.map_err(map_db_err)?;
+        ensure_author_exists(&txn, author_id).await?;
+        rename_author_by_id(&txn, author_id, new_name).await?;
+        txn.commit().await.map_err(map_db_err)?;
+        crate::revision::notify_committed();
+        Ok(())
+    })
+    .await
 }
 
 /// [`rename_author`] body for callers that already hold the library write lock (ADR-0026).
@@ -320,7 +352,13 @@ pub(crate) async fn rename_author_locked(
     let Some(id) = find_author_id_by_name(&db, old_name).await? else {
         return Err(HentaiError::validation(format!("作者不存在: {old_name}")));
     };
-    rename_author_by_id(&db, id, &new_name).await
+    let txn = db.begin().await.map_err(map_db_err)?;
+    let result = rename_author_by_id(&txn, id, &new_name).await;
+    if result.is_ok() {
+        txn.commit().await.map_err(map_db_err)?;
+        crate::revision::notify_committed();
+    }
+    result
 }
 
 pub async fn rename_author_by_id<C: ConnectionTrait>(
@@ -337,6 +375,18 @@ pub async fn rename_author_by_id<C: ConnectionTrait>(
             )));
         }
     }
+    let affected = db
+        .query_all(Statement::from_sql_and_values(
+            sea_orm::DatabaseBackend::Sqlite,
+            "SELECT comic_id FROM comic_authors WHERE author_id = ?",
+            [author_id.into()],
+        ))
+        .await
+        .map_err(map_db_err)?
+        .into_iter()
+        .map(|row| row.try_get("", "comic_id").map_err(map_db_err))
+        .collect::<Result<Vec<String>, _>>()?;
+    let captured = crate::resource_metadata::capture_affected_in(db, affected).await?;
     db.execute(Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
         "UPDATE authors SET name = ? WHERE id = ?",
@@ -344,6 +394,7 @@ pub async fn rename_author_by_id<C: ConnectionTrait>(
     ))
     .await
     .map_err(map_db_err)?;
+    crate::resource_metadata::record_affected_in(db, captured).await?;
     Ok(())
 }
 
@@ -388,6 +439,25 @@ pub async fn load_author_names_for_comics<C: ConnectionTrait>(
     db: &C,
     comic_ids: &[String],
 ) -> Result<std::collections::HashMap<String, Vec<String>>, HentaiError> {
+    Ok(load_comic_authors_for_comics(db, comic_ids)
+        .await?
+        .into_iter()
+        .map(|(comic_id, authors)| {
+            (
+                comic_id,
+                authors.into_iter().map(|a| a.name).collect::<Vec<String>>(),
+            )
+        })
+        .collect())
+}
+
+/// 读路径专用：Comic 附着的 Author 引用投影（`id` + 显示名，ADR-0024）。
+///
+/// 写路径仍用 [`load_author_names_for_comics`]（用户输入的是名字，需 upsert 成 id）。
+pub async fn load_comic_authors_for_comics<C: ConnectionTrait>(
+    db: &C,
+    comic_ids: &[String],
+) -> Result<std::collections::HashMap<String, Vec<ComicAuthorDto>>, HentaiError> {
     let mut map = std::collections::HashMap::new();
     if comic_ids.is_empty() {
         return Ok(map);
@@ -400,7 +470,7 @@ pub async fn load_author_names_for_comics<C: ConnectionTrait>(
         .query_all(Statement::from_sql_and_values(
             sea_orm::DatabaseBackend::Sqlite,
             format!(
-                "SELECT ca.comic_id, a.name \
+                "SELECT ca.comic_id, a.id, a.name \
                  FROM comic_authors ca \
                  INNER JOIN authors a ON a.id = ca.author_id \
                  WHERE ca.comic_id IN ({placeholders}) \
@@ -412,8 +482,13 @@ pub async fn load_author_names_for_comics<C: ConnectionTrait>(
         .map_err(map_db_err)?;
     for row in rows {
         let comic_id = string_column(&row, 0)?;
-        let name = string_column(&row, 1)?;
-        map.entry(comic_id).or_default().push(name);
+        let id = row
+            .try_get_by_index::<i64>(1)
+            .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?;
+        let name = string_column(&row, 2)?;
+        map.entry(comic_id)
+            .or_default()
+            .push(ComicAuthorDto { id: Some(id), name });
     }
     Ok(map)
 }
@@ -478,6 +553,7 @@ pub async fn add_author_link(
         platform_display_name: display,
         sort_key: next_key,
     };
+    crate::revision::notify_committed();
     schedule_author_image_refresh(author_id);
     Ok(link)
 }
@@ -539,6 +615,7 @@ pub async fn update_author_link(
             .map_err(map_db_err)?;
     }
     transaction.commit().await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
     if let Some(cache) = cache {
         if let Err(error) = cache.invalidate_platform_link(link_id) {
             tracing::debug!(
@@ -578,6 +655,7 @@ pub async fn delete_author_link(author_id: i64, link_id: i64) -> Result<(), Hent
         return Err(HentaiError::validation("Author link 不存在"));
     }
     transaction.commit().await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
     if let Some(cache) = cache {
         if let Err(error) = cache.invalidate_platform_link(link_id) {
             tracing::debug!(

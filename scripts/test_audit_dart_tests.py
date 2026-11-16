@@ -11,11 +11,26 @@ from audit_dart_tests import (
     build_inventory,
     classify_rubric,
     expand_manifest_to_test_paths,
+    is_compile_smoke,
     read_manifest_entries,
 )
 
 
 class AuditDartTestsTest(unittest.TestCase):
+    def test_compile_smoke_only_flags_symbol_existence_assertions(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp) / "exports_test.dart"
+            source.write_text(
+                "test('exports', () { expect(Foo, isNotNull); });",
+                encoding="utf-8",
+            )
+            self.assertTrue(is_compile_smoke(source))
+            source.write_text(
+                "test('behavior', () { expect(foo(), 1); });",
+                encoding="utf-8",
+            )
+            self.assertFalse(is_compile_smoke(source))
+
     def test_read_manifest_entries_strips_comments(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             manifest = Path(tmp) / "manifest.txt"
@@ -63,16 +78,29 @@ class AuditDartTestsTest(unittest.TestCase):
             )
 
     def test_classify_rubric_precedence(self) -> None:
+        for path in (
+            "test/design-system/design_system_boundary_test.dart",
+            "test/design-system/design_system_dependency_policy_test.dart",
+        ):
+            self.assertEqual(classify_rubric(path, True), "architecture-guard")
+        self.assertEqual(
+            classify_rubric("test/architecture/dart_dependency_graph_test.dart", True),
+            "architecture-guard",
+        )
+        self.assertEqual(
+            classify_rubric("test/shared/application/navigation/app_routes_test.dart", True),
+            "thin-edge",
+        )
         self.assertEqual(
             classify_rubric("test/gate/import_boundary_test.dart", True),
             "architecture-guard",
         )
         self.assertEqual(
-            classify_rubric("test/shared/data/frb/foo_mapper_test.dart", True),
+            classify_rubric("test/infrastructure/frb/foo_mapper_test.dart", True),
             "thin-edge",
         )
         self.assertEqual(
-            classify_rubric("test/features/read_session/domain/spread_test.dart", False),
+            classify_rubric("test/features/reader/domain/spread_test.dart", False),
             "thin-edge",
         )
         self.assertEqual(

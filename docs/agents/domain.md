@@ -1,34 +1,7 @@
-# Domain Docs
+# Domain documentation
 
-How the engineering skills should consume this repo's domain documentation when exploring the codebase.
+Before work that changes domain concepts, read the relevant GLOSSARY entries and the affected ADRs using `docs/adr/README.md`. Layout and collaboration work additionally uses ADR-0051/0052/0053 and the executable rules in `app/test/gate/` and `app/test/architecture/`.
 
-## Before exploring, read these
+Use GLOSSARY vocabulary in issues, PRs, proposals and test names. Check a missing concept against existing terms before adding it. Update the glossary when a definition changes; keep procedures in `docs/engineering/` and decisions in ADRs. Read-session rendering work must preserve **Page image fidelity**.
 
-- **`GLOSSARY.md`** at the repo root
-- **`docs/adr/`**: read ADRs that touch the area you're about to work in (`docs/adr/README.md` for the index). Layout / cross-feature imports: **ADR-0033**, **ADR-0034** + `app/test/gate/`.
-
-If any of these files don't exist, **proceed silently**. Don't flag their absence; don't suggest creating them upfront. The `/domain-modeling` skill (reached via `/grill-with-docs` and `/improve-codebase-architecture`) creates them lazily when terms or decisions actually get resolved.
-
-## File structure
-
-Single-context repo:
-
-```
-/
-├── GLOSSARY.md
-├── docs/adr/
-├── app/          ← Flutter
-└── core/         ← Rust (FRB)
-```
-
-## Use the glossary's vocabulary
-
-When your output names a domain concept (in an issue title, a refactor proposal, a hypothesis, a test name), use the term as defined in `GLOSSARY.md`. Don't drift to synonyms the glossary explicitly avoids.
-
-If the concept you need isn't in the glossary yet, that's a signal: either you're inventing language the project doesn't use (reconsider) or there's a real gap (note it for `/domain-modeling`).
-
-## Flag ADR conflicts
-
-If your output contradicts an existing ADR, surface it explicitly rather than silently overriding:
-
-> _Contradicts ADR-0007 (…), but worth reopening because…_
+Surface any conflict with an accepted ADR explicitly. Preserve its historical decision and record the superseding decision and references rather than silently rewriting its meaning. Write agent instructions, engineering guides and glossary entries in English; README files and CONTRIBUTING stay in Simplified Chinese.

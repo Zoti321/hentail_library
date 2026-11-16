@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
-import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/features/home/presentation/views/home/home_page_metrics.dart';
-import 'package:hentai_library/shared/ui/motion/motion.dart';
-import 'package:hentai_library/shared/ui/widgets/settings/tonal_surface.dart';
 import 'package:material_3_expressive/components/lists/components/m3e_card_radius_motion.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -13,7 +10,7 @@ enum HomeBentoStatLayout {
   /// 原样式：右上标签文案 + 中间大数字 + 底部 caption。
   metric,
 
-  /// 管理入口：右上箭头 + 标题 +「{数字} {单位}」（对齐 [HomeNavShortcutCard]）。
+  /// 管理入口：右上箭头 + 标题 + caption（shortcut 布局）。
   shortcut,
 }
 
@@ -55,8 +52,15 @@ class HomeBentoStatCard extends StatefulWidget {
 class _HomeBentoStatCardState extends State<HomeBentoStatCard> {
   bool _pressed = false;
 
+  void _handleStateChanged(M3EInteractionState state) {
+    final bool next = state.pressed;
+    if (_pressed != next) {
+      setState(() => _pressed = next);
+    }
+  }
+
   BorderRadius get _motionRadius => _pressed
-      ? BorderRadius.circular(kTonalSurfaceRadius)
+      ? const BorderRadius.all(Radius.circular(kTonalSurfaceRadius))
       : widget.borderRadius;
 
   @override
@@ -133,12 +137,7 @@ class _HomeBentoStatCardState extends State<HomeBentoStatCard> {
                   ? SystemMouseCursors.click
                   : SystemMouseCursors.basic,
               padding: EdgeInsets.zero,
-              onStateChanged: (M3EInteractionState state) {
-                final bool next = state.pressed;
-                if (_pressed != next) {
-                  setState(() => _pressed = next);
-                }
-              },
+              onStateChanged: _handleStateChanged,
               child: content,
             ),
           );

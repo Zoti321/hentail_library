@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/layout/library_edit_form_metrics.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/ui/motion/motion.dart';
+import 'package:hentai_library/features/library_admin/presentation/widgets/library_edit_form_metrics.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/features/library_admin/presentation/patterns/library_edit_form.dart';
-import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_surface.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/form/library_form.dart';
+import 'package:hentai_library/features/library_admin/domain/value_objects/library_form.dart';
 
 /// Widgetbook 中 Library 编辑页的打开意图。
 ///
@@ -86,6 +85,13 @@ class _LibraryEditPageState extends State<LibraryEditPage> {
     }
   }
 
+  void _handleFormChanged(LibraryForm value) {
+    setState(() {
+      _form = value;
+      _validation = null;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
@@ -102,14 +108,7 @@ class _LibraryEditPageState extends State<LibraryEditPage> {
         isCreate: _isCreate,
         validation: _validation,
         enabled: !_saving,
-        onFormChanged: (LibraryForm value) {
-          setState(() {
-            _form = value;
-            if (_validation != null) {
-              _validation = null;
-            }
-          });
-        },
+        onFormChanged: _handleFormChanged,
         onBrowseRoot: _form.isRemote ? null : _browseLocalRoot,
       ),
     );

@@ -1,7 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:hentai_library/features/reading_history/presentation/models/history_card_item.dart';
 import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_browse_page.dart';
-import 'package:hentai_library/shared/ui/widgets/history/reading_history_list_item.dart';
+import 'package:hentai_library/features/reading_history/presentation/widgets/reading_history_list_item.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 import '../preview/md3e_history_browse_page_preview_data.dart';
@@ -10,11 +12,7 @@ import '../preview/md3e_reader_page_preview_data.dart';
 
 /// Lab / Widgetbook：preview 阅读历史 + 清空全部（M3E 确认 → 清内存列表，不写 FRB）。
 class HistoryBrowsePageLabHost extends StatefulWidget {
-  const HistoryBrowsePageLabHost({
-    super.key,
-    this.initialItems,
-    this.clock,
-  });
+  const HistoryBrowsePageLabHost({super.key, this.initialItems, this.clock});
 
   final List<HistoryCardItem>? initialItems;
   final DateTime? clock;
@@ -38,18 +36,18 @@ class _Md3eHistoryBrowsePageLabHostState
   }
 
   void _deletePreviewEntry(HistoryCardItem item) {
-    setState(
-      () => _items = List<HistoryCardItem>.of(_items)..remove(item),
-    );
+    setState(() => _items = List<HistoryCardItem>.of(_items)..remove(item));
   }
 
   void _openReader(BuildContext context, HistoryCardItem item) {
-    openLabReader(
-      context,
-      preview: ReaderPagePreviewData(
-        title: item.title,
-        totalPages: _previewTotalPages,
-        initialPage: item.pageIndex ?? 1,
+    unawaited(
+      openLabReader(
+        context,
+        preview: ReaderPagePreviewData(
+          title: item.title,
+          totalPages: _previewTotalPages,
+          initialPage: item.pageIndex ?? 1,
+        ),
       ),
     );
   }

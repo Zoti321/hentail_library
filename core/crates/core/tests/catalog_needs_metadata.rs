@@ -1,6 +1,6 @@
 mod common;
 
-use hentai_core::sync::writer::replace_comic_authors;
+use hentai_core::replace_comic_authors;
 use hentai_core::util::compute_sort_key;
 use hentai_core::ComicGrouping;
 use hentai_core::{

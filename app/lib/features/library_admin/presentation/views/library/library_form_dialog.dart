@@ -1,23 +1,22 @@
 import 'package:file_picker/file_picker.dart';
-import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/core/logging/app_log.dart';
-import 'package:hentai_library/features/library_admin/data/local_library_root_access.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/application/logging/app_log.dart';
+import 'package:hentai_library/features/library_admin/presentation/providers/library_sync_providers.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/library/library_confirm_dialog.dart';
-import 'package:hentai_library/shared/ui/layout/library_edit_form_metrics.dart';
-import 'package:hentai_library/shared/ui/patterns/dialog/adaptive_form_dialog.dart';
+import 'package:hentai_library/features/library_admin/presentation/widgets/library_edit_form_metrics.dart';
 import 'package:hentai_library/features/library_admin/presentation/patterns/library_edit_form.dart';
-import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
-import 'package:hentai_library/shared/di/library_state_providers.dart';
+import 'package:hentai_library/features/library_admin/public/providers/library_admin_state_providers.dart';
 import 'package:hentai_library/features/library_admin/domain/resource_format_category.dart';
-import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/form/library_form.dart';
+import 'package:hentai_library/features/library_admin/domain/local_library.dart';
+import 'package:hentai_library/features/library_admin/domain/value_objects/library_form.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:path/path.dart' as p;
+import 'package:hentai_library/features/resource_metadata/public/widgets.dart';
 
 enum LibraryFormMode { createLocal, createRemote, edit }
 
@@ -142,14 +141,17 @@ class _LibraryFormState extends ConsumerState<_LibraryFormFields> {
     }
 
     if (!_isRemote && _isCreate) {
-      await ensureLocalFilesystemAccess();
+      await ref.read(localFilesystemAccessProvider)();
       if (!mounted) {
         return;
       }
-      if (!await isLocalLibraryRootReadable(_form.rootPath)) {
-        if (!mounted) {
-          return;
-        }
+      final bool rootReadable = await ref.read(
+        localLibraryRootReadableProvider,
+      )(_form.rootPath);
+      if (!mounted) {
+        return;
+      }
+      if (!rootReadable) {
         setState(() {
           _validation = LibraryFormValidation(
             rootError: l10n.formLibraryRootUnreadable,
@@ -164,12 +166,9 @@ class _LibraryFormState extends ConsumerState<_LibraryFormFields> {
       _saving = true;
     });
     try {
-      final LibraryFormApplyResult result = await ref
-          .read(librariesPortProvider)
-          .submitLibraryForm(
-            _form,
-            original: _isCreate ? null : widget.library!,
-          );
+      final LibraryFormApplyResult result = await ref.read(
+        submitLibraryFormCommandProvider,
+      )(_form, original: _isCreate ? null : widget.library!);
       if (!mounted) {
         return;
       }
@@ -198,7 +197,7 @@ class _LibraryFormState extends ConsumerState<_LibraryFormFields> {
   }
 
   Future<void> _browseLocalRoot() async {
-    await ensureLocalFilesystemAccess();
+    await ref.read(localFilesystemAccessProvider)();
     if (!mounted) {
       return;
     }
@@ -206,10 +205,13 @@ class _LibraryFormState extends ConsumerState<_LibraryFormFields> {
     if (directoryPath == null || directoryPath.isEmpty || !mounted) {
       return;
     }
-    if (!await isLocalLibraryRootReadable(directoryPath)) {
-      if (!mounted) {
-        return;
-      }
+    final bool rootReadable = await ref.read(localLibraryRootReadableProvider)(
+      directoryPath,
+    );
+    if (!mounted) {
+      return;
+    }
+    if (!rootReadable) {
       setState(() {
         _validation = LibraryFormValidation(
           rootError: context.l10n.formLibraryRootUnreadable,
@@ -229,6 +231,13 @@ class _LibraryFormState extends ConsumerState<_LibraryFormFields> {
     });
   }
 
+  void _handleFormChanged(LibraryForm value) {
+    setState(() {
+      _form = value;
+      _validation = null;
+    });
+  }
+
   void _handleCancel() {
     Navigator.of(context).pop();
   }
@@ -237,20 +246,19 @@ class _LibraryFormState extends ConsumerState<_LibraryFormFields> {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
 
-    final Widget form = LibraryEditForm(
-      form: _form,
-      isCreate: _isCreate,
-      validation: _validation,
-      enabled: !_saving,
-      onFormChanged: (LibraryForm value) {
-        setState(() {
-          _form = value;
-          if (_validation != null) {
-            _validation = null;
-          }
-        });
-      },
-      onBrowseRoot: _isRemote ? null : _browseLocalRoot,
+    final Widget form = Column(
+      children: [
+        LibraryEditForm(
+          form: _form,
+          isCreate: _isCreate,
+          validation: _validation,
+          enabled: !_saving,
+          onFormChanged: _handleFormChanged,
+          onBrowseRoot: _isRemote ? null : _browseLocalRoot,
+        ),
+        if (!_isRemote && widget.library != null)
+          WritebackSetting(libraryId: widget.library!.libraryId),
+      ],
     );
 
     if (widget.formOnly) {

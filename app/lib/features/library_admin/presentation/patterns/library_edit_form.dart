@@ -1,20 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
-import 'package:hentai_library/shared/ui/layout/library_edit_form_metrics.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/ui/patterns/library/library_filter_sort_metrics.dart';
-import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_field_label_row.dart';
-import 'package:hentai_library/shared/ui/widgets/inputs/outlined_text_field.dart';
-import 'package:hentai_library/shared/ui/widgets/inputs/scan_interval_dropdown.dart';
-import 'package:hentai_library/shared/ui/widgets/selection/segmented_capsule_bar.dart';
-import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
-import 'package:hentai_library/shared/ui/widgets/list_detail/list_detail_detail_transition.dart';
-import 'package:hentai_library/shared/ui/widgets/list_detail/list_detail_nav_item.dart';
+import 'package:hentai_library/design-system/design_system.dart';
+import 'package:hentai_library/features/library_admin/presentation/widgets/library_edit_form_metrics.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
+import 'package:hentai_library/features/library_admin/presentation/widgets/scan_interval_dropdown.dart';
 import 'package:hentai_library/features/library_admin/domain/resource_format_category.dart';
-import 'package:hentai_library/features/library_admin/domain/scan_interval.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/form/library_form.dart';
+import 'package:hentai_library/features/library_admin/domain/value_objects/scan_interval.dart';
+import 'package:hentai_library/features/library_admin/domain/value_objects/library_form.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:hentai_library/features/library_admin/presentation/l10n/library_admin_l10n.dart';
 
 enum _LibraryEditTab { general, webDav, scanner }
 
@@ -74,7 +68,8 @@ class _LibraryEditFormState extends State<LibraryEditForm> {
     super.didUpdateWidget(oldWidget);
     final LibraryFormValidation? validation = widget.validation;
     if (validation != null && validation != oldWidget.validation) {
-      setState(() => _tab = _tabForValidation(validation));
+      // didUpdateWidget 后必然 build，无需 setState。
+      _tab = _tabForValidation(validation);
     }
   }
 
@@ -128,19 +123,6 @@ class _LibraryEditFormState extends State<LibraryEditForm> {
     });
   }
 
-  Widget _detailTransition(Widget child) {
-    return ListDetailDetailTransition(
-      switchKey: _tab,
-      reverse: _detailTransitionReverse,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: LibraryEditFormMetrics.detailContentHorizontalInset,
-        ),
-        child: child,
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
@@ -156,19 +138,13 @@ class _LibraryEditFormState extends State<LibraryEditForm> {
         rootPath: _isRemote ? null : form.rootPath,
         rootError: _isRemote ? null : validation?.rootError,
         enabled: widget.enabled,
-        onBrowseRoot: _isRemote
-            ? null
-            : () {
-                widget.onBrowseRoot?.call();
-              },
-        onNameChanged: (String value) {
-          _patch((LibraryForm f) => f.copyWith(name: value));
-        },
+        onBrowseRoot: _isRemote ? null : () => widget.onBrowseRoot?.call(),
+        onNameChanged: (String value) =>
+            _patch((LibraryForm f) => f.copyWith(name: value)),
         onRootChanged: _isRemote
             ? null
-            : (String value) {
-                _patch((LibraryForm f) => f.copyWith(rootPath: value));
-              },
+            : (String value) =>
+                  _patch((LibraryForm f) => f.copyWith(rootPath: value)),
       ),
       _LibraryEditTab.webDav => _WebDavTab(
         rootPath: form.rootPath,
@@ -179,18 +155,14 @@ class _LibraryEditFormState extends State<LibraryEditForm> {
         rootError: validation?.rootError,
         passwordError: validation?.passwordError,
         enabled: widget.enabled,
-        onRootChanged: (String value) {
-          _patch((LibraryForm f) => f.copyWith(rootPath: value));
-        },
-        onUsernameChanged: (String value) {
-          _patch((LibraryForm f) => f.copyWith(username: value));
-        },
-        onPasswordChanged: (String value) {
-          _patch((LibraryForm f) => f.copyWith(password: value));
-        },
-        onAllowHttpChanged: (bool value) {
-          _patch((LibraryForm f) => f.copyWith(allowHttp: value));
-        },
+        onRootChanged: (String value) =>
+            _patch((LibraryForm f) => f.copyWith(rootPath: value)),
+        onUsernameChanged: (String value) =>
+            _patch((LibraryForm f) => f.copyWith(username: value)),
+        onPasswordChanged: (String value) =>
+            _patch((LibraryForm f) => f.copyWith(password: value)),
+        onAllowHttpChanged: (bool value) =>
+            _patch((LibraryForm f) => f.copyWith(allowHttp: value)),
       ),
       _LibraryEditTab.scanner => _ScannerTab(
         scanOnStartup: form.scanOnStartup,
@@ -199,12 +171,10 @@ class _LibraryEditFormState extends State<LibraryEditForm> {
             .toSet(),
         selectableResourceFormatCategories: _selectableResourceFormatCategories,
         enabled: widget.enabled,
-        onScanOnStartupChanged: (bool value) {
-          _patch((LibraryForm f) => f.copyWith(scanOnStartup: value));
-        },
-        onScanIntervalChanged: (ScanInterval value) {
-          _patch((LibraryForm f) => f.copyWith(scanInterval: value));
-        },
+        onScanOnStartupChanged: (bool value) =>
+            _patch((LibraryForm f) => f.copyWith(scanOnStartup: value)),
+        onScanIntervalChanged: (ScanInterval value) =>
+            _patch((LibraryForm f) => f.copyWith(scanInterval: value)),
         onResourceFormatCategoryChanged: _setResourceFormatCategory,
       ),
     };
@@ -230,9 +200,19 @@ class _LibraryEditFormState extends State<LibraryEditForm> {
               ),
               SizedBox(height: gap),
               if (boundedHeight)
-                Flexible(child: _detailTransition(scrollableTabBody))
+                Flexible(
+                  child: _DetailTransition(
+                    tab: _tab,
+                    reverse: _detailTransitionReverse,
+                    child: scrollableTabBody,
+                  ),
+                )
               else
-                _detailTransition(tabBody),
+                _DetailTransition(
+                  tab: _tab,
+                  reverse: _detailTransitionReverse,
+                  child: tabBody,
+                ),
             ],
           );
         }
@@ -250,7 +230,13 @@ class _LibraryEditFormState extends State<LibraryEditForm> {
               ),
             ),
             SizedBox(width: gap),
-            Expanded(child: _detailTransition(scrollableTabBody)),
+            Expanded(
+              child: _DetailTransition(
+                tab: _tab,
+                reverse: _detailTransitionReverse,
+                child: scrollableTabBody,
+              ),
+            ),
           ],
         );
       },
@@ -604,6 +590,32 @@ class _ResourceFormatCategoryRow extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _DetailTransition extends StatelessWidget {
+  const _DetailTransition({
+    required this.tab,
+    required this.reverse,
+    required this.child,
+  });
+
+  final _LibraryEditTab tab;
+  final bool reverse;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListDetailDetailTransition(
+      switchKey: tab,
+      reverse: reverse,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: LibraryEditFormMetrics.detailContentHorizontalInset,
+        ),
+        child: child,
       ),
     );
   }

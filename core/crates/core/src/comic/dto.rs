@@ -115,8 +115,31 @@ pub struct ComicMetaLocks {
     pub characters: bool,
 }
 
+/// Comic 附着的 Author **引用投影**：`id` 是稳定身份（ADR-0024），
+/// `name` 仅为当前显示名的只读投影，不是关联对象。
+///
+/// `id == None` 只出现在"仅有名字"的中间态（扫描结果 / 用户新输入的作者名），
+/// 该状态不可作为跨模块引用使用。
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ComicAuthorDto {
+    pub id: Option<i64>,
+    pub name: String,
+}
+
+impl ComicAuthorDto {
+    /// 由名字构造无 id 的中间态（仅写路径 / 扫描使用）。
+    pub fn from_name(name: impl Into<String>) -> Self {
+        Self {
+            id: None,
+            name: name.into(),
+        }
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ComicDto {
+    #[serde(default)]
+    pub resource_fingerprint: Option<crate::resource_verification::ResourceFingerprint>,
     pub comic_id: String,
     pub path: String,
     pub resource_type: String,
@@ -129,9 +152,9 @@ pub struct ComicDto {
     pub description: Option<String>,
     pub published_at: Option<i64>,
     pub last_read_time_ms: Option<i64>,
-    pub authors: Vec<String>,
+    pub authors: Vec<ComicAuthorDto>,
     pub tags: Vec<String>,
-    /// Ordered canonical English language names; empty = unset.
+    /// Optional Language represented as a zero-or-one list for wire compatibility.
     #[serde(default)]
     pub languages: Vec<String>,
     /// Parody (IP / franchise) names attached to this Comic; empty = none.
@@ -146,9 +169,35 @@ pub struct ComicDto {
     pub library_id: String,
 }
 
-/// Serialize Language list for `comic_meta.languages` JSON column.
+impl ComicDto {
+    /// Author 显示名列表：写路径（`replace_comic_authors`）与变更比对用；id 不参与。
+    pub fn author_names(&self) -> Vec<String> {
+        self.authors.iter().map(|a| a.name.clone()).collect()
+    }
+}
+
+/// 由名字列表构造无 id 的引用投影（扫描 / 用户新输入）。
+pub fn author_refs_from_names(names: &[String]) -> Vec<ComicAuthorDto> {
+    names
+        .iter()
+        .map(|n| ComicAuthorDto::from_name(n.clone()))
+        .collect()
+}
+
+/// Keep the first stored Language; the list shape preserves backup/wire compatibility.
+pub fn single_language(languages: &[String]) -> Vec<String> {
+    languages
+        .first()
+        .map(|value| value.trim())
+        .filter(|value| !value.is_empty())
+        .map(str::to_owned)
+        .into_iter()
+        .collect()
+}
+
+/// Serialize the optional Language for the legacy JSON-list column.
 pub fn serialize_languages(languages: &[String]) -> String {
-    serde_json::to_string(languages).unwrap_or_else(|_| "[]".to_string())
+    serde_json::to_string(&single_language(languages)).unwrap_or_else(|_| "[]".to_string())
 }
 
 /// Parse Language list; invalid JSON → empty (unset).
@@ -156,11 +205,7 @@ pub fn parse_languages_json(raw: &str) -> Vec<String> {
     let Ok(values) = serde_json::from_str::<Vec<String>>(raw) else {
         return Vec::new();
     };
-    values
-        .into_iter()
-        .map(|s| s.trim().to_string())
-        .filter(|s| !s.is_empty())
-        .collect()
+    single_language(&values)
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

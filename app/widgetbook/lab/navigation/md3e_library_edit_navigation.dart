@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
-import 'package:hentai_library/shared/ui/layout/library_edit_form_metrics.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/ui/motion/motion.dart';
+import 'package:hentai_library/design-system/design_system.dart';
+import 'package:hentai_library/features/library_admin/presentation/widgets/library_edit_form_metrics.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/library/library_edit_page.dart';
-import 'package:hentai_library/shared/ui/patterns/dialog/lab_dialog_presenter.dart';
 import 'package:hentai_library/features/library_admin/presentation/patterns/library_edit_form.dart';
 
 import '../../preview/md3e_library_edit_preview_data.dart';
 
-import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_actions.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/form/library_form.dart';
+import 'package:hentai_library/features/library_admin/domain/value_objects/library_form.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 打开 Library 创建/编辑：compact / medium M3E 全屏；expanded+ M3E basic dialog。
@@ -87,10 +84,8 @@ class _Md3eLibraryEditDialog extends StatefulWidget {
     LibraryEditPageIntent intent,
   ) {
     return switch (intent) {
-      LibraryEditPageIntent.createLocal =>
-        l10n.dialogCreateLocalLibraryTitle,
-      LibraryEditPageIntent.createRemote =>
-        l10n.dialogCreateRemoteLibraryTitle,
+      LibraryEditPageIntent.createLocal => l10n.dialogCreateLocalLibraryTitle,
+      LibraryEditPageIntent.createRemote => l10n.dialogCreateRemoteLibraryTitle,
       LibraryEditPageIntent.editLocal ||
       LibraryEditPageIntent.editRemote => l10n.dialogEditLibraryTitle,
     };
@@ -114,8 +109,7 @@ class _Md3eLibraryEditDialogState extends State<_Md3eLibraryEditDialog> {
 
   static LibraryForm _formForIntent(LibraryEditPageIntent intent) {
     return switch (intent) {
-      LibraryEditPageIntent.editLocal =>
-        LibraryEditPreviewData.editLocalForm(),
+      LibraryEditPageIntent.editLocal => LibraryEditPreviewData.editLocalForm(),
       LibraryEditPageIntent.editRemote =>
         LibraryEditPreviewData.editRemoteForm(),
       LibraryEditPageIntent.createLocal => LibraryForm.createLocal(),
@@ -168,8 +162,7 @@ class _Md3eLibraryEditDialogState extends State<_Md3eLibraryEditDialog> {
     }
 
     final AppLocalizations l10n = context.l10n;
-    final double horizontalInset = PageLayoutSpec.of(context)
-        .horizontalInset;
+    final double horizontalInset = PageLayoutSpec.of(context).horizontalInset;
 
     return M3EDialog(
       title: _Md3eLibraryEditDialog._titleForIntent(l10n, widget.intent),
@@ -184,13 +177,17 @@ class _Md3eLibraryEditDialogState extends State<_Md3eLibraryEditDialog> {
         ),
       ),
       bottomDivider: true,
-      actions: metadataEditDialogActions(
-        context,
-        onCancel: () => Navigator.of(context).pop(),
-        onSave: _saving ? null : _saveAndPop,
-        saving: _saving,
-        saveEnabled: true,
-      ),
+      actions: <Widget>[
+        MetadataEditCancelButton(
+          onCancel: () => Navigator.of(context).pop(),
+          saving: _saving,
+        ),
+        MetadataEditSaveButton(
+          onSave: _saving ? null : _saveAndPop,
+          saving: _saving,
+          saveEnabled: true,
+        ),
+      ],
     );
   }
 }

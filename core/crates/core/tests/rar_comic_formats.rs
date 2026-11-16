@@ -1,3 +1,4 @@
+use hentai_core::ReaderSessionRead;
 use std::path::PathBuf;
 
 use hentai_core::formats::read_rar_cover_bytes;
@@ -19,10 +20,19 @@ fn rar4_reader_lists_and_reads_image_pages() {
     let path_str = path.to_string_lossy().to_string();
 
     open_reader("rar4-comic", &path_str, "rar").expect("open");
-    let list = load_page_list("rar4-comic", &path_str, "rar").expect("list");
+    let list = load_page_list(&ReaderSessionRead::capture("rar4-comic").expect("capture session"))
+        .expect("list");
     assert_eq!(list.page_count, 2);
-    let page0 = load_page_bytes("rar4-comic", &path_str, "rar", 0).expect("page0");
-    let page1 = load_page_bytes("rar4-comic", &path_str, "rar", 1).expect("page1");
+    let page0 = load_page_bytes(
+        &ReaderSessionRead::capture("rar4-comic").expect("capture session"),
+        0,
+    )
+    .expect("page0");
+    let page1 = load_page_bytes(
+        &ReaderSessionRead::capture("rar4-comic").expect("capture session"),
+        1,
+    )
+    .expect("page1");
     assert_eq!(page0, b"page-one");
     assert_eq!(page1, b"page-two");
 }
@@ -34,11 +44,20 @@ fn rar5_reader_lists_and_reads_image_pages() {
     let path_str = path.to_string_lossy().to_string();
 
     open_reader("rar5-comic", &path_str, "rar").expect("open");
-    let list = load_page_list("rar5-comic", &path_str, "rar").expect("list");
+    let list = load_page_list(&ReaderSessionRead::capture("rar5-comic").expect("capture session"))
+        .expect("list");
     // Natural sort: 001.jpg, 002.jpg, cover.jpg
     assert_eq!(list.page_count, 3);
-    let page0 = load_page_bytes("rar5-comic", &path_str, "rar", 0).expect("page0");
-    let page1 = load_page_bytes("rar5-comic", &path_str, "rar", 1).expect("page1");
+    let page0 = load_page_bytes(
+        &ReaderSessionRead::capture("rar5-comic").expect("capture session"),
+        0,
+    )
+    .expect("page0");
+    let page1 = load_page_bytes(
+        &ReaderSessionRead::capture("rar5-comic").expect("capture session"),
+        1,
+    )
+    .expect("page1");
     assert_eq!(page0, b"page-one");
     assert_eq!(page1, b"page-two");
 }
@@ -52,10 +71,15 @@ fn cbr_extension_aliases_rar_reader_behavior() {
     let path_str = cbr.to_string_lossy().to_string();
 
     open_reader("cbr-comic", &path_str, "cbr").expect("open");
-    let list = load_page_list("cbr-comic", &path_str, "cbr").expect("list");
+    let list = load_page_list(&ReaderSessionRead::capture("cbr-comic").expect("capture session"))
+        .expect("list");
     assert_eq!(list.page_count, 2);
     assert_eq!(
-        load_page_bytes("cbr-comic", &path_str, "cbr", 0).expect("page0"),
+        load_page_bytes(
+            &ReaderSessionRead::capture("cbr-comic").expect("capture session"),
+            0
+        )
+        .expect("page0"),
         b"page-one"
     );
 }

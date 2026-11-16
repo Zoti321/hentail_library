@@ -1,19 +1,19 @@
+import 'dart:async';
+
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:flutter/material.dart';
 
 import '../preview/md3e_comic_detail_page_preview_data.dart';
 import '../preview/md3e_series_detail_page_preview_data.dart';
 
-import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_viewport_status.dart';
-import 'package:hentai_library/shared/ui/widgets/actions/catalog_view_mode_button_group.dart';
-import 'package:hentai_library/shared/ui/widgets/catalog/comic_card.dart';
-import 'package:hentai_library/shared/ui/widgets/catalog/comic_list_item.dart';
-import 'package:hentai_library/shared/ui/layout/reading_history_list_layout.dart';
-import 'package:hentai_library/shared/ui/widgets/history/reading_history_list_item.dart';
+import 'package:hentai_library/features/reader/presentation/patterns/reader/reader_viewport_status.dart';
+import 'package:hentai_library/features/reading_history/presentation/patterns/history/reading_history_list_layout.dart';
+import 'package:hentai_library/features/reading_history/presentation/widgets/reading_history_list_item.dart';
 import 'package:hentai_library/features/comic/presentation/patterns/comic_detail/comic_detail_metadata_tags_section.dart';
 import 'package:hentai_library/shared/ui/shell/desktop_shell.dart';
-import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
 
 import '../hosts/md3e_home_page_lab_host.dart';
+import '../hosts/resource_metadata_media_preview.dart';
 
 import 'package:hentai_library/features/comic_trash/presentation/views/trash/trash_purge_dialog.dart';
 
@@ -27,7 +27,7 @@ import 'package:hentai_library/features/comic/presentation/views/comic_detail/co
 
 import '../hosts/md3e_reader_page_lab_host.dart';
 import '../preview/md3e_reader_page_preview_data.dart';
-
+import '../preview/md3e_tag_input_field_preview.dart';
 
 import '../hosts/md3e_comic_metadata_edit_page_lab_host.dart';
 
@@ -36,21 +36,23 @@ import 'package:hentai_library/features/library_admin/presentation/views/library
 import '../hosts/md3e_library_edit_page_lab_host.dart';
 
 import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_page_lab_host.dart';
-import 'package:hentai_library/features/library_browse/presentation/catalog/patterns/metadata_edit/metadata_edit_navigation.dart';
+import 'package:hentai_library/features/comic/public/ui/comic_metadata_edit_draft.dart';
+import 'package:hentai_library/features/comic/public/ui/comic_metadata_edit_layout.dart';
+import 'package:hentai_library/features/comic/public/ui/comic_metadata_edit_present.dart';
+import 'package:hentai_library/features/series/public/ui/series_metadata_edit_layout.dart';
+import 'package:hentai_library/features/series/public/ui/series_metadata_edit_present.dart';
 
 import '../lab/navigation/md3e_lab_catalog_navigation.dart';
 
 import 'package:hentai_library/features/library_browse/presentation/browse/patterns/library/library_filter_sort_side_sheet.dart';
-import 'package:hentai_library/features/named_metadata/public/ui/metadata_lab_patterns.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/ui/widgets/selection/segmented_capsule_bar.dart';
-import 'package:hentai_library/shared/ui/widgets/inputs/tag_input_field.dart';
+import 'package:hentai_library/features/comic_metadata/public/ui/metadata_lab_patterns.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
+
 import '../preview/md3e_named_facet_multi_select_preview.dart';
-import 'package:hentai_library/shared/ui/widgets/desktop/desktop_title_bar.dart';
-import 'package:hentai_library/shared/ui/widgets/desktop/navigation_rail.dart';
+import '../preview/md3e_date_picker_preview.dart';
+
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/shared/ui/widgets/pagination/pagination.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:widgetbook/widgetbook.dart';
 
@@ -68,6 +70,39 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
         WidgetbookFolder(
           name: 'widgets',
           children: <WidgetbookNode>[
+            WidgetbookComponent(
+              name: 'Media metadata',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Resource writing states',
+                  builder: (_) => const Md3eWidgetbookScope(
+                    child: ResourceMetadataMediaPreview(),
+                  ),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'DatePicker',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Docked',
+                  builder: (_) =>
+                      const Md3eWidgetbookScope(child: Md3eDatePickerPreview()),
+                ),
+                WidgetbookUseCase(
+                  name: 'Modal',
+                  builder: (_) => const Md3eWidgetbookScope(
+                    child: Md3eDatePickerPreview(modal: true),
+                  ),
+                ),
+                WidgetbookUseCase(
+                  name: 'Modal input',
+                  builder: (_) => const Md3eWidgetbookScope(
+                    child: Md3eDatePickerPreview(modal: true, input: true),
+                  ),
+                ),
+              ],
+            ),
             WidgetbookComponent(
               name: 'ComicCard',
               useCases: <WidgetbookUseCase>[
@@ -205,7 +240,7 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                 WidgetbookUseCase(
                   name: 'Default',
                   builder: (BuildContext context) => const Md3eWidgetbookScope(
-                    child: TagInputFieldPreview(),
+                    child: Md3eTagInputFieldPreview(),
                   ),
                 ),
               ],
@@ -372,9 +407,8 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
                   name: 'Responsive · viewport addon',
-                  builder: (BuildContext context) => const Md3eWidgetbookScope(
-                    child: SettingsPageLabHost(),
-                  ),
+                  builder: (BuildContext context) =>
+                      const Md3eWidgetbookScope(child: SettingsPageLabHost()),
                 ),
               ],
             ),
@@ -760,7 +794,7 @@ Widget _md3ePaginationKnobsPreview(BuildContext context) {
 }
 
 Widget _md3eManagementBrowsePageLabHostPreview(BuildContext context) {
-  final String interactionKnob = context.knobs.list(
+  final String interactionKnob = context.knobs.object.dropdown(
     label: '新建交互',
     options: <String>['自动', '移动端 Dialog', '桌面端内联'],
     initialOption: '自动',

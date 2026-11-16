@@ -1,9 +1,16 @@
+import 'dart:async';
+
+import 'package:hentai_library/shared/presentation/providers/comic_return_series_providers.dart';
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/errors/app_exception.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/core/util/utils.dart';
-import 'package:hentai_library/features/comic/public/comic_detail_return_series.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
+import 'package:hentai_library/shared/application/errors/app_exception.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/presentation/providers/file_explorer_providers.dart';
+import 'package:hentai_library/features/library_admin/public.dart';
+import 'package:hentai_library/shared/presentation/providers/series_slot_providers.dart';
+import 'package:hentai_library/shared/ui/slots/series_slots.dart';
+import 'package:hentai_library/features/series/presentation/providers/series_by_id_provider.dart';
 import 'package:hentai_library/features/series/presentation/view_models/series_detail_comics_catalog_controller.dart';
 import 'package:hentai_library/features/series/presentation/view_models/series_detail_comics_catalog_state.dart';
 import 'package:hentai_library/features/series/presentation/view_models/series_detail_page_size_notifier.dart';
@@ -11,22 +18,20 @@ import 'package:hentai_library/features/series/presentation/view_models/series_d
 import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_cover.dart';
 import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_entry.dart';
 import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_layout.dart';
-import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
-import 'package:hentai_library/shared/di/app_router_provider.dart';
-import 'package:hentai_library/features/comic/public/di/comic_cover_providers.dart';
-import 'package:hentai_library/features/comic/public/ui/comic_cover_content.dart';
-import 'package:hentai_library/shared/di/library_command_providers.dart';
-import 'package:hentai_library/shared/di/library_state_providers.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/series_comic_page_item.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/series_comics_metadata.dart';
+import 'package:hentai_library/design-system/design_system.dart';
+import 'package:hentai_library/shared/presentation/providers/app_navigator_provider.dart';
+import 'package:hentai_library/features/series/domain/series.dart';
+import 'package:hentai_library/features/series/domain/series_comic_page_item.dart';
+import 'package:hentai_library/features/series/domain/value_objects/series_comics_metadata.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
-import 'package:hentai_library/shared/ui/widgets/feedback/metadata_refresh_toasts.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
-import 'package:hentai_library/features/library_admin/public.dart';
-import 'package:hentai_library/features/library_browse/public/catalog/for_comic_and_series.dart';
+import 'package:hentai_library/features/series/presentation/actions/series_metadata_edit_presenters.dart';
+import 'package:hentai_library/shared/presentation/providers/author_detail_providers.dart';
+import 'package:hentai_library/shared/ui/catalog/selection/catalog_selection_notifier.dart';
+import 'package:hentai_library/shared/ui/catalog/detail/detail_back_header.dart';
+import 'package:hentai_library/shared/ui/catalog/detail/detail_status_scaffold.dart';
 
 export 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_layout.dart';
 export 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_view_object.dart';
@@ -40,7 +45,7 @@ class SeriesDetailPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AsyncValue<Series?> seriesAsync = ref.watch(
-      seriesByIdStateProvider(seriesId),
+      seriesByIdProvider(seriesId),
     );
 
     return M3ETheme(
@@ -121,6 +126,24 @@ class _SeriesDetailCatalogLayout extends ConsumerWidget {
   final Series series;
   final SeriesComicsMetadata? metadata;
 
+  void _handleComicTap({
+    required WidgetRef ref,
+    required int globalIndex,
+    required int page,
+    required int pageSize,
+    required List<SeriesComicPageItem> items,
+    required String seriesId,
+  }) {
+    final int localIndex = globalIndex - (page - 1) * pageSize;
+    if (localIndex < 0 || localIndex >= items.length) {
+      return;
+    }
+    ref.read(rememberComicReturnSeriesCommandProvider)(seriesId);
+    ref
+        .read(appNavigatorProvider)
+        .pushComicDetail(items[localIndex].comic.comicId);
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final String seriesId = series.id;
@@ -133,6 +156,10 @@ class _SeriesDetailCatalogLayout extends ConsumerWidget {
     final List<SeriesComicPageItem> items =
         catalog?.items ?? const <SeriesComicPageItem>[];
 
+    final SeriesMemberCoverSlot memberCover = ref.watch(
+      seriesMemberCoverSlotProvider,
+    );
+    final String coverViewportScope = 'series-detail:$seriesId';
     final SeriesDetailViewObject entry = seriesDetailEntry(
       series: series,
       cover: SeriesDetailCover(seriesId: seriesId),
@@ -140,10 +167,12 @@ class _SeriesDetailCatalogLayout extends ConsumerWidget {
       pageItems: items,
       page: page,
       pageSize: pageSize,
-      comicCoverBuilder: (String comicId, int index) => ComicCoverContent(
-        comicId: comicId,
-        gridIndex: index,
-        coverViewportScope: CoverViewportScopes.seriesDetail(seriesId),
+      comicCoverBuilder: (String comicId, int index) => memberCover(
+        SeriesMemberCoverSlotArgs(
+          comicId: comicId,
+          gridIndex: index,
+          coverViewportScope: coverViewportScope,
+        ),
       ),
     );
     final AppLocalizations l10n = context.l10n;
@@ -176,26 +205,20 @@ class _SeriesDetailCatalogLayout extends ConsumerWidget {
         M3EMenuEntry(
           label: l10n.comicDetailShowInExplorer,
           leading: const Icon(LucideIcons.folderOpen),
-          onPressed: () => _showInExplorer(context, series),
+          onPressed: () => _showInExplorer(context, ref, series),
         ),
       ],
-      onAuthorTap: (String name) =>
-          openAuthorDetailByName(context: context, ref: ref, name: name),
-      onComicTap: (int globalIndex) {
-        final int localIndex = globalIndex - (page - 1) * pageSize;
-        if (localIndex < 0 || localIndex >= items.length) {
-          return;
-        }
-        ref.read(comicDetailReturnSeriesProvider.notifier).remember(seriesId);
-        ref
-            .read(appRouterProvider)
-            .pushNamed(
-              ContentBreadcrumbLabels.comicDetail,
-              pathParameters: <String, String>{
-                'id': items[localIndex].comic.comicId,
-              },
-            );
-      },
+      onAuthorTap: (AuthorRef author) => author.hasIdentity
+          ? ref.read(openAuthorByIdCommandProvider)(context, author.id!)
+          : ref.read(openAuthorByNameCommandProvider)(context, author.name),
+      onComicTap: (int globalIndex) => _handleComicTap(
+        ref: ref,
+        globalIndex: globalIndex,
+        page: page,
+        pageSize: pageSize,
+        items: items,
+        seriesId: seriesId,
+      ),
     );
   }
 }
@@ -206,9 +229,9 @@ Future<void> _refreshMetadata(
   Series series,
 ) async {
   try {
-    final MetadataRefreshBatchResult result = await ref
-        .read(libraryMetadataRefreshCommandPortProvider)
-        .refreshSeries(seriesId: series.id, name: series.name);
+    final MetadataRefreshBatchResult result = await ref.read(
+      refreshSeriesMetadataCommandProvider,
+    )(seriesId: series.id, name: series.name);
     if (!context.mounted) {
       return;
     }
@@ -220,24 +243,28 @@ Future<void> _refreshMetadata(
   }
 }
 
-void _showInExplorer(BuildContext context, Series series) {
+void _showInExplorer(BuildContext context, WidgetRef ref, Series series) {
   final AppLocalizations l10n = context.l10n;
-  showInFileExplorer(series.folderPath)
-      .catchError((Object error, StackTrace stackTrace) {
-        if (!context.mounted) {
-          return;
-        }
-        if (error is AppException) {
-          showErrorSnackbar(context, error);
-          return;
-        }
-        showErrorSnackbar(
-          context,
-          AppException(
-            l10n.comicDetailShowInExplorerFailed,
-            cause: error,
-            stackTrace: stackTrace,
-          ),
-        );
-      });
+  unawaited(
+    ref.read(showInFileExplorerProvider)(series.folderPath).catchError((
+      Object error,
+      StackTrace stackTrace,
+    ) {
+      if (!context.mounted) {
+        return;
+      }
+      if (error is AppException) {
+        showErrorSnackbar(context, error);
+        return;
+      }
+      showErrorSnackbar(
+        context,
+        AppException(
+          l10n.comicDetailShowInExplorerFailed,
+          cause: error,
+          stackTrace: stackTrace,
+        ),
+      );
+    }),
+  );
 }

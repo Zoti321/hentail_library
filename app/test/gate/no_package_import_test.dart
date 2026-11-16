@@ -8,7 +8,7 @@ import 'lib_layout_scan_helpers.dart';
 /// ADR-0031 终态：生产 `lib/features` 与 `lib/shared` 不得再 import 已删除的 `md3e/`。
 const String _forbiddenUriFragment = 'package:hentai_library/md3e/';
 
-List<String> collectForbiddenImports(Directory libDir) {
+List<String> _collectForbiddenImports(Directory libDir) {
   final List<String> violations = <String>[];
   for (final String root in <String>['features', 'shared']) {
     final Directory dir = Directory(p.join(libDir.path, root));
@@ -38,7 +38,7 @@ void main() {
     'features/ and shared/ must not import package:hentai_library/md3e/',
     () {
       expect(Directory(p.join(libDir.path, 'md3e')).existsSync(), isFalse);
-      final List<String> violations = collectForbiddenImports(libDir);
+      final List<String> violations = _collectForbiddenImports(libDir);
       expect(
         violations,
         isEmpty,

@@ -1,7 +1,8 @@
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/form/comic_metadata_form.dart';
-import 'package:hentai_library/features/comic/domain/comic_user_metadata_repository.dart';
-import 'package:hentai_library/features/library_admin/public.dart';
+import 'package:hentai_library/shared/domain/events/events.dart';
+import 'package:hentai_library/features/comic/domain/comic.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
+import 'package:hentai_library/features/comic/domain/value_objects/comic_metadata_form.dart';
+import 'package:hentai_library/features/comic/domain/repositories/comic_user_metadata_repository.dart';
 
 /// 浏览侧保存 Comic 元数据草稿的结果。仓储异常仍向上抛，由 UI toast。
 sealed class ComicMetadataApplyResult {
@@ -35,19 +36,17 @@ final class ComicMetadataApplySucceeded extends ComicMetadataApplyResult {
   final bool charactersWritten;
 }
 
-/// 按草稿相对原 Comic 的差异写入用户元数据，并发布 Library change。
+/// 按草稿相对原 Comic 的差异写入用户元数据，并发布 [ComicMetadataPersisted]。
 Future<ComicMetadataApplyResult> applyComicMetadataForm(
   ComicUserMetadataRepository repository,
   ComicMetadataForm form,
   Comic original, {
-  required void Function() notifyExternalChange,
-  required void Function(LibraryChange change) publish,
+  required DomainEventPublisher events,
 }) async {
-  switch (form.diffAgainst(original)) {
+  switch (original.metadataDiffAgainst(form)) {
     case ComicMetadataDraftInvalid(:final validation):
       return ComicMetadataApplyInvalid(validation);
     case ComicMetadataDraftUnchanged():
-      publish(const LibraryChange(metadataSaved: false));
       return const ComicMetadataApplySucceeded();
     case ComicMetadataDraftChanges(
       :final title,
@@ -67,22 +66,20 @@ Future<ComicMetadataApplyResult> applyComicMetadataForm(
         description: description,
         publishedAt: publishedAt,
         clearPublishedAt: clearPublishedAt,
-        authors: authors,
+        authors: authors?.map((AuthorRef a) => a.name).toList(),
         contentRating: contentRating,
         tags: tags,
         languages: languages,
         parodies: parodies,
         characters: characters,
       );
-      publish(
-        LibraryChange(
+      events.publish(
+        ComicMetadataPersisted(
           tagsWritten: tags != null,
           parodiesWritten: parodies != null,
           charactersWritten: characters != null,
-          metadataSaved: true,
         ),
       );
-      notifyExternalChange();
       return ComicMetadataApplySucceeded(
         persisted: true,
         tagsWritten: tags != null,

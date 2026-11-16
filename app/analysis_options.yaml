@@ -1,7 +1,8 @@
-# `riverpod_lint` 在 pubspec 中保留；接入 `plugins: riverpod_lint` 后 CI（CI=true analyze）
-# 会对既有代码报 avoid_build_context_in_providers / only_use_keep_alive_inside_keep_alive 等
-# 数十处 info·warning。Gate 暂不启用插件；清理后可打开 plugins 段。
 analyzer:
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
   exclude:
     - rust_builder/**
     - build/**
@@ -10,10 +11,138 @@ analyzer:
     - windows/**
     - macos/**
     - linux/**
-  errors:
-    deprecated_member_use: ignore
-    use_build_context_synchronously: ignore
 include: package:flutter_lints/flutter.yaml
+
+plugins:
+  riverpod_lint: 3.1.9
 
 linter:
   rules:
+    unawaited_futures: true
+    discarded_futures: true
+
+# One configuration owns all rules; per-rule includes distinguish lib, test,
+# and test case declarations (shared support helpers remain importable).
+# DCL runs through the CLI, not an analyzer plugin. Chinese punctuation and
+# dart format govern comments/trailing commas; prefer-first excludes first-or-null.
+# Widget factory exceptions implement fixed route/slot/Settings contracts.
+# DCL matches exception names globally: review new same-name declarations.
+dart_code_linter:
+  rules:
+    - always-remove-listener:
+        include: [lib/**]
+    - avoid-border-all:
+        include: [lib/**]
+    - avoid-cascade-after-if-null:
+        include: [lib/**]
+    - avoid-collection-methods-with-unrelated-types:
+        include: [lib/**]
+    - avoid-double-slash-imports:
+        include: [lib/**]
+    - avoid-duplicate-exports:
+        include: [lib/**]
+    - avoid-dynamic:
+        include: [lib/**]
+    - avoid-expanded-as-spacer:
+        include: [lib/**]
+    - avoid-global-state:
+        include: [lib/**]
+    - avoid-missing-enum-constant-in-map:
+        include: [lib/**]
+    - avoid-non-configurable-callbacks-in-init-state:
+        include: [lib/**]
+    - avoid-non-exhaustive-switch-on-sealed-classes:
+        include: [lib/**]
+    - avoid-redundant-async:
+        include: [lib/**]
+    - avoid-redundant-async-on-load:
+        include: [lib/**]
+    - avoid-shrink-wrap-in-lists:
+        include: [lib/**]
+    - avoid-throw-in-catch-block:
+        include: [lib/**]
+    - avoid-top-level-members-in-tests:
+        include: [test/**/*_test.dart]
+    - avoid-unnecessary-conditionals:
+        include: [lib/**]
+    - avoid-unnecessary-setstate:
+        include: [lib/**]
+    - avoid-unnecessary-type-assertions:
+        include: [lib/**]
+    - avoid-unnecessary-type-casts:
+        include: [lib/**]
+    - avoid-unrelated-type-assertions:
+        include: [lib/**]
+    - avoid-wrapping-in-padding:
+        include: [lib/**]
+    - check-for-equals-in-render-object-setters:
+        include: [lib/**]
+    - consistent-update-render-object:
+        include: [lib/**]
+    - double-literal-format:
+        include: [lib/**]
+    - list-all-equatable-fields:
+        include: [lib/**]
+    - no-blank-line-before-single-return:
+        include: [lib/**]
+    - no-boolean-literal-compare:
+        include: [lib/**]
+    - no-equal-then-else:
+        include: [lib/**]
+    - only-barrel-import:
+        include: [lib/**]
+    - prefer-async-await:
+        include: [lib/**]
+    - prefer-commenting-analyzer-ignores:
+        include: [lib/**]
+    - prefer-conditional-expressions:
+        include: [lib/**]
+    - prefer-correct-type-name:
+        include: [lib/**]
+    - prefer-define-hero-tag:
+        include: [lib/**]
+    - prefer-enums-by-name:
+        include: [lib/**]
+    - prefer-first:
+        include: [lib/**]
+    - prefer-immediate-return:
+        include: [lib/**]
+    - prefer-iterable-of:
+        include: [lib/**]
+    - prefer-last:
+        include: [lib/**]
+    - prefer-media-query-direct-access:
+        include: [lib/**]
+    - prefer-single-quotes:
+        include: [lib/**]
+    - use-setstate-synchronously:
+        include: [lib/**]
+    - prefer-using-list-view:
+        include: [lib/**]
+    - tag-name:
+        include: [lib/**]
+    - prefer-single-widget-per-file:
+        include: [lib/**]
+        ignore-private-widgets: true
+    - prefer-extracting-callbacks:
+        include: [lib/**]
+    - avoid-returning-widgets:
+        include: [lib/**]
+        ignored-names:
+          - buildSharedComicDetailPage
+          - buildSharedSeriesDetailPage
+          - buildSeriesCoverSlot
+          - buildSeriesMemberCoverSlot
+          - buildSeriesMemberCardSlot
+          - _settingsSections
+          - settingsSectionsFor
+          - _sectionsForCategory
+          - readerSettingsSections
+          - libraryAdminShellFeedbackBelowTitleBar
+    - missing-test-assertion:
+        include: [test/**]
+        include-assertions:
+          - _expectColorClose
+    - prefer-correct-test-file-name:
+        include: [test/**]
+  rules-exclude: []

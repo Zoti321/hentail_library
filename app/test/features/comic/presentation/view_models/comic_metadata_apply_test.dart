@@ -1,11 +1,19 @@
+import 'package:hentai_library/features/comic/public/comic_metadata_types.dart';
 import 'package:hentai_library/features/comic/application/comic_metadata_service.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
+import 'package:hentai_library/shared/domain/events/events.dart';
+import 'package:hentai_library/features/comic/domain/comic.dart';
+import 'package:hentai_library/features/comic_metadata/public/comic_metadata_entities.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/form/comic_metadata_form.dart';
-import 'package:hentai_library/features/comic/domain/comic_user_metadata_repository.dart';
+import 'package:hentai_library/features/comic/domain/value_objects/comic_metadata_form.dart';
+import 'package:hentai_library/features/comic/domain/repositories/comic_user_metadata_repository.dart';
 import 'package:test/test.dart';
-import 'package:hentai_library/features/library_admin/public.dart';
+
+class _RecordingEventPublisher implements DomainEventPublisher {
+  final List<DomainEvent> events = <DomainEvent>[];
+
+  @override
+  void publish(DomainEvent event) => events.add(event);
+}
 
 class _RecordingComicRepository implements ComicUserMetadataRepository {
   int callCount = 0;
@@ -17,9 +25,9 @@ class _RecordingComicRepository implements ComicUserMetadataRepository {
     String? description,
     DateTime? publishedAt,
     bool clearPublishedAt = false,
-    List? authors,
+    List<String>? authors,
     ContentRating? contentRating,
-    List? tags,
+    List<Tag>? tags,
     List<String>? languages,
     List<String>? parodies,
     List<String>? characters,
@@ -33,7 +41,7 @@ class _RecordingComicRepository implements ComicUserMetadataRepository {
 
 Comic _comic({List<Tag> tags = const <Tag>[]}) {
   final DateTime now = DateTime.utc(2024, 1, 1);
-  return Comic(
+  return Comic.restore(
     comicId: 'comic-1',
     path: '/library/comic-1',
     resourceType: ResourceType.dir,
@@ -55,31 +63,30 @@ void main() {
   group('applyComicMetadataForm', () {
     test('publishes tag write and metadata save when tags change', () async {
       final _RecordingComicRepository repo = _RecordingComicRepository();
+      final _RecordingEventPublisher events = _RecordingEventPublisher();
       final Comic original = _comic();
-      final List<LibraryChange> published = <LibraryChange>[];
-      var notifyCount = 0;
 
       final ComicMetadataApplyResult result = await applyComicMetadataForm(
         repo,
         ComicMetadataForm.fromComic(original).addTag('new-tag'),
         original,
-        publish: published.add,
-        notifyExternalChange: () => notifyCount += 1,
+        events: events,
       );
 
       expect(result, isA<ComicMetadataApplySucceeded>());
       expect(repo.callCount, 1);
-      expect(published, hasLength(1));
-      expect(published.single.tagsWritten, isTrue);
-      expect(published.single.parodiesWritten, isFalse);
-      expect(published.single.metadataSaved, isTrue);
-      expect(notifyCount, 1);
+      expect(events.events, hasLength(1));
+      final ComicMetadataPersisted persisted =
+          events.events.single as ComicMetadataPersisted;
+      expect(persisted.tagsWritten, isTrue);
+      expect(persisted.parodiesWritten, isFalse);
+      expect(persisted.dictionariesWritten, isTrue);
     });
 
     test('publishes parody and character writes together', () async {
       final _RecordingComicRepository repo = _RecordingComicRepository();
+      final _RecordingEventPublisher events = _RecordingEventPublisher();
       final Comic original = _comic();
-      final List<LibraryChange> published = <LibraryChange>[];
 
       await applyComicMetadataForm(
         repo,
@@ -87,77 +94,70 @@ void main() {
             .addParody('Fate')
             .addCharacter('Saber'),
         original,
-        publish: published.add,
-        notifyExternalChange: () {},
+        events: events,
       );
 
-      expect(published.single.parodiesWritten, isTrue);
-      expect(published.single.charactersWritten, isTrue);
-      expect(published.single.tagsWritten, isFalse);
-      expect(published.single.metadataSaved, isTrue);
+      final ComicMetadataPersisted persisted =
+          events.events.single as ComicMetadataPersisted;
+      expect(persisted.parodiesWritten, isTrue);
+      expect(persisted.charactersWritten, isTrue);
+      expect(persisted.tagsWritten, isFalse);
+      expect(persisted.dictionariesWritten, isTrue);
     });
 
     test(
       'title-only change publishes save without dictionary writes',
       () async {
         final _RecordingComicRepository repo = _RecordingComicRepository();
+        final _RecordingEventPublisher events = _RecordingEventPublisher();
         final Comic original = _comic();
-        final List<LibraryChange> published = <LibraryChange>[];
-        var notifyCount = 0;
 
         await applyComicMetadataForm(
           repo,
           ComicMetadataForm.fromComic(original).copyWith(title: '新标题'),
           original,
-          publish: published.add,
-          notifyExternalChange: () => notifyCount += 1,
+          events: events,
         );
 
         expect(repo.callCount, 1);
-        expect(published.single.dictionariesWritten, isFalse);
-        expect(published.single.metadataSaved, isTrue);
-        expect(notifyCount, 1);
+        final ComicMetadataPersisted persisted =
+            events.events.single as ComicMetadataPersisted;
+        expect(persisted.dictionariesWritten, isFalse);
       },
     );
 
-    test('does not publish or notify when form is invalid', () async {
+    test('does not publish when form is invalid', () async {
       final _RecordingComicRepository repo = _RecordingComicRepository();
+      final _RecordingEventPublisher events = _RecordingEventPublisher();
       final Comic original = _comic();
-      final List<LibraryChange> published = <LibraryChange>[];
-      var notifyCount = 0;
 
       final ComicMetadataApplyResult result = await applyComicMetadataForm(
         repo,
         ComicMetadataForm.fromComic(original).copyWith(title: '   '),
         original,
-        publish: published.add,
-        notifyExternalChange: () => notifyCount += 1,
+        events: events,
       );
 
       expect(result, isA<ComicMetadataApplyInvalid>());
       expect(repo.callCount, 0);
-      expect(published, isEmpty);
-      expect(notifyCount, 0);
+      expect(events.events, isEmpty);
     });
 
-    test('does not notify external change when nothing persisted', () async {
+    test('does not publish when unchanged', () async {
       final _RecordingComicRepository repo = _RecordingComicRepository();
+      final _RecordingEventPublisher events = _RecordingEventPublisher();
       final Comic original = _comic();
-      final List<LibraryChange> published = <LibraryChange>[];
-      var notifyCount = 0;
 
       final ComicMetadataApplyResult result = await applyComicMetadataForm(
         repo,
         ComicMetadataForm.fromComic(original),
         original,
-        publish: published.add,
-        notifyExternalChange: () => notifyCount += 1,
+        events: events,
       );
 
       expect(result, isA<ComicMetadataApplySucceeded>());
       expect(repo.callCount, 0);
-      expect(published.single.metadataSaved, isFalse);
-      expect(notifyCount, 0);
+      expect(events.events, isEmpty);
     });
   });
 }

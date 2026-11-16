@@ -1,10 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
-import 'package:hentai_library/shared/ui/layout/library_browse_page_metrics.dart';
-import 'package:hentai_library/features/named_metadata/public/ui/metadata_lab_patterns.dart';
-import 'package:hentai_library/shared/ui/patterns/shared/page_header.dart';
-import 'package:hentai_library/shared/ui/widgets/navigation/management_create_entity_fab.dart';
+import 'package:hentai_library/design-system/design_system.dart';
+import 'package:hentai_library/features/comic_metadata/public/ui/metadata_lab_patterns.dart';
+import 'package:hentai_library/features/comic_metadata/presentation/widgets/management_create_entity_fab.dart';
 
 /// Widgetbook / Lab 管理页壳（不挂生产路由）；与生产页共用 `Management*` patterns。
 class ManagementBrowsePage extends StatefulWidget {
@@ -32,8 +31,7 @@ class ManagementBrowsePage extends StatefulWidget {
   final ScrollController? scrollController;
 
   @override
-  State<ManagementBrowsePage> createState() =>
-      _Md3eManagementBrowsePageState();
+  State<ManagementBrowsePage> createState() => _Md3eManagementBrowsePageState();
 }
 
 class _Md3eManagementBrowsePageState extends State<ManagementBrowsePage> {
@@ -81,19 +79,19 @@ class _Md3eManagementBrowsePageState extends State<ManagementBrowsePage> {
       setState(() => _showInlineCreateField = true);
       return;
     }
-    showManagementCreateEntityDialog(
-      context: context,
-      facet: widget.facet,
-      onCreate: _handleEntityCreated,
+    unawaited(
+      showManagementCreateEntityDialog(
+        context: context,
+        facet: widget.facet,
+        onCreate: _handleEntityCreated,
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final double viewportWidth = MediaQuery.sizeOf(context).width;
-    final WindowSizeClass sizeClass = WindowSizeClass.fromWidth(
-      viewportWidth,
-    );
+    final WindowSizeClass sizeClass = WindowSizeClass.fromWidth(viewportWidth);
     final PageLayoutSpec layout = PageLayoutSpec.of(context);
     final double horizontal = layout.horizontalInset;
 

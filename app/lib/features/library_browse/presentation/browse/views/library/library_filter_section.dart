@@ -1,25 +1,32 @@
+import 'dart:async';
+
+import 'package:hentai_library/features/library_browse/domain/browse/library_comic_browse_preferences.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_comic_filters_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_filter_metadata_names_providers.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_series_filters_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_tab_filter_sort_providers.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/views/library/library_sort_section.dart';
-import 'package:hentai_library/features/library_browse/presentation/integrations/series_presentation_bridge.dart';
+import 'package:hentai_library/features/series/public.dart';
 import 'package:hentai_library/features/library_browse/domain/browse/library_age_restriction_filter.dart';
 import 'package:hentai_library/features/library_browse/domain/browse/library_tri_state_pick.dart';
-import 'package:hentai_library/shared/di/library_dictionary_providers.dart';
-import 'package:hentai_library/shared/domain/library/library_media_type_filter.dart';
-import 'package:hentai_library/shared/domain/library/library_metadata_filter_selection.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
+import 'package:hentai_library/features/comic_metadata/public/providers/comic_metadata_dictionary_state_providers.dart';
+import 'package:hentai_library/features/library_browse/domain/browse/library_media_type_filter.dart';
+import 'package:hentai_library/features/library_browse/domain/browse/library_metadata_filter_selection.dart';
+import 'package:hentai_library/features/comic_metadata/public/comic_metadata_entities.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/comic_language.dart';
-import 'package:hentai_library/shared/util/name_pinyin_assisted_filter.dart';
+import 'package:hentai_library/features/comic/public/comic_metadata_types.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:hentai_library/features/library_browse/presentation/l10n/library_browse_l10n.dart';
+import 'package:hentai_library/features/comic/public/l10n/comic_l10n.dart';
+import 'package:hentai_library/features/series/public/l10n/series_l10n.dart';
 
 const Duration _kFilterAccordionDuration = Duration(milliseconds: 200);
 const Curve _kFilterAccordionCurve = Curves.easeOutCubic;
@@ -88,22 +95,32 @@ class _AgeRestrictionFilterGroup extends ConsumerWidget {
             _CheckboxOptionRow(
               label: l10n.libraryAgeRestrictionFilterLabel(option),
               selected: selected == option,
-              onTap: () {
-                switch (displayTarget) {
-                  case LibraryDisplayTarget.comics:
-                    ref
-                        .read(libraryComicFiltersProvider.notifier)
-                        .toggleAgeRestrictionOption(option);
-                  case LibraryDisplayTarget.series:
-                    ref
-                        .read(librarySeriesFiltersProvider.notifier)
-                        .toggleAgeRestrictionOption(option);
-                }
-              },
+              onTap: () => _handleAgeRestrictionTap(ref, displayTarget, option),
             ),
         ],
       ),
     );
+  }
+
+  void _handleAgeRestrictionTap(
+    WidgetRef ref,
+    LibraryDisplayTarget displayTarget,
+    LibraryAgeRestrictionFilter option,
+  ) {
+    switch (displayTarget) {
+      case LibraryDisplayTarget.comics:
+        unawaited(
+          ref
+              .read(libraryComicFiltersProvider.notifier)
+              .toggleAgeRestrictionOption(option),
+        );
+      case LibraryDisplayTarget.series:
+        unawaited(
+          ref
+              .read(librarySeriesFiltersProvider.notifier)
+              .toggleAgeRestrictionOption(option),
+        );
+    }
   }
 }
 
@@ -120,7 +137,7 @@ class _MediaTypeFilterGroup extends ConsumerWidget {
     }
     final LibraryMediaTypeFilterSelection selected = ref.watch(
       libraryComicFiltersProvider.select(
-        (AsyncValue<LibraryComicFiltersState> state) =>
+        (AsyncValue<LibraryComicBrowsePreferences> state) =>
             state.value?.mediaTypeFilter ??
             const LibraryMediaTypeFilterSelection(),
       ),
@@ -195,7 +212,7 @@ class _TagFilterGroup extends ConsumerWidget {
     );
     final LibraryMetadataFilterSelection selection = ref.watch(
       libraryComicFiltersProvider.select(
-        (AsyncValue<LibraryComicFiltersState> state) =>
+        (AsyncValue<LibraryComicBrowsePreferences> state) =>
             state.value?.tagFilter ?? const LibraryMetadataFilterSelection(),
       ),
     );
@@ -228,7 +245,7 @@ class _AuthorFilterGroup extends ConsumerWidget {
     );
     final LibraryMetadataFilterSelection selection = ref.watch(
       libraryComicFiltersProvider.select(
-        (AsyncValue<LibraryComicFiltersState> state) =>
+        (AsyncValue<LibraryComicBrowsePreferences> state) =>
             state.value?.authorFilter ?? const LibraryMetadataFilterSelection(),
       ),
     );
@@ -239,23 +256,25 @@ class _AuthorFilterGroup extends ConsumerWidget {
       names: names,
       selection: selection,
       isLoading: namesAsync.isLoading && !namesAsync.hasValue,
-      labelFor: (String id) {
-        final List<Author> authors = ref
-            .watch(libraryAuthorDictionaryStateProvider)
-            .maybeWhen(
-              data: (List<Author> value) => value,
-              orElse: () => const <Author>[],
-            );
-        for (final Author author in authors) {
-          if ('${author.id}' == id) {
-            return author.name;
-          }
-        }
-        return id;
-      },
+      labelFor: (String id) => _labelFor(ref, id),
       onToggle: notifier.toggleAuthor,
       onIncludeModeChanged: notifier.setAuthorIncludeMode,
     );
+  }
+
+  String _labelFor(WidgetRef ref, String id) {
+    final List<Author> authors = ref
+        .watch(libraryAuthorDictionaryStateProvider)
+        .maybeWhen(
+          data: (List<Author> value) => value,
+          orElse: () => const <Author>[],
+        );
+    for (final Author author in authors) {
+      if ('${author.id}' == id) {
+        return author.name;
+      }
+    }
+    return id;
   }
 }
 
@@ -272,7 +291,7 @@ class _LanguageFilterGroup extends ConsumerWidget {
     }
     final Set<String> selected = ref.watch(
       libraryComicFiltersProvider.select(
-        (AsyncValue<LibraryComicFiltersState> state) =>
+        (AsyncValue<LibraryComicBrowsePreferences> state) =>
             state.value?.languageFilter ?? const <String>{},
       ),
     );
@@ -306,7 +325,7 @@ class _ParodyFilterGroup extends ConsumerWidget {
     );
     final LibraryMetadataFilterSelection selection = ref.watch(
       libraryComicFiltersProvider.select(
-        (AsyncValue<LibraryComicFiltersState> state) =>
+        (AsyncValue<LibraryComicBrowsePreferences> state) =>
             state.value?.parodyFilter ?? const LibraryMetadataFilterSelection(),
       ),
     );
@@ -339,7 +358,7 @@ class _CharacterFilterGroup extends ConsumerWidget {
     );
     final LibraryMetadataFilterSelection selection = ref.watch(
       libraryComicFiltersProvider.select(
-        (AsyncValue<LibraryComicFiltersState> state) =>
+        (AsyncValue<LibraryComicBrowsePreferences> state) =>
             state.value?.characterFilter ??
             const LibraryMetadataFilterSelection(),
       ),
@@ -370,7 +389,7 @@ class _OrganizeFilterGroup extends ConsumerWidget {
     }
     final bool needsMetadataOnly = ref.watch(
       libraryComicFiltersProvider.select(
-        (AsyncValue<LibraryComicFiltersState> state) =>
+        (AsyncValue<LibraryComicBrowsePreferences> state) =>
             state.value?.needsMetadataOnly ?? false,
       ),
     );

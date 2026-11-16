@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/features/comic/public/di/comic_cover_providers.dart';
-import 'package:hentai_library/shared/ui/widgets/element/image/comic_cover_renderer.dart';
-import 'package:hentai_library/features/series/di/series_cover_providers.dart';
+import 'package:hentai_library/features/series/presentation/providers/series_cover_providers.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/thumbnail/series_cover_source.dart';
 import 'package:hentai_library/shared/ui/models/comic_cover_source.dart';
-import 'package:hentai_library/shared/ui/models/comic_cover_state.dart';
+import 'package:hentai_library/shared/presentation/providers/series_slot_providers.dart';
+import 'package:hentai_library/shared/ui/slots/series_slots.dart';
 import 'package:hentai_library/shared/ui/widgets/catalog/catalog_cover_hero.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/adaptive_comic_cover.dart';
-import 'package:hentai_library/shared/ui/widgets/element/image/comic_cover_placeholder.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// MD3E 系列详情封面：沿用系列封面来源（[seriesCoverSourceProvider]），填充到 MD3E 封面容器内。
@@ -32,31 +31,21 @@ class SeriesDetailCover extends ConsumerWidget {
           ComicCoverSource.bytes(thumbnail),
           ComicCoverPlaceholderKind.loading,
         ),
-        SeriesCoverFallbackComic(:final comicId) => _fallbackComicCover(
-          ref,
-          comicId,
-        ),
+        SeriesCoverFallbackComic(:final comicId) =>
+          ref.watch(seriesCoverSlotProvider)(
+            SeriesCoverSlotArgs(
+              seriesId: seriesId,
+              fallbackComicId: comicId,
+              priority: ThumbnailPriority.critical.index,
+            ),
+          ),
         SeriesCoverMissing() => _cover(null, ComicCoverPlaceholderKind.noCover),
       },
     );
 
-    return CatalogCoverHero.wrap(
+    return CoverHero.wrap(
       tag: CatalogCoverHero.seriesTag(seriesId),
       child: cover,
-    );
-  }
-
-  Widget _fallbackComicCover(WidgetRef ref, String coverComicId) {
-    final ComicCover notifier = ref.read(
-      comicCoverProvider(coverComicId).notifier,
-    );
-    notifier.ensureLoaded(priority: ThumbnailPriority.critical);
-    final ComicCoverState state = ref.watch(comicCoverProvider(coverComicId));
-    return ComicCoverRenderer(
-      state: state,
-      variant: ComicCoverPaintVariant.detail,
-      onDecodeError: notifier.markDecodeError,
-      onRetry: notifier.retryLoad,
     );
   }
 

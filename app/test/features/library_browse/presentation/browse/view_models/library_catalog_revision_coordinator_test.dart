@@ -1,28 +1,19 @@
 import 'dart:async';
 
-import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
+import 'package:hentai_library/composition/composition_overrides.dart';
 
-import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
-import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
+import 'package:hentai_library/composition/feature_state_overrides.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/shared/domain/ports/library_revision_port.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_revision_coordinator.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
-import 'package:hentai_library/shared/di/browse_library_scope_providers.dart';
-import 'package:hentai_library/features/comic/di/comic_cover_providers.dart';
+import 'package:hentai_library/shared/presentation/providers/domain_event_bus_providers.dart';
+import 'package:hentai_library/shared/domain/events/events.dart';
+import 'package:hentai_library/shared/presentation/providers/browse_library_scope_providers.dart';
+import 'package:hentai_library/features/comic/presentation/providers/comic_cover_providers.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:riverpod/riverpod.dart';
 import 'package:test/test.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
-
-class _FakeLibraryRevisionPort implements LibraryRevisionPort {
-  _FakeLibraryRevisionPort(this._events);
-
-  final StreamController<void> _events;
-
-  @override
-  Stream<void> watchRevision() => _events.stream;
-}
+import 'package:hentai_library/composition/overrides/domain_event_bus_overrides.dart';
 
 class _FakeLibrariesNotifier extends LibrariesNotifier {
   static const LocalLibrary _libraryA = (
@@ -92,24 +83,20 @@ class _ControllableThumbnailEventCoordinator extends ThumbnailEventCoordinator {
 
 void main() {
   group('LibraryCatalogRevisionCoordinator', () {
-    late StreamController<void> events;
     late _FakeLibrariesNotifier librariesNotifier;
     late _ControllableScanLibraryController scanLibrary;
     late _ControllableThumbnailEventCoordinator thumbnails;
     late ProviderContainer container;
 
     setUp(() {
-      events = StreamController<void>.broadcast();
       librariesNotifier = _FakeLibrariesNotifier();
       scanLibrary = _ControllableScanLibraryController(running: false);
       thumbnails = _ControllableThumbnailEventCoordinator();
       container = ProviderContainer(
         overrides: <Override>[
-          ...sharedLibraryStateOverrides(),
+          ...featureStateOverrides(),
           ...bootstrapCompositionOverrides(),
-          libraryRevisionPortProvider.overrideWithValue(
-            _FakeLibraryRevisionPort(events),
-          ),
+          ...domainEventBusOverrides(),
           librariesProvider.overrideWith(() => librariesNotifier),
           scanLibraryControllerProvider.overrideWith(() => scanLibrary),
           thumbnailEventCoordinatorProvider.overrideWith(() => thumbnails),
@@ -123,15 +110,16 @@ void main() {
       container.read(libraryCatalogRevisionCoordinatorProvider);
     });
 
-    tearDown(() async {
+    tearDown(() {
       container.dispose();
-      await events.close();
     });
 
     test(
       'sync revision bump refreshes active tab immediately and defers inactive',
       () {
-        container.read(libraryRevisionProvider.notifier).notifyExternalChange();
+        container
+            .read(domainEventBusProvider)
+            .publish(const LibraryCatalogChanged(CatalogChangeSource.sync));
 
         expect(
           container.read(
@@ -172,7 +160,9 @@ void main() {
           1,
         );
 
-        container.read(libraryRevisionProvider.notifier).notifyExternalChange();
+        container
+            .read(domainEventBusProvider)
+            .publish(const LibraryCatalogChanged(CatalogChangeSource.sync));
         expect(
           container.read(
             libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.comics),
@@ -204,7 +194,9 @@ void main() {
         // Allow listen to observe running=true before bumps.
         await Future<void>.delayed(Duration.zero);
 
-        container.read(libraryRevisionProvider.notifier).notifyExternalChange();
+        container
+            .read(domainEventBusProvider)
+            .publish(const LibraryCatalogChanged(CatalogChangeSource.sync));
         expect(
           container.read(
             libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.comics),
@@ -212,8 +204,12 @@ void main() {
           1,
         );
 
-        container.read(libraryRevisionProvider.notifier).notifyExternalChange();
-        container.read(libraryRevisionProvider.notifier).notifyExternalChange();
+        container
+            .read(domainEventBusProvider)
+            .publish(const LibraryCatalogChanged(CatalogChangeSource.sync));
+        container
+            .read(domainEventBusProvider)
+            .publish(const LibraryCatalogChanged(CatalogChangeSource.sync));
         expect(
           container.read(
             libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.comics),
@@ -242,12 +238,16 @@ void main() {
         scanLibrary.setRunning(true);
         await Future<void>.delayed(Duration.zero);
 
-        container.read(libraryRevisionProvider.notifier).notifyExternalChange();
+        container
+            .read(domainEventBusProvider)
+            .publish(const LibraryCatalogChanged(CatalogChangeSource.sync));
         // 每次 bump 之间读取一次，使 listener 逐次观察到 revision（避免同步批次被合并）。
         container.read(
           libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.comics),
         );
-        container.read(libraryRevisionProvider.notifier).notifyExternalChange();
+        container
+            .read(domainEventBusProvider)
+            .publish(const LibraryCatalogChanged(CatalogChangeSource.sync));
         expect(
           container.read(
             libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.comics),
@@ -275,7 +275,9 @@ void main() {
         );
         await Future<void>.delayed(Duration.zero);
 
-        container.read(libraryRevisionProvider.notifier).notifyExternalChange();
+        container
+            .read(domainEventBusProvider)
+            .publish(const LibraryCatalogChanged(CatalogChangeSource.sync));
         expect(
           container.read(
             libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.comics),
@@ -283,8 +285,12 @@ void main() {
           1,
         );
 
-        container.read(libraryRevisionProvider.notifier).notifyExternalChange();
-        container.read(libraryRevisionProvider.notifier).notifyExternalChange();
+        container
+            .read(domainEventBusProvider)
+            .publish(const LibraryCatalogChanged(CatalogChangeSource.sync));
+        container
+            .read(domainEventBusProvider)
+            .publish(const LibraryCatalogChanged(CatalogChangeSource.sync));
         expect(
           container.read(
             libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.comics),
@@ -315,12 +321,16 @@ void main() {
         );
         await Future<void>.delayed(Duration.zero);
 
-        container.read(libraryRevisionProvider.notifier).notifyExternalChange();
+        container
+            .read(domainEventBusProvider)
+            .publish(const LibraryCatalogChanged(CatalogChangeSource.sync));
         // 每次 bump 之间读取一次，使 listener 逐次观察到 revision（避免同步批次被合并）。
         container.read(
           libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.comics),
         );
-        container.read(libraryRevisionProvider.notifier).notifyExternalChange();
+        container
+            .read(domainEventBusProvider)
+            .publish(const LibraryCatalogChanged(CatalogChangeSource.sync));
         expect(
           container.read(
             libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.comics),
@@ -350,12 +360,16 @@ void main() {
       );
       await Future<void>.delayed(Duration.zero);
 
-      container.read(libraryRevisionProvider.notifier).notifyExternalChange();
+      container
+          .read(domainEventBusProvider)
+          .publish(const LibraryCatalogChanged(CatalogChangeSource.sync));
       // 每次 bump 之间读取一次，使 listener 逐次观察到 revision（避免同步批次被合并）。
       container.read(
         libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.comics),
       );
-      container.read(libraryRevisionProvider.notifier).notifyExternalChange();
+      container
+          .read(domainEventBusProvider)
+          .publish(const LibraryCatalogChanged(CatalogChangeSource.sync));
       expect(
         container.read(
           libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.comics),

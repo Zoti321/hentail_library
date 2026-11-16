@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/ui/layout/metadata_edit_form_metrics.dart';
-import 'package:hentai_library/shared/ui/motion/motion.dart';
-import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_surface.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
+import 'package:hentai_library/design-system/design_system.dart';
+import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_actions.dart';
 import 'package:hentai_library/features/series/presentation/patterns/metadata_edit/series_metadata_edit_draft.dart';
 import 'package:hentai_library/features/series/presentation/patterns/metadata_edit/series_metadata_edit_form.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/series_meta_locks.dart';
+import 'package:hentai_library/features/series/domain/value_objects/series_meta_locks.dart';
 
 export 'package:hentai_library/features/series/presentation/patterns/metadata_edit/series_metadata_edit_draft.dart';
 
@@ -30,7 +29,8 @@ class SeriesMetadataEditLayout extends StatefulWidget {
       _SeriesMetadataEditPageState();
 }
 
-class _SeriesMetadataEditPageState extends State<SeriesMetadataEditLayout> {
+class _SeriesMetadataEditPageState extends State<SeriesMetadataEditLayout>
+    implements MetadataEditSaveActions {
   late SeriesMetadataEditDraft _draft = widget.initialDraft;
   String? _nameError;
   String? _totalCountError;
@@ -58,15 +58,28 @@ class _SeriesMetadataEditPageState extends State<SeriesMetadataEditLayout> {
     }
   }
 
+  void _handleDraftChanged(SeriesMetadataEditDraft value) {
+    final validation = value.validate();
+    setState(() {
+      _draft = value;
+      if (_nameError != null && validation.nameError == null) {
+        _nameError = null;
+      }
+      if (_totalCountError != null && validation.totalCountError == null) {
+        _totalCountError = null;
+      }
+    });
+  }
+
+  @override
   Future<void> saveAndPop() => _handleSave();
 
   Future<void> _handleSave() async {
-    final String? nameError = _draft.validateName();
-    final String? totalError = _draft.validateTotalCount();
-    if (nameError != null || totalError != null) {
+    final validation = _draft.validate();
+    if (!validation.isValid) {
       setState(() {
-        _nameError = nameError;
-        _totalCountError = totalError;
+        _nameError = validation.nameError;
+        _totalCountError = validation.totalCountError;
       });
       return;
     }
@@ -99,18 +112,7 @@ class _SeriesMetadataEditPageState extends State<SeriesMetadataEditLayout> {
         onLockChanged: _onLockChanged,
         nameError: _nameError,
         totalCountError: _totalCountError,
-        onDraftChanged: (SeriesMetadataEditDraft value) {
-          setState(() {
-            _draft = value;
-            if (_nameError != null && value.validateName() == null) {
-              _nameError = null;
-            }
-            if (_totalCountError != null &&
-                value.validateTotalCount() == null) {
-              _totalCountError = null;
-            }
-          });
-        },
+        onDraftChanged: _handleDraftChanged,
       ),
     );
   }

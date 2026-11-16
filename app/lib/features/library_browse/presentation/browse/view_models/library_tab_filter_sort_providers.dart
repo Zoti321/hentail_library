@@ -1,14 +1,18 @@
+import 'package:hentai_library/features/library_browse/domain/browse/library_series_browse_preferences.dart';
+
+import 'package:hentai_library/features/library_browse/domain/browse/library_comic_browse_preferences.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
-import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
+import 'package:hentai_library/features/app_settings/public/app_settings_cross_feature_types.dart';
+import 'package:hentai_library/features/app_settings/public/providers/app_settings_providers.dart';
 import 'package:hentai_library/features/library_browse/domain/browse/library_age_restriction_filter.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_comic_filters_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_series_filters_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:hentai_library/features/library_browse/presentation/integrations/comic_presentation_bridge.dart';
-import 'package:hentai_library/features/library_browse/presentation/integrations/series_presentation_bridge.dart';
+import 'package:hentai_library/features/comic/public.dart';
+import 'package:hentai_library/features/series/public.dart';
 
 part 'library_tab_filter_sort_providers.g.dart';
 
@@ -20,7 +24,7 @@ LibraryAgeRestrictionFilter libraryActiveAgeRestrictionFilter(Ref ref) {
   return switch (target) {
     LibraryDisplayTarget.comics => ref.watch(
       libraryComicFiltersProvider.select(
-        (AsyncValue<LibraryComicFiltersState> state) =>
+        (AsyncValue<LibraryComicBrowsePreferences> state) =>
             state.value?.ageRestriction ??
             LibraryAgeRestrictionFilter.unrestricted,
       ),
@@ -39,7 +43,7 @@ LibraryComicSortOption libraryActiveComicSortOption(Ref ref) {
   }
   return ref.watch(
     libraryComicFiltersProvider.select(
-      (AsyncValue<LibraryComicFiltersState> state) =>
+      (AsyncValue<LibraryComicBrowsePreferences> state) =>
           state.value?.sortOption ?? kLibraryDefaultSortOption,
     ),
   );
@@ -58,7 +62,7 @@ LibrarySeriesSortOption libraryActiveSeriesSortOption(Ref ref) {
 LibraryAgeRestrictionFilter librarySeriesTabAgeRestrictionFilter(Ref ref) {
   return ref.watch(
     librarySeriesFiltersProvider.select(
-      (AsyncValue<LibrarySeriesFiltersState> state) =>
+      (AsyncValue<LibrarySeriesBrowsePreferences> state) =>
           state.value?.ageRestriction ??
           LibraryAgeRestrictionFilter.unrestricted,
     ),
@@ -69,7 +73,7 @@ LibraryAgeRestrictionFilter librarySeriesTabAgeRestrictionFilter(Ref ref) {
 LibrarySeriesSortOption librarySeriesTabSortOption(Ref ref) {
   return ref.watch(
     librarySeriesFiltersProvider.select(
-      (AsyncValue<LibrarySeriesFiltersState> state) =>
+      (AsyncValue<LibrarySeriesBrowsePreferences> state) =>
           state.value?.sortOption ?? kLibraryDefaultSeriesSortOption,
     ),
   );
@@ -81,7 +85,7 @@ LibrarySerializationStatusFilter librarySeriesTabSerializationStatusFilter(
 ) {
   return ref.watch(
     librarySeriesFiltersProvider.select(
-      (AsyncValue<LibrarySeriesFiltersState> state) =>
+      (AsyncValue<LibrarySeriesBrowsePreferences> state) =>
           state.value?.serializationStatusFilter ??
           LibrarySerializationStatusFilter.unrestricted,
     ),
@@ -91,7 +95,7 @@ LibrarySerializationStatusFilter librarySeriesTabSerializationStatusFilter(
 @Riverpod(keepAlive: true)
 bool librarySeriesTabPreferLibraryRootSeries(Ref ref) {
   return ref.watch(
-    settingsProvider.select(
+    appSettingsProvider.select(
       (AsyncValue<AppSetting> async) =>
           async.asData?.value.preferLibraryRootSeries ?? true,
     ),

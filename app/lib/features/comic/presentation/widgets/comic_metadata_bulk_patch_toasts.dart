@@ -1,0 +1,39 @@
+import 'package:flutter/material.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
+import 'package:hentai_library/features/library_admin/public.dart';
+import 'package:hentai_library/design-system/design_system.dart';
+
+String comicMetadataBulkPatchMessage(
+  AppLocalizations l10n,
+  ComicMetadataBulkPatchResult result,
+) {
+  if (result.cancelled) {
+    return l10n.bulkEditMetadataBatchCancelled(
+      result.succeeded,
+      result.failed,
+      result.unchanged,
+    );
+  }
+  return l10n.bulkEditMetadataBatchDone(
+    result.succeeded,
+    result.failed,
+    result.unchanged,
+  );
+}
+
+void showComicMetadataBulkPatchToast(
+  BuildContext context,
+  ComicMetadataBulkPatchResult result,
+) {
+  final String message = comicMetadataBulkPatchMessage(context.l10n, result);
+  if (result.cancelled || result.failed > 0) {
+    showInfoSnackbar(context, message);
+    return;
+  }
+  if (result.succeeded == 0 && result.unchanged > 0) {
+    showInfoSnackbar(context, message);
+    return;
+  }
+  showSuccessSnackbar(context, message);
+}

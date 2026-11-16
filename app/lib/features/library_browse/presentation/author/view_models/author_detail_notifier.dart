@@ -1,12 +1,10 @@
+import 'package:hentai_library/features/library_browse/domain/browse/library_comic_browse_preferences.dart';
+
 import 'dart:typed_data';
 
-import 'package:hentai_library/features/library_browse/presentation/integrations/comic_presentation_bridge.dart';
+import 'package:hentai_library/features/comic/public.dart';
 
-import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/author_detail.dart';
-import 'package:hentai_library/features/named_metadata/public.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
-import 'package:hentai_library/shared/di/library_state_providers.dart';
+import 'package:hentai_library/features/comic_metadata/public.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_comic_filters_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
@@ -21,7 +19,7 @@ final authorDetailProvider = FutureProvider.autoDispose
           ref.invalidateSelf();
         }
       });
-      final LibraryComicFiltersState filters = await ref.watch(
+      final LibraryComicBrowsePreferences filters = await ref.watch(
         libraryComicFiltersProvider.future,
       );
       return ref
@@ -77,7 +75,7 @@ final authorImageProvider = FutureProvider.autoDispose
           },
         );
       }
-      final LibraryComicFiltersState filters = await ref.watch(
+      final LibraryComicBrowsePreferences filters = await ref.watch(
         libraryComicFiltersProvider.future,
       );
       return repo.loadImage(
@@ -102,13 +100,11 @@ class AuthorDetailCommands {
     return null;
   }
 
-  Future<void> rename({
-    required int authorId,
-    required String oldName,
-    required String newName,
-  }) async {
-    await _ref.read(authorRepoProvider).rename(oldName, newName);
-    _ref.invalidate(authorDetailProvider(authorId));
+  Future<void> rename({required int authorId, required String newName}) async {
+    await _ref.read(authorRepoProvider).renameById(authorId, newName);
+    if (_ref.mounted) {
+      _ref.invalidate(authorDetailProvider(authorId));
+    }
   }
 
   Future<void> addLink({

@@ -64,11 +64,8 @@ fn find_opf_path<R: Read + Seek>(archive: &mut ZipArchive<R>) -> Result<String, 
 }
 
 fn extract_container_opf_path(container_xml: &str) -> Option<String> {
-    let needle = "full-path=\"";
-    let start = container_xml.find(needle)? + needle.len();
-    let rest = &container_xml[start..];
-    let end = rest.find('"')?;
-    Some(normalize_zip_path(&rest[..end]))
+    crate::resource_metadata::container_package_path(container_xml)
+        .map(|path| normalize_zip_path(&path))
 }
 
 fn read_zip_entry_string<R: Read + Seek>(

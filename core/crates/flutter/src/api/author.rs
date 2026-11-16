@@ -3,7 +3,7 @@ use hentai_core::{
     delete_author_link as core_delete_link, delete_authors_by_names,
     fetch_authors_page_result as core_fetch_page, get_author_detail as core_detail,
     list_all_authors, list_author_links as core_list_links, load_author_image as core_load_image,
-    rename_author as core_rename, resolve_author_image as core_image,
+    rename_author as core_rename, rename_author_identity, resolve_author_image as core_image,
     update_author_link as core_update_link, watch_authors, AuthorIdentity, AuthorImageRef,
     AuthorImageSlot, AuthorImageSource, AuthorLinkDto, AuthorLinkPlatform,
 };
@@ -206,6 +206,16 @@ pub async fn delete_authors_by_names_frb(names: Vec<String>) -> Result<(), Henta
 #[flutter_rust_bridge::frb]
 pub async fn rename_author_frb(old_name: String, new_name: String) -> Result<(), HentaiErrorDto> {
     core_rename(&old_name, &new_name)
+        .await
+        .map_err(HentaiErrorDto::from)
+}
+
+#[flutter_rust_bridge::frb]
+pub async fn rename_author_by_id_frb(
+    author_id: i64,
+    new_name: String,
+) -> Result<(), HentaiErrorDto> {
+    rename_author_identity(author_id, &new_name)
         .await
         .map_err(HentaiErrorDto::from)
 }

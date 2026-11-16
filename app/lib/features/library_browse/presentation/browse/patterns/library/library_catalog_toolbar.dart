@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/shared/ui/widgets/selection/segmented_capsule_bar.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:hentai_library/shared/ui/l10n/library_display_target_l10n.dart';
 
 /// Body-top catalog row: 漫画 / 系列 胶囊切换（与管理页同款 [SegmentedCapsuleBar]）+ 当前数量（末端）。
 ///
@@ -51,13 +52,7 @@ class LibraryCatalogToolbar extends StatelessWidget {
               ),
             ],
             selectedIndex: displayTarget == LibraryDisplayTarget.comics ? 0 : 1,
-            onSelected: (int index) {
-              onDisplayTargetChanged(
-                index == 0
-                    ? LibraryDisplayTarget.comics
-                    : LibraryDisplayTarget.series,
-              );
-            },
+            onSelected: _handleSelected,
           ),
         ),
         const SizedBox(width: 12),
@@ -69,6 +64,12 @@ class LibraryCatalogToolbar extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  void _handleSelected(int index) {
+    onDisplayTargetChanged(
+      index == 0 ? LibraryDisplayTarget.comics : LibraryDisplayTarget.series,
     );
   }
 }

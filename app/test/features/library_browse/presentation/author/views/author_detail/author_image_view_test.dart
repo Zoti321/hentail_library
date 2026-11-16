@@ -1,18 +1,21 @@
+import 'package:hentai_library/composition/modules/library_browse/library_browse_preferences_overrides.dart';
+import 'package:hentai_library/design-system/design_system.dart';
+
 import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/features/comic/di/comic_cover_providers.dart';
+import 'package:hentai_library/features/comic/presentation/providers/comic_cover_providers.dart';
 import 'package:hentai_library/features/comic/public/ui/comic_cover_content.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/author_detail.dart';
+import 'package:hentai_library/features/comic_metadata/public/comic_metadata_entities.dart';
 import 'package:hentai_library/shared/ui/models/comic_cover_source.dart';
 import 'package:hentai_library/shared/ui/models/comic_cover_state.dart';
 import 'package:hentai_library/shared/ui/widgets/catalog/catalog_cover_hero.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/card_letterboxed_cover_image.dart';
 import 'package:hentai_library/features/library_browse/presentation/author/view_models/author_detail_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/author/views/author_detail/author_image_view.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/features/comic_metadata/public/providers/comic_metadata_repository_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart' show ProviderScope, Ref;
 import 'package:riverpod/misc.dart' show Override;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -176,7 +179,7 @@ void main() {
                         MaterialPageRoute<void>(
                           builder: (BuildContext context) {
                             return Scaffold(
-                              body: CatalogCoverHero.wrap(
+                              body: CoverHero.wrap(
                                 tag: CatalogCoverHero.comicTag(comicId),
                                 child: const SizedBox(width: 200, height: 300),
                               ),
@@ -270,7 +273,10 @@ void main() {
     final _PlatformAuthorRepository repo = _PlatformAuthorRepository();
     await pumpLocalizedApp(
       tester,
-      overrides: <Override>[authorRepoProvider.overrideWithValue(repo)],
+      overrides: <Override>[
+        ...libraryBrowsePreferencesOverrides(),
+        authorRepoProvider.overrideWithValue(repo),
+      ],
       home: const Scaffold(
         body: SizedBox(
           width: 400,

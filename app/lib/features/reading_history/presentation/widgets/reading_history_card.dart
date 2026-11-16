@@ -1,11 +1,9 @@
+import 'package:hentai_library/features/reading_history/presentation/l10n/reading_history_l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/comic/public.dart';
-import 'package:hentai_library/shared/ui/motion/app_motion.dart';
-import 'package:hentai_library/shared/ui/widgets/foundation/pointer_target.dart';
-import 'package:hentai_library/shared/ui/theme/theme.dart';
-import 'package:hentai_library/shared/ui/widgets/actions/ghost_button.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -34,6 +32,16 @@ class ReadingHistoryCard extends HookConsumerWidget {
 
   /// [coverViewportProvider] scope；与 [gridIndex] 同时提供时启用视口优先级。
   final String? coverViewportScope;
+
+  Object? _handleActivateIntent(ActivateIntent intent) {
+    onTap();
+    return null;
+  }
+
+  void _handleTap() {
+    onTap();
+    unfocusAfterPointerActivation();
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -71,17 +79,11 @@ class ReadingHistoryCard extends HookConsumerWidget {
             onShowFocusHighlight: (bool value) => isFocused.value = value,
             actions: <Type, Action<Intent>>{
               ActivateIntent: CallbackAction<ActivateIntent>(
-                onInvoke: (ActivateIntent intent) {
-                  onTap();
-                  return null;
-                },
+                onInvoke: _handleActivateIntent,
               ),
             },
             child: GestureDetector(
-              onTap: () {
-                onTap();
-                unfocusAfterPointerActivation();
-              },
+              onTap: _handleTap,
               child: AnimatedContainer(
                 duration: motionDurationOf(
                   context,

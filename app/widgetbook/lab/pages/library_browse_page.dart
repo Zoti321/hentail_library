@@ -1,19 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
-import 'package:hentai_library/shared/ui/layout/catalog_grid.dart';
-import 'package:hentai_library/shared/ui/layout/catalog_grid_metrics.dart';
-import 'package:hentai_library/shared/ui/layout/catalog_list_layout.dart';
-import 'package:hentai_library/shared/ui/layout/library_browse_page_metrics.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/patterns/library/library_catalog_toolbar.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/patterns/library/lab_catalog_item_preview.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/patterns/library/library_page_header.dart';
-import 'package:hentai_library/shared/ui/patterns/shared/page_header.dart';
-import 'package:hentai_library/shared/ui/widgets/actions/catalog_view_mode_button_group.dart';
-import 'package:hentai_library/shared/ui/widgets/catalog/comic_card.dart';
-import 'package:hentai_library/shared/ui/widgets/catalog/comic_list_item.dart';
-import 'package:hentai_library/shared/ui/widgets/navigation/expressive_library_scroll_to_top_button.dart';
-import 'package:hentai_library/shared/ui/widgets/pagination/pagination.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -105,9 +94,7 @@ class _Md3eLibraryBrowsePageState extends State<LibraryBrowseLayout> {
   @override
   Widget build(BuildContext context) {
     final double viewportWidth = MediaQuery.sizeOf(context).width;
-    final WindowSizeClass sizeClass = WindowSizeClass.fromWidth(
-      viewportWidth,
-    );
+    final WindowSizeClass sizeClass = WindowSizeClass.fromWidth(viewportWidth);
     final PageLayoutSpec layout = PageLayoutSpec.of(context);
     final double horizontal = layout.horizontalInset;
 
@@ -186,9 +173,7 @@ class _Md3eLibraryBrowsePageState extends State<LibraryBrowseLayout> {
             SliverPadding(
               padding: EdgeInsets.fromLTRB(
                 horizontal,
-                LibraryBrowsePageMetrics.paginationVerticalSpacing(
-                  sizeClass,
-                ),
+                LibraryBrowsePageMetrics.paginationVerticalSpacing(sizeClass),
                 horizontal,
                 LibraryBrowsePageMetrics.scrollBottomInset(sizeClass),
               ),
@@ -211,11 +196,7 @@ class _Md3eLibraryBrowsePageState extends State<LibraryBrowseLayout> {
     );
   }
 
-  Widget _buildGridCard(
-    BuildContext context,
-    int index,
-    CatalogGridLayout _,
-  ) {
+  Widget _buildGridCard(BuildContext context, int index, CatalogGridLayout _) {
     final ColorScheme scheme = Theme.of(context).colorScheme;
     final double? readProgress =
         widget.displayTarget == LibraryDisplayTarget.comics && index.isEven

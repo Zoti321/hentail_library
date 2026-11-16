@@ -1,0 +1,4774 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:intl/intl.dart' as intl;
+
+import 'app_localizations_en.dart';
+import 'app_localizations_zh.dart';
+
+// ignore_for_file: type=lint
+
+/// Callers can lookup localized strings with an instance of AppLocalizations
+/// returned by `AppLocalizations.of(context)`.
+///
+/// Applications need to include `AppLocalizations.delegate()` in their app's
+/// `localizationDelegates` list, and the locales they support in the app's
+/// `supportedLocales` list. For example:
+///
+/// ```dart
+/// import 'l10n/app_localizations.dart';
+///
+/// return MaterialApp(
+///   localizationsDelegates: AppLocalizations.localizationsDelegates,
+///   supportedLocales: AppLocalizations.supportedLocales,
+///   home: MyApplicationHome(),
+/// );
+/// ```
+///
+/// ## Update pubspec.yaml
+///
+/// Please make sure to update your pubspec.yaml to include the following
+/// packages:
+///
+/// ```yaml
+/// dependencies:
+///   # Internationalization support.
+///   flutter_localizations:
+///     sdk: flutter
+///   intl: any # Use the pinned version from flutter_localizations
+///
+///   # Rest of dependencies
+/// ```
+///
+/// ## iOS Applications
+///
+/// iOS applications define key application metadata, including supported
+/// locales, in an Info.plist file that is built into the application bundle.
+/// To configure the locales supported by your app, you’ll need to edit this
+/// file.
+///
+/// First, open your project’s ios/Runner.xcworkspace Xcode workspace file.
+/// Then, in the Project Navigator, open the Info.plist file under the Runner
+/// project’s Runner folder.
+///
+/// Next, select the Information Property List item, select Add Item from the
+/// Editor menu, then select Localizations from the pop-up menu.
+///
+/// Select and expand the newly-created Localizations item then, for each
+/// locale your application supports, add a new item and select the locale
+/// you wish to add from the pop-up menu in the Value field. This list should
+/// be consistent with the languages listed in the AppLocalizations.supportedLocales
+/// property.
+abstract class AppLocalizations {
+  AppLocalizations(String locale)
+    : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+
+  final String localeName;
+
+  static AppLocalizations of(BuildContext context) {
+    return Localizations.of<AppLocalizations>(context, AppLocalizations)!;
+  }
+
+  static const LocalizationsDelegate<AppLocalizations> delegate =
+      _AppLocalizationsDelegate();
+
+  /// A list of this localizations delegate along with the default localizations
+  /// delegates.
+  ///
+  /// Returns a list of localizations delegates containing this delegate along with
+  /// GlobalMaterialLocalizations.delegate, GlobalCupertinoLocalizations.delegate,
+  /// and GlobalWidgetsLocalizations.delegate.
+  ///
+  /// Additional delegates can be added by appending to this list in
+  /// MaterialApp. This list does not have to be used at all if a custom list
+  /// of delegates is preferred or required.
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
+      <LocalizationsDelegate<dynamic>>[
+        delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ];
+
+  /// A list of this localizations delegate's supported locales.
+  static const List<Locale> supportedLocales = <Locale>[
+    Locale('en'),
+    Locale('zh'),
+  ];
+
+  /// No description provided for @libraryTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'漫画库'**
+  String get libraryTitle;
+
+  /// No description provided for @sidebarAddLibraryTooltip.
+  ///
+  /// In zh, this message translates to:
+  /// **'新建漫画库'**
+  String get sidebarAddLibraryTooltip;
+
+  /// No description provided for @sidebarAddLocalLibrary.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加本地库'**
+  String get sidebarAddLocalLibrary;
+
+  /// No description provided for @sidebarAddRemoteLibrary.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加远程库'**
+  String get sidebarAddRemoteLibrary;
+
+  /// No description provided for @sidebarReorderLibraries.
+  ///
+  /// In zh, this message translates to:
+  /// **'重新排序'**
+  String get sidebarReorderLibraries;
+
+  /// No description provided for @sidebarExitReorder.
+  ///
+  /// In zh, this message translates to:
+  /// **'退出排序'**
+  String get sidebarExitReorder;
+
+  /// No description provided for @sidebarPinnedSection.
+  ///
+  /// In zh, this message translates to:
+  /// **'已固定'**
+  String get sidebarPinnedSection;
+
+  /// No description provided for @sidebarUnpinnedSection.
+  ///
+  /// In zh, this message translates to:
+  /// **'未固定'**
+  String get sidebarUnpinnedSection;
+
+  /// No description provided for @sidebarMoreLibraries.
+  ///
+  /// In zh, this message translates to:
+  /// **'更多'**
+  String get sidebarMoreLibraries;
+
+  /// No description provided for @sidebarScanAllLibraries.
+  ///
+  /// In zh, this message translates to:
+  /// **'扫描所有库'**
+  String get sidebarScanAllLibraries;
+
+  /// No description provided for @sidebarDeepScanAllLibraries.
+  ///
+  /// In zh, this message translates to:
+  /// **'深度扫描所有库'**
+  String get sidebarDeepScanAllLibraries;
+
+  /// No description provided for @sidebarScanLibrary.
+  ///
+  /// In zh, this message translates to:
+  /// **'扫描库'**
+  String get sidebarScanLibrary;
+
+  /// No description provided for @sidebarDeepScanLibrary.
+  ///
+  /// In zh, this message translates to:
+  /// **'深度扫描库'**
+  String get sidebarDeepScanLibrary;
+
+  /// No description provided for @cancelRefreshMetadata.
+  ///
+  /// In zh, this message translates to:
+  /// **'取消刷新元数据'**
+  String get cancelRefreshMetadata;
+
+  /// No description provided for @refreshMetadataBatchDone.
+  ///
+  /// In zh, this message translates to:
+  /// **'元数据刷新完成：成功 {succeeded}，失败 {failed}'**
+  String refreshMetadataBatchDone(int succeeded, int failed);
+
+  /// No description provided for @refreshMetadataBatchCancelled.
+  ///
+  /// In zh, this message translates to:
+  /// **'已取消元数据刷新（已刷新 {succeeded}，失败 {failed}）'**
+  String refreshMetadataBatchCancelled(int succeeded, int failed);
+
+  /// No description provided for @sidebarEditLibrary.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑'**
+  String get sidebarEditLibrary;
+
+  /// No description provided for @sidebarEditLibraryConnection.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑连接'**
+  String get sidebarEditLibraryConnection;
+
+  /// No description provided for @sidebarDeleteLibrary.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除'**
+  String get sidebarDeleteLibrary;
+
+  /// No description provided for @dialogCreateLocalLibraryTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加本地库'**
+  String get dialogCreateLocalLibraryTitle;
+
+  /// No description provided for @dialogCreateRemoteLibraryTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加远程库'**
+  String get dialogCreateRemoteLibraryTitle;
+
+  /// No description provided for @dialogEditLibraryTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑库'**
+  String get dialogEditLibraryTitle;
+
+  /// No description provided for @dialogEditLibraryTabGeneral.
+  ///
+  /// In zh, this message translates to:
+  /// **'常规'**
+  String get dialogEditLibraryTabGeneral;
+
+  /// No description provided for @dialogEditLibraryTabWebDav.
+  ///
+  /// In zh, this message translates to:
+  /// **'WebDAV'**
+  String get dialogEditLibraryTabWebDav;
+
+  /// No description provided for @dialogEditLibraryTabScanner.
+  ///
+  /// In zh, this message translates to:
+  /// **'扫描'**
+  String get dialogEditLibraryTabScanner;
+
+  /// No description provided for @formLibraryNameLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'名称'**
+  String get formLibraryNameLabel;
+
+  /// No description provided for @formLibraryRootLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'根位置'**
+  String get formLibraryRootLabel;
+
+  /// No description provided for @formLibraryRootBrowse.
+  ///
+  /// In zh, this message translates to:
+  /// **'浏览'**
+  String get formLibraryRootBrowse;
+
+  /// No description provided for @formLibraryRootUnreadable.
+  ///
+  /// In zh, this message translates to:
+  /// **'无法读取该目录。请授予存储权限后重试，或选择应用可读的路径。'**
+  String get formLibraryRootUnreadable;
+
+  /// No description provided for @formLibraryRootChangeConfirmTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'确认更改根位置？'**
+  String get formLibraryRootChangeConfirmTitle;
+
+  /// No description provided for @formLibraryRootChangeConfirmBody.
+  ///
+  /// In zh, this message translates to:
+  /// **'保存后，若新根当前可读，将按相对路径立即执行 Path migration，尽量保留漫画与系列的用户元数据、字段锁和阅读进度；若新根当前不可读，则仅保存新根。未在新根下匹配到相对路径的条目会保留旧身份，等待下次库同步处理。此操作不会自动触发同步。'**
+  String get formLibraryRootChangeConfirmBody;
+
+  /// No description provided for @formLibraryScanOnStartupLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'启动时扫描'**
+  String get formLibraryScanOnStartupLabel;
+
+  /// No description provided for @formLibraryScanOnStartupOn.
+  ///
+  /// In zh, this message translates to:
+  /// **'开启'**
+  String get formLibraryScanOnStartupOn;
+
+  /// No description provided for @formLibraryScanOnStartupOff.
+  ///
+  /// In zh, this message translates to:
+  /// **'关闭'**
+  String get formLibraryScanOnStartupOff;
+
+  /// No description provided for @formLibraryScanIntervalLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'扫描间隔'**
+  String get formLibraryScanIntervalLabel;
+
+  /// No description provided for @scanIntervalDisabled.
+  ///
+  /// In zh, this message translates to:
+  /// **'关闭'**
+  String get scanIntervalDisabled;
+
+  /// No description provided for @scanIntervalHourly.
+  ///
+  /// In zh, this message translates to:
+  /// **'每小时'**
+  String get scanIntervalHourly;
+
+  /// No description provided for @scanIntervalEvery6Hours.
+  ///
+  /// In zh, this message translates to:
+  /// **'每 6 小时'**
+  String get scanIntervalEvery6Hours;
+
+  /// No description provided for @scanIntervalEvery12Hours.
+  ///
+  /// In zh, this message translates to:
+  /// **'每 12 小时'**
+  String get scanIntervalEvery12Hours;
+
+  /// No description provided for @scanIntervalDaily.
+  ///
+  /// In zh, this message translates to:
+  /// **'每天'**
+  String get scanIntervalDaily;
+
+  /// No description provided for @scanIntervalWeekly.
+  ///
+  /// In zh, this message translates to:
+  /// **'每周'**
+  String get scanIntervalWeekly;
+
+  /// No description provided for @libraryEmptyTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无漫画'**
+  String get libraryEmptyTitle;
+
+  /// No description provided for @libraryEmptyHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'请先在「选中路径」中添加路径并扫描'**
+  String get libraryEmptyHint;
+
+  /// No description provided for @librarySeriesEmptyTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无系列'**
+  String get librarySeriesEmptyTitle;
+
+  /// No description provided for @librarySeriesEmptyHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'系列由扫描结果自动生成，添加路径并扫描后即可出现'**
+  String get librarySeriesEmptyHint;
+
+  /// No description provided for @libraryNoMatchTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'没有匹配结果'**
+  String get libraryNoMatchTitle;
+
+  /// No description provided for @libraryNoMatchFilterHintComics.
+  ///
+  /// In zh, this message translates to:
+  /// **'当前筛选条件下没有漫画'**
+  String get libraryNoMatchFilterHintComics;
+
+  /// No description provided for @libraryNoMatchFilterHintSeries.
+  ///
+  /// In zh, this message translates to:
+  /// **'当前筛选条件下没有系列'**
+  String get libraryNoMatchFilterHintSeries;
+
+  /// No description provided for @libraryClearFilters.
+  ///
+  /// In zh, this message translates to:
+  /// **'清除筛选'**
+  String get libraryClearFilters;
+
+  /// No description provided for @comicCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, =0{0 本} other{{count} 本}}'**
+  String comicCount(int count);
+
+  /// No description provided for @settingsLanguageLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'语言'**
+  String get settingsLanguageLabel;
+
+  /// No description provided for @localePreferenceSystem.
+  ///
+  /// In zh, this message translates to:
+  /// **'跟随系统'**
+  String get localePreferenceSystem;
+
+  /// No description provided for @localePreferenceZhCn.
+  ///
+  /// In zh, this message translates to:
+  /// **'中文'**
+  String get localePreferenceZhCn;
+
+  /// No description provided for @localePreferenceEn.
+  ///
+  /// In zh, this message translates to:
+  /// **'English'**
+  String get localePreferenceEn;
+
+  /// No description provided for @settingsFontLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'字体'**
+  String get settingsFontLabel;
+
+  /// No description provided for @fontPreferenceMiSans.
+  ///
+  /// In zh, this message translates to:
+  /// **'小米字体'**
+  String get fontPreferenceMiSans;
+
+  /// No description provided for @fontPreferenceNotoSans.
+  ///
+  /// In zh, this message translates to:
+  /// **'Noto Sans'**
+  String get fontPreferenceNotoSans;
+
+  /// No description provided for @settingsThemeLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'主题'**
+  String get settingsThemeLabel;
+
+  /// No description provided for @themePreferenceSystem.
+  ///
+  /// In zh, this message translates to:
+  /// **'跟随系统'**
+  String get themePreferenceSystem;
+
+  /// No description provided for @themePreferenceLight.
+  ///
+  /// In zh, this message translates to:
+  /// **'浅色'**
+  String get themePreferenceLight;
+
+  /// No description provided for @themePreferenceDark.
+  ///
+  /// In zh, this message translates to:
+  /// **'深色'**
+  String get themePreferenceDark;
+
+  /// No description provided for @settingsDynamicColorLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'动态配色'**
+  String get settingsDynamicColorLabel;
+
+  /// No description provided for @settingsDynamicColorDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'使用系统壁纸颜色；开启后无法选手动配色'**
+  String get settingsDynamicColorDescription;
+
+  /// No description provided for @settingsColorSchemeLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'配色'**
+  String get settingsColorSchemeLabel;
+
+  /// No description provided for @settingsDefaultLibraryDisplayTargetLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'默认库浏览'**
+  String get settingsDefaultLibraryDisplayTargetLabel;
+
+  /// No description provided for @settingsDefaultLibraryDisplayTargetDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'进入漫画库时先打开漫画或系列'**
+  String get settingsDefaultLibraryDisplayTargetDescription;
+
+  /// No description provided for @colorSchemePreferenceBrand.
+  ///
+  /// In zh, this message translates to:
+  /// **'紫罗兰色'**
+  String get colorSchemePreferenceBrand;
+
+  /// No description provided for @colorSchemePreferenceTeal.
+  ///
+  /// In zh, this message translates to:
+  /// **'青瓷色'**
+  String get colorSchemePreferenceTeal;
+
+  /// No description provided for @colorSchemePreferenceCyan.
+  ///
+  /// In zh, this message translates to:
+  /// **'天青色'**
+  String get colorSchemePreferenceCyan;
+
+  /// No description provided for @colorSchemePreferenceBlue.
+  ///
+  /// In zh, this message translates to:
+  /// **'矢车菊色'**
+  String get colorSchemePreferenceBlue;
+
+  /// No description provided for @colorSchemePreferenceIndigo.
+  ///
+  /// In zh, this message translates to:
+  /// **'靛蓝色'**
+  String get colorSchemePreferenceIndigo;
+
+  /// No description provided for @colorSchemePreferenceDeepPurple.
+  ///
+  /// In zh, this message translates to:
+  /// **'葡萄色'**
+  String get colorSchemePreferenceDeepPurple;
+
+  /// No description provided for @colorSchemePreferenceViolet.
+  ///
+  /// In zh, this message translates to:
+  /// **'紫罗兰色'**
+  String get colorSchemePreferenceViolet;
+
+  /// No description provided for @colorSchemePreferencePink.
+  ///
+  /// In zh, this message translates to:
+  /// **'蔷薇色'**
+  String get colorSchemePreferencePink;
+
+  /// No description provided for @colorSchemePreferenceSakura.
+  ///
+  /// In zh, this message translates to:
+  /// **'樱花色'**
+  String get colorSchemePreferenceSakura;
+
+  /// No description provided for @colorSchemePreferenceYellow.
+  ///
+  /// In zh, this message translates to:
+  /// **'琥珀色'**
+  String get colorSchemePreferenceYellow;
+
+  /// No description provided for @colorSchemePreferenceOrange.
+  ///
+  /// In zh, this message translates to:
+  /// **'金盏花色'**
+  String get colorSchemePreferenceOrange;
+
+  /// No description provided for @colorSchemePreferenceDeepOrange.
+  ///
+  /// In zh, this message translates to:
+  /// **'朱砂色'**
+  String get colorSchemePreferenceDeepOrange;
+
+  /// No description provided for @colorSchemePreferenceGreen.
+  ///
+  /// In zh, this message translates to:
+  /// **'苔绿色'**
+  String get colorSchemePreferenceGreen;
+
+  /// No description provided for @navHome.
+  ///
+  /// In zh, this message translates to:
+  /// **'首页'**
+  String get navHome;
+
+  /// No description provided for @navMetadata.
+  ///
+  /// In zh, this message translates to:
+  /// **'管理'**
+  String get navMetadata;
+
+  /// No description provided for @navHistory.
+  ///
+  /// In zh, this message translates to:
+  /// **'历史'**
+  String get navHistory;
+
+  /// No description provided for @navSettings.
+  ///
+  /// In zh, this message translates to:
+  /// **'设置'**
+  String get navSettings;
+
+  /// No description provided for @pageTitleReader.
+  ///
+  /// In zh, this message translates to:
+  /// **'阅读'**
+  String get pageTitleReader;
+
+  /// No description provided for @pageTitleComicDetail.
+  ///
+  /// In zh, this message translates to:
+  /// **'漫画详情'**
+  String get pageTitleComicDetail;
+
+  /// No description provided for @pageTitleSeriesDetail.
+  ///
+  /// In zh, this message translates to:
+  /// **'系列详情'**
+  String get pageTitleSeriesDetail;
+
+  /// No description provided for @pageTitleSearchResults.
+  ///
+  /// In zh, this message translates to:
+  /// **'搜索结果'**
+  String get pageTitleSearchResults;
+
+  /// No description provided for @pageTitleNotFound.
+  ///
+  /// In zh, this message translates to:
+  /// **'页面不存在'**
+  String get pageTitleNotFound;
+
+  /// No description provided for @shellOpenNavMenu.
+  ///
+  /// In zh, this message translates to:
+  /// **'打开导航菜单'**
+  String get shellOpenNavMenu;
+
+  /// No description provided for @shellLoadFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'加载失败'**
+  String get shellLoadFailed;
+
+  /// No description provided for @shellLoading.
+  ///
+  /// In zh, this message translates to:
+  /// **'加载中…'**
+  String get shellLoading;
+
+  /// No description provided for @shellBack.
+  ///
+  /// In zh, this message translates to:
+  /// **'返回'**
+  String get shellBack;
+
+  /// No description provided for @shellBackToSettings.
+  ///
+  /// In zh, this message translates to:
+  /// **'返回设置'**
+  String get shellBackToSettings;
+
+  /// No description provided for @shellRetry.
+  ///
+  /// In zh, this message translates to:
+  /// **'重试'**
+  String get shellRetry;
+
+  /// No description provided for @shellRetrying.
+  ///
+  /// In zh, this message translates to:
+  /// **'重试中…'**
+  String get shellRetrying;
+
+  /// No description provided for @shellProcessing.
+  ///
+  /// In zh, this message translates to:
+  /// **'处理中…'**
+  String get shellProcessing;
+
+  /// No description provided for @homeTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'首页'**
+  String get homeTitle;
+
+  /// No description provided for @homeShortcutsSectionTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'快捷入口'**
+  String get homeShortcutsSectionTitle;
+
+  /// No description provided for @homeHistoryCardCaption.
+  ///
+  /// In zh, this message translates to:
+  /// **'查看阅读记录'**
+  String get homeHistoryCardCaption;
+
+  /// No description provided for @homeTrashCardCaption.
+  ///
+  /// In zh, this message translates to:
+  /// **'可恢复删除'**
+  String get homeTrashCardCaption;
+
+  /// No description provided for @homeScanLibrary.
+  ///
+  /// In zh, this message translates to:
+  /// **'扫描漫画库'**
+  String get homeScanLibrary;
+
+  /// No description provided for @homeGreetingLateNight.
+  ///
+  /// In zh, this message translates to:
+  /// **'凌晨好'**
+  String get homeGreetingLateNight;
+
+  /// No description provided for @homeGreetingEarlyMorning.
+  ///
+  /// In zh, this message translates to:
+  /// **'早上好'**
+  String get homeGreetingEarlyMorning;
+
+  /// No description provided for @homeGreetingMorning.
+  ///
+  /// In zh, this message translates to:
+  /// **'上午好'**
+  String get homeGreetingMorning;
+
+  /// No description provided for @homeGreetingNoon.
+  ///
+  /// In zh, this message translates to:
+  /// **'中午好'**
+  String get homeGreetingNoon;
+
+  /// No description provided for @homeGreetingAfternoon.
+  ///
+  /// In zh, this message translates to:
+  /// **'下午好'**
+  String get homeGreetingAfternoon;
+
+  /// No description provided for @homeGreetingEvening.
+  ///
+  /// In zh, this message translates to:
+  /// **'晚上好'**
+  String get homeGreetingEvening;
+
+  /// No description provided for @homeGreetingLate.
+  ///
+  /// In zh, this message translates to:
+  /// **'夜深了'**
+  String get homeGreetingLate;
+
+  /// No description provided for @homeGreetingReader.
+  ///
+  /// In zh, this message translates to:
+  /// **'{greeting}，读者'**
+  String homeGreetingReader(String greeting);
+
+  /// No description provided for @homeEmptyTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'开始建立你的漫画库'**
+  String get homeEmptyTitle;
+
+  /// No description provided for @homeEmptyHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加本地或远程 Library 后即可在侧栏对该库执行 Library sync。'**
+  String get homeEmptyHint;
+
+  /// No description provided for @homeRecentlyAdded.
+  ///
+  /// In zh, this message translates to:
+  /// **'最近入库'**
+  String get homeRecentlyAdded;
+
+  /// No description provided for @homeViewAllHistory.
+  ///
+  /// In zh, this message translates to:
+  /// **'查看全部'**
+  String get homeViewAllHistory;
+
+  /// No description provided for @homeAlertDismissLater.
+  ///
+  /// In zh, this message translates to:
+  /// **'稍后'**
+  String get homeAlertDismissLater;
+
+  /// No description provided for @homeAlertRemoteUnreachable.
+  ///
+  /// In zh, this message translates to:
+  /// **'{libraryName} 无法连接，建议检查网络或凭证'**
+  String homeAlertRemoteUnreachable(String libraryName);
+
+  /// No description provided for @homeAlertSyncFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'{libraryName} 同步失败，建议重试'**
+  String homeAlertSyncFailed(String libraryName);
+
+  /// No description provided for @homeAlertStaleSync.
+  ///
+  /// In zh, this message translates to:
+  /// **'{libraryName} 距上次同步已 {days} 天，建议同步'**
+  String homeAlertStaleSync(String libraryName, int days);
+
+  /// No description provided for @homeStatSeries.
+  ///
+  /// In zh, this message translates to:
+  /// **'系列'**
+  String get homeStatSeries;
+
+  /// No description provided for @homeStatTags.
+  ///
+  /// In zh, this message translates to:
+  /// **'标签'**
+  String get homeStatTags;
+
+  /// No description provided for @homeStatAuthors.
+  ///
+  /// In zh, this message translates to:
+  /// **'作者'**
+  String get homeStatAuthors;
+
+  /// No description provided for @homeStatFinishedComics.
+  ///
+  /// In zh, this message translates to:
+  /// **'读完'**
+  String get homeStatFinishedComics;
+
+  /// No description provided for @homeFinishedComicCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{{count} 本}}'**
+  String homeFinishedComicCount(int count);
+
+  /// No description provided for @homeStatReadingDuration.
+  ///
+  /// In zh, this message translates to:
+  /// **'阅读时长'**
+  String get homeStatReadingDuration;
+
+  /// No description provided for @homeReadingDurationZero.
+  ///
+  /// In zh, this message translates to:
+  /// **'不足 1 分钟'**
+  String get homeReadingDurationZero;
+
+  /// No description provided for @homeReadingDurationMinutes.
+  ///
+  /// In zh, this message translates to:
+  /// **'{minutes} 分钟'**
+  String homeReadingDurationMinutes(int minutes);
+
+  /// No description provided for @homeReadingDurationHoursMinutes.
+  ///
+  /// In zh, this message translates to:
+  /// **'{hours} 小时 {minutes} 分'**
+  String homeReadingDurationHoursMinutes(int hours, int minutes);
+
+  /// No description provided for @homeReadingDurationHours.
+  ///
+  /// In zh, this message translates to:
+  /// **'{hours} 小时'**
+  String homeReadingDurationHours(int hours);
+
+  /// No description provided for @homeComicTotal.
+  ///
+  /// In zh, this message translates to:
+  /// **'共 {count, plural, other{{count} 本}}'**
+  String homeComicTotal(int count);
+
+  /// No description provided for @homeSeriesCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{{count} 个系列}}'**
+  String homeSeriesCount(int count);
+
+  /// No description provided for @homeTagCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{{count} 个标签}}'**
+  String homeTagCount(int count);
+
+  /// No description provided for @homeAuthorCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{{count} 位}}'**
+  String homeAuthorCount(int count);
+
+  /// No description provided for @homeNoAuthors.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无作者'**
+  String get homeNoAuthors;
+
+  /// No description provided for @homeContinueReading.
+  ///
+  /// In zh, this message translates to:
+  /// **'继续阅读'**
+  String get homeContinueReading;
+
+  /// No description provided for @homeNoReadingHistory.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无阅读记录'**
+  String get homeNoReadingHistory;
+
+  /// No description provided for @homeGoToLibrary.
+  ///
+  /// In zh, this message translates to:
+  /// **'去漫画库'**
+  String get homeGoToLibrary;
+
+  /// No description provided for @historyTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'阅读历史'**
+  String get historyTitle;
+
+  /// No description provided for @historyClearAction.
+  ///
+  /// In zh, this message translates to:
+  /// **'清空阅读历史'**
+  String get historyClearAction;
+
+  /// No description provided for @historyClearedToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'已清空阅读历史'**
+  String get historyClearedToast;
+
+  /// No description provided for @historyRecordSummary.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{{count} 条记录 • 最长保留 1 年}}'**
+  String historyRecordSummary(int count);
+
+  /// No description provided for @historySectionToday.
+  ///
+  /// In zh, this message translates to:
+  /// **'今天'**
+  String get historySectionToday;
+
+  /// No description provided for @historySectionYesterday.
+  ///
+  /// In zh, this message translates to:
+  /// **'昨天'**
+  String get historySectionYesterday;
+
+  /// No description provided for @historySectionThisWeek.
+  ///
+  /// In zh, this message translates to:
+  /// **'本周'**
+  String get historySectionThisWeek;
+
+  /// No description provided for @historySectionThisMonth.
+  ///
+  /// In zh, this message translates to:
+  /// **'本月'**
+  String get historySectionThisMonth;
+
+  /// No description provided for @historySectionEarlier.
+  ///
+  /// In zh, this message translates to:
+  /// **'更早'**
+  String get historySectionEarlier;
+
+  /// No description provided for @historySectionItemCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{{count} 条}}'**
+  String historySectionItemCount(int count);
+
+  /// No description provided for @historySearchHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'搜索历史记录...'**
+  String get historySearchHint;
+
+  /// No description provided for @historyEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无阅读历史'**
+  String get historyEmpty;
+
+  /// No description provided for @historyNoMatch.
+  ///
+  /// In zh, this message translates to:
+  /// **'没有匹配的历史记录'**
+  String get historyNoMatch;
+
+  /// No description provided for @historyDeletedToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'已删除记录'**
+  String get historyDeletedToast;
+
+  /// No description provided for @libraryLocalAddedToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'已添加本地库'**
+  String get libraryLocalAddedToast;
+
+  /// No description provided for @libraryRemovedToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'已移除库'**
+  String get libraryRemovedToast;
+
+  /// No description provided for @remoteLibraryAddButton.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加远程库'**
+  String get remoteLibraryAddButton;
+
+  /// No description provided for @remoteLibraryAddedToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'已添加远程库'**
+  String get remoteLibraryAddedToast;
+
+  /// No description provided for @remoteLibraryUpdatedToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'已更新远程库'**
+  String get remoteLibraryUpdatedToast;
+
+  /// No description provided for @remoteLibraryAddTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加远程库'**
+  String get remoteLibraryAddTitle;
+
+  /// No description provided for @remoteLibraryEditTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑远程库'**
+  String get remoteLibraryEditTitle;
+
+  /// No description provided for @remoteLibraryFormHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'填写 WebDAV 根地址与 Basic 凭证。密码保存在系统安全存储，不会写入本地数据库。'**
+  String get remoteLibraryFormHint;
+
+  /// No description provided for @remoteLibraryUrlLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'WebDAV 根 URL'**
+  String get remoteLibraryUrlLabel;
+
+  /// No description provided for @remoteLibraryUrlHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'例如 nas.local/webdav 或 https://…'**
+  String get remoteLibraryUrlHint;
+
+  /// No description provided for @remoteLibraryUrlRequired.
+  ///
+  /// In zh, this message translates to:
+  /// **'请填写 WebDAV 根 URL'**
+  String get remoteLibraryUrlRequired;
+
+  /// No description provided for @remoteLibraryHttpRequiresAllow.
+  ///
+  /// In zh, this message translates to:
+  /// **'使用 HTTP 时请先开启「允许 HTTP」'**
+  String get remoteLibraryHttpRequiresAllow;
+
+  /// No description provided for @remoteLibraryUsernameLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'用户名'**
+  String get remoteLibraryUsernameLabel;
+
+  /// No description provided for @remoteLibraryPasswordLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'密码'**
+  String get remoteLibraryPasswordLabel;
+
+  /// No description provided for @remoteLibraryPasswordEditLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'密码（留空则不修改）'**
+  String get remoteLibraryPasswordEditLabel;
+
+  /// No description provided for @remoteLibraryPasswordKeepHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'留空表示保持原密码'**
+  String get remoteLibraryPasswordKeepHint;
+
+  /// No description provided for @remoteLibraryPasswordRequired.
+  ///
+  /// In zh, this message translates to:
+  /// **'请填写密码'**
+  String get remoteLibraryPasswordRequired;
+
+  /// No description provided for @remoteLibraryAllowHttpLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'允许 HTTP'**
+  String get remoteLibraryAllowHttpLabel;
+
+  /// No description provided for @remoteLibraryAllowHttpOn.
+  ///
+  /// In zh, this message translates to:
+  /// **'已允许明文 HTTP（仅建议局域网）'**
+  String get remoteLibraryAllowHttpOn;
+
+  /// No description provided for @remoteLibraryAllowHttpOff.
+  ///
+  /// In zh, this message translates to:
+  /// **'仅 HTTPS（默认）'**
+  String get remoteLibraryAllowHttpOff;
+
+  /// No description provided for @remoteLibraryEditAction.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑远程库'**
+  String get remoteLibraryEditAction;
+
+  /// No description provided for @commonAdd.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加'**
+  String get commonAdd;
+
+  /// No description provided for @notFoundTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'页面不存在'**
+  String get notFoundTitle;
+
+  /// No description provided for @notFoundHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'你访问的链接可能已失效，或页面已被移除。'**
+  String get notFoundHint;
+
+  /// No description provided for @notFoundGoHome.
+  ///
+  /// In zh, this message translates to:
+  /// **'返回首页'**
+  String get notFoundGoHome;
+
+  /// No description provided for @notFoundGoLibrary.
+  ///
+  /// In zh, this message translates to:
+  /// **'去漫画库'**
+  String get notFoundGoLibrary;
+
+  /// No description provided for @settingsMasterGroupApp.
+  ///
+  /// In zh, this message translates to:
+  /// **'应用'**
+  String get settingsMasterGroupApp;
+
+  /// No description provided for @settingsMasterGroupOther.
+  ///
+  /// In zh, this message translates to:
+  /// **'其他'**
+  String get settingsMasterGroupOther;
+
+  /// No description provided for @settingsMasterGroupLibraryAdmin.
+  ///
+  /// In zh, this message translates to:
+  /// **'漫画库管理'**
+  String get settingsMasterGroupLibraryAdmin;
+
+  /// No description provided for @settingsGroupAppearance.
+  ///
+  /// In zh, this message translates to:
+  /// **'外观'**
+  String get settingsGroupAppearance;
+
+  /// No description provided for @settingsGroupInterface.
+  ///
+  /// In zh, this message translates to:
+  /// **'界面'**
+  String get settingsGroupInterface;
+
+  /// No description provided for @settingsGroupReading.
+  ///
+  /// In zh, this message translates to:
+  /// **'阅读'**
+  String get settingsGroupReading;
+
+  /// No description provided for @settingsGroupLibraryBrowse.
+  ///
+  /// In zh, this message translates to:
+  /// **'库浏览'**
+  String get settingsGroupLibraryBrowse;
+
+  /// No description provided for @settingsGroupAbout.
+  ///
+  /// In zh, this message translates to:
+  /// **'关于'**
+  String get settingsGroupAbout;
+
+  /// No description provided for @settingsGroupUpdates.
+  ///
+  /// In zh, this message translates to:
+  /// **'更新'**
+  String get settingsGroupUpdates;
+
+  /// No description provided for @settingsGroupStorageAndLogs.
+  ///
+  /// In zh, this message translates to:
+  /// **'存储与日志'**
+  String get settingsGroupStorageAndLogs;
+
+  /// No description provided for @settingsGroupMetadataBackup.
+  ///
+  /// In zh, this message translates to:
+  /// **'元数据备份'**
+  String get settingsGroupMetadataBackup;
+
+  /// No description provided for @settingsSectionReading.
+  ///
+  /// In zh, this message translates to:
+  /// **'阅读'**
+  String get settingsSectionReading;
+
+  /// No description provided for @settingsSectionLibraryBrowse.
+  ///
+  /// In zh, this message translates to:
+  /// **'库与浏览'**
+  String get settingsSectionLibraryBrowse;
+
+  /// No description provided for @settingsSectionDiagnostics.
+  ///
+  /// In zh, this message translates to:
+  /// **'诊断'**
+  String get settingsSectionDiagnostics;
+
+  /// No description provided for @settingsSectionUpdates.
+  ///
+  /// In zh, this message translates to:
+  /// **'更新'**
+  String get settingsSectionUpdates;
+
+  /// No description provided for @settingsMetadataBackupAutoGroupTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'自动备份'**
+  String get settingsMetadataBackupAutoGroupTitle;
+
+  /// No description provided for @settingsMetadataBackupManualGroupTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'手动备份'**
+  String get settingsMetadataBackupManualGroupTitle;
+
+  /// No description provided for @settingsMetadataBackupAutoToggleLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'自动备份元数据'**
+  String get settingsMetadataBackupAutoToggleLabel;
+
+  /// No description provided for @settingsMetadataBackupAutoToggleDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'在应用数据目录轮转保留 gzip 备份（默认开启）'**
+  String get settingsMetadataBackupAutoToggleDescription;
+
+  /// No description provided for @settingsMetadataBackupStoragePathLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'备份目录'**
+  String get settingsMetadataBackupStoragePathLabel;
+
+  /// No description provided for @settingsMetadataBackupStoragePathLoading.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在读取路径…'**
+  String get settingsMetadataBackupStoragePathLoading;
+
+  /// No description provided for @settingsMetadataBackupLastBackupLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'上次备份'**
+  String get settingsMetadataBackupLastBackupLabel;
+
+  /// No description provided for @settingsMetadataBackupLastBackupEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'尚无自动备份'**
+  String get settingsMetadataBackupLastBackupEmpty;
+
+  /// No description provided for @settingsMetadataBackupNowLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'立即备份'**
+  String get settingsMetadataBackupNowLabel;
+
+  /// No description provided for @settingsMetadataBackupNowDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'立即写入 gzip 备份到应用轮转目录'**
+  String get settingsMetadataBackupNowDescription;
+
+  /// No description provided for @settingsMetadataBackupNowSuccess.
+  ///
+  /// In zh, this message translates to:
+  /// **'已更新自动备份目录'**
+  String get settingsMetadataBackupNowSuccess;
+
+  /// No description provided for @settingsMetadataBackupLastBackupAt.
+  ///
+  /// In zh, this message translates to:
+  /// **'上次备份：{timestamp}'**
+  String settingsMetadataBackupLastBackupAt(String timestamp);
+
+  /// No description provided for @settingsMetadataBackupOpenFolderLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'打开备份文件夹'**
+  String get settingsMetadataBackupOpenFolderLabel;
+
+  /// No description provided for @settingsMetadataBackupOpenFolderDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'在文件管理器中打开自动备份目录'**
+  String get settingsMetadataBackupOpenFolderDescription;
+
+  /// No description provided for @settingsMetadataBackupImportLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'导入元数据'**
+  String get settingsMetadataBackupImportLabel;
+
+  /// No description provided for @settingsMetadataBackupImportDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'从备份文件恢复 Comic 用户元数据'**
+  String get settingsMetadataBackupImportDescription;
+
+  /// No description provided for @settingsMetadataBackupImportPickDialogTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择元数据备份文件'**
+  String get settingsMetadataBackupImportPickDialogTitle;
+
+  /// No description provided for @settingsMetadataBackupImportInvalidFile.
+  ///
+  /// In zh, this message translates to:
+  /// **'请选择 .hlmeta.json 或 .hlmeta.json.gz 文件'**
+  String get settingsMetadataBackupImportInvalidFile;
+
+  /// No description provided for @settingsMetadataBackupImportConfirmTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'导入元数据备份？'**
+  String get settingsMetadataBackupImportConfirmTitle;
+
+  /// No description provided for @settingsMetadataBackupImportConfirmWarning.
+  ///
+  /// In zh, this message translates to:
+  /// **'匹配的 Comic 将被覆盖，且全部 Metadata field lock 将上锁；未匹配项会跳过。'**
+  String get settingsMetadataBackupImportConfirmWarning;
+
+  /// No description provided for @settingsMetadataBackupImportConfirmAction.
+  ///
+  /// In zh, this message translates to:
+  /// **'导入'**
+  String get settingsMetadataBackupImportConfirmAction;
+
+  /// No description provided for @settingsMetadataBackupImportManifestSchema.
+  ///
+  /// In zh, this message translates to:
+  /// **'Schema 版本'**
+  String get settingsMetadataBackupImportManifestSchema;
+
+  /// No description provided for @settingsMetadataBackupImportManifestExportedAt.
+  ///
+  /// In zh, this message translates to:
+  /// **'导出时间'**
+  String get settingsMetadataBackupImportManifestExportedAt;
+
+  /// No description provided for @settingsMetadataBackupImportManifestComicCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'Comic 数量'**
+  String get settingsMetadataBackupImportManifestComicCount;
+
+  /// No description provided for @settingsMetadataBackupImportManifestAppVersion.
+  ///
+  /// In zh, this message translates to:
+  /// **'应用版本'**
+  String get settingsMetadataBackupImportManifestAppVersion;
+
+  /// No description provided for @settingsMetadataBackupImportRunningTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在导入元数据'**
+  String get settingsMetadataBackupImportRunningTitle;
+
+  /// No description provided for @settingsMetadataBackupImportRunningBody.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在将备份应用到匹配的 Comic…'**
+  String get settingsMetadataBackupImportRunningBody;
+
+  /// No description provided for @settingsMetadataBackupImportResultTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'导入完成'**
+  String get settingsMetadataBackupImportResultTitle;
+
+  /// No description provided for @settingsMetadataBackupImportResultApplied.
+  ///
+  /// In zh, this message translates to:
+  /// **'已恢复'**
+  String get settingsMetadataBackupImportResultApplied;
+
+  /// No description provided for @settingsMetadataBackupImportResultSkippedNotFound.
+  ///
+  /// In zh, this message translates to:
+  /// **'跳过（未匹配）'**
+  String get settingsMetadataBackupImportResultSkippedNotFound;
+
+  /// No description provided for @settingsMetadataBackupImportResultSkippedAmbiguous.
+  ///
+  /// In zh, this message translates to:
+  /// **'跳过（歧义）'**
+  String get settingsMetadataBackupImportResultSkippedAmbiguous;
+
+  /// No description provided for @settingsMetadataBackupImportResultErrors.
+  ///
+  /// In zh, this message translates to:
+  /// **'错误'**
+  String get settingsMetadataBackupImportResultErrors;
+
+  /// No description provided for @settingsMetadataBackupImportPreviewRunningTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在预演匹配…'**
+  String get settingsMetadataBackupImportPreviewRunningTitle;
+
+  /// No description provided for @settingsMetadataBackupImportPreviewRunningBody.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在分析备份与库内 Comic 的匹配关系…'**
+  String get settingsMetadataBackupImportPreviewRunningBody;
+
+  /// No description provided for @settingsMetadataBackupImportConfirmManifestSection.
+  ///
+  /// In zh, this message translates to:
+  /// **'备份文件'**
+  String get settingsMetadataBackupImportConfirmManifestSection;
+
+  /// No description provided for @settingsMetadataBackupImportConfirmPreviewSection.
+  ///
+  /// In zh, this message translates to:
+  /// **'匹配预演'**
+  String get settingsMetadataBackupImportConfirmPreviewSection;
+
+  /// No description provided for @settingsMetadataBackupImportPreviewWouldApply.
+  ///
+  /// In zh, this message translates to:
+  /// **'将恢复'**
+  String get settingsMetadataBackupImportPreviewWouldApply;
+
+  /// No description provided for @settingsMetadataBackupImportPreviewSkippedNotFound.
+  ///
+  /// In zh, this message translates to:
+  /// **'未找到'**
+  String get settingsMetadataBackupImportPreviewSkippedNotFound;
+
+  /// No description provided for @settingsMetadataBackupImportPreviewSkippedAmbiguous.
+  ///
+  /// In zh, this message translates to:
+  /// **'歧义'**
+  String get settingsMetadataBackupImportPreviewSkippedAmbiguous;
+
+  /// No description provided for @settingsMetadataBackupImportPreviewOrphanFacets.
+  ///
+  /// In zh, this message translates to:
+  /// **'将新增字典项'**
+  String get settingsMetadataBackupImportPreviewOrphanFacets;
+
+  /// No description provided for @settingsMetadataBackupImportConfirmDetailsTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'详情'**
+  String get settingsMetadataBackupImportConfirmDetailsTitle;
+
+  /// No description provided for @settingsMetadataBackupImportConfirmActionWithCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'导入 {count}'**
+  String settingsMetadataBackupImportConfirmActionWithCount(int count);
+
+  /// No description provided for @settingsMetadataBackupImportConfirmActionDisabled.
+  ///
+  /// In zh, this message translates to:
+  /// **'无法导入'**
+  String get settingsMetadataBackupImportConfirmActionDisabled;
+
+  /// No description provided for @settingsMetadataBackupImportPreviewMatchTierPath.
+  ///
+  /// In zh, this message translates to:
+  /// **'路径匹配'**
+  String get settingsMetadataBackupImportPreviewMatchTierPath;
+
+  /// No description provided for @settingsMetadataBackupImportPreviewMatchTierLibraryRelative.
+  ///
+  /// In zh, this message translates to:
+  /// **'库相对路径匹配'**
+  String get settingsMetadataBackupImportPreviewMatchTierLibraryRelative;
+
+  /// No description provided for @settingsMetadataBackupExportLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'导出元数据'**
+  String get settingsMetadataBackupExportLabel;
+
+  /// No description provided for @settingsMetadataBackupExportDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'将 Comic 用户元数据导出为 JSON，便于外置保存'**
+  String get settingsMetadataBackupExportDescription;
+
+  /// No description provided for @settingsMetadataBackupExportDialogTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'导出元数据'**
+  String get settingsMetadataBackupExportDialogTitle;
+
+  /// No description provided for @settingsMetadataBackupExportGzipLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'使用 gzip 压缩'**
+  String get settingsMetadataBackupExportGzipLabel;
+
+  /// No description provided for @settingsMetadataBackupExportOrphanFacetsLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'包含孤立标签与字典项'**
+  String get settingsMetadataBackupExportOrphanFacetsLabel;
+
+  /// No description provided for @settingsMetadataBackupExportCurrentLibraryLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'仅当前 Library'**
+  String get settingsMetadataBackupExportCurrentLibraryLabel;
+
+  /// No description provided for @settingsMetadataBackupExportConfirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'继续'**
+  String get settingsMetadataBackupExportConfirm;
+
+  /// No description provided for @settingsMetadataBackupExportSaveDialogTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'保存元数据备份'**
+  String get settingsMetadataBackupExportSaveDialogTitle;
+
+  /// No description provided for @settingsMetadataBackupExportSuccess.
+  ///
+  /// In zh, this message translates to:
+  /// **'元数据已导出至 {fileName}'**
+  String settingsMetadataBackupExportSuccess(String fileName);
+
+  /// No description provided for @settingsHealthyModeLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'健康模式'**
+  String get settingsHealthyModeLabel;
+
+  /// No description provided for @settingsHealthyModeDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'在库、搜索与历史中隐藏 R18 漫画，不改动分级'**
+  String get settingsHealthyModeDescription;
+
+  /// No description provided for @settingsDiagnosticModeLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'详细诊断'**
+  String get settingsDiagnosticModeLabel;
+
+  /// No description provided for @settingsDiagnosticModeDescriptionEnabled.
+  ///
+  /// In zh, this message translates to:
+  /// **'已开启：记录更详细的 Dart 与 Rust 日志'**
+  String get settingsDiagnosticModeDescriptionEnabled;
+
+  /// No description provided for @settingsDiagnosticModeDescriptionDisabled.
+  ///
+  /// In zh, this message translates to:
+  /// **'临时提高日志详细程度，便于排查问题'**
+  String get settingsDiagnosticModeDescriptionDisabled;
+
+  /// No description provided for @settingsDiagnosticModeEnabledBadge.
+  ///
+  /// In zh, this message translates to:
+  /// **'已开启'**
+  String get settingsDiagnosticModeEnabledBadge;
+
+  /// No description provided for @settingsExportLogsLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'导出日志'**
+  String get settingsExportLogsLabel;
+
+  /// No description provided for @settingsExportLogsDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'打包应用与核心日志，便于反馈问题'**
+  String get settingsExportLogsDescription;
+
+  /// No description provided for @settingsAutoScanLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'自动扫描'**
+  String get settingsAutoScanLabel;
+
+  /// No description provided for @settingsSupportedFormatsDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'取消勾选的格式会在下次库同步时从当前本地库中移除；未同步前已入库的漫画仍可阅读。'**
+  String get settingsSupportedFormatsDescription;
+
+  /// No description provided for @settingsSupportedFormatsGroupTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'格式分组'**
+  String get settingsSupportedFormatsGroupTitle;
+
+  /// No description provided for @settingsFormatGroupFolder.
+  ///
+  /// In zh, this message translates to:
+  /// **'漫画文件夹'**
+  String get settingsFormatGroupFolder;
+
+  /// No description provided for @settingsFormatGroupPdf.
+  ///
+  /// In zh, this message translates to:
+  /// **'PDF'**
+  String get settingsFormatGroupPdf;
+
+  /// No description provided for @settingsFormatGroupEpub.
+  ///
+  /// In zh, this message translates to:
+  /// **'EPUB'**
+  String get settingsFormatGroupEpub;
+
+  /// No description provided for @settingsFormatGroupArchive.
+  ///
+  /// In zh, this message translates to:
+  /// **'漫画压缩包'**
+  String get settingsFormatGroupArchive;
+
+  /// No description provided for @settingsDisableAllFormatsConfirmTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'关闭全部格式？'**
+  String get settingsDisableAllFormatsConfirmTitle;
+
+  /// No description provided for @settingsDisableAllFormatsConfirmContent.
+  ///
+  /// In zh, this message translates to:
+  /// **'保存后，下次库同步将清空当前本地库中的全部 Comic。确定继续？'**
+  String get settingsDisableAllFormatsConfirmContent;
+
+  /// No description provided for @currentLibraryLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'当前库'**
+  String get currentLibraryLabel;
+
+  /// No description provided for @setCurrentLibrary.
+  ///
+  /// In zh, this message translates to:
+  /// **'设为当前库'**
+  String get setCurrentLibrary;
+
+  /// No description provided for @settingsAutoUpdateLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'自动更新'**
+  String get settingsAutoUpdateLabel;
+
+  /// No description provided for @settingsCurrentVersion.
+  ///
+  /// In zh, this message translates to:
+  /// **'当前版本 v{version}'**
+  String settingsCurrentVersion(String version);
+
+  /// No description provided for @settingsCurrentVersionLoading.
+  ///
+  /// In zh, this message translates to:
+  /// **'当前版本 …'**
+  String get settingsCurrentVersionLoading;
+
+  /// No description provided for @settingsCheckForUpdatesLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'检查更新'**
+  String get settingsCheckForUpdatesLabel;
+
+  /// No description provided for @settingsUpdateCheckFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'检查更新失败，请稍后重试'**
+  String get settingsUpdateCheckFailed;
+
+  /// No description provided for @settingsUpdateUpToDate.
+  ///
+  /// In zh, this message translates to:
+  /// **'当前已是最新版本'**
+  String get settingsUpdateUpToDate;
+
+  /// No description provided for @libraryTabComics.
+  ///
+  /// In zh, this message translates to:
+  /// **'漫画'**
+  String get libraryTabComics;
+
+  /// No description provided for @libraryTabSeries.
+  ///
+  /// In zh, this message translates to:
+  /// **'系列'**
+  String get libraryTabSeries;
+
+  /// No description provided for @librarySeriesCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{{count} 个系列}}'**
+  String librarySeriesCount(int count);
+
+  /// No description provided for @librarySearchHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'搜索…'**
+  String get librarySearchHint;
+
+  /// No description provided for @librarySearchKeywordEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'关键词不能为空'**
+  String get librarySearchKeywordEmpty;
+
+  /// No description provided for @libraryFilterSortTooltip.
+  ///
+  /// In zh, this message translates to:
+  /// **'筛选、分组与排序'**
+  String get libraryFilterSortTooltip;
+
+  /// No description provided for @libraryFilterSortSemantic.
+  ///
+  /// In zh, this message translates to:
+  /// **'打开筛选、分组与排序'**
+  String get libraryFilterSortSemantic;
+
+  /// No description provided for @libraryPageSizeTooltip.
+  ///
+  /// In zh, this message translates to:
+  /// **'每页数量'**
+  String get libraryPageSizeTooltip;
+
+  /// No description provided for @libraryPageSizeSemantic.
+  ///
+  /// In zh, this message translates to:
+  /// **'设置每页数量'**
+  String get libraryPageSizeSemantic;
+
+  /// No description provided for @libraryScanCancelledToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'已取消扫描'**
+  String get libraryScanCancelledToast;
+
+  /// No description provided for @libraryScanningDeep.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在深度扫描…'**
+  String get libraryScanningDeep;
+
+  /// No description provided for @libraryScanning.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在扫描…'**
+  String get libraryScanning;
+
+  /// No description provided for @libraryCancelScan.
+  ///
+  /// In zh, this message translates to:
+  /// **'取消扫描'**
+  String get libraryCancelScan;
+
+  /// No description provided for @libraryMoreActions.
+  ///
+  /// In zh, this message translates to:
+  /// **'更多操作'**
+  String get libraryMoreActions;
+
+  /// No description provided for @libraryMoreActionsSemantic.
+  ///
+  /// In zh, this message translates to:
+  /// **'打开更多操作'**
+  String get libraryMoreActionsSemantic;
+
+  /// No description provided for @libraryRefresh.
+  ///
+  /// In zh, this message translates to:
+  /// **'刷新'**
+  String get libraryRefresh;
+
+  /// No description provided for @libraryScan.
+  ///
+  /// In zh, this message translates to:
+  /// **'扫描'**
+  String get libraryScan;
+
+  /// No description provided for @libraryDeepScan.
+  ///
+  /// In zh, this message translates to:
+  /// **'深度扫描'**
+  String get libraryDeepScan;
+
+  /// No description provided for @libraryScrollToTop.
+  ///
+  /// In zh, this message translates to:
+  /// **'回到顶部'**
+  String get libraryScrollToTop;
+
+  /// No description provided for @libraryFilterSection.
+  ///
+  /// In zh, this message translates to:
+  /// **'筛选'**
+  String get libraryFilterSection;
+
+  /// No description provided for @libraryGroupSection.
+  ///
+  /// In zh, this message translates to:
+  /// **'分组'**
+  String get libraryGroupSection;
+
+  /// No description provided for @librarySortSection.
+  ///
+  /// In zh, this message translates to:
+  /// **'排序'**
+  String get librarySortSection;
+
+  /// No description provided for @libraryAgeRestrictionFilter.
+  ///
+  /// In zh, this message translates to:
+  /// **'年龄限制'**
+  String get libraryAgeRestrictionFilter;
+
+  /// No description provided for @libraryMediaTypeFilter.
+  ///
+  /// In zh, this message translates to:
+  /// **'媒体类型'**
+  String get libraryMediaTypeFilter;
+
+  /// No description provided for @librarySerializationStatusFilter.
+  ///
+  /// In zh, this message translates to:
+  /// **'连载状态'**
+  String get librarySerializationStatusFilter;
+
+  /// No description provided for @libraryLanguageFilter.
+  ///
+  /// In zh, this message translates to:
+  /// **'语言'**
+  String get libraryLanguageFilter;
+
+  /// No description provided for @libraryParodyFilter.
+  ///
+  /// In zh, this message translates to:
+  /// **'原作'**
+  String get libraryParodyFilter;
+
+  /// No description provided for @libraryCharacterFilter.
+  ///
+  /// In zh, this message translates to:
+  /// **'角色'**
+  String get libraryCharacterFilter;
+
+  /// No description provided for @libraryTagFilter.
+  ///
+  /// In zh, this message translates to:
+  /// **'标签'**
+  String get libraryTagFilter;
+
+  /// No description provided for @libraryAuthorFilter.
+  ///
+  /// In zh, this message translates to:
+  /// **'作者'**
+  String get libraryAuthorFilter;
+
+  /// No description provided for @libraryOrganizeFilter.
+  ///
+  /// In zh, this message translates to:
+  /// **'整理'**
+  String get libraryOrganizeFilter;
+
+  /// No description provided for @libraryNeedsMetadataOnlyFilter.
+  ///
+  /// In zh, this message translates to:
+  /// **'仅显示待补元数据'**
+  String get libraryNeedsMetadataOnlyFilter;
+
+  /// No description provided for @libraryMetadataFilterClear.
+  ///
+  /// In zh, this message translates to:
+  /// **'清除'**
+  String get libraryMetadataFilterClear;
+
+  /// No description provided for @libraryMetadataFilterSearchHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'搜索…'**
+  String get libraryMetadataFilterSearchHint;
+
+  /// No description provided for @libraryMetadataFilterEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'无匹配项'**
+  String get libraryMetadataFilterEmpty;
+
+  /// No description provided for @libraryMetadataFilterIncludeAny.
+  ///
+  /// In zh, this message translates to:
+  /// **'满足任一'**
+  String get libraryMetadataFilterIncludeAny;
+
+  /// No description provided for @libraryMetadataFilterIncludeAll.
+  ///
+  /// In zh, this message translates to:
+  /// **'满足全部'**
+  String get libraryMetadataFilterIncludeAll;
+
+  /// No description provided for @libraryResetAllFilters.
+  ///
+  /// In zh, this message translates to:
+  /// **'恢复默认'**
+  String get libraryResetAllFilters;
+
+  /// No description provided for @libraryComingSoon.
+  ///
+  /// In zh, this message translates to:
+  /// **'即将推出'**
+  String get libraryComingSoon;
+
+  /// No description provided for @libraryComicSortTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'标题'**
+  String get libraryComicSortTitle;
+
+  /// No description provided for @libraryComicSortCreatedAt.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加时间'**
+  String get libraryComicSortCreatedAt;
+
+  /// No description provided for @libraryComicSortLastUpdatedAt.
+  ///
+  /// In zh, this message translates to:
+  /// **'更新时间'**
+  String get libraryComicSortLastUpdatedAt;
+
+  /// No description provided for @libraryComicSortPublishedAt.
+  ///
+  /// In zh, this message translates to:
+  /// **'发布日期'**
+  String get libraryComicSortPublishedAt;
+
+  /// No description provided for @libraryComicSortReadAt.
+  ///
+  /// In zh, this message translates to:
+  /// **'阅读时间'**
+  String get libraryComicSortReadAt;
+
+  /// No description provided for @libraryComicSortFileSize.
+  ///
+  /// In zh, this message translates to:
+  /// **'文件大小'**
+  String get libraryComicSortFileSize;
+
+  /// No description provided for @libraryComicSortPageCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'页数'**
+  String get libraryComicSortPageCount;
+
+  /// No description provided for @libraryExpandBySeries.
+  ///
+  /// In zh, this message translates to:
+  /// **'按系列展开'**
+  String get libraryExpandBySeries;
+
+  /// No description provided for @libraryGroupBySeries.
+  ///
+  /// In zh, this message translates to:
+  /// **'按系列分组'**
+  String get libraryGroupBySeries;
+
+  /// No description provided for @libraryGroupNone.
+  ///
+  /// In zh, this message translates to:
+  /// **'不分组'**
+  String get libraryGroupNone;
+
+  /// No description provided for @libraryGroupBySerializationStatus.
+  ///
+  /// In zh, this message translates to:
+  /// **'按连载状态分组'**
+  String get libraryGroupBySerializationStatus;
+
+  /// No description provided for @settingsPreferLibraryRootSeriesLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'置顶库根系列'**
+  String get settingsPreferLibraryRootSeriesLabel;
+
+  /// No description provided for @settingsPreferLibraryRootSeriesDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'在系列列表中，将库根系列固定显示在最前'**
+  String get settingsPreferLibraryRootSeriesDescription;
+
+  /// No description provided for @librarySeriesSortName.
+  ///
+  /// In zh, this message translates to:
+  /// **'名称'**
+  String get librarySeriesSortName;
+
+  /// No description provided for @librarySeriesSortComicCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'漫画数量'**
+  String get librarySeriesSortComicCount;
+
+  /// No description provided for @librarySeriesSortRandom.
+  ///
+  /// In zh, this message translates to:
+  /// **'随机'**
+  String get librarySeriesSortRandom;
+
+  /// No description provided for @libraryPreferLibraryRootSeries.
+  ///
+  /// In zh, this message translates to:
+  /// **'优先显示库根系列'**
+  String get libraryPreferLibraryRootSeries;
+
+  /// No description provided for @filterAgeUnrestricted.
+  ///
+  /// In zh, this message translates to:
+  /// **'不限'**
+  String get filterAgeUnrestricted;
+
+  /// No description provided for @filterAgeAllAges.
+  ///
+  /// In zh, this message translates to:
+  /// **'全年龄'**
+  String get filterAgeAllAges;
+
+  /// No description provided for @filterAgeR18Only.
+  ///
+  /// In zh, this message translates to:
+  /// **'R18'**
+  String get filterAgeR18Only;
+
+  /// No description provided for @filterMediaTypePdf.
+  ///
+  /// In zh, this message translates to:
+  /// **'PDF'**
+  String get filterMediaTypePdf;
+
+  /// No description provided for @filterMediaTypeEpub.
+  ///
+  /// In zh, this message translates to:
+  /// **'EPUB'**
+  String get filterMediaTypeEpub;
+
+  /// No description provided for @filterMediaTypeArchive.
+  ///
+  /// In zh, this message translates to:
+  /// **'压缩包'**
+  String get filterMediaTypeArchive;
+
+  /// No description provided for @libraryScanComplete.
+  ///
+  /// In zh, this message translates to:
+  /// **'扫描完成'**
+  String get libraryScanComplete;
+
+  /// No description provided for @libraryDeepScanComplete.
+  ///
+  /// In zh, this message translates to:
+  /// **'深度扫描完成'**
+  String get libraryDeepScanComplete;
+
+  /// No description provided for @libraryScanCompleteNoRoots.
+  ///
+  /// In zh, this message translates to:
+  /// **'扫描完成：未配置扫描路径'**
+  String get libraryScanCompleteNoRoots;
+
+  /// No description provided for @libraryDeepScanCompleteNoRoots.
+  ///
+  /// In zh, this message translates to:
+  /// **'深度扫描完成：未配置扫描路径'**
+  String get libraryDeepScanCompleteNoRoots;
+
+  /// No description provided for @libraryScanCompleteCleared.
+  ///
+  /// In zh, this message translates to:
+  /// **'扫描完成：已移除 {count} 项'**
+  String libraryScanCompleteCleared(int count);
+
+  /// No description provided for @libraryDeepScanCompleteCleared.
+  ///
+  /// In zh, this message translates to:
+  /// **'深度扫描完成：已移除 {count} 项'**
+  String libraryDeepScanCompleteCleared(int count);
+
+  /// No description provided for @libraryScanCompleteStats.
+  ///
+  /// In zh, this message translates to:
+  /// **'扫描完成：新增 {added}，移除 {removed}，迁移 {migrated}'**
+  String libraryScanCompleteStats(int added, int removed, int migrated);
+
+  /// No description provided for @libraryDeepScanCompleteStats.
+  ///
+  /// In zh, this message translates to:
+  /// **'深度扫描完成：新增 {added}，移除 {removed}，迁移 {migrated}'**
+  String libraryDeepScanCompleteStats(int added, int removed, int migrated);
+
+  /// No description provided for @libraryStartupScanCompleteStats.
+  ///
+  /// In zh, this message translates to:
+  /// **'应用启动时扫描完成：新增 {added}，移除 {removed}，迁移 {migrated}'**
+  String libraryStartupScanCompleteStats(int added, int removed, int migrated);
+
+  /// No description provided for @searchResultsTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'搜索结果'**
+  String get searchResultsTitle;
+
+  /// No description provided for @searchResultsForQuery.
+  ///
+  /// In zh, this message translates to:
+  /// **'\"{query}\"的搜索结果'**
+  String searchResultsForQuery(String query);
+
+  /// No description provided for @searchEnterKeyword.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入关键词后按回车搜索'**
+  String get searchEnterKeyword;
+
+  /// No description provided for @searchLoadFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'加载失败：{error}'**
+  String searchLoadFailed(String error);
+
+  /// No description provided for @searchBackToLibrary.
+  ///
+  /// In zh, this message translates to:
+  /// **'返回漫画库'**
+  String get searchBackToLibrary;
+
+  /// No description provided for @searchScrollLeft.
+  ///
+  /// In zh, this message translates to:
+  /// **'向左滚动'**
+  String get searchScrollLeft;
+
+  /// No description provided for @searchScrollRight.
+  ///
+  /// In zh, this message translates to:
+  /// **'向右滚动'**
+  String get searchScrollRight;
+
+  /// No description provided for @comicDetailPageCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{{count} 页}}'**
+  String comicDetailPageCount(int count);
+
+  /// No description provided for @comicDetailAuthors.
+  ///
+  /// In zh, this message translates to:
+  /// **'作者'**
+  String get comicDetailAuthors;
+
+  /// No description provided for @comicDetailTags.
+  ///
+  /// In zh, this message translates to:
+  /// **'标签'**
+  String get comicDetailTags;
+
+  /// No description provided for @comicDetailParodies.
+  ///
+  /// In zh, this message translates to:
+  /// **'原作'**
+  String get comicDetailParodies;
+
+  /// No description provided for @comicDetailCharacters.
+  ///
+  /// In zh, this message translates to:
+  /// **'角色'**
+  String get comicDetailCharacters;
+
+  /// No description provided for @comicDetailResourceInfo.
+  ///
+  /// In zh, this message translates to:
+  /// **'资源信息'**
+  String get comicDetailResourceInfo;
+
+  /// No description provided for @comicDetailResourceFormat.
+  ///
+  /// In zh, this message translates to:
+  /// **'资源格式'**
+  String get comicDetailResourceFormat;
+
+  /// No description provided for @comicDetailResourceSize.
+  ///
+  /// In zh, this message translates to:
+  /// **'资源大小'**
+  String get comicDetailResourceSize;
+
+  /// No description provided for @comicDetailResourcePath.
+  ///
+  /// In zh, this message translates to:
+  /// **'资源路径'**
+  String get comicDetailResourcePath;
+
+  /// No description provided for @comicDetailAddedAt.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加时间'**
+  String get comicDetailAddedAt;
+
+  /// No description provided for @comicDetailUpdatedAt.
+  ///
+  /// In zh, this message translates to:
+  /// **'更新时间'**
+  String get comicDetailUpdatedAt;
+
+  /// No description provided for @comicDetailRead.
+  ///
+  /// In zh, this message translates to:
+  /// **'阅读'**
+  String get comicDetailRead;
+
+  /// No description provided for @comicDetailReadIncognito.
+  ///
+  /// In zh, this message translates to:
+  /// **'无痕阅读'**
+  String get comicDetailReadIncognito;
+
+  /// No description provided for @comicDetailEditMetadata.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑元数据'**
+  String get comicDetailEditMetadata;
+
+  /// No description provided for @refreshMetadata.
+  ///
+  /// In zh, this message translates to:
+  /// **'刷新元数据'**
+  String get refreshMetadata;
+
+  /// No description provided for @refreshMetadataComicSuccess.
+  ///
+  /// In zh, this message translates to:
+  /// **'已刷新元数据'**
+  String get refreshMetadataComicSuccess;
+
+  /// No description provided for @refreshMetadataComicFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'刷新元数据失败'**
+  String get refreshMetadataComicFailed;
+
+  /// No description provided for @refreshMetadataBusy.
+  ///
+  /// In zh, this message translates to:
+  /// **'库同步或元数据刷新进行中'**
+  String get refreshMetadataBusy;
+
+  /// No description provided for @comicDetailShowInExplorer.
+  ///
+  /// In zh, this message translates to:
+  /// **'在资源管理器中显示'**
+  String get comicDetailShowInExplorer;
+
+  /// No description provided for @comicDetailShowInExplorerFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'无法在文件资源管理器中显示该项目'**
+  String get comicDetailShowInExplorerFailed;
+
+  /// No description provided for @comicDetailDelete.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除'**
+  String get comicDetailDelete;
+
+  /// No description provided for @comicDetailDeleteTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除漫画？'**
+  String get comicDetailDeleteTitle;
+
+  /// No description provided for @comicDetailDeleteLocalConfirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'将从库中移除「{title}」，并永久删除其在磁盘上的资源（文件或图片文件夹）。此操作不可撤销。'**
+  String comicDetailDeleteLocalConfirm(String title);
+
+  /// No description provided for @comicDetailDeleteRemoteConfirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'将从库中移除「{title}」。不会删除远程资源。'**
+  String comicDetailDeleteRemoteConfirm(String title);
+
+  /// No description provided for @comicDetailDeleteLocalAcknowledge.
+  ///
+  /// In zh, this message translates to:
+  /// **'我了解磁盘上的资源将被永久删除'**
+  String get comicDetailDeleteLocalAcknowledge;
+
+  /// No description provided for @comicDetailCancel.
+  ///
+  /// In zh, this message translates to:
+  /// **'取消'**
+  String get comicDetailCancel;
+
+  /// No description provided for @comicDetailNotFound.
+  ///
+  /// In zh, this message translates to:
+  /// **'漫画不存在或已移除'**
+  String get comicDetailNotFound;
+
+  /// No description provided for @comicDetailLoadFailedRetry.
+  ///
+  /// In zh, this message translates to:
+  /// **'加载失败，请重试'**
+  String get comicDetailLoadFailedRetry;
+
+  /// No description provided for @comicDetailGoToLibrary.
+  ///
+  /// In zh, this message translates to:
+  /// **'前往漫画库'**
+  String get comicDetailGoToLibrary;
+
+  /// No description provided for @comicDetailSeriesPrev.
+  ///
+  /// In zh, this message translates to:
+  /// **'上一本'**
+  String get comicDetailSeriesPrev;
+
+  /// No description provided for @comicDetailSeriesPrevSemantic.
+  ///
+  /// In zh, this message translates to:
+  /// **'系列上一本'**
+  String get comicDetailSeriesPrevSemantic;
+
+  /// No description provided for @comicDetailSeriesCatalog.
+  ///
+  /// In zh, this message translates to:
+  /// **'系列目录'**
+  String get comicDetailSeriesCatalog;
+
+  /// No description provided for @comicDetailSeriesNext.
+  ///
+  /// In zh, this message translates to:
+  /// **'下一本'**
+  String get comicDetailSeriesNext;
+
+  /// No description provided for @comicDetailSeriesNextSemantic.
+  ///
+  /// In zh, this message translates to:
+  /// **'系列下一本'**
+  String get comicDetailSeriesNextSemantic;
+
+  /// No description provided for @seriesDetailEdit.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑系列'**
+  String get seriesDetailEdit;
+
+  /// No description provided for @formSeriesItemSortOrderLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'排序序号'**
+  String get formSeriesItemSortOrderLabel;
+
+  /// No description provided for @formSeriesItemSortOrderHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'例如 1 或 1.5'**
+  String get formSeriesItemSortOrderHint;
+
+  /// No description provided for @formSeriesItemSortOrderInvalid.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入有效数字'**
+  String get formSeriesItemSortOrderInvalid;
+
+  /// No description provided for @seriesDetailNoComics.
+  ///
+  /// In zh, this message translates to:
+  /// **'系列内暂无漫画'**
+  String get seriesDetailNoComics;
+
+  /// No description provided for @seriesDetailComicsLoadFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'漫画列表加载失败'**
+  String get seriesDetailComicsLoadFailed;
+
+  /// No description provided for @seriesDetailLoadFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'加载失败：{error}'**
+  String seriesDetailLoadFailed(String error);
+
+  /// No description provided for @seriesDetailUnknown.
+  ///
+  /// In zh, this message translates to:
+  /// **'未知系列'**
+  String get seriesDetailUnknown;
+
+  /// No description provided for @seriesDetailNotFound.
+  ///
+  /// In zh, this message translates to:
+  /// **'未找到系列「{name}」'**
+  String seriesDetailNotFound(String name);
+
+  /// No description provided for @seriesDetailVolumeCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{{count} 本}}'**
+  String seriesDetailVolumeCount(int count);
+
+  /// No description provided for @seriesDetailVolumeProgress.
+  ///
+  /// In zh, this message translates to:
+  /// **'{current} / 共 {total} 本'**
+  String seriesDetailVolumeProgress(int current, int total);
+
+  /// No description provided for @seriesDetailPaginationPage.
+  ///
+  /// In zh, this message translates to:
+  /// **'第 {page} / {totalPages} 页'**
+  String seriesDetailPaginationPage(int page, int totalPages);
+
+  /// No description provided for @seriesDetailPaginationFirst.
+  ///
+  /// In zh, this message translates to:
+  /// **'首页'**
+  String get seriesDetailPaginationFirst;
+
+  /// No description provided for @seriesDetailPaginationPrevious.
+  ///
+  /// In zh, this message translates to:
+  /// **'上一页'**
+  String get seriesDetailPaginationPrevious;
+
+  /// No description provided for @seriesDetailPaginationNext.
+  ///
+  /// In zh, this message translates to:
+  /// **'下一页'**
+  String get seriesDetailPaginationNext;
+
+  /// No description provided for @seriesDetailPaginationLast.
+  ///
+  /// In zh, this message translates to:
+  /// **'末页'**
+  String get seriesDetailPaginationLast;
+
+  /// No description provided for @serializationStatusOngoing.
+  ///
+  /// In zh, this message translates to:
+  /// **'连载中'**
+  String get serializationStatusOngoing;
+
+  /// No description provided for @serializationStatusEnded.
+  ///
+  /// In zh, this message translates to:
+  /// **'已完结'**
+  String get serializationStatusEnded;
+
+  /// No description provided for @serializationStatusHiatus.
+  ///
+  /// In zh, this message translates to:
+  /// **'休刊'**
+  String get serializationStatusHiatus;
+
+  /// No description provided for @serializationStatusUnknown.
+  ///
+  /// In zh, this message translates to:
+  /// **'未知'**
+  String get serializationStatusUnknown;
+
+  /// No description provided for @readerSettingsTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'阅读设置'**
+  String get readerSettingsTitle;
+
+  /// No description provided for @readerSettingsGeneral.
+  ///
+  /// In zh, this message translates to:
+  /// **'常规'**
+  String get readerSettingsGeneral;
+
+  /// No description provided for @readerSettingsReadingMode.
+  ///
+  /// In zh, this message translates to:
+  /// **'阅读模式'**
+  String get readerSettingsReadingMode;
+
+  /// No description provided for @readerSettingsAutoPlay.
+  ///
+  /// In zh, this message translates to:
+  /// **'自动翻页'**
+  String get readerSettingsAutoPlay;
+
+  /// No description provided for @readerSettingsAutoPlayMode.
+  ///
+  /// In zh, this message translates to:
+  /// **'翻页范围'**
+  String get readerSettingsAutoPlayMode;
+
+  /// No description provided for @readerSettingsPlayInterval.
+  ///
+  /// In zh, this message translates to:
+  /// **'翻页间隔'**
+  String get readerSettingsPlayInterval;
+
+  /// No description provided for @readerSettingsSecondsSuffix.
+  ///
+  /// In zh, this message translates to:
+  /// **'秒'**
+  String get readerSettingsSecondsSuffix;
+
+  /// No description provided for @autoPlayModeComicOnce.
+  ///
+  /// In zh, this message translates to:
+  /// **'本话一次'**
+  String get autoPlayModeComicOnce;
+
+  /// No description provided for @autoPlayModeComicLoop.
+  ///
+  /// In zh, this message translates to:
+  /// **'本话循环'**
+  String get autoPlayModeComicLoop;
+
+  /// No description provided for @autoPlayModeSeriesOnce.
+  ///
+  /// In zh, this message translates to:
+  /// **'系列一次'**
+  String get autoPlayModeSeriesOnce;
+
+  /// No description provided for @autoPlayModeSeriesLoop.
+  ///
+  /// In zh, this message translates to:
+  /// **'系列循环'**
+  String get autoPlayModeSeriesLoop;
+
+  /// No description provided for @readerSettingsWebtoonMode.
+  ///
+  /// In zh, this message translates to:
+  /// **'Webtoon 模式'**
+  String get readerSettingsWebtoonMode;
+
+  /// No description provided for @readerSettingsPagedOptions.
+  ///
+  /// In zh, this message translates to:
+  /// **'翻页模式'**
+  String get readerSettingsPagedOptions;
+
+  /// No description provided for @readerSettingsHorizontalMargin.
+  ///
+  /// In zh, this message translates to:
+  /// **'左右边距'**
+  String get readerSettingsHorizontalMargin;
+
+  /// No description provided for @readerSettingsMarginNone.
+  ///
+  /// In zh, this message translates to:
+  /// **'无（0%）'**
+  String get readerSettingsMarginNone;
+
+  /// No description provided for @readerSettingsMarginPercent.
+  ///
+  /// In zh, this message translates to:
+  /// **'{percent}%'**
+  String readerSettingsMarginPercent(int percent);
+
+  /// No description provided for @readerSettingsZoomMode.
+  ///
+  /// In zh, this message translates to:
+  /// **'显示比例'**
+  String get readerSettingsZoomMode;
+
+  /// No description provided for @readerSettingsPageLayout.
+  ///
+  /// In zh, this message translates to:
+  /// **'页面布局'**
+  String get readerSettingsPageLayout;
+
+  /// No description provided for @readingModeCategoryPaged.
+  ///
+  /// In zh, this message translates to:
+  /// **'翻页'**
+  String get readingModeCategoryPaged;
+
+  /// No description provided for @readingModeCategoryWebtoon.
+  ///
+  /// In zh, this message translates to:
+  /// **'Webtoon'**
+  String get readingModeCategoryWebtoon;
+
+  /// No description provided for @readingModePaged.
+  ///
+  /// In zh, this message translates to:
+  /// **'翻页'**
+  String get readingModePaged;
+
+  /// No description provided for @readingModeWebtoon.
+  ///
+  /// In zh, this message translates to:
+  /// **'Webtoon'**
+  String get readingModeWebtoon;
+
+  /// No description provided for @readingModeDualPage.
+  ///
+  /// In zh, this message translates to:
+  /// **'双页'**
+  String get readingModeDualPage;
+
+  /// No description provided for @readingModePagedSingle.
+  ///
+  /// In zh, this message translates to:
+  /// **'单页'**
+  String get readingModePagedSingle;
+
+  /// No description provided for @readingModePagedDual.
+  ///
+  /// In zh, this message translates to:
+  /// **'双页'**
+  String get readingModePagedDual;
+
+  /// No description provided for @readingModeWebtoonFitWidth.
+  ///
+  /// In zh, this message translates to:
+  /// **'适应宽度'**
+  String get readingModeWebtoonFitWidth;
+
+  /// No description provided for @readingModeWebtoonOriginalSize.
+  ///
+  /// In zh, this message translates to:
+  /// **'原始尺寸'**
+  String get readingModeWebtoonOriginalSize;
+
+  /// No description provided for @readerSetComicCover.
+  ///
+  /// In zh, this message translates to:
+  /// **'将当前页设为漫画封面'**
+  String get readerSetComicCover;
+
+  /// No description provided for @readerSetSeriesCover.
+  ///
+  /// In zh, this message translates to:
+  /// **'将当前页设为系列封面'**
+  String get readerSetSeriesCover;
+
+  /// No description provided for @readerCopyPageImage.
+  ///
+  /// In zh, this message translates to:
+  /// **'复制图片'**
+  String get readerCopyPageImage;
+
+  /// No description provided for @readerMore.
+  ///
+  /// In zh, this message translates to:
+  /// **'更多'**
+  String get readerMore;
+
+  /// No description provided for @readerMoreSemantic.
+  ///
+  /// In zh, this message translates to:
+  /// **'更多阅读选项'**
+  String get readerMoreSemantic;
+
+  /// No description provided for @readerStateNotReady.
+  ///
+  /// In zh, this message translates to:
+  /// **'阅读状态未就绪'**
+  String get readerStateNotReady;
+
+  /// No description provided for @readerCopyPageImageSuccess.
+  ///
+  /// In zh, this message translates to:
+  /// **'已复制图片'**
+  String get readerCopyPageImageSuccess;
+
+  /// No description provided for @readerComicCoverSet.
+  ///
+  /// In zh, this message translates to:
+  /// **'已设为漫画封面'**
+  String get readerComicCoverSet;
+
+  /// No description provided for @readerComicCoverSetFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'设置漫画封面失败：{error}'**
+  String readerComicCoverSetFailed(String error);
+
+  /// No description provided for @readerSeriesCoverSet.
+  ///
+  /// In zh, this message translates to:
+  /// **'已设为系列封面'**
+  String get readerSeriesCoverSet;
+
+  /// No description provided for @readerSeriesCoverSetFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'设置系列封面失败：{error}'**
+  String readerSeriesCoverSetFailed(String error);
+
+  /// No description provided for @readerBackSemantic.
+  ///
+  /// In zh, this message translates to:
+  /// **'返回上一页'**
+  String get readerBackSemantic;
+
+  /// No description provided for @readerExitFullscreen.
+  ///
+  /// In zh, this message translates to:
+  /// **'退出全屏'**
+  String get readerExitFullscreen;
+
+  /// No description provided for @readerEnterFullscreen.
+  ///
+  /// In zh, this message translates to:
+  /// **'全屏'**
+  String get readerEnterFullscreen;
+
+  /// No description provided for @readerExitFullscreenSemantic.
+  ///
+  /// In zh, this message translates to:
+  /// **'退出全屏'**
+  String get readerExitFullscreenSemantic;
+
+  /// No description provided for @readerEnterFullscreenSemantic.
+  ///
+  /// In zh, this message translates to:
+  /// **'进入全屏'**
+  String get readerEnterFullscreenSemantic;
+
+  /// No description provided for @readerOpenSettingsSemantic.
+  ///
+  /// In zh, this message translates to:
+  /// **'打开阅读设置'**
+  String get readerOpenSettingsSemantic;
+
+  /// No description provided for @readerSeriesCatalog.
+  ///
+  /// In zh, this message translates to:
+  /// **'系列目录'**
+  String get readerSeriesCatalog;
+
+  /// No description provided for @readerPrevPage.
+  ///
+  /// In zh, this message translates to:
+  /// **'上一页'**
+  String get readerPrevPage;
+
+  /// No description provided for @readerNextPage.
+  ///
+  /// In zh, this message translates to:
+  /// **'下一页'**
+  String get readerNextPage;
+
+  /// No description provided for @readerDisableAutoPlay.
+  ///
+  /// In zh, this message translates to:
+  /// **'关闭自动翻页'**
+  String get readerDisableAutoPlay;
+
+  /// No description provided for @readerEnableAutoPlay.
+  ///
+  /// In zh, this message translates to:
+  /// **'开启自动翻页'**
+  String get readerEnableAutoPlay;
+
+  /// No description provided for @readerInvalidParams.
+  ///
+  /// In zh, this message translates to:
+  /// **'阅读参数错误：缺少 comic_id'**
+  String get readerInvalidParams;
+
+  /// No description provided for @readerSeriesAdvancePrompt.
+  ///
+  /// In zh, this message translates to:
+  /// **'再次翻页将进入下一卷'**
+  String get readerSeriesAdvancePrompt;
+
+  /// No description provided for @readerSeriesRetreatPrompt.
+  ///
+  /// In zh, this message translates to:
+  /// **'再次翻页将进入上一卷'**
+  String get readerSeriesRetreatPrompt;
+
+  /// No description provided for @readerNoImages.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无图片'**
+  String get readerNoImages;
+
+  /// No description provided for @readerOpenResourceNotFound.
+  ///
+  /// In zh, this message translates to:
+  /// **'找不到漫画资源。文件可能已被移动或删除，或路径已失效。'**
+  String get readerOpenResourceNotFound;
+
+  /// No description provided for @readerOpenRemoteUnreachable.
+  ///
+  /// In zh, this message translates to:
+  /// **'无法连接远程书库。请检查网络与服务器地址。'**
+  String get readerOpenRemoteUnreachable;
+
+  /// No description provided for @readerOpenRemoteAuthFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'远程书库认证失败。请检查用户名与密码。'**
+  String get readerOpenRemoteAuthFailed;
+
+  /// No description provided for @readerOpenTimedOut.
+  ///
+  /// In zh, this message translates to:
+  /// **'打开超时。资源所在位置可能不可达或响应过慢。'**
+  String get readerOpenTimedOut;
+
+  /// No description provided for @readerOpenInvalidContent.
+  ///
+  /// In zh, this message translates to:
+  /// **'漫画内容无效或没有可阅读的页面。'**
+  String get readerOpenInvalidContent;
+
+  /// No description provided for @readerOpenLoadFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'打开阅读失败。'**
+  String get readerOpenLoadFailed;
+
+  /// No description provided for @readerOpenBackToDetail.
+  ///
+  /// In zh, this message translates to:
+  /// **'返回详情'**
+  String get readerOpenBackToDetail;
+
+  /// No description provided for @readerViewportPagesFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'无法加载页面列表。'**
+  String get readerViewportPagesFailed;
+
+  /// No description provided for @metadataTabAuthors.
+  ///
+  /// In zh, this message translates to:
+  /// **'作者'**
+  String get metadataTabAuthors;
+
+  /// No description provided for @metadataTabTags.
+  ///
+  /// In zh, this message translates to:
+  /// **'标签'**
+  String get metadataTabTags;
+
+  /// No description provided for @metadataTabParodies.
+  ///
+  /// In zh, this message translates to:
+  /// **'原作'**
+  String get metadataTabParodies;
+
+  /// No description provided for @metadataTabCharacters.
+  ///
+  /// In zh, this message translates to:
+  /// **'角色'**
+  String get metadataTabCharacters;
+
+  /// No description provided for @metadataAddAuthor.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加作者'**
+  String get metadataAddAuthor;
+
+  /// No description provided for @metadataAddTag.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加标签'**
+  String get metadataAddTag;
+
+  /// No description provided for @metadataAddParody.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加原作'**
+  String get metadataAddParody;
+
+  /// No description provided for @metadataAddCharacter.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加角色'**
+  String get metadataAddCharacter;
+
+  /// No description provided for @metadataAdd.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加'**
+  String get metadataAdd;
+
+  /// No description provided for @metadataSearchNameHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'搜索名称…'**
+  String get metadataSearchNameHint;
+
+  /// No description provided for @metadataRename.
+  ///
+  /// In zh, this message translates to:
+  /// **'重命名'**
+  String get metadataRename;
+
+  /// No description provided for @metadataMerge.
+  ///
+  /// In zh, this message translates to:
+  /// **'合并'**
+  String get metadataMerge;
+
+  /// No description provided for @metadataMergeConfirmTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'确认合并'**
+  String get metadataMergeConfirmTitle;
+
+  /// No description provided for @metadataMergeConfirmBody.
+  ///
+  /// In zh, this message translates to:
+  /// **'将 {sourceCount} 个标签合并到「{target}」？来源标签的漫画附着会转移到目标，来源标签将被删除。'**
+  String metadataMergeConfirmBody(int sourceCount, String target);
+
+  /// No description provided for @metadataMergeConfirmDontAskAgain.
+  ///
+  /// In zh, this message translates to:
+  /// **'以后不再提示'**
+  String get metadataMergeConfirmDontAskAgain;
+
+  /// No description provided for @metadataMergeCompletedToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'合并完成'**
+  String get metadataMergeCompletedToast;
+
+  /// No description provided for @metadataMergeSelectionLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'合并 {count} 项'**
+  String metadataMergeSelectionLabel(int count);
+
+  /// No description provided for @metadataDelete.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除'**
+  String get metadataDelete;
+
+  /// No description provided for @metadataMoreActions.
+  ///
+  /// In zh, this message translates to:
+  /// **'更多操作'**
+  String get metadataMoreActions;
+
+  /// No description provided for @metadataAllAuthors.
+  ///
+  /// In zh, this message translates to:
+  /// **'全部作者'**
+  String get metadataAllAuthors;
+
+  /// No description provided for @metadataAllTags.
+  ///
+  /// In zh, this message translates to:
+  /// **'全部标签'**
+  String get metadataAllTags;
+
+  /// No description provided for @metadataAllParodies.
+  ///
+  /// In zh, this message translates to:
+  /// **'全部原作'**
+  String get metadataAllParodies;
+
+  /// No description provided for @metadataAllCharacters.
+  ///
+  /// In zh, this message translates to:
+  /// **'全部角色'**
+  String get metadataAllCharacters;
+
+  /// No description provided for @metadataTotalCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{共 {count} 条}}'**
+  String metadataTotalCount(int count);
+
+  /// No description provided for @metadataAuthorCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{{count} 位作者}}'**
+  String metadataAuthorCount(int count);
+
+  /// No description provided for @metadataTagCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{{count} 个标签}}'**
+  String metadataTagCount(int count);
+
+  /// No description provided for @metadataParodyCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{{count} 部原作}}'**
+  String metadataParodyCount(int count);
+
+  /// No description provided for @metadataCharacterCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{{count} 位角色}}'**
+  String metadataCharacterCount(int count);
+
+  /// No description provided for @navRailExpand.
+  ///
+  /// In zh, this message translates to:
+  /// **'展开导航'**
+  String get navRailExpand;
+
+  /// No description provided for @navRailCollapse.
+  ///
+  /// In zh, this message translates to:
+  /// **'收起导航'**
+  String get navRailCollapse;
+
+  /// No description provided for @paginationPageSemantic.
+  ///
+  /// In zh, this message translates to:
+  /// **'第 {page} 页'**
+  String paginationPageSemantic(int page);
+
+  /// No description provided for @metadataRenameAuthor.
+  ///
+  /// In zh, this message translates to:
+  /// **'重命名作者'**
+  String get metadataRenameAuthor;
+
+  /// No description provided for @metadataRenameTag.
+  ///
+  /// In zh, this message translates to:
+  /// **'重命名标签'**
+  String get metadataRenameTag;
+
+  /// No description provided for @metadataRenameParody.
+  ///
+  /// In zh, this message translates to:
+  /// **'重命名原作'**
+  String get metadataRenameParody;
+
+  /// No description provided for @metadataRenameCharacter.
+  ///
+  /// In zh, this message translates to:
+  /// **'重命名角色'**
+  String get metadataRenameCharacter;
+
+  /// No description provided for @metadataNewName.
+  ///
+  /// In zh, this message translates to:
+  /// **'新名称'**
+  String get metadataNewName;
+
+  /// No description provided for @metadataRenameAuthorHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'输入新的作者名称…'**
+  String get metadataRenameAuthorHint;
+
+  /// No description provided for @metadataRenameTagHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'输入新的标签名称…'**
+  String get metadataRenameTagHint;
+
+  /// No description provided for @metadataRenameParodyHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'输入新的原作名称…'**
+  String get metadataRenameParodyHint;
+
+  /// No description provided for @metadataRenameCharacterHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'输入新的角色名称…'**
+  String get metadataRenameCharacterHint;
+
+  /// No description provided for @metadataNameLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'名称'**
+  String get metadataNameLabel;
+
+  /// No description provided for @metadataAddAuthorHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'输入作者名称…'**
+  String get metadataAddAuthorHint;
+
+  /// No description provided for @metadataAddTagHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'输入标签名称…'**
+  String get metadataAddTagHint;
+
+  /// No description provided for @metadataAddParodyHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'输入原作名称…'**
+  String get metadataAddParodyHint;
+
+  /// No description provided for @metadataAddCharacterHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'输入角色名称…'**
+  String get metadataAddCharacterHint;
+
+  /// No description provided for @metadataAuthorDeletedToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'已删除作者'**
+  String get metadataAuthorDeletedToast;
+
+  /// No description provided for @metadataTagDeletedToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'已删除标签'**
+  String get metadataTagDeletedToast;
+
+  /// No description provided for @metadataParodyDeletedToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'已删除原作'**
+  String get metadataParodyDeletedToast;
+
+  /// No description provided for @metadataCharacterDeletedToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'已删除角色'**
+  String get metadataCharacterDeletedToast;
+
+  /// No description provided for @metadataAuthorsEmptyTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无作者'**
+  String get metadataAuthorsEmptyTitle;
+
+  /// No description provided for @metadataAuthorsEmptyHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'你可以从这里添加、重命名或删除作者。'**
+  String get metadataAuthorsEmptyHint;
+
+  /// No description provided for @metadataTagsEmptyTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无标签'**
+  String get metadataTagsEmptyTitle;
+
+  /// No description provided for @metadataTagsEmptyHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'你可以从这里添加、重命名或删除标签。'**
+  String get metadataTagsEmptyHint;
+
+  /// No description provided for @metadataParodiesEmptyTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无原作'**
+  String get metadataParodiesEmptyTitle;
+
+  /// No description provided for @metadataParodiesEmptyHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'你可以从这里添加、重命名或删除原作。'**
+  String get metadataParodiesEmptyHint;
+
+  /// No description provided for @metadataCharactersEmptyTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无角色'**
+  String get metadataCharactersEmptyTitle;
+
+  /// No description provided for @metadataCharactersEmptyHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'你可以从这里添加、重命名或删除角色。'**
+  String get metadataCharactersEmptyHint;
+
+  /// No description provided for @metadataAuthorsNoMatchTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'未找到匹配的作者'**
+  String get metadataAuthorsNoMatchTitle;
+
+  /// No description provided for @metadataTagsNoMatchTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'未找到匹配的标签'**
+  String get metadataTagsNoMatchTitle;
+
+  /// No description provided for @metadataParodiesNoMatchTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'未找到匹配的原作'**
+  String get metadataParodiesNoMatchTitle;
+
+  /// No description provided for @metadataCharactersNoMatchTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'未找到匹配的角色'**
+  String get metadataCharactersNoMatchTitle;
+
+  /// No description provided for @metadataSearchNoMatchHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'试试其他关键词，或清空搜索'**
+  String get metadataSearchNoMatchHint;
+
+  /// No description provided for @metadataAttachedComicsCaption.
+  ///
+  /// In zh, this message translates to:
+  /// **'附着漫画数'**
+  String get metadataAttachedComicsCaption;
+
+  /// No description provided for @metadataLoadingMore.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在加载更多…'**
+  String get metadataLoadingMore;
+
+  /// No description provided for @metadataLoadMore.
+  ///
+  /// In zh, this message translates to:
+  /// **'加载更多'**
+  String get metadataLoadMore;
+
+  /// No description provided for @metadataListEnd.
+  ///
+  /// In zh, this message translates to:
+  /// **'已显示全部'**
+  String get metadataListEnd;
+
+  /// No description provided for @metadataDeleteAllTags.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除所有'**
+  String get metadataDeleteAllTags;
+
+  /// No description provided for @metadataTagsDeletedAllToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'已删除全部标签'**
+  String get metadataTagsDeletedAllToast;
+
+  /// No description provided for @metadataImportTagDictionaryMenuLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'导入标签字典'**
+  String get metadataImportTagDictionaryMenuLabel;
+
+  /// No description provided for @metadataImportTagDictionaryPickDialogTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择标签字典 JSON'**
+  String get metadataImportTagDictionaryPickDialogTitle;
+
+  /// No description provided for @metadataImportTagDictionaryInvalidFile.
+  ///
+  /// In zh, this message translates to:
+  /// **'请选择有效的 JSON 标签字典文件'**
+  String get metadataImportTagDictionaryInvalidFile;
+
+  /// No description provided for @metadataImportTagDictionaryDialogTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'导入标签字典'**
+  String get metadataImportTagDictionaryDialogTitle;
+
+  /// No description provided for @metadataImportTagDictionaryDialogBody.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在下载标签字典并写入全局 Tag…'**
+  String get metadataImportTagDictionaryDialogBody;
+
+  /// No description provided for @metadataImportTagDictionaryDialogBodyLocal.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在写入全局 Tag…'**
+  String get metadataImportTagDictionaryDialogBodyLocal;
+
+  /// No description provided for @metadataImportTagDictionarySummary.
+  ///
+  /// In zh, this message translates to:
+  /// **'新增 {added} 条，已存在跳过 {skippedExisting} 条，过滤/空名/去重跳过 {skippedFiltered} 条'**
+  String metadataImportTagDictionarySummary(
+    int added,
+    int skippedExisting,
+    int skippedFiltered,
+  );
+
+  /// No description provided for @commonCancel.
+  ///
+  /// In zh, this message translates to:
+  /// **'取消'**
+  String get commonCancel;
+
+  /// No description provided for @commonToggleOn.
+  ///
+  /// In zh, this message translates to:
+  /// **'开启'**
+  String get commonToggleOn;
+
+  /// No description provided for @commonToggleOff.
+  ///
+  /// In zh, this message translates to:
+  /// **'关闭'**
+  String get commonToggleOff;
+
+  /// No description provided for @commonSave.
+  ///
+  /// In zh, this message translates to:
+  /// **'保存'**
+  String get commonSave;
+
+  /// No description provided for @commonSaveChanges.
+  ///
+  /// In zh, this message translates to:
+  /// **'保存更改'**
+  String get commonSaveChanges;
+
+  /// No description provided for @commonClose.
+  ///
+  /// In zh, this message translates to:
+  /// **'关闭'**
+  String get commonClose;
+
+  /// No description provided for @commonConfirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'确认'**
+  String get commonConfirm;
+
+  /// No description provided for @commonDelete.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除'**
+  String get commonDelete;
+
+  /// No description provided for @commonRemove.
+  ///
+  /// In zh, this message translates to:
+  /// **'移除'**
+  String get commonRemove;
+
+  /// No description provided for @commonClear.
+  ///
+  /// In zh, this message translates to:
+  /// **'清空'**
+  String get commonClear;
+
+  /// No description provided for @commonRetry.
+  ///
+  /// In zh, this message translates to:
+  /// **'重试'**
+  String get commonRetry;
+
+  /// No description provided for @commonOk.
+  ///
+  /// In zh, this message translates to:
+  /// **'确定'**
+  String get commonOk;
+
+  /// No description provided for @commonLoadFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'加载失败'**
+  String get commonLoadFailed;
+
+  /// No description provided for @commonBack.
+  ///
+  /// In zh, this message translates to:
+  /// **'返回'**
+  String get commonBack;
+
+  /// No description provided for @commonSavedToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'已保存'**
+  String get commonSavedToast;
+
+  /// No description provided for @commonSaveFailedToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'保存失败'**
+  String get commonSaveFailedToast;
+
+  /// No description provided for @dialogEditSeriesTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑系列'**
+  String get dialogEditSeriesTitle;
+
+  /// No description provided for @dialogEditMetadataTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑元数据'**
+  String get dialogEditMetadataTitle;
+
+  /// No description provided for @dialogEditMetadataTabGeneral.
+  ///
+  /// In zh, this message translates to:
+  /// **'常规'**
+  String get dialogEditMetadataTabGeneral;
+
+  /// No description provided for @dialogEditMetadataTabAuthorsTags.
+  ///
+  /// In zh, this message translates to:
+  /// **'作者&标签'**
+  String get dialogEditMetadataTabAuthorsTags;
+
+  /// No description provided for @dialogEditMetadataTabFieldLocks.
+  ///
+  /// In zh, this message translates to:
+  /// **'字段锁'**
+  String get dialogEditMetadataTabFieldLocks;
+
+  /// No description provided for @dialogEditMetadataTabContent.
+  ///
+  /// In zh, this message translates to:
+  /// **'内容'**
+  String get dialogEditMetadataTabContent;
+
+  /// No description provided for @smartFacetMatchToggleLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'智能匹配'**
+  String get smartFacetMatchToggleLabel;
+
+  /// No description provided for @smartFacetMatchHintTooltip.
+  ///
+  /// In zh, this message translates to:
+  /// **'由智能匹配推荐'**
+  String get smartFacetMatchHintTooltip;
+
+  /// No description provided for @formSeriesNameLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'系列名称'**
+  String get formSeriesNameLabel;
+
+  /// No description provided for @formSeriesSerializationStatusLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'连载状态'**
+  String get formSeriesSerializationStatusLabel;
+
+  /// No description provided for @formSeriesTotalCountLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'漫画总数'**
+  String get formSeriesTotalCountLabel;
+
+  /// No description provided for @formSeriesTotalCountHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'留空表示不设置'**
+  String get formSeriesTotalCountHint;
+
+  /// No description provided for @formComicTitleLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'漫画标题'**
+  String get formComicTitleLabel;
+
+  /// No description provided for @formComicTitleHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'修改漫画标题'**
+  String get formComicTitleHint;
+
+  /// No description provided for @formComicDescriptionLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'概要'**
+  String get formComicDescriptionLabel;
+
+  /// No description provided for @formComicDescriptionHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加漫画简介…'**
+  String get formComicDescriptionHint;
+
+  /// No description provided for @formPublishedDateLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'发布日期'**
+  String get formPublishedDateLabel;
+
+  /// No description provided for @formLanguagesLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'语言'**
+  String get formLanguagesLabel;
+
+  /// No description provided for @comicLanguageChinese.
+  ///
+  /// In zh, this message translates to:
+  /// **'中文'**
+  String get comicLanguageChinese;
+
+  /// No description provided for @comicLanguageJapanese.
+  ///
+  /// In zh, this message translates to:
+  /// **'日语'**
+  String get comicLanguageJapanese;
+
+  /// No description provided for @comicLanguageEnglish.
+  ///
+  /// In zh, this message translates to:
+  /// **'英语'**
+  String get comicLanguageEnglish;
+
+  /// No description provided for @comicLanguageKorean.
+  ///
+  /// In zh, this message translates to:
+  /// **'韩语'**
+  String get comicLanguageKorean;
+
+  /// No description provided for @comicLanguageSpanish.
+  ///
+  /// In zh, this message translates to:
+  /// **'西班牙语'**
+  String get comicLanguageSpanish;
+
+  /// No description provided for @comicLanguageOther.
+  ///
+  /// In zh, this message translates to:
+  /// **'其他'**
+  String get comicLanguageOther;
+
+  /// No description provided for @formAgeRestrictionLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'年龄限制'**
+  String get formAgeRestrictionLabel;
+
+  /// No description provided for @formDatePickerHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择发布日期'**
+  String get formDatePickerHint;
+
+  /// No description provided for @formDatePickerHelp.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择发布日期'**
+  String get formDatePickerHelp;
+
+  /// No description provided for @formDateFieldLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'日期'**
+  String get formDateFieldLabel;
+
+  /// No description provided for @formDateFieldHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'年/月/日'**
+  String get formDateFieldHint;
+
+  /// No description provided for @formDateInvalidFormat.
+  ///
+  /// In zh, this message translates to:
+  /// **'日期格式无效'**
+  String get formDateInvalidFormat;
+
+  /// No description provided for @formDateOutOfRange.
+  ///
+  /// In zh, this message translates to:
+  /// **'日期超出可选范围'**
+  String get formDateOutOfRange;
+
+  /// No description provided for @formDateClearTooltip.
+  ///
+  /// In zh, this message translates to:
+  /// **'清空日期'**
+  String get formDateClearTooltip;
+
+  /// No description provided for @formAuthorSelectPlaceholder.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择或输入作者…'**
+  String get formAuthorSelectPlaceholder;
+
+  /// No description provided for @formAuthorListLoadFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'作者列表加载失败'**
+  String get formAuthorListLoadFailed;
+
+  /// No description provided for @formAuthorEmptyCatalog.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无作者'**
+  String get formAuthorEmptyCatalog;
+
+  /// No description provided for @formAuthorEmptyRemaining.
+  ///
+  /// In zh, this message translates to:
+  /// **'没有更多可选'**
+  String get formAuthorEmptyRemaining;
+
+  /// No description provided for @formParodySelectPlaceholder.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择或输入原作…'**
+  String get formParodySelectPlaceholder;
+
+  /// No description provided for @formParodyListLoadFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'原作列表加载失败'**
+  String get formParodyListLoadFailed;
+
+  /// No description provided for @formParodyEmptyCatalog.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无原作'**
+  String get formParodyEmptyCatalog;
+
+  /// No description provided for @formParodyEmptyRemaining.
+  ///
+  /// In zh, this message translates to:
+  /// **'没有更多可选'**
+  String get formParodyEmptyRemaining;
+
+  /// No description provided for @formCharacterSelectPlaceholder.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择或输入角色…'**
+  String get formCharacterSelectPlaceholder;
+
+  /// No description provided for @formCharacterListLoadFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'角色列表加载失败'**
+  String get formCharacterListLoadFailed;
+
+  /// No description provided for @formCharacterEmptyCatalog.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无角色'**
+  String get formCharacterEmptyCatalog;
+
+  /// No description provided for @formCharacterEmptyRemaining.
+  ///
+  /// In zh, this message translates to:
+  /// **'没有更多可选'**
+  String get formCharacterEmptyRemaining;
+
+  /// No description provided for @formTagSelectPlaceholder.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择或输入标签…'**
+  String get formTagSelectPlaceholder;
+
+  /// No description provided for @formTagListLoadFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'标签列表加载失败'**
+  String get formTagListLoadFailed;
+
+  /// No description provided for @formTagEmptyCatalog.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无标签'**
+  String get formTagEmptyCatalog;
+
+  /// No description provided for @formTagEmptyRemaining.
+  ///
+  /// In zh, this message translates to:
+  /// **'没有更多可选'**
+  String get formTagEmptyRemaining;
+
+  /// No description provided for @scanDialogTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'扫描漫画库'**
+  String get scanDialogTitle;
+
+  /// No description provided for @scanBackgroundAction.
+  ///
+  /// In zh, this message translates to:
+  /// **'后台扫描'**
+  String get scanBackgroundAction;
+
+  /// No description provided for @scanPreparing.
+  ///
+  /// In zh, this message translates to:
+  /// **'准备中…'**
+  String get scanPreparing;
+
+  /// No description provided for @scanGeneratingThumbnails.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在生成缩略图…'**
+  String get scanGeneratingThumbnails;
+
+  /// No description provided for @scanProgressSimple.
+  ///
+  /// In zh, this message translates to:
+  /// **'{done} / {total}'**
+  String scanProgressSimple(int done, int total);
+
+  /// No description provided for @scanProgressWithFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'{done} / {total} · 失败 {failed}'**
+  String scanProgressWithFailed(int done, int total, int failed);
+
+  /// No description provided for @scanSyncing.
+  ///
+  /// In zh, this message translates to:
+  /// **'同步中…'**
+  String get scanSyncing;
+
+  /// No description provided for @scanWritingDb.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在写入数据库…'**
+  String get scanWritingDb;
+
+  /// No description provided for @scanClearingLibrary.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在清空漫画库…'**
+  String get scanClearingLibrary;
+
+  /// No description provided for @scanScanningFiles.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在扫描文件…'**
+  String get scanScanningFiles;
+
+  /// No description provided for @scanComplete.
+  ///
+  /// In zh, this message translates to:
+  /// **'同步完成'**
+  String get scanComplete;
+
+  /// No description provided for @scanFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'同步失败'**
+  String get scanFailed;
+
+  /// No description provided for @scanCancelled.
+  ///
+  /// In zh, this message translates to:
+  /// **'已取消扫描'**
+  String get scanCancelled;
+
+  /// No description provided for @scanBackgroundThumbnails.
+  ///
+  /// In zh, this message translates to:
+  /// **'后台生成缩略图 {done} / {total}{failedSuffix}'**
+  String scanBackgroundThumbnails(int done, int total, String failedSuffix);
+
+  /// No description provided for @scanThumbnailFailedSuffix.
+  ///
+  /// In zh, this message translates to:
+  /// **' · 缩略图失败 {count}'**
+  String scanThumbnailFailedSuffix(int count);
+
+  /// No description provided for @scanDoneNoRoots.
+  ///
+  /// In zh, this message translates to:
+  /// **'未配置有效路径，库中无漫画，同步已完成。'**
+  String get scanDoneNoRoots;
+
+  /// No description provided for @scanDoneCleared.
+  ///
+  /// In zh, this message translates to:
+  /// **'已清空现有漫画数据。'**
+  String get scanDoneCleared;
+
+  /// No description provided for @scanDoneStats.
+  ///
+  /// In zh, this message translates to:
+  /// **'同步完成 · 移除 {removed} · 新增 {added} · 保留 {kept}{thumbSuffix}'**
+  String scanDoneStats(int removed, int added, int kept, String thumbSuffix);
+
+  /// No description provided for @updateNewVersionTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'发现新版本 v{version}'**
+  String updateNewVersionTitle(String version);
+
+  /// No description provided for @updatePublishedOn.
+  ///
+  /// In zh, this message translates to:
+  /// **'发布于 {date}'**
+  String updatePublishedOn(String date);
+
+  /// No description provided for @updateRemindLater.
+  ///
+  /// In zh, this message translates to:
+  /// **'稍后'**
+  String get updateRemindLater;
+
+  /// No description provided for @updateViewDetails.
+  ///
+  /// In zh, this message translates to:
+  /// **'查看详情'**
+  String get updateViewDetails;
+
+  /// No description provided for @updateNow.
+  ///
+  /// In zh, this message translates to:
+  /// **'更新'**
+  String get updateNow;
+
+  /// No description provided for @updateManualDownloadToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'请手动下载适合您系统的安装包'**
+  String get updateManualDownloadToast;
+
+  /// No description provided for @updateDownloadingTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在下载更新'**
+  String get updateDownloadingTitle;
+
+  /// No description provided for @updateDownloadFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'下载失败，请重试'**
+  String get updateDownloadFailed;
+
+  /// No description provided for @confirmDeleteTagsTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'确认删除'**
+  String get confirmDeleteTagsTitle;
+
+  /// No description provided for @confirmDeleteTagsContent.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{将删除 {count} 个标签，并同时从所有漫画中移除这些标签。此操作不可撤销。}}'**
+  String confirmDeleteTagsContent(int count);
+
+  /// No description provided for @confirmDeleteNamedFacetTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'确认删除'**
+  String get confirmDeleteNamedFacetTitle;
+
+  /// No description provided for @confirmDeleteNamedFacetContent.
+  ///
+  /// In zh, this message translates to:
+  /// **'将删除「{name}」，并解除与 {count} 本漫画的附着。此操作不可撤销。'**
+  String confirmDeleteNamedFacetContent(String name, int count);
+
+  /// No description provided for @homeLibraryDeleteConfirmTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除「{name}」？'**
+  String homeLibraryDeleteConfirmTitle(String name);
+
+  /// No description provided for @homeLibraryDeleteConfirmBody.
+  ///
+  /// In zh, this message translates to:
+  /// **'将从应用中移除此库。漫画文件会保留在原位置。'**
+  String get homeLibraryDeleteConfirmBody;
+
+  /// No description provided for @homeLibraryDeleteConfirmAcknowledge.
+  ///
+  /// In zh, this message translates to:
+  /// **'我了解不会删除漫画文件'**
+  String get homeLibraryDeleteConfirmAcknowledge;
+
+  /// No description provided for @homeLibraryManagementSectionTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'我的漫画库'**
+  String get homeLibraryManagementSectionTitle;
+
+  /// No description provided for @homeLibraryManagementCountSubtitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'共 {count} 个库'**
+  String homeLibraryManagementCountSubtitle(int count);
+
+  /// No description provided for @homeLibraryLastSyncLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'上次同步'**
+  String get homeLibraryLastSyncLabel;
+
+  /// No description provided for @homeLibraryScanInProgressHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'扫描进行中…'**
+  String get homeLibraryScanInProgressHint;
+
+  /// No description provided for @homeLibraryMetadataRefreshInProgressHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'元数据刷新中…'**
+  String get homeLibraryMetadataRefreshInProgressHint;
+
+  /// No description provided for @homeLibrarySyncWarningHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'已超过 {staleDays} 天未同步'**
+  String homeLibrarySyncWarningHint(int staleDays);
+
+  /// No description provided for @homeLibrarySyncRecommendedHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'建议同步'**
+  String get homeLibrarySyncRecommendedHint;
+
+  /// No description provided for @homeLibraryUnreachableHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'无法连接远程库'**
+  String get homeLibraryUnreachableHint;
+
+  /// No description provided for @confirmClearHistoryTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'确认清空'**
+  String get confirmClearHistoryTitle;
+
+  /// No description provided for @confirmClearHistoryContent.
+  ///
+  /// In zh, this message translates to:
+  /// **'将清空全部阅读历史记录。此操作不可撤销。'**
+  String get confirmClearHistoryContent;
+
+  /// No description provided for @breadcrumbReturnLibrary.
+  ///
+  /// In zh, this message translates to:
+  /// **'返回漫画库'**
+  String get breadcrumbReturnLibrary;
+
+  /// No description provided for @breadcrumbReturnLibraryWithTrail.
+  ///
+  /// In zh, this message translates to:
+  /// **'返回漫画库，当前：{trail}'**
+  String breadcrumbReturnLibraryWithTrail(String trail);
+
+  /// No description provided for @diagnosticModeBannerMessage.
+  ///
+  /// In zh, this message translates to:
+  /// **'诊断模式已开启 · 正在记录更详细日志'**
+  String get diagnosticModeBannerMessage;
+
+  /// No description provided for @diagnosticModeDisable.
+  ///
+  /// In zh, this message translates to:
+  /// **'关闭'**
+  String get diagnosticModeDisable;
+
+  /// No description provided for @sidebarCollapse.
+  ///
+  /// In zh, this message translates to:
+  /// **'收起侧边栏'**
+  String get sidebarCollapse;
+
+  /// No description provided for @sidebarExpand.
+  ///
+  /// In zh, this message translates to:
+  /// **'展开侧边栏'**
+  String get sidebarExpand;
+
+  /// No description provided for @filterAdvancedTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'高级筛选'**
+  String get filterAdvancedTitle;
+
+  /// No description provided for @filterResultCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{{count} 个结果}}'**
+  String filterResultCount(int count);
+
+  /// No description provided for @sortAndViewTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'排序与视图'**
+  String get sortAndViewTitle;
+
+  /// No description provided for @contentRatingUnknown.
+  ///
+  /// In zh, this message translates to:
+  /// **'未知'**
+  String get contentRatingUnknown;
+
+  /// No description provided for @contentRatingSafe.
+  ///
+  /// In zh, this message translates to:
+  /// **'全年龄'**
+  String get contentRatingSafe;
+
+  /// No description provided for @contentRatingR18.
+  ///
+  /// In zh, this message translates to:
+  /// **'NSFW'**
+  String get contentRatingR18;
+
+  /// No description provided for @relativeTimeJustNow.
+  ///
+  /// In zh, this message translates to:
+  /// **'刚刚'**
+  String get relativeTimeJustNow;
+
+  /// No description provided for @relativeTimeMinutesAgo.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{{count} 分钟前}}'**
+  String relativeTimeMinutesAgo(int count);
+
+  /// No description provided for @relativeTimeHoursAgo.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{{count} 小时前}}'**
+  String relativeTimeHoursAgo(int count);
+
+  /// No description provided for @relativeTimeDaysAgo.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{{count} 天前}}'**
+  String relativeTimeDaysAgo(int count);
+
+  /// No description provided for @readingProgressPage.
+  ///
+  /// In zh, this message translates to:
+  /// **'第 {page} 页'**
+  String readingProgressPage(int page);
+
+  /// No description provided for @readingProgressPageOfTotal.
+  ///
+  /// In zh, this message translates to:
+  /// **'{current}/{total}'**
+  String readingProgressPageOfTotal(int current, int total);
+
+  /// No description provided for @historyGoToComicDetail.
+  ///
+  /// In zh, this message translates to:
+  /// **'跳转到详情页'**
+  String get historyGoToComicDetail;
+
+  /// No description provided for @historyDeleteRecord.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除记录'**
+  String get historyDeleteRecord;
+
+  /// No description provided for @bootstrapStartupFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'启动失败：{error}'**
+  String bootstrapStartupFailed(String error);
+
+  /// No description provided for @catalogSelectionEnter.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择漫画'**
+  String get catalogSelectionEnter;
+
+  /// No description provided for @catalogSelectionExit.
+  ///
+  /// In zh, this message translates to:
+  /// **'取消'**
+  String get catalogSelectionExit;
+
+  /// No description provided for @catalogSelectionSelectPage.
+  ///
+  /// In zh, this message translates to:
+  /// **'全选本页'**
+  String get catalogSelectionSelectPage;
+
+  /// No description provided for @catalogSelectionClear.
+  ///
+  /// In zh, this message translates to:
+  /// **'清除选择'**
+  String get catalogSelectionClear;
+
+  /// No description provided for @catalogSelectionEditMetadata.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑元数据'**
+  String get catalogSelectionEditMetadata;
+
+  /// No description provided for @catalogSelectionSelectedCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'已选 {count} 本'**
+  String catalogSelectionSelectedCount(int count);
+
+  /// No description provided for @bulkEditMetadataTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'批量编辑 · {count} 本'**
+  String bulkEditMetadataTitle(int count);
+
+  /// No description provided for @bulkEditMetadataConfirmTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'确认批量保存？'**
+  String get bulkEditMetadataConfirmTitle;
+
+  /// No description provided for @bulkEditMetadataConfirmBody.
+  ///
+  /// In zh, this message translates to:
+  /// **'将对 {comicCount} 本漫画应用 {fieldCount} 个启用字段。'**
+  String bulkEditMetadataConfirmBody(int comicCount, int fieldCount);
+
+  /// No description provided for @bulkEditMetadataFieldTags.
+  ///
+  /// In zh, this message translates to:
+  /// **'标签'**
+  String get bulkEditMetadataFieldTags;
+
+  /// No description provided for @bulkEditMetadataFieldAuthors.
+  ///
+  /// In zh, this message translates to:
+  /// **'作者'**
+  String get bulkEditMetadataFieldAuthors;
+
+  /// No description provided for @bulkEditMetadataFieldLanguages.
+  ///
+  /// In zh, this message translates to:
+  /// **'语言'**
+  String get bulkEditMetadataFieldLanguages;
+
+  /// No description provided for @bulkEditMetadataFieldParodies.
+  ///
+  /// In zh, this message translates to:
+  /// **'原作'**
+  String get bulkEditMetadataFieldParodies;
+
+  /// No description provided for @bulkEditMetadataFieldCharacters.
+  ///
+  /// In zh, this message translates to:
+  /// **'角色'**
+  String get bulkEditMetadataFieldCharacters;
+
+  /// No description provided for @bulkEditMetadataFieldContentRating.
+  ///
+  /// In zh, this message translates to:
+  /// **'内容分级'**
+  String get bulkEditMetadataFieldContentRating;
+
+  /// No description provided for @bulkEditMetadataFieldDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'概要'**
+  String get bulkEditMetadataFieldDescription;
+
+  /// No description provided for @bulkEditMetadataFieldPublishedAt.
+  ///
+  /// In zh, this message translates to:
+  /// **'发布日期'**
+  String get bulkEditMetadataFieldPublishedAt;
+
+  /// No description provided for @bulkEditMetadataOpClear.
+  ///
+  /// In zh, this message translates to:
+  /// **'清除'**
+  String get bulkEditMetadataOpClear;
+
+  /// No description provided for @seriesDetailEditMembersMetadata.
+  ///
+  /// In zh, this message translates to:
+  /// **'批量编辑元数据'**
+  String get seriesDetailEditMembersMetadata;
+
+  /// No description provided for @bulkEditMetadataOpAdd.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加'**
+  String get bulkEditMetadataOpAdd;
+
+  /// No description provided for @bulkEditMetadataOpRemove.
+  ///
+  /// In zh, this message translates to:
+  /// **'移除'**
+  String get bulkEditMetadataOpRemove;
+
+  /// No description provided for @bulkEditMetadataOpReplace.
+  ///
+  /// In zh, this message translates to:
+  /// **'替换'**
+  String get bulkEditMetadataOpReplace;
+
+  /// No description provided for @bulkEditMetadataMixedValues.
+  ///
+  /// In zh, this message translates to:
+  /// **'多种值'**
+  String get bulkEditMetadataMixedValues;
+
+  /// No description provided for @bulkEditMetadataOperationLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'操作'**
+  String get bulkEditMetadataOperationLabel;
+
+  /// No description provided for @bulkEditMetadataCancelBatch.
+  ///
+  /// In zh, this message translates to:
+  /// **'取消批量编辑'**
+  String get bulkEditMetadataCancelBatch;
+
+  /// No description provided for @bulkEditMetadataBusy.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在批量编辑 {count} 本漫画…'**
+  String bulkEditMetadataBusy(int count);
+
+  /// No description provided for @bulkEditMetadataBatchDone.
+  ///
+  /// In zh, this message translates to:
+  /// **'批量编辑完成：已更新 {succeeded}，失败 {failed}，无变化 {unchanged}'**
+  String bulkEditMetadataBatchDone(int succeeded, int failed, int unchanged);
+
+  /// No description provided for @bulkEditMetadataBatchCancelled.
+  ///
+  /// In zh, this message translates to:
+  /// **'已取消批量编辑（已更新 {succeeded}，失败 {failed}，无变化 {unchanged}）'**
+  String bulkEditMetadataBatchCancelled(
+    int succeeded,
+    int failed,
+    int unchanged,
+  );
+
+  /// No description provided for @bulkEditMetadataSelectFieldHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'在左侧选择要编辑的字段'**
+  String get bulkEditMetadataSelectFieldHint;
+
+  /// No description provided for @bulkEditMetadataFieldSummaryCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{opLabel} · {count} 项'**
+  String bulkEditMetadataFieldSummaryCount(String opLabel, int count);
+
+  /// No description provided for @bulkEditMetadataFieldSummaryReplace.
+  ///
+  /// In zh, this message translates to:
+  /// **'替换'**
+  String get bulkEditMetadataFieldSummaryReplace;
+
+  /// No description provided for @bulkEditMetadataFieldSummaryClear.
+  ///
+  /// In zh, this message translates to:
+  /// **'清除'**
+  String get bulkEditMetadataFieldSummaryClear;
+
+  /// No description provided for @navTrash.
+  ///
+  /// In zh, this message translates to:
+  /// **'垃圾桶'**
+  String get navTrash;
+
+  /// No description provided for @readerOpenComicTrashed.
+  ///
+  /// In zh, this message translates to:
+  /// **'该漫画已删除，恢复后才能阅读。'**
+  String get readerOpenComicTrashed;
+
+  /// No description provided for @comicTrashConfirmContent.
+  ///
+  /// In zh, this message translates to:
+  /// **'「{title}」将移入「已删除」，可随时在那里恢复。'**
+  String comicTrashConfirmContent(String title);
+
+  /// No description provided for @comicTrashedToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'已移入「已删除」'**
+  String get comicTrashedToast;
+
+  /// No description provided for @trashPageSummary.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{共 {count} 本 • 可恢复或永久删除}}'**
+  String trashPageSummary(int count);
+
+  /// No description provided for @trashEmptyTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'没有已删除的漫画'**
+  String get trashEmptyTitle;
+
+  /// No description provided for @trashEmptyDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除的漫画会先放在这里，可恢复或永久删除。'**
+  String get trashEmptyDescription;
+
+  /// No description provided for @trashRestore.
+  ///
+  /// In zh, this message translates to:
+  /// **'恢复'**
+  String get trashRestore;
+
+  /// No description provided for @trashPurge.
+  ///
+  /// In zh, this message translates to:
+  /// **'永久删除'**
+  String get trashPurge;
+
+  /// No description provided for @trashPurgeAll.
+  ///
+  /// In zh, this message translates to:
+  /// **'全部删除'**
+  String get trashPurgeAll;
+
+  /// No description provided for @trashRestoreAll.
+  ///
+  /// In zh, this message translates to:
+  /// **'全部恢复'**
+  String get trashRestoreAll;
+
+  /// No description provided for @trashRestoreSelected.
+  ///
+  /// In zh, this message translates to:
+  /// **'恢复选中'**
+  String get trashRestoreSelected;
+
+  /// No description provided for @trashPurgeSelected.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除选中'**
+  String get trashPurgeSelected;
+
+  /// No description provided for @trashSelectedCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{已选 {count} 本}}'**
+  String trashSelectedCount(int count);
+
+  /// No description provided for @trashDeletedAt.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除于 {time}'**
+  String trashDeletedAt(String time);
+
+  /// No description provided for @trashBadgeLocal.
+  ///
+  /// In zh, this message translates to:
+  /// **'本地'**
+  String get trashBadgeLocal;
+
+  /// No description provided for @trashBadgeRemote.
+  ///
+  /// In zh, this message translates to:
+  /// **'远程'**
+  String get trashBadgeRemote;
+
+  /// No description provided for @trashRestoredToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{已恢复 {count} 本漫画}}'**
+  String trashRestoredToast(int count);
+
+  /// No description provided for @trashPurgeSucceededToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{已永久删除 {count} 本漫画}}'**
+  String trashPurgeSucceededToast(int count);
+
+  /// No description provided for @trashPurgePartialToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'已永久删除 {succeeded} 本，{failed} 本失败（仍保留在「已删除」中）'**
+  String trashPurgePartialToast(int succeeded, int failed);
+
+  /// No description provided for @trashPurgeFailedToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{{count} 本永久删除失败，仍保留在「已删除」中}}'**
+  String trashPurgeFailedToast(int count);
+
+  /// No description provided for @comicPurgeTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'永久删除漫画？'**
+  String get comicPurgeTitle;
+
+  /// No description provided for @comicPurgeLocalBatchConfirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{将从库中移除 {count} 本漫画，并永久删除其在磁盘上的资源（文件或图片文件夹）。此操作不可撤销。}}'**
+  String comicPurgeLocalBatchConfirm(int count);
+
+  /// No description provided for @comicPurgeRemoteBatchConfirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{将从库中移除 {count} 本远程漫画。仅从库中移除，不会删除远程资源。}}'**
+  String comicPurgeRemoteBatchConfirm(int count);
+
+  /// No description provided for @comicPurgeMixedConfirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'{localCount} 本本地漫画将永久删除磁盘文件；{remoteCount} 本远程漫画仅从库中移除，不会删除远程资源。此操作不可撤销。'**
+  String comicPurgeMixedConfirm(int localCount, int remoteCount);
+
+  /// No description provided for @comicPurgeRemoteAcknowledge.
+  ///
+  /// In zh, this message translates to:
+  /// **'我了解将从库中永久移除，此操作不可撤销'**
+  String get comicPurgeRemoteAcknowledge;
+
+  /// No description provided for @authorDetailTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'作者'**
+  String get authorDetailTitle;
+
+  /// No description provided for @authorDetailVerified.
+  ///
+  /// In zh, this message translates to:
+  /// **'认证作者'**
+  String get authorDetailVerified;
+
+  /// No description provided for @authorDetailAddLink.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加链接'**
+  String get authorDetailAddLink;
+
+  /// No description provided for @authorDetailLinkPasteHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'粘贴主页链接'**
+  String get authorDetailLinkPasteHint;
+
+  /// No description provided for @authorDetailPlatformPixiv.
+  ///
+  /// In zh, this message translates to:
+  /// **'Pixiv'**
+  String get authorDetailPlatformPixiv;
+
+  /// No description provided for @authorDetailPlatformX.
+  ///
+  /// In zh, this message translates to:
+  /// **'X'**
+  String get authorDetailPlatformX;
+
+  /// No description provided for @authorDetailPlatformPatreon.
+  ///
+  /// In zh, this message translates to:
+  /// **'Patreon'**
+  String get authorDetailPlatformPatreon;
+
+  /// No description provided for @authorDetailPlatformFanbox.
+  ///
+  /// In zh, this message translates to:
+  /// **'FANBOX'**
+  String get authorDetailPlatformFanbox;
+
+  /// No description provided for @authorDetailPlatformDiscord.
+  ///
+  /// In zh, this message translates to:
+  /// **'Discord'**
+  String get authorDetailPlatformDiscord;
+
+  /// No description provided for @authorDetailPlatformOther.
+  ///
+  /// In zh, this message translates to:
+  /// **'其他'**
+  String get authorDetailPlatformOther;
+
+  /// No description provided for @authorDetailDeleteLink.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除链接'**
+  String get authorDetailDeleteLink;
+
+  /// No description provided for @authorDetailDeleteLinkConfirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除链接「{label}」？'**
+  String authorDetailDeleteLinkConfirm(String label);
+
+  /// No description provided for @authorDetailLinkTooltip.
+  ///
+  /// In zh, this message translates to:
+  /// **'{url}'**
+  String authorDetailLinkTooltip(String url);
+
+  /// No description provided for @authorDetailComicsSection.
+  ///
+  /// In zh, this message translates to:
+  /// **'漫画 · {count}'**
+  String authorDetailComicsSection(int count);
+
+  /// No description provided for @authorDetailComicsEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无漫画'**
+  String get authorDetailComicsEmpty;
+
+  /// No description provided for @authorDetailViewInSearch.
+  ///
+  /// In zh, this message translates to:
+  /// **'在搜索中查看'**
+  String get authorDetailViewInSearch;
+
+  /// No description provided for @authorDetailRename.
+  ///
+  /// In zh, this message translates to:
+  /// **'重命名'**
+  String get authorDetailRename;
+
+  /// No description provided for @authorDetailAliases.
+  ///
+  /// In zh, this message translates to:
+  /// **'别名：{aliases}'**
+  String authorDetailAliases(String aliases);
+
+  /// No description provided for @authorDetailInvalidUrl.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入以 http:// 或 https:// 开头的链接'**
+  String get authorDetailInvalidUrl;
+
+  /// No description provided for @authorDetailOpenLinkFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'无法打开链接'**
+  String get authorDetailOpenLinkFailed;
+
+  /// No description provided for @mediaTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'媒体'**
+  String get mediaTitle;
+
+  /// No description provided for @mediaSubtitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'查看本地漫画资源的元数据写入概况。'**
+  String get mediaSubtitle;
+
+  /// No description provided for @writebackTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'自动将元数据写入原文件'**
+  String get writebackTitle;
+
+  /// No description provided for @writebackDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'将应用内元数据写入原始漫画资源。开启后自动处理已有漫画；压缩包可能重写，其他软件可以读取这些信息。失败会自动重试。'**
+  String get writebackDescription;
+
+  /// No description provided for @writebackConfirmTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'允许修改原始资源？'**
+  String get writebackConfirmTitle;
+
+  /// No description provided for @writebackEnable.
+  ///
+  /// In zh, this message translates to:
+  /// **'开启自动写入'**
+  String get writebackEnable;
+
+  /// No description provided for @writebackDisabled.
+  ///
+  /// In zh, this message translates to:
+  /// **'已关闭'**
+  String get writebackDisabled;
+
+  /// No description provided for @writebackPending.
+  ///
+  /// In zh, this message translates to:
+  /// **'待处理'**
+  String get writebackPending;
+
+  /// No description provided for @writebackProcessing.
+  ///
+  /// In zh, this message translates to:
+  /// **'处理中'**
+  String get writebackProcessing;
+
+  /// No description provided for @writebackCompleted.
+  ///
+  /// In zh, this message translates to:
+  /// **'已完成'**
+  String get writebackCompleted;
+
+  /// No description provided for @writebackFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'失败'**
+  String get writebackFailed;
+
+  /// No description provided for @writebackUnsupported.
+  ///
+  /// In zh, this message translates to:
+  /// **'当前版本不支持'**
+  String get writebackUnsupported;
+
+  /// No description provided for @writebackFailure.
+  ///
+  /// In zh, this message translates to:
+  /// **'文件元数据写入设置保存失败'**
+  String get writebackFailure;
+
+  /// No description provided for @mediaResourceTotal.
+  ///
+  /// In zh, this message translates to:
+  /// **'漫画资源'**
+  String get mediaResourceTotal;
+
+  /// No description provided for @mediaLocalScope.
+  ///
+  /// In zh, this message translates to:
+  /// **'来自 {count} 个本地库'**
+  String mediaLocalScope(int count);
+
+  /// No description provided for @mediaWritten.
+  ///
+  /// In zh, this message translates to:
+  /// **'已写入原文件'**
+  String get mediaWritten;
+
+  /// No description provided for @mediaWrittenCaption.
+  ///
+  /// In zh, this message translates to:
+  /// **'当前元数据已保存到原始资源'**
+  String get mediaWrittenCaption;
+
+  /// No description provided for @mediaNotEnabled.
+  ///
+  /// In zh, this message translates to:
+  /// **'未开启自动写入'**
+  String get mediaNotEnabled;
+
+  /// No description provided for @mediaNotEnabledCaption.
+  ///
+  /// In zh, this message translates to:
+  /// **'所属库尚未开启自动写入的资源'**
+  String get mediaNotEnabledCaption;
+
+  /// No description provided for @mediaWritingOverview.
+  ///
+  /// In zh, this message translates to:
+  /// **'自动写入概况'**
+  String get mediaWritingOverview;
+
+  /// No description provided for @mediaEnabledScope.
+  ///
+  /// In zh, this message translates to:
+  /// **'已在 {enabled} / {total} 个本地库开启'**
+  String mediaEnabledScope(int enabled, int total);
+
+  /// No description provided for @mediaPendingCaption.
+  ///
+  /// In zh, this message translates to:
+  /// **'等待自动写入'**
+  String get mediaPendingCaption;
+
+  /// No description provided for @mediaProcessingCaption.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在将元数据写入原始资源'**
+  String get mediaProcessingCaption;
+
+  /// No description provided for @mediaFailedCaption.
+  ///
+  /// In zh, this message translates to:
+  /// **'应用运行期间会自动重试'**
+  String get mediaFailedCaption;
+
+  /// No description provided for @mediaUnsupportedCaption.
+  ///
+  /// In zh, this message translates to:
+  /// **'当前版本无法写入的资源'**
+  String get mediaUnsupportedCaption;
+
+  /// No description provided for @mediaLibrarySettings.
+  ///
+  /// In zh, this message translates to:
+  /// **'各库写入设置'**
+  String get mediaLibrarySettings;
+
+  /// No description provided for @mediaAutomaticInfo.
+  ///
+  /// In zh, this message translates to:
+  /// **'默认关闭。开启后也会将已有元数据写入原始资源；写入与失败重试在应用运行期间自动进行。'**
+  String get mediaAutomaticInfo;
+
+  /// No description provided for @mediaNoLocalLibraries.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加本地库后，可开启文件元数据自动写入。'**
+  String get mediaNoLocalLibraries;
+
+  /// No description provided for @mediaRefreshFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'概况更新失败，当前显示上次获取的统计。'**
+  String get mediaRefreshFailed;
+}
+
+class _AppLocalizationsDelegate
+    extends LocalizationsDelegate<AppLocalizations> {
+  const _AppLocalizationsDelegate();
+
+  @override
+  Future<AppLocalizations> load(Locale locale) {
+    return SynchronousFuture<AppLocalizations>(lookupAppLocalizations(locale));
+  }
+
+  @override
+  bool isSupported(Locale locale) =>
+      <String>['en', 'zh'].contains(locale.languageCode);
+
+  @override
+  bool shouldReload(_AppLocalizationsDelegate old) => false;
+}
+
+AppLocalizations lookupAppLocalizations(Locale locale) {
+  // Lookup logic when only language code is specified.
+  switch (locale.languageCode) {
+    case 'en':
+      return AppLocalizationsEn();
+    case 'zh':
+      return AppLocalizationsZh();
+  }
+
+  throw FlutterError(
+    'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
+    'an issue with the localizations generation tool. Please file an issue '
+    'on GitHub with a reproducible sample app and the gen-l10n configuration '
+    'that was used.',
+  );
+}

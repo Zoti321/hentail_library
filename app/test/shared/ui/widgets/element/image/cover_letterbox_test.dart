@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/shared/ui/widgets/element/image/cover_letterbox.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 
 /// Minimal 1×1 JPEG (SOF0 width=1 height=1).
 Uint8List _tinyJpeg({required int width, required int height}) {

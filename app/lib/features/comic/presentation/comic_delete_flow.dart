@@ -1,11 +1,13 @@
+import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
+import 'package:hentai_library/design-system/design_system.dart';
+import 'package:hentai_library/shared/presentation/providers/trash_comics_command_provider.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/shared/ui/patterns/dialog/confirm_dialog.dart';
-import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
-import 'package:hentai_library/shared/di/library_command_providers.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
+import 'package:hentai_library/features/comic/domain/comic.dart';
+
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -54,7 +56,7 @@ Future<void> confirmAndTrashComicById(
     return;
   }
   try {
-    await ref.read(comicTrashCommandPortProvider).trash(<String>[comicId]);
+    await ref.read(trashComicsCommandProvider)(<String>[comicId]);
     if (!context.mounted) {
       return;
     }

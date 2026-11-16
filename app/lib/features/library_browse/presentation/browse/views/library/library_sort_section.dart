@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_comic_filters_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_series_filters_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_tab_filter_sort_providers.dart';
-import 'package:hentai_library/features/library_browse/presentation/integrations/comic_presentation_bridge.dart';
-import 'package:hentai_library/features/library_browse/presentation/integrations/series_presentation_bridge.dart';
+import 'package:hentai_library/features/comic/public.dart';
+import 'package:hentai_library/features/series/public.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:hentai_library/features/comic/public/l10n/comic_l10n.dart';
+import 'package:hentai_library/features/series/public/l10n/series_l10n.dart';
 
 /// 抽屉内容左缘内边距（与 Baseline 抽屉一致）。
 const double kLibrarySortSectionInset = 16;
@@ -149,9 +151,8 @@ class _ComicSortRow extends ConsumerWidget {
       isSelected: sortOption.field == field,
       isAscending: !sortOption.descending,
       comingSoon: !implemented,
-      onTap: () {
-        ref.read(libraryComicFiltersProvider.notifier).setSortField(field);
-      },
+      onTap: () =>
+          ref.read(libraryComicFiltersProvider.notifier).setSortField(field),
     );
   }
 }
@@ -173,9 +174,8 @@ class _SeriesSortRow extends ConsumerWidget {
       isSelected: sortOption.field == field,
       isAscending: !sortOption.descending,
       comingSoon: !implemented,
-      onTap: () {
-        ref.read(librarySeriesFiltersProvider.notifier).setSortField(field);
-      },
+      onTap: () =>
+          ref.read(librarySeriesFiltersProvider.notifier).setSortField(field),
     );
   }
 }

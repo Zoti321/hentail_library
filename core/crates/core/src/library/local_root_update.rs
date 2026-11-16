@@ -74,6 +74,7 @@ async fn update_local_library_root_locked(id: &str, root: &str) -> Result<Librar
     active.root_path = Set(root.to_string());
     let updated = active.update(&txn).await.map_err(map_db_err)?;
     txn.commit().await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
     clear_reader_sessions();
     Ok(model_to_dto(updated))
 }
@@ -208,7 +209,7 @@ async fn load_comics_ordered_for_connection<C: ConnectionTrait>(
         .all(db)
         .await
         .map_err(map_db_err)?;
-    let author_map = crate::author::load_author_names_for_comics(db, comic_ids).await?;
+    let author_map = crate::author::load_comic_authors_for_comics(db, comic_ids).await?;
     let tag_map = load_named_rows(
         db,
         "comic_tags",
@@ -252,6 +253,7 @@ async fn load_comics_ordered_for_connection<C: ConnectionTrait>(
             continue;
         };
         out.push(ComicDto {
+            resource_fingerprint: None,
             comic_id: model.comic_id.clone(),
             path: model.path,
             resource_type: model.resource_type,

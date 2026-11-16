@@ -1,16 +1,17 @@
+import 'package:hentai_library/features/comic/public/comic_metadata_types.dart';
 import 'package:flutter/material.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_entry.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
+import 'package:hentai_library/features/comic/domain/comic.dart';
+import 'package:hentai_library/features/comic_metadata/public/comic_metadata_entities.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 
 Comic _comic({
   ContentRating contentRating = ContentRating.safe,
   int pageCount = 24,
 }) {
-  return Comic(
+  return Comic.restore(
     comicId: 'c1',
     path: r'D:\lib\c1.zip',
     resourceType: ResourceType.zip,
@@ -20,7 +21,7 @@ Comic _comic({
     title: '示例漫画',
     pageCount: pageCount,
     description: '简介',
-    authors: <Author>[Author(name: '作者甲')],
+    authors: <AuthorRef>[AuthorRef(id: 7, name: '作者甲')],
     tags: <Tag>[Tag(name: 'tag-a')],
     parodies: <String>['原作'],
     characters: <String>['角色'],
@@ -46,7 +47,7 @@ void main() {
       expect(entry.title, '示例漫画');
       expect(entry.description, '简介');
       expect(entry.pageCount, 24);
-      expect(entry.authors, <String>['作者甲']);
+      expect(entry.authors, <AuthorRef>[AuthorRef(id: 7, name: '作者甲')]);
       expect(entry.tags, <String>['tag-a']);
       expect(entry.parodies, <String>['原作']);
       expect(entry.characters, <String>['角色']);

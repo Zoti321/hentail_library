@@ -1,18 +1,16 @@
 import 'dart:async';
 
-import 'package:dio/dio.dart';
+import 'package:hentai_library/core/async/cancellation_token.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/core/logging/app_log.dart';
-import 'package:hentai_library/core/util/open_downloaded_file.dart';
-import 'package:hentai_library/core/util/utils.dart';
-import 'package:hentai_library/features/app_settings/di/app_update_providers.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/application/logging/app_log.dart';
+import 'package:hentai_library/features/app_settings/presentation/providers/app_update_opener_providers.dart';
+import 'package:hentai_library/core/util/format_byte_size.dart';
+import 'package:hentai_library/features/app_settings/presentation/providers/app_update_providers.dart';
 import 'package:hentai_library/features/app_settings/domain/app_release_info.dart';
-import 'package:hentai_library/shared/ui/patterns/dialog/lab_dialog_presenter.dart';
-import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
-import 'package:hentai_library/shared/ui/theme/lab_text.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -36,6 +34,14 @@ class AppUpdateDownloadDialog extends HookConsumerWidget {
 
   final AppReleaseAsset asset;
 
+  void _handleCancelDownload(
+    BuildContext context,
+    ObjectRef<CancellationToken?> cancelTokenRef,
+  ) {
+    cancelTokenRef.value?.cancel();
+    Navigator.of(context).pop();
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
@@ -51,7 +57,8 @@ class AppUpdateDownloadDialog extends HookConsumerWidget {
     final ValueNotifier<int> totalBytes = useState<int>(asset.size);
     final ValueNotifier<bool> isDownloading = useState<bool>(true);
     final ValueNotifier<bool> hasFailed = useState<bool>(false);
-    final ObjectRef<CancelToken?> cancelTokenRef = useRef<CancelToken?>(null);
+    final ObjectRef<CancellationToken?> cancelTokenRef =
+        useRef<CancellationToken?>(null);
 
     Future<void> startDownload() async {
       isDownloading.value = true;
@@ -59,11 +66,11 @@ class AppUpdateDownloadDialog extends HookConsumerWidget {
       progress.value = 0;
       receivedBytes.value = 0;
       totalBytes.value = asset.size;
-      final CancelToken cancelToken = CancelToken();
+      final CancellationToken cancelToken = CancellationToken();
       cancelTokenRef.value = cancelToken;
       try {
         final String savedPath = await ref
-            .read(appUpdateServiceProvider)
+            .read(appUpdateGatewayProvider)
             .downloadAsset(
               asset: asset,
               cancelToken: cancelToken,
@@ -79,14 +86,9 @@ class AppUpdateDownloadDialog extends HookConsumerWidget {
           return;
         }
         Navigator.of(context).pop();
-        await openDownloadedUpdateFile(savedPath);
-      } on DioException catch (error, stackTrace) {
-        if (CancelToken.isCancel(error)) {
-          return;
-        }
-        logError(AppLog.ui('appUpdate'), '下载更新失败', error, stackTrace);
-        hasFailed.value = true;
-        isDownloading.value = false;
+        await ref.read(openDownloadedUpdateProvider)(savedPath);
+      } on OperationCancelledException {
+        return;
       } catch (error, stackTrace) {
         logError(AppLog.ui('appUpdate'), '下载更新失败', error, stackTrace);
         hasFailed.value = true;
@@ -140,10 +142,7 @@ class AppUpdateDownloadDialog extends HookConsumerWidget {
       actions: <Widget>[
         if (isDownloading.value)
           M3EButton(
-            onPressed: () {
-              cancelTokenRef.value?.cancel();
-              Navigator.of(context).pop();
-            },
+            onPressed: () => _handleCancelDownload(context, cancelTokenRef),
             style: M3EButtonStyle.text,
             decoration: M3EButtonDecoration(textStyle: actionLabelStyle),
             label: Text(l10n.commonCancel),

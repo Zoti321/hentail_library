@@ -1,0 +1,39 @@
+import 'package:flutter/material.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
+import 'package:hentai_library/features/comic/domain/value_objects/comic_language.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:hentai_library/features/comic/presentation/l10n/comic_l10n.dart';
+
+/// Optional single Language; selecting the active chip clears the value.
+class ComicLanguageQuickPick extends StatelessWidget {
+  const ComicLanguageQuickPick({
+    super.key,
+    required this.selected,
+    required this.onCanonicalToggled,
+  });
+
+  /// 已选规范名（[ComicLanguageNames.closedSet] 元素）。
+  final List<String> selected;
+  final ValueChanged<String> onCanonicalToggled;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
+    final M3ESpacing spacing = M3ETheme.of(context).spacing;
+
+    return Wrap(
+      spacing: spacing.sm,
+      runSpacing: spacing.sm,
+      children: ComicLanguageNames.closedSet.map((String canonical) {
+        final bool isSelected = selected.contains(canonical);
+        return M3EChip(
+          label: l10n.comicLanguageLabel(canonical),
+          type: M3EChipType.filter,
+          selected: isSelected,
+          onPressed: () => onCanonicalToggled(canonical),
+        );
+      }).toList(),
+    );
+  }
+}

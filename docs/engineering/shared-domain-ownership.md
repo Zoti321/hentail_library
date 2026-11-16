@@ -1,65 +1,63 @@
-# `shared/domain` 归属表（Epic #436 收尾）
+# Domain ownership and Shared Kernel
 
-**决策索引**：ADR-0033（Application 层）、ADR-0034（public only）、**ADR-0035**（Catalog Shared Kernel）。  
-**门禁**：L3b `shared_domain_feature_import_baseline.json`（当前应为 `[]`）；**2026-11-02** 起 owner 域 strangler re-export 已全部移除（`strangler_shims.txt` 为空），请直接 import **`features/<owner>/domain/...`**。
+Follow ADR-0035/0041/0042/0045/0048/0049/0051/0052. New business types belong to their producer feature. Consumer count alone does not justify moving a type to shared.
 
-## 真源在 owner feature（已从 shared 移除 strangler）
+## Owner rules
 
-下列类型 **仅** 存在于各 feature `domain/`；`shared/domain/repositories/`、`shared/domain/reading/`、多数 `shared/domain/library/` shim 文件已删除：
+- Comic entity, metadata draft/locks, title projection, catalog rules and repositories: `features/comic/domain/`.
+- Series entities, members, metadata and ordering rules: `features/series/domain/`. Public APIs expose queries/read-only records rather than the Series entity.
+- Series metadata forms own validation and draft differences, including unchanged and explicit count-clear semantics. Presentation drafts adapt raw input to the same form for validation and saving; Lab acceptance uses the production validator. The application service consumes the domain difference, writes one repository patch and reports the save outcome; apply-result types belong to application rather than the form's domain library.
+- A Series planned count is either absent or an integer from 1 through 2147483647. The domain form rejects values outside this range before any metadata write; the infrastructure mapper also checks direct repository requests before FRB encoding. Large positive Dart integers must not silently wrap through the persisted count representation. Blank input retains the explicit clear behavior.
+- Author/AuthorDetail/Tag and metadata dictionaries/forms: `features/comic_metadata/domain/`.
+- Metadata merge-confirmation preferences and local dictionary reads stay with `comic_metadata/infrastructure`; its presentation consumes injected query/command functions. File selection remains a UI operation. Preserve non-empty selected-byte precedence, copied byte snapshots, path fallback and the existing invalid-file response on read failure.
+- Library configuration, credentials, sync/refresh and bulk-edit orchestration: `features/library_admin/`.
+- Browse shell preferences and cross-tab query assembly: `features/library_browse/`; Comic/Series tab rules remain with their owners.
+- Read sessions and reading preference semantics: `features/reader/`.
+- Reading history and activity statistics: `reading_history` and `reading_stats` respectively; Home only assembles their presentation.
+- Home library alert dismissal belongs to `home`: fingerprint visibility rules and dismissal entries are domain values; JSON compatibility and persistence stay in its infrastructure repository. The presentation notifier refreshes after successful writes and leaves the previous snapshot visible when a write fails. Composition supplies the repository.
+- Settings persistence/schema: `app_settings`; communicate Reader preferences through the primitive ReadingPreferencesRecord and Reader ACL (ADR-0046).
+- Trash lifecycle and metadata backups: `comic_trash` and `metadata_backup` respectively.
 
-| 语义 | Owner 真源 |
-| --- | --- |
-| `comic_trash/*`、`TrashedComic` read model | `features/comic_trash/domain/` |
-| `reading/*` | `features/read_session/domain/` |
-| 库 browse 壳（跨 Tab 偏好、作者、catalog 壳） | `features/library_browse/domain/browse/`（**不含** comic/series Tab 规则） |
-| Comic 仓储、Comics Tab 规则、展示标题、smart facet | `features/comic/domain/` |
-| Series 仓储、Series Tab 规则 | `features/series/domain/` |
-| 库 admin（扫描、revision、current library 等） | `features/library_admin/domain/` |
-| `comic_display_title` 等 | `features/comic/domain/` |
-| read_session / app_settings 端口实现类型 | 各 owner `domain/` |
-| `repositories/*` 契约 | 各 owner `features/*/domain/` |
-| **reading_history** | `features/reading_history/domain/` |
-| `app_setting*` | `features/app_settings/domain/` |
-| home read models | `features/home/domain/` |
-| named metadata 表单/字典 | `features/named_metadata/domain/`；跨 feature **`features/named_metadata/public.dart`**（仓储契约、字典 Riverpod、生产页）；Comic 表单窄面 **`public/named_metadata_form.dart`**；Lab patterns **`public/ui/metadata_lab_patterns.dart`** |
+Within a feature, import its own domain directly. Across features, use `public/**` only. Removed shared re-export shims are not compatibility surfaces. Current paths are discoverable in code; do not maintain a duplicate migration inventory here.
 
-Feature 内代码应 **import owner `domain/`**（`library_browse` 内按 [`library-browse-zones.md`](library-browse-zones.md) 分子目录）；跨 feature 经 **`features/<owner>/public/**`**（ADR-0034）。**勿**再新增对已删除 shared shim 路径的依赖。
+## Shared placement test
 
-`models/models.dart` 仍 re-export `reading_history` 与 `app_setting` 的 **feature URI**（便捷 barrel，非 strangler 文件）。
+Keep a contract shared when importing its producer would violate a forbidden module edge or create a public cycle, or when shared code itself must consume it. Put domain vocabulary in `shared/domain/`, orchestration signatures in `shared/application/contracts/`, UI signatures/slots in `shared/ui/`, and Riverpod tokens in `shared/presentation/providers/`. Composition binds owner implementations. A contract's shared location does not transfer ownership of the business operation.
 
-## Comic 聚合 vs feature 边界（ADR-0002 / 0026 / 0036）
+The Catalog Shared Kernel includes resource/display/thumbnail enums, pagination values, AuthorRef, SeriesItemMembership, SeriesReadingContext, shared age-restriction vocabulary and cover-source contracts. It excludes Comic/Series/Author entities and owner repositories. Domain events under `shared/domain/events/` are shared facts, not catalog entities.
 
-- **聚合写集在 Rust**：以 `comicId` 为根，同事务提交 `comics` + `comic_meta` + facet junction + Metadata field lock。单本用户写不持库级写锁；跨本 bulk / sync / trash 等走库级写接缝。
-- **`features/comic` 是 feature，不是 Dart Aggregate Root**：契约与 Comics Tab 规则、展示标题、smart facet、单本元数据 application 在此；**勿**在 Dart 侧再建 `ComicAggregate` 或把 Kernel DTO 迁入本 feature（ADR-0035）。
-- **对照归属**：Series 成员/排序 → `features/series`；trash 生命周期 → `features/comic_trash`；库级 bulk patch 编排 → `features/library_admin`（与 comic 单本 form 草稿路径不同，无需合并）；浏览壳 → `features/library_browse`。分区协作与 public 收窄见 [`library-browse-zones.md`](library-browse-zones.md)。
+## Transaction boundary
 
-## Catalog Shared Kernel（真源 @ shared，ADR-0035）
+Rust owns the Comic aggregate write set: the Comic row, metadata/locks and facet junctions commit in one transaction (ADR-0002/0026). Dart Comic is a projection entity with construction invariants, draft application and field diffs. Do not duplicate Rust transactions, lock merging or rollback in a Dart aggregate. Single-Comic metadata writes and library-level sync/bulk/trash use their existing distinct write seams.
 
-不在 #436 批量迁出；consumer 继续 `import shared/domain/...`：
+Rust `comic` owns the internal full upsert and deletion write sets in `comic/persistence.rs`. Both accept the caller's `DatabaseTransaction`; callers retain commit, notification, library locking and resource I/O. Reader writeback, Metadata refresh, Library deletion and scan maintenance use these Comic entry points. Sync owns scan-plan application and Series rebuilding, rather than the reusable Comic persistence implementation. Comic metadata patches call the Author and NamedFacet owners directly for facet replacement.
 
-- `models/entity/comic/**`、`models/enums.dart`
-- `models/value_objects/page_request.dart`、`paged_result.dart`、`page_jump.dart`
-- 与 catalog 强绑定的 form / pick / meta VO（见 `models/models.dart` barrel）
-- `reading/series_reading_context.dart`（类型；读口 `SeriesReadingContextPort` @ shared/di，实现 @ series）
-- `library/scan_interval.dart`、`library/metadata_refresh_types.dart`、`library/comic_metadata_bulk_patch_result.dart`（库扫描/批量结果；shared UI toast 与 `LocalLibrary` 共用）
-- `models/managed_named_facet_kind.dart`（metadata 管理 Tab 枚举）
-- `thumbnail/**`
+Library sync plans retain source candidates and distinguish Resource metadata from reused catalog projections. Planning may derive thumbnail candidates, but those projections are not persistence payloads. The scan writer loads the current complete Comic aggregates inside its transaction, then merges source metadata against current values and locks. Reuse updates physical fields while preserving current metadata, locks and page count; it cannot insert a missing catalog record. Expected existing identities that disappeared invalidate the plan before any writes. Planned Comic migrations also retain scan candidates and become persistence migrations only after this merge. Their current metadata and locks accompany live child attachments and trash state to the new identity. The transaction still covers the whole Library write set, with one notification after commit and no automatic retry.
 
-## 契约仍定义在 `shared/domain`（未 owner 化）
+Resource parsing derives identity, filename title fallbacks and size from the original location and its ResourceAccess adapter. RAR/CBR, 7z/CB7 and PDF decoders receive the adapter's local path when available; otherwise parsing holds a temporary file for the duration of native decoding. URL prefixes do not select the I/O implementation, and temporary filenames or local decoder paths do not become catalog metadata. Source stat failures propagate and missing or non-file sources are not imported. PDF embedded metadata retains precedence over filename fallbacks.
 
-UI / 编排命令类型；发现面经 owner `public/` re-export（ADR-0034）：
+Resource owns the file/directory parse dispatch used by Library sync and explicit Metadata refresh, using the adapter's actual kind. A qualifying image directory remains a directory even when its name ends in a supported file extension. Explicit directory refresh recomputes image count, total size and the folder title under the existing field locks; mixed or nested folders retain their existing rejection rules. Reader directory page-list reconciliation uses the opened session's page count and does not parse directory contents again, including for names with file extensions.
 
-- `ports/author_detail_port.dart`
-- `ports/comic_trash_command_port.dart`
-- `ports/library_management_port.dart`
-- `ports/library_revision_port.dart`、`ports/library_revision_signal_port.dart`
-- `ports/series_reading_context_port.dart`
-- `ports/read_session_launch_port.dart`
-- `library/comic_detail_return_series_port.dart`（实现 @ `comic`）
+Library removal acquires the existing global Library write lock before reading or deleting catalog records. It fails immediately while sync, refresh or another bulk write owns that lock, preventing an in-progress scan from recreating records for a removed Library. The Library, Comic write sets, Series and resource snapshots retain their existing single transaction; failure rolls back without notification and releases the lock. Removal deletes records while retaining Resources.
 
-`shared/di` 声明跨 feature 协作用的 Riverpod token（#426）；实现与 `createXxx()` 在 owner `di/` / `public/di/`，由 `features/bootstrap/di/overrides/` 注入。跨 feature UI 封面等用 **`comic/public.dart`**、**`series/public.dart`** 或 browse 壳 public。
+Folder series rebuilding captures members' locked sort orders before deleting inactive Series or clearing memberships. Deleting a source Series cascades to its memberships, including the last Comic moved into an existing target Series; this cleanup must not erase that Comic's manual order or lock before the target membership is rebuilt (ADR-0006/0013).
 
-## 测试目录约定
+Reader first-open physical metadata writeback follows the same single-Comic transaction rule. Resource parsing precedes the transaction and validates the source metadata retained by the Reader snapshot before and after I/O. Within the transaction, Comic's repository loads the latest visible aggregate, and Reader checks its path, type, Library and catalog size before merging against its current field locks. Missing, trashed or changed sources are skipped; a parse without metadata changes only the latest aggregate's page count. The Comic row, metadata and facet replacements commit together before notifying observers. The internal Comic upsert accepts a database transaction rather than an autocommit connection. This write does not acquire the global Library write lock. Failed or skipped writes do not announce a commit. Reader page-list loading remains usable when this best-effort writeback fails, with the failure logged by the existing reader entry point. Source metadata validation and the database commit are separate operations, rather than an atomic filesystem/database transaction.
 
-- Owner 域行为单测：`app/test/features/<owner>/domain/**`
-- Shared Kernel / 跨库契约：`app/test/shared/domain/**`（entity、VO、repository 契约等）
+Explicit Metadata refresh also parses outside the transaction and merges against the latest visible Comic and field locks inside it. It validates source metadata after parsing and checks path, type, Library and catalog size again before writing. A missing, trashed or changed source fails that Comic without notification or retry; Series and Library refresh retain committed members and continue reporting partial failures. Batch target selection excludes Comics already in trash. The global Library write lock still guards refresh orchestration, while single-entity user edits remain available.
+
+Series owns folder-derived name refresh through its internal write command. After member refresh, the command uses the caller's database connection and reads the current folder, name and name lock in its own transaction. It updates only the name and sort key and notifies once after an actual committed change, including a Series with no members. A newly locked user name is retained, a newly released lock permits inference, and unchanged or failed writes do not notify. Refresh checks cancellation before entering the name phase and before each Library name write, including after the last member and for empty member lists. Cancellation skips remaining writes; an already accepted transaction may finish.
+
+Reading activity commands commit their duration increment and optional Finished comic mark in one Rust transaction, then notify observers once. A failure in either write rolls back the complete command without notification or automatic retry. Shared SQL helpers use the caller's connection so the combined command and existing single-action APIs retain the same positive-duration and sticky first-finished-time rules. Dart still owns session qualification, incognito handling and last-page semantics; this write does not acquire the library write lock.
+
+Reading history commands commit the per-Comic progress upsert and expired-history retention cleanup in one Rust transaction, then notify observers once. A retention failure restores the previous title, last-read time and page, or leaves a new history absent, without notifying observers. Sync continues to run the same retention helper inside its own transaction. History writes retain their existing timestamp replacement semantics and remain independent of Reading activity statistics.
+
+NamedFacet dictionary deletion notifies revision subscribers once after its SQL statement succeeds, including non-empty requests whose names are already absent. Empty requests and failed SQL do not notify. Tag, Parody and Character deletion share this owner path; observers must not rely on a presentation refresh to discover the committed change.
+
+Reading activity snapshots load the Finished comic count and lifetime duration in one SQL statement. Finished marks count only when their Comic exists and is not trashed; orphan-history visibility does not apply to this metric. A missing duration singleton yields zero duration while retaining the visible finished count.
+
+Bulk published-date requests distinguish a replacement containing a valid DateTime from explicit clearing. Timestamp encoding belongs to the library_admin FRB mapper; epoch zero is a valid replacement, never a fallback for missing input. The Comic editor retains raw input and blocks confirmation when a selected replacement has no parseable date. Unselected fields stay absent, and other selected edits are not submitted while that replacement is invalid.
+
+## Verification
+
+Preserve `shared/domain`'s zero feature dependencies, public-only cross-feature edges, forbidden edges, acyclicity and required-provider binding. Entity ownership tests, module boundary tests and recursive dependency tests under `app/test/architecture/` and `app/test/gate/` enforce these rules. UI ownership follows [design-system.md](design-system.md), not this producer rule alone.

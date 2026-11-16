@@ -5,18 +5,14 @@ use crate::formats::{read_pdf_page, read_rar_page, read_sevenz_page};
 
 use super::backend::{read_epub_page, read_zip_page, ReaderBackend};
 use super::dto::ReaderPageListDto;
-use super::manager::with_session;
+use super::manager::ReaderSessionRead;
 use super::writeback::writeback_after_open;
 
-#[tracing::instrument(err, fields(comic_id, resource_type, path))]
-pub fn load_page_list(
-    comic_id: &str,
-    path: &str,
-    resource_type: &str,
-) -> Result<ReaderPageListDto, HentaiError> {
-    // `path` kept for API/tracing; page list comes from the open session backend.
-    let _ = path;
-    let list = with_session(comic_id, |backend| match backend {
+#[tracing::instrument(err, skip(read), fields(comic_id = read.comic_id, resource_type = read.resource_type, path = read.path))]
+pub fn load_page_list(read: &ReaderSessionRead) -> Result<ReaderPageListDto, HentaiError> {
+    let comic_id = &read.comic_id;
+    let resource_type = &read.resource_type;
+    let list = read.with_backend(|backend| match backend {
         ReaderBackend::Dir(dir) => Ok(ReaderPageListDto {
             resource_type: "dir".to_string(),
             page_count: dir.files.len() as i32,
@@ -59,28 +55,17 @@ pub fn load_page_list(
         "reader page list loaded"
     );
     // First-open physical metadata writeback (ADR-0008 / #59). Best-effort.
-    if let Err(err) = block_on(writeback_after_open(comic_id, list.page_count)) {
+    if let Err(err) = block_on(writeback_after_open(read, list.page_count)) {
         tracing::warn!(comic_id, error = %err, "page_count writeback failed");
     }
     Ok(list)
 }
 
-#[tracing::instrument(err, fields(comic_id, resource_type, page_index), skip(path))]
-pub fn load_page_bytes(
-    comic_id: &str,
-    path: &str,
-    resource_type: &str,
-    page_index: i32,
-) -> Result<Vec<u8>, HentaiError> {
-    if resource_type == "dir" {
-        return Err(HentaiError::reader_invalid_content(
-            "目录资源请通过 dir_page_paths 读取文件",
-        ));
-    }
-    let _ = path; // kept for API symmetry with open/list; bytes come from session
+#[tracing::instrument(err, skip(read), fields(comic_id = read.comic_id, resource_type = read.resource_type))]
+pub fn load_page_bytes(read: &ReaderSessionRead, page_index: i32) -> Result<Vec<u8>, HentaiError> {
     let page_index = usize::try_from(page_index)
         .map_err(|_| HentaiError::reader_invalid_content(format!("页索引无效: {page_index}")))?;
-    with_session(comic_id, |backend| match backend {
+    read.with_backend(|backend| match backend {
         ReaderBackend::Dir(_) => Err(HentaiError::reader_invalid_content(
             "目录资源请通过 dir_page_paths 读取文件",
         )),

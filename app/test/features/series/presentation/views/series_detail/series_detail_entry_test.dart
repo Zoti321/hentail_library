@@ -1,15 +1,18 @@
+import 'package:hentai_library/features/series/domain/value_objects/series_folder_info.dart';
+import 'package:hentai_library/features/series/domain/value_objects/series_metadata.dart';
 import 'package:flutter/material.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_entry.dart';
 import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_view_object.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
+import 'package:hentai_library/features/comic/public/comic.dart';
+import 'package:hentai_library/features/series/domain/series.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/series_comic_page_item.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/series_comics_metadata.dart';
+import 'package:hentai_library/features/series/domain/series_comic_page_item.dart';
+import 'package:hentai_library/features/series/domain/value_objects/series_comics_metadata.dart';
 
 Comic _comic(String id, String title) {
-  return Comic(
+  return Comic.restore(
     comicId: id,
     path: '/lib/$id.zip',
     resourceType: ResourceType.zip,
@@ -26,16 +29,18 @@ void main() {
     test('maps series and current page only', () {
       final Series series = Series(
         id: 's1',
-        name: '系列甲',
-        folderPath: '/lib/s1',
-        serializationStatus: SerializationStatus.hiatus,
-        totalCount: 5,
+        folderInfo: SeriesFolderInfo(folderPath: '/lib/s1'),
+        metadata: SeriesMetadata(
+          name: '系列甲',
+          serializationStatus: SerializationStatus.hiatus,
+          totalCount: 5,
+        ),
       );
       final entry = seriesDetailEntry(
         series: series,
         cover: const SizedBox(),
         metadata: const SeriesComicsMetadata(
-          authors: <String>['作者'],
+          authors: <AuthorRef>[AuthorRef(id: 9, name: '作者')],
           tags: <String>['tag'],
           hasR18: true,
           languages: <String>['English'],
@@ -48,9 +53,9 @@ void main() {
       );
 
       expect(entry.title, '系列甲');
-      expect(entry.serializationStatus, SeriesSerializationStatus.hiatus);
+      expect(entry.serializationStatus, SerializationStatus.hiatus);
       expect(entry.languages, <String>['English']);
-      expect(entry.authors, <String>['作者']);
+      expect(entry.authors, <AuthorRef>[AuthorRef(id: 9, name: '作者')]);
       expect(entry.tags, <String>['tag']);
       expect(entry.showAgeRestrictionChip, isTrue);
       expect(entry.showMetadataBlock, isTrue);
@@ -65,8 +70,8 @@ void main() {
     test('hides metadata block when metadata is absent', () {
       final Series series = Series(
         id: 's2',
-        name: '系列乙',
-        folderPath: '/lib/s2',
+        folderInfo: SeriesFolderInfo(folderPath: '/lib/s2'),
+        metadata: SeriesMetadata(name: '系列乙'),
       );
       final entry = seriesDetailEntry(
         series: series,
@@ -79,7 +84,7 @@ void main() {
 
       expect(entry.showMetadataBlock, isFalse);
       expect(entry.comics, isEmpty);
-      expect(entry.serializationStatus, SeriesSerializationStatus.unknown);
+      expect(entry.serializationStatus, SerializationStatus.unknown);
     });
   });
 }

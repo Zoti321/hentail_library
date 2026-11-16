@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
-import 'package:hentai_library/shared/ui/layout/series_detail_page_metrics.dart';
+import 'package:hentai_library/design-system/design_system.dart';
+import 'package:hentai_library/features/series/presentation/patterns/series_detail/series_detail_page_metrics.dart';
 import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_view_object.dart';
 import 'package:hentai_library/features/series/presentation/patterns/series_detail/series_detail_comics_grid.dart';
-import 'package:hentai_library/shared/ui/widgets/pagination/pagination.dart';
 
 /// 系列漫画列表区：网格 + 底部分页。
 class SeriesDetailComicsSection extends StatelessWidget {

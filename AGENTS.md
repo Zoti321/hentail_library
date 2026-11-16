@@ -1,41 +1,30 @@
 # Hentai Library
 
-Monorepo: **`app/`** Flutter · **`core/`** Rust (FRB).  
-Setup: `./scripts/setup-dev.sh` · PR gate: `./scripts/run-gate.sh` · Human onboarding: `README.md` · Contributor map: `CONTRIBUTING.md`.
+Flutter lives in `app/`; Rust and FRB live in `core/`. Work in the current clone and branch; create a branch or worktree only with explicit user permission.
 
-**Glossary** — domain terms, terminology, edit ADR → `GLOSSARY.md` + `docs/adr/`.  
-**Read session pages** → `GLOSSARY.md` **Page image fidelity** only.
+## Start here
 
-**Product scope** (capabilities, platforms) → `README.md` § 核心功能 / 支持平台.
+- Setup and product scope: [README.md](README.md). Contributor commands and documentation map: [CONTRIBUTING.md](CONTRIBUTING.md).
+- Domain vocabulary: [GLOSSARY.md](GLOSSARY.md). Read the relevant [ADRs](docs/adr/README.md) before changing a decision.
+- Tests and CI: [gate.md](docs/engineering/gate.md). Local entry: `./scripts/run-gate.sh`; executable rules live in `app/test/gate/` and `app/test/architecture/`.
 
-**Flutter UI — production** (shell, tokens, components) → `app/lib/shared/ui/theme/` + `shared/ui/widgets/`; structure ADR-0027, theme ADR-0028. Do not treat Figma or `design-system/` as the live spec for shipping routes unless an ADR says otherwise.
+## Read for the task
 
-**Flutter UI — MD3E Lab** (`app/lib/md3e/`, `integrate/md3e`) → **Widgetbook** (`app/widgetbook/`, `flutter run -t widgetbook/main.dart`) + `material_3_expressive` official docs; patterns/pages live in `md3e/`. Visual acceptance for Lab is Widgetbook, not Figma frames. **New MD3E widgets** → material_ui `MaterialLocalizations` via `app/lib/shared/ui/l10n/m3e_material_localizations.dart` (`md3eMaterialLocalizationsOf` / `md3eMaterialUiLocalizationsScope`); do not use Flutter `material.dart` `MaterialLocalizations` in new code.
+- Dart layout, external adapters, core/shared ownership: [feature-data-layout.md](docs/engineering/feature-data-layout.md), ADR-0051/0052.
+- Cross-feature calls, providers, events and composition: [cross-feature-collaboration.md](docs/engineering/cross-feature-collaboration.md), ADR-0034/0039/0050/0051.
+- Domain ownership: [shared-domain-ownership.md](docs/engineering/shared-domain-ownership.md). Browse/comic/series seams: [library-browse-zones.md](docs/engineering/library-browse-zones.md).
+- Domain type names: [ddd-domain-naming.md](docs/engineering/ddd-domain-naming.md). Reader names: [reader-ddd-lexicon.md](docs/engineering/reader-ddd-lexicon.md).
+- Production UI: [design-system.md](docs/engineering/design-system.md), ADR-0053. The only external design-system entry is `app/lib/design-system/design_system.dart`. Product adapters belong to `shared/ui` or the feature owner.
+- UI previews: `app/widgetbook/` (`cd app && flutter run -t widgetbook/main.dart`). Widgetbook is the Lab acceptance surface. The root `design-system/` directory is not a UI specification.
+- Reader page rendering: **Page image fidelity** in GLOSSARY takes precedence over performance tuning advice.
+- Rust sync, reading and persistence: `core/`, ADR-0002 and the relevant domain ADRs.
+- Logs and tag dictionary support: [maintainer.md](docs/engineering/maintainer.md).
+- Issue tracking: [issue-tracker.md](docs/agents/issue-tracker.md). Triage: [triage-labels.md](docs/agents/triage-labels.md). Domain documentation edits: [domain.md](docs/agents/domain.md).
 
-**design-system/** → **cleared** (2026-11-01): only `.gitkeep` and `example.png` remain; `hentai-library/MASTER.md`, `pages/*`, `research/` were removed (recoverable from git history). No UI spec lives here; see ADR-0030. ADR-0029 charter is superseded for any future visual refresh unless a new ADR reintroduces a doc source.
+## Documentation
 
-**Dart layout & imports** (features/shared/core, MVVM) → ADR-0017、ADR-0027、**ADR-0033**（feature `application/`）、**ADR-0034**（cross-feature 仅 `features/*/public/**`）、**ADR-0035**（Catalog Shared Kernel 留 `shared/domain`）、**ADR-0036**（`comic` / `series` / `library_browse` 三 module）；领域层 DDD 文件/类型命名 → `docs/engineering/ddd-domain-naming.md`；Wayfinder 终态以 `app/test/gate/` 为准，并由 `project_layout_test.dart` 等门禁强制执行。
+Write agent instructions, engineering guides and GLOSSARY in English. Keep README files and CONTRIBUTING in Simplified Chinese. Preserve historical ADR decisions; add a superseding decision when behavior changes. Keep current procedures in engineering guides and task history in issues/PRs.
 
-**Wayfinder product modules**（`app/lib/features/`）：`bootstrap`、`home`、`library_admin`、`library_browse`、`comic`、`series`、`read_session`、`reading_history`、`comic_trash`、`named_metadata`、`app_settings`、`metadata_backup`。
+## File removal
 
-**Rust** (sync, read, DB) → `core/`; see `docs/adr/README.md` (ADR-0002 and related).
-
-**Tests & CI** → `docs/engineering/gate.md`; tier names ADR-0018; workflows `.github/workflows/gate.yml`.
-
-**Issues** · **logs export** · **tag dictionary JSON** → `docs/engineering/maintainer.md`.
-
-**Git workspace (agents)** — 未经用户明确允许，不要为改代码而新建 `git worktree` 或额外分支；在当前 clone 与用户指定的分支上工作即可。
-
-## Agent skills
-
-### Issue tracker
-
-GitHub Issues via `gh` (default); local `.scratch/<feature>/issues/` only when `gh` cannot reach GitHub. See `docs/agents/issue-tracker.md`.
-
-### Triage labels
-
-Canonical state + category roles; label strings match GitHub. See `docs/agents/triage-labels.md`. Maintainer workflow: `/triage` skill.
-
-### Domain docs
-
-Single-context: `GLOSSARY.md` + `docs/adr/`. See `docs/agents/domain.md`.
+Remove only one explicitly named file at a time. Recursive or bulk deletion is prohibited. If cleanup requires multiple deletions, stop that operation and ask the user to delete the files manually unless the user explicitly authorizes an exception.

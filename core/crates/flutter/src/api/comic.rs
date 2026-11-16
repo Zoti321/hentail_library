@@ -57,12 +57,28 @@ pub struct ComicMetaLocksDto {
     pub characters: bool,
 }
 
+/// Comic 附着的 Author 引用投影（见 core `ComicAuthorDto`，ADR-0024）。
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ComicAuthorDto {
+    pub id: Option<i64>,
+    pub name: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct ResourceFingerprintDto {
+    pub digest: String,
+    pub resource_type: String,
+    pub modified_ms: i64,
+    pub size: i64,
+}
+
 #[derive(Debug, Clone)]
 pub struct ComicDto {
     pub comic_id: String,
     pub path: String,
     pub resource_type: String,
     pub resource_size: i64,
+    pub resource_fingerprint: Option<ResourceFingerprintDto>,
     pub created_at: i64,
     pub last_updated_at: i64,
     pub title: String,
@@ -71,7 +87,7 @@ pub struct ComicDto {
     pub description: Option<String>,
     pub published_at: Option<i64>,
     pub last_read_time_ms: Option<i64>,
-    pub authors: Vec<String>,
+    pub authors: Vec<ComicAuthorDto>,
     pub tags: Vec<String>,
     pub languages: Vec<String>,
     pub parodies: Vec<String>,
@@ -119,6 +135,14 @@ impl From<hentai_core::ComicDto> for ComicDto {
             path: value.path,
             resource_type: value.resource_type,
             resource_size: value.resource_size,
+            resource_fingerprint: value.resource_fingerprint.map(|fingerprint| {
+                ResourceFingerprintDto {
+                    digest: fingerprint.digest,
+                    resource_type: fingerprint.resource_type,
+                    modified_ms: fingerprint.modified_ms,
+                    size: fingerprint.size,
+                }
+            }),
             created_at: value.created_at,
             last_updated_at: value.last_updated_at,
             title: value.title,
@@ -127,7 +151,14 @@ impl From<hentai_core::ComicDto> for ComicDto {
             description: value.description,
             published_at: value.published_at,
             last_read_time_ms: value.last_read_time_ms,
-            authors: value.authors,
+            authors: value
+                .authors
+                .into_iter()
+                .map(|a| ComicAuthorDto {
+                    id: a.id,
+                    name: a.name,
+                })
+                .collect(),
             tags: value.tags,
             languages: value.languages,
             parodies: value.parodies,
@@ -563,7 +594,7 @@ pub async fn watch_comic_changes(
     let mut changes = hentai_core::revision::subscribe();
     while changes.changed().await.is_ok() {
         // Dart 侧只关心「变了」（`watchComicChanges().map((_) {})`），
-        // 故推送 generation 而非 data_version 本身。
+        // 故推送写路径通知产生的 generation。
         let generation = *changes.borrow_and_update();
         if sink.add((generation & 0x7fff_ffff) as i32).is_err() {
             break;

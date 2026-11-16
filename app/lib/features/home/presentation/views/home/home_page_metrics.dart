@@ -1,6 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
-import 'package:hentai_library/shared/ui/layout/spacing.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 
 /// [HomeLayout] 间距与内容宽度（对齐生产 Home 与 M3 边距）。
 abstract final class HomePageMetrics {
@@ -30,8 +29,11 @@ abstract final class HomePageMetrics {
       };
     }
     return switch (sizeClass) {
-      WindowSizeClass.compact => const EdgeInsets.fromLTRB(20, 16, 20, 16),
-      _ => const EdgeInsets.fromLTRB(22, 18, 22, 18),
+      WindowSizeClass.compact => const EdgeInsets.symmetric(
+        horizontal: 20,
+        vertical: 16,
+      ),
+      _ => const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
     };
   }
 

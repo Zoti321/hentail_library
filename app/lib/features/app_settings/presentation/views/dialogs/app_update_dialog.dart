@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/core/util/open_downloaded_file.dart';
-import 'package:hentai_library/features/app_settings/di/app_update_providers.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
+import 'package:hentai_library/features/app_settings/presentation/providers/app_update_opener_providers.dart';
+import 'package:hentai_library/features/app_settings/presentation/providers/app_update_providers.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hentai_library/features/app_settings/presentation/views/dialogs/app_update_download_dialog.dart';
 import 'package:hentai_library/features/app_settings/domain/app_release_info.dart';
-import 'package:hentai_library/shared/ui/patterns/dialog/lab_dialog_presenter.dart';
-import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
-import 'package:hentai_library/shared/ui/theme/lab_text.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:intl/intl.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
@@ -33,6 +31,44 @@ class AppUpdateDialog extends ConsumerWidget {
   const AppUpdateDialog({super.key, required this.release});
 
   final AppReleaseInfo release;
+
+  Future<void> _handleRemindLater(BuildContext context, WidgetRef ref) async {
+    await ref
+        .read(settingsProvider.notifier)
+        .setDismissedUpdateVersion(release.version);
+    if (context.mounted) {
+      Navigator.of(context).pop();
+    }
+  }
+
+  Future<void> _handleUpdateNow(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) async {
+    Navigator.of(context).pop();
+    final AppReleaseAsset? asset = ref
+        .read(appUpdateGatewayProvider)
+        .findPlatformAsset(release.assets);
+    if (asset == null) {
+      try {
+        await ref.read(openReleasePageProvider)(release.htmlUrl);
+      } catch (error) {
+        if (context.mounted) {
+          showErrorSnackbar(context, error);
+        }
+        return;
+      }
+      if (context.mounted) {
+        showInfoSnackbar(context, l10n.updateManualDownloadToast);
+      }
+      return;
+    }
+    if (!context.mounted) {
+      return;
+    }
+    await showAppUpdateDownloadDialog(context: context, asset: asset);
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -78,43 +114,13 @@ class AppUpdateDialog extends ConsumerWidget {
       bottomDivider: true,
       actions: <Widget>[
         M3EButton(
-          onPressed: () async {
-            await ref
-                .read(settingsProvider.notifier)
-                .setDismissedUpdateVersion(release.version);
-            if (context.mounted) {
-              Navigator.of(context).pop();
-            }
-          },
+          onPressed: () => _handleRemindLater(context, ref),
           style: M3EButtonStyle.text,
           decoration: M3EButtonDecoration(textStyle: actionLabelStyle),
           label: Text(l10n.updateRemindLater),
         ),
         M3EButton.icon(
-          onPressed: () async {
-            Navigator.of(context).pop();
-            final AppReleaseAsset? asset = ref
-                .read(appUpdateServiceProvider)
-                .findPlatformAsset(release.assets);
-            if (asset == null) {
-              try {
-                await openReleasePage(release.htmlUrl);
-              } catch (error) {
-                if (context.mounted) {
-                  showErrorSnackbar(context, error);
-                }
-                return;
-              }
-              if (context.mounted) {
-                showInfoSnackbar(context, l10n.updateManualDownloadToast);
-              }
-              return;
-            }
-            if (!context.mounted) {
-              return;
-            }
-            await showAppUpdateDownloadDialog(context: context, asset: asset);
-          },
+          onPressed: () => _handleUpdateNow(context, ref, l10n),
           style: M3EButtonStyle.filled,
           size: M3EButtonSize.sm,
           decoration: M3EButtonDecoration(textStyle: actionLabelStyle),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/features/comic_trash/presentation/views/trash/trash_purge_dialog.dart';
 import 'package:hentai_library/features/comic_trash/domain/comic_purge_strategy.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';

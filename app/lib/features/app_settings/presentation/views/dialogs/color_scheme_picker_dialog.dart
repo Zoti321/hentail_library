@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/app_settings/domain/app_color_scheme_preference.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
-import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
-import 'package:hentai_library/shared/ui/theme/color/app_color_scheme_seeds.dart';
-import 'package:hentai_library/shared/ui/widgets/sheets/overlay_route_scope.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_color_utilities/material_color_utilities.dart';
+import 'package:hentai_library/features/app_settings/presentation/l10n/app_settings_l10n.dart';
 
 /// 弹出配色方案选择 dialog（参考 Kazumi：圆角卡 + 圆形三色调 + 点选即生效）。
 ///
@@ -30,7 +29,7 @@ Future<AppColorSchemePreference?> showColorSchemePickerDialog({
   );
   return M3EDialog.show<AppColorSchemePreference>(
     context,
-    dialog: overlayRouteScope(
+    dialog: OverlayRouteScope(
       scope: scope.withM3e(m3e),
       child: _ColorSchemePickerDialog(selected: selected),
     ),
@@ -134,7 +133,7 @@ class _ColorSchemeOption extends StatelessWidget {
       label: label,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: const BorderRadius.all(Radius.circular(16)),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[

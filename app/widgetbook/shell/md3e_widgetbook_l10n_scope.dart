@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
 
 import 'md3e_widgetbook_localizations.dart';
 

@@ -84,7 +84,7 @@ fn fetch_series_comics_metadata_aggregates_language_parody_character_first_seen_
             update_comic_user_meta(
                 "c2",
                 UpdateComicUserMetaDto {
-                    languages: Some(vec!["Japanese".to_string(), "Chinese".to_string()]),
+                    languages: Some(vec!["Japanese".to_string()]),
                     parodies: Some(vec!["Zebra".to_string()]),
                     characters: Some(vec!["Zelda".to_string()]),
                     ..Default::default()
@@ -95,7 +95,7 @@ fn fetch_series_comics_metadata_aggregates_language_parody_character_first_seen_
             update_comic_user_meta(
                 "c3",
                 UpdateComicUserMetaDto {
-                    languages: Some(vec!["Chinese".to_string(), "English".to_string()]),
+                    languages: Some(vec!["Chinese".to_string()]),
                     parodies: Some(vec!["Apple".to_string(), "Zebra".to_string()]),
                     characters: Some(vec!["Alice".to_string(), "Zelda".to_string()]),
                     ..Default::default()
@@ -124,7 +124,6 @@ fn fetch_series_comics_metadata_aggregates_language_parody_character_first_seen_
                 vec![
                     "Japanese".to_string(),
                     "Chinese".to_string(),
-                    "English".to_string(),
                     "Korean".to_string(),
                 ],
                 "languages: member order + first-seen (not alpha)"

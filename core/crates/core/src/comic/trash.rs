@@ -5,6 +5,7 @@ use std::path::Path;
 
 use sea_orm::{ConnectionTrait, DatabaseConnection, Statement, TransactionTrait, Value};
 
+use crate::comic::delete_comics_side_effects;
 use crate::comic::dto::{now_ms, PageRequestDto};
 use crate::comic::pagination::paginate;
 use crate::comic_id::normalize_path_for_key;
@@ -13,7 +14,6 @@ use crate::error::HentaiError;
 use crate::library_write::{begin_library_write_txn, with_library_write};
 use crate::reader::close_reader;
 use crate::sync::series_rebuild::rebuild_series_from_comics;
-use crate::sync::writer::delete_comics_side_effects;
 
 const MAX_ERROR_SAMPLES: usize = 5;
 const ID_BATCH_SIZE: usize = 500;
@@ -91,6 +91,7 @@ pub async fn trash_comics(comic_ids: Vec<String>) -> Result<(), HentaiError> {
             .map_err(map_db_err)?;
     }
     write.commit().await?;
+    crate::revision::notify_committed();
     for id in &ids {
         close_reader(id);
     }
@@ -104,8 +105,19 @@ pub async fn restore_comics(comic_ids: Vec<String>) -> Result<(), HentaiError> {
         return Ok(());
     }
     let write = begin_library_write_txn().await?;
+    let mut restored = Vec::new();
     for chunk in ids.chunks(ID_BATCH_SIZE) {
         let (placeholders, values) = id_placeholders(chunk);
+        let rows = write.txn().query_all(Statement::from_sql_and_values(
+            sea_orm::DatabaseBackend::Sqlite,
+            format!("SELECT comic_id FROM comics WHERE deleted_at IS NOT NULL AND comic_id IN ({placeholders})"),
+            values.clone(),
+        )).await.map_err(map_db_err)?;
+        restored.extend(
+            rows.into_iter()
+                .map(|row| row.try_get::<String>("", "comic_id").map_err(map_db_err))
+                .collect::<Result<Vec<_>, _>>()?,
+        );
         write
             .txn()
             .execute(Statement::from_sql_and_values(
@@ -116,7 +128,11 @@ pub async fn restore_comics(comic_ids: Vec<String>) -> Result<(), HentaiError> {
             .await
             .map_err(map_db_err)?;
     }
+    for id in restored {
+        crate::resource_metadata::reschedule_in(write.txn(), &id).await?;
+    }
     write.commit().await?;
+    crate::revision::notify_committed();
     Ok(())
 }
 
@@ -171,6 +187,7 @@ async fn rebuild_series_after_purge(db: &DatabaseConnection) -> Result<(), Henta
     let txn = db.begin().await.map_err(map_db_err)?;
     rebuild_series_from_comics(&txn, None).await?;
     txn.commit().await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(())
 }
 
@@ -180,6 +197,7 @@ async fn purge_one(db: &DatabaseConnection, target: &PurgeTarget) -> Result<(), 
     let txn = db.begin().await.map_err(map_db_err)?;
     delete_comics_side_effects(&txn, std::slice::from_ref(&target.comic_id)).await?;
     txn.commit().await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(())
 }
 

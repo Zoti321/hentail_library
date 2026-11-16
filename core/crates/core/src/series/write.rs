@@ -1,10 +1,40 @@
-use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, Set};
+use sea_orm::{
+    ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, Set,
+    TransactionTrait,
+};
 
 use crate::db::{connection, map_db_err};
 use crate::entity::{prelude::*, series, series_items};
 use crate::error::HentaiError;
-use crate::metadata_lock::{series_auto_locks, SeriesMetaField};
+use crate::metadata_lock::{
+    merge_series_name, series_auto_locks, series_name_needs_write, SeriesMetaField,
+};
+use crate::series_id::series_name_from_folder_path;
 use crate::util::compute_sort_key;
+
+pub(crate) async fn refresh_series_name_from_folder(
+    db: &DatabaseConnection,
+    series_id: &str,
+) -> Result<(), HentaiError> {
+    let txn = db.begin().await.map_err(map_db_err)?;
+    let current = Series::find_by_id(series_id)
+        .one(&txn)
+        .await
+        .map_err(map_db_err)?
+        .ok_or_else(|| HentaiError::validation(format!("系列不存在: {series_id}")))?;
+    let folder_name = series_name_from_folder_path(&current.folder_path);
+    if !series_name_needs_write(current.name_locked, &current.name, &folder_name) {
+        return Ok(());
+    }
+    let merged_name = merge_series_name(current.name_locked, &current.name, &folder_name);
+    let mut active: series::ActiveModel = current.into();
+    active.name_sort_key = Set(compute_sort_key(&merged_name));
+    active.name = Set(merged_name);
+    active.update(&txn).await.map_err(map_db_err)?;
+    txn.commit().await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
+    Ok(())
+}
 
 #[derive(Debug, Clone, Default)]
 pub struct UpdateSeriesUserMetaDto {
@@ -92,6 +122,7 @@ pub async fn update_series_user_meta(
         apply_series_lock(&mut active, field, true);
     }
     active.update(&db).await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(())
 }
 
@@ -116,6 +147,7 @@ pub async fn set_series_meta_locks(
         }
     }
     active.update(&db).await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(())
 }
 
@@ -150,6 +182,7 @@ pub async fn update_series_item_sort_order(
     active.sort_order = Set(sort_order);
     active.sort_order_locked = Set(true);
     active.update(&db).await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(())
 }
 
@@ -178,6 +211,7 @@ pub async fn set_series_item_sort_order_locked(
     let mut active: series_items::ActiveModel = existing.into();
     active.sort_order_locked = Set(locked);
     active.update(&db).await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(())
 }
 

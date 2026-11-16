@@ -9,7 +9,7 @@
 //! Held-lock entry points (keep in sync with ADR-0026):
 //! `sync_library`, `refresh_comic_metadata`, `refresh_series_metadata`,
 //! `refresh_library_metadata`, `apply_comic_metadata_bulk_patch`, `trash_comics`,
-//! `restore_comics`, `purge_comics`, `update_local_library_root`,
+//! `restore_comics`, `purge_comics`, `update_local_library_root`, `delete_library`,
 //! `import_comic_metadata`, `rename_author`, `delete_authors_by_names`,
 //! `rename_named_facet_name`, `delete_named_facet_by_names`, `merge_named_facet_name`,
 //! `clear_all_reading`.
@@ -96,7 +96,9 @@ impl LibraryWriteTxn {
     }
 
     pub async fn commit(self) -> Result<(), HentaiError> {
-        self.txn.commit().await.map_err(map_db_err)
+        self.txn.commit().await.map_err(map_db_err)?;
+        crate::revision::notify_committed();
+        Ok(())
     }
 
     /// 显式回滚（等价于未提交就 drop，但回滚在本调用内完成）。

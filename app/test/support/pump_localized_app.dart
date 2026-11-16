@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/shared/ui/theme/theme.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 import 'localized_test_app.dart';
@@ -39,13 +39,10 @@ Future<void> pumpLocalizedApp(
   List<Override> overrides = const <Override>[],
   bool wrapProviderScope = false,
 }) async {
-  final config = localizedTestAppConfig(locale: locale);
-  Widget app = MaterialApp(
-    locale: config.locale,
-    localizationsDelegates: config.delegates,
-    supportedLocales: config.locales,
-    theme: theme ?? buildAppTheme(Brightness.light),
+  Widget app = buildLocalizedTestMaterialApp(
     home: home,
+    locale: locale,
+    theme: theme,
   );
   if (wrapProviderScope || overrides.isNotEmpty) {
     app = ProviderScope(overrides: overrides, child: app);

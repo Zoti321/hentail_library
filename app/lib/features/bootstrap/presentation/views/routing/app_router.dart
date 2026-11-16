@@ -1,28 +1,49 @@
+import 'dart:async';
+
+import 'package:hentai_library/features/bootstrap/presentation/views/routing/route_transition_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hentai_library/shared/ui/motion/desktop_page_transition.dart';
 import 'package:hentai_library/features/library_browse/public.dart';
 import 'package:hentai_library/features/app_settings/public.dart';
 import 'package:hentai_library/features/home/public.dart';
+import 'package:hentai_library/features/metadata_backup/public.dart';
+import 'package:hentai_library/features/reader/public.dart';
+import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:hentai_library/features/reading_history/public.dart';
-import 'package:hentai_library/core/constants/libraries_routes.dart';
+import 'package:hentai_library/shared/application/navigation/app_routes.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/application_shell.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/routing/shared_content_routes.dart';
 import 'package:hentai_library/features/comic_trash/public.dart';
-import 'package:hentai_library/shared/di/browse_library_scope_providers.dart';
+import 'package:hentai_library/shared/presentation/providers/browse_library_scope_providers.dart';
+import 'package:hentai_library/shared/ui/navigation/app_root_navigator_key.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:hentai_library/features/media/public/widgets.dart';
 
-final GlobalKey<NavigatorState> appRootNavigatorKey =
-    GlobalKey<NavigatorState>();
+/// 设置页分区组合根（ADR-0046 §6）：`app_settings` 自有分类 + owner 分区。
+///
+/// 「阅读」由 `reader`、「元数据备份」由 `metadata_backup` 提供；
+/// 未注入的 owner 分类渲染为空列表，不抛异常。
+List<Widget> _settingsSections(
+  BuildContext context,
+  SettingsCategory category,
+) {
+  return switch (category) {
+    SettingsCategory.reading => readerSettingsSections(context),
+    SettingsCategory.metadataBackup => const <Widget>[
+      MetadataBackupSettingsSections(),
+    ],
+    _ => settingsSectionsFor(category, context),
+  };
+}
 
 String? _librariesRedirect(BuildContext context, GoRouterState state) {
-  return LibrariesRoutes.redirectPath(locationPath: state.uri.path);
+  return AppRoutes.legacyRedirectPath(state.uri.path);
 }
 
 final GoRouter appRouter = GoRouter(
   navigatorKey: appRootNavigatorKey,
-  initialLocation: '/home',
+  initialLocation: AppRoutes.home,
   routes: <RouteBase>[
     ShellRoute(
       builder: (BuildContext context, GoRouterState state, Widget child) {
@@ -30,23 +51,35 @@ final GoRouter appRouter = GoRouter(
       },
       routes: <RouteBase>[
         GoRoute(
-          path: '/home',
-          name: '主页',
-          pageBuilder: (BuildContext context, GoRouterState state) =>
-              buildShellNavPage(state: state, child: const HomePage()),
+          path: AppRoutes.media,
+          name: AppRoutes.mediaName,
+          pageBuilder: (context, state) =>
+              buildShellNavPage(state: state, child: const MediaPage()),
         ),
         GoRoute(
-          path: LibrariesRoutes.root,
+          path: AppRoutes.home,
+          name: AppRoutes.homeName,
+          pageBuilder: (BuildContext context, GoRouterState state) =>
+              buildShellNavPage(
+                state: state,
+                child: HomePage(
+                  libraryManagementSection: const HomeLibraryManagementPanel(),
+                ),
+              ),
+        ),
+        GoRoute(
+          path: AppRoutes.libraries,
           redirect: _librariesRedirect,
           routes: <RouteBase>[
             // Legacy bookmark: never treat `all` as a library id.
             GoRoute(
-              path: LibrariesRoutes.legacyAllSegment,
-              redirect: (BuildContext context, GoRouterState state) => '/home',
+              path: AppRoutes.legacyAllSegment,
+              redirect: (BuildContext context, GoRouterState state) =>
+                  AppRoutes.home,
             ),
             GoRoute(
               path: ':libraryId',
-              name: '漫画库',
+              name: AppRoutes.libraryName,
               pageBuilder: (BuildContext context, GoRouterState state) {
                 final String libraryId =
                     state.pathParameters['libraryId'] ?? '';
@@ -59,27 +92,31 @@ final GoRouter appRouter = GoRouter(
           ],
         ),
         GoRoute(
-          path: '/local',
-          name: '本地漫画',
-          redirect: (BuildContext context, GoRouterState state) => '/home',
+          path: AppRoutes.local,
+          name: AppRoutes.localName,
+          redirect: (BuildContext context, GoRouterState state) =>
+              AppRoutes.home,
         ),
         GoRoute(
-          path: '/history',
-          name: '历史记录',
+          path: AppRoutes.history,
+          name: AppRoutes.historyName,
           pageBuilder: (BuildContext context, GoRouterState state) =>
               buildShellNavPage(state: state, child: const HistoryPage()),
         ),
         GoRoute(
-          path: '/trash',
-          name: '已删除',
+          path: AppRoutes.trash,
+          name: AppRoutes.trashName,
           pageBuilder: (BuildContext context, GoRouterState state) =>
               buildShellNavPage(state: state, child: const TrashPage()),
         ),
         GoRoute(
-          path: '/settings',
-          name: '设置',
+          path: AppRoutes.settings,
+          name: AppRoutes.settingsName,
           pageBuilder: (BuildContext context, GoRouterState state) =>
-              buildShellNavPage(state: state, child: const SettingsPage()),
+              buildShellNavPage(
+                state: state,
+                child: const SettingsPage(sectionsBuilder: _settingsSections),
+              ),
         ),
         ...buildSharedContentRoutes(),
       ],
@@ -99,27 +136,34 @@ class LibraryBrowsePage extends HookConsumerWidget {
       final String? scopedId = libraryId.isEmpty ? null : libraryId;
       // 先抓住 notifier：dispose 后不能再用 ref。
       final BrowseLibraryId scope = ref.read(browseLibraryIdProvider.notifier);
-      var cancelled = false;
-      int? epoch;
       // claim/release 必须离开 build；epoch 防止旧页 dispose 清掉新页已 claim 的 id。
-      Future<void>.microtask(() {
-        if (cancelled) {
-          return;
-        }
-        epoch = scope.claim(scopedId);
-      });
-      return () {
-        cancelled = true;
-        Future<void>.microtask(() {
-          final int? claimed = epoch;
-          if (claimed == null) {
-            return;
-          }
-          scope.release(claimed);
-        });
-      };
+      final _LibraryScopeClaim claim = _LibraryScopeClaim();
+      unawaited(Future<void>.microtask(() => claim.claim(scope, scopedId)));
+      return () => Future<void>.microtask(() => claim.release(scope));
     }, <Object?>[libraryId]);
 
     return const LibraryPage();
+  }
+}
+
+/// 单库浏览页的 claim/release 生命周期；claim/release 都离开 build 执行。
+class _LibraryScopeClaim {
+  bool _cancelled = false;
+  int? _epoch;
+
+  void claim(BrowseLibraryId scope, String? libraryId) {
+    if (_cancelled) {
+      return;
+    }
+    _epoch = scope.claim(libraryId);
+  }
+
+  void release(BrowseLibraryId scope) {
+    _cancelled = true;
+    final int? claimed = _epoch;
+    if (claimed == null) {
+      return;
+    }
+    scope.release(claimed);
   }
 }

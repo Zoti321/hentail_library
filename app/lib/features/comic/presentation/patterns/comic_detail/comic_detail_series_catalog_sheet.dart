@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
-import 'package:hentai_library/shared/ui/patterns/library/library_filter_sort_metrics.dart';
-import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
-import 'package:hentai_library/shared/ui/widgets/sheets/overlay_route_scope.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -24,7 +21,7 @@ abstract final class ComicDetailSeriesCatalogSheet {
     required ValueChanged<int> onSelectIndex,
   }) {
     final double itemGap = m3e.menuTheme.itemGap;
-    return overlayRouteScope(
+    return OverlayRouteScope(
       scope: scope,
       child: M3ETheme(
         data: m3e,

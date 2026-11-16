@@ -1,24 +1,22 @@
 use sea_orm::{
-    ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, QueryOrder, Set, TransactionTrait,
+    ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, QueryOrder, QuerySelect, QueryTrait,
+    TransactionTrait,
 };
 
-use crate::comic::find_comic_by_id;
+use crate::comic::repository::find_visible_comic_by_id_in;
+use crate::comic::{upsert_comics, ComicDto};
 use crate::db::{connection, map_db_err};
 use crate::entity::{comics, prelude::*, series, series_items};
 use crate::error::HentaiError;
 use crate::library::{
     find_library_by_id, remote_password_for, resolve_access_for_comic, LibraryDto,
 };
-use crate::metadata_lock::{
-    merge_refresh_scan_with_existing, merge_series_name, series_name_needs_write,
-};
-use crate::resource::{parse_file_with, parsed_to_comic, ResourceAccess, WebDavResourceAccess};
-use crate::series_id::series_name_from_folder_path;
-use crate::util::compute_sort_key;
+use crate::metadata_lock::merge_refresh_scan_with_existing;
+use crate::resource::{parse_resource_with, parsed_to_comic, ResourceAccess, WebDavResourceAccess};
+use crate::series::refresh_series_name_from_folder;
 
 use super::handle::SyncHandle;
 use super::remote::normalize_remote_location_key;
-use super::writer::upsert_comics;
 use crate::library_write::with_library_write;
 
 #[derive(Debug, Clone)]
@@ -52,12 +50,13 @@ pub async fn refresh_comic_metadata(comic_id: &str) -> Result<(), HentaiError> {
 }
 
 pub(crate) async fn refresh_comic_metadata_locked(comic_id: &str) -> Result<(), HentaiError> {
-    let existing = find_comic_by_id(comic_id)
+    let db = connection()?;
+    let existing = find_visible_comic_by_id_in(&db, comic_id)
         .await?
         .ok_or_else(|| HentaiError::validation(format!("漫画不存在: {comic_id}")))?;
 
     let resolved = resolve_access_for_comic(&existing)?;
-    refresh_comic_metadata_with(resolved.as_dyn(), &existing.comic_id).await
+    refresh_comic_metadata_snapshot(&db, resolved.as_dyn(), existing).await
 }
 
 /// Injected-access refresh (FakeResourceAccess / tests).
@@ -69,21 +68,50 @@ pub async fn refresh_comic_metadata_with(
     comic_id: &str,
 ) -> Result<(), HentaiError> {
     let db = connection()?;
-    let existing = find_comic_by_id(comic_id)
+    let existing = find_visible_comic_by_id_in(&db, comic_id)
         .await?
         .ok_or_else(|| HentaiError::validation(format!("漫画不存在: {comic_id}")))?;
 
-    let Some(_) = access.stat(&existing.path)? else {
+    refresh_comic_metadata_snapshot(&db, access, existing).await
+}
+
+async fn refresh_comic_metadata_snapshot(
+    db: &DatabaseConnection,
+    access: &dyn ResourceAccess,
+    existing: ComicDto,
+) -> Result<(), HentaiError> {
+    let Some(source_stat) = access.stat(&existing.path)? else {
         return Err(HentaiError::reader_not_found(&existing.path));
     };
 
-    let parsed = parse_file_with(access, &existing.path)?.ok_or_else(|| {
+    let parsed = parse_resource_with(access, &existing.path)?.ok_or_else(|| {
         HentaiError::reader_invalid_content(format!("无法解析资源元数据: {}", existing.path))
     })?;
-    let scanned = parsed_to_comic(&parsed);
-    let merged = merge_refresh_scan_with_existing(&scanned, &existing);
+    if access.stat(&existing.path)?.as_ref() != Some(&source_stat) {
+        return Err(HentaiError::reader_invalid_content(format!(
+            "刷新期间源资源已改变，请重新刷新: {}",
+            existing.path
+        )));
+    }
 
     let txn = db.begin().await.map_err(map_db_err)?;
+    let current = find_visible_comic_by_id_in(&txn, &existing.comic_id)
+        .await?
+        .ok_or_else(|| {
+            HentaiError::validation(format!("漫画已移除或移入回收站: {}", existing.comic_id))
+        })?;
+    if current.path != existing.path
+        || current.resource_type != existing.resource_type
+        || current.library_id != existing.library_id
+        || current.resource_size != existing.resource_size
+    {
+        return Err(HentaiError::validation(format!(
+            "刷新期间漫画来源已改变，请重新刷新: {}",
+            existing.comic_id
+        )));
+    }
+    let scanned = parsed_to_comic(&parsed);
+    let merged = merge_refresh_scan_with_existing(&scanned, &current);
     let skipped = upsert_comics(&txn, std::slice::from_ref(&merged)).await?;
     if skipped.iter().any(|id| id == &merged.comic_id) {
         // Nothing was written (upsert skips page_count <= 0). Reporting success
@@ -95,6 +123,7 @@ pub async fn refresh_comic_metadata_with(
         )));
     }
     txn.commit().await.map_err(map_db_err)?;
+    crate::revision::notify_committed();
     Ok(())
 }
 
@@ -123,6 +152,15 @@ async fn refresh_series_metadata_locked(
 
     let comic_ids: Vec<String> = SeriesItems::find()
         .filter(series_items::Column::SeriesId.eq(series_id))
+        .filter(
+            series_items::Column::ComicId.in_subquery(
+                Comics::find()
+                    .select_only()
+                    .column(comics::Column::ComicId)
+                    .filter(comics::Column::DeletedAt.is_null())
+                    .into_query(),
+            ),
+        )
         .order_by_asc(series_items::Column::SortOrder)
         .order_by_asc(series_items::Column::ComicId)
         .all(&db)
@@ -163,8 +201,9 @@ async fn refresh_series_metadata_locked(
         });
     }
 
+    cancelled |= handle.is_cancelled();
     if !cancelled {
-        maybe_refresh_series_name(&db, series_row).await?;
+        refresh_series_name_from_folder(&db, &series_row.series_id).await?;
     }
 
     let result = RefreshSeriesResultDto {
@@ -217,6 +256,7 @@ async fn refresh_library_metadata_locked(
 
     let comic_ids: Vec<String> = Comics::find()
         .filter(comics::Column::LibraryId.eq(library_id))
+        .filter(comics::Column::DeletedAt.is_null())
         .order_by_asc(comics::Column::ComicId)
         .all(&db)
         .await
@@ -256,6 +296,7 @@ async fn refresh_library_metadata_locked(
         });
     }
 
+    cancelled |= handle.is_cancelled();
     if !cancelled {
         let series_rows = Series::find()
             .filter(series::Column::LibraryId.eq(library_id))
@@ -263,7 +304,11 @@ async fn refresh_library_metadata_locked(
             .await
             .map_err(map_db_err)?;
         for series_row in series_rows {
-            maybe_refresh_series_name(&db, series_row).await?;
+            if handle.is_cancelled() {
+                cancelled = true;
+                break;
+            }
+            refresh_series_name_from_folder(&db, &series_row.series_id).await?;
         }
     }
 
@@ -323,20 +368,4 @@ fn probe_remote_library_skip(library: &LibraryDto) -> Result<Option<String>, Hen
         }
         Err(err) => Err(err),
     }
-}
-
-async fn maybe_refresh_series_name(
-    db: &sea_orm::DatabaseConnection,
-    series_row: series::Model,
-) -> Result<(), HentaiError> {
-    let folder_name = series_name_from_folder_path(&series_row.folder_path);
-    if !series_name_needs_write(series_row.name_locked, &series_row.name, &folder_name) {
-        return Ok(());
-    }
-    let mut active: series::ActiveModel = series_row.clone().into();
-    let merged_name = merge_series_name(series_row.name_locked, &series_row.name, &folder_name);
-    active.name_sort_key = Set(compute_sort_key(&merged_name));
-    active.name = Set(merged_name);
-    active.update(db).await.map_err(map_db_err)?;
-    Ok(())
 }

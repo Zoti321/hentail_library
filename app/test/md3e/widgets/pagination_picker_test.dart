@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
-import 'package:hentai_library/shared/ui/widgets/pagination/pagination.dart';
-import 'package:hentai_library/shared/ui/widgets/pagination/pagination_compact_summary.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 
-import '../../support/pump_app.dart';
+import '../../support/pump_design_system_app.dart';
 
 void main() {
   testWidgets('compact page picker opens M3E sheet and returns chosen page', (
@@ -15,7 +13,7 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
 
     final List<int> changed = <int>[];
-    await pumpApp(
+    await pumpDesignSystemApp(
       tester,
       home: Center(
         child: Pagination(page: 1, totalPages: 5, onPageChanged: changed.add),

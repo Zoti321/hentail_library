@@ -62,7 +62,7 @@ Stream<T> throttleWhile<T>(
           if (value != null) {
             emit(value);
           }
-          controller.close();
+          unawaited(controller.close());
         },
       );
     },

@@ -158,6 +158,7 @@ fn register_remote_file(
         now
     };
     let comic = ComicDto {
+        resource_fingerprint: None,
         comic_id: comic_id_for_remote_location(&path),
         path: path.clone(),
         resource_type: resource_type.to_string(),
@@ -179,11 +180,7 @@ fn register_remote_file(
         locks: Default::default(),
         library_id: String::new(),
     };
-    Ok(Some(ScanItem {
-        path,
-        resource_type: resource_type.to_string(),
-        comic,
-    }))
+    Ok(Some(ScanItem::from_resource(comic)))
 }
 
 pub(crate) fn remote_resource_type_from_location(location: &str) -> Option<&'static str> {

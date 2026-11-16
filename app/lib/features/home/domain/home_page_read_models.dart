@@ -1,20 +1,4 @@
-export 'package:hentai_library/shared/domain/library/home_library_stat.dart';
-
-/// 首页仪表盘聚合统计（行数/记录数，非业务字段）。
-class HomePageCounts {
-  const HomePageCounts({
-    required this.comicCount,
-    required this.tagCount,
-    required this.seriesCount,
-    required this.authorCount,
-    required this.libraryCount,
-  });
-  final int comicCount;
-  final int tagCount;
-  final int seriesCount;
-  final int authorCount;
-  final int libraryCount;
-}
+export 'package:hentai_library/features/home/domain/home_library_stat.dart';
 
 enum HomeLibraryAlertKind { remoteUnreachable, syncFailed, staleSync }
 

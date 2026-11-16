@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/app_settings/presentation/patterns/settings/settings_catalog.dart';
-import 'package:hentai_library/shared/ui/layout/spacing.dart';
-import 'package:hentai_library/shared/ui/widgets/settings/content_section.dart';
-import 'package:hentai_library/shared/ui/widgets/settings/settings_section_header.dart';
-import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 
 /// Settings master pane: rail (wide) or grouped category tiles (narrow).
 class SettingsMasterMenu extends StatelessWidget {
@@ -53,8 +50,8 @@ class SettingsMasterMenu extends StatelessWidget {
       behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
       child: ListView(
         padding: wide
-            ? const EdgeInsets.fromLTRB(4, 0, 0, 12)
-            : const EdgeInsets.fromLTRB(0, 8, 0, 24),
+            ? const EdgeInsets.only(left: 4, bottom: 12)
+            : const EdgeInsets.only(top: 8, bottom: 24),
         children: <Widget>[
           if (wide)
             for (final entry in groups) ...<Widget>[

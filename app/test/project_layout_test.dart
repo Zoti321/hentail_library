@@ -154,29 +154,36 @@ void main() {
       expect(stateDirs, isEmpty);
     });
 
-    test('views and shared/ui widgets never touch Repository providers', () {
-      final RegExp repoProvider = RegExp(r'\b\w+RepoProvider\b');
-      final Directory libRoot = Directory('lib');
-      if (!libRoot.existsSync()) {
-        return;
-      }
-      final List<String> offenders = libRoot
-          .listSync(recursive: true)
-          .whereType<File>()
-          .where((File file) => file.path.endsWith('.dart'))
-          .where((File file) {
-            final String rel = p.posix.joinAll(
-              p.split(p.relative(file.path, from: libRoot.path)),
-            );
-            final bool isView =
-                rel.startsWith('features/') && rel.split('/').contains('views');
-            final bool isSharedUi = rel.startsWith('shared/ui/');
-            return isView || isSharedUi;
-          })
-          .where((File file) => repoProvider.hasMatch(file.readAsStringSync()))
-          .map((File file) => p.posix.joinAll(p.split(file.path)))
-          .toList();
-      expect(offenders, isEmpty);
-    });
+    test(
+      'views, shared/ui and design-system never touch Repository providers',
+      () {
+        final RegExp repoProvider = RegExp(r'\b\w+RepoProvider\b');
+        final Directory libRoot = Directory('lib');
+        if (!libRoot.existsSync()) {
+          return;
+        }
+        final List<String> offenders = libRoot
+            .listSync(recursive: true)
+            .whereType<File>()
+            .where((File file) => file.path.endsWith('.dart'))
+            .where((File file) {
+              final String rel = p.posix.joinAll(
+                p.split(p.relative(file.path, from: libRoot.path)),
+              );
+              final bool isView =
+                  rel.startsWith('features/') &&
+                  rel.split('/').contains('views');
+              final bool isSharedUi = rel.startsWith('shared/ui/');
+              final bool isDesignSystem = rel.startsWith('design-system/');
+              return isView || isSharedUi || isDesignSystem;
+            })
+            .where(
+              (File file) => repoProvider.hasMatch(file.readAsStringSync()),
+            )
+            .map((File file) => p.posix.joinAll(p.split(file.path)))
+            .toList();
+        expect(offenders, isEmpty);
+      },
+    );
   });
 }

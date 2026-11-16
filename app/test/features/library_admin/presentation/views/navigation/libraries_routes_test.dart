@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:hentai_library/core/constants/libraries_routes.dart';
+import 'package:hentai_library/shared/ui/navigation/libraries_routes.dart';
 
 void main() {
   group('LibrariesRoutes', () {

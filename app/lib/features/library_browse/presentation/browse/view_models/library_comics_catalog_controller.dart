@@ -1,15 +1,17 @@
-import 'package:hentai_library/features/comic/domain/comic_browse_list_item.dart';
+import 'package:hentai_library/features/library_browse/domain/browse/library_comic_browse_preferences.dart';
+
+import 'package:hentai_library/features/library_browse/presentation/browse/models/comic_browse_view_object.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_jump.dart';
-import 'package:hentai_library/features/library_browse/presentation/catalog/view_models/catalog_pagination_engine.dart';
+import 'package:hentai_library/shared/ui/catalog/pagination/catalog_pagination_engine.dart';
+import 'package:hentai_library/shared/ui/catalog/pagination/library_pagination.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_query_intent_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/library.dart';
-import 'package:hentai_library/shared/di/browse_library_scope_providers.dart';
-import 'package:hentai_library/shared/di/library_state_providers.dart';
+import 'package:hentai_library/shared/presentation/providers/browse_library_scope_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
-import 'package:hentai_library/features/library_browse/presentation/integrations/comic_presentation_bridge.dart';
+import 'package:hentai_library/features/comic/public.dart';
 
 part 'library_comics_catalog_controller.g.dart';
 
@@ -17,6 +19,8 @@ part 'library_comics_catalog_controller.g.dart';
 class LibraryComicsCatalogController extends _$LibraryComicsCatalogController {
   final CatalogPaginationEngine _pagination = CatalogPaginationEngine();
 
+  // Imperative pagination cursor; rendered pagination remains in provider state.
+  // ignore: riverpod_lint/avoid_public_notifier_properties
   int get pageIndex => _pagination.pageIndex;
 
   @override
@@ -29,9 +33,9 @@ class LibraryComicsCatalogController extends _$LibraryComicsCatalogController {
   /// 分页查询键 =（关键词，整份筛选意图，每页数量，浏览库 id）；任一变化即回到第 1 页。
   void _syncPaginationWithQueryKey() {
     final String keyword = ref.watch(libraryFilterQueryProvider);
-    final LibraryComicFiltersState filters =
+    final LibraryComicBrowsePreferences filters =
         ref.watch(libraryComicFiltersProvider).value ??
-        LibraryComicFiltersState.defaults;
+        LibraryComicBrowsePreferences.defaults;
     final int pageSize = ref.watch(libraryComicsTabPageSizeProvider);
     final String? libraryId = ref.watch(browseLibraryIdProvider);
     _pagination.syncQueryKey((keyword, filters, pageSize, libraryId));
@@ -40,6 +44,8 @@ class LibraryComicsCatalogController extends _$LibraryComicsCatalogController {
   Future<LibraryComicsCatalogState> _load() async {
     // Comics sort has no `random` field (unlike Series); always watch revision.
     // If random comics sort is added later, exempt revision like Series (P2-8).
+    // Watched revision stays subscribed for this catalog lifetime; no cached one-shot read.
+    // ignore: riverpod_lint/only_use_keep_alive_inside_keep_alive
     ref.watch(libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.comics));
 
     final LibraryRevisionState revisionState = ref.read(
@@ -50,7 +56,7 @@ class LibraryComicsCatalogController extends _$LibraryComicsCatalogController {
     }
 
     final String keyword = ref.read(libraryQueryIntentProvider).keyword;
-    final PagedResult<ComicBrowseListItem> page = await _fetchPage();
+    final PagedResult<ComicBrowseViewObject> page = await _fetchPage();
     final int tableTotalCount = await ref
         .read(comicCatalogRepositoryProvider)
         .countAll();
@@ -70,13 +76,13 @@ class LibraryComicsCatalogController extends _$LibraryComicsCatalogController {
     );
   }
 
-  Future<PagedResult<ComicBrowseListItem>> _fetchPage() async {
+  Future<PagedResult<ComicBrowseViewObject>> _fetchPage() {
     final LibraryComicFilter filter = ref.read(libraryComicFilterQueryProvider);
-    final LibraryComicFiltersState filters =
+    final LibraryComicBrowsePreferences filters =
         ref.read(libraryComicFiltersProvider).value ??
-        LibraryComicFiltersState.defaults;
+        LibraryComicBrowsePreferences.defaults;
     final int pageSize = ref.read(libraryComicsTabPageSizeProvider);
-    return _pagination.fetchPage<ComicBrowseListItem>(
+    return _pagination.fetchPage<ComicBrowseViewObject>(
       pageSize: pageSize,
       fetch: (request) => ref
           .read(comicCatalogRepositoryProvider)

@@ -42,6 +42,7 @@ path = "tests/shutdown_db_test.rs"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 sha1 = "0.10"
+sha2 = "0.10"
 thiserror = "2"
 tracing = "0.1"
 sea-orm = { version = "1.1", features = ["sqlx-sqlite", "runtime-tokio-rustls", "macros"] }
@@ -65,6 +66,7 @@ scraper = "0.24"
 # PDF 后端跨平台共用：桌面/Android/iOS 均经 pdfium-render 运行时绑定 vendored pdfium。
 pdfium-render = "0.8"
 rusqlite = { version = "0.32", features = ["backup"] }
+lopdf = { version = "0.47.0", default-features = false, features = ["rayon"] }
 
 [dev-dependencies]
 serde_json = "1"

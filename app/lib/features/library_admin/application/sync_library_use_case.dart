@@ -1,17 +1,18 @@
 import 'package:hentai_library/features/library_admin/domain/sync_library_port.dart';
 import 'package:hentai_library/features/library_admin/domain/sync_library_types.dart';
+import 'package:hentai_library/shared/domain/events/events.dart';
 
-/// Library sync 编排：可选本地存储授权 → FRB sync → 成功且未取消时 bump catalog revision。
+/// Library sync 编排：可选本地存储授权 → FRB sync → 成功且未取消时发布目录变更。
 class SyncLibraryUseCase {
   const SyncLibraryUseCase({
     required this._port,
     required this._ensureLocalFilesystemAccess,
-    required this._onCatalogRevision,
+    required this._events,
   });
 
   final SyncLibraryPort _port;
   final Future<void> Function() _ensureLocalFilesystemAccess;
-  final void Function() _onCatalogRevision;
+  final DomainEventPublisher _events;
 
   Future<void> run({
     ScanMode mode = ScanMode.incremental,
@@ -35,7 +36,7 @@ class SyncLibraryUseCase {
       onProgress: onProgress,
     );
     if (!isCancelled()) {
-      _onCatalogRevision();
+      _events.publish(const LibraryCatalogChanged(CatalogChangeSource.sync));
     }
   }
 

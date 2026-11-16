@@ -1,36 +1,35 @@
-import 'package:hentai_library/features/app_settings/domain/reader_session_preference_types.dart';
-import 'package:hentai_library/features/library_admin/public.dart';
+import 'package:hentai_library/features/app_settings/domain/reading_preferences_schema.dart';
 
 /// Normalizes legacy `settings.json` / aggregate JSON into [AppSetting] shape.
+///
+/// 阅读偏好字段只做**纯字符串规范化**（ADR-0046）：本模块不认识阅读枚举，
+/// 未知 id 原样保留，由 `reader` 的防腐层退回默认值并上报。
 Map<String, dynamic> migrateAppSettingJson(Map<String, dynamic> json) {
   final Map<String, dynamic> migrated = Map<String, dynamic>.from(json);
-  if (migrated.containsKey('readingMode')) {
-    final Object? rawMode = migrated['readingMode'];
-    if (rawMode == 'continuousVertical') {
-      migrated['readingMode'] = readingModeToJson(ReadingMode.webtoon);
-    } else if (rawMode == 'dualPageNoCover') {
-      migrated['readingMode'] = readingModeToJson(ReadingMode.dualPage);
-    } else {
-      migrated['readingMode'] = readingModeToJson(readingModeFromJson(rawMode));
-    }
-  }
+
   if (!migrated.containsKey('readingMode') &&
       migrated.containsKey('readerIsVertical')) {
     migrated['readingMode'] = migrated['readerIsVertical'] == true
-        ? readingModeToJson(ReadingMode.webtoon)
-        : readingModeToJson(kDefaultReadingMode);
+        ? ReadingPreferenceSchema.readingModeWebtoonId
+        : ReadingPreferenceSchema.defaultReadingModeId;
   }
+  migrated['readingMode'] = ReadingPreferenceSchema.normalizeReadingModeId(
+    migrated['readingMode'],
+  );
+  migrated['webtoonZoomMode'] =
+      ReadingPreferenceSchema.normalizeWebtoonZoomModeId(
+        migrated['webtoonZoomMode'],
+      );
+  migrated['autoPlayMode'] = ReadingPreferenceSchema.normalizeAutoPlayModeId(
+    migrated['autoPlayMode'],
+  );
+
   migrated.remove('readerIsVertical');
   migrated.remove('readerDimLevel');
   migrated.remove('readerAutoPlayEnabled');
   migrated.remove('autoScan');
   migrated.remove('enabledFormatGroups');
   migrated.remove('libraryCatalogSortFlipEnabled');
-  if (migrated.containsKey('autoPlayMode')) {
-    migrated['autoPlayMode'] = autoPlayModeToJson(
-      autoPlayModeFromJson(migrated['autoPlayMode']),
-    );
-  }
   migrated.putIfAbsent('useDynamicColor', () => false);
   migrated.putIfAbsent('colorSchemePreference', () => 'brand');
   migrated.putIfAbsent('preferLibraryRootSeries', () => true);
@@ -48,14 +47,9 @@ Map<String, dynamic> migrateAppSettingJson(Map<String, dynamic> json) {
 }
 
 /// Reads legacy app-global format groups before they are dropped from AppSetting.
-List<ResourceFormatCategory> legacyEnabledResourceFormatCategoriesFromJson(
+({Object? enabledFormatGroups}) legacyResourceFormatPayloadFromJson(
   Map<String, dynamic> json,
-) {
-  if (json.containsKey('enabledFormatGroups')) {
-    return resourceFormatCategoriesFromStorage(json['enabledFormatGroups']);
-  }
-  return List<ResourceFormatCategory>.from(ResourceFormatCategory.all);
-}
+) => (enabledFormatGroups: json['enabledFormatGroups']);
 
 /// Reads legacy app-level autoScan before it is dropped from AppSetting.
 bool? legacyAutoScanFromJson(Map<String, dynamic> json) {

@@ -1,17 +1,15 @@
+import 'package:hentai_library/features/metadata_backup/presentation/providers/metadata_backup_use_case_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
-import 'package:hentai_library/core/logging/app_log.dart';
+import 'package:hentai_library/shared/application/logging/app_log.dart';
 import 'package:hentai_library/features/metadata_backup/domain/metadata_auto_backup_logic.dart';
-import 'package:hentai_library/features/metadata_backup/domain/metadata_backup_repository.dart';
-import 'package:hentai_library/features/metadata_backup/data/services/metadata_auto_backup_service.dart';
-import 'package:hentai_library/features/metadata_backup/di/metadata_backup_repository_provider.dart';
 import 'package:hentai_library/features/metadata_backup/presentation/view_models/metadata_auto_backup_notifier.dart';
 import 'package:hentai_library/features/metadata_backup/presentation/view_models/metadata_last_auto_backup_notifier.dart';
 import 'package:hentai_library/core/util/debouncer.dart';
-import 'package:hentai_library/shared/di/library_change_bus.dart';
+import 'package:hentai_library/shared/presentation/providers/domain_event_revisions.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'metadata_auto_backup_coordinator_notifier.g.dart';
@@ -21,7 +19,6 @@ class MetadataAutoBackupCoordinatorNotifier
     extends _$MetadataAutoBackupCoordinatorNotifier {
   Debouncer? _metadataSaveDebouncer;
   bool _startupScheduled = false;
-  bool _backupInFlight = false;
   DateTime Function() _now = DateTime.now;
 
   @visibleForTesting
@@ -35,8 +32,8 @@ class MetadataAutoBackupCoordinatorNotifier
       _metadataSaveDebouncer?.dispose();
     });
     ref.listen<int>(
-      libraryChangeBusProvider.select(
-        (LibraryChangeState s) => s.metadataSaveRevision,
+      domainEventRevisionsProvider.select(
+        (DomainEventRevisionsState s) => s.metadataSaveRevision,
       ),
       (int? previous, int next) {
         if (previous != null && previous != next) {
@@ -79,45 +76,29 @@ class MetadataAutoBackupCoordinatorNotifier
     required bool fromStartup,
     bool force = false,
   }) async {
-    if (_backupInFlight) {
+    if (!ref.mounted) {
       return;
     }
-
-    final bool enabled =
-        ref.read(metadataAutoBackupProvider).asData?.value ?? true;
-    if (!enabled && !force) {
-      return;
-    }
-
-    if (!force && fromStartup) {
-      final DateTime? lastBackup = ref
-          .read(metadataLastAutoBackupProvider)
-          .asData
-          ?.value;
-      if (!shouldRunStartupMetadataAutoBackup(
-        now: _now(),
-        lastBackupAt: lastBackup,
-      )) {
+    try {
+      final lastBackupAt = await ref.read(
+        metadataLastAutoBackupProvider.future,
+      );
+      if (!ref.mounted) {
         return;
       }
-    }
-
-    _backupInFlight = true;
-    try {
-      final MetadataBackupRepository repo = ref.read(
-        metadataBackupRepositoryProvider,
-      );
-      final MetadataAutoBackupRunResult result = await runMetadataAutoBackup(
-        export: () => repo.exportComicMetadata(includeOrphanFacets: false),
+      final enabled = await ref.read(metadataAutoBackupProvider.future);
+      if (!ref.mounted) {
+        return;
+      }
+      await ref.read(runMetadataAutoBackupUseCaseProvider)(
+        enabled: enabled,
+        fromStartup: fromStartup,
+        force: force,
+        lastBackupAt: lastBackupAt,
         now: _now,
       );
-      await ref
-          .read(metadataLastAutoBackupProvider.notifier)
-          .recordBackup(result.completedAt);
     } catch (e, st) {
       logError(AppLog.core('metadata_backup'), '自动元数据备份失败', e, st);
-    } finally {
-      _backupInFlight = false;
     }
   }
 }

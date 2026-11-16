@@ -1,18 +1,11 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/features/comic/di/comic_cover_providers.dart';
-import 'package:hentai_library/features/comic_trash/presentation/views/trash/trash_page.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/comic/presentation/providers/comic_cover_providers.dart';
+import 'package:hentai_library/features/comic/public/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/features/comic_trash/domain/trashed_comic.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
-import 'package:hentai_library/shared/domain/ports/comic_trash_reader_session_port.dart';
-import 'package:hentai_library/shared/domain/ports/library_revision_port.dart';
-import 'package:hentai_library/features/comic_trash/domain/comic_trash_repository.dart';
+import 'package:hentai_library/features/comic_trash/public.dart';
 import 'package:hentai_library/shared/ui/models/comic_cover_state.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -20,12 +13,7 @@ import 'package:riverpod/misc.dart' show Override;
 
 import '../../../../../support/pump_localized_app.dart';
 
-class _FakeLibraryRevisionPort implements LibraryRevisionPort {
-  final StreamController<void> events = StreamController<void>.broadcast();
-
-  @override
-  Stream<void> watchRevision() => events.stream;
-}
+import 'package:hentai_library/composition/overrides/domain_event_bus_overrides.dart';
 
 class _TrashComicRepo implements ComicTrashRepository {
   _TrashComicRepo(this.items);
@@ -53,7 +41,7 @@ class _TrashComicRepo implements ComicTrashRepository {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-class _NoopReaderSessionPort implements ComicTrashReaderSessionPort {
+class _NoopNativeReaderPort implements ComicTrashNativeReaderPort {
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
@@ -66,7 +54,7 @@ class _NoCoverComicCover extends ComicCover {
 TrashedComic _trashed(String id, {bool remote = false}) {
   final DateTime t = DateTime.utc(2026, 10, 2, 8);
   return (
-    comic: Comic(
+    comic: Comic.restore(
       comicId: id,
       path: '/$id.cbz',
       resourceType: ResourceType.cbz,
@@ -87,16 +75,14 @@ Future<void> _pumpTrash(WidgetTester tester, List<TrashedComic> items) async {
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.resetPhysicalSize);
   addTearDown(tester.view.resetDevicePixelRatio);
-  final _FakeLibraryRevisionPort revision = _FakeLibraryRevisionPort();
-  addTearDown(revision.events.close);
   await pumpLocalizedApp(
     tester,
     home: const Scaffold(body: TrashPage()),
     overrides: <Override>[
-      libraryRevisionPortProvider.overrideWithValue(revision),
+      ...domainEventBusOverrides(),
       comicTrashRepositoryProvider.overrideWithValue(_TrashComicRepo(items)),
-      comicTrashReaderSessionPortProvider.overrideWithValue(
-        _NoopReaderSessionPort(),
+      comicTrashNativeReaderPortProvider.overrideWithValue(
+        _NoopNativeReaderPort(),
       ),
       for (final TrashedComic item in items)
         comicCoverProvider(item.comic.comicId)

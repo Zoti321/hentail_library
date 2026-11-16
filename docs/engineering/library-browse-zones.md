@@ -1,47 +1,25 @@
-# `library_browse` 与 Comic / Series 模块（ADR-0036）
+# Browse, Comic and Series boundaries
 
-**2026-11-05**：Comic 与 Series 已拆为独立 feature **`comic`**、**`series`**（[#457](https://github.com/Zoti321/hentail_library/issues/457)）。本文件描述 **browse 壳** 与两 feature 的协作；完整决策见 **ADR-0036**。
+ADR-0036 separates three product modules. `library_browse` owns the current-Library shell, search, author details, query state and cross-tab UI assembly. `comic` owns Comic rules/details/metadata UX; `series` owns Series rules/details/membership/order.
 
-**Catalog 实体 DTO**（`Comic`、`Series` 等）仍 @ `shared/domain`（**ADR-0035**）。
+## Shell collaboration
 
-## 模块一览
+Search/filter/sort/group state and pagination assembly stay in browse. ComicCatalogQueryAssembly and SeriesCatalogQueryAssembly combine intent with rules exposed by the corresponding owner public API. List rows use read-only records (ADR-0040); Series does not expose its entity (ADR-0042). Author/Tag entities belong to comic_metadata (ADR-0048).
 
-| Feature id | 语义 | 代码落点 |
-| --- | --- | --- |
-| **`comic`** | 单本漫画、Comics Tab 规则、详情/metadata/bulk | `features/comic/{domain,data,application,presentation,public}/` |
-| **`series`** | 系列、Series Tab 规则、详情/metadata | `features/series/...` |
-| **`library_browse`** | 当前库双 Tab 壳、搜索、作者详情、`presentation/catalog` | `features/library_browse/...` |
+Browse observes owner public provider tokens in one direction. Product modules do not read browse state back. Shared UI composition uses `shared/ui/slots/` and required shared providers, with owner implementations bound in `composition/`.
 
-## `library_browse` 壳内保留
+## Dependency direction
 
-| 路径 | 内容 |
-| --- | --- |
-| `domain/browse/` | 库页 request 编排、年龄限制投影偏好、跨 Tab facet selection（**不含** `library_comic_*` / `library_series_*` 规则类型） |
-| `presentation/browse/` | `library_md3e_*`、搜索、browse VM |
-| `presentation/catalog/` | 双 Tab 共用分页/选择、metadata 编辑导航/锁 UI |
-| `presentation/author/` | 作者详情 |
+`library_browse` may consume comic/series public APIs; series may consume permitted comic public capabilities. Comic cannot depend on browse, series or reader; series cannot depend on browse; Reader cannot depend on series or comic. Reader cover editing uses shared commands bound to the owners by composition. The complete forbidden-edge set and baselines are maintained in `app/test/architecture/module_boundary_test.dart` and `app/test/gate/`, not duplicated here.
 
-Comics/Series Tab **筛选/排序/投影规则类型** 分别 @ `comic/domain`、`series/domain`；壳 VM 经 **`comic/public`**、**`series/public`** 引用（ADR-0034）。
+Use shared membership/reading-context contracts when an owner is unreachable. Do not revive presentation bridges or export chains that hide a forbidden edge. Boundary checks inspect imports and exports; ordinary public facades remain export-only under ADR-0051.
 
-## Comic 聚合 vs Dart feature（一致性边界）
+## Consistency
 
-- **Comic 聚合写集**（Rust 真源，ADR-0002 / 0026）：同事务内 `comics` + `comic_meta`（含 Metadata field lock）+ authors/tags/parodies/characters junction。单本用户元数据写**不持**库级写锁。
-- **Dart `features/comic`** 是 feature / 限界上下文：仓储契约、Comics Tab 规则、详情与元数据 UX、窄 public。**不是** Aggregate Root 类，也不在 Dart application 复刻 lock / sync merge。
-- **外置**：Series 成员与排序（`series`）、Comic trash 生命周期（`comic_trash`）、阅读历史、跨本 bulk / sync（`library_admin` + 库级写锁）。
-- Catalog 实体 DTO 仍 @ Shared Kernel（ADR-0035）；勿为目录整齐迁入 `comic/domain`。
+`library_browse/domain/browse` owns Comic and Series browse preference values and the typed preferences repository contract. Notifiers retain optimistic UI updates, transient language/parody/character filters and query projections; they do not read storage keys or invoke SharedPreferences. The owner infrastructure adapter handles independent field writes, default-key removal, legacy age/grouping/author-ID migrations and page-size normalization. Composition binds the adapter and its Author repository dependency. Keep reset failures visible and preserve session state until persistent reset succeeds; do not replace field writes with whole-preference saves that overwrite unrelated dimensions.
 
-## browse ↔ comic/series 壳接缝（阶段 2）
+Shared page-size values and normalization belong to `shared/domain/models/value_objects`, since browse and Series detail both consume them. Page-size controls and preference-to-widget adapters remain in UI.
 
-- **已删除** `comic/public/shell` 与 `series/public/shell`；browse 经本地 `presentation/integrations/{comic,series}_presentation_bridge.dart` 消费 presentation / 窄 public。
-- **`library_browse/public/catalog/for_comic_and_series.dart`**：仅保留 comic/series 实际使用的壳原子（详情状态、锁 UI、metadata mappers/presenters、catalog selection/pagination、page size、breadcrumb、comic card actions、`openAuthorDetailByName`、bulkEditComicsByIdsProvider 等）；已去掉未消费的 `library_page_header`、`library_search_query_parser` re-export。
-- **R12**：`public/` 对自身 `presentation/` 的 `export` 纳入门禁；既有 `public/ui` 与本 catalog barrel 等见 `app/test/gate/public_presentation_export_allowlist.txt`（只缩不扩）。
+Series detail persists its own page size through injected query/command functions. Its storage key and SharedPreferences operations remain with Series infrastructure; the Notifier retains optimistic updates and propagates write failures.
 
-## Cross-feature
-
-- 允许：`library_browse` → `comic` / `series` public；`series` → `comic` public（封面）。
-- 禁止：`comic` → `series` public（连读上下文经 `SeriesReadingContextPort` @ shared/di）。
-
-## 参考
-
-- ADR-0036、ADR-0035、ADR-0034、ADR-0002、ADR-0026
-- [`shared-domain-ownership.md`](shared-domain-ownership.md)
+Rust owns catalog predicates, membership rebuilding, ordering locks and aggregate writes. Browse assembles filter intent rather than duplicating SQL rules in memory. Comic metadata, Series ordering, trash and library-level bulk/sync retain their respective owners. See [shared-domain-ownership.md](shared-domain-ownership.md) and [cross-feature-collaboration.md](cross-feature-collaboration.md).

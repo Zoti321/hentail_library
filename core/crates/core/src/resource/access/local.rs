@@ -39,6 +39,10 @@ impl LocalResourceAccess {
 }
 
 impl ResourceAccess for LocalResourceAccess {
+    fn local_path(&self, location: &str) -> Option<PathBuf> {
+        Some(Self::path_for(location))
+    }
+
     fn list(&self, location: &str) -> Result<Vec<ResourceEntry>, HentaiError> {
         let location = location.to_string();
         run_with_deadline(LOCAL_IO_TIMEOUT, move || list_unbounded(&location))

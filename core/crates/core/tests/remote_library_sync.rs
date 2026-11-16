@@ -116,8 +116,8 @@ fn remote_unreachable_probe_does_not_surface_as_scanned() {
 #[test]
 fn remote_reachable_plan_adds_and_orphans_without_deleting_on_unreachable() {
     common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let db_path = common::create_fixture_db(temp.path());
+        let temp = TempDir::new().expect("tempdir").keep();
+        let db_path = common::create_fixture_db(temp.as_path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init");

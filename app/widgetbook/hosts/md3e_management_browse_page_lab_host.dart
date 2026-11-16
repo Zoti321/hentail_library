@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../lab/pages/md3e_management_browse_page.dart';
 
-import 'package:hentai_library/features/named_metadata/public/ui/metadata_lab_patterns.dart';
+import 'package:hentai_library/features/comic_metadata/public/ui/metadata_lab_patterns.dart';
 
 /// Lab / Widgetbook：preview facet chip 列表 + 新建实体（Dialog / 内联草稿 → 内存列表，不写 FRB）。
 class ManagementBrowsePageLabHost extends StatefulWidget {

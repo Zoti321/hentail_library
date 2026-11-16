@@ -1,4 +1,4 @@
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 import 'package:hentai_library/features/reading_history/domain/reading_history.dart';
 import 'package:hentai_library/features/reading_history/domain/reading_history_exceptions.dart';
 import 'package:hentai_library/features/reading_history/domain/reading_history_search_specification.dart';
@@ -9,14 +9,13 @@ void main() {
     final DateTime when = DateTime.utc(2026, 1, 2);
 
     test('builds snapshot and trims identifiers', () {
-      final record = ReadingHistory.recordSessionProgress(
+      final ReadingHistory snapshot = ReadingHistory.recordSessionProgress(
         comicId: '  c1  ',
         title: '  Title  ',
         lastReadTime: when,
         pageIndex: 2,
         pageCount: 10,
       );
-      final ReadingHistory snapshot = record.snapshot;
 
       expect(snapshot.comicId, 'c1');
       expect(snapshot.title, 'Title');

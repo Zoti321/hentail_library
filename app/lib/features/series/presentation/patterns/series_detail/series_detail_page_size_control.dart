@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/ui/patterns/library/library_page_header_metrics.dart';
-import 'package:hentai_library/shared/ui/widgets/menu/anchored_menu.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:hentai_library/features/library_browse/public/catalog/for_comic_and_series.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/library_tab_page_size_settings.dart';
 
 /// 系列详情顶栏每页条数菜单节点。
 List<M3EMenuNode> seriesDetailPageSizeMenuNodes({

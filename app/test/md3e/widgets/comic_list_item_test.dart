@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../../widgetbook/lab/theme/md3e_theme.dart';
-
-import 'package:hentai_library/shared/ui/widgets/catalog/comic_list_item.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-import '../../support/pump_app.dart';
+import '../../support/pump_design_system_app.dart';
 
 void main() {
   test('infoProgressWidthFor caps width without filling column', () {
@@ -28,7 +26,7 @@ void main() {
   testWidgets('ComicListItem shows title and meta line', (
     WidgetTester tester,
   ) async {
-    await pumpApp(
+    await pumpDesignSystemApp(
       tester,
       home: ComicListItem(
         title: '深海图书馆',
@@ -45,7 +43,7 @@ void main() {
     WidgetTester tester,
   ) async {
     var tapped = false;
-    await pumpApp(
+    await pumpDesignSystemApp(
       tester,
       home: ComicListItem(
         title: '点我',
@@ -61,7 +59,7 @@ void main() {
   testWidgets('ComicListItem hides info progress when readProgress is 0', (
     WidgetTester tester,
   ) async {
-    await pumpApp(
+    await pumpDesignSystemApp(
       tester,
       home: ComicListItem(
         title: '未读',
@@ -75,7 +73,7 @@ void main() {
   testWidgets('ComicListItem shows info progress when readProgress > 0', (
     WidgetTester tester,
   ) async {
-    await pumpApp(
+    await pumpDesignSystemApp(
       tester,
       home: ComicListItem(
         title: '在读',
@@ -89,7 +87,7 @@ void main() {
   testWidgets('ComicListItem shows more menu and opens on tap', (
     WidgetTester tester,
   ) async {
-    await pumpApp(
+    await pumpDesignSystemApp(
       tester,
       home: ComicListItem(
         title: '菜单',
@@ -111,7 +109,7 @@ void main() {
   testWidgets('ComicListItem shows checkbox in selection mode', (
     WidgetTester tester,
   ) async {
-    await pumpApp(
+    await pumpDesignSystemApp(
       tester,
       home: ComicListItem(
         title: '多选',

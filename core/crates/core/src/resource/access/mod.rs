@@ -9,6 +9,7 @@ mod local;
 mod webdav;
 
 use std::io::{Read, Seek};
+use std::path::PathBuf;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use crate::error::HentaiError;
@@ -49,6 +50,12 @@ pub type ResourceStream = Box<dyn ResourceReadSeek>;
 
 /// Unified access to resources under a Library root.
 pub trait ResourceAccess: Send + Sync {
+    /// Local source that may change after opening; wrappers must forward this capability.
+    /// Adapters returning None provide an owned, stable stream snapshot.
+    fn local_path(&self, _location: &str) -> Option<PathBuf> {
+        None
+    }
+
     fn list(&self, location: &str) -> Result<Vec<ResourceEntry>, HentaiError>;
     fn stat(&self, location: &str) -> Result<Option<ResourceStat>, HentaiError>;
     fn open_stream(&self, location: &str) -> Result<ResourceStream, HentaiError>;

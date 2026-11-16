@@ -1,12 +1,14 @@
+import 'package:hentai_library/features/library_browse/domain/browse/library_comic_browse_preferences.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_comic_filters_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_series_filters_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/views/library/library_sort_section.dart';
-import 'package:hentai_library/features/library_browse/presentation/integrations/comic_presentation_bridge.dart';
-import 'package:hentai_library/features/library_browse/presentation/integrations/series_presentation_bridge.dart';
+import 'package:hentai_library/features/comic/public.dart';
+import 'package:hentai_library/features/series/public.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 
 /// 库页筛选排序抽屉中的「分组」区（MD3E 生产实现）。
@@ -34,7 +36,7 @@ class _ComicsGroupingSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final LibraryComicGrouping selected = ref.watch(
       libraryComicFiltersProvider.select(
-        (AsyncValue<LibraryComicFiltersState> state) =>
+        (AsyncValue<LibraryComicBrowsePreferences> state) =>
             state.value?.grouping ?? LibraryComicGrouping.defaultValue,
       ),
     );
@@ -113,10 +115,10 @@ class _GroupingRadioRow extends StatelessWidget {
             SizedBox(
               width: 24,
               height: 24,
-              child: Radio<bool>(
-                value: true,
+              child: RadioGroup<bool>(
                 groupValue: selected,
                 onChanged: (_) => onSelected(),
+                child: Radio<bool>(value: true),
               ),
             ),
             const SizedBox(width: 8),

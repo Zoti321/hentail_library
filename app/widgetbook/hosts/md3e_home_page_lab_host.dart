@@ -6,12 +6,13 @@ import 'package:hentai_library/features/library_admin/presentation/views/library
 
 import '../lab/navigation/md3e_library_edit_navigation.dart';
 
+import 'package:hentai_library/features/reading_stats/public.dart';
 import 'package:hentai_library/shared/ui/patterns/home/home_library_dashboard_models.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/home_library_management_section.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/home_library_delete_confirm_dialog.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/home_library_list_order.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/features/named_metadata/public/ui/metadata_lab_patterns.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
+import 'package:hentai_library/features/comic_metadata/public/ui/metadata_lab_patterns.dart';
 
 import '../preview/md3e_home_page_preview_data.dart';
 import 'md3e_history_browse_page_lab_host.dart';
@@ -73,19 +74,13 @@ class _Md3eHomePageLabHostState extends State<HomePageLabHost> {
     super.didUpdateWidget(oldWidget);
     if (widget.initialLibraries != null &&
         widget.initialLibraries != oldWidget.initialLibraries) {
-      _libraries = List<HomeLibraryDashboardRow>.of(
-        widget.initialLibraries!,
-      );
+      _libraries = List<HomeLibraryDashboardRow>.of(widget.initialLibraries!);
     }
   }
 
   void _handleReorder(int oldIndex, int newIndex) {
     setState(() {
-      _libraries = applyHomeLibraryListReorder(
-        _libraries,
-        oldIndex,
-        newIndex,
-      );
+      _libraries = applyHomeLibraryListReorder(_libraries, oldIndex, newIndex);
     });
   }
 
@@ -106,8 +101,7 @@ class _Md3eHomePageLabHostState extends State<HomePageLabHost> {
       return;
     }
     setState(() {
-      _libraries = List<HomeLibraryDashboardRow>.of(_libraries)
-        ..[index] = next;
+      _libraries = List<HomeLibraryDashboardRow>.of(_libraries)..[index] = next;
     });
   }
 
@@ -151,8 +145,7 @@ class _Md3eHomePageLabHostState extends State<HomePageLabHost> {
 
     switch (action) {
       case HomeLibraryManagementAction.edit:
-        final LibraryEditPageIntent intent =
-            row.kind == HomeLibraryKind.remote
+        final LibraryEditPageIntent intent = row.kind == HomeLibraryKind.remote
             ? LibraryEditPageIntent.editRemote
             : LibraryEditPageIntent.editLocal;
         await _openLibraryEdit(intent);
@@ -163,9 +156,7 @@ class _Md3eHomePageLabHostState extends State<HomePageLabHost> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text(
-                _HomePageLabPreviewCopy.scanPreviewSnackBar,
-              ),
+              content: Text(_HomePageLabPreviewCopy.scanPreviewSnackBar),
             ),
           );
         }
@@ -192,8 +183,7 @@ class _Md3eHomePageLabHostState extends State<HomePageLabHost> {
         setState(() {
           _libraries = _libraries
               .where(
-                (HomeLibraryDashboardRow item) =>
-                    item.libraryId != libraryId,
+                (HomeLibraryDashboardRow item) => item.libraryId != libraryId,
               )
               .toList(growable: false);
         });
@@ -226,6 +216,10 @@ class _Md3eHomePageLabHostState extends State<HomePageLabHost> {
   Widget build(BuildContext context) {
     return HomeLayout(
       aggregateCounts: HomePagePreviewData.sampleAggregateCounts(),
+      activityStats: const ReadingActivityStats(
+        finishedCount: 12,
+        totalDuration: Duration(hours: 3, minutes: 20),
+      ),
       onOpenNavigation: widget.onOpenNavigation,
       onOpenHistory: () {
         unawaited(
@@ -241,9 +235,8 @@ class _Md3eHomePageLabHostState extends State<HomePageLabHost> {
         unawaited(
           Navigator.of(context).push<void>(
             MaterialPageRoute<void>(
-              builder: (BuildContext context) => Scaffold(
-                body: Center(child: Text(context.l10n.navTrash)),
-              ),
+              builder: (BuildContext context) =>
+                  Scaffold(body: Center(child: Text(context.l10n.navTrash))),
             ),
           ),
         );
@@ -256,8 +249,7 @@ class _Md3eHomePageLabHostState extends State<HomePageLabHost> {
         libraries: _libraries,
         onLibraryOpen: widget.onLibraryOpen,
         onLibraryAction: _handleLibraryAction,
-        onAddLocalLibrary:
-            widget.onAddLocalLibrary ?? _defaultAddLocalLibrary,
+        onAddLocalLibrary: widget.onAddLocalLibrary ?? _defaultAddLocalLibrary,
         onAddRemoteLibrary:
             widget.onAddRemoteLibrary ?? _defaultAddRemoteLibrary,
         onLibrariesReorder: widget.enableReorder ? _handleReorder : null,

@@ -1,8 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/app_settings/public.dart';
-import 'package:hentai_library/features/read_session/public.dart';
-import 'package:hentai_library/shared/di/app_shell_providers.dart';
+import 'package:hentai_library/features/reader/public.dart';
+import 'package:hentai_library/shared/presentation/providers/app_shell_providers.dart';
 import 'package:hentai_library/shared/ui/shell/responsive_app_shell.dart';
 
 export 'package:hentai_library/shared/ui/shell/responsive_app_shell.dart'
@@ -21,6 +23,12 @@ class ApplicationShell extends ConsumerWidget {
 
   final Widget routeChild;
 
+  void _handleToggleSidebar(WidgetRef ref, bool expanded) {
+    unawaited(
+      ref.read(settingsProvider.notifier).setDesktopSidebarExpanded(!expanded),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final bool isSidebarExpandedPref = ref.watch(
@@ -29,7 +37,7 @@ class ApplicationShell extends ConsumerWidget {
             asyncValue.asData?.value.desktopSidebarExpanded ?? true,
       ),
     );
-    final bool readerFullscreen = ref.watch(readerFullscreenControllerProvider);
+    final bool readerFullscreen = ref.watch(readerChromeNotifierProvider);
     final AppShellFeedbackBelowTitleBarFactory feedbackFactory = ref.watch(
       appShellFeedbackBelowTitleBarFactoryProvider,
     );
@@ -40,11 +48,8 @@ class ApplicationShell extends ConsumerWidget {
     return ResponsiveAppShell(
       routeChild: routeChild,
       isDesktopSidebarExpanded: isSidebarExpandedPref,
-      onToggleDesktopSidebarExpanded: () {
-        ref
-            .read(settingsProvider.notifier)
-            .setDesktopSidebarExpanded(!isSidebarExpandedPref);
-      },
+      onToggleDesktopSidebarExpanded: () =>
+          _handleToggleSidebar(ref, isSidebarExpandedPref),
       isReaderFullscreen: readerFullscreen,
       shellFeedbackBelowTitleBar: feedbackFactory(),
       navigationSlotBuilder: (BuildContext ctx) => navigationAssembly(ctx, ref),

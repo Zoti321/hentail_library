@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/comic/domain/smart_facet_match.dart';
-import 'package:hentai_library/shared/ui/widgets/inputs/named_facet_multi_select_copy.dart';
-import 'package:hentai_library/shared/ui/widgets/inputs/named_facet_multi_select_field.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show ProviderListenable;
 
@@ -18,12 +17,9 @@ class NamedFacetMultiSelectField extends ConsumerWidget {
     required this.itemsProvider,
     required this.onRetry,
     required this.copy,
-    this.labelTrailing,
-    this.compactTrigger = false,
   });
 
   final String label;
-  final Widget? labelTrailing;
   final List<String> selectedNames;
   final ValueChanged<String> onAdd;
   final ValueChanged<String> onRemove;
@@ -32,18 +28,34 @@ class NamedFacetMultiSelectField extends ConsumerWidget {
   itemsProvider;
   final VoidCallback onRetry;
   final NamedFacetMultiSelectCopy copy;
-  final bool compactTrigger;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final String tooltip = context.l10n.smartFacetMatchHintTooltip;
+    final candidates = ref
+        .watch(itemsProvider)
+        .when(
+          data: (items) => (items: items, loading: false, error: false),
+          loading: () => (
+            items: <SmartFacetMatchCandidate>[],
+            loading: true,
+            error: false,
+          ),
+          error: (_, _) => (
+            items: <SmartFacetMatchCandidate>[],
+            loading: false,
+            error: true,
+          ),
+        );
     return FacetMultiSelectField<SmartFacetMatchCandidate>(
       label: label,
       selectedNames: selectedNames,
       onAdd: onAdd,
       onRemove: onRemove,
       onClearAll: onClearAll,
-      itemsProvider: itemsProvider,
+      items: candidates.items,
+      isLoading: candidates.loading,
+      hasLoadError: candidates.error,
       onRetry: onRetry,
       resolveName: (SmartFacetMatchCandidate item) => item.name,
       resolveSmartMatched: (SmartFacetMatchCandidate item) => item.smartMatched,

@@ -6,8 +6,8 @@ import 'package:hentai_library/features/comic/presentation/views/metadata_edit/c
 
 import '../preview/md3e_comic_metadata_edit_preview_data.dart';
 
-import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_surface.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/comic_meta_locks.dart';
+import 'package:hentai_library/design-system/design_system.dart';
+import 'package:hentai_library/features/comic/domain/value_objects/comic_meta_locks.dart';
 
 /// Lab / Widgetbook：漫画元数据编辑 + 字段锁 KV preview（切换锁状态，不写 core）。
 class ComicMetadataEditPageLabHost extends StatelessWidget {
@@ -31,9 +31,7 @@ class ComicMetadataEditPageLabHost extends StatelessWidget {
     return ComicMetadataEditLayout(
       initialDraft:
           initialDraft ??
-          ComicMetadataEditDraft.fromEntry(
-            ComicDetailPagePreviewData.sample(),
-          ),
+          ComicMetadataEditDraft.fromEntry(ComicDetailPagePreviewData.sample()),
       initialLocks:
           initialLocks ?? Md3eComicMetadataEditPreviewData.sampleLocks,
       presentation: presentation,

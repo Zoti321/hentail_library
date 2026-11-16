@@ -1,260 +1,44 @@
-import 'package:flutter/foundation.dart';
-import 'package:hentai_library/features/library_browse/domain/browse/author_filter_preference_migration.dart';
+import 'package:hentai_library/features/library_browse/domain/browse/library_comic_browse_preferences.dart';
+import 'package:hentai_library/features/library_browse/domain/browse/library_browse_preferences_repository.dart';
+import 'package:hentai_library/features/library_browse/presentation/providers/library_browse_preferences_provider.dart';
+
 import 'package:hentai_library/features/library_browse/domain/browse/library_age_restriction_filter.dart';
-import 'package:hentai_library/shared/domain/library/library_media_type_filter.dart';
-import 'package:hentai_library/shared/domain/library/library_metadata_filter_selection.dart';
+import 'package:hentai_library/features/library_browse/domain/browse/library_media_type_filter.dart';
+import 'package:hentai_library/features/library_browse/domain/browse/library_metadata_filter_selection.dart';
 import 'package:hentai_library/features/library_browse/domain/browse/library_needs_metadata_only.dart';
 import 'package:hentai_library/features/library_browse/domain/browse/library_tri_state_pick.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_query_intent.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_query_intent_notifier.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/shared/di/browse_library_scope_providers.dart';
+import 'package:hentai_library/shared/presentation/providers/browse_library_scope_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:hentai_library/features/library_browse/presentation/integrations/comic_presentation_bridge.dart';
+import 'package:hentai_library/features/comic/public.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/models/comic_catalog_query_assembly.dart';
 
 part 'library_comic_filters_notifier.g.dart';
-part 'library_comic_filters_persistence.dart';
-part 'library_comic_filters_author_migration.dart';
 
-/// Comics 默认排序（标题升序）。
-final LibraryComicSortOption kLibraryDefaultSortOption =
-    LibraryComicSortOption();
-
-/// 会话级 include-only 筛选维度（不落盘，仅在浏览期间保留）。
-enum LibraryIncludeSetKind { language }
-
-/// Comics Tab 的完整 Library browse preference（筛选 + 排序意图）。
-///
-/// 单一不可变值对象：Comics 目录、筛选抽屉、重置与选择模式都只依赖它，
-/// 新增一个筛选维度只需改动此处与 [LibraryComicFiltersNotifier]。
-class LibraryComicFiltersState {
-  LibraryComicFiltersState({
-    required this.ageRestriction,
-    required this.mediaTypeFilter,
-    required this.tagFilter,
-    required this.authorFilter,
-    required this.needsMetadataOnly,
-    required this.grouping,
-    required this.sortOption,
-    this.languageFilter = const <String>{},
-    this.parodyFilter = const LibraryMetadataFilterSelection(),
-    this.characterFilter = const LibraryMetadataFilterSelection(),
-  });
-
-  /// 默认（未筛选）状态；加载完成前的占位值。
-  static final LibraryComicFiltersState defaults = LibraryComicFiltersState(
-    ageRestriction: LibraryAgeRestrictionFilter.unrestricted,
-    mediaTypeFilter: const LibraryMediaTypeFilterSelection(),
-    tagFilter: const LibraryMetadataFilterSelection(),
-    authorFilter: const LibraryMetadataFilterSelection(),
-    needsMetadataOnly: LibraryNeedsMetadataOnly.defaultValue,
-    grouping: LibraryComicGrouping.defaultValue,
-    sortOption: LibraryComicSortOption(),
-  );
-
-  final LibraryAgeRestrictionFilter ageRestriction;
-  final LibraryMediaTypeFilterSelection mediaTypeFilter;
-  final LibraryMetadataFilterSelection tagFilter;
-  final LibraryMetadataFilterSelection authorFilter;
-  final bool needsMetadataOnly;
-  final LibraryComicGrouping grouping;
-  final LibraryComicSortOption sortOption;
-
-  /// 会话级 include-only 维度（语言闭集）。
-  final Set<String> languageFilter;
-
-  /// 会话级原作 / 角色三态筛选（不落盘）。
-  final LibraryMetadataFilterSelection parodyFilter;
-  final LibraryMetadataFilterSelection characterFilter;
-
-  Set<String> includeSetFor(LibraryIncludeSetKind kind) => switch (kind) {
-    LibraryIncludeSetKind.language => languageFilter,
-  };
-
-  LibraryComicFiltersState copyWith({
-    LibraryAgeRestrictionFilter? ageRestriction,
-    LibraryMediaTypeFilterSelection? mediaTypeFilter,
-    LibraryMetadataFilterSelection? tagFilter,
-    LibraryMetadataFilterSelection? authorFilter,
-    bool? needsMetadataOnly,
-    LibraryComicGrouping? grouping,
-    LibraryComicSortOption? sortOption,
-    Set<String>? languageFilter,
-    LibraryMetadataFilterSelection? parodyFilter,
-    LibraryMetadataFilterSelection? characterFilter,
-  }) {
-    return LibraryComicFiltersState(
-      ageRestriction: ageRestriction ?? this.ageRestriction,
-      mediaTypeFilter: mediaTypeFilter ?? this.mediaTypeFilter,
-      tagFilter: tagFilter ?? this.tagFilter,
-      authorFilter: authorFilter ?? this.authorFilter,
-      needsMetadataOnly: needsMetadataOnly ?? this.needsMetadataOnly,
-      grouping: grouping ?? this.grouping,
-      sortOption: sortOption ?? this.sortOption,
-      languageFilter: languageFilter ?? this.languageFilter,
-      parodyFilter: parodyFilter ?? this.parodyFilter,
-      characterFilter: characterFilter ?? this.characterFilter,
-    );
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        other is LibraryComicFiltersState &&
-            other.ageRestriction == ageRestriction &&
-            setEquals(
-              other.mediaTypeFilter.selected,
-              mediaTypeFilter.selected,
-            ) &&
-            other.tagFilter == tagFilter &&
-            other.authorFilter == authorFilter &&
-            other.needsMetadataOnly == needsMetadataOnly &&
-            other.grouping == grouping &&
-            other.sortOption == sortOption &&
-            setEquals(other.languageFilter, languageFilter) &&
-            other.parodyFilter == parodyFilter &&
-            other.characterFilter == characterFilter;
-  }
-
-  @override
-  int get hashCode => Object.hash(
-    ageRestriction,
-    Object.hashAllUnordered(mediaTypeFilter.selected),
-    tagFilter,
-    authorFilter,
-    needsMetadataOnly,
-    grouping,
-    sortOption,
-    Object.hashAllUnordered(languageFilter),
-    parodyFilter,
-    characterFilter,
-  );
-}
-
-/// 年龄限制存储键：Comics 归本模块，Series 归
-/// [LibrarySeriesFiltersNotifier]。
-const String kLibraryComicsAgeRestrictionStorageKey =
-    'library_age_restriction_filter_comics';
-const String kLibrarySeriesAgeRestrictionStorageKey =
-    'library_age_restriction_filter_series';
-
-/// 旧版「按系列展开」布尔偏好一次性迁移为分组方式（新键缺失时才迁移）。
-///
-/// 旧键为 `false` 迁移为 [LibraryComicGrouping.none]，否则为 [LibraryComicGrouping.bySeries]；
-/// 迁移后删除旧键，重复执行结果一致。
-Future<void> migrateLegacyLibraryComicGrouping(SharedPreferences prefs) async {
-  const String legacyKey = LibraryComicGrouping.legacyExpandBySeriesStorageKey;
-  if (!prefs.containsKey(legacyKey)) {
-    return;
-  }
-  if (!prefs.containsKey(LibraryComicGrouping.storageKey)) {
-    final bool expandBySeries = prefs.getBool(legacyKey) ?? true;
-    final LibraryComicGrouping migrated = expandBySeries
-        ? LibraryComicGrouping.bySeries
-        : LibraryComicGrouping.none;
-    if (migrated != LibraryComicGrouping.defaultValue) {
-      await prefs.setString(LibraryComicGrouping.storageKey, migrated.name);
-    }
-  }
-  await prefs.remove(legacyKey);
-}
-
-/// 旧版单键年龄限制一次性迁移到 Comics / Series 双键。
-Future<void> migrateLegacyLibraryAgeRestriction(SharedPreferences prefs) async {
-  if (!prefs.containsKey(kLibraryComicsAgeRestrictionStorageKey) &&
-      !prefs.containsKey(kLibrarySeriesAgeRestrictionStorageKey) &&
-      prefs.containsKey(LibraryAgeRestrictionFilter.storageKey)) {
-    final LibraryAgeRestrictionFilter legacy =
-        LibraryAgeRestrictionFilter.fromStorage(
-          prefs.getString(LibraryAgeRestrictionFilter.storageKey),
-        );
-    if (legacy != LibraryAgeRestrictionFilter.unrestricted) {
-      await prefs.setString(
-        kLibraryComicsAgeRestrictionStorageKey,
-        legacy.name,
-      );
-      await prefs.setString(
-        kLibrarySeriesAgeRestrictionStorageKey,
-        legacy.name,
-      );
-    }
-    await prefs.remove(LibraryAgeRestrictionFilter.storageKey);
-  }
-}
-
-const LibraryComicProjection _comicProjection = LibraryComicProjection();
-
-/// Comics Tab 筛选偏好的 SharedPreferences 键（#308 持久化侧，供主类与 mixin 共用）。
-const String _ageStorageKey = kLibraryComicsAgeRestrictionStorageKey;
-const String _mediaTypeStorageKey = 'library_media_type_filter_comics';
-const String _tagIncludeStorageKey = 'library_tag_filter_include';
-const String _tagExcludeStorageKey = 'library_tag_filter_exclude';
-const String _tagIncludeModeStorageKey = 'library_tag_filter_include_mode';
-const String _authorIncludeStorageKey = 'library_author_filter_include_ids';
-const String _authorExcludeStorageKey = 'library_author_filter_exclude_ids';
-const String _authorIncludeModeStorageKey =
-    'library_author_filter_include_mode';
-const String _legacyAuthorIncludeStorageKey = 'library_author_filter_include';
-const String _legacyAuthorExcludeStorageKey = 'library_author_filter_exclude';
-const String _sortStorageKey = 'library_sort_comics';
+const ComicCatalogQueryAssembly _comicProjection = ComicCatalogQueryAssembly();
 
 /// Comics Tab 的 Library browse preference（筛选 + 排序）唯一事实来源。
 ///
 /// 持有持久化偏好（年龄、媒体类型、标签、作者、仅待补元数据、按系列分组、排序）
-/// 与会话级维度（语言 include-set、原作/角色三态）；命令方法负责写回
-/// SharedPreferences。派生 [libraryComicFilterQueryProvider] 供 Rust 查询消费。
+/// 与会话级维度（语言 include-set、原作/角色三态）。持久化经注入仓储执行。
+/// 派生 [libraryComicFilterQueryProvider] 供 Rust 查询消费。
 @Riverpod(keepAlive: true)
-class LibraryComicFiltersNotifier extends _$LibraryComicFiltersNotifier
-    with _LibraryComicFiltersAuthorMigration {
+class LibraryComicFiltersNotifier extends _$LibraryComicFiltersNotifier {
+  LibraryBrowsePreferencesRepository get _preferences =>
+      ref.read(libraryBrowsePreferencesRepositoryProvider);
   @override
-  Future<LibraryComicFiltersState> build() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await migrateLegacyLibraryAgeRestriction(prefs);
-    await migrateLegacyLibraryComicGrouping(prefs);
+  Future<LibraryComicBrowsePreferences> build() =>
+      _preferences.loadComicFilters();
 
-    final LibraryMetadataFilterSelection authorFilter = await _loadAuthorFilter(
-      prefs,
-    );
-
-    return LibraryComicFiltersState(
-      ageRestriction: LibraryAgeRestrictionFilter.fromStorage(
-        prefs.getString(_ageStorageKey),
-      ),
-      mediaTypeFilter: LibraryMediaTypeFilterSelection.fromStorage(
-        prefs.getStringList(_mediaTypeStorageKey),
-      ),
-      tagFilter: LibraryMetadataFilterSelection.fromStorage(
-        includeNames: prefs.getStringList(_tagIncludeStorageKey),
-        excludeNames: prefs.getStringList(_tagExcludeStorageKey),
-        includeModeName: prefs.getString(_tagIncludeModeStorageKey),
-      ),
-      authorFilter: authorFilter,
-      needsMetadataOnly: LibraryNeedsMetadataOnly.fromStorage(
-        prefs.getBool(LibraryNeedsMetadataOnly.storageKey),
-      ),
-      grouping: LibraryComicGrouping.fromStorage(
-        prefs.getString(LibraryComicGrouping.storageKey),
-      ),
-      sortOption: _decodeComicSortOption(prefs.getString(_sortStorageKey)),
-    );
-  }
-
-  void _apply(LibraryComicFiltersState updated) {
-    state = AsyncData<LibraryComicFiltersState>(updated);
+  void _apply(LibraryComicBrowsePreferences updated) {
+    state = AsyncData<LibraryComicBrowsePreferences>(updated);
   }
 
   Future<void> setAgeRestriction(LibraryAgeRestrictionFilter filter) async {
     _apply((await future).copyWith(ageRestriction: filter));
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    if (filter == LibraryAgeRestrictionFilter.unrestricted) {
-      await prefs.remove(_ageStorageKey);
-    } else {
-      await prefs.setString(_ageStorageKey, filter.name);
-    }
+    await _preferences.saveComicAgeRestriction(filter);
   }
 
   Future<void> toggleAgeRestrictionOption(
@@ -267,16 +51,11 @@ class LibraryComicFiltersNotifier extends _$LibraryComicFiltersNotifier
   }
 
   Future<void> toggleMediaType(LibraryMediaTypeFilterOption option) async {
-    final LibraryComicFiltersState current = await future;
+    final LibraryComicBrowsePreferences current = await future;
     final LibraryMediaTypeFilterSelection updated = current.mediaTypeFilter
         .withToggled(option);
     _apply(current.copyWith(mediaTypeFilter: updated));
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (updated.selected.isEmpty) {
-      await prefs.remove(_mediaTypeStorageKey);
-    } else {
-      await prefs.setStringList(_mediaTypeStorageKey, updated.toStorage());
-    }
+    await _preferences.saveComicMediaTypes(updated);
   }
 
   Future<void> clearMediaType() async {
@@ -285,8 +64,9 @@ class LibraryComicFiltersNotifier extends _$LibraryComicFiltersNotifier
         mediaTypeFilter: const LibraryMediaTypeFilterSelection(),
       ),
     );
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_mediaTypeStorageKey);
+    await _preferences.saveComicMediaTypes(
+      const LibraryMediaTypeFilterSelection(),
+    );
   }
 
   Future<void> toggleTag(String name) async {
@@ -342,7 +122,7 @@ class LibraryComicFiltersNotifier extends _$LibraryComicFiltersNotifier
     )
     transform,
   }) async {
-    final LibraryComicFiltersState current = await future;
+    final LibraryComicBrowsePreferences current = await future;
     final LibraryMetadataFilterSelection updated = transform(
       tags ? current.tagFilter : current.authorFilter,
     );
@@ -351,16 +131,15 @@ class LibraryComicFiltersNotifier extends _$LibraryComicFiltersNotifier
           ? current.copyWith(tagFilter: updated)
           : current.copyWith(authorFilter: updated),
     );
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await _writeMetadataSelection(
-      prefs,
-      updated,
-      keys: tags ? _tagStorageKeys : _authorStorageKeys,
-    );
+    if (tags) {
+      await _preferences.saveComicTags(updated);
+    } else {
+      await _preferences.saveComicAuthors(updated);
+    }
   }
 
   Future<void> toggleIncludeSet(LibraryIncludeSetKind kind, String name) async {
-    final LibraryComicFiltersState current = await future;
+    final LibraryComicBrowsePreferences current = await future;
     final Set<String> updated = Set<String>.of(current.includeSetFor(kind));
     if (!updated.add(name)) {
       updated.remove(name);
@@ -372,8 +151,8 @@ class LibraryComicFiltersNotifier extends _$LibraryComicFiltersNotifier
     _apply(_withIncludeSet(await future, kind, const <String>{}));
   }
 
-  LibraryComicFiltersState _withIncludeSet(
-    LibraryComicFiltersState current,
+  LibraryComicBrowsePreferences _withIncludeSet(
+    LibraryComicBrowsePreferences current,
     LibraryIncludeSetKind kind,
     Set<String> value,
   ) {
@@ -383,14 +162,14 @@ class LibraryComicFiltersNotifier extends _$LibraryComicFiltersNotifier
   }
 
   Future<void> toggleParody(String name) async {
-    final LibraryComicFiltersState current = await future;
+    final LibraryComicBrowsePreferences current = await future;
     _apply(
       current.copyWith(parodyFilter: current.parodyFilter.withToggled(name)),
     );
   }
 
   Future<void> setParodyIncludeMode(LibraryMetadataIncludeMode mode) async {
-    final LibraryComicFiltersState current = await future;
+    final LibraryComicBrowsePreferences current = await future;
     _apply(
       current.copyWith(
         parodyFilter: current.parodyFilter.withIncludeMode(mode),
@@ -399,7 +178,7 @@ class LibraryComicFiltersNotifier extends _$LibraryComicFiltersNotifier
   }
 
   Future<void> toggleCharacter(String name) async {
-    final LibraryComicFiltersState current = await future;
+    final LibraryComicBrowsePreferences current = await future;
     _apply(
       current.copyWith(
         characterFilter: current.characterFilter.withToggled(name),
@@ -408,7 +187,7 @@ class LibraryComicFiltersNotifier extends _$LibraryComicFiltersNotifier
   }
 
   Future<void> setCharacterIncludeMode(LibraryMetadataIncludeMode mode) async {
-    final LibraryComicFiltersState current = await future;
+    final LibraryComicBrowsePreferences current = await future;
     _apply(
       current.copyWith(
         characterFilter: current.characterFilter.withIncludeMode(mode),
@@ -418,22 +197,12 @@ class LibraryComicFiltersNotifier extends _$LibraryComicFiltersNotifier
 
   Future<void> setNeedsMetadataOnly(bool enabled) async {
     _apply((await future).copyWith(needsMetadataOnly: enabled));
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (enabled == LibraryNeedsMetadataOnly.defaultValue) {
-      await prefs.remove(LibraryNeedsMetadataOnly.storageKey);
-    } else {
-      await prefs.setBool(LibraryNeedsMetadataOnly.storageKey, enabled);
-    }
+    await _preferences.saveNeedsMetadataOnly(enabled);
   }
 
   Future<void> setGrouping(LibraryComicGrouping grouping) async {
     _apply((await future).copyWith(grouping: grouping));
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (grouping == LibraryComicGrouping.defaultValue) {
-      await prefs.remove(LibraryComicGrouping.storageKey);
-    } else {
-      await prefs.setString(LibraryComicGrouping.storageKey, grouping.name);
-    }
+    await _preferences.saveComicGrouping(grouping);
   }
 
   Future<void> setSortField(LibraryComicSortField field) async {
@@ -445,39 +214,22 @@ class LibraryComicFiltersNotifier extends _$LibraryComicFiltersNotifier
             descending: field == LibraryComicSortField.readAt,
           );
     _apply((await future).copyWith(sortOption: next));
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (_isDefaultComicSort(next)) {
-      await prefs.remove(_sortStorageKey);
-    } else {
-      await prefs.setString(_sortStorageKey, _encodeComicSortOption(next));
-    }
+    await _preferences.saveComicSort(next);
   }
 
   /// 清空当前 Library 的全部 Comics 筛选与排序（会话级维度一并清空）。
   Future<void> resetAll() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_ageStorageKey);
-    await prefs.remove(_mediaTypeStorageKey);
-    await prefs.remove(_tagIncludeStorageKey);
-    await prefs.remove(_tagExcludeStorageKey);
-    await prefs.remove(_tagIncludeModeStorageKey);
-    await prefs.remove(_authorIncludeStorageKey);
-    await prefs.remove(_authorExcludeStorageKey);
-    await prefs.remove(_authorIncludeModeStorageKey);
-    await prefs.remove(_sortStorageKey);
-    await prefs.remove(LibraryNeedsMetadataOnly.storageKey);
-    await prefs.remove(LibraryComicGrouping.storageKey);
-    await prefs.remove(LibraryComicGrouping.legacyExpandBySeriesStorageKey);
-    _apply(LibraryComicFiltersState.defaults);
+    await _preferences.resetComicFilters();
+    _apply(LibraryComicBrowsePreferences.defaults);
   }
 }
 
 /// Comics Tab 筛选意图派生出的 Rust 查询 filter（含关键词）。
 final Provider<LibraryComicFilter> libraryComicFilterQueryProvider =
     Provider<LibraryComicFilter>((Ref ref) {
-      final LibraryComicFiltersState filters =
+      final LibraryComicBrowsePreferences filters =
           ref.watch(libraryComicFiltersProvider).value ??
-          LibraryComicFiltersState.defaults;
+          LibraryComicBrowsePreferences.defaults;
       final String keyword = ref.watch(
         libraryQueryIntentProvider.select(
           (LibraryQueryIntent intent) => intent.keyword,
@@ -502,9 +254,9 @@ final Provider<LibraryComicFilter> libraryComicFilterQueryProvider =
 final Provider<bool> libraryComicFiltersIsCustomizedProvider = Provider<bool>((
   Ref ref,
 ) {
-  final LibraryComicFiltersState filters =
+  final LibraryComicBrowsePreferences filters =
       ref.watch(libraryComicFiltersProvider).value ??
-      LibraryComicFiltersState.defaults;
+      LibraryComicBrowsePreferences.defaults;
   if (filters.ageRestriction != LibraryAgeRestrictionFilter.unrestricted ||
       filters.mediaTypeFilter.isActive ||
       filters.tagFilter.isActive ||

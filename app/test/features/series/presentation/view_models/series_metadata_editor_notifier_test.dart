@@ -1,8 +1,11 @@
-import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/form/series_metadata_form.dart';
+import 'package:hentai_library/features/series/domain/value_objects/series_folder_info.dart';
+import 'package:hentai_library/features/series/domain/value_objects/series_metadata.dart';
+import 'package:hentai_library/features/series/application/series_metadata_service.dart';
+import 'package:hentai_library/features/series/domain/series.dart';
+import 'package:hentai_library/features/series/domain/value_objects/series_metadata_form.dart';
 import 'package:hentai_library/features/series/domain/series_repository.dart';
 import 'package:hentai_library/features/series/presentation/view_models/series_metadata_editor_notifier.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/features/series/public/providers/series_repository_providers.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:riverpod/riverpod.dart';
 import 'package:test/test.dart';
@@ -54,8 +57,8 @@ void main() {
     () async {
       final Series series = Series(
         id: 'series-1',
-        name: '系列',
-        folderPath: '/library/series-1',
+        folderInfo: SeriesFolderInfo(folderPath: '/library/series-1'),
+        metadata: SeriesMetadata(name: '系列'),
       );
 
       final SeriesMetadataApplyResult result = await editor().apply(

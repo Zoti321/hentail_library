@@ -63,6 +63,7 @@ pub async fn import_tag_dictionary(
         let txn = db.begin().await.map_err(map_db_err)?;
         insert_tag_names_ignore_conflict(&txn, &to_insert).await?;
         txn.commit().await.map_err(map_db_err)?;
+        crate::revision::notify_committed();
     }
 
     Ok(TagDictionaryImportResult {

@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
-import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
-import 'package:hentai_library/shared/ui/patterns/library/library_page_header_metrics.dart';
-import 'package:hentai_library/shared/ui/patterns/shared/page_title.dart';
-import 'package:hentai_library/shared/ui/patterns/shared/pinned_toolbar_chrome.dart';
-import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_tab_page_size_settings.dart'
+import 'package:hentai_library/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
+import 'package:hentai_library/design-system/design_system.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/library_tab_page_size_settings.dart'
     show kLibraryPageSizeOptions;
-import 'package:hentai_library/shared/ui/widgets/menu/anchored_menu.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 漫画库粘滞页头：标题 + 操作（与 [LibraryBrowseLayout] 一致）。
@@ -161,7 +156,7 @@ class _LibraryHeaderActions extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        _actionIcon(
+        _HeaderActionIcon(
           icon: Icons.filter_list,
           tooltip: l10n.libraryFilterSortTooltip,
           semanticLabel: l10n.libraryFilterSortSemantic,
@@ -170,7 +165,7 @@ class _LibraryHeaderActions extends StatelessWidget {
         ),
         SizedBox(width: gap),
         if (menuChildren.isEmpty)
-          _actionIcon(
+          _HeaderActionIcon(
             icon: Icons.more_vert,
             tooltip: l10n.metadataMoreActions,
             onPressed: null,
@@ -180,7 +175,7 @@ class _LibraryHeaderActions extends StatelessWidget {
             position: M3EMenuAnchorPosition.bottomEnd,
             children: menuChildren,
             anchorBuilder: (BuildContext context, VoidCallback open) {
-              return _actionIcon(
+              return _HeaderActionIcon(
                 icon: Icons.more_vert,
                 tooltip: l10n.metadataMoreActions,
                 onPressed: open,
@@ -190,14 +185,25 @@ class _LibraryHeaderActions extends StatelessWidget {
       ],
     );
   }
+}
 
-  Widget _actionIcon({
-    required IconData icon,
-    required String tooltip,
-    String? semanticLabel,
-    Color? color,
-    VoidCallback? onPressed,
-  }) {
+class _HeaderActionIcon extends StatelessWidget {
+  const _HeaderActionIcon({
+    required this.icon,
+    required this.tooltip,
+    this.semanticLabel,
+    this.color,
+    this.onPressed,
+  });
+
+  final IconData icon;
+  final String tooltip;
+  final String? semanticLabel;
+  final Color? color;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
     return M3EIconButton(
       icon: Icon(
         icon,

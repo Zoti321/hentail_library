@@ -1,43 +1,28 @@
-# 维护者操作
+# Maintenance operations
 
-## GitHub Issues（`gh`）
+## GitHub issues
 
-仓库内用 `gh`（从 `git remote` 推断 repo）。**Agent 技能**（`to-tickets`、`implement-spec` 等）的 tracker 约定见 `docs/agents/issue-tracker.md`。
+Use `gh` inside the clone so the repository is inferred from its remote. The canonical tracker workflow is [issue-tracker.md](../agents/issue-tracker.md); state/category rules live in [triage-labels.md](../agents/triage-labels.md). Keep task history and individual verification results in issues/PRs rather than engineering guides.
 
-| 操作 | 命令 |
-|------|------|
-| 创建 | `gh issue create --title "..." --body "..."` |
-| 查看 | `gh issue view <n> --comments` |
-| 列表 | `gh issue list --state open --json number,title,labels` |
-| 评论 | `gh issue comment <n> --body "..."` |
-| 标签 | `gh issue edit <n> --add-label "..."` / `--remove-label "..."` |
-| 关闭 | `gh issue close <n> --comment "..."` |
+## Diagnostics and support
 
-Triage：**恰好一个** state 标签——`needs-triage` · `needs-info` · `ready-for-agent` · `ready-for-human` · `wontfix`（与 `docs/agents/triage-labels.md` 一致）。分类常用 `bug` / `enhancement`。Agent 分拣：`/triage` 技能。
+Follow ADR-0004 and ADR-0010 for diagnostics and data-profile isolation.
 
-## 用户日志与支持
+1. Ask the reporter to enable verbose diagnostics in Settings, reproduce, then export logs (a redacted ZIP by default).
+2. Inspect `app_log.txt`, `rust_log.txt`, `diagnostics.json` and rotated `.bak` files.
+3. For UI jank, disable verbose diagnostics and use `flutter run --profile` with DevTools Performance.
+4. For Rust development logging, use `RUST_LOG=hentai_core::sync=debug flutter run` from `app/` in a shell supporting environment prefixes.
 
-设计：ADR-0004。
-
-1. 用户：**设置 → 诊断与支持** 开 **详细诊断** → 复现 → **导出日志**（默认脱敏 zip）。
-2. 包内：`app_log.txt`、`rust_log.txt`、`diagnostics.json`（及 `.bak` 轮转）。
-3. UI 卡顿排查：关详细诊断，用 `flutter run --profile` + DevTools Performance。
-4. 开发 Rust 日志：`RUST_LOG=hentai_core::sync=debug flutter run`；文件见 ADR-0010 / ADR-0004。
-
-脱敏会缩短路径、哈希 `comic_id`；路径关键时用户选 **完整日志** 并确认隐私。
+Redaction shortens paths and hashes Comic IDs. Request full logs only when the path is necessary and the reporter chooses that export mode with the privacy confirmation.
 
 ## Tag dictionary import
 
-背景：ADR-0011（已移除 EhTag 专用接入）。**Tag dictionary import** = 从 JSON 幂等写入全局 Tag 字典。
-
-JSON：
+ADR-0011 defines an idempotent import into the global Tag dictionary:
 
 ```json
-{ "tags": ["标签A", "标签B"] }
+{ "tags": ["tag-a", "tag-b"] }
 ```
 
-或 `["标签A", "标签B"]`。trim 非空；库内按 name 精确匹配跳过；不删不改已有 Tag；不附着 Comic。
+A top-level string array is also accepted. Trim names, discard empty values, skip existing exact-name matches, and neither change/delete existing Tags nor attach them to Comics.
 
-实现：`import_tag_dictionary`（Rust）、`TagDictionaryImportController` / Dialog（Flutter）。生产 UI：`/metadata` 更多菜单 → 选本地 JSON → `importFromBytes`；亦保留 `importFromNetwork` 供脚本/测试。
-
-Issue/文档用 **Tag dictionary import**，勿再以 EhTagTranslation 为默认数据源。
+The metadata page's additional-actions menu accepts a local JSON file. Rust exposes `import_tag_dictionary`; Flutter's controller accepts bytes and also retains a network import capability. Use **Tag dictionary import** in issues/docs; EhTagTranslation is not a default data source.

@@ -1,12 +1,13 @@
-import 'package:hentai_library/core/logging/app_log.dart';
+import 'dart:async';
+
+import 'package:hentai_library/features/comic/presentation/providers/comic_metadata_use_case_providers.dart';
+import 'package:hentai_library/shared/application/logging/app_log.dart';
 import 'package:hentai_library/features/comic/presentation/patterns/metadata_edit/comic_metadata_edit_draft.dart';
-import 'package:hentai_library/features/comic/presentation/patterns/metadata_edit/comic_metadata_smart_facet_scope.dart';
 import 'package:hentai_library/features/comic/presentation/view_models/comic_metadata_edit_ui_state.dart';
 import 'package:hentai_library/features/comic/presentation/view_models/comic_metadata_editor_notifier.dart';
-import 'package:hentai_library/features/comic/presentation/view_models/comic_metadata_smart_facet_providers.dart';
-import 'package:hentai_library/features/library_browse/public/catalog/for_comic_and_series.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/form/comic_metadata_form.dart';
+import 'package:hentai_library/features/comic/presentation/mappers/comic_metadata_edit_mappers.dart';
+import 'package:hentai_library/features/comic/domain/comic.dart';
+import 'package:hentai_library/features/comic/domain/value_objects/comic_metadata_form.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/series_item_membership.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -22,24 +23,18 @@ class ComicMetadataEditSession extends _$ComicMetadataEditSession {
   @override
   ComicMetadataEditUiState build(Comic comic) {
     _original = comic;
-    Future<void>.microtask(_loadSeriesSortMembership);
+    unawaited(Future<void>.microtask(_loadSeriesSortMembership));
     return ComicMetadataEditUiState(
       draft: comicMetadataDraftFromComic(comic),
       locks: comic.locks,
-      smartFacetScope: comicMetadataSmartFacetScopeForComic(comic),
+      comicId: comic.comicId,
+      resourcePath: comic.path,
     );
   }
 
   void updateDraft(ComicMetadataEditDraft draft) {
-    final ComicMetadataSmartFacetScope scope = state.smartFacetScope;
     state = state.copyWith(
       draft: draft,
-      smartFacetScope: (
-        comicId: scope.comicId,
-        title: draft.title,
-        resourcePath: scope.resourcePath,
-        seriesId: scope.seriesId,
-      ),
       clearTitleError:
           state.titleError != null && draft.validateTitle() == null,
     );
@@ -73,19 +68,21 @@ class ComicMetadataEditSession extends _$ComicMetadataEditSession {
           parodies: parodies,
           characters: characters,
         );
-    state = state.copyWith(
-      locks: state.locks.copyWith(
-        title: title,
-        description: description,
-        publishedAt: publishedAt,
-        contentRating: contentRating,
-        authors: authors,
-        tags: tags,
-        languages: languages,
-        parodies: parodies,
-        characters: characters,
-      ),
-    );
+    if (ref.mounted) {
+      state = state.copyWith(
+        locks: state.locks.copyWith(
+          title: title,
+          description: description,
+          publishedAt: publishedAt,
+          contentRating: contentRating,
+          authors: authors,
+          tags: tags,
+          languages: languages,
+          parodies: parodies,
+          characters: characters,
+        ),
+      );
+    }
   }
 
   /// 校验并保存。
@@ -113,24 +110,22 @@ class ComicMetadataEditSession extends _$ComicMetadataEditSession {
 
     state = state.copyWith(saving: true);
     try {
-      final ComicMetadataEditorNotifier editor = ref.read(
-        comicMetadataEditorProvider.notifier,
-      );
-      await editor.apply(
+      await ref.read(saveComicMetadataUseCaseProvider)(
         comicMetadataFormFromDraft(state.draft, _original).normalized,
         _original,
+        sort: seed != null && sortOrder != null
+            ? (
+                seed: seed,
+                sortOrder: sortOrder,
+                draftLocked: seed.sortOrderLocked,
+              )
+            : null,
       );
-      if (seed != null && sortOrder != null) {
-        await editor.persistSeriesSort(
-          comicId: _original.comicId,
-          seed: seed,
-          sortOrder: sortOrder,
-          draftLocked: seed.sortOrderLocked,
-        );
-      }
       return ComicMetadataEditSaveResult.succeeded;
     } finally {
-      state = state.copyWith(saving: false);
+      if (ref.mounted) {
+        state = state.copyWith(saving: false);
+      }
     }
   }
 
@@ -147,10 +142,6 @@ class ComicMetadataEditSession extends _$ComicMetadataEditSession {
       }
       state = state.copyWith(
         seed: membership,
-        smartFacetScope: comicMetadataSmartFacetScopeForComic(
-          _original,
-          seriesId: membership.seriesId,
-        ),
         draft: state.draft.copyWith(
           seriesSortOrderText: _formatSortOrder(membership.sortOrder),
         ),

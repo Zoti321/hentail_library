@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/shell/shell_library_secondary_layout.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/shared/ui/patterns/home/home_library_dashboard_models.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -29,9 +29,9 @@ class ShellLibraryPickerRow extends StatelessWidget {
         cursor: ShellNavigationCursor.interactive,
         child: Material(
           color: selected ? scheme.secondaryContainer : Colors.transparent,
-          borderRadius: BorderRadius.circular(28),
+          borderRadius: const BorderRadius.all(Radius.circular(28)),
           child: InkWell(
-            borderRadius: BorderRadius.circular(28),
+            borderRadius: const BorderRadius.all(Radius.circular(28)),
             onTap: onTap,
             child: Padding(
               padding: EdgeInsets.symmetric(

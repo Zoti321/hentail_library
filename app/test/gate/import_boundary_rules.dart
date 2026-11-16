@@ -5,8 +5,6 @@ import 'package:path/path.dart' as p;
 import 'lib_layout_scan_helpers.dart';
 
 /// Feature / module ids for import-boundary Gate (#220).
-///
-/// Keep in sync with `scripts/research/cross_feature_import_audit.py` (`classify`).
 const Set<String> kImportBoundaryModules = <String>{
   'bootstrap',
   'home',
@@ -14,10 +12,11 @@ const Set<String> kImportBoundaryModules = <String>{
   'library_browse',
   'comic',
   'series',
-  'read_session',
+  'reader',
   'reading_history',
+  'reading_stats',
   'comic_trash',
-  'named_metadata',
+  'comic_metadata',
   'app_settings',
   'metadata_backup',
   'shared',
@@ -73,6 +72,31 @@ bool isPublicPresentationExportAllowlisted(String libRelativePosix) {
   );
 }
 
+bool isPublicPresentationFacadeExport(
+  String source,
+  String target, [
+  String contents = '',
+]) {
+  final String module = classifyLibPath(source);
+  if (source.startsWith('features/$module/public/providers/') &&
+      target.startsWith('features/$module/presentation/providers/')) {
+    return true;
+  }
+  if ((source == 'features/$module/public/providers.dart' ||
+          source == 'features/$module/public/widgets.dart') &&
+      target.startsWith('features/$module/presentation/')) {
+    return true;
+  }
+  if (!source.startsWith('features/$module/public/') ||
+      !target.startsWith('features/$module/presentation/')) {
+    return false;
+  }
+  return RegExp(
+    "^export\\s+'package:hentai_library/${RegExp.escape(target)}'\\s+show\\s+[A-Za-z0-9_,\\s]+;",
+    multiLine: true,
+  ).hasMatch(contents);
+}
+
 final RegExp _exportOnlyShimRe = RegExp(
   r"^\s*export\s+'package:hentai_library/[^']+';\s*$",
 );
@@ -116,13 +140,13 @@ String classifyLibPath(String relativePosix) {
       return parts[1];
     }
   }
-  if (path.startsWith('shared/')) {
+  if (path.startsWith('shared/') || path.startsWith('design-system/')) {
     return 'shared';
   }
   if (path.startsWith('src/rust/')) {
     return 'frb_generated';
   }
-  if (path == 'main.dart') {
+  if (path.startsWith('composition/') || path == 'main.dart') {
     return 'bootstrap';
   }
   return 'shared';
@@ -172,7 +196,7 @@ bool isDomainLayerPath(String libRelativePosix) {
 
 bool isApplicationLayerPath(String libRelativePosix) {
   final String path = libRelativePosix.replaceAll(r'\', '/');
-  return path.startsWith('features/') && path.contains('/application/');
+  return path.contains('/application/');
 }
 
 /// Cross-feature allowlist (#427 / ADR-0034): `features/<owner>/public/**` only.
@@ -197,15 +221,15 @@ bool isFeaturePublicLayerPath(String libRelativePosix) {
 }
 
 bool _importTargetsFeatureApplication(String importPath) {
-  return importPath.startsWith('features/') &&
-      importPath.contains('/application/');
+  return importPath.contains('/application/');
 }
 
 bool _importTargetsDataLayer(String importPath) {
-  if (importPath.startsWith('shared/data/')) {
+  if (importPath.startsWith('infrastructure/')) {
     return true;
   }
-  return importPath.startsWith('features/') && importPath.contains('/data/');
+  return importPath.startsWith('features/') &&
+      importPath.contains('/infrastructure/');
 }
 
 bool _importTargetsPresentationLayer(String importPath) {
@@ -221,11 +245,11 @@ bool isFrbImportAllowedSource(String libRelativePosix) {
   if (path == 'main.dart') {
     return true;
   }
-  if (path.startsWith('shared/data/')) {
+  if (path.startsWith('infrastructure/')) {
     return true;
   }
-  // Wayfinder Phase C (#256 / #280): FRB thin edge lives in owner feature data/.
-  if (path.startsWith('features/') && path.contains('/data/')) {
+  // FRB calls stay in owner infrastructure; composition only selects adapters.
+  if (path.startsWith('features/') && path.contains('/infrastructure/')) {
     return true;
   }
   return false;
@@ -291,6 +315,7 @@ List<ImportViolation> collectImportViolations(Directory libDir) {
         continue;
       }
       _checkStructuralRules(
+        sourceContents: contents,
         found: found,
         sourceRel: rel,
         sourceModule: sourceModule,
@@ -324,6 +349,7 @@ List<ImportViolation> collectImportViolations(Directory libDir) {
           continue;
         }
         _checkStructuralRules(
+          sourceContents: contents,
           found: found,
           sourceRel: rel,
           sourceModule: sourceModule,
@@ -338,6 +364,7 @@ List<ImportViolation> collectImportViolations(Directory libDir) {
 }
 
 void _checkStructuralRules({
+  required String sourceContents,
   required List<ImportViolation> found,
   required String sourceRel,
   required String sourceModule,
@@ -346,10 +373,12 @@ void _checkStructuralRules({
   required String targetModule,
 }) {
   if (isDomainLayerPath(sourceRel)) {
-    final bool domainImportsSharedData = importPath.startsWith('shared/data/');
+    final bool domainImportsSharedData = importPath.startsWith(
+      'infrastructure/',
+    );
     final bool domainImportsOwnFeatureData =
         isProductModule(sourceModule) &&
-        importPath.startsWith('features/$sourceModule/data/');
+        importPath.startsWith('features/$sourceModule/infrastructure/');
     if (domainImportsSharedData || domainImportsOwnFeatureData) {
       found.add(
         violation(
@@ -463,7 +492,7 @@ void _checkStructuralRules({
   if (sourceModule == 'library_browse' ||
       sourceModule == 'comic' ||
       sourceModule == 'series') {
-    if (importPath.startsWith('features/read_session/')) {
+    if (importPath.startsWith('features/reader/')) {
       found.add(
         violation(
           ruleId: 'R5',
@@ -490,9 +519,18 @@ void _checkStructuralRules({
     );
   }
 
+  // R13（`shared/**` 不得 import/export `features/**`）只由
+  // `test/architecture/module_boundary_test.dart` 实现（扫 import + export），
+  // 本文件不再产出该规则（#504）。
+
   if (isFeaturePublicLayerPath(sourceRel) &&
       isProductModule(sourceModule) &&
       importPath.startsWith('features/$sourceModule/presentation/') &&
+      !isPublicPresentationFacadeExport(
+        sourceRel,
+        importPath,
+        sourceContents,
+      ) &&
       !isPublicPresentationExportAllowlisted(sourceRel)) {
     found.add(
       violation(
@@ -574,16 +612,21 @@ void _checkModuleGraphRules({
   }
 }
 
+/// Rules enforced with a shrink-only baseline instead of zero tolerance.
+const Set<String> kRatchetRuleIds = <String>{'M1', 'M2', 'M3'};
+
 List<ImportViolation> structuralViolations(List<ImportViolation> all) {
-  return all.where((ImportViolation v) => v.ruleId.startsWith('R')).toList();
+  return all
+      .where(
+        (ImportViolation v) =>
+            v.ruleId.startsWith('R') && !kRatchetRuleIds.contains(v.ruleId),
+      )
+      .toList();
 }
 
 List<ImportViolation> ratchetViolations(List<ImportViolation> all) {
   return all
-      .where(
-        (ImportViolation v) =>
-            v.ruleId == 'M1' || v.ruleId == 'M2' || v.ruleId == 'M3',
-      )
+      .where((ImportViolation v) => kRatchetRuleIds.contains(v.ruleId))
       .toList();
 }
 

@@ -1,9 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/motion/motion.dart';
-import 'package:hentai_library/shared/ui/shell/shell_library_secondary_layout.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/shared/ui/patterns/home/home_library_dashboard_models.dart';
 import 'package:hentai_library/shared/ui/shell/shell_library_secondary_panel.dart';
-import 'package:hentai_library/shared/ui/shell/shell_nav_divider.dart';
 import 'package:hentai_library/shared/ui/shell/shell_navigation.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:motor/motor.dart';
@@ -96,7 +96,7 @@ class _ShellLibrarySecondaryColumnState
       return;
     }
     _reveal.motion = LabMotion.shellLibrarySecondaryReveal;
-    _reveal.animateTo(widget.open ? 1.0 : 0.0);
+    unawaited(_reveal.animateTo(widget.open ? 1.0 : 0.0));
   }
 
   @override
@@ -107,6 +107,53 @@ class _ShellLibrarySecondaryColumnState
 
   @override
   Widget build(BuildContext context) {
+    final TextDirection textDirection = Directionality.of(context);
+    final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
+
+    final BorderRadius flyoutRadius = BorderRadiusDirectional.only(
+      topEnd: Radius.circular(ShellLibrarySecondaryPanelMetrics.cornerRadius),
+      bottomEnd: Radius.circular(
+        ShellLibrarySecondaryPanelMetrics.cornerRadius,
+      ),
+    ).resolve(textDirection);
+
+    final Widget panelChrome = Row(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        ShellNavVerticalDivider(
+          color: widget.dividerColor,
+          height: widget.height,
+        ),
+        Expanded(
+          child: ShellLibrarySecondaryPanel(
+            libraries: widget.libraries,
+            selectedLibraryId: widget.selectedLibraryId,
+            onLibrarySelected: widget.onLibrarySelected,
+            backgroundColor: widget.backgroundColor,
+          ),
+        ),
+      ],
+    );
+
+    final Widget panelBody = DecoratedBox(
+      decoration: BoxDecoration(
+        color: widget.backgroundColor,
+        borderRadius: flyoutRadius,
+        boxShadow: ShellLibrarySecondaryPanelMetrics.trailingShadows(
+          scheme.shadow,
+          textDirection,
+        ),
+      ),
+      child: ClipRRect(borderRadius: flyoutRadius, child: panelChrome),
+    );
+
+    final Widget interactivePane = MouseRegion(
+      cursor: ShellNavigationCursor.interactive,
+      onEnter: (_) => widget.onPointerEnter?.call(),
+      onExit: (_) => widget.onPointerExit?.call(),
+      child: panelBody,
+    );
+
     return AnimatedBuilder(
       animation: _reveal,
       builder: (BuildContext context, Widget? child) {
@@ -118,53 +165,6 @@ class _ShellLibrarySecondaryColumnState
         const double panelWidth = ShellNavigation.librarySecondaryPanelWidth;
 
         final TextDirection textDirection = Directionality.of(context);
-        final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
-
-        final BorderRadius flyoutRadius = BorderRadiusDirectional.only(
-          topEnd: Radius.circular(
-            ShellLibrarySecondaryPanelMetrics.cornerRadius,
-          ),
-          bottomEnd: Radius.circular(
-            ShellLibrarySecondaryPanelMetrics.cornerRadius,
-          ),
-        ).resolve(textDirection);
-
-        final Widget panelChrome = Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            ShellNavVerticalDivider(
-              color: widget.dividerColor,
-              height: widget.height,
-            ),
-            Expanded(
-              child: ShellLibrarySecondaryPanel(
-                libraries: widget.libraries,
-                selectedLibraryId: widget.selectedLibraryId,
-                onLibrarySelected: widget.onLibrarySelected,
-                backgroundColor: widget.backgroundColor,
-              ),
-            ),
-          ],
-        );
-
-        final Widget panelBody = DecoratedBox(
-          decoration: BoxDecoration(
-            color: widget.backgroundColor,
-            borderRadius: flyoutRadius,
-            boxShadow: ShellLibrarySecondaryPanelMetrics.trailingShadows(
-              scheme.shadow,
-              textDirection,
-            ),
-          ),
-          child: ClipRRect(borderRadius: flyoutRadius, child: panelChrome),
-        );
-
-        final Widget interactivePane = MouseRegion(
-          cursor: ShellNavigationCursor.interactive,
-          onEnter: (_) => widget.onPointerEnter?.call(),
-          onExit: (_) => widget.onPointerExit?.call(),
-          child: panelBody,
-        );
 
         final double revealedWidth = panelWidth * reveal;
         final double layoutWidth =
@@ -188,7 +188,7 @@ class _ShellLibrarySecondaryColumnState
                     maxWidth: panelWidth,
                     minHeight: widget.height,
                     maxHeight: widget.height,
-                    child: interactivePane,
+                    child: child,
                   ),
                 ),
               ),
@@ -196,6 +196,13 @@ class _ShellLibrarySecondaryColumnState
           ),
         );
       },
+      child: ExcludeFocus(
+        excluding: !widget.open,
+        child: ExcludeSemantics(
+          excluding: !widget.open,
+          child: interactivePane,
+        ),
+      ),
     );
   }
 }

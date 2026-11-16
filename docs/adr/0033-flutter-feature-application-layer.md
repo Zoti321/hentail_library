@@ -4,11 +4,17 @@
 
 Accepted
 
+## ADR-0050 修订（2026-11-12）
+
+应用编排按具体 UseCase 命名；纯 Dart 依赖以构造参数注入 Repository、明确函数或真实系统 Gateway。Library 提交与初始化、Comic 保存与排序、Reader 上下文、备份 prepare/commit 和自动执行已归 application。薄查询不新增空用例。共享纯 Dart 协作契约归 `shared/domain/contracts/`；含 BuildContext 的签名归 `shared/ui/contracts/`。以下旧 Port 目录表达由本修订取代，纯 Dart 与禁止边规则不变。
+
+> **ADR-0051 修订（2026-11-12）**：组合根迁到 `lib/composition/`；owner `data/` 迁为 `infrastructure/`；共享协作签名在 `shared/application/contracts/`，Riverpod 适配在 `shared/presentation/providers/`。内层以递归 import/export 门禁为准；下文旧目录是历史语境。
+
 ## Context
 
 Wayfinder feature 模块已有 `domain` / `data` / `presentation`，但 `*Service`、`*Coordinator` 与交互草稿混在 `domain/`，ViewModel 又承担过多用例编排。ADR-0002 将业务真值放在 Rust；Dart 侧需要一层 **无 Flutter、无 FRB** 的用例编排，且与 glossary 中的 **Application data**（应用数据目录）术语区分。
 
-`shared/domain/ports/` 与 `shared/domain/library/` 中的跨 feature **命令契约**（含部分含 `BuildContext` 的 UI 命令类型；#434 起不再使用 `shared/application/ports/`）；消费方 **import owner** `features/<id>/public.dart`（ADR-0034）。feature 内仍缺同级 **用例编排** 命名层。
+`shared/domain/ports/` 与 `shared/domain/library/` 中的跨 feature **命令契约**（含部分含 `BuildContext` 的 UI 命令类型；#434 起不再使用 `shared/application/ports/`；2026-11-12 / #530 起 `LibraryManagementPort` 已归 `library_admin`，shared 只留 `LibraryBrowseFallbackPort` 窄口）；消费方 **import owner** `features/<id>/public.dart`（ADR-0034）。feature 内仍缺同级 **用例编排** 命名层。
 
 ## Decision
 
@@ -35,9 +41,11 @@ Wayfinder feature 模块已有 `domain` / `data` / `presentation`，但 `*Servic
 
 ### 4. 迁移
 
-#419 / #420–#424 已落地：read_session、comic_trash、library_admin application 迁移与 library_browse 草稿归位。新用例编排仍按本节落 `application/`。
+#419 / #420–#424 已落地：reader、comic_trash、library_admin application 迁移与 library_browse 草稿归位。新用例编排仍按本节落 `application/`。
 
 > **实现修订（2026-11-02）**：Epic [#436](https://github.com/Zoti321/hentail_library/issues/436)（#437–#444）将 purge/阅读/库筛选·管理/Repository/周边 read model 等 **Dart 域真源**迁入各 owner `features/<id>/domain/`；`shared/domain/**` 对迁出符号仅保留 **export-only strangler**（`app/test/gate/strangler_shims.txt`）。Catalog 实体与分页/thumbnail 内核仍 @ shared（**ADR-0035**）。归属表与仍留 shared 的 UI 契约见 [`docs/engineering/shared-domain-ownership.md`](../engineering/shared-domain-ownership.md)。
+
+> **实现修订（2026-11-11）**：漫画封面写入命令从 reader 的 VM 移入 `features/comic/application/comic_cover_service.dart`，经 `comicCoverSetCommandProvider`（`comic/public/di/`）供 reader 调用；封面缓存刷新留在装配层。系列封面仍归 series owner。
 
 ## Consequences
 

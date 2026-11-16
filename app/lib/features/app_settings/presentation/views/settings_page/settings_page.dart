@@ -7,8 +7,13 @@ import 'package:hentai_library/features/app_settings/presentation/patterns/setti
 import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 
 /// 设置页（MD3E Cutover）：生产 `/settings` 路由入口。
+///
+/// 默认只渲染 `app_settings` 自有分类；「阅读」由 `reader`、「元数据备份」由
+/// `metadata_backup` 提供，由组合根经 [sectionsBuilder] 组合（ADR-0046 §6）。
 class SettingsPage extends ConsumerWidget {
-  const SettingsPage({super.key});
+  const SettingsPage({super.key, this.sectionsBuilder});
+
+  final SettingsSectionsBuilder? sectionsBuilder;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -28,9 +33,10 @@ class SettingsPage extends ConsumerWidget {
 
     return SettingsLayout(
       key: const Key('settings'),
-      sectionsBuilder: (BuildContext context, SettingsCategory category) {
-        return settingsSectionsFor(category, context);
-      },
+      sectionsBuilder:
+          sectionsBuilder ??
+          (BuildContext context, SettingsCategory category) =>
+              settingsSectionsFor(category, context),
     );
   }
 }

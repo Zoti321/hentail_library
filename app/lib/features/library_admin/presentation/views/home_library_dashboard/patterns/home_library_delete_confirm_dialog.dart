@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/ui/patterns/dialog/lab_dialog_presenter.dart';
-import 'package:hentai_library/shared/ui/theme/lab_text.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 从 Home「我的漫画库」移除 Library 的确认（勾选闸门；不删 Resource）。
@@ -33,49 +32,35 @@ class _HomeLibraryDeleteConfirmDialogState
     extends State<_HomeLibraryDeleteConfirmDialog> {
   bool _acknowledged = false;
 
+  void _handleAcknowledgementChanged(bool value) {
+    setState(() => _acknowledged = value);
+  }
+
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     final M3EThemeData theme = M3ETheme.of(context);
     final M3EColorScheme scheme = theme.colorScheme;
     final M3ESpacing spacing = theme.spacing;
-    final TextStyle dialogActionLabelStyle = labButtonLabelStyle(
-      theme,
-      M3EButtonSize.sm,
-    );
 
     return M3EDialog(
       title: l10n.homeLibraryDeleteConfirmTitle(widget.libraryDisplayName),
       content: _HomeLibraryDeleteConfirmBody(
         acknowledged: _acknowledged,
-        onAcknowledgementChanged: (bool value) {
-          setState(() => _acknowledged = value);
-        },
+        onAcknowledgementChanged: _handleAcknowledgementChanged,
         scheme: scheme,
         spacing: spacing,
         theme: theme,
       ),
       bottomDivider: true,
       actions: <Widget>[
-        M3EButton(
-          onPressed: () => Navigator.of(context).pop(false),
-          style: M3EButtonStyle.text,
-          decoration: M3EButtonDecoration(textStyle: dialogActionLabelStyle),
-          label: Text(l10n.commonCancel),
-        ),
-        M3EButton(
-          onPressed: _acknowledged
-              ? () => Navigator.of(context).pop(true)
-              : null,
-          style: M3EButtonStyle.filled,
-          decoration: M3EButtonDecoration.styleFrom(
-            textStyle: dialogActionLabelStyle,
-            backgroundColor: scheme.error,
-            foregroundColor: scheme.onError,
-            disabledBackgroundColor: scheme.onSurface.withValues(alpha: 0.12),
-            disabledForegroundColor: scheme.onSurface.withValues(alpha: 0.38),
-          ),
-          label: Text(l10n.sidebarDeleteLibrary),
+        DialogActionBar(
+          onCancel: () => Navigator.of(context).pop(false),
+          onConfirm: () => Navigator.of(context).pop(true),
+          cancelLabel: l10n.commonCancel,
+          confirmLabel: l10n.sidebarDeleteLibrary,
+          destructive: true,
+          confirmEnabled: _acknowledged,
         ),
       ],
     );
@@ -118,15 +103,14 @@ class _HomeLibraryDeleteConfirmBody extends StatelessWidget {
         Text(l10n.homeLibraryDeleteConfirmBody, style: descriptionStyle),
         SizedBox(height: spacing.md),
         InkWell(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: const BorderRadius.all(Radius.circular(12)),
           onTap: toggleAcknowledgement,
           child: Row(
             children: <Widget>[
               M3ECheckbox(
                 value: acknowledged,
-                onChanged: (bool? value) {
-                  onAcknowledgementChanged(value ?? false);
-                },
+                onChanged: (bool? value) =>
+                    onAcknowledgementChanged(value ?? false),
                 focusable: true,
               ),
               SizedBox(width: spacing.sm),

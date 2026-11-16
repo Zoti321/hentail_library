@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/ui/models/comic_cover_source.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/app_comic_image.dart';
-import 'package:hentai_library/shared/ui/widgets/element/image/comic_cover_placeholder.dart';
-import 'package:hentai_library/shared/ui/widgets/element/image/cover_letterbox.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 
 /// Catalog-card cover: MD3 letterbox + soft-crop [BoxFit] after decode.
 ///

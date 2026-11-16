@@ -1,28 +1,25 @@
-import 'package:hentai_library/shared/di/library_management_providers.dart';
+import 'package:hentai_library/features/library_admin/public/providers/library_admin_state_providers.dart';
+import 'package:hentai_library/features/library_admin/presentation/contracts/library_management_commands.dart';
 
 import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/home_library_list_order.dart';
+import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/home_library_dashboard_rows.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/home_library_management_section.dart';
-import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/home_library_row_health.dart';
-import 'package:hentai_library/shared/di/home_library_stats_providers.dart';
-import 'package:hentai_library/shared/di/library_command_providers.dart';
-import 'package:hentai_library/shared/domain/ports/library_management_port.dart';
-import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/features/library_admin/domain/libraries_state.dart';
 import 'package:hentai_library/features/library_admin/domain/library_scan_activity_state.dart';
 import 'package:hentai_library/features/library_admin/domain/library_sidebar_layout.dart';
-import 'package:hentai_library/features/library_admin/domain/library_metadata_refresh_command_port.dart';
 import 'package:hentai_library/features/library_admin/domain/metadata_refresh_types.dart';
 import 'package:hentai_library/features/library_admin/domain/sync_library_types.dart';
-import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
-import 'package:hentai_library/shared/domain/library/home_library_stat.dart';
+import 'package:hentai_library/features/library_admin/domain/local_library.dart';
+import 'package:hentai_library/features/home/public/home_library_stat.dart';
 import 'package:hentai_library/shared/ui/patterns/home/home_library_dashboard_models.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
-import 'package:hentai_library/shared/ui/widgets/feedback/metadata_refresh_toasts.dart';
+import 'package:hentai_library/features/library_admin/presentation/feedback/metadata_refresh_toasts.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:hentai_library/features/home/public/providers/home_library_stats_stream.dart';
 
 /// 生产首页「我的漫画库」区块：库列表 UI + 扫描/编辑/排序等编排。
 class HomeLibraryManagementPanel extends HookConsumerWidget {
@@ -59,38 +56,14 @@ class HomeLibraryManagementPanel extends HookConsumerWidget {
     }, <Object?>[libraries]);
     final List<LocalLibrary> ordered = pendingOrder.value ?? libraries;
 
-    final Map<String, HomeLibraryStat> statsById = <String, HomeLibraryStat>{
-      for (final HomeLibraryStat stat in stats) stat.libraryId: stat,
-    };
     final DateTime now = DateTime.now();
-    final List<HomeLibraryDashboardRow> rows = ordered
-        .map((LocalLibrary library) {
-          final HomeLibraryStat? stat = statsById[library.libraryId];
-          final int comicCount = stat?.comicCount ?? 0;
-          final DateTime? lastSyncedAt = stat?.lastSuccessfulSyncAt;
-          final ({HomeLibraryRowHint hint, int? staleDays}) health =
-              resolveHomeLibraryRowHealth(
-                now: now,
-                scanInterval: library.scanInterval,
-                lastSuccessfulSyncAt: lastSyncedAt,
-                comicCount: comicCount,
-              );
-          return HomeLibraryDashboardRow(
-            libraryId: library.libraryId,
-            displayName: localLibraryDisplayName(library),
-            kind: isRemoteLibrary(library)
-                ? HomeLibraryKind.remote
-                : HomeLibraryKind.local,
-            comicCount: comicCount,
-            seriesCount: stat?.seriesCount ?? 0,
-            lastSyncedAt: lastSyncedAt,
-            hint: health.hint,
-            staleDays: health.staleDays,
-            scanInProgress: scanRunning,
-            metadataRefreshInProgress: refreshingLibraryId == library.libraryId,
-          );
-        })
-        .toList(growable: false);
+    final List<HomeLibraryDashboardRow> rows = buildHomeLibraryDashboardRows(
+      libraries: ordered,
+      stats: stats,
+      now: now,
+      scanInProgress: scanRunning,
+      metadataRefreshLibraryId: refreshingLibraryId,
+    );
 
     final Map<String, LocalLibrary> libraryById = <String, LocalLibrary>{
       for (final LocalLibrary library in libraries) library.libraryId: library,
@@ -115,8 +88,8 @@ class HomeLibraryManagementPanel extends HookConsumerWidget {
       unawaited(_runLibraryAction(context, ref, library, action));
     }
 
-    final LibraryManagementPort management = ref.read(
-      libraryManagementPortProvider,
+    final LibraryManagementCommands management = ref.read(
+      libraryManagementCommandsProvider,
     );
 
     return HomeLibraryManagementSection(
@@ -156,14 +129,12 @@ Future<void> _persistOrder(
 ) async {
   final LibrarySidebarSections sections = splitLibrarySidebar(next);
   try {
-    await ref
-        .read(librariesPortProvider)
-        .updateSidebarLayout(
-          encodeLibrarySidebarLayout(
-            pinned: sections.pinned,
-            unpinned: sections.unpinned,
-          ),
-        );
+    await ref.read(updateLibrarySidebarCommandProvider)(
+      encodeLibrarySidebarLayout(
+        pinned: sections.pinned,
+        unpinned: sections.unpinned,
+      ),
+    );
   } catch (err) {
     pendingOrder.value = null;
     if (context.mounted) {
@@ -178,8 +149,8 @@ Future<void> _runLibraryAction(
   LocalLibrary library,
   HomeLibraryManagementAction action,
 ) async {
-  final LibraryManagementPort management = ref.read(
-    libraryManagementPortProvider,
+  final LibraryManagementCommands management = ref.read(
+    libraryManagementCommandsProvider,
   );
   final String libraryId = library.libraryId;
   switch (action) {
@@ -188,19 +159,15 @@ Future<void> _runLibraryAction(
     case HomeLibraryManagementAction.deepScan:
       await management.scanLibrary(context, libraryId, mode: ScanMode.full);
     case HomeLibraryManagementAction.refreshMetadata:
-      final LibraryMetadataRefreshCommandPort refresh = ref.read(
-        libraryMetadataRefreshCommandPortProvider,
-      );
       if (ref.read(libraryMetadataRefreshTargetLibraryIdStateProvider) ==
           libraryId) {
-        refresh.cancel();
+        ref.read(cancelMetadataRefreshCommandProvider)();
         return;
       }
       try {
-        final MetadataRefreshBatchResult result = await refresh.refreshLibrary(
-          libraryId: libraryId,
-          name: localLibraryDisplayName(library),
-        );
+        final MetadataRefreshBatchResult result = await ref.read(
+          refreshLibraryMetadataCommandProvider,
+        )(libraryId: libraryId, name: localLibraryDisplayName(library));
         if (context.mounted) {
           showMetadataRefreshBatchToast(context, result);
         }

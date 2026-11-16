@@ -1,8 +1,9 @@
+import 'package:hentai_library/features/series/domain/value_objects/serialization_status.dart';
 import 'package:flutter/widgets.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/shared/ui/models/series_serialization_status.dart';
+import 'package:hentai_library/features/comic/public/comic.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
 
-export 'package:hentai_library/shared/ui/models/series_serialization_status.dart';
+export 'package:hentai_library/features/series/domain/value_objects/serialization_status.dart';
 
 /// 系列内单册预览项。
 class SeriesDetailComicItem {
@@ -30,14 +31,14 @@ class SeriesDetailViewObject {
   const SeriesDetailViewObject({
     required this.title,
     this.cover,
-    this.serializationStatus = SeriesSerializationStatus.ongoing,
+    this.serializationStatus = SerializationStatus.ongoing,
     this.languages = const <String>[],
     this.showAgeRestrictionChip = false,
     this.volumeCurrent = 0,
     this.volumeTotal,
     this.showMetadataBlock = true,
     this.parodies = const <String>[],
-    this.authors = const <String>[],
+    this.authors = const <AuthorRef>[],
     this.characters = const <String>[],
     this.tags = const <String>[],
     this.comics = const <SeriesDetailComicItem>[],
@@ -47,7 +48,7 @@ class SeriesDetailViewObject {
 
   final String title;
   final Widget? cover;
-  final SeriesSerializationStatus serializationStatus;
+  final SerializationStatus serializationStatus;
 
   /// 已本地化的语言展示名（卷册语言并集；多数系列仅一项）。
   final List<String> languages;
@@ -56,7 +57,7 @@ class SeriesDetailViewObject {
   final int? volumeTotal;
   final bool showMetadataBlock;
   final List<String> parodies;
-  final List<String> authors;
+  final List<AuthorRef> authors;
   final List<String> characters;
   final List<String> tags;
   final List<SeriesDetailComicItem> comics;
@@ -66,7 +67,7 @@ class SeriesDetailViewObject {
   SeriesDetailViewObject copyWith({
     bool? showAgeRestrictionChip,
     bool? showMetadataBlock,
-    SeriesSerializationStatus? serializationStatus,
+    SerializationStatus? serializationStatus,
   }) {
     return SeriesDetailViewObject(
       title: title,

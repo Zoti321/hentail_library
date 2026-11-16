@@ -1,20 +1,17 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/patterns/shared/page_title.dart';
-import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/comic_trash/presentation/view_models/trash_page_controller.dart';
 import 'package:hentai_library/features/comic_trash/presentation/view_models/trash_page_state.dart';
 import 'package:hentai_library/features/comic_trash/presentation/views/trash/trash_actions.dart';
 import 'package:hentai_library/features/comic_trash/presentation/views/trash/widgets/trash_list_item.dart';
-import 'package:hentai_library/shared/ui/patterns/library/library_page_header_metrics.dart';
-import 'package:hentai_library/shared/ui/patterns/shared/page_header.dart';
-import 'package:hentai_library/shared/ui/patterns/shared/page_header_back_button.dart';
-import 'package:hentai_library/shared/ui/patterns/shared/pinned_toolbar_chrome.dart';
-import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
 import 'package:hentai_library/features/comic_trash/domain/trashed_comic.dart';
 import 'package:hentai_library/shared/ui/layout/app_shell_navigation.dart';
+import 'package:hentai_library/shared/ui/navigation/pop_or_go_home.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -26,6 +23,15 @@ const double _kTrashLoadMoreThreshold = 400;
 class TrashPage extends ConsumerWidget {
   const TrashPage({super.key});
 
+  bool _handleScroll(ScrollUpdateNotification notification, WidgetRef ref) {
+    final ScrollMetrics metrics = notification.metrics;
+    if (metrics.maxScrollExtent > 0 &&
+        metrics.pixels >= metrics.maxScrollExtent - _kTrashLoadMoreThreshold) {
+      unawaited(ref.read(trashPageControllerProvider.notifier).loadMore());
+    }
+    return false;
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final PageLayoutSpec layout = PageLayoutSpec.of(context);
@@ -34,15 +40,8 @@ class TrashPage extends ConsumerWidget {
     return ColoredBox(
       color: labBrowseCanvasColor(scheme),
       child: NotificationListener<ScrollUpdateNotification>(
-        onNotification: (ScrollUpdateNotification notification) {
-          final ScrollMetrics metrics = notification.metrics;
-          if (metrics.maxScrollExtent > 0 &&
-              metrics.pixels >=
-                  metrics.maxScrollExtent - _kTrashLoadMoreThreshold) {
-            ref.read(trashPageControllerProvider.notifier).loadMore();
-          }
-          return false;
-        },
+        onNotification: (ScrollUpdateNotification notification) =>
+            _handleScroll(notification, ref),
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: <Widget>[
@@ -175,12 +174,12 @@ class _TrashBody extends ConsumerWidget {
             itemCount: items.length,
             itemBuilder: (BuildContext context, int index) {
               final TrashedComic item = items[index];
+              final String comicId = item.comic.comicId;
               return TrashListItem(
-                key: ValueKey<String>(item.comic.comicId),
+                key: ValueKey<String>(comicId),
                 item: item,
-                selected: selectedIds.contains(item.comic.comicId),
-                onToggleSelected: () =>
-                    controller.toggleSelected(item.comic.comicId),
+                selected: selectedIds.contains(comicId),
+                onToggleSelected: () => controller.toggleSelected(comicId),
               );
             },
           ),
@@ -224,105 +223,96 @@ class _TrashHeader extends ConsumerWidget {
     TrashPageState? readState() =>
         ref.read(trashPageControllerProvider).asData?.value;
 
-    return PinnedToolbarChrome(
-      child: Row(
-        children: <Widget>[
-          if (onBack != null) ...<Widget>[
-            PageHeaderBackButton(onPressed: onBack!),
-            const SizedBox(width: 4),
-          ],
-          if (onOpenNavigation != null) ...<Widget>[
-            M3EIconButton(
-              icon: const Icon(Symbols.menu),
-              variant: M3EIconButtonVariant.standard,
-              size: M3EIconButtonSize.sm,
-              tooltip: l10n.shellOpenNavMenu,
-              semanticLabel: l10n.shellOpenNavMenu,
-              onPressed: onOpenNavigation,
+    return LibraryToolbarRow(
+      title: PageTitle(l10n.navTrash),
+      onBack: onBack,
+      onOpenNavigation: onOpenNavigation,
+      menuTooltip: l10n.shellOpenNavMenu,
+      menuSemanticLabel: l10n.shellOpenNavMenu,
+      trailing: <Widget>[
+        if (hasSelection)
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: Text(
+              l10n.trashSelectedCount(selectedCount),
+              style: Theme.of(context).textTheme.bodyMedium
+                  ?.copyWith(color: scheme.onSurfaceVariant),
             ),
-            const SizedBox(width: 8),
-          ],
-          Expanded(child: PageTitle(l10n.navTrash)),
-          if (hasSelection)
-            Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: Text(
-                l10n.trashSelectedCount(selectedCount),
-                style: Theme.of(context).textTheme.bodyMedium
-                    ?.copyWith(color: scheme.onSurfaceVariant),
-              ),
-            ),
-          M3EIconButton(
-            icon: Icon(
-              Symbols.restore,
-              size: LibraryPageHeaderMetrics.actionIconSize,
-              color: scheme.onSurfaceVariant,
-            ),
-            variant: M3EIconButtonVariant.standard,
-            size: M3EIconButtonSize.sm,
-            tooltip: hasSelection
-                ? l10n.trashRestoreSelected
-                : l10n.trashRestoreAll,
-            semanticLabel: hasSelection
-                ? l10n.trashRestoreSelected
-                : l10n.trashRestoreAll,
-            onPressed: hasItems
-                ? hasSelection
-                      ? () {
-                          final TrashPageState? state = readState();
-                          if (state == null) {
-                            return;
-                          }
+          ),
+        M3EIconButton(
+          icon: Icon(
+            Symbols.restore,
+            size: LibraryPageHeaderMetrics.actionIconSize,
+            color: scheme.onSurfaceVariant,
+          ),
+          variant: M3EIconButtonVariant.standard,
+          size: M3EIconButtonSize.sm,
+          tooltip: hasSelection
+              ? l10n.trashRestoreSelected
+              : l10n.trashRestoreAll,
+          semanticLabel: hasSelection
+              ? l10n.trashRestoreSelected
+              : l10n.trashRestoreAll,
+          onPressed: hasItems
+              ? hasSelection
+                    ? () {
+                        final TrashPageState? state = readState();
+                        if (state == null) {
+                          return;
+                        }
+                        unawaited(
                           restoreTrashedComics(
                             context,
                             ref,
                             state.selectedItems
                                 .map((TrashedComic item) => item.comic.comicId)
                                 .toList(),
-                          );
-                        }
-                      : () => restoreAllTrashedComics(context, ref)
-                : null,
+                          ),
+                        );
+                      }
+                    : () => restoreAllTrashedComics(context, ref)
+              : null,
+        ),
+        const SizedBox(width: 4),
+        M3EIconButton(
+          icon: Icon(
+            Symbols.delete_forever,
+            size: LibraryPageHeaderMetrics.actionIconSize,
+            color: hasItems ? scheme.error : scheme.onSurfaceVariant,
           ),
-          const SizedBox(width: 4),
-          M3EIconButton(
-            icon: Icon(
-              Symbols.delete_forever,
-              size: LibraryPageHeaderMetrics.actionIconSize,
-              color: hasItems ? scheme.error : scheme.onSurfaceVariant,
-            ),
-            variant: M3EIconButtonVariant.standard,
-            size: M3EIconButtonSize.sm,
-            tooltip: hasSelection
-                ? l10n.trashPurgeSelected
-                : l10n.trashPurgeAll,
-            semanticLabel: hasSelection
-                ? l10n.trashPurgeSelected
-                : l10n.trashPurgeAll,
-            onPressed: hasItems
-                ? hasSelection
-                      ? () {
-                          final TrashPageState? state = readState();
-                          if (state == null) {
-                            return;
-                          }
-                          purgeTrashedComics(context, ref, state.selectedItems);
+          variant: M3EIconButtonVariant.standard,
+          size: M3EIconButtonSize.sm,
+          tooltip: hasSelection ? l10n.trashPurgeSelected : l10n.trashPurgeAll,
+          semanticLabel: hasSelection
+              ? l10n.trashPurgeSelected
+              : l10n.trashPurgeAll,
+          onPressed: hasItems
+              ? hasSelection
+                    ? () {
+                        final TrashPageState? state = readState();
+                        if (state == null) {
+                          return;
                         }
-                      : () {
-                          final TrashPageState? state = readState();
-                          if (state == null) {
-                            return;
-                          }
+                        unawaited(
+                          purgeTrashedComics(context, ref, state.selectedItems),
+                        );
+                      }
+                    : () {
+                        final TrashPageState? state = readState();
+                        if (state == null) {
+                          return;
+                        }
+                        unawaited(
                           purgeAllTrashedComics(
                             context,
                             ref,
                             state.allPurgeCounts,
-                          );
-                        }
-                : null,
-          ),
-        ],
-      ),
+                          ),
+                        );
+                      }
+              : null,
+        ),
+      ],
     );
   }
 }

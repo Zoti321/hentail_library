@@ -1,27 +1,29 @@
+import 'package:hentai_library/composition/modules/library_browse/library_browse_preferences_overrides.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/features/comic/domain/library_comic_grouping.dart';
-import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
-import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
+import 'package:hentai_library/features/comic/domain/value_objects/library_comic_grouping.dart';
+import 'package:hentai_library/composition/composition_overrides.dart';
+import 'package:hentai_library/composition/feature_state_overrides.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/features/comic/domain/library_comic_filter.dart';
-import 'package:hentai_library/features/comic/domain/library_comic_sort_option.dart';
+import 'package:hentai_library/features/comic/domain/value_objects/library_comic_filter.dart';
+import 'package:hentai_library/features/comic/domain/value_objects/library_comic_sort_option.dart';
 import 'package:hentai_library/features/series/domain/library_series_grouping.dart';
-import 'package:hentai_library/features/series/domain/library_series_projection.dart';
+import 'package:hentai_library/features/series/domain/library_series_filter.dart';
 import 'package:hentai_library/features/series/domain/library_series_sort_option.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
+import 'package:hentai_library/features/comic/public/comic.dart';
+import 'package:hentai_library/features/series/domain/series.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
-import 'package:hentai_library/features/comic/domain/comic_browse_list_item.dart';
-import 'package:hentai_library/features/comic/domain/comic_catalog_repository.dart';
-import 'package:hentai_library/features/comic/di/comic_repository_providers.dart';
-import 'package:hentai_library/features/series/domain/series_browse_list_item.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/models/comic_browse_view_object.dart';
+import 'package:hentai_library/features/comic/domain/repositories/comic_catalog_repository.dart';
+import 'package:hentai_library/features/comic/presentation/providers/comic_repository_providers.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/models/series_browse_view_object.dart';
 import 'package:hentai_library/features/series/domain/series_repository.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_comic_filters_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_comics_catalog_controller.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_query_intent_notifier.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/features/series/public/providers/series_repository_providers.dart';
+import 'package:hentai_library/features/comic_metadata/public/providers/comic_metadata_repository_providers.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -53,14 +55,14 @@ class _FakeComicRepo implements ComicCatalogRepository {
   }
 
   @override
-  Future<PagedResult<ComicBrowseListItem>> fetchComicsBrowsePage({
+  Future<PagedResult<ComicBrowseViewObject>> fetchComicsBrowsePage({
     required PageRequest request,
     required LibraryComicFilter filter,
     required LibraryComicGrouping grouping,
     required LibraryComicSortOption sortOption,
   }) async {
-    return PagedResult<ComicBrowseListItem>(
-      items: const <ComicBrowseListItem>[],
+    return PagedResult<ComicBrowseViewObject>(
+      items: const <ComicBrowseViewObject>[],
       page: request.page,
       pageSize: request.pageSize,
       totalCount: 0,
@@ -91,14 +93,14 @@ class _FakeSeriesRepo implements SeriesRepository {
   }
 
   @override
-  Future<PagedResult<SeriesBrowseListItem>> fetchBrowsePage({
+  Future<PagedResult<SeriesBrowseViewObject>> fetchBrowsePage({
     required PageRequest request,
     required LibrarySeriesFilter filter,
     required LibrarySeriesGrouping grouping,
     required LibrarySeriesSortOption sortOption,
   }) async {
-    return PagedResult<SeriesBrowseListItem>(
-      items: const <SeriesBrowseListItem>[],
+    return PagedResult<SeriesBrowseViewObject>(
+      items: const <SeriesBrowseViewObject>[],
       page: request.page,
       pageSize: request.pageSize,
       totalCount: 0,
@@ -122,7 +124,8 @@ void main() {
   ProviderContainer createContainer() {
     return ProviderContainer(
       overrides: <Override>[
-        ...sharedLibraryStateOverrides(),
+        ...libraryBrowsePreferencesOverrides(),
+        ...featureStateOverrides(),
         ...bootstrapCompositionOverrides(),
         ...idleRevisionThrottleOverrides(),
         libraryRevisionProvider.overrideWith(_FakeLibraryRevision.new),
