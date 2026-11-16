@@ -3,8 +3,9 @@ use std::collections::HashMap;
 use crate::db::connection;
 use crate::db::map_db_err;
 use crate::error::HentaiError;
+use crate::image_set::sync_image_set_library;
 use crate::library::{
-    find_library_by_id, list_libraries, record_library_sync_failure,
+    find_library_by_id, is_image_set_catalog, list_libraries, record_library_sync_failure,
     record_library_sync_success_in, LibraryDto,
 };
 use crate::probe::{prepare_snapshot, replace_snapshot_in};
@@ -198,6 +199,11 @@ async fn sync_one_library(
 ) -> Result<SyncOneOutcome, HentaiError> {
     if library.kind == "remote" {
         return sync_remote_library(db, handle, library, password, emit).await;
+    }
+    if is_image_set_catalog(&library.catalog_kind) {
+        return Ok(map_finish_outcome(
+            sync_image_set_library(db, handle, library, emit).await?,
+        ));
     }
 
     let roots = normalize_roots(std::slice::from_ref(&library.root_path));

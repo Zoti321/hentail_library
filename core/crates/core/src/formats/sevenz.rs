@@ -58,7 +58,7 @@ pub fn read_sevenz_page(
     read_sevenz_entry(&backend.path, target)
 }
 
-fn list_sevenz_image_names(file: &Path) -> Result<Vec<String>, HentaiError> {
+pub(crate) fn list_sevenz_image_names(file: &Path) -> Result<Vec<String>, HentaiError> {
     let mut reader = File::open(file).map_err(|e| map_archive_err("7z 打开失败", e))?;
     let len = reader
         .metadata()

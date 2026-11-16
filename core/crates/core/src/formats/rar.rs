@@ -71,7 +71,7 @@ pub fn read_rar_page(backend: &RarBackend, page_index: usize) -> Result<Vec<u8>,
     read_rar_entry(&backend.path, target)
 }
 
-fn list_rar_image_names(file: &Path) -> Result<Vec<String>, HentaiError> {
+pub(crate) fn list_rar_image_names(file: &Path) -> Result<Vec<String>, HentaiError> {
     let archive = Archive::new(file)
         .open_for_listing()
         .map_err(|e| map_archive_err("rar 列表失败", e))?;

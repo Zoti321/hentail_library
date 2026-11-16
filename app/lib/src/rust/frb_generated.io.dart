@@ -11,6 +11,7 @@ import 'api/comic.dart';
 import 'api/comic_trash.dart';
 import 'api/history.dart';
 import 'api/home.dart';
+import 'api/image_set.dart';
 import 'api/init.dart';
 import 'api/library.dart';
 import 'api/logging.dart';
@@ -323,6 +324,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PlatformInt64 dco_decode_i_64(dynamic raw);
 
   @protected
+  ImageSetDto dco_decode_image_set_dto(dynamic raw);
+
+  @protected
+  ImageSetImageDto dco_decode_image_set_image_dto(dynamic raw);
+
+  @protected
   ImportComicMetadataResultDto dco_decode_import_comic_metadata_result_dto(
     dynamic raw,
   );
@@ -389,6 +396,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<HomeRecentlyAddedDto> dco_decode_list_home_recently_added_dto(
     dynamic raw,
   );
+
+  @protected
+  List<ImageSetDto> dco_decode_list_image_set_dto(dynamic raw);
+
+  @protected
+  List<ImageSetImageDto> dco_decode_list_image_set_image_dto(dynamic raw);
 
   @protected
   List<LibraryDto> dco_decode_list_library_dto(dynamic raw);
@@ -1121,6 +1134,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PlatformInt64 sse_decode_i_64(SseDeserializer deserializer);
 
   @protected
+  ImageSetDto sse_decode_image_set_dto(SseDeserializer deserializer);
+
+  @protected
+  ImageSetImageDto sse_decode_image_set_image_dto(SseDeserializer deserializer);
+
+  @protected
   ImportComicMetadataResultDto sse_decode_import_comic_metadata_result_dto(
     SseDeserializer deserializer,
   );
@@ -1201,6 +1220,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<HomeRecentlyAddedDto> sse_decode_list_home_recently_added_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  List<ImageSetDto> sse_decode_list_image_set_dto(SseDeserializer deserializer);
+
+  @protected
+  List<ImageSetImageDto> sse_decode_list_image_set_image_dto(
     SseDeserializer deserializer,
   );
 
@@ -2111,6 +2138,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_i_64(PlatformInt64 self, SseSerializer serializer);
 
   @protected
+  void sse_encode_image_set_dto(ImageSetDto self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_image_set_image_dto(
+    ImageSetImageDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_import_comic_metadata_result_dto(
     ImportComicMetadataResultDto self,
     SseSerializer serializer,
@@ -2206,6 +2242,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_home_recently_added_dto(
     List<HomeRecentlyAddedDto> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_image_set_dto(
+    List<ImageSetDto> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_image_set_image_dto(
+    List<ImageSetImageDto> self,
     SseSerializer serializer,
   );
 
