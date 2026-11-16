@@ -64,14 +64,6 @@ run_codegen_drift() {
   fi
   if [[ -n "$drift" ]]; then
     echo "$drift"
-    git -C "$REPO_ROOT" --no-pager diff HEAD -- app/lib/src/rust/api/author.dart \
-      app/lib/src/rust/api/comic.dart \
-      app/lib/src/rust/api/library.dart \
-      app/lib/src/rust/api/named_facet/types.dart \
-      app/lib/src/rust/api/resource_verification.dart \
-      app/lib/src/rust/api/series.dart \
-      app/lib/src/rust/api/sync.dart \
-      app/lib/src/rust/api/thumbnail.dart || true
     git -C "$REPO_ROOT" --no-pager diff HEAD --stat -- app core
     echo "::error::Codegen drift: 重新运行 FRB generate / build_runner 并提交产物。" >&2
     return 1

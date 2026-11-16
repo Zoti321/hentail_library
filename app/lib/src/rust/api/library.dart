@@ -14,7 +14,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'sync.dart';
 
 // These functions are ignored because they are not marked as `pub`: `map_resource_format_category_core`, `map_resource_format_category`, `map_scan_interval_core`, `map_scan_interval`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `clone`, `clone`, `clone`, `eq`, `fmt`, `fmt`, `fmt`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `eq`, `fmt`, `fmt`, `fmt`, `from`
 
 Future<List<LibraryDto>> listLibrariesFrb() =>
     RustLib.instance.api.crateApiLibraryListLibrariesFrb();
