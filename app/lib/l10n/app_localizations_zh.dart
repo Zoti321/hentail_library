@@ -63,7 +63,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get imageSetRootName => '库根目录';
+  String get imageSetRootName => '未分类';
 
   @override
   String get imageSetDetailEmpty => '该图集没有图片';

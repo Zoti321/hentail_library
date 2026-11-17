@@ -191,7 +191,7 @@ abstract class AppLocalizations {
   /// No description provided for @imageSetRootName.
   ///
   /// In zh, this message translates to:
-  /// **'库根目录'**
+  /// **'未分类'**
   String get imageSetRootName;
 
   /// No description provided for @imageSetDetailEmpty.

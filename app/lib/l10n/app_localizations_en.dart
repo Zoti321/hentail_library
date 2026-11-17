@@ -64,7 +64,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get imageSetRootName => 'Library root';
+  String get imageSetRootName => 'Unclassified';
 
   @override
   String get imageSetDetailEmpty => 'This image set has no images';

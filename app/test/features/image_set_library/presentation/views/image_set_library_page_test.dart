@@ -2,10 +2,13 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_image.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_reader_entry.dart';
 import 'package:hentai_library/features/image_set_library/presentation/providers/image_set_library_providers.dart';
+import 'package:hentai_library/features/image_set_library/presentation/views/image_set_card.dart';
+import 'package:hentai_library/features/image_set_library/presentation/views/image_set_cover.dart';
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_library_page.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:riverpod/misc.dart' show Override;
@@ -48,6 +51,16 @@ const List<ImageSetImage> _alphaImages = <ImageSetImage>[
   ),
 ];
 
+/// 1×1 opaque PNG for cover decode in widget tests.
+final Uint8List _png1x1 = Uint8List.fromList(<int>[
+  0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D,
+  0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
+  0x08, 0x02, 0x00, 0x00, 0x00, 0x90, 0x77, 0x53, 0xDE, 0x00, 0x00, 0x00,
+  0x0C, 0x49, 0x44, 0x41, 0x54, 0x08, 0xD7, 0x63, 0xF8, 0xCF, 0xC0, 0x00,
+  0x00, 0x00, 0x03, 0x00, 0x01, 0x00, 0x05, 0xFE, 0xD4, 0xEF, 0x00, 0x00,
+  0x00, 0x00, 0x49, 0x45, 0x4E, 0x44, 0xAE, 0x42, 0x60, 0x82,
+]);
+
 const LibrarySyncState _idle = (
   running: false,
   cancelled: false,
@@ -72,10 +85,13 @@ List<Override> _overrides(
       (String libraryId) async => <ImageSet>[_root, _alpha],
     ),
     imageSetImagesQueryProvider.overrideWithValue(
-      (String libraryId, String imageSetId) async => _alphaImages,
+      (String libraryId, String imageSetId) async =>
+          imageSetId == _alpha.imageSetId
+          ? _alphaImages
+          : const <ImageSetImage>[],
     ),
     imageSetPageBytesQueryProvider.overrideWithValue(
-      (String libraryId, ImageSetImage image) async => Uint8List(0),
+      (String libraryId, ImageSetImage image) async => _png1x1,
     ),
     imageSetReaderEntryCommandProvider.overrideWithValue(probe.entries.add),
   ];
@@ -93,6 +109,38 @@ Future<void> _pumpPage(WidgetTester tester, List<Override> overrides) =>
 
 void main() {
   testWidgets(
+    'defaults to card grid with root unclassified label and covers',
+    (WidgetTester tester) async {
+      final _Probe probe = _Probe();
+      await _pumpPage(tester, _overrides(probe));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(CatalogViewModeButtonGroup), findsOneWidget);
+      expect(find.byType(ImageSetCard), findsNWidgets(2));
+      expect(find.byType(ImageSetCover), findsWidgets);
+      expect(find.text('未分类'), findsOneWidget);
+      expect(find.text('alpha'), findsOneWidget);
+      expect(find.byType(ListTile), findsNothing);
+    },
+  );
+
+  testWidgets('toggles to list with leading cover thumbs', (
+    WidgetTester tester,
+  ) async {
+    final _Probe probe = _Probe();
+    await _pumpPage(tester, _overrides(probe));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.bySemanticsLabel('列表视图'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ListTile), findsNWidgets(2));
+    expect(find.byType(ImageSetCard), findsNothing);
+    expect(find.byType(ImageSetCover), findsNWidgets(2));
+    expect(find.text('未分类'), findsOneWidget);
+  });
+
+  testWidgets(
     'list Scrollbar shares an explicit controller on desktop surface',
     (WidgetTester tester) async {
       await tester.binding.setSurfaceSize(const Size(1280, 800));
@@ -106,16 +154,10 @@ void main() {
     },
   );
 
-  testWidgets('list shows root image set first and opens detail grid', (
-    WidgetTester tester,
-  ) async {
+  testWidgets('card tap opens detail grid', (WidgetTester tester) async {
     final _Probe probe = _Probe();
     await _pumpPage(tester, _overrides(probe));
     await tester.pumpAndSettle();
-
-    expect(find.text('库根目录'), findsOneWidget);
-    expect(find.text('alpha'), findsOneWidget);
-    expect(find.text('同步图集'), findsNothing);
 
     await tester.tap(find.byKey(const ValueKey<String>('imageSet-a')));
     await tester.pumpAndSettle();

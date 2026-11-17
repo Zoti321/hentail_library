@@ -46,7 +46,7 @@
       }
     }
   },
-  "imageSetRootName": "库根目录",
+  "imageSetRootName": "未分类",
   "imageSetDetailEmpty": "该图集没有图片",
   "sidebarAddRemoteLibrary": "添加远程库",
   "sidebarReorderLibraries": "重新排序",
