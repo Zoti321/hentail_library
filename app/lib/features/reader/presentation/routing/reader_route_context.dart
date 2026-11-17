@@ -78,12 +78,14 @@ class ReaderRouteContext {
     required String libraryId,
     required String imageSetId,
     required int startIndex,
+    String? imageSetImageId,
   }) {
     return ReaderRouteContext(
       source: ImageSetReadSessionSource(
         libraryId: libraryId,
         imageSetId: imageSetId,
         startIndex: startIndex,
+        imageSetImageId: imageSetImageId,
       ),
       startFromFirstPage: true,
     );

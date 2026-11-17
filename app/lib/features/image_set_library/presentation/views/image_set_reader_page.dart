@@ -8,9 +8,7 @@ void pushImageSetReaderPage(
   ImageSetReaderEntry entry,
 ) {
   navigator?.push(
-    MaterialPageRoute<void>(
-      builder: (_) => ImageSetReaderPage(entry: entry),
-    ),
+    MaterialPageRoute<void>(builder: (_) => ImageSetReaderPage(entry: entry)),
   );
 }
 
@@ -27,6 +25,7 @@ class ImageSetReaderPage extends StatelessWidget {
         libraryId: entry.libraryId,
         imageSetId: entry.imageSetId,
         startIndex: entry.index,
+        imageSetImageId: entry.imageSetImageId,
       ),
     );
   }

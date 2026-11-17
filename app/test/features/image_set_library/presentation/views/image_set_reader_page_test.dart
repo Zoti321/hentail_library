@@ -14,6 +14,7 @@ import 'package:hentai_library/features/reader/domain/comic_page_source_port.dar
 import 'package:hentai_library/features/reader/domain/image_set_read_port.dart';
 import 'package:hentai_library/features/reader/domain/native_reader_port.dart';
 import 'package:hentai_library/features/reader/domain/read_session_page.dart';
+import 'package:hentai_library/features/reader/domain/read_session_source.dart';
 import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
 import 'package:hentai_library/features/reader/domain/reader_page_payload.dart';
 import 'package:hentai_library/features/reader/presentation/providers/reader_dependencies.dart';
@@ -91,7 +92,7 @@ class _FakeImageSetReadPort implements ImageSetReadPort {
     return ImageSetOpenedReadSession(
       libraryId: libraryId,
       imageSetId: imageSetId,
-      title: pages[clamped].name,
+      title: pages.first.name,
       pages: pages,
       startIndex: clamped,
     );
@@ -185,13 +186,15 @@ List<Override> _overrides(_Probe probe) {
     }) async {
       probe.progressWrites++;
     }),
-    recordReadSessionActivityCommandProvider.overrideWithValue(({
-      required String comicId,
-      required bool incognito,
-      required Duration foregroundElapsed,
-      required int pageIndex,
-      required int pageCount,
-    }) async {}),
+    recordReadSessionActivityCommandProvider.overrideWithValue(
+      ({
+        required String comicId,
+        required bool incognito,
+        required Duration foregroundElapsed,
+        required int pageIndex,
+        required int pageCount,
+      }) async {},
+    ),
     openReadSessionServiceProvider.overrideWithValue(
       OpenReadSessionService(
         comicLookup: _StubComicLookup(),
@@ -216,79 +219,88 @@ void main() {
     libraryId: 'img-1',
     imageSetId: 'a',
     imageSetImageId: 'i2',
-    index: 1,
+    index: 99,
   );
 
-  testWidgets('opens ReaderPage at catalog index without writing progress', (
+  testWidgets(
+    'opens selected image despite stale index without writing progress',
+    (WidgetTester tester) async {
+      await tester.binding.setSurfaceSize(const Size(1024, 800));
+      final _Probe probe = _Probe();
+      await pumpLocalizedApp(
+        tester,
+        overrides: _overrides(probe),
+        home: const ImageSetReaderPage(entry: entry),
+      );
+      await _pumpFrames(tester);
+
+      expect(find.byType(ReaderPage), findsOneWidget);
+      final source = tester.widget<ReaderPage>(find.byType(ReaderPage)).source;
+      expect(
+        (source as ImageSetReadSessionSource).imageSetImageId,
+        entry.imageSetImageId,
+      );
+      final layout = tester.widget<ReaderLayout>(find.byType(ReaderLayout));
+      expect(layout.currentPage, 2);
+      expect(layout.totalPages, 3);
+      expect(probe.progressWrites, 0);
+
+      await tester.tapAt(tester.getCenter(find.byType(Scaffold).last));
+      await _pumpFrames(tester);
+      expect(find.text('系列目录'), findsNothing);
+      await tester.binding.setSurfaceSize(null);
+    },
+  );
+
+  testWidgets('entry push opens ReaderPage and Flutter pop returns to host', (
     WidgetTester tester,
   ) async {
     await tester.binding.setSurfaceSize(const Size(1024, 800));
     final _Probe probe = _Probe();
-    await pumpLocalizedApp(
-      tester,
-      overrides: _overrides(probe),
-      home: const ImageSetReaderPage(entry: entry),
+    final config = localizedTestAppConfig();
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: _overrides(probe),
+        child: MaterialApp(
+          navigatorKey: appRootNavigatorKey,
+          locale: config.locale,
+          localizationsDelegates: config.delegates,
+          supportedLocales: config.locales,
+          theme: buildAppTheme(Brightness.light),
+          home: Builder(
+            builder: (BuildContext context) {
+              return Scaffold(
+                body: TextButton(
+                  onPressed: () =>
+                      pushImageSetReaderPage(Navigator.of(context), entry),
+                  child: const Text('open-reader'),
+                ),
+              );
+            },
+          ),
+        ),
+      ),
     );
     await _pumpFrames(tester);
 
+    await tester.tap(find.text('open-reader'));
+    await _pumpFrames(tester);
+
     expect(find.byType(ReaderPage), findsOneWidget);
-    expect(find.text('2.png'), findsWidgets);
+    final layout = tester.widget<ReaderLayout>(find.byType(ReaderLayout));
+    expect(layout.currentPage, 2);
+    expect(layout.totalPages, 3);
     expect(probe.progressWrites, 0);
 
+    // Reveal chrome and exit via Reader back (force pop past PopScope).
     await tester.tapAt(tester.getCenter(find.byType(Scaffold).last));
     await _pumpFrames(tester);
-    expect(find.text('系列目录'), findsNothing);
+    await tester.tap(find.bySemanticsLabel('返回上一页'));
+    await _pumpFrames(tester);
+
+    expect(find.byType(ReaderPage), findsNothing);
+    expect(find.text('open-reader'), findsOneWidget);
+    expect(probe.progressWrites, 0);
     await tester.binding.setSurfaceSize(null);
   });
-
-  testWidgets(
-    'entry push opens ReaderPage and Flutter pop returns to host',
-    (WidgetTester tester) async {
-      await tester.binding.setSurfaceSize(const Size(1024, 800));
-      final _Probe probe = _Probe();
-      final config = localizedTestAppConfig();
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: _overrides(probe),
-          child: MaterialApp(
-            navigatorKey: appRootNavigatorKey,
-            locale: config.locale,
-            localizationsDelegates: config.delegates,
-            supportedLocales: config.locales,
-            theme: buildAppTheme(Brightness.light),
-            home: Builder(
-              builder: (BuildContext context) {
-                return Scaffold(
-                  body: TextButton(
-                    onPressed: () =>
-                        pushImageSetReaderPage(Navigator.of(context), entry),
-                    child: const Text('open-reader'),
-                  ),
-                );
-              },
-            ),
-          ),
-        ),
-      );
-      await _pumpFrames(tester);
-
-      await tester.tap(find.text('open-reader'));
-      await _pumpFrames(tester);
-
-      expect(find.byType(ReaderPage), findsOneWidget);
-      expect(find.text('2.png'), findsWidgets);
-      expect(probe.progressWrites, 0);
-
-      // Reveal chrome and exit via Reader back (force pop past PopScope).
-      await tester.tapAt(tester.getCenter(find.byType(Scaffold).last));
-      await _pumpFrames(tester);
-      await tester.tap(find.bySemanticsLabel('返回上一页'));
-      await _pumpFrames(tester);
-
-      expect(find.byType(ReaderPage), findsNothing);
-      expect(find.text('open-reader'), findsOneWidget);
-      expect(probe.progressWrites, 0);
-      await tester.binding.setSurfaceSize(null);
-    },
-  );
 }

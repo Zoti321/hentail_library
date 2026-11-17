@@ -42,6 +42,13 @@ class ReadSessionPageLoadException extends AppException {
     );
   }
 
+  factory ReadSessionPageLoadException.imageSetImageNotFound(String imageId) {
+    return ReadSessionPageLoadException._(
+      '图集图片不存在: $imageId',
+      kind: ReadSessionFailureKind.resourceNotFound,
+    );
+  }
+
   factory ReadSessionPageLoadException.emptyPages({
     required String comicId,
     required String path,

@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:hentai_library/features/reader/application/open_read_session_service.dart';
+import 'package:hentai_library/features/reader/application/read_session_page_load_exception.dart';
 import 'package:hentai_library/features/reader/application/read_session_application_service.dart';
 import 'package:hentai_library/features/reader/domain/comic_page_source_port.dart';
 import 'package:hentai_library/features/reader/domain/image_set_read_port.dart';
@@ -34,6 +36,8 @@ class _UnusedNative implements NativeReaderPort {
 
 class _FakeImageSetPort implements ImageSetReadPort {
   int openCount = 0;
+  int? requestedStartIndex;
+  Completer<void>? pendingOpen;
 
   @override
   Future<ImageSetOpenedReadSession> openSession({
@@ -42,6 +46,8 @@ class _FakeImageSetPort implements ImageSetReadPort {
     required int startIndex,
   }) async {
     openCount += 1;
+    requestedStartIndex = startIndex;
+    await pendingOpen?.future;
     return ImageSetOpenedReadSession(
       libraryId: libraryId,
       imageSetId: imageSetId,
@@ -78,6 +84,118 @@ class _FakeImageSetPort implements ImageSetReadPort {
 }
 
 void main() {
+  OpenReadSessionService serviceFor(_FakeImageSetPort port) =>
+      OpenReadSessionService(
+        comicLookup: _NoComicLookup(),
+        pageSource: _UnusedPageSource(),
+        readResumePage: (_) async => null,
+        sessionPort: _UnusedNative(),
+        imageSetReadPort: port,
+      );
+
+  test('selected image identity overrides an obsolete catalog index', () async {
+    final port = _FakeImageSetPort();
+    final service = serviceFor(port);
+    final opened = await service.openFromSource(
+      const ImageSetReadSessionSource(
+        libraryId: 'lib',
+        imageSetId: 'set',
+        startIndex: 99,
+        imageSetImageId: 'i2',
+      ),
+    );
+
+    expect(opened.resumePageIndex, 2);
+    expect(port.requestedStartIndex, 0);
+  });
+
+  test(
+    'selection resolves separately against the shared page snapshot',
+    () async {
+      final port = _FakeImageSetPort();
+      final service = serviceFor(port);
+      final first = await service.openFromSource(
+        const ImageSetReadSessionSource(
+          libraryId: 'lib',
+          imageSetId: 'set',
+          startIndex: 1,
+          imageSetImageId: 'i1',
+        ),
+      );
+      final second = await service.openFromSource(
+        const ImageSetReadSessionSource(
+          libraryId: 'lib',
+          imageSetId: 'set',
+          startIndex: 0,
+          imageSetImageId: 'i2',
+        ),
+      );
+
+      expect(first.resumePageIndex, 1);
+      expect(second.resumePageIndex, 2);
+      expect(port.openCount, 1);
+    },
+  );
+
+  test(
+    'missing selected image fails instead of opening another page',
+    () async {
+      final port = _FakeImageSetPort();
+      final service = serviceFor(port);
+      await expectLater(
+        service.openFromSource(
+          const ImageSetReadSessionSource(
+            libraryId: 'lib',
+            imageSetId: 'set',
+            startIndex: 0,
+            imageSetImageId: 'removed',
+          ),
+        ),
+        throwsA(
+          isA<ReadSessionPageLoadException>().having(
+            (error) => error.kind,
+            'kind',
+            ReadSessionFailureKind.resourceNotFound,
+          ),
+        ),
+      );
+      expect(port.openCount, 1);
+    },
+  );
+
+  test(
+    'concurrent callers share preparation but retain selected identities',
+    () async {
+      final pending = Completer<void>();
+      final port = _FakeImageSetPort()..pendingOpen = pending;
+      final service = serviceFor(port);
+      final first = service.openFromSource(
+        const ImageSetReadSessionSource(
+          libraryId: 'lib',
+          imageSetId: 'set',
+          startIndex: 99,
+          imageSetImageId: 'i1',
+        ),
+      );
+      final second = service.openFromSource(
+        const ImageSetReadSessionSource(
+          libraryId: 'lib',
+          imageSetId: 'set',
+          startIndex: 99,
+          imageSetImageId: 'i2',
+        ),
+      );
+      pending.complete();
+      final opened = await Future.wait(<Future<OpenedReadSession>>[
+        first,
+        second,
+      ]);
+
+      expect(opened.map((session) => session.resumePageIndex), <int>[1, 2]);
+      expect(port.openCount, 1);
+    },
+  );
+
   test('openFromSource maps image set pages and start index', () async {
     final _FakeImageSetPort port = _FakeImageSetPort();
     final OpenReadSessionService service = OpenReadSessionService(
@@ -110,47 +228,49 @@ void main() {
     expect(payload, isA<ReaderPageBytes>());
   });
 
-  test('beginReadSession skips progress when persistProgress is false', () async {
-    int writes = 0;
-    final OpenReadSessionService sessions = OpenReadSessionService(
-      comicLookup: _NoComicLookup(),
-      pageSource: _UnusedPageSource(),
-      readResumePage: (_) async => null,
-      sessionPort: _UnusedNative(),
-      imageSetReadPort: _FakeImageSetPort(),
-    );
-    final ReadSessionApplicationService app = ReadSessionApplicationService(
-      sessionService: sessions,
-      recordProgress:
-          ({
-            required String comicId,
-            required String title,
-            required DateTime lastReadTime,
-            required int pageIndex,
-          }) async {
-            writes += 1;
-          },
-      recordActivity:
-          ({
-            required String comicId,
-            required bool incognito,
-            required Duration foregroundElapsed,
-            required int pageIndex,
-            required int pageCount,
-          }) async {},
-    );
+  test(
+    'beginReadSession skips progress when persistProgress is false',
+    () async {
+      int writes = 0;
+      final OpenReadSessionService sessions = OpenReadSessionService(
+        comicLookup: _NoComicLookup(),
+        pageSource: _UnusedPageSource(),
+        readResumePage: (_) async => null,
+        sessionPort: _UnusedNative(),
+        imageSetReadPort: _FakeImageSetPort(),
+      );
+      final ReadSessionApplicationService app = ReadSessionApplicationService(
+        sessionService: sessions,
+        recordProgress:
+            ({
+              required String comicId,
+              required String title,
+              required DateTime lastReadTime,
+              required int pageIndex,
+            }) async {
+              writes += 1;
+            },
+        recordActivity: ({
+          required String comicId,
+          required bool incognito,
+          required Duration foregroundElapsed,
+          required int pageIndex,
+          required int pageCount,
+        }) async {},
+      );
 
-    await app.beginReadSession(
-      comic: const ReaderComicRef(
-        comicId: 'image_set:lib:set',
-        path: 'image_set:lib:set',
-        resourceType: ResourceType.dir,
-        pageCount: 2,
-        title: 'p1.png',
-      ),
-      persistProgress: false,
-    );
-    expect(writes, 0);
-    expect(app.hasActiveSession, isFalse);
-  });
+      await app.beginReadSession(
+        comic: const ReaderComicRef(
+          comicId: 'image_set:lib:set',
+          path: 'image_set:lib:set',
+          resourceType: ResourceType.dir,
+          pageCount: 2,
+          title: 'p1.png',
+        ),
+        persistProgress: false,
+      );
+      expect(writes, 0);
+      expect(app.hasActiveSession, isFalse);
+    },
+  );
 }

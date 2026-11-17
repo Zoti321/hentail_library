@@ -92,17 +92,14 @@ class OpenReadSessionService {
     final Object lifetime = _lifetimes.putIfAbsent(sessionKey, Object.new);
     final _OpenedPages opened = await _openPages(source);
     final int resumePageIndex = switch (source) {
-      ImageSetReadSessionSource(:final int startIndex) =>
-        clampOneBasedResumeIndex(
-          storedPageIndex: startIndex + 1,
-          totalPages: opened.pages.length,
-        ),
-      ComicReadSessionSource() => (incognito || startFromFirstPage)
-          ? 1
-          : clampOneBasedResumeIndex(
-              storedPageIndex: await _readResumePage(sessionKey),
-              totalPages: opened.pages.length,
-            ),
+      ImageSetReadSessionSource() => _imageSetResumeIndex(source, opened.pages),
+      ComicReadSessionSource() =>
+        (incognito || startFromFirstPage)
+            ? 1
+            : clampOneBasedResumeIndex(
+                storedPageIndex: await _readResumePage(sessionKey),
+                totalPages: opened.pages.length,
+              ),
     };
     _ensureLifetime(sessionKey, lifetime);
     return OpenedReadSession(
@@ -110,6 +107,28 @@ class OpenReadSessionService {
       pages: opened.pages,
       resumePageIndex: resumePageIndex,
     );
+  }
+
+  int _imageSetResumeIndex(
+    ImageSetReadSessionSource source,
+    List<ReadSessionPage> pages,
+  ) {
+    final String? imageId = source.imageSetImageId;
+    if (imageId == null) {
+      return clampOneBasedResumeIndex(
+        storedPageIndex: source.startIndex + 1,
+        totalPages: pages.length,
+      );
+    }
+    final int index = pages.indexWhere(
+      (page) =>
+          page is ReadSessionImageSetPage &&
+          page.page.imageSetImageId == imageId,
+    );
+    if (index < 0) {
+      throw ReadSessionPageLoadException.imageSetImageNotFound(imageId);
+    }
+    return index + 1;
   }
 
   Future<List<ReadSessionPage>> loadPages(String comicId) async {
@@ -350,7 +369,8 @@ class OpenReadSessionService {
         .openSession(
           libraryId: source.libraryId,
           imageSetId: source.imageSetId,
-          startIndex: source.startIndex,
+          // Identity is resolved against this snapshot after opening it.
+          startIndex: source.imageSetImageId == null ? source.startIndex : 0,
         );
     _ensureLifetime(sessionKey, attempt.lifetime);
     if (opened.pages.isEmpty) {
@@ -371,11 +391,7 @@ class OpenReadSessionService {
         (ImageSetReadPage page) => ReadSessionImageSetPage(page: page),
       ),
     );
-    final _OpenedPages result = (
-      comic: comic,
-      pages: pages,
-      source: source,
-    );
+    final _OpenedPages result = (comic: comic, pages: pages, source: source);
     _openedPages[sessionKey] = result;
     return result;
   }
