@@ -1,4 +1,4 @@
-import 'package:hentai_library/features/comic/application/comic_metadata_service.dart';
+import 'package:hentai_library/features/comic/application/apply_comic_metadata_form_use_case.dart';
 import 'package:hentai_library/features/comic/presentation/providers/comic_metadata_use_case_providers.dart';
 import 'package:hentai_library/shared/presentation/providers/series_item_membership_providers.dart';
 import 'package:hentai_library/shared/presentation/providers/series_item_sort_providers.dart';

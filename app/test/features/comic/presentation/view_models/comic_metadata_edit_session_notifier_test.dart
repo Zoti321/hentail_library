@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:hentai_library/features/comic/application/comic_metadata_service.dart';
+import 'package:hentai_library/features/comic/application/apply_comic_metadata_form_use_case.dart';
 import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/features/comic/domain/repositories/comic_user_metadata_repository.dart';
 import 'package:hentai_library/features/comic/presentation/providers/comic_metadata_use_case_providers.dart';

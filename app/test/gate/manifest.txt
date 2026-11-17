@@ -59,7 +59,6 @@ test/features/reader/presentation/reader_input_test.dart
 test/features/library_browse/presentation/browse/view_models/stable_page_count_test.dart
 test/features/library_browse/presentation/catalog/view_models/catalog_pagination_engine_test.dart
 test/features/comic/presentation/view_models/comic_detail_return_series_notifier_test.dart
-test/features/comic/presentation/view_models/comic_metadata_apply_test.dart
 test/features/comic/presentation/view_models/comic_metadata_editor_notifier_test.dart
 test/features/comic/presentation/view_models/comic_metadata_edit_session_notifier_test.dart
 test/features/library_browse/presentation/browse/view_models/library_comic_filters_notifier_test.dart

@@ -1,6 +1,6 @@
 import 'package:test/test.dart';
 import 'package:hentai_library/features/comic/application/save_comic_metadata_use_case.dart';
-import 'package:hentai_library/features/comic/application/comic_metadata_service.dart';
+import 'package:hentai_library/features/comic/application/apply_comic_metadata_form_use_case.dart';
 import 'package:hentai_library/features/comic/domain/comic.dart';
 import 'package:hentai_library/features/comic/domain/value_objects/comic_metadata_form.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
@@ -54,6 +54,29 @@ void main() {
       );
     });
   }
+  test('invalid metadata skips optional Series ordering', () async {
+    final calls = <String>[];
+    final useCase = SaveComicMetadataUseCase(
+      apply: (form, original) async => ComicMetadataApplyInvalid(
+        const ComicMetadataFormValidation(titleError: 'required'),
+      ),
+      persistSort:
+          ({
+            required comicId,
+            required seed,
+            required sortOrder,
+            required draftLocked,
+          }) async {
+            calls.add('sort');
+            return true;
+          },
+    );
+
+    final result = await useCase(form, comic, sort: sort);
+
+    expect(result, isA<ComicMetadataApplyInvalid>());
+    expect(calls, isEmpty);
+  });
   test('unchanged metadata still permits optional sort; absent sort does not write it', () async {
     var sorts = 0;
     final useCase = SaveComicMetadataUseCase(
