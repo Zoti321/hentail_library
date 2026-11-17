@@ -11,7 +11,7 @@ import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Image set 库浏览：列表与同步 busy 投影（手动同步入口在 Home「更多」）。
-class ImageSetLibraryPage extends ConsumerWidget {
+class ImageSetLibraryPage extends ConsumerStatefulWidget {
   const ImageSetLibraryPage({
     super.key,
     required this.libraryId,
@@ -22,7 +22,23 @@ class ImageSetLibraryPage extends ConsumerWidget {
   final String displayName;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ImageSetLibraryPage> createState() =>
+      _ImageSetLibraryPageState();
+}
+
+class _ImageSetLibraryPageState extends ConsumerState<ImageSetLibraryPage> {
+  // Desktop Scrollbar does not auto-attach to PrimaryScrollController; share
+  // an explicit controller with the ListView (same pattern as library browse).
+  final ScrollController _listScrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _listScrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     final M3EThemeData theme = M3ETheme.of(context);
     final double horizontalInset = PageLayoutSpec.of(context).horizontalInset;
@@ -30,7 +46,7 @@ class ImageSetLibraryPage extends ConsumerWidget {
       librarySyncStateProvider.select((LibrarySyncState s) => s.running),
     );
     final AsyncValue<List<ImageSet>> sets = ref.watch(
-      imageSetSetsProvider(libraryId),
+      imageSetSetsProvider(widget.libraryId),
     );
 
     return Material(
@@ -42,7 +58,7 @@ class ImageSetLibraryPage extends ConsumerWidget {
           children: <Widget>[
             Padding(
               padding: EdgeInsets.symmetric(horizontal: horizontalInset),
-              child: PageTitle(displayName),
+              child: PageTitle(widget.displayName),
             ),
             if (busy) ...<Widget>[
               Padding(
@@ -76,8 +92,10 @@ class ImageSetLibraryPage extends ConsumerWidget {
                         child: _MessageText(l10n.imageSetListEmpty),
                       )
                     : Scrollbar(
+                        controller: _listScrollController,
                         thumbVisibility: true,
                         child: ListView.builder(
+                          controller: _listScrollController,
                           padding: EdgeInsets.symmetric(
                             horizontal: horizontalInset,
                           ),
@@ -97,7 +115,7 @@ class ImageSetLibraryPage extends ConsumerWidget {
                               onTap: () => Navigator.of(context).push(
                                 MaterialPageRoute<void>(
                                   builder: (_) => ImageSetDetailPage(
-                                    libraryId: libraryId,
+                                    libraryId: widget.libraryId,
                                     imageSet: set,
                                   ),
                                 ),

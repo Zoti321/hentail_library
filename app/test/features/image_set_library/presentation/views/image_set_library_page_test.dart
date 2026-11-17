@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_image.dart';
@@ -92,6 +92,20 @@ Future<void> _pumpPage(WidgetTester tester, List<Override> overrides) =>
     );
 
 void main() {
+  testWidgets(
+    'list Scrollbar shares an explicit controller on desktop surface',
+    (WidgetTester tester) async {
+      await tester.binding.setSurfaceSize(const Size(1280, 800));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      final _Probe probe = _Probe();
+      await _pumpPage(tester, _overrides(probe));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(Scrollbar), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
   testWidgets('list shows root image set first and opens detail grid', (
     WidgetTester tester,
   ) async {
