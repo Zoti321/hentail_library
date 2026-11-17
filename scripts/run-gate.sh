@@ -100,7 +100,18 @@ run_dart_test() {
     return 1
   fi
   cargo build --manifest-path "$CORE_MANIFEST" -p hentai_flutter
-  (cd "$APP_DIR" && flutter test "${entries[@]}")
+  if [[ "${OSTYPE:-}" == msys* || "${OSTYPE:-}" == mingw* || "${OSTYPE:-}" == cygwin* ]]; then
+    # Keep the Flutter subprocess command line below Windows' CreateProcess limit.
+    local offset=0
+    local batch_size=25
+    while (( offset < ${#entries[@]} )); do
+      local batch=("${entries[@]:offset:batch_size}")
+      (cd "$APP_DIR" && flutter test "${batch[@]}")
+      offset=$((offset + batch_size))
+    done
+  else
+    (cd "$APP_DIR" && flutter test "${entries[@]}")
+  fi
 }
 
 run_step() {

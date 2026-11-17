@@ -12,7 +12,7 @@ From the repository root, run `./scripts/run-gate.sh` for all hard gates, or pas
 ./scripts/run-gate.sh codegen-drift
 ```
 
-Use `./scripts/run-gate.sh --help` for step details. `dart-test` first builds the host hentai_flutter cdylib, then runs `app/test/gate/manifest.txt`. `codegen-drift` regenerates FRB/build_runner outputs in place and compares all tracked/untracked changes under app/core with HEAD; commit relevant work before running it. Use a local SDK aligned with CI; CI treats analyzer info diagnostics as failures.
+Use `./scripts/run-gate.sh --help` for step details. `dart-test` first builds the host hentai_flutter cdylib, then runs `app/test/gate/manifest.txt`; Git Bash on Windows runs the entries in batches to stay within the operating system's command-line limit. `codegen-drift` regenerates FRB/build_runner outputs in place and compares all tracked/untracked changes under app/core with HEAD; commit relevant work before running it. Use a local SDK aligned with CI; CI treats analyzer info diagnostics as failures.
 
 For focused Flutter checks, run `flutter test <path>` from `app/`. For full UI regression checks, run `flutter test` after building the host cdylib. Regenerate localization with `flutter gen-l10n` when ARB inputs change. Platform smoke tests under `integration_test/` use `*_smoke_test.dart`, run through Watch/Release, and stay outside the hard manifest. Sync/WebDAV end-to-end business tests belong in Rust.
 
