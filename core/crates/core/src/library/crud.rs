@@ -435,9 +435,7 @@ pub async fn update_library_settings(
     active.name = Set(trimmed_name.to_string());
     if is_image_set_catalog(&model.catalog_kind) {
         if scan_on_startup || scan_interval != ScanInterval::Disabled {
-            return Err(HentaiError::validation(
-                "Image set library 仅支持手动同步",
-            ));
+            return Err(HentaiError::validation("Image set library 仅支持手动同步"));
         }
         if !groups.is_empty() {
             return Err(HentaiError::validation(

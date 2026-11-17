@@ -108,7 +108,9 @@ pub(crate) fn catalog_kind_from_stored(raw: &str) -> String {
 }
 
 pub fn is_image_set_catalog(catalog_kind: &str) -> bool {
-    catalog_kind.trim().eq_ignore_ascii_case(CATALOG_KIND_IMAGE_SET)
+    catalog_kind
+        .trim()
+        .eq_ignore_ascii_case(CATALOG_KIND_IMAGE_SET)
 }
 
 /// One Library's pin group and Library sidebar order.

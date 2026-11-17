@@ -12,8 +12,8 @@ pub use crud::{
 };
 pub use dto::{
     is_image_set_catalog, library_id_from_root, parse_resource_format_categories_json,
-    parse_scan_interval, serialize_resource_format_categories, LibraryDto,
-    LibrarySidebarPlacement, ScanInterval,
+    parse_scan_interval, serialize_resource_format_categories, LibraryDto, LibrarySidebarPlacement,
+    ScanInterval,
 };
 pub use local_root_update::update_local_library_root;
 pub use remote_access::{

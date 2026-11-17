@@ -5,7 +5,7 @@ mod common;
 use hentai_core::library_write::try_acquire_library_write_lock;
 use hentai_core::{
     create_image_set_local_library, create_local_library, delete_library, init_db_at_path,
-    list_libraries, update_local_library_root, update_library_settings, ScanInterval,
+    list_libraries, update_library_settings, update_local_library_root, ScanInterval,
 };
 use tempfile::TempDir;
 
@@ -25,10 +25,12 @@ fn create_image_set_and_comic_libraries_keep_orthogonal_catalog_kind() {
             let comic = create_local_library(&comic_root.to_string_lossy(), Some("Comics"))
                 .await
                 .expect("create comic");
-            let image =
-                create_image_set_local_library(&image_root.to_string_lossy(), Some("Illustrations"))
-                    .await
-                    .expect("create image set");
+            let image = create_image_set_local_library(
+                &image_root.to_string_lossy(),
+                Some("Illustrations"),
+            )
+            .await
+            .expect("create image set");
 
             assert_eq!(comic.kind, "local");
             assert_eq!(comic.catalog_kind, "comic");
@@ -172,11 +174,7 @@ fn delete_image_set_library_fails_fast_while_write_lock_busy() {
             let err = delete_library(&library.library_id)
                 .await
                 .expect_err("busy delete");
-            assert!(
-                err.message.contains("库写入操作进行中"),
-                "{}",
-                err.message
-            );
+            assert!(err.message.contains("库写入操作进行中"), "{}", err.message);
             drop(_guard);
 
             delete_library(&library.library_id)
