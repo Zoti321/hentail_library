@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/image/image_decode_cache_size.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
 import 'package:hentai_library/features/reader/domain/reader_page_payload.dart';
@@ -64,7 +63,6 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
     const Widget loadingSurface = _ReaderLoadingSurface();
     const Widget errorPlaceholder = _ReaderImageErrorPlaceholder();
     final ReaderPageImageData imageData = widget.imageData;
-    final int? cacheWidth = _readerDecodeCacheWidth(context);
     const FilterQuality filterQuality = kReaderPageFilterQuality;
 
     if (imageData is ReaderDirPageImageData) {
@@ -90,7 +88,6 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
               filterQuality: filterQuality,
               useReaderImageCache: true,
               readerImageProviderBuilder: buildReaderImageProvider,
-              cacheWidth: cacheWidth,
               loadingPlaceholder: loadingSurface,
               errorPlaceholder: errorPlaceholder,
               onImageSize: _rememberImageSize,
@@ -158,7 +155,6 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
               loadingSurface: loadingSurface,
               errorPlaceholder: errorPlaceholder,
               filterQuality: filterQuality,
-              cacheWidth: cacheWidth,
             ),
           ReaderPageFilePath() => errorPlaceholder,
           ReaderPageBytes(:final Uint8List data) => ReaderPageFadeIn(
@@ -172,7 +168,6 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
                 filterQuality: filterQuality,
                 useReaderImageCache: true,
                 readerImageProviderBuilder: buildReaderImageProvider,
-                cacheWidth: cacheWidth,
                 loadingPlaceholder: loadingSurface,
                 errorPlaceholder: errorPlaceholder,
                 onImageSize: _rememberImageSize,
@@ -211,7 +206,6 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
     required Widget loadingSurface,
     required Widget errorPlaceholder,
     required FilterQuality filterQuality,
-    required int? cacheWidth,
   }) {
     // Disk may be gone after cache eviction while keepAlive still holds FilePath.
     if (_reloadScheduled) {
@@ -233,7 +227,6 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
           filterQuality: filterQuality,
           useReaderImageCache: true,
           readerImageProviderBuilder: buildReaderImageProvider,
-          cacheWidth: cacheWidth,
           loadingPlaceholder: loadingSurface,
           errorPlaceholder: errorPlaceholder,
           onImageSize: _rememberImageSize,
@@ -242,14 +235,6 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
         ),
       ),
     );
-  }
-
-  int? _readerDecodeCacheWidth(BuildContext context) {
-    return decodeCacheSizeForContext(
-      context,
-      logicalWidth: widget.slotLogicalWidth,
-      logicalHeight: widget.slotLogicalWidth,
-    ).cacheWidth;
   }
 
   void _scheduleReaderPageReload(

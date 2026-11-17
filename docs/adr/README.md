@@ -138,3 +138,4 @@ Accepted | Superseded by ADR-000N | Deprecated
 | [0057](./0057-automatic-local-metadata-writeback.md) | Automatic Resource metadata embedding | Accepted; supersedes ADR-0007 Language cardinality and affected scan-source assumptions |
 | [0058](./0058-media-metadata-dashboard.md) | Media metadata dashboard | Accepted; supersedes ADR-0057 individual Comic inspection scope |
 | [0059](./0059-single-nightly-dart-test-run.md) | Single nightly Dart test run | Accepted; supersedes ADR-0018 separate nightly UI job |
+| [0060](./0060-page-image-fidelity-source-resolution.md) | Page image fidelity at source resolution | Accepted |

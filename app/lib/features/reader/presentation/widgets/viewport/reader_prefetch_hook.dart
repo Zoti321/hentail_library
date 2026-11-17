@@ -4,7 +4,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hentai_library/shared/ui/image/image_decode_cache_size.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/reader_prefetch_notifier.dart';
 import 'package:hentai_library/features/reader/domain/page_prefetch_window.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/read_session_page_data.dart';
@@ -31,17 +30,13 @@ void useReaderPrefetchWindow({
         neighborCount: kReaderPrefetchNeighborCount,
         extraPageIndexesOneBased: extraPageIndexesOneBased,
       );
-      final int? cacheWidth = decodeCacheSizeForContext(
-        context,
-        logicalWidth: slotLogicalWidth,
-        logicalHeight: slotLogicalWidth,
-      ).cacheWidth;
       final ReaderPrefetchNotifier controller = ref.read(
         readerPrefetchNotifierProvider.notifier,
       );
       // Defer warmWindow: useEffect can run during hook init/build, and
       // bumpGeneration must not modify providers mid-build (Riverpod assert).
       // Also lets viewport jumpToPage mount the landing page first.
+      // Page image fidelity: prefetch at source resolution (no cacheWidth).
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!context.mounted) {
           return;
@@ -67,7 +62,7 @@ void useReaderPrefetchWindow({
             comicId: comicId,
             pageIndexesOneBased: targets,
             imageList: imageList,
-            cacheWidth: cacheWidth,
+            cacheWidth: null,
             skipPageOneBased: centerPageOneBased,
           );
         }());
@@ -79,7 +74,6 @@ void useReaderPrefetchWindow({
       centerPageOneBased,
       totalPages,
       slotLogicalWidth,
-      MediaQuery.devicePixelRatioOf(context),
       Object.hashAll(extraPageIndexesOneBased),
       Object.hashAll(
         imageList.map((ReaderPageImageData data) => data.hashCode),

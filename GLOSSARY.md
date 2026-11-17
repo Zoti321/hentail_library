@@ -357,8 +357,8 @@ _Avoid_: Webtoon as a work classification or ambiguous mode name.
 **Paged layout**: Reader layout advancing through discrete pages rather than continuous scrolling.
 _Avoid_: single-page-only mode.
 
-**Page image fidelity**: Preserve source bitmap appearance in a Read session. Keep GPU sampling fixed at `FilterQuality.medium` for stable downsampling; do not change quality for scrolling/idle state, sharpen/beautify, or switch to high at rest (moire risk in screened artwork). Viewport/memory-constrained decoding such as cacheWidth is allowed. This rule overrides Reader performance-tuning advice and excludes catalog covers/thumbnails.
-_Avoid_: scroll quality reduction, idle quality boost, FilterQuality.high for page images, enhanced/sharpened reading.
+**Page image fidelity**: Preserve source bitmap appearance in a Read session. Decode page images at source resolution (no viewport `cacheWidth` downdecode) and keep GPU sampling fixed at `FilterQuality.high`; do not change quality for scrolling/idle state, sharpen/beautify, or switch quality at rest. Catalog covers/thumbnails use their own high + display-sized `cacheWidth` policy and are outside this rule. Oversized-bitmap memory safety is a separate follow-up (#591), not a license to soften normal pages. This rule overrides Reader performance-tuning advice. See ADR-0060.
+_Avoid_: scroll quality reduction, idle quality boost, page-image `cacheWidth` downdecode, enhanced/sharpened reading.
 
 **Page image copy**: Copy a page bitmap from a Read session to the system clipboard, distinct from Comic covers/thumbnails or saving/exporting files.
 _Avoid_: share image, export page, save image.
