@@ -34,7 +34,7 @@ Future<void> _pumpMenu(
     home: Scaffold(
       body: Builder(
         builder: (BuildContext context) {
-          final AppLocalizations l10n = AppLocalizations.of(context)!;
+          final AppLocalizations l10n = AppLocalizations.of(context);
           return HomeLibraryRowMoreMenu(
             l10n: l10n,
             row: row,

@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
+import 'package:hentai_library/features/reader/domain/read_session_source.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/reader/domain/reading_mode.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/reader_chrome_notifier.dart';
@@ -13,6 +14,7 @@ import 'package:riverpod/misc.dart' show Override;
 const String _comicId = 'shell-select-comic';
 const ReaderViewModelKey _viewKey = (
   comicId: _comicId,
+  source: ComicReadSessionSource(_comicId),
   incognito: false,
   startFromFirstPage: false,
 );

@@ -3,6 +3,7 @@ import 'package:hentai_library/composition/composition_overrides.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
+import 'package:hentai_library/features/reader/domain/read_session_source.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/comic/public/comic_lookup_repository.dart';
 import 'package:hentai_library/features/reader/application/read_session_application_service.dart';
@@ -33,11 +34,13 @@ import 'package:hentai_library/features/app_settings/public/providers/app_settin
 const String _comicId = 'reader-controller-comic';
 const ReaderViewModelKey _key = (
   comicId: _comicId,
+  source: ComicReadSessionSource(_comicId),
   incognito: false,
   startFromFirstPage: false,
 );
 const ReaderViewModelKey _incognitoKey = (
   comicId: _comicId,
+  source: ComicReadSessionSource(_comicId),
   incognito: true,
   startFromFirstPage: false,
 );
@@ -209,9 +212,10 @@ ProviderContainer _createContainer({
       appSettingRepositoryProvider.overrideWithValue(
         MemoryAppSettingRepository(initial: initialSetting),
       ),
-      readerSessionOpenProvider(
-        comicId: key.comicId,
+      readerSessionOpenFromSourceProvider(
+        source: key.source,
         incognito: key.incognito,
+        startFromFirstPage: key.startFromFirstPage,
       ).overrideWith((Ref ref) async => session),
       if (seriesNavigation != null)
         readerSeriesNavigationProvider.overrideWith(() => seriesNavigation),
@@ -262,6 +266,7 @@ void main() {
     test('new comic session starts with auto-play off', () async {
       const ReaderViewModelKey otherKey = (
         comicId: 'reader-controller-other',
+        source: ComicReadSessionSource('reader-controller-other'),
         incognito: false,
         startFromFirstPage: false,
       );
@@ -292,13 +297,15 @@ void main() {
               initial: AppSetting(readingModeId: 'paged'),
             ),
           ),
-          readerSessionOpenProvider(
-            comicId: _key.comicId,
+          readerSessionOpenFromSourceProvider(
+            source: _key.source,
             incognito: _key.incognito,
+            startFromFirstPage: _key.startFromFirstPage,
           ).overrideWith((Ref ref) async => _snapshot()),
-          readerSessionOpenProvider(
-            comicId: otherKey.comicId,
+          readerSessionOpenFromSourceProvider(
+            source: otherKey.source,
             incognito: otherKey.incognito,
+            startFromFirstPage: otherKey.startFromFirstPage,
           ).overrideWith((Ref ref) async => otherSnapshot),
         ],
       );
@@ -333,6 +340,7 @@ void main() {
     test('armed autoplay carry restores on next ReaderViewModel', () async {
       const ReaderViewModelKey otherKey = (
         comicId: 'reader-controller-carry',
+        source: ComicReadSessionSource('reader-controller-carry'),
         incognito: false,
         startFromFirstPage: true,
       );
@@ -363,8 +371,8 @@ void main() {
               initial: AppSetting(readingModeId: 'paged'),
             ),
           ),
-          readerSessionOpenProvider(
-            comicId: otherKey.comicId,
+          readerSessionOpenFromSourceProvider(
+            source: otherKey.source,
             incognito: otherKey.incognito,
             startFromFirstPage: otherKey.startFromFirstPage,
           ).overrideWith((Ref ref) async => otherSnapshot),

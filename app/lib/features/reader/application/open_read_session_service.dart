@@ -38,9 +38,9 @@ class OpenReadSessionService {
     required this._pageSource,
     required this._readResumePage,
     required this._sessionPort,
-    ImageSetReadPort? imageSetReadPort,
+    this._imageSetReadPort,
     this._openTimeout = defaultOpenTimeout,
-  }) : _imageSetReadPort = imageSetReadPort;
+  });
 
   /// Resource access / reader open 的默认有界时限（Local + Remote）。
   static const Duration defaultOpenTimeout = Duration(seconds: 30);
