@@ -8,7 +8,6 @@ export 'components/actions/catalog_view_mode_button_group.dart'
         CatalogViewModeButtonGroup,
         catalogViewModeButtonGroupDecoration,
         kCatalogViewModeButtonGroupIconSize;
-export 'components/actions/filled_button.dart' show ExpressiveFilledButton;
 export 'components/actions/ghost_button.dart' show GhostButton;
 export 'components/actions/popup_menu_panel_shell.dart'
     show PopupMenuPanelShell;

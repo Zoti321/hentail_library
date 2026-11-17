@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/reader/domain/comic_page_source_port.dart';
+import 'package:hentai_library/features/reader/domain/image_set_read_port.dart';
 import 'package:hentai_library/features/reader/domain/native_reader_port.dart';
 import 'package:hentai_library/shared/presentation/providers/required_provider.dart';
 
@@ -11,3 +12,7 @@ final Provider<NativeReaderPort> nativeReaderPortProvider = requiredProvider(
 
 final Provider<ComicPageSourcePort> comicPageSourcePortProvider =
     requiredProvider('comicPageSourcePortProvider');
+
+final Provider<ImageSetReadPort> imageSetReadPortProvider = requiredProvider(
+  'imageSetReadPortProvider',
+);

@@ -21,24 +21,18 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 class ContinuousVerticalViewport extends HookConsumerWidget {
   const ContinuousVerticalViewport({
     super.key,
+    required this.viewKey,
     required this.comicId,
-    required this.incognito,
-    this.startFromFirstPage = false,
     required this.preferredPageIndex,
   });
 
+  final ReaderViewModelKey viewKey;
   final String comicId;
-  final bool incognito;
-  final bool startFromFirstPage;
   final int? preferredPageIndex;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final ReaderViewModelKey viewKey = readerViewModelKey(
-      comicId,
-      incognito: incognito,
-      startFromFirstPage: startFromFirstPage,
-    );
+    final ReaderViewModelKey viewKey = this.viewKey;
     // Do not watch currentIndex here — scroll setIndex must not rebuild the list.
     final int seedIndex =
         ref.read(readerViewModelProvider(viewKey)).asData?.value.currentIndex ??

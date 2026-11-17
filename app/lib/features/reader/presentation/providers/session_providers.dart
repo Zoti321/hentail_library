@@ -13,6 +13,7 @@ final Provider<OpenReadSessionService> openReadSessionServiceProvider =
         pageSource: ref.read(comicPageSourcePortProvider),
         readResumePage: ref.read(readResumePageQueryProvider),
         sessionPort: ref.read(nativeReaderPortProvider),
+        imageSetReadPort: ref.read(imageSetReadPortProvider),
       );
     });
 

@@ -77,6 +77,7 @@ class ImageSetDetailPage extends ConsumerWidget {
                                     key: ValueKey<String>(
                                       image.imageSetImageId,
                                     ),
+                                    libraryId: libraryId,
                                     image: image,
                                     onTap: () =>
                                         ref.read(

@@ -28,8 +28,11 @@ class HomeLibraryRowMoreMenu extends StatelessWidget {
     }
 
     final bool comicCatalog = row.catalogKind == HomeLibraryCatalogKind.comic;
+    final bool imageSetCatalog =
+        row.catalogKind == HomeLibraryCatalogKind.imageSet;
+    // Image set sync ignores ScanMode in core; expose a single scan entry only.
     final List<M3EMenuEntry> entries = <M3EMenuEntry>[
-      if (comicCatalog)
+      if (comicCatalog || imageSetCatalog)
         M3EMenuEntry(
           label: l10n.sidebarScanLibrary,
           enabled: scanEnabled,

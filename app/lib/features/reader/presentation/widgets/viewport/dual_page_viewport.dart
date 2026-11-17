@@ -16,9 +16,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 class DualPageViewport extends HookConsumerWidget {
   const DualPageViewport({
     super.key,
+    required this.viewKey,
     required this.comicId,
-    required this.incognito,
-    this.startFromFirstPage = false,
     required this.readingMode,
     required this.initialPage,
     required this.preferredPageIndex,
@@ -26,9 +25,8 @@ class DualPageViewport extends HookConsumerWidget {
     this.onRequestPrevPage,
   });
 
+  final ReaderViewModelKey viewKey;
   final String comicId;
-  final bool incognito;
-  final bool startFromFirstPage;
   final ReadingMode readingMode;
   final int initialPage;
   final int? preferredPageIndex;
@@ -37,11 +35,7 @@ class DualPageViewport extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final ReaderViewModelKey viewKey = readerViewModelKey(
-      comicId,
-      incognito: incognito,
-      startFromFirstPage: startFromFirstPage,
-    );
+    final ReaderViewModelKey viewKey = this.viewKey;
     final int totalPages = ref.watch(
       readerViewModelProvider(viewKey).select(
         (AsyncValue<ReaderUiState> value) =>

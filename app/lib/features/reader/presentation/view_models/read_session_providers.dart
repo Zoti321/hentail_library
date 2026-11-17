@@ -1,11 +1,12 @@
 import 'dart:io';
 
-import 'package:hentai_library/features/reading_history/public.dart';
-import 'package:hentai_library/features/reader/domain/read_session_page.dart';
-import 'package:hentai_library/features/reader/presentation/view_models/read_session_page_data.dart';
-import 'package:hentai_library/features/reader/domain/reader_page_payload.dart';
 import 'package:hentai_library/features/reader/domain/opened_read_session.dart';
+import 'package:hentai_library/features/reader/domain/read_session_page.dart';
+import 'package:hentai_library/features/reader/domain/read_session_source.dart';
+import 'package:hentai_library/features/reader/domain/reader_page_payload.dart';
 import 'package:hentai_library/features/reader/presentation/providers/session_providers.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/read_session_page_data.dart';
+import 'package:hentai_library/features/reading_history/public.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'read_session_providers.g.dart';
@@ -16,6 +17,8 @@ ReaderPageImageData _mapReadSessionPageToUi(ReadSessionPage page) {
       ReaderDirPageImageData(File(filePath), pageIndex: pageIndex),
     ReadSessionArchivePage(:final String comicId, :final int pageIndex) =>
       ReaderArchivePageImageData(comicId: comicId, pageIndex: pageIndex),
+    ReadSessionImageSetPage(:final page) =>
+      ReaderImageSetPageImageData(page: page),
   };
 }
 
@@ -26,10 +29,25 @@ Future<OpenedReadSession> readerSessionOpen(
   bool incognito = false,
   bool startFromFirstPage = false,
 }) {
+  return readerSessionOpenFromSource(
+    ref,
+    source: ComicReadSessionSource(comicId),
+    incognito: incognito,
+    startFromFirstPage: startFromFirstPage,
+  );
+}
+
+@Riverpod()
+Future<OpenedReadSession> readerSessionOpenFromSource(
+  Ref ref, {
+  required ReadSessionSource source,
+  bool incognito = false,
+  bool startFromFirstPage = false,
+}) {
   return ref
       .read(openReadSessionServiceProvider)
-      .open(
-        comicId: comicId,
+      .openFromSource(
+        source,
         incognito: incognito,
         startFromFirstPage: startFromFirstPage,
       );

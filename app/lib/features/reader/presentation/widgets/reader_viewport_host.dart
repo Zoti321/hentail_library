@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/features/reader/domain/reading_mode.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_view_model.dart';
 import 'package:hentai_library/features/reader/presentation/widgets/viewport/continuous_vertical_viewport.dart';
 import 'package:hentai_library/features/reader/presentation/widgets/viewport/dual_page_viewport.dart';
 import 'package:hentai_library/features/reader/presentation/widgets/viewport/paged_viewport.dart';
@@ -7,6 +8,7 @@ import 'package:hentai_library/features/reader/presentation/widgets/viewport/pag
 class ReaderViewportHost extends StatelessWidget {
   const ReaderViewportHost({
     super.key,
+    required this.viewKey,
     required this.comicId,
     required this.incognito,
     this.startFromFirstPage = false,
@@ -17,6 +19,7 @@ class ReaderViewportHost extends StatelessWidget {
     this.onRequestPrevPage,
   });
 
+  final ReaderViewModelKey viewKey;
   final String comicId;
   final bool incognito;
   final bool startFromFirstPage;
@@ -30,17 +33,15 @@ class ReaderViewportHost extends StatelessWidget {
   Widget build(BuildContext context) {
     if (readingMode.isWebtoon) {
       return ContinuousVerticalViewport(
+        viewKey: viewKey,
         comicId: comicId,
-        incognito: incognito,
-        startFromFirstPage: startFromFirstPage,
         preferredPageIndex: preferredPageIndex,
       );
     }
     if (readingMode.isDualPageMode) {
       return DualPageViewport(
+        viewKey: viewKey,
         comicId: comicId,
-        incognito: incognito,
-        startFromFirstPage: startFromFirstPage,
         readingMode: readingMode,
         initialPage: initialPage,
         preferredPageIndex: preferredPageIndex,
@@ -49,9 +50,8 @@ class ReaderViewportHost extends StatelessWidget {
       );
     }
     return PagedViewport(
+      viewKey: viewKey,
       comicId: comicId,
-      incognito: incognito,
-      startFromFirstPage: startFromFirstPage,
       initialPage: initialPage,
       preferredPageIndex: preferredPageIndex,
       onRequestNextPage: onRequestNextPage,

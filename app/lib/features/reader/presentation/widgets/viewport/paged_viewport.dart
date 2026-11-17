@@ -14,18 +14,16 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 class PagedViewport extends HookConsumerWidget {
   const PagedViewport({
     super.key,
+    required this.viewKey,
     required this.comicId,
-    required this.incognito,
-    this.startFromFirstPage = false,
     required this.initialPage,
     required this.preferredPageIndex,
     this.onRequestNextPage,
     this.onRequestPrevPage,
   });
 
+  final ReaderViewModelKey viewKey;
   final String comicId;
-  final bool incognito;
-  final bool startFromFirstPage;
   final int initialPage;
   final int? preferredPageIndex;
   final Future<void> Function()? onRequestNextPage;
@@ -33,11 +31,7 @@ class PagedViewport extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final ReaderViewModelKey viewKey = readerViewModelKey(
-      comicId,
-      incognito: incognito,
-      startFromFirstPage: startFromFirstPage,
-    );
+    final ReaderViewModelKey viewKey = this.viewKey;
     final int totalPages = ref.watch(
       readerViewModelProvider(viewKey).select(
         (AsyncValue<ReaderUiState> value) =>

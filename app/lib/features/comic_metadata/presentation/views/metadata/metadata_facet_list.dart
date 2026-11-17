@@ -235,12 +235,13 @@ class _FacetFooter extends ConsumerWidget {
       );
     }
     return Center(
-      child: ExpressiveFilledButton(
-        label: l10n.metadataLoadMore,
-        icon: Symbols.expand_more,
+      child: M3EButton(
+        style: M3EButtonStyle.filled,
         onPressed: () => ref
             .read(namedFacetManagementViewModelProvider(kind).notifier)
             .loadMore(),
+        icon: const Icon(Symbols.expand_more),
+        label: Text(l10n.metadataLoadMore),
       ),
     );
   }
@@ -280,9 +281,10 @@ class _FacetError extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(color: scheme.onSurfaceVariant),
             ),
-            ExpressiveFilledButton(
-              label: context.l10n.commonRetry,
+            M3EButton(
+              style: M3EButtonStyle.filled,
               onPressed: onRetry,
+              label: Text(context.l10n.commonRetry),
             ),
           ],
         ),
@@ -336,9 +338,10 @@ class _FacetEmpty extends StatelessWidget {
             ),
             if (!hasSearchQuery) ...<Widget>[
               const SizedBox(height: 8),
-              ExpressiveFilledButton(
-                label: l10n.metadataAddLabel(kind),
+              M3EButton(
+                style: M3EButtonStyle.filled,
                 onPressed: onCreate,
+                label: Text(l10n.metadataAddLabel(kind)),
               ),
             ],
           ],

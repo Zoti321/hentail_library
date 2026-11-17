@@ -1,3 +1,5 @@
+import 'package:hentai_library/features/reader/domain/image_set_read_port.dart';
+
 /// 阅读会话中的一页（领域层，不含 UI / IO 类型）。
 sealed class ReadSessionPage {
   const ReadSessionPage();
@@ -18,4 +20,10 @@ final class ReadSessionArchivePage extends ReadSessionPage {
 
   final String comicId;
   final int pageIndex;
+}
+
+final class ReadSessionImageSetPage extends ReadSessionPage {
+  const ReadSessionImageSetPage({required this.page});
+
+  final ImageSetReadPage page;
 }

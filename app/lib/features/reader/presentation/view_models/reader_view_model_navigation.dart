@@ -4,7 +4,7 @@ part of 'reader_view_model.dart';
 mixin _ReaderViewModelNavigation on _$ReaderViewModel {
   void _notifyPageChanged(int pageIndex) {
     final ReaderViewModelKey key = ref.$arg as ReaderViewModelKey;
-    if (key.incognito) {
+    if (key.incognito || key.source.isImageSet) {
       return;
     }
     ref.read(readSessionApplicationServiceProvider).updatePage(pageIndex);

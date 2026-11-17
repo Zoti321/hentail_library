@@ -5,6 +5,7 @@ import 'package:hentai_library/features/reader/domain/spread_navigation.dart';
 import 'package:hentai_library/features/reader/domain/auto_play_mode.dart';
 import 'package:hentai_library/features/reader/domain/reading_mode.dart';
 import 'package:hentai_library/features/reader/domain/opened_read_session.dart';
+import 'package:hentai_library/features/reader/domain/read_session_source.dart';
 import 'package:hentai_library/features/reader/presentation/input/reader_tap_zone.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/reader_auto_play_carry.dart';
 import 'package:hentai_library/features/reader/presentation/reader_exit_location.dart';
@@ -34,6 +35,7 @@ enum SeriesBoundaryPrompt { none, advance, retreat }
 
 typedef ReaderViewModelKey = ({
   String comicId,
+  ReadSessionSource source,
   bool incognito,
   bool startFromFirstPage,
 });
@@ -42,8 +44,19 @@ ReaderViewModelKey readerViewModelKey(
   String comicId, {
   bool incognito = false,
   bool startFromFirstPage = false,
+}) => readerViewModelKeyForSource(
+  ComicReadSessionSource(comicId),
+  incognito: incognito,
+  startFromFirstPage: startFromFirstPage,
+);
+
+ReaderViewModelKey readerViewModelKeyForSource(
+  ReadSessionSource source, {
+  bool incognito = false,
+  bool startFromFirstPage = false,
 }) => (
-  comicId: comicId,
+  comicId: source.sessionKey,
+  source: source,
   incognito: incognito,
   startFromFirstPage: startFromFirstPage,
 );
@@ -71,12 +84,13 @@ class ReaderViewModel extends _$ReaderViewModel
     with _ReaderViewModelNavigation, _ReaderViewModelAutoPlay {
   @override
   Future<ReaderUiState> build(ReaderViewModelKey key) async {
-    final String id = key.comicId;
+    final ReadSessionSource source = key.source;
     final bool incognito = key.incognito;
     final bool startFromFirstPage = key.startFromFirstPage;
+    final bool persistProgress = source.isComic;
     final OpenedReadSession snapshot = await ref.watch(
-      readerSessionOpenProvider(
-        comicId: id,
+      readerSessionOpenFromSourceProvider(
+        source: source,
         incognito: incognito,
         startFromFirstPage: startFromFirstPage,
       ).future,
@@ -95,6 +109,7 @@ class ReaderViewModel extends _$ReaderViewModel
           comic: snapshot.comic,
           incognito: incognito,
           initialPageIndex: snapshot.resumePageIndex,
+          persistProgress: persistProgress,
         );
     return ReaderUiState(
       comic: snapshot.comic,
@@ -202,7 +217,7 @@ class ReaderViewModel extends _$ReaderViewModel
   Future<void> executeSaveProgress({
     required ReaderRouteContext routeContext,
   }) async {
-    if (routeContext.incognito) {
+    if (routeContext.incognito || !routeContext.persistProgress) {
       return;
     }
     final ReaderUiState? currentState = state.asData?.value;
@@ -215,7 +230,7 @@ class ReaderViewModel extends _$ReaderViewModel
     await sessions.flushProgress();
   }
 
-  /// 结算会话并返回退出导航意图；由 View 执行 go_router。
+  /// 结算会话并返回退出导航意图；由 View 执行 go_router / Navigator.pop。
   Future<ReaderExitIntent> prepareExitReader({
     required ReaderRouteContext routeContext,
     required bool canPop,
@@ -230,8 +245,13 @@ class ReaderViewModel extends _$ReaderViewModel
           comicId: _comicId,
           incognito: routeContext.incognito,
           currentPageIndex: currentState?.currentIndex,
+          persistProgress: routeContext.persistProgress,
         );
     ref.read(readerPrefetchNotifierProvider.notifier).clearComic(_comicId);
+    // Image set is always MaterialPageRoute-stacked onto detail → prefer pop.
+    if (routeContext.isImageSet) {
+      return const ReaderExitPopIntent();
+    }
     final String? goLocation = resolveReaderExitNavigation(
       canPop: canPop,
       comicId: routeContext.comicId,

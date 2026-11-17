@@ -23,7 +23,7 @@ class ReadSessionContextData {
 
 @riverpod
 Future<int?> comicReadingPageIndexForReader(Ref ref, String comicId) async {
-  if (comicId.isEmpty) {
+  if (comicId.isEmpty || comicId.startsWith('image_set:')) {
     return null;
   }
   return ref.read(readResumePageQueryProvider)(comicId);
@@ -36,6 +36,18 @@ Future<ReadSessionContextData> readSessionContextForReader(
   bool incognito = false,
   bool startFromFirstPage = false,
 }) async {
+  // Image set sessions have no Series membership or Comic resume.
+  if (comicId.startsWith('image_set:')) {
+    return ReadSessionContextData(
+      seriesId: null,
+      navContext: buildReaderNavContextData(
+        items: const <ReaderComicListItem>[],
+        currentComicId: comicId,
+        preferredPageIndex: null,
+      ),
+      preferredPageIndex: null,
+    );
+  }
   final prepared =
       await PrepareReaderContextUseCase(
         seriesContext: ref.read(findSeriesReadingContextQueryProvider),

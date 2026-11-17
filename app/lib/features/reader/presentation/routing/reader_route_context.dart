@@ -1,4 +1,5 @@
 import 'package:hentai_library/features/reader/application/open_reader_args.dart';
+import 'package:hentai_library/features/reader/domain/read_session_source.dart';
 
 class ReaderComicListItem {
   const ReaderComicListItem({
@@ -33,20 +34,33 @@ class ReaderNavContextData {
 
 class ReaderRouteContext {
   const ReaderRouteContext({
-    required this.comicId,
+    required this.source,
     this.incognito = false,
     this.startFromFirstPage = false,
   });
 
-  final String comicId;
+  final ReadSessionSource source;
   final bool incognito;
   final bool startFromFirstPage;
 
-  OpenReaderArgs get session => OpenReaderArgs(
-    comicId: comicId,
-    incognito: incognito,
-    startFromFirstPage: startFromFirstPage,
-  );
+  String get comicId => source.sessionKey;
+
+  bool get persistProgress => source.isComic;
+
+  bool get isImageSet => source.isImageSet;
+
+  /// Comic go_router / OpenReaderArgs bridge（Image set 不走此路径）。
+  OpenReaderArgs get session {
+    final ReadSessionSource current = source;
+    if (current is! ComicReadSessionSource) {
+      throw StateError('OpenReaderArgs is comic-only');
+    }
+    return OpenReaderArgs(
+      comicId: current.comicId,
+      incognito: incognito,
+      startFromFirstPage: startFromFirstPage,
+    );
+  }
 
   static ReaderRouteContext normalize({
     required String comicId,
@@ -54,9 +68,24 @@ class ReaderRouteContext {
     bool startFromFirstPage = false,
   }) {
     return ReaderRouteContext(
-      comicId: comicId.trim(),
+      source: ComicReadSessionSource(comicId.trim()),
       incognito: incognito,
       startFromFirstPage: startFromFirstPage,
+    );
+  }
+
+  static ReaderRouteContext imageSet({
+    required String libraryId,
+    required String imageSetId,
+    required int startIndex,
+  }) {
+    return ReaderRouteContext(
+      source: ImageSetReadSessionSource(
+        libraryId: libraryId,
+        imageSetId: imageSetId,
+        startIndex: startIndex,
+      ),
+      startFromFirstPage: true,
     );
   }
 }

@@ -99,24 +99,33 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
         ),
       );
     }
-    if (imageData is! ReaderArchivePageImageData) {
+    final String? sessionComicId = switch (imageData) {
+      ReaderArchivePageImageData(:final String comicId) => comicId,
+      ReaderImageSetPageImageData(:final String sessionKey) => sessionKey,
+      _ => null,
+    };
+    final int? sessionPageIndex = switch (imageData) {
+      ReaderArchivePageImageData(:final int pageIndex) => pageIndex,
+      ReaderImageSetPageImageData(:final page) => page.index,
+      _ => null,
+    };
+    if (sessionComicId == null || sessionPageIndex == null) {
       return _ReaderContextMenuRegion(
         comic: widget.comic,
         archivePageIndex: widget.imageData.archivePageIndex,
         child: errorPlaceholder,
       );
     }
-    final ReaderArchivePageImageData archiveData = imageData;
     ref
         .read(readerPrefetchNotifierProvider.notifier)
         .notePageTouched(
-          comicId: archiveData.comicId,
-          pageOneBased: archiveData.pageIndex + 1,
+          comicId: sessionComicId,
+          pageOneBased: sessionPageIndex + 1,
         );
     final AsyncValue<ReaderPagePayload> pageAsync = ref.watch(
       comicReaderPageProvider(
-        comicId: archiveData.comicId,
-        pageIndex: archiveData.pageIndex,
+        comicId: sessionComicId,
+        pageIndex: sessionPageIndex,
       ),
     );
     // skipLoadingOnRefresh:false — invalidate 后必须卸掉失败态 ExtendedImage，
@@ -130,7 +139,9 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
         child: loadingSurface,
       ),
       error: (_, StackTrace _) {
-        _scheduleReaderPageReload(archiveData);
+        if (imageData is ReaderArchivePageImageData) {
+          _scheduleReaderPageReload(imageData);
+        }
         return _ReaderContextMenuRegion(
           comic: widget.comic,
           archivePageIndex: widget.imageData.archivePageIndex,
@@ -139,14 +150,17 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
       },
       data: (ReaderPagePayload page) {
         final Widget content = switch (page) {
-          ReaderPageFilePath(:final String path) => _buildArchiveFilePathPage(
-            archiveData: archiveData,
-            path: path,
-            loadingSurface: loadingSurface,
-            errorPlaceholder: errorPlaceholder,
-            filterQuality: filterQuality,
-            cacheWidth: cacheWidth,
-          ),
+          ReaderPageFilePath(:final String path)
+              when imageData is ReaderArchivePageImageData =>
+            _buildArchiveFilePathPage(
+              archiveData: imageData,
+              path: path,
+              loadingSurface: loadingSurface,
+              errorPlaceholder: errorPlaceholder,
+              filterQuality: filterQuality,
+              cacheWidth: cacheWidth,
+            ),
+          ReaderPageFilePath() => errorPlaceholder,
           ReaderPageBytes(:final Uint8List data) => ReaderPageFadeIn(
             enabled: widget.enableCrossfade,
             child: Align(

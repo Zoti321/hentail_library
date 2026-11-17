@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/features/reader/domain/reading_mode.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_view_model.dart';
 import 'package:hentai_library/features/reader/presentation/widgets/reader_viewport_host.dart';
 
 class ReaderContent extends StatelessWidget {
   const ReaderContent({
     super.key,
+    required this.viewKey,
     required this.comicId,
     required this.incognito,
     this.startFromFirstPage = false,
@@ -15,6 +17,7 @@ class ReaderContent extends StatelessWidget {
     this.onRequestPrevPage,
   });
 
+  final ReaderViewModelKey viewKey;
   final String comicId;
   final bool incognito;
   final bool startFromFirstPage;
@@ -29,6 +32,7 @@ class ReaderContent extends StatelessWidget {
     // Mode switches swap viewports immediately — no AnimatedSwitcher overlap (P2-9).
     return ReaderViewportHost(
       key: ValueKey<ReadingMode>(readingMode),
+      viewKey: viewKey,
       comicId: comicId,
       incognito: incognito,
       startFromFirstPage: startFromFirstPage,

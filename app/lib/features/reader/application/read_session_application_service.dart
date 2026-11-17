@@ -36,10 +36,12 @@ class ReadSessionApplicationService {
     required ReaderComicRef comic,
     bool incognito = false,
     int initialPageIndex = 1,
+    bool persistProgress = true,
   }) async {
     final int generation = ++_sessionGeneration;
     final ReadSession? previous = _session;
-    if (incognito) {
+    // Image set / incognito: no Comic history or reading_stats activity.
+    if (incognito || !persistProgress) {
       _session = null;
       return;
     }
@@ -108,12 +110,16 @@ class ReadSessionApplicationService {
     required String comicId,
     required bool incognito,
     int? currentPageIndex,
+    bool persistProgress = true,
   }) async {
-    if (!incognito) {
+    if (!incognito && persistProgress) {
       if (currentPageIndex != null) {
         updatePage(currentPageIndex);
       }
       await endSession();
+    } else {
+      _sessionGeneration++;
+      _session = null;
     }
     await sessionService.close(comicId);
   }

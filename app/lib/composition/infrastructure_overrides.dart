@@ -10,6 +10,7 @@ import 'package:hentai_library/composition/modules/home/home_page_repository_fac
 import 'package:hentai_library/composition/modules/library_admin/remote_library_credentials_port_factory.dart';
 import 'package:hentai_library/composition/modules/library_admin/library_repository_factory.dart';
 import 'package:hentai_library/composition/modules/reader/comic_page_source_port_factory.dart';
+import 'package:hentai_library/composition/modules/reader/image_set_read_port_factory.dart';
 import 'package:hentai_library/composition/modules/reader/native_reader_port_factory.dart';
 import 'package:hentai_library/composition/modules/reading_history/reading_history_repository_factory.dart';
 import 'package:hentai_library/composition/modules/series/series_repository_factory.dart';
@@ -87,4 +88,5 @@ List<Override> infrastructureOverrides() => <Override>[
         ComicTrashReaderSessionAdapter(ref.read(nativeReaderPortProvider)),
   ),
   comicPageSourcePortProvider.overrideWith(createComicPageSourcePort),
+  imageSetReadPortProvider.overrideWith(createImageSetReadPort),
 ];
