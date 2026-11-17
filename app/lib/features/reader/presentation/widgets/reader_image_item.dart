@@ -99,12 +99,12 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
     final String? sessionComicId = switch (imageData) {
       ReaderArchivePageImageData(:final String comicId) => comicId,
       ReaderImageSetPageImageData(:final String sessionKey) => sessionKey,
-      _ => null,
+      ReaderDirPageImageData() => null,
     };
     final int? sessionPageIndex = switch (imageData) {
       ReaderArchivePageImageData(:final int pageIndex) => pageIndex,
       ReaderImageSetPageImageData(:final page) => page.index,
-      _ => null,
+      ReaderDirPageImageData() => null,
     };
     if (sessionComicId == null || sessionPageIndex == null) {
       return _ReaderContextMenuRegion(

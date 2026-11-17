@@ -44,16 +44,18 @@ class _ImageSetLibraryPageState extends ConsumerState<ImageSetLibraryPage> {
   void _openDetail(ImageSet set) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => ImageSetDetailPage(
-          libraryId: widget.libraryId,
-          imageSet: set,
-        ),
+        builder: (_) =>
+            ImageSetDetailPage(libraryId: widget.libraryId, imageSet: set),
       ),
     );
   }
 
   String _setTitle(AppLocalizations l10n, ImageSet set) =>
       set.isRoot ? l10n.imageSetRootName : set.name;
+
+  void _setViewMode(CatalogViewMode mode) {
+    setState(() => _viewMode = mode);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -129,9 +131,7 @@ class _ImageSetLibraryPageState extends ConsumerState<ImageSetLibraryPage> {
                 alignment: Alignment.centerRight,
                 child: CatalogViewModeButtonGroup(
                   mode: _viewMode,
-                  onModeChanged: (CatalogViewMode mode) {
-                    setState(() => _viewMode = mode);
-                  },
+                  onModeChanged: _setViewMode,
                 ),
               ),
             ),
