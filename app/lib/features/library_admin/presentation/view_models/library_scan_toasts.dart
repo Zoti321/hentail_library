@@ -12,6 +12,7 @@ typedef LibraryScanCompletion = ({
   ScanMode scanMode,
   SyncLibraryProgress? progress,
   bool fromStartup,
+  bool imageSetCatalog,
 });
 
 enum _LibraryScanToastKind { cancelled, error, warning, success }
@@ -47,6 +48,9 @@ String libraryScanCompletionMessage(
   AppLocalizations l10n,
   LibraryScanCompletion completion,
 ) {
+  if (completion.imageSetCatalog) {
+    return _imageSetScanCompletionMessage(l10n, completion);
+  }
   return switch (_kindFor(completion)) {
     _LibraryScanToastKind.cancelled => l10n.libraryScanCancelledToast,
     _LibraryScanToastKind.error => completion.error!,
@@ -55,6 +59,23 @@ String libraryScanCompletionMessage(
       mode: completion.scanMode,
       progress: completion.progress,
       fromStartup: completion.fromStartup,
+    ),
+  };
+}
+
+String _imageSetScanCompletionMessage(
+  AppLocalizations l10n,
+  LibraryScanCompletion completion,
+) {
+  return switch (_kindFor(completion)) {
+    _LibraryScanToastKind.cancelled => l10n.imageSetLibrarySyncCancelled,
+    _LibraryScanToastKind.error =>
+      l10n.imageSetLibrarySyncFailed(completion.error!),
+    _LibraryScanToastKind.warning =>
+      l10n.imageSetLibrarySyncWarning(completion.progress!.errorMessage!),
+    _LibraryScanToastKind.success => l10n.imageSetLibrarySyncSuccess(
+      completion.progress?.addedCount ?? 0,
+      completion.progress?.removedCount ?? 0,
     ),
   };
 }

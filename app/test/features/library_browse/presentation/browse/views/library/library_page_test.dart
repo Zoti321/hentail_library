@@ -178,6 +178,7 @@ Future<void> _pumpLibraryPage(
       libraryScanActivityStateProvider.overrideWithValue((
         running: false,
         scanMode: ScanMode.incremental,
+        targetLibraryId: null,
       )),
       if (selection != null)
         catalogSelectionProvider.overrideWith(

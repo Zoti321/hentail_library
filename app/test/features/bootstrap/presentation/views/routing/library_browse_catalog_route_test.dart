@@ -42,6 +42,7 @@ void main() {
         librarySyncStateProvider.overrideWithValue((
           running: false,
           cancelled: false,
+          targetLibraryId: null,
           error: null,
           progress: null,
         )),

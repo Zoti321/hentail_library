@@ -3,23 +3,29 @@ import 'dart:typed_data';
 import 'package:hentai_library/shared/application/errors/app_exception.dart';
 import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
 import 'package:hentai_library/features/reader/domain/clipboard_image_port.dart';
-import 'package:hentai_library/features/reader/domain/comic_page_source_port.dart';
 
 typedef PageImagePngEncoder = Future<Uint8List> Function(Uint8List imageBytes);
+
+/// Session-aware page byte loader (Comic or Image set via OpenReadSessionService).
+typedef CopyPageImageBytesLoader =
+    Future<Uint8List?> Function({
+      required String comicId,
+      required int archivePageIndex,
+    });
 
 /// Copy a reader page to the clipboard (load → encode PNG → write).
 ///
 /// PNG encoding is injected; the engine-backed default lives in data adapters.
 class CopyPageImageService {
   CopyPageImageService({
-    required this._pageSource,
-    required this._clipboardImage,
-    required this._encodePng,
+    required this.loadPageBytes,
+    required this.clipboardImage,
+    required this.encodePng,
   });
 
-  final ComicPageSourcePort _pageSource;
-  final ClipboardImagePort _clipboardImage;
-  final PageImagePngEncoder _encodePng;
+  final CopyPageImageBytesLoader loadPageBytes;
+  final ClipboardImagePort clipboardImage;
+  final PageImagePngEncoder encodePng;
 
   Future<void> execute({
     required ReaderComicRef comic,
@@ -27,9 +33,9 @@ class CopyPageImageService {
   }) async {
     final Uint8List? sourceBytes;
     try {
-      sourceBytes = await _pageSource.loadPageBytes(
+      sourceBytes = await loadPageBytes(
         comicId: comic.comicId,
-        pageIndex: archivePageIndex,
+        archivePageIndex: archivePageIndex,
       );
     } on Object catch (error, stackTrace) {
       Error.throwWithStackTrace(
@@ -50,7 +56,7 @@ class CopyPageImageService {
 
     final Uint8List pngBytes;
     try {
-      pngBytes = await _encodePng(sourceBytes);
+      pngBytes = await encodePng(sourceBytes);
     } on Object catch (error, stackTrace) {
       Error.throwWithStackTrace(
         CopyPageImageException.encodeFailed(
@@ -63,7 +69,7 @@ class CopyPageImageService {
     }
 
     try {
-      await _clipboardImage.writePng(pngBytes);
+      await clipboardImage.writePng(pngBytes);
     } on Object catch (error, stackTrace) {
       Error.throwWithStackTrace(
         CopyPageImageException.clipboardWriteFailed(

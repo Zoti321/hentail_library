@@ -20,6 +20,8 @@ abstract class ScanLibraryState with _$ScanLibraryState {
     @Default(false) bool silent,
     @Default(false) bool fromStartup,
     @Default(ScanMode.incremental) ScanMode scanMode,
+    /// null when idle, or when [syncAll] is scanning every library.
+    String? targetLibraryId,
     String? error,
     SyncLibraryProgress? progress,
   }) = _ScanLibraryState;
@@ -67,6 +69,8 @@ class ScanLibraryController extends _$ScanLibraryController {
       silent: silent,
       fromStartup: fromStartup,
       scanMode: mode,
+      // syncAll leaves target null so observers treat it as library-wide.
+      targetLibraryId: syncAll ? null : targetLibraryId,
       error: null,
       progress: null,
     );
@@ -89,13 +93,17 @@ class ScanLibraryController extends _$ScanLibraryController {
           promptStorageAccess: promptStorageAccess,
         );
         if (_isCurrentRun(run)) {
-          state = state.copyWith(running: false);
+          state = state.copyWith(running: false, targetLibraryId: null);
         }
       } on Object catch (e, st) {
         logError(AppLog.ui('scan'), '漫画库同步失败', e, st);
         if (_isCurrentRun(run)) {
           final String message = appErrorMessage(e);
-          state = state.copyWith(running: false, error: message);
+          state = state.copyWith(
+            running: false,
+            targetLibraryId: null,
+            error: message,
+          );
         }
       } finally {
         if (identical(_activeRun, run)) {
@@ -119,7 +127,11 @@ class ScanLibraryController extends _$ScanLibraryController {
       ref.read(syncLibraryUseCaseProvider).cancelActive();
     } finally {
       if (ref.mounted && identical(_activeRun, run)) {
-        state = state.copyWith(running: false, cancelled: true);
+        state = state.copyWith(
+          running: false,
+          cancelled: true,
+          targetLibraryId: null,
+        );
       }
     }
   }

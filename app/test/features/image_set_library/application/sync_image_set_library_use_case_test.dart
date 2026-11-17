@@ -23,6 +23,7 @@ void main() {
         readSyncState: () => (
           running: false,
           cancelled: false,
+          targetLibraryId: null,
           error: null,
           progress: (
             phase: SyncLibraryPhase.done,
@@ -60,6 +61,7 @@ void main() {
         imageSetSyncOutcomeFrom((
           running: false,
           cancelled: true,
+          targetLibraryId: null,
           error: null,
           progress: null,
         )),
@@ -68,6 +70,7 @@ void main() {
       final ImageSetSyncOutcome failed = imageSetSyncOutcomeFrom((
         running: false,
         cancelled: false,
+        targetLibraryId: null,
         error: '读取失败',
         progress: null,
       ));

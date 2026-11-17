@@ -4,30 +4,26 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/reader/domain/clipboard_image_port.dart';
-import 'package:hentai_library/features/reader/domain/comic_page_source_port.dart';
 import 'package:hentai_library/features/reader/application/copy_page_image_service.dart';
 
-class _FakeComicPageSourcePort implements ComicPageSourcePort {
-  _FakeComicPageSourcePort({this.pageBytes, this.error});
+class _FakePageBytesLoader {
+  _FakePageBytesLoader({this.pageBytes, this.error});
 
   final Uint8List? pageBytes;
   final Object? error;
-  final List<int> requestedPageIndexes = <int>[];
+  final List<({String comicId, int archivePageIndex})> requests =
+      <({String comicId, int archivePageIndex})>[];
 
-  @override
-  Future<Uint8List?> loadPageBytes({
+  Future<Uint8List?> call({
     required String comicId,
-    required int pageIndex,
+    required int archivePageIndex,
   }) async {
-    requestedPageIndexes.add(pageIndex);
+    requests.add((comicId: comicId, archivePageIndex: archivePageIndex));
     if (error != null) {
       throw error!;
     }
     return pageBytes;
   }
-
-  @override
-  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 class _FakeClipboardImagePort implements ClipboardImagePort {
@@ -45,9 +41,9 @@ class _FakeClipboardImagePort implements ClipboardImagePort {
   }
 }
 
-ReaderComicRef _comic() {
-  return const ReaderComicRef(
-    comicId: 'c1',
+ReaderComicRef _comic({String comicId = 'c1'}) {
+  return ReaderComicRef(
+    comicId: comicId,
     path: '/tmp/comic',
     resourceType: ResourceType.zip,
     title: 'Test',
@@ -70,12 +66,12 @@ Uint8List _encodedPng() => Uint8List.fromList(<int>[
 ]);
 
 CopyPageImageService _subject({
-  required _FakeComicPageSourcePort pageSource,
+  required _FakePageBytesLoader loader,
   required _FakeClipboardImagePort clipboard,
   required PageImagePngEncoder encodePng,
 }) {
   return CopyPageImageService(
-    pageSource: pageSource,
+    loadPageBytes: loader.call,
     clipboardImage: clipboard,
     encodePng: encodePng,
   );
@@ -84,13 +80,13 @@ CopyPageImageService _subject({
 void main() {
   group('CopyPageImageService', () {
     test('loads requested page bytes, encodes PNG, writes clipboard', () async {
-      final _FakeComicPageSourcePort pageSource = _FakeComicPageSourcePort(
+      final _FakePageBytesLoader loader = _FakePageBytesLoader(
         pageBytes: _sourceBytes(),
       );
       final _FakeClipboardImagePort clipboard = _FakeClipboardImagePort();
       final List<Uint8List> encodedInputs = <Uint8List>[];
       final CopyPageImageService subject = _subject(
-        pageSource: pageSource,
+        loader: loader,
         clipboard: clipboard,
         encodePng: (Uint8List bytes) async {
           encodedInputs.add(bytes);
@@ -100,20 +96,43 @@ void main() {
 
       await subject.execute(comic: _comic(), archivePageIndex: 4);
 
-      expect(pageSource.requestedPageIndexes, <int>[4]);
+      expect(loader.requests.single.archivePageIndex, 4);
+      expect(loader.requests.single.comicId, 'c1');
       expect(encodedInputs, <Uint8List>[_sourceBytes()]);
+      expect(clipboard.writes, <Uint8List>[_encodedPng()]);
+    });
+
+    test('loads image-set session keys through the same loader seam', () async {
+      const String sessionKey = 'image_set:lib-1:set-a';
+      final _FakePageBytesLoader loader = _FakePageBytesLoader(
+        pageBytes: _sourceBytes(),
+      );
+      final _FakeClipboardImagePort clipboard = _FakeClipboardImagePort();
+      final CopyPageImageService subject = _subject(
+        loader: loader,
+        clipboard: clipboard,
+        encodePng: (_) async => _encodedPng(),
+      );
+
+      await subject.execute(
+        comic: _comic(comicId: sessionKey),
+        archivePageIndex: 2,
+      );
+
+      expect(loader.requests.single.comicId, sessionKey);
+      expect(loader.requests.single.archivePageIndex, 2);
       expect(clipboard.writes, <Uint8List>[_encodedPng()]);
     });
 
     test(
       'throws load failure and does not write clipboard when page load fails',
       () async {
-        final _FakeComicPageSourcePort pageSource = _FakeComicPageSourcePort(
+        final _FakePageBytesLoader loader = _FakePageBytesLoader(
           error: StateError('io failed'),
         );
         final _FakeClipboardImagePort clipboard = _FakeClipboardImagePort();
         final CopyPageImageService subject = _subject(
-          pageSource: pageSource,
+          loader: loader,
           clipboard: clipboard,
           encodePng: (_) async => _encodedPng(),
         );
@@ -132,33 +151,36 @@ void main() {
       },
     );
 
-    test('throws load failure and does not write clipboard when page bytes missing', () async {
-      final _FakeComicPageSourcePort pageSource = _FakeComicPageSourcePort(
-        pageBytes: null,
-      );
-      final _FakeClipboardImagePort clipboard = _FakeClipboardImagePort();
-      final CopyPageImageService subject = _subject(
-        pageSource: pageSource,
-        clipboard: clipboard,
-        encodePng: (_) async => _encodedPng(),
-      );
+    test(
+      'throws load failure and does not write clipboard when page bytes missing',
+      () async {
+        final _FakePageBytesLoader loader = _FakePageBytesLoader(
+          pageBytes: null,
+        );
+        final _FakeClipboardImagePort clipboard = _FakeClipboardImagePort();
+        final CopyPageImageService subject = _subject(
+          loader: loader,
+          clipboard: clipboard,
+          encodePng: (_) async => _encodedPng(),
+        );
 
-      await expectLater(
-        () => subject.execute(comic: _comic(), archivePageIndex: 0),
-        throwsA(isA<CopyPageImageException>()),
-      );
-      expect(clipboard.writes, isEmpty);
-    });
+        await expectLater(
+          () => subject.execute(comic: _comic(), archivePageIndex: 0),
+          throwsA(isA<CopyPageImageException>()),
+        );
+        expect(clipboard.writes, isEmpty);
+      },
+    );
 
     test(
       'throws encode failure and does not write clipboard when encode fails',
       () async {
-        final _FakeComicPageSourcePort pageSource = _FakeComicPageSourcePort(
+        final _FakePageBytesLoader loader = _FakePageBytesLoader(
           pageBytes: _sourceBytes(),
         );
         final _FakeClipboardImagePort clipboard = _FakeClipboardImagePort();
         final CopyPageImageService subject = _subject(
-          pageSource: pageSource,
+          loader: loader,
           clipboard: clipboard,
           encodePng: (_) async => throw StateError('bad image'),
         );
@@ -178,14 +200,14 @@ void main() {
     );
 
     test('throws clipboard failure after PNG encode', () async {
-      final _FakeComicPageSourcePort pageSource = _FakeComicPageSourcePort(
+      final _FakePageBytesLoader loader = _FakePageBytesLoader(
         pageBytes: _sourceBytes(),
       );
       final _FakeClipboardImagePort clipboard = _FakeClipboardImagePort(
         error: StateError('clipboard unavailable'),
       );
       final CopyPageImageService subject = _subject(
-        pageSource: pageSource,
+        loader: loader,
         clipboard: clipboard,
         encodePng: (_) async => _encodedPng(),
       );

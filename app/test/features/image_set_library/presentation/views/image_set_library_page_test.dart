@@ -64,6 +64,7 @@ final Uint8List _png1x1 = Uint8List.fromList(<int>[
 const LibrarySyncState _idle = (
   running: false,
   cancelled: false,
+  targetLibraryId: null,
   error: null,
   progress: null,
 );
@@ -203,7 +204,13 @@ void main() {
       tester,
       _overrides(
         probe,
-        sync: (running: true, cancelled: false, error: null, progress: null),
+        sync: (
+          running: true,
+          cancelled: false,
+          targetLibraryId: 'img-1',
+          error: null,
+          progress: null,
+        ),
       ),
     );
     await tester.pump();
@@ -215,5 +222,32 @@ void main() {
     );
     expect(find.text('正在同步图集…'), findsOneWidget);
     expect(find.text('同步图集'), findsNothing);
+  });
+
+  testWidgets('sync for another library does not show progress on this page', (
+    WidgetTester tester,
+  ) async {
+    final _Probe probe = _Probe();
+    await _pumpPage(
+      tester,
+      _overrides(
+        probe,
+        sync: (
+          running: true,
+          cancelled: false,
+          targetLibraryId: 'other-lib',
+          error: null,
+          progress: null,
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump();
+
+    expect(
+      find.byKey(const ValueKey<String>('imageSetSyncProgress')),
+      findsNothing,
+    );
+    expect(find.text('正在同步图集…'), findsNothing);
   });
 }

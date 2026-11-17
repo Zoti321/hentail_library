@@ -60,7 +60,13 @@ class _ImageSetLibraryPageState extends ConsumerState<ImageSetLibraryPage> {
     final M3EThemeData theme = M3ETheme.of(context);
     final double horizontalInset = PageLayoutSpec.of(context).horizontalInset;
     final bool busy = ref.watch(
-      librarySyncStateProvider.select((LibrarySyncState s) => s.running),
+      librarySyncStateProvider.select((LibrarySyncState s) {
+        if (!s.running) {
+          return false;
+        }
+        final String? targetId = s.targetLibraryId;
+        return targetId == null || targetId == widget.libraryId;
+      }),
     );
     final AsyncValue<List<ImageSet>> sets = ref.watch(
       imageSetSetsProvider(widget.libraryId),

@@ -75,6 +75,7 @@ void main() {
           scanMode: ScanMode.incremental,
           progress: _withRoots(added: 0, removed: 0, migrated: 0),
           fromStartup: true,
+          imageSetCatalog: false,
         )),
         '应用启动时扫描完成：新增 0，移除 0，迁移 0',
       );
@@ -88,6 +89,7 @@ void main() {
           scanMode: ScanMode.incremental,
           progress: _withRoots(added: 2, removed: 1, migrated: 3),
           fromStartup: false,
+          imageSetCatalog: false,
         )),
         '扫描完成：新增 2，移除 1，迁移 3',
       );
@@ -101,6 +103,7 @@ void main() {
           scanMode: ScanMode.incremental,
           progress: null,
           fromStartup: true,
+          imageSetCatalog: false,
         )),
         l10n.libraryScanCancelledToast,
       );
@@ -111,6 +114,7 @@ void main() {
           scanMode: ScanMode.incremental,
           progress: null,
           fromStartup: false,
+          imageSetCatalog: false,
         )),
         'boom',
       );
@@ -129,8 +133,61 @@ void main() {
             errorMessage: '已跳过远程库',
           ),
           fromStartup: true,
+          imageSetCatalog: false,
         )),
         '已跳过远程库',
+      );
+    });
+
+    test('image set catalog uses image-set sync copy', () {
+      expect(
+        libraryScanCompletionMessage(l10n, (
+          cancelled: false,
+          error: null,
+          scanMode: ScanMode.incremental,
+          progress: _withRoots(added: 3, removed: 1, migrated: 0),
+          fromStartup: false,
+          imageSetCatalog: true,
+        )),
+        '同步完成：新增 3，移除 1',
+      );
+      expect(
+        libraryScanCompletionMessage(l10n, (
+          cancelled: true,
+          error: null,
+          scanMode: ScanMode.incremental,
+          progress: null,
+          fromStartup: false,
+          imageSetCatalog: true,
+        )),
+        l10n.imageSetLibrarySyncCancelled,
+      );
+      expect(
+        libraryScanCompletionMessage(l10n, (
+          cancelled: false,
+          error: 'disk full',
+          scanMode: ScanMode.incremental,
+          progress: null,
+          fromStartup: false,
+          imageSetCatalog: true,
+        )),
+        '图集同步失败：disk full',
+      );
+      expect(
+        libraryScanCompletionMessage(l10n, (
+          cancelled: false,
+          error: null,
+          scanMode: ScanMode.incremental,
+          progress: _withRoots(
+            added: 1,
+            removed: 0,
+            migrated: 0,
+            errorMessage: 'incomplete zip',
+          ),
+          fromStartup: false,
+          imageSetCatalog: true,
+        )),
+        '同步完成，但有内容需要关注：incomplete zip',
       );
     });
   });
