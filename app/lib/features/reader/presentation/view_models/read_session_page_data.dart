@@ -35,8 +35,7 @@ class ReaderImageSetPageImageData extends ReaderPageImageData {
 
   final ImageSetReadPage page;
 
-  String get sessionKey =>
-      'image_set:${page.libraryId}:${page.imageSetId}';
+  String get sessionKey => 'image_set:${page.libraryId}:${page.imageSetId}';
 
   @override
   int get archivePageIndex => page.index;

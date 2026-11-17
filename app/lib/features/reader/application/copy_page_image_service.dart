@@ -7,11 +7,10 @@ import 'package:hentai_library/features/reader/domain/clipboard_image_port.dart'
 typedef PageImagePngEncoder = Future<Uint8List> Function(Uint8List imageBytes);
 
 /// Session-aware page byte loader (Comic or Image set via OpenReadSessionService).
-typedef CopyPageImageBytesLoader =
-    Future<Uint8List?> Function({
-      required String comicId,
-      required int archivePageIndex,
-    });
+typedef CopyPageImageBytesLoader = Future<Uint8List?> Function({
+  required String comicId,
+  required int archivePageIndex,
+});
 
 /// Copy a reader page to the clipboard (load → encode PNG → write).
 ///

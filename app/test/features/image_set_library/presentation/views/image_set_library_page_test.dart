@@ -53,12 +53,76 @@ const List<ImageSetImage> _alphaImages = <ImageSetImage>[
 
 /// 1×1 opaque PNG for cover decode in widget tests.
 final Uint8List _png1x1 = Uint8List.fromList(<int>[
-  0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D,
-  0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
-  0x08, 0x02, 0x00, 0x00, 0x00, 0x90, 0x77, 0x53, 0xDE, 0x00, 0x00, 0x00,
-  0x0C, 0x49, 0x44, 0x41, 0x54, 0x08, 0xD7, 0x63, 0xF8, 0xCF, 0xC0, 0x00,
-  0x00, 0x00, 0x03, 0x00, 0x01, 0x00, 0x05, 0xFE, 0xD4, 0xEF, 0x00, 0x00,
-  0x00, 0x00, 0x49, 0x45, 0x4E, 0x44, 0xAE, 0x42, 0x60, 0x82,
+  0x89,
+  0x50,
+  0x4E,
+  0x47,
+  0x0D,
+  0x0A,
+  0x1A,
+  0x0A,
+  0x00,
+  0x00,
+  0x00,
+  0x0D,
+  0x49,
+  0x48,
+  0x44,
+  0x52,
+  0x00,
+  0x00,
+  0x00,
+  0x01,
+  0x00,
+  0x00,
+  0x00,
+  0x01,
+  0x08,
+  0x02,
+  0x00,
+  0x00,
+  0x00,
+  0x90,
+  0x77,
+  0x53,
+  0xDE,
+  0x00,
+  0x00,
+  0x00,
+  0x0C,
+  0x49,
+  0x44,
+  0x41,
+  0x54,
+  0x08,
+  0xD7,
+  0x63,
+  0xF8,
+  0xCF,
+  0xC0,
+  0x00,
+  0x00,
+  0x00,
+  0x03,
+  0x00,
+  0x01,
+  0x00,
+  0x05,
+  0xFE,
+  0xD4,
+  0xEF,
+  0x00,
+  0x00,
+  0x00,
+  0x00,
+  0x49,
+  0x45,
+  0x4E,
+  0x44,
+  0xAE,
+  0x42,
+  0x60,
+  0x82,
 ]);
 
 const LibrarySyncState _idle = (
@@ -73,10 +137,7 @@ class _Probe {
   final List<ImageSetReaderEntry> entries = <ImageSetReaderEntry>[];
 }
 
-List<Override> _overrides(
-  _Probe probe, {
-  LibrarySyncState sync = _idle,
-}) {
+List<Override> _overrides(_Probe probe, {LibrarySyncState sync = _idle}) {
   return <Override>[
     libraryRevisionStateProvider.overrideWithValue(
       const LibraryRevisionState(),
@@ -109,25 +170,24 @@ Future<void> _pumpPage(WidgetTester tester, List<Override> overrides) =>
     );
 
 void main() {
-  testWidgets(
-    'defaults to card grid with root unclassified label and covers',
-    (WidgetTester tester) async {
-      final _Probe probe = _Probe();
-      await _pumpPage(tester, _overrides(probe));
-      await tester.pumpAndSettle();
+  testWidgets('defaults to card grid with root unclassified label and covers', (
+    WidgetTester tester,
+  ) async {
+    final _Probe probe = _Probe();
+    await _pumpPage(tester, _overrides(probe));
+    await tester.pumpAndSettle();
 
-      expect(
-        find.byKey(const ValueKey<String>('imageSetFilterSort')),
-        findsOneWidget,
-      );
-      expect(find.byType(CatalogViewModeButtonGroup), findsOneWidget);
-      expect(find.byType(ImageSetCard), findsNWidgets(2));
-      expect(find.byType(ImageSetCover), findsWidgets);
-      expect(find.text('未分类'), findsOneWidget);
-      expect(find.text('alpha'), findsOneWidget);
-      expect(find.byType(ListTile), findsNothing);
-    },
-  );
+    expect(
+      find.byKey(const ValueKey<String>('imageSetFilterSort')),
+      findsOneWidget,
+    );
+    expect(find.byType(CatalogViewModeButtonGroup), findsOneWidget);
+    expect(find.byType(ImageSetCard), findsNWidgets(2));
+    expect(find.byType(ImageSetCover), findsWidgets);
+    expect(find.text('未分类'), findsOneWidget);
+    expect(find.text('alpha'), findsOneWidget);
+    expect(find.byType(ListTile), findsNothing);
+  });
 
   testWidgets('filter icon opens empty adaptive sheet shell', (
     WidgetTester tester,

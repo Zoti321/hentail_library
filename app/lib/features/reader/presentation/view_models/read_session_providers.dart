@@ -17,8 +17,9 @@ ReaderPageImageData _mapReadSessionPageToUi(ReadSessionPage page) {
       ReaderDirPageImageData(File(filePath), pageIndex: pageIndex),
     ReadSessionArchivePage(:final String comicId, :final int pageIndex) =>
       ReaderArchivePageImageData(comicId: comicId, pageIndex: pageIndex),
-    ReadSessionImageSetPage(:final page) =>
-      ReaderImageSetPageImageData(page: page),
+    ReadSessionImageSetPage(:final page) => ReaderImageSetPageImageData(
+      page: page,
+    ),
   };
 }
 

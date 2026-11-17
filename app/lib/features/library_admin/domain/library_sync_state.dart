@@ -4,6 +4,7 @@ import 'package:hentai_library/features/library_admin/domain/sync_library_types.
 typedef LibrarySyncState = ({
   bool running,
   bool cancelled,
+
   /// null when idle or scanning all libraries.
   String? targetLibraryId,
   String? error,

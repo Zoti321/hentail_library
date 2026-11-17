@@ -20,6 +20,7 @@ abstract class ScanLibraryState with _$ScanLibraryState {
     @Default(false) bool silent,
     @Default(false) bool fromStartup,
     @Default(ScanMode.incremental) ScanMode scanMode,
+
     /// null when idle, or when [syncAll] is scanning every library.
     String? targetLibraryId,
     String? error,

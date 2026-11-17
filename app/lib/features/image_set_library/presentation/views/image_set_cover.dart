@@ -24,10 +24,7 @@ class ImageSetCover extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final M3EThemeData theme = M3ETheme.of(context);
     final AsyncValue<List<ImageSetImage>> images = ref.watch(
-      imageSetImagesProvider((
-        libraryId: libraryId,
-        imageSetId: imageSetId,
-      )),
+      imageSetImagesProvider((libraryId: libraryId, imageSetId: imageSetId)),
     );
 
     return images.when(
@@ -76,9 +73,11 @@ class _ImageSetCoverBytes extends ConsumerWidget {
         height: double.infinity,
         gaplessPlayback: true,
         filterQuality: kCatalogImageFilterQuality,
-        errorBuilder:
-            (BuildContext context, Object error, StackTrace? stackTrace) =>
-                _ImageSetCoverPlaceholder(theme: theme, broken: true),
+        errorBuilder: (
+          BuildContext context,
+          Object error,
+          StackTrace? stackTrace,
+        ) => _ImageSetCoverPlaceholder(theme: theme, broken: true),
       ),
       loading: () => _ImageSetCoverPlaceholder(theme: theme),
       error: (Object _, StackTrace _) =>

@@ -36,10 +36,7 @@ class ImageSetCard extends StatelessWidget {
         children: <Widget>[
           AspectRatio(
             aspectRatio: 2 / 3,
-            child: ImageSetCover(
-              libraryId: libraryId,
-              imageSetId: imageSetId,
-            ),
+            child: ImageSetCover(libraryId: libraryId, imageSetId: imageSetId),
           ),
           Padding(
             padding: EdgeInsets.fromLTRB(

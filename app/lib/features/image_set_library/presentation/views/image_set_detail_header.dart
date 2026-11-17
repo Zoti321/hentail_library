@@ -35,10 +35,7 @@ class ImageSetDetailHeader extends StatelessWidget {
           width: 120,
           child: AspectRatio(
             aspectRatio: 2 / 3,
-            child: ImageSetCover(
-              libraryId: libraryId,
-              imageSetId: imageSetId,
-            ),
+            child: ImageSetCover(libraryId: libraryId, imageSetId: imageSetId),
           ),
         ),
         SizedBox(width: spacing.lg),

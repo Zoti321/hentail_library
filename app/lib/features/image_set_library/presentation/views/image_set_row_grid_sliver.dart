@@ -34,31 +34,31 @@ class ImageSetRowGridSliver extends StatelessWidget {
         return SliverPadding(
           padding: EdgeInsets.symmetric(horizontal: layout.horizontalMargin),
           sliver: SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (BuildContext context, int rowIndex) {
-                final int start = rowIndex * columnCount;
-                final int end = (start + columnCount).clamp(0, itemCount);
-                return Padding(
-                  padding: EdgeInsets.only(
-                    bottom: rowIndex < rowCount - 1 ? layout.gutter : 0,
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      for (int slot = 0; slot < columnCount; slot++) ...<Widget>[
-                        if (slot > 0) SizedBox(width: layout.gutter),
-                        Expanded(
-                          child: start + slot < end
-                              ? itemBuilder(context, start + slot)
-                              : const SizedBox.shrink(),
-                        ),
-                      ],
+            delegate: SliverChildBuilderDelegate((
+              BuildContext context,
+              int rowIndex,
+            ) {
+              final int start = rowIndex * columnCount;
+              final int end = (start + columnCount).clamp(0, itemCount);
+              return Padding(
+                padding: EdgeInsets.only(
+                  bottom: rowIndex < rowCount - 1 ? layout.gutter : 0,
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    for (int slot = 0; slot < columnCount; slot++) ...<Widget>[
+                      if (slot > 0) SizedBox(width: layout.gutter),
+                      Expanded(
+                        child: start + slot < end
+                            ? itemBuilder(context, start + slot)
+                            : const SizedBox.shrink(),
+                      ),
                     ],
-                  ),
-                );
-              },
-              childCount: rowCount,
-            ),
+                  ],
+                ),
+              );
+            }, childCount: rowCount),
           ),
         );
       },

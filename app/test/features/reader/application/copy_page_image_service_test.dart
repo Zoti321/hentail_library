@@ -151,26 +151,21 @@ void main() {
       },
     );
 
-    test(
-      'throws load failure and does not write clipboard when page bytes missing',
-      () async {
-        final _FakePageBytesLoader loader = _FakePageBytesLoader(
-          pageBytes: null,
-        );
-        final _FakeClipboardImagePort clipboard = _FakeClipboardImagePort();
-        final CopyPageImageService subject = _subject(
-          loader: loader,
-          clipboard: clipboard,
-          encodePng: (_) async => _encodedPng(),
-        );
+    test('throws load failure and does not write clipboard when page bytes missing', () async {
+      final _FakePageBytesLoader loader = _FakePageBytesLoader(pageBytes: null);
+      final _FakeClipboardImagePort clipboard = _FakeClipboardImagePort();
+      final CopyPageImageService subject = _subject(
+        loader: loader,
+        clipboard: clipboard,
+        encodePng: (_) async => _encodedPng(),
+      );
 
-        await expectLater(
-          () => subject.execute(comic: _comic(), archivePageIndex: 0),
-          throwsA(isA<CopyPageImageException>()),
-        );
-        expect(clipboard.writes, isEmpty);
-      },
-    );
+      await expectLater(
+        () => subject.execute(comic: _comic(), archivePageIndex: 0),
+        throwsA(isA<CopyPageImageException>()),
+      );
+      expect(clipboard.writes, isEmpty);
+    });
 
     test(
       'throws encode failure and does not write clipboard when encode fails',

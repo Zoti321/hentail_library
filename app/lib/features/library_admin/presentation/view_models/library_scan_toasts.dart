@@ -69,10 +69,12 @@ String _imageSetScanCompletionMessage(
 ) {
   return switch (_kindFor(completion)) {
     _LibraryScanToastKind.cancelled => l10n.imageSetLibrarySyncCancelled,
-    _LibraryScanToastKind.error =>
-      l10n.imageSetLibrarySyncFailed(completion.error!),
-    _LibraryScanToastKind.warning =>
-      l10n.imageSetLibrarySyncWarning(completion.progress!.errorMessage!),
+    _LibraryScanToastKind.error => l10n.imageSetLibrarySyncFailed(
+      completion.error!,
+    ),
+    _LibraryScanToastKind.warning => l10n.imageSetLibrarySyncWarning(
+      completion.progress!.errorMessage!,
+    ),
     _LibraryScanToastKind.success => l10n.imageSetLibrarySyncSuccess(
       completion.progress?.addedCount ?? 0,
       completion.progress?.removedCount ?? 0,

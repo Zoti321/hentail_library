@@ -38,9 +38,11 @@ class ImageSetImageTile extends ConsumerWidget {
             width: double.infinity,
             gaplessPlayback: true,
             filterQuality: kCatalogImageFilterQuality,
-            errorBuilder:
-                (BuildContext context, Object error, StackTrace? stackTrace) =>
-                    _TilePlaceholder(theme: theme, broken: true),
+            errorBuilder: (
+              BuildContext context,
+              Object error,
+              StackTrace? stackTrace,
+            ) => _TilePlaceholder(theme: theme, broken: true),
           ),
           loading: () => AspectRatio(
             aspectRatio: 2 / 3,
