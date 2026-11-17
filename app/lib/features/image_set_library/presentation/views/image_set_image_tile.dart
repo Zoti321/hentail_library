@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_image.dart';
 import 'package:hentai_library/features/image_set_library/presentation/providers/image_set_library_providers.dart';
+import 'package:hentai_library/shared/ui/image/image_decode_cache_size.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// Image set 缩略图：经 Image set page-bytes 解码，表面无圆角裁剪。
+/// Image set detail tile: page-bytes decode, no caption, intrinsic aspect.
 class ImageSetImageTile extends ConsumerWidget {
   const ImageSetImageTile({
     super.key,
@@ -30,63 +31,60 @@ class ImageSetImageTile extends ConsumerWidget {
       color: theme.colorScheme.surfaceContainerHigh,
       child: InkWell(
         onTap: onTap,
-        child: Column(
-          children: <Widget>[
-            Expanded(
-              child: bytes.when(
-                data: (Uint8List data) => LayoutBuilder(
-                  builder: (BuildContext context, BoxConstraints constraints) {
-                    final int? cacheWidth = constraints.maxWidth.isFinite
-                        ? (constraints.maxWidth *
-                                  MediaQuery.devicePixelRatioOf(context))
-                              .round()
-                        : null;
-                    return Image.memory(
-                      data,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      height: double.infinity,
-                      gaplessPlayback: true,
-                      filterQuality: FilterQuality.medium,
-                      cacheWidth: cacheWidth,
-                      errorBuilder:
-                          (
-                            BuildContext context,
-                            Object error,
-                            StackTrace? stackTrace,
-                          ) => Center(
-                            child: Icon(
-                              Icons.broken_image_outlined,
-                              color: theme.colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                    );
-                  },
-                ),
-                loading: () => Center(
-                  child: Icon(
-                    Icons.image_outlined,
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                error: (Object _, StackTrace _) => Center(
-                  child: Icon(
-                    Icons.broken_image_outlined,
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8),
-              child: Text(
-                image.name,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: theme.typeScale.bodySmall,
-              ),
-            ),
-          ],
+        child: bytes.when(
+          data: (Uint8List data) => LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+              final int? cacheWidth = constraints.maxWidth.isFinite
+                  ? decodeCacheSizeForContext(
+                      context,
+                      logicalWidth: constraints.maxWidth,
+                      logicalHeight: constraints.maxWidth,
+                    ).cacheWidth
+                  : null;
+              return Image.memory(
+                data,
+                fit: BoxFit.fitWidth,
+                width: double.infinity,
+                gaplessPlayback: true,
+                filterQuality: FilterQuality.high,
+                cacheWidth: cacheWidth,
+                errorBuilder:
+                    (
+                      BuildContext context,
+                      Object error,
+                      StackTrace? stackTrace,
+                    ) => _TilePlaceholder(theme: theme, broken: true),
+              );
+            },
+          ),
+          loading: () => AspectRatio(
+            aspectRatio: 2 / 3,
+            child: _TilePlaceholder(theme: theme),
+          ),
+          error: (Object _, StackTrace _) => AspectRatio(
+            aspectRatio: 2 / 3,
+            child: _TilePlaceholder(theme: theme, broken: true),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TilePlaceholder extends StatelessWidget {
+  const _TilePlaceholder({required this.theme, this.broken = false});
+
+  final M3EThemeData theme;
+  final bool broken;
+
+  @override
+  Widget build(BuildContext context) {
+    return ColoredBox(
+      color: theme.colorScheme.surfaceContainerHigh,
+      child: Center(
+        child: Icon(
+          broken ? Icons.broken_image_outlined : Icons.image_outlined,
+          color: theme.colorScheme.onSurfaceVariant,
         ),
       ),
     );

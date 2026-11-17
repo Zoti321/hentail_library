@@ -48,6 +48,15 @@
   },
   "imageSetRootName": "Unclassified",
   "imageSetDetailEmpty": "This image set has no images",
+  "imageSetDetailMetaEmpty": "None",
+  "imageSetDetailImageCount": "{count, plural, one{1 image} other{{count} images}}",
+  "@imageSetDetailImageCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "sidebarAddRemoteLibrary": "Add remote library",
   "sidebarReorderLibraries": "Reorder",
   "sidebarExitReorder": "Done reordering",

@@ -70,6 +70,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get imageSetDetailEmpty => 'This image set has no images';
 
   @override
+  String get imageSetDetailMetaEmpty => 'None';
+
+  @override
+  String imageSetDetailImageCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count images',
+      one: '1 image',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get sidebarAddRemoteLibrary => 'Add remote library';
 
   @override

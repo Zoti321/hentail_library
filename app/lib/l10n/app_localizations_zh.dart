@@ -69,6 +69,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String get imageSetDetailEmpty => '该图集没有图片';
 
   @override
+  String get imageSetDetailMetaEmpty => '暂无';
+
+  @override
+  String imageSetDetailImageCount(int count) {
+    return '$count 张';
+  }
+
+  @override
   String get sidebarAddRemoteLibrary => '添加远程库';
 
   @override

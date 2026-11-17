@@ -5,13 +5,15 @@ import 'package:hentai_library/features/image_set_library/domain/image_set.dart'
 import 'package:hentai_library/features/image_set_library/domain/image_set_image.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_reader_entry.dart';
 import 'package:hentai_library/features/image_set_library/presentation/providers/image_set_library_providers.dart';
+import 'package:hentai_library/features/image_set_library/presentation/views/image_set_detail_header.dart';
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_image_tile.dart';
+import 'package:hentai_library/features/image_set_library/presentation/views/image_set_masonry_sliver.dart';
 import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/application/errors/error_message.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// Image set 详情：虚拟化缩略图网格，按 catalog 顺序排列。
+/// Image set 详情：stub 顶栏 + 无标题 masonry 图流。
 class ImageSetDetailPage extends ConsumerWidget {
   const ImageSetDetailPage({
     super.key,
@@ -48,54 +50,62 @@ class ImageSetDetailPage extends ConsumerWidget {
                 horizontal: horizontalInset,
                 vertical: theme.spacing.sm,
               ),
-              child: Row(
-                children: <Widget>[
-                  DetailHeaderBackButton(
-                    onBack: () => Navigator.of(context).maybePop(),
-                  ),
-                  SizedBox(width: theme.spacing.sm),
-                  Expanded(child: PageTitle(title)),
-                ],
+              child: DetailHeaderBackButton(
+                onBack: () => Navigator.of(context).maybePop(),
               ),
             ),
             Expanded(
               child: images.when(
-                data: (List<ImageSetImage> list) => list.isEmpty
-                    ? Center(child: Text(l10n.imageSetDetailEmpty))
-                    : CustomScrollView(
-                        slivers: <Widget>[
-                          CatalogGridSliver(
-                            itemCount: list.length,
-                            itemBuilder:
-                                (
-                                  BuildContext context,
-                                  int index,
-                                  CatalogGridLayout _,
-                                ) {
-                                  final ImageSetImage image = list[index];
-                                  return ImageSetImageTile(
-                                    key: ValueKey<String>(
-                                      image.imageSetImageId,
-                                    ),
-                                    libraryId: libraryId,
-                                    image: image,
-                                    onTap: () =>
-                                        ref.read(
-                                          imageSetReaderEntryCommandProvider,
-                                        )(
-                                          ImageSetReaderEntry(
-                                            libraryId: libraryId,
-                                            imageSetId: imageSet.imageSetId,
-                                            imageSetImageId:
-                                                image.imageSetImageId,
-                                            index: index,
-                                          ),
-                                        ),
-                                  );
-                                },
-                          ),
-                        ],
+                data: (List<ImageSetImage> list) => CustomScrollView(
+                  slivers: <Widget>[
+                    SliverPadding(
+                      padding: EdgeInsets.fromLTRB(
+                        horizontalInset,
+                        0,
+                        horizontalInset,
+                        theme.spacing.md,
                       ),
+                      sliver: SliverToBoxAdapter(
+                        child: ImageSetDetailHeader(
+                          libraryId: libraryId,
+                          imageSetId: imageSet.imageSetId,
+                          title: title,
+                          imageCount: list.length,
+                        ),
+                      ),
+                    ),
+                    if (list.isEmpty)
+                      SliverFillRemaining(
+                        hasScrollBody: false,
+                        child: Center(child: Text(l10n.imageSetDetailEmpty)),
+                      )
+                    else
+                      ImageSetMasonrySliver(
+                        itemCount: list.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          final ImageSetImage image = list[index];
+                          return ImageSetImageTile(
+                            key: ValueKey<String>(image.imageSetImageId),
+                            libraryId: libraryId,
+                            image: image,
+                            onTap: () =>
+                                ref.read(imageSetReaderEntryCommandProvider)(
+                                  ImageSetReaderEntry(
+                                    libraryId: libraryId,
+                                    imageSetId: imageSet.imageSetId,
+                                    imageSetImageId: image.imageSetImageId,
+                                    index: index,
+                                  ),
+                                ),
+                          );
+                        },
+                      ),
+                    // Bottom breathing room.
+                    SliverToBoxAdapter(
+                      child: SizedBox(height: theme.spacing.lg),
+                    ),
+                  ],
+                ),
                 loading: () => const Center(child: CircularProgressIndicator()),
                 error: (Object error, StackTrace _) =>
                     Center(child: Text(appErrorMessage(error))),

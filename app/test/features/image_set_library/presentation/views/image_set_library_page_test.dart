@@ -154,7 +154,9 @@ void main() {
     },
   );
 
-  testWidgets('card tap opens detail grid', (WidgetTester tester) async {
+  testWidgets('card tap opens detail with stub header and caption-free tiles', (
+    WidgetTester tester,
+  ) async {
     final _Probe probe = _Probe();
     await _pumpPage(tester, _overrides(probe));
     await tester.pumpAndSettle();
@@ -162,8 +164,17 @@ void main() {
     await tester.tap(find.byKey(const ValueKey<String>('imageSet-a')));
     await tester.pumpAndSettle();
 
+    expect(find.text('alpha'), findsWidgets);
+    expect(find.text('2 张'), findsOneWidget);
+    expect(find.text('作者'), findsOneWidget);
+    expect(find.text('标签'), findsOneWidget);
+    expect(find.text('原作'), findsOneWidget);
+    expect(find.text('角色'), findsOneWidget);
+    expect(find.text('暂无'), findsNWidgets(4));
     expect(find.byKey(const ValueKey<String>('i1')), findsOneWidget);
     expect(find.byKey(const ValueKey<String>('i2')), findsOneWidget);
+    expect(find.text('1.jpg'), findsNothing);
+    expect(find.text('2.png'), findsNothing);
   });
 
   testWidgets(

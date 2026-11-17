@@ -200,6 +200,18 @@ abstract class AppLocalizations {
   /// **'该图集没有图片'**
   String get imageSetDetailEmpty;
 
+  /// No description provided for @imageSetDetailMetaEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无'**
+  String get imageSetDetailMetaEmpty;
+
+  /// No description provided for @imageSetDetailImageCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count} 张'**
+  String imageSetDetailImageCount(int count);
+
   /// No description provided for @sidebarAddRemoteLibrary.
   ///
   /// In zh, this message translates to:
