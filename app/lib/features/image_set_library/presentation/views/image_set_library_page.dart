@@ -6,13 +6,14 @@ import 'package:hentai_library/features/image_set_library/presentation/providers
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_card.dart';
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_cover.dart';
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_detail_page.dart';
+import 'package:hentai_library/features/image_set_library/presentation/views/image_set_library_filter_sheet.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/application/errors/error_message.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// Image set 库浏览：会话内 card/list 双视图与同步 busy 投影（手动同步入口在 Home「更多」）。
+/// Image set 库浏览：header + body；会话内 card/list；同步 busy 投影（手动同步在 Home「更多」）。
 class ImageSetLibraryPage extends ConsumerStatefulWidget {
   const ImageSetLibraryPage({
     super.key,
@@ -81,7 +82,24 @@ class _ImageSetLibraryPageState extends ConsumerState<ImageSetLibraryPage> {
           children: <Widget>[
             Padding(
               padding: EdgeInsets.symmetric(horizontal: horizontalInset),
-              child: PageTitle(widget.displayName),
+              child: LibraryToolbarRow(
+                title: PageTitle(widget.displayName),
+                trailing: <Widget>[
+                  M3EIconButton(
+                    key: const ValueKey<String>('imageSetFilterSort'),
+                    icon: Icon(
+                      Icons.filter_list,
+                      size: LibraryPageHeaderMetrics.actionIconSize,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                    variant: M3EIconButtonVariant.standard,
+                    size: M3EIconButtonSize.sm,
+                    tooltip: l10n.libraryFilterSortTooltip,
+                    semanticLabel: l10n.libraryFilterSortSemantic,
+                    onPressed: () => ImageSetLibraryFilterSheet.show(context),
+                  ),
+                ],
+              ),
             ),
             if (busy) ...<Widget>[
               Padding(

@@ -116,6 +116,10 @@ void main() {
       await _pumpPage(tester, _overrides(probe));
       await tester.pumpAndSettle();
 
+      expect(
+        find.byKey(const ValueKey<String>('imageSetFilterSort')),
+        findsOneWidget,
+      );
       expect(find.byType(CatalogViewModeButtonGroup), findsOneWidget);
       expect(find.byType(ImageSetCard), findsNWidgets(2));
       expect(find.byType(ImageSetCover), findsWidgets);
@@ -124,6 +128,26 @@ void main() {
       expect(find.byType(ListTile), findsNothing);
     },
   );
+
+  testWidgets('filter icon opens empty adaptive sheet shell', (
+    WidgetTester tester,
+  ) async {
+    final _Probe probe = _Probe();
+    await _pumpPage(tester, _overrides(probe));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const ValueKey<String>('imageSetFilterSort')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('筛选、分组与排序'), findsWidgets);
+    expect(
+      find.byKey(const ValueKey<String>('imageSetFilterSortEmptyBody')),
+      findsOneWidget,
+    );
+    expect(find.text('筛选'), findsNothing);
+    expect(find.text('分组'), findsNothing);
+    expect(find.text('排序'), findsNothing);
+  });
 
   testWidgets('toggles to list with leading cover thumbs', (
     WidgetTester tester,
@@ -155,28 +179,29 @@ void main() {
     },
   );
 
-  testWidgets('card tap opens detail with stub header and caption-free tiles', (
-    WidgetTester tester,
-  ) async {
-    final _Probe probe = _Probe();
-    await _pumpPage(tester, _overrides(probe));
-    await tester.pumpAndSettle();
+  testWidgets(
+    'card tap opens detail without empty meta and with caption-free row tiles',
+    (WidgetTester tester) async {
+      final _Probe probe = _Probe();
+      await _pumpPage(tester, _overrides(probe));
+      await tester.pumpAndSettle();
 
-    await tester.tap(find.byKey(const ValueKey<String>('imageSet-a')));
-    await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey<String>('imageSet-a')));
+      await tester.pumpAndSettle();
 
-    expect(find.text('alpha'), findsWidgets);
-    expect(find.text('2 张'), findsOneWidget);
-    expect(find.text('作者'), findsOneWidget);
-    expect(find.text('标签'), findsOneWidget);
-    expect(find.text('原作'), findsOneWidget);
-    expect(find.text('角色'), findsOneWidget);
-    expect(find.text('暂无'), findsNWidgets(4));
-    expect(find.byKey(const ValueKey<String>('i1')), findsOneWidget);
-    expect(find.byKey(const ValueKey<String>('i2')), findsOneWidget);
-    expect(find.text('1.jpg'), findsNothing);
-    expect(find.text('2.png'), findsNothing);
-  });
+      expect(find.text('alpha'), findsWidgets);
+      expect(find.text('2 张'), findsOneWidget);
+      expect(find.text('作者'), findsNothing);
+      expect(find.text('标签'), findsNothing);
+      expect(find.text('原作'), findsNothing);
+      expect(find.text('角色'), findsNothing);
+      expect(find.text('暂无'), findsNothing);
+      expect(find.byKey(const ValueKey<String>('i1')), findsOneWidget);
+      expect(find.byKey(const ValueKey<String>('i2')), findsOneWidget);
+      expect(find.text('1.jpg'), findsNothing);
+      expect(find.text('2.png'), findsNothing);
+    },
+  );
 
   testWidgets(
     'selecting a thumbnail invokes the Reader entry with catalog index',

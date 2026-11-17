@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_image.dart';
 import 'package:hentai_library/features/image_set_library/presentation/providers/image_set_library_providers.dart';
-import 'package:hentai_library/shared/ui/image/image_decode_cache_size.dart';
+import 'package:hentai_library/shared/ui/image/catalog_image_filter_quality.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Image set detail tile: page-bytes decode, no caption, intrinsic aspect.
@@ -32,30 +32,15 @@ class ImageSetImageTile extends ConsumerWidget {
       child: InkWell(
         onTap: onTap,
         child: bytes.when(
-          data: (Uint8List data) => LayoutBuilder(
-            builder: (BuildContext context, BoxConstraints constraints) {
-              final int? cacheWidth = constraints.maxWidth.isFinite
-                  ? decodeCacheSizeForContext(
-                      context,
-                      logicalWidth: constraints.maxWidth,
-                      logicalHeight: constraints.maxWidth,
-                    ).cacheWidth
-                  : null;
-              return Image.memory(
-                data,
-                fit: BoxFit.fitWidth,
-                width: double.infinity,
-                gaplessPlayback: true,
-                filterQuality: FilterQuality.high,
-                cacheWidth: cacheWidth,
-                errorBuilder:
-                    (
-                      BuildContext context,
-                      Object error,
-                      StackTrace? stackTrace,
-                    ) => _TilePlaceholder(theme: theme, broken: true),
-              );
-            },
+          data: (Uint8List data) => Image.memory(
+            data,
+            fit: BoxFit.fitWidth,
+            width: double.infinity,
+            gaplessPlayback: true,
+            filterQuality: kCatalogImageFilterQuality,
+            errorBuilder:
+                (BuildContext context, Object error, StackTrace? stackTrace) =>
+                    _TilePlaceholder(theme: theme, broken: true),
           ),
           loading: () => AspectRatio(
             aspectRatio: 2 / 3,

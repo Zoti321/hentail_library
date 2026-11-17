@@ -7,13 +7,13 @@ import 'package:hentai_library/features/image_set_library/domain/image_set_reade
 import 'package:hentai_library/features/image_set_library/presentation/providers/image_set_library_providers.dart';
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_detail_header.dart';
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_image_tile.dart';
-import 'package:hentai_library/features/image_set_library/presentation/views/image_set_masonry_sliver.dart';
+import 'package:hentai_library/features/image_set_library/presentation/views/image_set_row_grid_sliver.dart';
 import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/application/errors/error_message.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// Image set 详情：stub 顶栏 + 无标题 masonry 图流。
+/// Image set 详情：顶栏（标题/张数）+ 无标题按行顶对齐图流。
 class ImageSetDetailPage extends ConsumerWidget {
   const ImageSetDetailPage({
     super.key,
@@ -80,7 +80,7 @@ class ImageSetDetailPage extends ConsumerWidget {
                         child: Center(child: Text(l10n.imageSetDetailEmpty)),
                       )
                     else
-                      ImageSetMasonrySliver(
+                      ImageSetRowGridSliver(
                         itemCount: list.length,
                         itemBuilder: (BuildContext context, int index) {
                           final ImageSetImage image = list[index];
