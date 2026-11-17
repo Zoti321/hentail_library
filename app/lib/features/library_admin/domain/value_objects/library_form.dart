@@ -124,6 +124,15 @@ final class LibraryFormApplySucceeded extends LibraryFormApplyResult {
 }
 
 extension LibraryFormOps on LibraryForm {
+  LibraryForm normalizedForEdit(LocalLibrary original) {
+    // Catalog/access kind and Image set roots belong to the saved Library.
+    return copyWith(
+      isRemote: isRemoteLibrary(original),
+      isImageSet: isImageSetLibrary(original),
+      rootPath: isImageSetLibrary(original) ? original.rootPath : rootPath,
+    ).normalized;
+  }
+
   LibraryFormValidation validate({required bool isCreate}) {
     final String? nameError = name.trim().isEmpty ? '库名称不能为空' : null;
     final String? rootError = rootPath.trim().isEmpty
@@ -153,8 +162,12 @@ extension LibraryFormOps on LibraryForm {
   LibraryForm get normalized {
     if (isImageSet) {
       return copyWith(
+        isRemote: false,
         name: name.trim(),
         rootPath: rootPath.trim(),
+        username: '',
+        password: '',
+        allowHttp: false,
         enabledResourceFormatCategories: const <ResourceFormatCategory>[],
         scanOnStartup: false,
         scanInterval: ScanInterval.disabled,

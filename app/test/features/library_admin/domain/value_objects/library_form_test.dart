@@ -33,8 +33,12 @@ void main() {
   group('LibraryForm image set', () {
     test('createImageSetLocal has no format groups and scan disabled', () {
       final LibraryForm form = LibraryForm.createImageSetLocal().copyWith(
+        isRemote: true,
         name: 'G',
         rootPath: r'D:\images',
+        username: 'user',
+        password: 'secret',
+        allowHttp: true,
         scanOnStartup: true,
         scanInterval: ScanInterval.daily,
         enabledResourceFormatCategories: ResourceFormatCategory.all,
@@ -42,6 +46,9 @@ void main() {
       final LibraryForm ready = form.normalized;
       expect(ready.isImageSet, isTrue);
       expect(ready.isRemote, isFalse);
+      expect(ready.username, isEmpty);
+      expect(ready.password, isEmpty);
+      expect(ready.allowHttp, isFalse);
       expect(ready.enabledResourceFormatCategories, isEmpty);
       expect(ready.scanOnStartup, isFalse);
       expect(ready.scanInterval, ScanInterval.disabled);

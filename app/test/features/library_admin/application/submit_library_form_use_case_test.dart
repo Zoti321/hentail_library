@@ -254,6 +254,75 @@ void main() {
     });
 
     test(
+      'image set edit cannot bypass its constraints with draft flags',
+      () async {
+        final original = _lib(
+          kind: 'local',
+          catalogKind: 'image_set',
+          root: r'D:\images',
+          name: 'Alpha',
+          groups: const <ResourceFormatCategory>[],
+        );
+        final repo = _RecordingLibraryRepository();
+        final events = _Events();
+        final result = await SubmitLibraryFormUseCase(repo, events)(
+          LibraryForm.createRemote().copyWith(
+            name: 'Beta',
+            rootPath: 'https://example.com/dav',
+            password: 'secret',
+            scanOnStartup: true,
+            scanInterval: ScanInterval.daily,
+          ),
+          original: original,
+        );
+
+        expect(result, isA<LibraryFormApplySucceeded>());
+        expect((result as LibraryFormApplySucceeded).rootChanged, isFalse);
+        expect(repo.calls, ['updateSettings']);
+        expect(repo.lastName, 'Beta');
+        expect(repo.lastGroups, isEmpty);
+        expect(repo.lastScanOnStartup, isFalse);
+        expect(repo.lastScanInterval, ScanInterval.disabled);
+        expect(events.events, [isA<LibraryCatalogChanged>()]);
+      },
+    );
+
+    test(
+      'comic edit retains root migration despite an image set draft',
+      () async {
+        final original = _lib(kind: 'local', root: '/old', name: 'Alpha');
+        final repo = _RecordingLibraryRepository();
+        final result = await LibraryForm.fromLibrary(original)
+            .copyWith(isImageSet: true, rootPath: '/new')
+            .submit(repo, original: original);
+
+        expect(result, isA<LibraryFormApplySucceeded>());
+        expect((result as LibraryFormApplySucceeded).rootChanged, isTrue);
+        expect(repo.calls, ['updateLocalRoot']);
+        expect(repo.lastRoot, '/new');
+      },
+    );
+
+    test(
+      'remote edit keeps its connection command despite a local draft',
+      () async {
+        final original = _lib(
+          kind: 'remote',
+          root: 'https://example.com/old',
+          name: 'Alpha',
+        );
+        final repo = _RecordingLibraryRepository();
+        await LibraryForm.fromLibrary(original)
+            .copyWith(isRemote: false, rootPath: 'https://example.com/new')
+            .submit(repo, original: original);
+
+        expect(repo.calls, ['updateRemote']);
+        expect(repo.lastRoot, 'https://example.com/new');
+        expect(repo.lastPassword, isNull);
+      },
+    );
+
+    test(
       'image set create uses image set repository without settings write',
       () async {
         final _RecordingLibraryRepository repo = _RecordingLibraryRepository();

@@ -56,10 +56,7 @@ class SubmitLibraryFormUseCase {
     LibraryForm form,
     LocalLibrary original,
   ) async {
-    // Image set 根路径创建后锁定：忽略表单中的路径变更，不走 updateLocalRoot。
-    final LibraryForm ready =
-        (form.isImageSet ? form.copyWith(rootPath: original.rootPath) : form)
-            .normalized;
+    final LibraryForm ready = form.normalizedForEdit(original);
     final LibraryFormValidation validation = ready.validate(isCreate: false);
     if (!validation.isValid) {
       return LibraryFormApplyInvalid(validation);
