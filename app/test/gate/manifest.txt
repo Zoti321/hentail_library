@@ -68,12 +68,12 @@ test/features/library_browse/presentation/browse/view_models/library_series_filt
 # Browse preference storage, legacy migration and injected UI state.
 test/features/library_browse/infrastructure
 test/features/library_browse/presentation/browse/view_models/library_browse_preferences_injection_test.dart
-test/features/series/presentation/view_models/series_item_sort_persist_test.dart
+test/features/series/application/persist_series_item_sort_use_case_test.dart
 test/features/series/presentation/view_models/series_metadata_editor_notifier_test.dart
 test/features/series/presentation/view_models/series_metadata_edit_session_notifier_test.dart
 test/features/series/domain/value_objects/form/series_metadata_form_test.dart
 test/features/series/presentation/patterns/metadata_edit/series_metadata_edit_draft_test.dart
-test/features/series/application/series_metadata_service_test.dart
+test/features/series/application/apply_series_metadata_form_use_case_test.dart
 test/features/series/presentation/view_models/series_detail_page_size_notifier_test.dart
 test/features/series/infrastructure/series_detail_page_size_storage_test.dart
 test/features/reader/presentation/reader_exit_location_test.dart

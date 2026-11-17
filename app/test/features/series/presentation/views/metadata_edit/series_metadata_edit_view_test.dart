@@ -1,6 +1,6 @@
 import 'package:hentai_library/features/series/domain/value_objects/series_folder_info.dart';
 import 'package:hentai_library/features/series/domain/value_objects/series_metadata.dart';
-import 'package:hentai_library/features/series/application/series_metadata_service.dart';
+import 'package:hentai_library/features/series/application/apply_series_metadata_form_use_case.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/series/presentation/views/metadata_edit/series_metadata_edit_page.dart';

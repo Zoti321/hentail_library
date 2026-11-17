@@ -5,7 +5,7 @@ import 'package:hentai_library/features/series/domain/value_objects/serializatio
 import 'package:hentai_library/features/series/domain/series.dart';
 import 'package:hentai_library/features/series/domain/value_objects/series_metadata_form.dart';
 import 'package:hentai_library/features/series/domain/series_repository.dart';
-import 'package:hentai_library/features/series/application/series_metadata_service.dart';
+import 'package:hentai_library/features/series/application/apply_series_metadata_form_use_case.dart';
 
 class _RecordingSeriesRepository implements SeriesRepository {
   String? seriesId;
@@ -58,8 +58,7 @@ void main() {
     'an unsupported planned count prevents the whole metadata write',
     () async {
       final repo = _RecordingSeriesRepository();
-      final result = await applySeriesMetadataForm(
-        repo,
+      final result = await ApplySeriesMetadataFormUseCase(repo)(
         SeriesMetadataForm(
           name: 'Changed name',
           serializationStatus: SerializationStatus.ended,
@@ -76,8 +75,7 @@ void main() {
     final repo = _RecordingSeriesRepository()..fail = true;
     final original = _series();
     await expectLater(
-      applySeriesMetadataForm(
-        repo,
+      ApplySeriesMetadataFormUseCase(repo)(
         SeriesMetadataForm.fromSeries(original).copyWith(name: 'new'),
         original,
       ),
@@ -85,18 +83,18 @@ void main() {
     );
     expect(repo.callCount, 1);
   });
-  group('applySeriesMetadataForm', () {
+  group('ApplySeriesMetadataFormUseCase', () {
     test('returns Invalid and does not call repository', () async {
       final _RecordingSeriesRepository repo = _RecordingSeriesRepository();
-      final SeriesMetadataApplyResult result = await applySeriesMetadataForm(
-        repo,
-        SeriesMetadataForm(
-          name: '',
-          serializationStatus: SerializationStatus.ongoing,
-          totalCountText: 'x',
-        ),
-        _series(),
-      );
+      final SeriesMetadataApplyResult result =
+          await ApplySeriesMetadataFormUseCase(repo)(
+            SeriesMetadataForm(
+              name: '',
+              serializationStatus: SerializationStatus.ongoing,
+              totalCountText: 'x',
+            ),
+            _series(),
+          );
 
       expect(result, isA<SeriesMetadataApplyInvalid>());
       expect(repo.callCount, 0);
@@ -113,12 +111,12 @@ void main() {
         status: SerializationStatus.ongoing,
         totalCount: 12,
       );
-      final SeriesMetadataApplyResult result = await applySeriesMetadataForm(
-        repo,
-        SeriesMetadataForm.fromSeries(original)
-            .copyWith(serializationStatus: SerializationStatus.ended),
-        original,
-      );
+      final SeriesMetadataApplyResult result =
+          await ApplySeriesMetadataFormUseCase(repo)(
+            SeriesMetadataForm.fromSeries(original)
+                .copyWith(serializationStatus: SerializationStatus.ended),
+            original,
+          );
 
       expect(result, isA<SeriesMetadataApplySucceeded>());
       expect(repo.callCount, 1);
@@ -134,11 +132,11 @@ void main() {
       () async {
         final _RecordingSeriesRepository repo = _RecordingSeriesRepository();
         final Series original = _series(totalCount: null);
-        final SeriesMetadataApplyResult result = await applySeriesMetadataForm(
-          repo,
-          SeriesMetadataForm.fromSeries(original),
-          original,
-        );
+        final SeriesMetadataApplyResult result =
+            await ApplySeriesMetadataFormUseCase(repo)(
+              SeriesMetadataForm.fromSeries(original),
+              original,
+            );
 
         expect(result, isA<SeriesMetadataApplySucceeded>());
         expect(repo.callCount, 0);
@@ -152,15 +150,15 @@ void main() {
         status: SerializationStatus.ongoing,
         totalCount: 3,
       );
-      final SeriesMetadataApplyResult result = await applySeriesMetadataForm(
-        repo,
-        SeriesMetadataForm(
-          name: ' 新系列 ',
-          serializationStatus: SerializationStatus.ended,
-          totalCountText: '8',
-        ),
-        original,
-      );
+      final SeriesMetadataApplyResult result =
+          await ApplySeriesMetadataFormUseCase(repo)(
+            SeriesMetadataForm(
+              name: ' 新系列 ',
+              serializationStatus: SerializationStatus.ended,
+              totalCountText: '8',
+            ),
+            original,
+          );
 
       expect(result, isA<SeriesMetadataApplySucceeded>());
       expect(repo.callCount, 1);
@@ -178,11 +176,12 @@ void main() {
         status: SerializationStatus.ongoing,
         totalCount: 12,
       );
-      final SeriesMetadataApplyResult result = await applySeriesMetadataForm(
-        repo,
-        SeriesMetadataForm.fromSeries(original).copyWith(totalCountText: ''),
-        original,
-      );
+      final SeriesMetadataApplyResult result =
+          await ApplySeriesMetadataFormUseCase(repo)(
+            SeriesMetadataForm.fromSeries(original)
+                .copyWith(totalCountText: ''),
+            original,
+          );
 
       expect(result, isA<SeriesMetadataApplySucceeded>());
       expect(repo.callCount, 1);

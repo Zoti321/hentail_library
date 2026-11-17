@@ -1,4 +1,4 @@
-import 'package:hentai_library/features/series/application/series_metadata_service.dart';
+import 'package:hentai_library/features/series/application/apply_series_metadata_form_use_case.dart';
 import 'package:hentai_library/features/series/domain/series.dart';
 import 'package:hentai_library/features/series/domain/value_objects/series_metadata_form.dart';
 import 'package:hentai_library/features/series/public/providers/series_repository_providers.dart';
@@ -16,8 +16,7 @@ class SeriesMetadataEditorNotifier extends _$SeriesMetadataEditorNotifier {
     SeriesMetadataForm form,
     Series original,
   ) {
-    return applySeriesMetadataForm(
-      ref.read(seriesRepoProvider),
+    return ApplySeriesMetadataFormUseCase(ref.read(seriesRepoProvider))(
       form,
       original,
     );

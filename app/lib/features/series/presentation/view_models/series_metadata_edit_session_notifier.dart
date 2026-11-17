@@ -1,4 +1,4 @@
-import 'package:hentai_library/features/series/application/series_metadata_service.dart';
+import 'package:hentai_library/features/series/application/apply_series_metadata_form_use_case.dart';
 import 'package:hentai_library/features/series/presentation/mappers/series_metadata_edit_mappers.dart';
 import 'package:hentai_library/features/series/presentation/patterns/metadata_edit/series_metadata_edit_draft.dart';
 import 'package:hentai_library/features/series/presentation/view_models/series_metadata_edit_ui_state.dart';

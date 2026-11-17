@@ -1,4 +1,4 @@
-import 'package:hentai_library/features/series/application/series_item_sort_service.dart';
+import 'package:hentai_library/features/series/application/persist_series_item_sort_use_case.dart';
 import 'package:hentai_library/shared/domain/events/events.dart';
 import 'package:hentai_library/features/series/domain/series_repository.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/series_item_membership.dart';
@@ -10,6 +10,7 @@ class _LockObservingSeriesRepository implements SeriesRepository {
   double? sortOrder;
   int updateSortOrderCalls = 0;
   int setLockCalls = 0;
+  Object? failure;
 
   @override
   Future<void> updateSeriesItemSortOrder({
@@ -18,6 +19,8 @@ class _LockObservingSeriesRepository implements SeriesRepository {
     required double sortOrder,
   }) async {
     updateSortOrderCalls += 1;
+    final error = failure;
+    if (error != null) throw error;
     this.sortOrder = sortOrder;
     sortOrderLocked = true;
   }
@@ -29,6 +32,8 @@ class _LockObservingSeriesRepository implements SeriesRepository {
     required bool locked,
   }) async {
     setLockCalls += 1;
+    final error = failure;
+    if (error != null) throw error;
     sortOrderLocked = locked;
   }
 
@@ -36,11 +41,11 @@ class _LockObservingSeriesRepository implements SeriesRepository {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-class _NoopPublisher implements DomainEventPublisher {
-  const _NoopPublisher();
+class _RecordingPublisher implements DomainEventPublisher {
+  final List<DomainEvent> events = <DomainEvent>[];
 
   @override
-  void publish(DomainEvent event) {}
+  void publish(DomainEvent event) => events.add(event);
 }
 
 void main() {
@@ -50,14 +55,15 @@ void main() {
     sortOrderLocked: false,
   );
 
-  group('persistSeriesItemSortIfChanged', () {
+  group('PersistSeriesItemSortUseCase', () {
     test('order change with draft unlocked leaves member locked', () async {
       final _LockObservingSeriesRepository repo =
           _LockObservingSeriesRepository()..sortOrderLocked = false;
 
-      await persistSeriesItemSortIfChanged(
-        repo: repo,
-        events: _NoopPublisher(),
+      await PersistSeriesItemSortUseCase(
+        repository: repo,
+        events: _RecordingPublisher(),
+      )(
         comicId: 'comic-1',
         seed: unlockedSeed,
         sortOrder: 1.5,
@@ -79,14 +85,10 @@ void main() {
         sortOrderLocked: true,
       );
 
-      await persistSeriesItemSortIfChanged(
-        repo: repo,
-        events: _NoopPublisher(),
-        comicId: 'comic-1',
-        seed: seed,
-        sortOrder: 2.5,
-        draftLocked: true,
-      );
+      await PersistSeriesItemSortUseCase(
+        repository: repo,
+        events: _RecordingPublisher(),
+      )(comicId: 'comic-1', seed: seed, sortOrder: 2.5, draftLocked: true);
 
       expect(repo.updateSortOrderCalls, 1);
       expect(repo.sortOrderLocked, isTrue);
@@ -104,14 +106,10 @@ void main() {
         sortOrderLocked: true,
       );
 
-      await persistSeriesItemSortIfChanged(
-        repo: repo,
-        events: _NoopPublisher(),
-        comicId: 'comic-1',
-        seed: seed,
-        sortOrder: 3.0,
-        draftLocked: false,
-      );
+      await PersistSeriesItemSortUseCase(
+        repository: repo,
+        events: _RecordingPublisher(),
+      )(comicId: 'comic-1', seed: seed, sortOrder: 3.0, draftLocked: false);
 
       expect(repo.updateSortOrderCalls, 0);
       expect(repo.setLockCalls, 1);
@@ -123,9 +121,10 @@ void main() {
       final _LockObservingSeriesRepository repo =
           _LockObservingSeriesRepository()..sortOrderLocked = false;
 
-      await persistSeriesItemSortIfChanged(
-        repo: repo,
-        events: _NoopPublisher(),
+      await PersistSeriesItemSortUseCase(
+        repository: repo,
+        events: _RecordingPublisher(),
+      )(
         comicId: 'comic-1',
         seed: unlockedSeed,
         sortOrder: 1.0,
@@ -141,17 +140,63 @@ void main() {
       final _LockObservingSeriesRepository repo =
           _LockObservingSeriesRepository()..sortOrderLocked = false;
 
-      await persistSeriesItemSortIfChanged(
-        repo: repo,
-        events: _NoopPublisher(),
-        comicId: 'comic-1',
-        seed: unlockedSeed,
-        sortOrder: 1.0,
-        draftLocked: false,
-      );
+      final events = _RecordingPublisher();
+      final changed =
+          await PersistSeriesItemSortUseCase(repository: repo, events: events)(
+            comicId: 'comic-1',
+            seed: unlockedSeed,
+            sortOrder: 1.0,
+            draftLocked: false,
+          );
 
       expect(repo.updateSortOrderCalls, 0);
       expect(repo.setLockCalls, 0);
+      expect(changed, isFalse);
+      expect(events.events, isEmpty);
     });
+
+    for (final orderChanged in <bool>[true, false]) {
+      test(
+        'publishes only after successful persistence: orderChanged=$orderChanged',
+        () async {
+          final repo = _LockObservingSeriesRepository();
+          final events = _RecordingPublisher();
+          final changed =
+              await PersistSeriesItemSortUseCase(
+                repository: repo,
+                events: events,
+              )(
+                comicId: 'comic-1',
+                seed: unlockedSeed,
+                sortOrder: orderChanged ? 2.0 : 1.0,
+                draftLocked: true,
+              );
+
+          expect(changed, isTrue);
+          expect(events.events, <Object>[isA<LibraryCatalogChanged>()]);
+        },
+      );
+
+      test(
+        'preserves write failure without event or retry: orderChanged=$orderChanged',
+        () async {
+          final error = StateError('write');
+          final repo = _LockObservingSeriesRepository()..failure = error;
+          final events = _RecordingPublisher();
+          await expectLater(
+            PersistSeriesItemSortUseCase(repository: repo, events: events)(
+              comicId: 'comic-1',
+              seed: unlockedSeed,
+              sortOrder: orderChanged ? 2.0 : 1.0,
+              draftLocked: true,
+            ),
+            throwsA(same(error)),
+          );
+
+          expect(repo.updateSortOrderCalls + repo.setLockCalls, 1);
+          expect(events.events, isEmpty);
+        },
+      );
+    }
   });
 }
