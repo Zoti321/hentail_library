@@ -271,6 +271,18 @@ mod tests {
                     stream.read_exact(&mut byte).unwrap();
                     request.push(byte[0]);
                 }
+                // Drain the PROPFIND body before closing to avoid a TCP reset on Windows.
+                let content_length = String::from_utf8_lossy(&request)
+                    .lines()
+                    .find_map(|line| {
+                        let (name, value) = line.split_once(':')?;
+                        name.eq_ignore_ascii_case("content-length")
+                            .then(|| value.trim().parse::<usize>().ok())
+                            .flatten()
+                    })
+                    .unwrap_or(0);
+                let mut body = vec![0; content_length];
+                stream.read_exact(&mut body).unwrap();
                 write!(
                     stream,
                     "HTTP/1.1 {status} Error\r\nContent-Length: 0\r\nConnection: close\r\n\r\n"

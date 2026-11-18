@@ -7,9 +7,9 @@ use std::io::Write;
 use std::path::{Path, PathBuf};
 
 use hentai_core::{
-    connection, create_image_set_local_library, create_sync_handle, init_db_at_path,
-    list_image_set_images, list_image_sets, load_image_set_page_bytes, open_image_set_reader,
-    sync_library, HentaiError, SyncScanMode,
+    connection, create_image_set_local_library, create_local_library, create_sync_handle,
+    init_db_at_path, list_image_set_images, list_image_sets, load_image_set_page_bytes,
+    open_image_set_reader, sync_library, HentaiError, HentaiErrorCode, SyncScanMode,
 };
 use sea_orm::{ConnectionTrait, DatabaseBackend, Statement};
 use tempfile::TempDir;
@@ -202,5 +202,63 @@ fn session_rejects_carrier_paths_escaping_library_root() {
             .runtime
             .block_on(load_image_set_page_bytes(&fixture.library_id, &forged));
         assert!(result.is_err());
+    });
+}
+
+#[test]
+fn page_read_rejects_an_image_from_another_library_before_reading_a_same_named_file() {
+    common::with_global_db(|| {
+        let fixture = Fixture::new("reader_session_owner.sqlite");
+        write_file(&fixture.root.join("loose.jpg"), b"selected-library");
+        fixture.sync();
+        let session = fixture.open(&fixture.set_id(""), 0).expect("session");
+        let other_root = fixture._temp.path().join("other-pics");
+        write_file(&other_root.join("loose.jpg"), b"wrong-library");
+        let other = fixture.runtime.block_on(async {
+            create_image_set_local_library(&other_root.to_string_lossy(), Some("Other"))
+                .await
+                .expect("other library")
+        });
+
+        let result = fixture.runtime.block_on(load_image_set_page_bytes(
+            &other.library_id,
+            &session.pages[0],
+        ));
+
+        let error = result.expect_err("a page cannot be resolved against another library");
+        assert_eq!(error.code, HentaiErrorCode::Validation);
+        assert_eq!(
+            fixture.load(0, &fixture.set_id("")).expect("original page"),
+            b"selected-library"
+        );
+    });
+}
+
+#[test]
+fn page_read_rejects_a_comic_library_even_when_the_carrier_exists() {
+    common::with_global_db(|| {
+        let fixture = Fixture::new("reader_session_catalog_kind.sqlite");
+        write_file(&fixture.root.join("loose.jpg"), b"selected-library");
+        fixture.sync();
+        let mut image = fixture
+            .open(&fixture.set_id(""), 0)
+            .expect("session")
+            .pages
+            .remove(0);
+        let comic_root = fixture._temp.path().join("comics");
+        write_file(&comic_root.join("loose.jpg"), b"comic-library");
+        let comic = fixture.runtime.block_on(async {
+            create_local_library(&comic_root.to_string_lossy(), Some("Comics"))
+                .await
+                .expect("comic library")
+        });
+        image.library_id = comic.library_id.clone();
+
+        let result = fixture
+            .runtime
+            .block_on(load_image_set_page_bytes(&comic.library_id, &image));
+
+        let error = result.expect_err("Image set pages require an Image set library");
+        assert_eq!(error.code, HentaiErrorCode::Validation);
     });
 }

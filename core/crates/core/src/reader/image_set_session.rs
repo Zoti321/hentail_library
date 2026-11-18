@@ -11,7 +11,7 @@ use zip::ZipArchive;
 use crate::error::HentaiError;
 use crate::formats::{map_archive_err, read_rar_entry, read_sevenz_entry};
 use crate::image_set::{list_image_set_images, ImageSetImageDto};
-use crate::library::find_library_by_id;
+use crate::library::{find_library_by_id, is_image_set_catalog};
 
 /// Catalog-ordered page snapshot of one Image set Read session.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -52,9 +52,15 @@ pub async fn load_image_set_page_bytes(
     library_id: &str,
     image: &ImageSetImageDto,
 ) -> Result<Vec<u8>, HentaiError> {
+    if image.library_id != library_id {
+        return Err(HentaiError::validation("图集图片不属于指定库"));
+    }
     let library = find_library_by_id(library_id)
         .await?
         .ok_or_else(|| HentaiError::validation(format!("图集库不存在: {library_id}")))?;
+    if library.kind != "local" || !is_image_set_catalog(&library.catalog_kind) {
+        return Err(HentaiError::validation("图集页读取仅支持本地图集库"));
+    }
     let carrier = resolve_carrier_path(&library.root_path, &image.carrier_relative_path)?;
     match image.carrier_kind.as_str() {
         "loose" => std::fs::read(&carrier)
