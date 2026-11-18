@@ -24,20 +24,20 @@ _Avoid_: overloading `libraries.kind` local/remote to mean Comic vs Image set.
 **Comic library**: A catalog kind whose catalog is Comics and Folder series. May be Local or Remote.
 _Avoid_: calling every Library a Comic library when Image set libraries exist.
 
-**Image set library**: A catalog kind whose catalog is Image sets rather than Comics or Folder series. Initial delivery is Local-only; its Local root cannot be remapped in the first iteration (delete and recreate instead), and it has manual sync only.
-_Avoid_: album library, treating Image sets as Comics or Series, WebDAV Image set library in the first iteration.
+**Image set library**: A catalog kind whose catalog is Image sets rather than Comics or Folder series. Local-only in the current product; sync settings (manual, on startup, or interval) belong to the Library like other Local libraries.
+_Avoid_: album library, treating Image sets as Comics or Series, WebDAV Image set library.
 
-**Image set**: An ordered collection of images in an Image set library. It corresponds either to one first-level subdirectory of the Library root that yields discoverable images, or to the Library root image set. Nested directories and archives under a set are physical carriers, not separate Image sets.
-_Avoid_: album, Series, Comic, treating each archive as its own Image set by default.
+**Image set**: An ordered collection of images in an Image set library. It is one first-level subdirectory of the Library root that yields discoverable images, or one first-level archive (zip/rar/7z) directly under the Library root. Nested directories and archives under a directory Image set are physical carriers of that set's images, not separate Image sets. Loose image files directly under the Library root are out of catalog (ignored); product copy may explain the layout rule.
+_Avoid_: album, Series, Comic, Library root image set, treating nested archives under a directory set as their own Image sets.
 
-**Library root image set**: The Image set that holds only images discovered at the Library root—loose image files and image members of root-level archives—without entering first-level subdirectories. Presented as unclassified and not bound to an Author.
-_Avoid_: Library root series for image collections, dumping author-directory contents into the root set.
+**Image set image**: One catalogued image occurrence inside an Image set, anchored to its physical location (loose relative path under the set, or archive relative path plus entry path). Byte-identical copies at different locations are distinct Image set images until a later content-identity decision says otherwise.
+_Avoid_: Set image as content-hash identity, Comic page as the Image set catalog entity, cataloguing Library-root loose images.
 
-**Image set image**: One catalogued image occurrence inside an Image set, anchored to its physical location (loose relative path, or archive relative path plus entry path). Byte-identical copies at different locations are distinct Image set images until a later content-identity decision says otherwise.
-_Avoid_: Set image as content-hash identity in the first iteration, Comic page as the Image set catalog entity.
+**Image set metadata**: An Image set's user-facing name and Author / Tag / Parody / Character facet bindings, together with Metadata field locks where a sync scan source exists. The name's scan source is the first-level folder basename or archive file basename; facet dictionaries are the shared global Author and Named metadata facet tables, not a second vocabulary.
+_Avoid_: Comic metadata pipeline for Image sets, Library display name as the Image set name.
 
-**Image set sync**: User-triggered reconciliation of an Image set library with its Library root: discover Image sets and Image set images, then remove catalog records only where a complete observation confirms absence. An inaccessible root, cancelled sync or failed write preserves all records. A still-present archive or directory tree that cannot be fully listed preserves its prior images and may warn without counting as deletion evidence. Unchanged carriers may skip re-listing. Successful commits are library-scoped and atomic; warnings on incomplete carriers do not block success for fully observed carriers.
-_Avoid_: applying Comic orphan deletion when archive parse returns empty, treating an unreadable root as an empty library.
+**Image set sync**: Reconciliation of an Image set library with its Library root (manual, startup, or scheduled): discover Image sets and Image set images, then remove catalog records only where a complete observation confirms absence. An inaccessible root, cancelled sync or failed write preserves all records. A still-present archive or directory tree that cannot be fully listed preserves its prior images and may warn without counting as deletion evidence. Unchanged carriers may skip re-listing. Successful commits are library-scoped and atomic; warnings on incomplete carriers do not block success for fully observed carriers.
+_Avoid_: applying Comic orphan deletion when archive parse returns empty, treating an unreadable root as an empty library, inventing a Library root image set for ignored root loose files.
 
 **Home page**: Default `/home` route with continue-reading, Recently added on Home, Home page counts, Reading activity stats and dismissible Home library alerts. Presentation belongs to home; counts/activity belong to reading_stats. It has no permanent global sync action. ADR-0020.
 _Avoid_: current-Library dashboard, Home scan, Home dashboard.
@@ -75,7 +75,7 @@ _Avoid_: item/work as an ambiguous replacement, Dart transaction aggregate.
 **Comic identity**: Identity anchored to a normalized local path or WebDAV resource URL, not content hashes. Moving/renaming changes `comicId`; Path migration preserves continuity when eligible. ADR-0001/0013.
 _Avoid_: content ID, file fingerprint identity.
 
-**Path migration**: Rekeying an existing Comic/Series after a verified location change while preserving its user state; explicit readable Local root changes retain eligible relative-path continuity. Unique matches of previously recorded full-content fingerprints also permit automatic continuity; weak fingerprints and ambiguous copies do not, and records without prior content evidence cannot be matched retroactively (ADR-0001/0013/0054/0055).
+**Path migration**: Rekeying an existing Comic/Series/Image set after a verified location change while preserving its user state; explicit readable Local root changes retain eligible relative-path continuity (including Image set Metadata field locks and facet bindings). Unique matches of previously recorded full-content fingerprints also permit automatic continuity for Comic/Series; weak fingerprints and ambiguous copies do not, and records without prior content evidence cannot be matched retroactively. Ordinary Image set sync does not treat a relative-path rename as migration (ADR-0001/0013/0054/0055).
 _Avoid_: content-hash identity, unconditional rename preservation, Metadata refresh.
 
 **Comic deletion**: Historical umbrella for the user-driven trash-then-purge lifecycle. Use the specific stage in new text. Sync orphan cleanup and Library removal delete records, not Resources. ADR-0012/0023.
