@@ -34,7 +34,7 @@ abstract class LibraryForm with _$LibraryForm {
     );
   }
 
-  /// Image set 仅名称可编辑；无格式多选、无扫描、根路径创建后锁定。
+  /// Image set：Local-only、无格式多选；可设启动/间隔扫描；根路径创建后仍锁定（改根另票）。
   factory LibraryForm.createImageSetLocal() {
     return LibraryForm(
       isRemote: false,
@@ -169,8 +169,6 @@ extension LibraryFormOps on LibraryForm {
         password: '',
         allowHttp: false,
         enabledResourceFormatCategories: const <ResourceFormatCategory>[],
-        scanOnStartup: false,
-        scanInterval: ScanInterval.disabled,
       );
     }
     final Set<ResourceFormatCategory> unique = enabledResourceFormatCategories

@@ -31,7 +31,7 @@ void main() {
   });
 
   group('LibraryForm image set', () {
-    test('createImageSetLocal has no format groups and scan disabled', () {
+    test('createImageSetLocal clears remote/formats but keeps scan settings', () {
       final LibraryForm form = LibraryForm.createImageSetLocal().copyWith(
         isRemote: true,
         name: 'G',
@@ -50,8 +50,30 @@ void main() {
       expect(ready.password, isEmpty);
       expect(ready.allowHttp, isFalse);
       expect(ready.enabledResourceFormatCategories, isEmpty);
-      expect(ready.scanOnStartup, isFalse);
-      expect(ready.scanInterval, ScanInterval.disabled);
+      expect(ready.scanOnStartup, isTrue);
+      expect(ready.scanInterval, ScanInterval.daily);
+    });
+
+    test('fromLibrary preserves Image set scan settings', () {
+      final LocalLibrary library = (
+        libraryId: 'img',
+        kind: 'local',
+        catalogKind: 'image_set',
+        rootPath: r'D:\images',
+        name: 'G',
+        enabledResourceFormatCategories: const <ResourceFormatCategory>[],
+        username: '',
+        allowHttp: false,
+        scanOnStartup: true,
+        scanInterval: ScanInterval.hourly,
+        pinned: false,
+        sidebarOrder: 0,
+      );
+      final LibraryForm form = LibraryForm.fromLibrary(library);
+      expect(form.scanOnStartup, isTrue);
+      expect(form.scanInterval, ScanInterval.hourly);
+      expect(form.normalized.scanOnStartup, isTrue);
+      expect(form.normalized.scanInterval, ScanInterval.hourly);
     });
 
     test('fromLibrary keeps image set kind and clears format groups', () {

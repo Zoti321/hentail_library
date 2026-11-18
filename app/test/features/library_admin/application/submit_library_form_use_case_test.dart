@@ -254,7 +254,7 @@ void main() {
     });
 
     test(
-      'image set edit cannot bypass its constraints with draft flags',
+      'image set edit keeps Local-only and root lock but allows scan settings',
       () async {
         final original = _lib(
           kind: 'local',
@@ -281,8 +281,8 @@ void main() {
         expect(repo.calls, ['updateSettings']);
         expect(repo.lastName, 'Beta');
         expect(repo.lastGroups, isEmpty);
-        expect(repo.lastScanOnStartup, isFalse);
-        expect(repo.lastScanInterval, ScanInterval.disabled);
+        expect(repo.lastScanOnStartup, isTrue);
+        expect(repo.lastScanInterval, ScanInterval.daily);
         expect(events.events, [isA<LibraryCatalogChanged>()]);
       },
     );
@@ -323,7 +323,7 @@ void main() {
     );
 
     test(
-      'image set create uses image set repository without settings write',
+      'image set create writes scan settings when they differ from defaults',
       () async {
         final _RecordingLibraryRepository repo = _RecordingLibraryRepository();
         final LibraryFormApplyResult result =
@@ -332,11 +332,14 @@ void main() {
                   name: 'Gallery',
                   rootPath: r'D:\images',
                   scanOnStartup: true,
+                  scanInterval: ScanInterval.daily,
                 )
                 .submit(repo);
         expect(result, isA<LibraryFormApplySucceeded>());
-        expect(repo.calls, <String>['createImageSetLocal']);
-        expect(repo.lastGroups, isNull);
+        expect(repo.calls, <String>['createImageSetLocal', 'updateSettings']);
+        expect(repo.lastScanOnStartup, isTrue);
+        expect(repo.lastScanInterval, ScanInterval.daily);
+        expect(repo.lastGroups, isEmpty);
       },
     );
 

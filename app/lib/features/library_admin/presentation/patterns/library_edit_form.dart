@@ -52,14 +52,15 @@ class _LibraryEditFormState extends State<LibraryEditForm> {
           _LibraryEditTab.webDav,
           _LibraryEditTab.scanner,
         ]
-      : _isImageSet
-      ? const <_LibraryEditTab>[_LibraryEditTab.general]
       : const <_LibraryEditTab>[
           _LibraryEditTab.general,
           _LibraryEditTab.scanner,
         ];
 
   List<ResourceFormatCategory> get _selectableResourceFormatCategories {
+    if (_isImageSet) {
+      return const <ResourceFormatCategory>[];
+    }
     if (_isRemote) {
       return ResourceFormatCategory.all
           .where(
@@ -522,28 +523,30 @@ class _ScannerTab extends StatelessWidget {
           enabled: enabled,
           onChanged: onScanIntervalChanged,
         ),
-        SizedBox(height: spacing.lg),
-        Text(
-          l10n.settingsSupportedFormatsGroupTitle,
-          style: theme.typeScale.titleSmall.copyWith(color: scheme.onSurface),
-        ),
-        SizedBox(height: spacing.sm),
-        Text(
-          l10n.settingsSupportedFormatsDescription,
-          style: theme.typeScale.bodyMedium.copyWith(
-            color: scheme.onSurfaceVariant,
+        if (selectableResourceFormatCategories.isNotEmpty) ...<Widget>[
+          SizedBox(height: spacing.lg),
+          Text(
+            l10n.settingsSupportedFormatsGroupTitle,
+            style: theme.typeScale.titleSmall.copyWith(color: scheme.onSurface),
           ),
-        ),
-        SizedBox(height: spacing.sm),
-        for (final ResourceFormatCategory group
-            in selectableResourceFormatCategories)
-          _ResourceFormatCategoryRow(
-            label: l10n.resourceFormatCategoryLabel(group),
-            selected: enabledResourceFormatCategories.contains(group),
-            enabled: enabled,
-            onChanged: (bool value) =>
-                onResourceFormatCategoryChanged(group, value),
+          SizedBox(height: spacing.sm),
+          Text(
+            l10n.settingsSupportedFormatsDescription,
+            style: theme.typeScale.bodyMedium.copyWith(
+              color: scheme.onSurfaceVariant,
+            ),
           ),
+          SizedBox(height: spacing.sm),
+          for (final ResourceFormatCategory group
+              in selectableResourceFormatCategories)
+            _ResourceFormatCategoryRow(
+              label: l10n.resourceFormatCategoryLabel(group),
+              selected: enabledResourceFormatCategories.contains(group),
+              enabled: enabled,
+              onChanged: (bool value) =>
+                  onResourceFormatCategoryChanged(group, value),
+            ),
+        ],
       ],
     );
   }
