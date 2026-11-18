@@ -1,10 +1,12 @@
 import 'dart:async';
 
 import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
+import 'package:hentai_library/features/reader/domain/read_session_capabilities.dart';
+import 'package:hentai_library/features/reader/domain/read_session_source.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/reader/application/open_reader_args.dart';
-import 'package:hentai_library/features/reader/application/read_session_application_service.dart';
-import 'package:hentai_library/features/reader/application/open_read_session_service.dart';
+import 'package:hentai_library/features/reader/application/manage_read_session_use_case.dart';
+import 'package:hentai_library/features/reader/application/open_read_session_use_case.dart';
 import 'package:test/test.dart';
 
 class _RecordingReadingHistoryCommands {
@@ -82,8 +84,8 @@ class _RecordingActivityCommands {
   }
 }
 
-class _RecordingOpenReadSessionService implements OpenReadSessionService {
-  _RecordingOpenReadSessionService() : closedComicIds = <String>[];
+class _RecordingOpenReadSessionUseCase implements OpenReadSessionUseCase {
+  _RecordingOpenReadSessionUseCase() : closedComicIds = <String>[];
 
   final List<String> closedComicIds;
 
@@ -107,20 +109,26 @@ ReaderComicRef _comic({String id = 'c1', String title = 'Test Comic'}) {
   );
 }
 
+ReadSessionCapabilities _comicCaps({bool incognito = false}) =>
+    ReadSessionCapabilities.from(
+      ComicReadSessionSource('c1'),
+      incognito: incognito,
+    );
+
 void main() {
   late _RecordingReadingHistoryCommands readingCommands;
   late _RecordingActivityCommands activityCommands;
-  late _RecordingOpenReadSessionService sessionService;
-  late ReadSessionApplicationService coordinator;
+  late _RecordingOpenReadSessionUseCase openReadSession;
+  late ManageReadSessionUseCase coordinator;
   late DateTime now;
 
   setUp(() {
     readingCommands = _RecordingReadingHistoryCommands();
     activityCommands = _RecordingActivityCommands();
-    sessionService = _RecordingOpenReadSessionService();
+    openReadSession = _RecordingOpenReadSessionUseCase();
     now = DateTime.utc(2026, 1, 1, 12);
-    coordinator = ReadSessionApplicationService(
-      sessionService: sessionService,
+    coordinator = ManageReadSessionUseCase(
+      openReadSession: openReadSession,
       recordProgress: readingCommands.recordReading,
       recordActivity: activityCommands.record,
       now: () => now,
@@ -129,6 +137,8 @@ void main() {
 
   test('incognito beginReadSession is no-op', () async {
     await coordinator.beginReadSession(
+      capabilities: _comicCaps(),
+      
       comic: _comic(),
       incognito: true,
       initialPageIndex: 3,
@@ -140,7 +150,9 @@ void main() {
   });
 
   test('beginReadSession writes only comic history', () async {
-    await coordinator.beginReadSession(comic: _comic(), initialPageIndex: 2);
+    await coordinator.beginReadSession(
+      capabilities: _comicCaps(),
+      comic: _comic(), initialPageIndex: 2);
 
     expect(readingCommands.records, hasLength(1));
     expect(readingCommands.records.single.comicId, 'c1');
@@ -149,7 +161,9 @@ void main() {
   });
 
   test('updatePage and flushProgress persist latest page only', () async {
-    await coordinator.beginReadSession(comic: _comic(), initialPageIndex: 1);
+    await coordinator.beginReadSession(
+      capabilities: _comicCaps(),
+      comic: _comic(), initialPageIndex: 1);
     readingCommands.records.clear();
     activityCommands.records.clear();
 
@@ -163,7 +177,9 @@ void main() {
   });
 
   test('endSession reports foreground elapsed once', () async {
-    await coordinator.beginReadSession(comic: _comic(), initialPageIndex: 3);
+    await coordinator.beginReadSession(
+      capabilities: _comicCaps(),
+      comic: _comic(), initialPageIndex: 3);
     readingCommands.records.clear();
     activityCommands.records.clear();
 
@@ -187,7 +203,9 @@ void main() {
   test(
     'pauseForeground reports then resume continues without double count',
     () async {
-      await coordinator.beginReadSession(comic: _comic(), initialPageIndex: 1);
+      await coordinator.beginReadSession(
+      capabilities: _comicCaps(),
+      comic: _comic(), initialPageIndex: 1);
       activityCommands.records.clear();
 
       now = now.add(const Duration(seconds: 20));
@@ -214,14 +232,17 @@ void main() {
   test(
     'exitReadSession flushes history, reports activity, closes I/O',
     () async {
-      await coordinator.beginReadSession(comic: _comic(), initialPageIndex: 2);
+      await coordinator.beginReadSession(
+      capabilities: _comicCaps(),
+      comic: _comic(), initialPageIndex: 2);
       readingCommands.records.clear();
       activityCommands.records.clear();
 
       now = now.add(const Duration(seconds: 12));
       coordinator.updatePage(6);
       await coordinator.exitReadSession(
-        comicId: 'c1',
+        capabilities: _comicCaps(),
+      sessionKey: 'c1',
         incognito: false,
         currentPageIndex: 6,
       );
@@ -234,26 +255,29 @@ void main() {
         const Duration(seconds: 12),
       );
       expect(coordinator.hasActiveSession, isFalse);
-      expect(sessionService.closedComicIds, <String>['c1']);
+      expect(openReadSession.closedComicIds, <String>['c1']);
     },
   );
 
   test('exitReadSession skips history and activity when incognito', () async {
     await coordinator.exitReadSession(
-      comicId: 'c1',
+      capabilities: _comicCaps(),
+      sessionKey: 'c1',
       incognito: true,
       currentPageIndex: 3,
     );
 
     expect(readingCommands.records, isEmpty);
     expect(activityCommands.records, isEmpty);
-    expect(sessionService.closedComicIds, <String>['c1']);
+    expect(openReadSession.closedComicIds, <String>['c1']);
   });
 
   test(
     'prepareSeriesSwitch returns next session starting from first page',
     () async {
-      await coordinator.beginReadSession(comic: _comic(), initialPageIndex: 3);
+      await coordinator.beginReadSession(
+      capabilities: _comicCaps(),
+      comic: _comic(), initialPageIndex: 3);
       readingCommands.records.clear();
       activityCommands.records.clear();
 
@@ -272,7 +296,7 @@ void main() {
         const Duration(seconds: 11),
       );
       expect(coordinator.hasActiveSession, isFalse);
-      expect(sessionService.closedComicIds, <String>['c1']);
+      expect(openReadSession.closedComicIds, <String>['c1']);
       expect(plan.closeComicId, 'c1');
       expect(plan.targetComicId, 'c2');
       expect(plan.nextSession.comicId, 'c2');
@@ -301,17 +325,22 @@ void main() {
       });
 
       final initial = coordinator.beginReadSession(
+      capabilities: _comicCaps(),
+      
         comic: _comic(),
         initialPageIndex: 1,
       );
       await initialStarted.future;
       now = now.add(const Duration(seconds: 12));
       final exiting = coordinator.exitReadSession(
-        comicId: 'c1',
+        capabilities: _comicCaps(),
+      sessionKey: 'c1',
         incognito: false,
         currentPageIndex: 2,
       );
       final reopening = coordinator.beginReadSession(
+      capabilities: _comicCaps(),
+      
         comic: _comic(),
         initialPageIndex: 7,
       );
@@ -342,22 +371,28 @@ void main() {
         activityCommands.records.single.foregroundElapsed,
         const Duration(seconds: 12),
       );
-      expect(sessionService.closedComicIds, ['c1']);
+      expect(openReadSession.closedComicIds, ['c1']);
     },
   );
 
   test(
     'an incognito begin supersedes an older begin awaiting its previous flush',
     () async {
-      await coordinator.beginReadSession(comic: _comic());
+      await coordinator.beginReadSession(
+      capabilities: _comicCaps(),
+      comic: _comic());
       final oldFlush = Completer<void>();
       final oldFlushStarted = Completer<void>();
       readingCommands.pendingWrites[2] = oldFlush;
       readingCommands.startedWrites[2] = oldFlushStarted;
-      final older = coordinator.beginReadSession(comic: _comic(id: 'c2'));
+      final older = coordinator.beginReadSession(
+      capabilities: _comicCaps(),
+      comic: _comic(id: 'c2'));
       await oldFlushStarted.future;
 
       await coordinator.beginReadSession(
+      capabilities: _comicCaps(),
+      
         comic: _comic(id: 'private'),
         incognito: true,
       );
@@ -391,18 +426,23 @@ void main() {
     final secondFailure = StateError('exit write failed');
 
     final initial = coordinator.beginReadSession(
+      capabilities: _comicCaps(),
+      
       comic: _comic(),
       initialPageIndex: 1,
     );
     final initialResult = expectLater(initial, throwsA(same(firstFailure)));
     await firstStarted.future;
     final exiting = coordinator.exitReadSession(
-      comicId: 'c1',
+      capabilities: _comicCaps(),
+      sessionKey: 'c1',
       incognito: false,
       currentPageIndex: 2,
     );
     final exitResult = expectLater(exiting, throwsA(same(secondFailure)));
     final reopening = coordinator.beginReadSession(
+      capabilities: _comicCaps(),
+      
       comic: _comic(),
       initialPageIndex: 7,
     );
@@ -423,13 +463,15 @@ void main() {
     ]);
     expect(readingCommands.persistedPages['c1'], 7);
     expect(activityCommands.records, isEmpty);
-    expect(sessionService.closedComicIds, isEmpty);
+    expect(openReadSession.closedComicIds, isEmpty);
   });
 
   test(
     'queued flush reads the latest page and clock when its write starts',
     () async {
-      await coordinator.beginReadSession(comic: _comic());
+      await coordinator.beginReadSession(
+      capabilities: _comicCaps(),
+      comic: _comic());
       final blockedWrite = Completer<void>();
       final blockedStarted = Completer<void>();
       final queuedStarted = Completer<void>();
@@ -465,13 +507,17 @@ void main() {
   );
 
   test('ending during an older begin activity report does not resurrect that begin', () async {
-    await coordinator.beginReadSession(comic: _comic());
+    await coordinator.beginReadSession(
+      capabilities: _comicCaps(),
+      comic: _comic());
     now = now.add(const Duration(seconds: 12));
     final oldReport = Completer<void>();
     final reportStarted = Completer<void>();
     activityCommands.pendingReports[1] = oldReport;
     activityCommands.startedReports[1] = reportStarted;
-    final older = coordinator.beginReadSession(comic: _comic(id: 'c2'));
+    final older = coordinator.beginReadSession(
+      capabilities: _comicCaps(),
+      comic: _comic(id: 'c2'));
     await reportStarted.future;
 
     await coordinator.endSession();
@@ -496,15 +542,21 @@ void main() {
   });
 
   test('a newer begin supersedes an older begin waiting to flush the previous session', () async {
-    await coordinator.beginReadSession(comic: _comic());
+    await coordinator.beginReadSession(
+      capabilities: _comicCaps(),
+      comic: _comic());
     now = now.add(const Duration(seconds: 11));
     final oldFlush = Completer<void>();
     final oldStarted = Completer<void>();
     readingCommands.pendingWrites[2] = oldFlush;
     readingCommands.startedWrites[2] = oldStarted;
-    final older = coordinator.beginReadSession(comic: _comic(id: 'c2'));
+    final older = coordinator.beginReadSession(
+      capabilities: _comicCaps(),
+      comic: _comic(id: 'c2'));
     await oldStarted.future;
     final latest = coordinator.beginReadSession(
+      capabilities: _comicCaps(),
+      
       comic: _comic(id: 'c3'),
       initialPageIndex: 4,
     );
@@ -541,7 +593,9 @@ void main() {
       if (callIndex == 1) reentrant = coordinator.flushProgress();
     };
 
-    final initial = coordinator.beginReadSession(comic: _comic());
+    final initial = coordinator.beginReadSession(
+      capabilities: _comicCaps(),
+      comic: _comic());
     await firstStarted.future;
     await Future<void>.delayed(Duration.zero);
     expect(readingCommands.records, hasLength(1));

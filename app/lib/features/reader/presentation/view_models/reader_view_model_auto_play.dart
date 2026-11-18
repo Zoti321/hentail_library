@@ -13,7 +13,7 @@ mixin _ReaderViewModelAutoPlay
   Future<({bool keepTicking, ReaderReplaceReaderRouteIntent? replace})>
   advanceAutoPlay({
     required ReaderNavContextData? navContext,
-    required OpenReaderArgs session,
+    OpenReaderArgs? session,
   }) async {
     final ReaderUiState? current = state.asData?.value;
     if (current == null || !current.autoPlayEnabled) {
@@ -31,7 +31,36 @@ mixin _ReaderViewModelAutoPlay
       nextPage();
       return (keepTicking: true, replace: null);
     }
-    final AutoPlayMode mode = ref.read(readingPreferencesProvider).autoPlayMode;
+    final AutoPlayMode preferredMode = ref
+        .read(readingPreferencesProvider)
+        .autoPlayMode;
+    // Without Comic session / Series capability, map Series modes to Comic-only.
+    if (session == null || !current.capabilities.seriesAutoPlayModes) {
+      final AutoPlayMode localMode = switch (preferredMode) {
+        AutoPlayMode.seriesOnce => AutoPlayMode.comicOnce,
+        AutoPlayMode.seriesLoop => AutoPlayMode.comicLoop,
+        AutoPlayMode.comicOnce || AutoPlayMode.comicLoop => preferredMode,
+      };
+      final AutoPlayBoundaryDecision localDecision =
+          AutoPlayBoundaryPolicy.resolve(
+            mode: localMode,
+            currentComicId: current.sessionKey,
+            nextComicId: null,
+            firstComicId: null,
+          );
+      switch (localDecision) {
+        case AutoPlayBoundaryStop():
+          setAutoPlayEnabled(false);
+          return (keepTicking: false, replace: null);
+        case AutoPlayBoundaryJumpToFirstPage():
+          setIndex(1);
+          return (keepTicking: true, replace: null);
+        case AutoPlayBoundarySwitchComic():
+          setAutoPlayEnabled(false);
+          return (keepTicking: false, replace: null);
+      }
+    }
+    final AutoPlayMode mode = preferredMode;
     final List<ReaderComicListItem>? items = navContext?.items;
     final String? firstComicId = items != null && items.isNotEmpty
         ? items.first.comicId

@@ -32,7 +32,7 @@ void main() {
     );
     expect(
       isFrbImportAllowedSource(
-        'features/reader/application/open_read_session_service.dart',
+        'features/reader/application/open_read_session_use_case.dart',
       ),
       isFalse,
     );

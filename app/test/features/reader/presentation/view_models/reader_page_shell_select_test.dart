@@ -1,6 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
+import 'package:hentai_library/features/reader/domain/read_session_capabilities.dart';
 import 'package:hentai_library/features/reader/domain/read_session_source.dart';
+import 'package:hentai_library/features/reader/domain/read_session_subject.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/reader/domain/reading_mode.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/reader_chrome_notifier.dart';
@@ -13,7 +15,7 @@ import 'package:riverpod/misc.dart' show Override;
 
 const String _comicId = 'shell-select-comic';
 const ReaderViewModelKey _viewKey = (
-  comicId: _comicId,
+  sessionKey: _comicId,
   source: ComicReadSessionSource(_comicId),
   incognito: false,
   startFromFirstPage: false,
@@ -66,7 +68,9 @@ AsyncValue<ReaderPageViewShell> _watchViewShell(ProviderContainer container) {
             return const AsyncLoading<ReaderPageViewShell>();
           }
           return AsyncData<ReaderPageViewShell>((
+            subject: state.subject,
             comic: state.comic,
+            capabilities: state.capabilities,
             totalPages: state.totalPages,
           ));
         }),
@@ -87,7 +91,7 @@ void main() {
       container.read(readSessionContextForReaderProvider(comicId: _comicId)),
     );
     final ReaderPageShellData shell = shellAsync.requireValue;
-    expect(shell.comic.title, 'Ready');
+    expect(shell.subject.title, 'Ready');
     expect(shell.totalPages, 10);
     expect(shell.sessionContext.hasSeriesContext, isFalse);
     expect(container.read(readerChromeNotifierProvider), isFalse);
@@ -115,7 +119,10 @@ void main() {
             if (state == null) {
               return null;
             }
-            return (comicId: state.comic.comicId, totalPages: state.totalPages);
+            return (
+              sessionKey: state.sessionKey,
+              totalPages: state.totalPages,
+            );
           }),
       (previous, next) {
         notifications++;
@@ -145,7 +152,7 @@ void main() {
             if (state == null) {
               return null;
             }
-            return (title: state.comic.title, totalPages: state.totalPages);
+            return (title: state.subject.title, totalPages: state.totalPages);
           }),
       (previous, next) {
         notifications++;
@@ -159,7 +166,7 @@ void main() {
     await Future<void>.delayed(Duration.zero);
 
     expect(notifications, greaterThan(0));
-    expect(_watchViewShell(container).requireValue.comic.title, 'Renamed');
+    expect(_watchViewShell(container).requireValue.subject.title, 'Renamed');
   });
 
   test('fullscreen and boundary prompt are orthogonal selects', () async {
@@ -212,8 +219,16 @@ class _StubReaderViewModel extends ReaderViewModel {
 
   @override
   Future<ReaderUiState> build(ReaderViewModelKey key) async {
+    final comic = _comic(title: _title);
+    const source = ComicReadSessionSource(_comicId);
     return ReaderUiState(
-      comic: _comic(title: _title),
+      subject: ReadSessionSubject(
+        sessionKey: _comicId,
+        title: _title,
+        pageCount: 10,
+      ),
+      comic: comic,
+      capabilities: ReadSessionCapabilities.from(source),
       readingMode: ReadingMode.paged,
       currentIndex: 1,
       totalPagesOverride: 10,
@@ -231,7 +246,17 @@ class _StubReaderViewModel extends ReaderViewModel {
   }
 
   void replaceComicTitle(String title) {
-    state = AsyncData(state.requireValue.copyWith(comic: _comic(title: title)));
+    final comic = _comic(title: title);
+    state = AsyncData(
+      state.requireValue.copyWith(
+        comic: comic,
+        subject: ReadSessionSubject(
+          sessionKey: _comicId,
+          title: title,
+          pageCount: 10,
+        ),
+      ),
+    );
   }
 }
 

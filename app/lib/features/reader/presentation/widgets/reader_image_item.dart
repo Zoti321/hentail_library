@@ -25,15 +25,17 @@ const int _kReaderPageReloadMaxAttempts = 3;
 class ReaderImageItem extends ConsumerStatefulWidget {
   const ReaderImageItem({
     super.key,
-    required this.comic,
+    required this.sessionKey,
     required this.imageData,
     required this.slotLogicalWidth,
+    this.comic,
     this.enableCrossfade = false,
     this.alignment = Alignment.center,
     this.fit = BoxFit.contain,
   });
 
-  final ReaderComicRef comic;
+  final String sessionKey;
+  final ReaderComicRef? comic;
   final ReaderPageImageData imageData;
   final double slotLogicalWidth;
   final bool enableCrossfade;
@@ -69,13 +71,13 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
       final String dirPath = imageData.file.path.trim();
       if (dirPath.isEmpty) {
         return _ReaderContextMenuRegion(
-          comic: widget.comic,
+          sessionKey: widget.sessionKey,
           archivePageIndex: widget.imageData.archivePageIndex,
           child: errorPlaceholder,
         );
       }
       return _ReaderContextMenuRegion(
-        comic: widget.comic,
+        sessionKey: widget.sessionKey,
         archivePageIndex: widget.imageData.archivePageIndex,
         child: ReaderPageFadeIn(
           enabled: widget.enableCrossfade,
@@ -108,7 +110,7 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
     };
     if (sessionComicId == null || sessionPageIndex == null) {
       return _ReaderContextMenuRegion(
-        comic: widget.comic,
+        sessionKey: widget.sessionKey,
         archivePageIndex: widget.imageData.archivePageIndex,
         child: errorPlaceholder,
       );
@@ -120,8 +122,8 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
           pageOneBased: sessionPageIndex + 1,
         );
     final AsyncValue<ReaderPagePayload> pageAsync = ref.watch(
-      comicReaderPageProvider(
-        comicId: sessionComicId,
+      sessionReaderPageProvider(
+        sessionKey: sessionComicId,
         pageIndex: sessionPageIndex,
       ),
     );
@@ -131,7 +133,7 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
       skipLoadingOnReload: false,
       skipLoadingOnRefresh: false,
       loading: () => _ReaderContextMenuRegion(
-        comic: widget.comic,
+        sessionKey: widget.sessionKey,
         archivePageIndex: widget.imageData.archivePageIndex,
         child: loadingSurface,
       ),
@@ -140,7 +142,7 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
           _scheduleReaderPageReload(imageData);
         }
         return _ReaderContextMenuRegion(
-          comic: widget.comic,
+          sessionKey: widget.sessionKey,
           archivePageIndex: widget.imageData.archivePageIndex,
           child: errorPlaceholder,
         );
@@ -176,7 +178,7 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
           ),
         };
         return _ReaderContextMenuRegion(
-          comic: widget.comic,
+          sessionKey: widget.sessionKey,
           archivePageIndex: widget.imageData.archivePageIndex,
           child: content,
         );
@@ -193,7 +195,7 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
     ref
         .read(readerPageAspectRatiosProvider.notifier)
         .remember(
-          comicId: widget.comic.comicId,
+          comicId: widget.sessionKey,
           pageIndexZeroBased: widget.imageData.archivePageIndex,
           width: size.width,
           height: size.height,
@@ -315,12 +317,12 @@ class _ReaderImageErrorPlaceholder extends StatelessWidget {
 /// 页图右键 / 长按菜单（复制图片）。
 class _ReaderContextMenuRegion extends ConsumerWidget {
   const _ReaderContextMenuRegion({
-    required this.comic,
+    required this.sessionKey,
     required this.archivePageIndex,
     required this.child,
   });
 
-  final ReaderComicRef comic;
+  final String sessionKey;
   final int archivePageIndex;
   final Widget child;
 
@@ -366,8 +368,8 @@ class _ReaderContextMenuRegion extends ConsumerWidget {
   Future<void> _copyPageImage(BuildContext context, WidgetRef ref) async {
     try {
       await ref
-          .read(copyPageImageServiceProvider)
-          .execute(comic: comic, archivePageIndex: archivePageIndex);
+          .read(copyPageImageUseCaseProvider)
+          .execute(sessionKey: sessionKey, archivePageIndex: archivePageIndex);
       if (context.mounted) {
         showSuccessSnackbar(context, context.l10n.readerCopyPageImageSuccess);
       }

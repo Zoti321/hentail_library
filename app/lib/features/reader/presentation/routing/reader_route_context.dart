@@ -1,4 +1,5 @@
 import 'package:hentai_library/features/reader/application/open_reader_args.dart';
+import 'package:hentai_library/features/reader/domain/read_session_capabilities.dart';
 import 'package:hentai_library/features/reader/domain/read_session_source.dart';
 
 class ReaderComicListItem {
@@ -43,23 +44,36 @@ class ReaderRouteContext {
   final bool incognito;
   final bool startFromFirstPage;
 
-  String get comicId => source.sessionKey;
+  String get sessionKey => source.sessionKey;
 
-  bool get persistProgress => source.isComic;
+  /// Legacy alias for [sessionKey] (Comic id or Image set opaque key).
+  String get comicId => sessionKey;
 
-  bool get isImageSet => source.isImageSet;
+  ReadSessionCapabilities get capabilities =>
+      ReadSessionCapabilities.from(source, incognito: incognito);
 
-  /// Comic go_router / OpenReaderArgs bridge（Image set 不走此路径）。
-  OpenReaderArgs get session {
+  bool get persistProgress => capabilities.persistProgress;
+
+  /// Comic go_router / OpenReaderArgs bridge（仅 Comic / series 导航能力）。
+  OpenReaderArgs? get sessionOrNull {
     final ReadSessionSource current = source;
     if (current is! ComicReadSessionSource) {
-      throw StateError('OpenReaderArgs is comic-only');
+      return null;
     }
     return OpenReaderArgs(
       comicId: current.comicId,
       incognito: incognito,
       startFromFirstPage: startFromFirstPage,
     );
+  }
+
+  /// Comic-only; throws when Series/Comic session args are unavailable.
+  OpenReaderArgs get session {
+    final OpenReaderArgs? args = sessionOrNull;
+    if (args == null) {
+      throw StateError('OpenReaderArgs is comic-only');
+    }
+    return args;
   }
 
   static ReaderRouteContext normalize({

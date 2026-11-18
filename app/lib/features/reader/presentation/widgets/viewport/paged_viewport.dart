@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
 import 'package:hentai_library/features/reader/presentation/session/reader_session_bindings.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/read_session_page_data.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/reader_view_model.dart';
@@ -38,12 +37,13 @@ class PagedViewport extends HookConsumerWidget {
             value.asData?.value.totalPages ?? 1,
       ),
     );
-    final ReaderComicRef? comic = ref.watch(
-      readerViewModelProvider(
-        viewKey,
-      ).select((AsyncValue<ReaderUiState> value) => value.asData?.value.comic),
+    final String? sessionKey = ref.watch(
+      readerViewModelProvider(viewKey).select(
+        (AsyncValue<ReaderUiState> value) =>
+            value.asData?.value.sessionKey,
+      ),
     );
-    if (comic == null) {
+    if (sessionKey == null) {
       return const SizedBox.expand();
     }
     final ReaderViewportPages resolvedPages = resolveReaderViewportPages(
@@ -62,7 +62,6 @@ class PagedViewport extends HookConsumerWidget {
     return ReaderPagedViewportKernel(
       viewKey: viewKey,
       comicId: comicId,
-      comic: comic,
       totalPages: totalPages,
       imageList: imageList,
       initialPage: initialPage,
@@ -76,11 +75,11 @@ class PagedViewport extends HookConsumerWidget {
           (
             BuildContext context,
             int index,
-            ReaderComicRef comic,
+            String sessionKey,
             List<ReaderPageImageData> imageList,
             double slotLogicalWidth,
           ) => ReaderImageItem(
-            comic: comic,
+            sessionKey: sessionKey,
             imageData: imageList[index],
             slotLogicalWidth: slotLogicalWidth,
             enableCrossfade: readerPageCrossfadeEnabled(

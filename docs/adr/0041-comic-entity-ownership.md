@@ -66,7 +66,7 @@ ADR-0035 §4 规定的「内核迁出 shared」触发条件已满足：
 
 - `features/reader/domain/reader_comic_ref.dart`：`comicId` / `path` / `resourceType` / `pageCount` / `title`。
 - `OpenedReadSession.comic`、`ReadSession.comic`、`ComicPageSourcePort.loadPages`、`NativeReaderPort.openComic` 等改用该类型。
-- `open_read_session_service.dart` 仍经既有 baselined public 面取 Comic，随后在 reader 侧映射为 `ReaderComicRef`；**不新增**任何 reader → comic 基线条目。
+- `open_read_session_use_case.dart` 仍经既有 baselined public 面取 Comic，随后在 reader 侧映射为 `ReaderComicRef`；**不新增**任何 reader → comic 基线条目。
 
 ### 6. 门禁
 

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
 import 'package:hentai_library/features/reader/domain/reading_mode.dart';
 import 'package:hentai_library/features/reader/domain/spread_navigation.dart';
 import 'package:hentai_library/features/reader/presentation/session/reader_session_bindings.dart';
@@ -48,12 +47,12 @@ class DualPageViewport extends HookConsumerWidget {
             value.asData?.value.readingMode ?? readingMode,
       ),
     );
-    final ReaderComicRef? comic = ref.watch(
-      readerViewModelProvider(
-        viewKey,
-      ).select((AsyncValue<ReaderUiState> value) => value.asData?.value.comic),
+    final String? sessionKey = ref.watch(
+      readerViewModelProvider(viewKey).select(
+        (AsyncValue<ReaderUiState> value) => value.asData?.value.sessionKey,
+      ),
     );
-    if (comic == null) {
+    if (sessionKey == null) {
       return const SizedBox.expand();
     }
     final ReaderViewportPages resolvedPages = resolveReaderViewportPages(
@@ -82,7 +81,6 @@ class DualPageViewport extends HookConsumerWidget {
     return ReaderPagedViewportKernel(
       viewKey: viewKey,
       comicId: comicId,
-      comic: comic,
       totalPages: totalPages,
       imageList: imageList,
       initialPage: initialPage,
@@ -106,11 +104,11 @@ class DualPageViewport extends HookConsumerWidget {
           (
             BuildContext context,
             int spreadIndex,
-            ReaderComicRef comic,
+            String sessionKey,
             List<ReaderPageImageData> imageList,
             double slotLogicalWidth,
           ) => _DualSpreadPage(
-            comic: comic,
+            sessionKey: sessionKey,
             pages: SpreadNavigation.pagesInSpread(
               mode: activeMode,
               totalPages: safeTotalPages,
@@ -202,13 +200,13 @@ class _DualPagePrefetchBinder extends HookConsumerWidget {
 
 class _DualSpreadPage extends StatelessWidget {
   const _DualSpreadPage({
-    required this.comic,
+    required this.sessionKey,
     required this.pages,
     required this.imageList,
     required this.slotLogicalWidth,
   });
 
-  final ReaderComicRef comic;
+  final String sessionKey;
   final List<int> pages;
   final List<ReaderPageImageData> imageList;
   final double slotLogicalWidth;
@@ -231,7 +229,7 @@ class _DualSpreadPage extends StatelessWidget {
         children: <Widget>[
           Expanded(
             child: ReaderImageItem(
-              comic: comic,
+              sessionKey: sessionKey,
               imageData: imageData,
               slotLogicalWidth: slotLogicalWidth,
               alignment: Alignment.centerRight,
@@ -250,7 +248,7 @@ class _DualSpreadPage extends StatelessWidget {
           child: leftImage == null
               ? const SizedBox.shrink()
               : ReaderImageItem(
-                  comic: comic,
+                  sessionKey: sessionKey,
                   imageData: leftImage,
                   slotLogicalWidth: slotLogicalWidth,
                   alignment: Alignment.centerRight,
@@ -261,7 +259,7 @@ class _DualSpreadPage extends StatelessWidget {
           child: rightImage == null
               ? const SizedBox.shrink()
               : ReaderImageItem(
-                  comic: comic,
+                  sessionKey: sessionKey,
                   imageData: rightImage,
                   slotLogicalWidth: slotLogicalWidth,
                   alignment: Alignment.centerLeft,

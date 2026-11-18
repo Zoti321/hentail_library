@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/read_session_page_data.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/reader_view_model.dart';
 import 'package:hentai_library/features/reader/presentation/widgets/viewport/reader_viewport_constants.dart';
@@ -19,7 +18,7 @@ typedef ReaderViewportPageForItemIndex = int Function(int itemIndex);
 typedef ReaderViewportItemBuilder = Widget Function(
   BuildContext context,
   int itemIndex,
-  ReaderComicRef comic,
+  String sessionKey,
   List<ReaderPageImageData> imageList,
   double slotLogicalWidth,
 );
@@ -34,7 +33,6 @@ class ReaderPagedViewportKernel extends HookConsumerWidget {
     super.key,
     required this.viewKey,
     required this.comicId,
-    required this.comic,
     required this.totalPages,
     required this.imageList,
     required this.initialPage,
@@ -53,7 +51,6 @@ class ReaderPagedViewportKernel extends HookConsumerWidget {
 
   final ReaderViewModelKey viewKey;
   final String comicId;
-  final ReaderComicRef comic;
   final int totalPages;
   final List<ReaderPageImageData> imageList;
 
@@ -236,7 +233,7 @@ class ReaderPagedViewportKernel extends HookConsumerWidget {
                     itemBuilder(
                       context,
                       itemIndex,
-                      comic,
+                      comicId,
                       imageList,
                       slotLogicalWidth,
                     ),

@@ -330,8 +330,11 @@ _Avoid_: View as the display-shell suffix, Page without a production route.
 **Reader**: Product module `features/reader/`: page IO, viewport/chrome, settings, Series volume navigation and Read session orchestration. ADR-0038; names in [reader-ddd-lexicon.md](docs/engineering/reader-ddd-lexicon.md).
 _Avoid_: read_session module, Reading module ambiguous with history/stats.
 
-**Read session**: Lifecycle opened by comicId (plus options such as incognito), with no separate standalone/Series modes or seriesId input. Progress belongs only to Reading history. Exit returns to the Comic detail page. Remote Resources stream without whole-book disk caching. Entity/orchestration belong to Reader. ADR-0005/0038.
-_Avoid_: Standalone read, Series read, Comic read, Read session as the module name.
+**Read session**: Lifecycle opened from a Read session source (Comic by comicId, or Image set by library/image-set identity and start index or Image set image identity), with options such as incognito. There are no standalone/Series session modes or seriesId input. Reading history and reading activity apply only to non-incognito Comic sessions; Image set sessions do not persist progress. Comic exit returns to the Comic detail page; Image set exit pops the stacked reader route. Remote Comic Resources stream without whole-book disk caching. Entity/orchestration belong to Reader. ADR-0005/0038/0061.
+_Avoid_: Standalone read, Series read, Comic read, Read session as the module name, treating Image set as a Comic.
+
+**Read session capabilities**: Domain flags derived from the Read session source (and incognito) that enable shared Reader shell features versus Comic-only ones (progress/stats, Series navigation, cover actions, native archive session/prefetch, go_router exit). Presentation and application consume the flags; they do not branch on catalog kind. ADR-0061.
+_Avoid_: isImageSet UI gates, `image_set:` string protocol as business logic.
 
 **Series reading context**: Optional core-derived seriesId/name/ordered Comic IDs/current index for volume navigation. Not a session mode or progress record. Absent when no Series applies; Flutter formats member titles using the existing indexed Comic title convention.
 _Avoid_: Series session, Series reading mode.

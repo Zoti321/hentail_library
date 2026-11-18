@@ -4,26 +4,26 @@ import 'dart:typed_data';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/features/reader/application/open_read_session_service.dart';
+import 'package:hentai_library/features/reader/application/open_read_session_use_case.dart';
 import 'package:hentai_library/features/reader/domain/reader_page_payload.dart';
 import 'package:hentai_library/features/reader/presentation/image/reader_image_cache.dart';
 import 'package:hentai_library/features/reader/presentation/providers/session_providers.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/read_session_page_data.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/reader_prefetch_notifier.dart';
 
-class _Service implements OpenReadSessionService {
+class _Service implements OpenReadSessionUseCase {
   final requests = <({String comicId, int generation, List<int> pages})>[];
   final pending = <Future<void>>[];
   final cleared = <String>[];
 
   @override
   Future<void> prefetchPages({
-    required String comicId,
+    required String sessionKey,
     required List<int> archivePageIndexes,
     required int generation,
   }) async {
     requests.add((
-      comicId: comicId,
+      comicId: sessionKey,
       generation: generation,
       pages: archivePageIndexes,
     ));
@@ -32,13 +32,13 @@ class _Service implements OpenReadSessionService {
 
   @override
   Future<ReaderPagePayload> loadReaderPage({
-    required String comicId,
+    required String sessionKey,
     required int archivePageIndex,
   }) async => ReaderPageBytes(Uint8List.fromList([archivePageIndex]));
 
   @override
-  Future<void> clearPageCache({required String comicId}) async {
-    cleared.add(comicId);
+  Future<void> clearPageCache({required String sessionKey}) async {
+    cleared.add(sessionKey);
   }
 
   @override
@@ -61,7 +61,7 @@ void main() {
     disposed = false;
     service = _Service();
     container = ProviderContainer(
-      overrides: [openReadSessionServiceProvider.overrideWithValue(service)],
+      overrides: [openReadSessionUseCaseProvider.overrideWithValue(service)],
     );
     addTearDown(() {
       if (!disposed) container.dispose();

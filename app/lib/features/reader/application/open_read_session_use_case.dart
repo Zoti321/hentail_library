@@ -6,8 +6,10 @@ import 'package:hentai_library/features/reader/domain/comic_page_source_port.dar
 import 'package:hentai_library/features/reader/domain/image_set_read_port.dart';
 import 'package:hentai_library/features/reader/domain/native_reader_port.dart';
 import 'package:hentai_library/features/reader/domain/opened_read_session.dart';
+import 'package:hentai_library/features/reader/domain/read_session_capabilities.dart';
 import 'package:hentai_library/features/reader/domain/read_session_page.dart';
 import 'package:hentai_library/features/reader/domain/read_session_source.dart';
+import 'package:hentai_library/features/reader/domain/read_session_subject.dart';
 import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
 import 'package:hentai_library/features/reader/domain/reader_page_payload.dart';
 import 'package:hentai_library/features/reading_history/public/reading_progress_commands.dart';
@@ -15,7 +17,8 @@ import 'package:hentai_library/shared/application/contracts/comic_read_query.dar
 import 'package:hentai_library/shared/domain/models/enums.dart';
 
 typedef _OpenedPages = ({
-  ReaderComicRef comic,
+  ReadSessionSubject subject,
+  ReaderComicRef? comic,
   List<ReadSessionPage> pages,
   ReadSessionSource source,
 });
@@ -32,8 +35,8 @@ class _ReaderOpenAttempt {
 /// 阅读 I/O 编排：显式 open/close、页码约定与 [OpenedReadSession]。
 ///
 /// 同一 sessionKey 在 close 前复用页列表，避免 open 与 loadPages 双次列页。
-class OpenReadSessionService {
-  OpenReadSessionService({
+class OpenReadSessionUseCase {
+  OpenReadSessionUseCase({
     required this._comicLookup,
     required this._pageSource,
     required this._readResumePage,
@@ -91,6 +94,10 @@ class OpenReadSessionService {
     final String sessionKey = source.sessionKey;
     final Object lifetime = _lifetimes.putIfAbsent(sessionKey, Object.new);
     final _OpenedPages opened = await _openPages(source);
+    final ReadSessionCapabilities capabilities = ReadSessionCapabilities.from(
+      source,
+      incognito: incognito,
+    );
     final int resumePageIndex = switch (source) {
       ImageSetReadSessionSource() => _imageSetResumeIndex(source, opened.pages),
       ComicReadSessionSource() =>
@@ -103,9 +110,12 @@ class OpenReadSessionService {
     };
     _ensureLifetime(sessionKey, lifetime);
     return OpenedReadSession(
-      comic: opened.comic,
+      subject: opened.subject,
+      source: opened.source,
+      capabilities: capabilities,
       pages: opened.pages,
       resumePageIndex: resumePageIndex,
+      comic: opened.comic,
     );
   }
 
@@ -131,23 +141,31 @@ class OpenReadSessionService {
     return index + 1;
   }
 
-  Future<List<ReadSessionPage>> loadPages(String comicId) async {
-    final Object lifetime = _lifetimes.putIfAbsent(comicId, Object.new);
-    final _OpenedPages opened = await _openPages(
-      ComicReadSessionSource(comicId),
-    );
-    _ensureLifetime(comicId, lifetime);
+  /// Load pages for [source]. Prefer an already-opened snapshot.
+  Future<List<ReadSessionPage>> loadPages(ReadSessionSource source) async {
+    final String sessionKey = source.sessionKey;
+    final Object lifetime = _lifetimes.putIfAbsent(sessionKey, Object.new);
+    final _OpenedPages opened = await _openPages(source);
+    _ensureLifetime(sessionKey, lifetime);
     return opened.pages;
   }
 
-  Future<void> close(String comicId) async {
-    final _OpenedPages? opened = _openedPages.remove(comicId);
-    _lifetimes.remove(comicId);
-    _opening.remove(comicId);
-    if (opened?.source.isImageSet ?? comicId.startsWith('image_set:')) {
+  /// Comic-only convenience; Image set callers must use [loadPages] with source.
+  Future<List<ReadSessionPage>> loadPagesByComicId(String comicId) {
+    return loadPages(ComicReadSessionSource(comicId));
+  }
+
+  ReadSessionSource? openedSource(String sessionKey) =>
+      _openedPages[sessionKey]?.source;
+
+  Future<void> close(String sessionKey) async {
+    final _OpenedPages? opened = _openedPages.remove(sessionKey);
+    _lifetimes.remove(sessionKey);
+    _opening.remove(sessionKey);
+    if (opened?.source.isImageSet ?? false) {
       return;
     }
-    await _closeNative(comicId);
+    await _closeNative(sessionKey);
   }
 
   Future<void> _closeNative(String comicId) {
@@ -160,7 +178,6 @@ class OpenReadSessionService {
       await _waitForOperation(previous);
       await _waitForOperation(closing);
       if (identical(_operations[comicId], barrier)) {
-        // The operation is already observed; only remove its map entry.
         final _ = _operations.remove(comicId);
       }
     });
@@ -169,10 +186,10 @@ class OpenReadSessionService {
   }
 
   Future<Uint8List?> loadPageBytes({
-    required String comicId,
+    required String sessionKey,
     required int archivePageIndex,
   }) async {
-    final _OpenedPages? opened = _openedPages[comicId];
+    final _OpenedPages? opened = _openedPages[sessionKey];
     if (opened != null && opened.source.isImageSet) {
       final ReadSessionPage? page = _pageAt(opened.pages, archivePageIndex);
       if (page is! ReadSessionImageSetPage) {
@@ -181,27 +198,23 @@ class OpenReadSessionService {
       return _requireImageSetPort().loadPageBytes(page.page);
     }
     return _pageSource.loadPageBytes(
-      comicId: comicId,
+      comicId: sessionKey,
       pageIndex: archivePageIndex,
     );
   }
 
   /// [archivePageIndex] 为 0-based 归档页索引。
   Future<ReaderPagePayload> loadReaderPage({
-    required String comicId,
+    required String sessionKey,
     required int archivePageIndex,
   }) async {
-    final ReaderComicRef? comic = await _resolveOpenedComic(comicId);
-    if (comic == null) {
-      throw ReadSessionPageLoadException.comicNotFound(comicId);
-    }
-    final _OpenedPages? opened = _openedPages[comicId];
+    final _OpenedPages? opened = _openedPages[sessionKey];
     if (opened != null && opened.source.isImageSet) {
       final ReadSessionPage? page = _pageAt(opened.pages, archivePageIndex);
       if (page is! ReadSessionImageSetPage) {
         throw ReadSessionPageLoadException.loadFailed(
-          comicId: comicId,
-          path: comic.path,
+          comicId: sessionKey,
+          path: opened.subject.sessionKey,
           cause: StateError('Image set page missing at $archivePageIndex'),
         );
       }
@@ -213,8 +226,8 @@ class OpenReadSessionService {
       } on Object catch (error, stackTrace) {
         Error.throwWithStackTrace(
           ReadSessionPageLoadException.loadFailed(
-            comicId: comic.comicId,
-            path: comic.path,
+            comicId: sessionKey,
+            path: opened.subject.sessionKey,
             cause: error,
             stackTrace: stackTrace,
           ),
@@ -222,9 +235,13 @@ class OpenReadSessionService {
         );
       }
     }
+    final ReaderComicRef? comic = await _resolveOpenedComic(sessionKey);
+    if (comic == null) {
+      throw ReadSessionPageLoadException.comicNotFound(sessionKey);
+    }
     try {
       return await _pageSource.loadReaderPage(
-        comicId: comicId,
+        comicId: sessionKey,
         pageIndex: archivePageIndex,
       );
     } on ReadSessionPageLoadException {
@@ -242,40 +259,36 @@ class OpenReadSessionService {
     }
   }
 
-  /// [archivePageIndexes] 为 0-based 归档页索引；目录漫与 Image set 不走 Comic prefetch。
+  /// [archivePageIndexes] 为 0-based；目录漫与 Image set 不走 Comic prefetch。
   Future<void> prefetchPages({
-    required String comicId,
+    required String sessionKey,
     required List<int> archivePageIndexes,
     required int generation,
   }) async {
     if (archivePageIndexes.isEmpty) {
       return;
     }
-    final ReaderComicRef? comic = await _resolveOpenedComic(comicId);
+    final _OpenedPages? opened = _openedPages[sessionKey];
+    if (opened != null && !opened.source.isComic) {
+      return;
+    }
+    final ReaderComicRef? comic = await _resolveOpenedComic(sessionKey);
     if (comic == null || comic.resourceType == ResourceType.dir) {
       return;
     }
-    final _OpenedPages? opened = _openedPages[comicId];
-    if (opened != null && opened.source.isImageSet) {
-      return;
-    }
     await _pageSource.prefetchPages(
-      comicId: comicId,
+      comicId: sessionKey,
       pageIndexes: archivePageIndexes,
       generation: generation,
     );
   }
 
-  /// Prefer in-session comic to avoid a findById FRB on every page load/prefetch.
-  Future<ReaderComicRef?> _resolveOpenedComic(String comicId) async {
-    final _OpenedPages? opened = _openedPages[comicId];
+  Future<ReaderComicRef?> _resolveOpenedComic(String sessionKey) async {
+    final _OpenedPages? opened = _openedPages[sessionKey];
     if (opened != null) {
       return opened.comic;
     }
-    if (comicId.startsWith('image_set:')) {
-      return null;
-    }
-    final found = await _comicLookup.findById(comicId);
+    final found = await _comicLookup.findById(sessionKey);
     return found == null
         ? null
         : ReaderComicRef(
@@ -287,12 +300,12 @@ class OpenReadSessionService {
           );
   }
 
-  Future<void> clearPageCache({required String comicId}) {
-    if (comicId.startsWith('image_set:') ||
-        (_openedPages[comicId]?.source.isImageSet ?? false)) {
+  Future<void> clearPageCache({required String sessionKey}) {
+    final _OpenedPages? opened = _openedPages[sessionKey];
+    if (opened != null && !opened.source.isComic) {
       return Future<void>.value();
     }
-    return _pageSource.clearPageCache(comicId: comicId);
+    return _pageSource.clearPageCache(comicId: sessionKey);
   }
 
   Future<_OpenedPages> _openPages(ReadSessionSource source) async {
@@ -349,7 +362,6 @@ class OpenReadSessionService {
         return await _openNative(comic, attempt);
       } finally {
         if (identical(_operations[comicId], nativeOperation)) {
-          // The operation is already observed; only remove its map entry.
           final _ = _operations.remove(comicId);
         }
       }
@@ -369,7 +381,6 @@ class OpenReadSessionService {
         .openSession(
           libraryId: source.libraryId,
           imageSetId: source.imageSetId,
-          // Identity is resolved against this snapshot after opening it.
           startIndex: source.imageSetImageId == null ? source.startIndex : 0,
         );
     _ensureLifetime(sessionKey, attempt.lifetime);
@@ -379,19 +390,22 @@ class OpenReadSessionService {
         path: sessionKey,
       );
     }
-    final ReaderComicRef comic = ReaderComicRef(
-      comicId: sessionKey,
-      path: sessionKey,
-      resourceType: ResourceType.dir,
-      pageCount: opened.pages.length,
+    final ReadSessionSubject subject = ReadSessionSubject(
+      sessionKey: sessionKey,
       title: opened.title,
+      pageCount: opened.pages.length,
     );
     final List<ReadSessionPage> pages = List<ReadSessionPage>.unmodifiable(
       opened.pages.map(
         (ImageSetReadPage page) => ReadSessionImageSetPage(page: page),
       ),
     );
-    final _OpenedPages result = (comic: comic, pages: pages, source: source);
+    final _OpenedPages result = (
+      subject: subject,
+      comic: null,
+      pages: pages,
+      source: source,
+    );
     _openedPages[sessionKey] = result;
     return result;
   }
@@ -414,6 +428,11 @@ class OpenReadSessionService {
         );
       }
       final opened = (
+        subject: ReadSessionSubject(
+          sessionKey: comicId,
+          title: comic.title,
+          pageCount: pages.length,
+        ),
         comic: comic,
         pages: List<ReadSessionPage>.unmodifiable(pages),
         source: ComicReadSessionSource(comicId),
@@ -427,23 +446,22 @@ class OpenReadSessionService {
   }
 
   Future<_OpenedPages> _finishOpen(
-    String comicId,
+    String sessionKey,
     _ReaderOpenAttempt attempt,
   ) async {
     try {
       return await attempt.operation.timeout(_openTimeout);
     } on TimeoutException catch (_, stackTrace) {
-      if (identical(_lifetimes[comicId], attempt.lifetime)) {
-        _lifetimes.remove(comicId);
+      if (identical(_lifetimes[sessionKey], attempt.lifetime)) {
+        _lifetimes.remove(sessionKey);
       }
       if (attempt.nativeStarted) {
-        // Keep cleanup in the native barrier without delaying the timeout result.
-        unawaited(_waitForOperation(_closeNative(comicId)));
+        unawaited(_waitForOperation(_closeNative(sessionKey)));
       }
       Error.throwWithStackTrace(
         ReadSessionPageLoadException.timedOut(
-          comicId: comicId,
-          path: attempt.path ?? comicId,
+          comicId: sessionKey,
+          path: attempt.path ?? sessionKey,
         ),
         stackTrace,
       );
@@ -452,16 +470,16 @@ class OpenReadSessionService {
     } on Object catch (error, stackTrace) {
       Error.throwWithStackTrace(
         ReadSessionPageLoadException.loadFailed(
-          comicId: comicId,
-          path: attempt.path ?? comicId,
+          comicId: sessionKey,
+          path: attempt.path ?? sessionKey,
           cause: error,
           stackTrace: stackTrace,
         ),
         stackTrace,
       );
     } finally {
-      if (identical(_opening[comicId], attempt)) {
-        _opening.remove(comicId);
+      if (identical(_opening[sessionKey], attempt)) {
+        _opening.remove(sessionKey);
       }
     }
   }
@@ -474,11 +492,11 @@ class OpenReadSessionService {
     }
   }
 
-  void _ensureLifetime(String comicId, Object lifetime) {
-    if (!identical(_lifetimes[comicId], lifetime)) {
+  void _ensureLifetime(String sessionKey, Object lifetime) {
+    if (!identical(_lifetimes[sessionKey], lifetime)) {
       throw ReadSessionPageLoadException.loadFailed(
-        comicId: comicId,
-        path: comicId,
+        comicId: sessionKey,
+        path: sessionKey,
         cause: StateError('Reader open was closed'),
       );
     }

@@ -6,14 +6,16 @@ import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
 import 'package:hentai_library/features/reader/domain/read_session_source.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/comic/public/comic_lookup_repository.dart';
-import 'package:hentai_library/features/reader/application/read_session_application_service.dart';
-import 'package:hentai_library/features/reader/application/open_read_session_service.dart';
+import 'package:hentai_library/features/reader/application/manage_read_session_use_case.dart';
+import 'package:hentai_library/features/reader/application/open_read_session_use_case.dart';
 import 'package:hentai_library/features/reader/presentation/providers/session_providers.dart';
 import 'package:hentai_library/features/reader/domain/comic_page_source_port.dart';
 import 'package:hentai_library/features/reader/application/open_reader_args.dart';
 import 'package:hentai_library/features/reader/domain/read_session_page.dart';
 import 'package:hentai_library/features/reader/domain/native_reader_port.dart';
 import 'package:hentai_library/features/reader/domain/opened_read_session.dart';
+import 'package:hentai_library/features/reader/domain/read_session_capabilities.dart';
+import 'package:hentai_library/features/reader/domain/read_session_subject.dart';
 import 'package:hentai_library/features/reader/domain/reading_mode.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/reader_auto_play_carry.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/reader_view_model.dart';
@@ -33,13 +35,13 @@ import 'package:hentai_library/features/app_settings/public/providers/app_settin
 
 const String _comicId = 'reader-controller-comic';
 const ReaderViewModelKey _key = (
-  comicId: _comicId,
+  sessionKey: _comicId,
   source: ComicReadSessionSource(_comicId),
   incognito: false,
   startFromFirstPage: false,
 );
 const ReaderViewModelKey _incognitoKey = (
-  comicId: _comicId,
+  sessionKey: _comicId,
   source: ComicReadSessionSource(_comicId),
   incognito: true,
   startFromFirstPage: false,
@@ -57,7 +59,15 @@ ReaderComicRef _comic({int pageCount = 10}) {
 
 OpenedReadSession _snapshot({int pageCount = 10, int resumePage = 1}) {
   final ReaderComicRef comic = _comic(pageCount: pageCount);
+  const source = ComicReadSessionSource(_comicId);
   return OpenedReadSession(
+    subject: ReadSessionSubject(
+      sessionKey: _comicId,
+      title: comic.title,
+      pageCount: pageCount,
+    ),
+    source: source,
+    capabilities: ReadSessionCapabilities.from(source),
     comic: comic,
     pages: List<ReadSessionPage>.generate(
       pageCount,
@@ -144,9 +154,9 @@ class _NoOpActivityCommands {
 /// Controller build now begins a history session; keep I/O stubs unused.
 Override _stubCoordinatorOverride() {
   final _NoOpHistoryCommands history = _NoOpHistoryCommands();
-  return readSessionApplicationServiceProvider.overrideWithValue(
-    ReadSessionApplicationService(
-      sessionService: OpenReadSessionService(
+  return manageReadSessionUseCaseProvider.overrideWithValue(
+    ManageReadSessionUseCase(
+      openReadSession: OpenReadSessionUseCase(
         comicLookup: createComicReadQuery(_UnusedComicLookup()),
         pageSource: _UnusedPageSource(),
         readResumePage: history.readResumePageIndex,
@@ -265,12 +275,19 @@ void main() {
 
     test('new comic session starts with auto-play off', () async {
       const ReaderViewModelKey otherKey = (
-        comicId: 'reader-controller-other',
+        sessionKey: 'reader-controller-other',
         source: ComicReadSessionSource('reader-controller-other'),
         incognito: false,
         startFromFirstPage: false,
       );
       final OpenedReadSession otherSnapshot = OpenedReadSession(
+        subject: ReadSessionSubject(
+          sessionKey: otherKey.comicId,
+          title: 'Other Comic',
+          pageCount: 5,
+        ),
+        source: ComicReadSessionSource(otherKey.comicId),
+        capabilities: ReadSessionCapabilities.from(ComicReadSessionSource(otherKey.comicId)),
         comic: ReaderComicRef(
           comicId: otherKey.comicId,
           path: '/tmp/${otherKey.comicId}.cbz',
@@ -339,12 +356,19 @@ void main() {
 
     test('armed autoplay carry restores on next ReaderViewModel', () async {
       const ReaderViewModelKey otherKey = (
-        comicId: 'reader-controller-carry',
+        sessionKey: 'reader-controller-carry',
         source: ComicReadSessionSource('reader-controller-carry'),
         incognito: false,
         startFromFirstPage: true,
       );
       final OpenedReadSession otherSnapshot = OpenedReadSession(
+        subject: ReadSessionSubject(
+          sessionKey: otherKey.comicId,
+          title: 'Other Comic',
+          pageCount: 5,
+        ),
+        source: ComicReadSessionSource(otherKey.comicId),
+        capabilities: ReadSessionCapabilities.from(ComicReadSessionSource(otherKey.comicId)),
         comic: ReaderComicRef(
           comicId: otherKey.comicId,
           path: '/tmp/${otherKey.comicId}.cbz',

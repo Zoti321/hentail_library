@@ -18,6 +18,8 @@ ADR-0005 已统一 **Read session** 语义（仅 comicId；进度只写 Reading 
 4. 命名词典与分层卫生（实体 `ReadSession`、application `OpenReadSessionService` / `CopyPageImageService`、port `NativeReaderPort` 等）随本 ADR 落地；细则见 `docs/engineering/reader-ddd-lexicon.md`。
 5. Rust `core/src/reader` **不改名**（已是 reader）。
 
+> **实现修订（2026-11-18）**：application 编排按 ADR-0050 改为具体 UseCase 命名（`OpenReadSessionUseCase` / `ManageReadSessionUseCase` / `CopyPageImageUseCase`）；多源会话与 Capabilities 见 ADR-0061。
+
 ## Consequences
 
 ### Positive

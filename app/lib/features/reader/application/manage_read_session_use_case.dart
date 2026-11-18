@@ -1,27 +1,28 @@
-import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
 import 'package:hentai_library/features/reader/application/open_reader_args.dart';
-import 'package:hentai_library/features/reader/application/open_read_session_service.dart';
+import 'package:hentai_library/features/reader/application/open_read_session_use_case.dart';
 import 'package:hentai_library/features/reader/domain/read_session.dart';
+import 'package:hentai_library/features/reader/domain/read_session_capabilities.dart';
+import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
 import 'package:hentai_library/features/reading_history/public/reading_progress_commands.dart';
 import 'package:hentai_library/features/reading_stats/public/read_session_activity.dart';
 
-/// 系列切卷时 Application Service 返回的计划；UI 负责 prefetch 与路由跳转。
+/// 系列切卷时 UseCase 返回的计划；UI 负责 prefetch 与路由跳转。
 typedef SeriesSwitchPlan = ({
   String closeComicId,
   String targetComicId,
   OpenReaderArgs nextSession,
 });
 
-/// Read session 应用服务：进度落盘 / 活动统计 / close / 系列切卷编排。
-class ReadSessionApplicationService {
-  ReadSessionApplicationService({
-    required this.sessionService,
+/// Read session lifecycle：进度落盘 / 活动统计 / close / 系列切卷编排。
+class ManageReadSessionUseCase {
+  ManageReadSessionUseCase({
+    required this.openReadSession,
     required this.recordProgress,
     required this.recordActivity,
     DateTime Function()? now,
   }) : _now = now ?? DateTime.now;
 
-  final OpenReadSessionService sessionService;
+  final OpenReadSessionUseCase openReadSession;
   final RecordReadingProgressCommand recordProgress;
   final RecordReadSessionActivityCommand recordActivity;
   final DateTime Function() _now;
@@ -33,19 +34,21 @@ class ReadSessionApplicationService {
   bool get hasActiveSession => _session != null;
 
   Future<void> beginReadSession({
-    required ReaderComicRef comic,
+    required ReadSessionCapabilities capabilities,
+    ReaderComicRef? comic,
     bool incognito = false,
     int initialPageIndex = 1,
-    bool persistProgress = true,
   }) async {
     final int generation = ++_sessionGeneration;
     final ReadSession? previous = _session;
-    // Image set / incognito: no Comic history or reading_stats activity.
-    if (incognito || !persistProgress) {
+    final bool persist =
+        capabilities.persistProgress && !incognito && comic != null;
+    if (!persist) {
       _session = null;
       return;
     }
-    if (previous != null && previous.comicId != comic.comicId) {
+    final ReaderComicRef comicRef = comic;
+    if (previous != null && previous.comicId != comicRef.comicId) {
       await _flushSession(previous);
       if (generation != _sessionGeneration) {
         return;
@@ -56,7 +59,7 @@ class ReadSessionApplicationService {
       }
     }
     final ReadSession session = ReadSession(
-      comic: comic,
+      comic: comicRef,
       initialPageIndex: initialPageIndex,
       foregroundStartedAt: _now(),
     );
@@ -107,12 +110,12 @@ class ReadSessionApplicationService {
   }
 
   Future<void> exitReadSession({
-    required String comicId,
+    required String sessionKey,
+    required ReadSessionCapabilities capabilities,
     required bool incognito,
     int? currentPageIndex,
-    bool persistProgress = true,
   }) async {
-    if (!incognito && persistProgress) {
+    if (!incognito && capabilities.persistProgress) {
       if (currentPageIndex != null) {
         updatePage(currentPageIndex);
       }
@@ -121,7 +124,7 @@ class ReadSessionApplicationService {
       _sessionGeneration++;
       _session = null;
     }
-    await sessionService.close(comicId);
+    await openReadSession.close(sessionKey);
   }
 
   Future<SeriesSwitchPlan> prepareSeriesSwitch({
@@ -142,7 +145,7 @@ class ReadSessionApplicationService {
       }
       await endSession();
     }
-    await sessionService.close(currentSession.comicId);
+    await openReadSession.close(currentSession.comicId);
     return (
       closeComicId: currentSession.comicId,
       targetComicId: targetComicId,

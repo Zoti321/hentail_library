@@ -9,7 +9,7 @@ import 'package:hentai_library/features/image_set_library/domain/image_set_reade
 import 'package:hentai_library/features/image_set_library/presentation/providers/image_set_library_providers.dart';
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_reader_page.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
-import 'package:hentai_library/features/reader/application/open_read_session_service.dart';
+import 'package:hentai_library/features/reader/application/open_read_session_use_case.dart';
 import 'package:hentai_library/features/reader/domain/comic_page_source_port.dart';
 import 'package:hentai_library/features/reader/domain/image_set_read_port.dart';
 import 'package:hentai_library/features/reader/domain/native_reader_port.dart';
@@ -195,8 +195,8 @@ List<Override> _overrides(_Probe probe) {
         required int pageCount,
       }) async {},
     ),
-    openReadSessionServiceProvider.overrideWithValue(
-      OpenReadSessionService(
+    openReadSessionUseCaseProvider.overrideWithValue(
+      OpenReadSessionUseCase(
         comicLookup: _StubComicLookup(),
         pageSource: _StubPageSource(),
         readResumePage: (_) async => null,

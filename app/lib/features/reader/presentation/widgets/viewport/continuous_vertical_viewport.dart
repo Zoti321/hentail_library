@@ -2,7 +2,6 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
 import 'package:hentai_library/features/reader/domain/reading_mode.dart';
 import 'package:hentai_library/features/reader/presentation/widgets/viewport/reader_viewport_constants.dart';
 import 'package:hentai_library/features/reader/presentation/widgets/viewport/reader_viewport_pages.dart';
@@ -37,12 +36,12 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
     final int seedIndex =
         ref.read(readerViewModelProvider(viewKey)).asData?.value.currentIndex ??
         1;
-    final ReaderComicRef? comic = ref.watch(
-      readerViewModelProvider(
-        viewKey,
-      ).select((AsyncValue<ReaderUiState> value) => value.asData?.value.comic),
+    final String? sessionKey = ref.watch(
+      readerViewModelProvider(viewKey).select(
+        (AsyncValue<ReaderUiState> value) => value.asData?.value.sessionKey,
+      ),
     );
-    if (comic == null) {
+    if (sessionKey == null) {
       return const SizedBox.expand();
     }
 
@@ -259,7 +258,7 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
       itemBuilder: (BuildContext context, int index) {
         final ReaderPageImageData imageData = imageList[index];
         final String aspectKey = readerPageAspectRatioKey(
-          comic.comicId,
+          sessionKey,
           imageData.archivePageIndex,
         );
         final double resolvedAspect = ref.watch(
@@ -269,7 +268,7 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
           ),
         );
         final Widget image = ReaderImageItem(
-          comic: comic,
+          sessionKey: sessionKey,
           imageData: imageData,
           slotLogicalWidth: slotLogicalWidth,
           enableCrossfade: false,

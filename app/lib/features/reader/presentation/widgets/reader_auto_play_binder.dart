@@ -138,7 +138,7 @@ class ReaderAutoPlayBinder extends HookConsumerWidget {
       final ({bool keepTicking, ReaderReplaceReaderRouteIntent? replace}) tick =
           await viewModel.advanceAutoPlay(
             navContext: seriesNavContext,
-            session: routeContext.session,
+            session: routeContext.sessionOrNull,
           );
       if (!context.mounted) {
         cancelTimer();

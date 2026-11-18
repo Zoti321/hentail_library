@@ -5,12 +5,14 @@ import 'package:hentai_library/features/reader/domain/spread_navigation.dart';
 import 'package:hentai_library/features/reader/domain/auto_play_mode.dart';
 import 'package:hentai_library/features/reader/domain/reading_mode.dart';
 import 'package:hentai_library/features/reader/domain/opened_read_session.dart';
+import 'package:hentai_library/features/reader/domain/read_session_capabilities.dart';
 import 'package:hentai_library/features/reader/domain/read_session_source.dart';
+import 'package:hentai_library/features/reader/domain/read_session_subject.dart';
 import 'package:hentai_library/features/reader/presentation/input/reader_tap_zone.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/reader_auto_play_carry.dart';
 import 'package:hentai_library/features/reader/presentation/reader_exit_location.dart';
 import 'package:hentai_library/features/reader/presentation/routing/reader_route_context.dart';
-import 'package:hentai_library/features/reader/application/read_session_application_service.dart';
+import 'package:hentai_library/features/reader/application/manage_read_session_use_case.dart';
 import 'package:hentai_library/features/app_settings/public/providers/app_settings_providers.dart';
 import 'package:hentai_library/features/app_settings/public/app_settings_cross_feature_types.dart';
 import 'package:hentai_library/features/reader/domain/reading_preferences.dart';
@@ -34,11 +36,16 @@ part 'reader_view_model_auto_play.dart';
 enum SeriesBoundaryPrompt { none, advance, retreat }
 
 typedef ReaderViewModelKey = ({
-  String comicId,
+  String sessionKey,
   ReadSessionSource source,
   bool incognito,
   bool startFromFirstPage,
 });
+
+extension ReaderViewModelKeyX on ReaderViewModelKey {
+  /// Legacy alias for [sessionKey] (Comic id or Image set opaque key).
+  String get comicId => sessionKey;
+}
 
 ReaderViewModelKey readerViewModelKey(
   String comicId, {
@@ -55,7 +62,7 @@ ReaderViewModelKey readerViewModelKeyForSource(
   bool incognito = false,
   bool startFromFirstPage = false,
 }) => (
-  comicId: source.sessionKey,
+  sessionKey: source.sessionKey,
   source: source,
   incognito: incognito,
   startFromFirstPage: startFromFirstPage,
@@ -64,7 +71,9 @@ ReaderViewModelKey readerViewModelKeyForSource(
 @freezed
 abstract class ReaderUiState with _$ReaderUiState {
   factory ReaderUiState({
-    required ReaderComicRef comic,
+    required ReadSessionSubject subject,
+    ReaderComicRef? comic,
+    required ReadSessionCapabilities capabilities,
     @Default(ReadingMode.paged) ReadingMode readingMode,
     @Default(false) bool showControls,
     @Default(1) int currentIndex,
@@ -77,6 +86,8 @@ abstract class ReaderUiState with _$ReaderUiState {
   ReaderUiState._();
 
   int get totalPages => totalPagesOverride ?? 0;
+
+  String get sessionKey => subject.sessionKey;
 }
 
 @riverpod
@@ -87,7 +98,6 @@ class ReaderViewModel extends _$ReaderViewModel
     final ReadSessionSource source = key.source;
     final bool incognito = key.incognito;
     final bool startFromFirstPage = key.startFromFirstPage;
-    final bool persistProgress = source.isComic;
     final OpenedReadSession snapshot = await ref.watch(
       readerSessionOpenFromSourceProvider(
         source: source,
@@ -104,15 +114,17 @@ class ReaderViewModel extends _$ReaderViewModel
         .read(readerAutoPlayCarryProvider.notifier)
         .take();
     await ref
-        .read(readSessionApplicationServiceProvider)
+        .read(manageReadSessionUseCaseProvider)
         .beginReadSession(
+          capabilities: snapshot.capabilities,
           comic: snapshot.comic,
           incognito: incognito,
           initialPageIndex: snapshot.resumePageIndex,
-          persistProgress: persistProgress,
         );
     return ReaderUiState(
+      subject: snapshot.subject,
       comic: snapshot.comic,
+      capabilities: snapshot.capabilities,
       readingMode: initialMode,
       currentIndex: snapshot.resumePageIndex,
       totalPagesOverride: snapshot.totalPages > 0 ? snapshot.totalPages : null,
@@ -134,7 +146,7 @@ class ReaderViewModel extends _$ReaderViewModel
     }
   }
 
-  String get _comicId => (ref.$arg as ReaderViewModelKey).comicId;
+  String get _sessionKey => (ref.$arg as ReaderViewModelKey).sessionKey;
 
   void toggleShowControls() {
     _updateDataState((s) => s.copyWith(showControls: !s.showControls));
@@ -207,22 +219,22 @@ class ReaderViewModel extends _$ReaderViewModel
   }
 
   Future<void> pauseForeground() {
-    return ref.read(readSessionApplicationServiceProvider).pauseForeground();
+    return ref.read(manageReadSessionUseCaseProvider).pauseForeground();
   }
 
   void resumeForeground() {
-    ref.read(readSessionApplicationServiceProvider).resumeForeground();
+    ref.read(manageReadSessionUseCaseProvider).resumeForeground();
   }
 
   Future<void> executeSaveProgress({
     required ReaderRouteContext routeContext,
   }) async {
-    if (routeContext.incognito || !routeContext.persistProgress) {
+    if (routeContext.incognito || !routeContext.capabilities.persistProgress) {
       return;
     }
     final ReaderUiState? currentState = state.asData?.value;
-    final ReadSessionApplicationService sessions = ref.read(
-      readSessionApplicationServiceProvider,
+    final ManageReadSessionUseCase sessions = ref.read(
+      manageReadSessionUseCaseProvider,
     );
     if (currentState != null) {
       sessions.updatePage(currentState.currentIndex);
@@ -239,22 +251,23 @@ class ReaderViewModel extends _$ReaderViewModel
         .read(readerChromeNotifierProvider.notifier)
         .exitFullscreenIfNeeded();
     final ReaderUiState? currentState = state.asData?.value;
+    final ReadSessionCapabilities capabilities =
+        currentState?.capabilities ?? routeContext.capabilities;
     await ref
-        .read(readSessionApplicationServiceProvider)
+        .read(manageReadSessionUseCaseProvider)
         .exitReadSession(
-          comicId: _comicId,
+          sessionKey: _sessionKey,
+          capabilities: capabilities,
           incognito: routeContext.incognito,
           currentPageIndex: currentState?.currentIndex,
-          persistProgress: routeContext.persistProgress,
         );
-    ref.read(readerPrefetchNotifierProvider.notifier).clearComic(_comicId);
-    // Image set is always MaterialPageRoute-stacked onto detail → prefer pop.
-    if (routeContext.isImageSet) {
+    ref.read(readerPrefetchNotifierProvider.notifier).clearComic(_sessionKey);
+    if (capabilities.exitPolicy == ReadSessionExitPolicy.popRoute) {
       return const ReaderExitPopIntent();
     }
     final String? goLocation = resolveReaderExitNavigation(
       canPop: canPop,
-      comicId: routeContext.comicId,
+      comicId: routeContext.sessionKey,
     );
     if (goLocation == null) {
       return const ReaderExitPopIntent();

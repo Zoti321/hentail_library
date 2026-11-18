@@ -24,6 +24,8 @@ import 'package:hentai_library/features/reader/presentation/views/reader/reader_
 import 'package:hentai_library/features/reader/presentation/patterns/reader/reader_series_catalog_sheet.dart';
 import 'package:hentai_library/features/reader/presentation/patterns/reader/reader_series_volume.dart';
 import 'package:hentai_library/features/reader/presentation/patterns/reader/reader_viewport_status.dart';
+import 'package:hentai_library/features/reader/application/open_reader_args.dart';
+import 'package:hentai_library/features/reader/domain/read_session_capabilities.dart';
 import 'package:hentai_library/features/reader/domain/read_session_source.dart';
 import 'package:hentai_library/features/reader/domain/reading_mode.dart';
 import 'package:hentai_library/features/reader/domain/reading_preferences.dart';
@@ -110,16 +112,19 @@ class ReaderPage extends HookConsumerWidget {
               return const AsyncLoading<ReaderPageViewShell>();
             }
             return AsyncData<ReaderPageViewShell>((
+              subject: state.subject,
               comic: state.comic,
+              capabilities: state.capabilities,
               totalPages: state.totalPages,
             ));
           }),
     );
     final AsyncValue<ReadSessionContextData> sessionAsync = ref.watch(
       readSessionContextForReaderProvider(
-        comicId: routeContext.comicId,
+        comicId: routeContext.sessionKey,
         incognito: routeContext.incognito,
         startFromFirstPage: routeContext.startFromFirstPage,
+        seriesNavigation: routeContext.capabilities.seriesNavigation,
       ),
     );
     final AsyncValue<ReaderPageShellData> shellAsync = combineReaderPageShell(
@@ -220,24 +225,19 @@ class ReaderPage extends HookConsumerWidget {
     }, <Object?>[seriesBoundaryPrompt, context]);
 
     Future<void> exitReader() async {
-      // Image set is MaterialPageRoute-stacked on the Flutter navigator, not
-      // go_router — AppNavigator.pop would miss that route. Use pop() (not
-      // maybePop): PopScope(canPop: false) would re-enter exitReader forever.
-      if (routeContext.isImageSet) {
-        await viewModel.prepareExitReader(
-          routeContext: routeContext,
-          canPop: true,
-        );
-        if (context.mounted) {
-          Navigator.of(context).pop();
-        }
-        return;
-      }
+      final bool preferPop =
+          routeContext.capabilities.exitPolicy ==
+          ReadSessionExitPolicy.popRoute;
       final ReaderExitIntent intent = await viewModel.prepareExitReader(
         routeContext: routeContext,
-        canPop: appNavigatorOf(context).canPop(),
+        canPop: preferPop ? true : appNavigatorOf(context).canPop(),
       );
       if (!context.mounted) {
+        return;
+      }
+      // Image set is MaterialPageRoute-stacked — Navigator.pop, not go_router.
+      if (preferPop) {
+        Navigator.of(context).pop();
         return;
       }
       applyReaderExitIntent(context, intent);
@@ -351,17 +351,18 @@ class _ReaderReadyBody extends ConsumerWidget {
     final ReaderViewModel viewModel = ref.read(
       readerViewModelProvider(viewKey).notifier,
     );
-    final ReaderNavContextData? seriesNavContext = routeContext.isImageSet
-        ? null
-        : (shell.sessionContext.hasSeriesContext
-              ? shell.sessionContext.navContext
-              : null);
+    final bool seriesNavigation = shell.capabilities.seriesNavigation;
+    final ReaderNavContextData? seriesNavContext = seriesNavigation &&
+            shell.sessionContext.hasSeriesContext
+        ? shell.sessionContext.navContext
+        : null;
+    final OpenReaderArgs? comicSession = routeContext.sessionOrNull;
 
     Future<void> requestNextPage() async {
       final ReaderReplaceReaderRouteIntent? intent = await viewModel
           .requestNextPage(
             navContext: seriesNavContext,
-            session: routeContext.isImageSet ? null : routeContext.session,
+            session: comicSession,
           );
       if (!context.mounted) {
         return;
@@ -373,7 +374,7 @@ class _ReaderReadyBody extends ConsumerWidget {
       final ReaderReplaceReaderRouteIntent? intent = await viewModel
           .requestPrevPage(
             navContext: seriesNavContext,
-            session: routeContext.isImageSet ? null : routeContext.session,
+            session: comicSession,
           );
       if (!context.mounted) {
         return;
@@ -394,7 +395,7 @@ class _ReaderReadyBody extends ConsumerWidget {
       fit: StackFit.expand,
       children: <Widget>[
         ReaderLayout(
-          title: shell.comic.title,
+          title: shell.subject.title,
           currentPage: chrome.currentIndex,
           totalPages: shell.totalPages,
           chromeVisible: chrome.showControls,
@@ -411,7 +412,12 @@ class _ReaderReadyBody extends ConsumerWidget {
           onAutoPlayChanged: supportsAutoPlay
               ? viewModel.setAutoPlayEnabled
               : null,
-          onOpenSettings: () => unawaited(ReaderSettingsSheet.show(context)),
+          onOpenSettings: () => unawaited(
+            ReaderSettingsSheet.show(
+              context,
+              seriesAutoPlayModes: shell.capabilities.seriesAutoPlayModes,
+            ),
+          ),
           onOpenSeriesCatalog: seriesNavContext == null
               ? null
               : () => _openSeriesCatalog(
@@ -420,14 +426,14 @@ class _ReaderReadyBody extends ConsumerWidget {
                   routeContext: routeContext,
                   navContext: seriesNavContext,
                 ),
-          moreMenuEntries: routeContext.isImageSet
-              ? const <M3EMenuNode>[]
-              : _buildMoreMenuEntries(
+          moreMenuEntries: shell.capabilities.coverActions
+              ? _buildMoreMenuEntries(
                   context,
                   ref,
                   viewKey: viewKey,
                   seriesId: isSeriesRead ? seriesId : null,
-                ),
+                )
+              : const <M3EMenuNode>[],
           contentBuilder: (FocusNode focusNode) => _ReaderPageContent(
             viewKey: viewKey,
             routeContext: routeContext,
@@ -518,7 +524,7 @@ class _ReaderPageContent extends ConsumerWidget {
           .handleTapZone(
             zone,
             navContext: seriesNavContext,
-            session: routeContext.isImageSet ? null : routeContext.session,
+            session: routeContext.sessionOrNull,
           );
       if (!context.mounted) {
         return;
@@ -535,7 +541,7 @@ class _ReaderPageContent extends ConsumerWidget {
     final ReaderReplaceReaderRouteIntent? intent = await viewModel
         .requestNextPage(
           navContext: navContext,
-          session: routeContext.isImageSet ? null : routeContext.session,
+          session: routeContext.sessionOrNull,
         );
     if (!context.mounted) {
       return;
@@ -551,7 +557,7 @@ class _ReaderPageContent extends ConsumerWidget {
     final ReaderReplaceReaderRouteIntent? intent = await viewModel
         .requestPrevPage(
           navContext: navContext,
-          session: routeContext.isImageSet ? null : routeContext.session,
+          session: routeContext.sessionOrNull,
         );
     if (!context.mounted) {
       return;

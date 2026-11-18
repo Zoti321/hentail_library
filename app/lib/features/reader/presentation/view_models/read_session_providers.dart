@@ -46,7 +46,7 @@ Future<OpenedReadSession> readerSessionOpenFromSource(
   bool startFromFirstPage = false,
 }) {
   return ref
-      .read(openReadSessionServiceProvider)
+      .read(openReadSessionUseCaseProvider)
       .openFromSource(
         source,
         incognito: incognito,
@@ -55,27 +55,49 @@ Future<OpenedReadSession> readerSessionOpenFromSource(
 }
 
 @Riverpod()
+Future<List<ReaderPageImageData>> sessionPages(
+  Ref ref, {
+  required ReadSessionSource source,
+}) async {
+  final List<ReadSessionPage> pages = await ref
+      .read(openReadSessionUseCaseProvider)
+      .loadPages(source);
+  return pages.map(_mapReadSessionPageToUi).toList(growable: false);
+}
+
+/// Comic convenience / legacy viewport key. Prefer [sessionPages] with source.
+@Riverpod()
 Future<List<ReaderPageImageData>> comicImages(
   Ref ref, {
   required String comicId,
   String? chapterId,
 }) async {
-  final List<ReadSessionPage> pages = await ref
-      .read(openReadSessionServiceProvider)
-      .loadPages(comicId);
-  return pages.map(_mapReadSessionPageToUi).toList(growable: false);
+  final service = ref.read(openReadSessionUseCaseProvider);
+  final ReadSessionSource source =
+      service.openedSource(comicId) ?? ComicReadSessionSource(comicId);
+  return sessionPages(ref, source: source);
 }
 
-/// 会话内 keepAlive：翻页回看不因 autoDispose 重载；退出阅读器时由 prefetch clearComic invalidate。
+/// 会话内 keepAlive：翻页回看不因 autoDispose 重载；退出阅读器时由 prefetch clear invalidate。
+@Riverpod(keepAlive: true)
+Future<ReaderPagePayload> sessionReaderPage(
+  Ref ref, {
+  required String sessionKey,
+  required int pageIndex,
+}) {
+  return ref
+      .read(openReadSessionUseCaseProvider)
+      .loadReaderPage(sessionKey: sessionKey, archivePageIndex: pageIndex);
+}
+
+/// Legacy name for [sessionReaderPage].
 @Riverpod(keepAlive: true)
 Future<ReaderPagePayload> comicReaderPage(
   Ref ref, {
   required String comicId,
   required int pageIndex,
 }) {
-  return ref
-      .read(openReadSessionServiceProvider)
-      .loadReaderPage(comicId: comicId, archivePageIndex: pageIndex);
+  return sessionReaderPage(ref, sessionKey: comicId, pageIndex: pageIndex);
 }
 
 @Riverpod()

@@ -52,7 +52,9 @@ class ReaderPrefetchNotifier extends _$ReaderPrefetchNotifier {
     ref.read(readerPageAspectRatiosProvider.notifier).clearComic(comicId);
     // Fire-and-forget: async FRB must not block exit navigation (P2-4).
     unawaited(
-      ref.read(openReadSessionServiceProvider).clearPageCache(comicId: comicId),
+      ref
+          .read(openReadSessionUseCaseProvider)
+          .clearPageCache(sessionKey: comicId),
     );
     ref.invalidate(comicReaderPageProvider);
   }
@@ -117,9 +119,9 @@ class ReaderPrefetchNotifier extends _$ReaderPrefetchNotifier {
       }
     }());
     await ref
-        .read(openReadSessionServiceProvider)
+        .read(openReadSessionUseCaseProvider)
         .prefetchPages(
-          comicId: comicId,
+          sessionKey: comicId,
           archivePageIndexes: targets
               .map((int pageOneBased) => pageOneBased - 1)
               .toList(growable: false),

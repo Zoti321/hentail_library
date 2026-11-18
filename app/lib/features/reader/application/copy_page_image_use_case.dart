@@ -1,22 +1,21 @@
 import 'dart:typed_data';
 
 import 'package:hentai_library/shared/application/errors/app_exception.dart';
-import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
 import 'package:hentai_library/features/reader/domain/clipboard_image_port.dart';
 
 typedef PageImagePngEncoder = Future<Uint8List> Function(Uint8List imageBytes);
 
-/// Session-aware page byte loader (Comic or Image set via OpenReadSessionService).
+/// Session-aware page byte loader (Comic or Image set via OpenReadSessionUseCase).
 typedef CopyPageImageBytesLoader = Future<Uint8List?> Function({
-  required String comicId,
+  required String sessionKey,
   required int archivePageIndex,
 });
 
 /// Copy a reader page to the clipboard (load → encode PNG → write).
 ///
 /// PNG encoding is injected; the engine-backed default lives in data adapters.
-class CopyPageImageService {
-  CopyPageImageService({
+class CopyPageImageUseCase {
+  CopyPageImageUseCase({
     required this.loadPageBytes,
     required this.clipboardImage,
     required this.encodePng,
@@ -27,13 +26,13 @@ class CopyPageImageService {
   final PageImagePngEncoder encodePng;
 
   Future<void> execute({
-    required ReaderComicRef comic,
+    required String sessionKey,
     required int archivePageIndex,
   }) async {
     final Uint8List? sourceBytes;
     try {
       sourceBytes = await loadPageBytes(
-        comicId: comic.comicId,
+        sessionKey: sessionKey,
         archivePageIndex: archivePageIndex,
       );
     } on Object catch (error, stackTrace) {

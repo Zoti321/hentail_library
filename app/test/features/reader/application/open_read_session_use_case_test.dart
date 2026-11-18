@@ -12,7 +12,7 @@ import 'package:hentai_library/features/reader/domain/native_reader_port.dart';
 import 'package:hentai_library/features/reader/application/read_session_page_load_exception.dart';
 import 'package:hentai_library/features/reader/domain/read_session_page.dart';
 import 'package:hentai_library/features/reader/domain/reader_page_payload.dart';
-import 'package:hentai_library/features/reader/application/open_read_session_service.dart';
+import 'package:hentai_library/features/reader/application/open_read_session_use_case.dart';
 import 'package:hentai_library/features/reader/domain/opened_read_session.dart';
 import 'package:test/test.dart';
 
@@ -179,14 +179,14 @@ Comic _inputComic() {
   );
 }
 
-OpenReadSessionService _service({
+OpenReadSessionUseCase _service({
   Comic? comic,
   List<ReadSessionPage>? pages,
   Object? loadError,
   int? storedPageIndex,
   _FakeComicPageSourcePort? pageSource,
 }) {
-  return OpenReadSessionService(
+  return OpenReadSessionUseCase(
     comicLookup: createComicReadQuery(
       _FakeComicRepository(comic: comic ?? _inputComic()),
     ),
@@ -203,13 +203,13 @@ OpenReadSessionService _service({
 }
 
 void main() {
-  group('OpenReadSessionService', () {
+  group('OpenReadSessionUseCase', () {
     test(
       'a hanging native timeout cleanup does not delay the timeout result',
       () async {
         final native = _ControlledNativeReaderPort()
           ..firstClose = Completer<void>();
-        final service = OpenReadSessionService(
+        final service = OpenReadSessionUseCase(
           comicLookup: createComicReadQuery(
             _FakeComicRepository(comic: _inputComic()),
           ),
@@ -248,7 +248,7 @@ void main() {
         pages: [ReadSessionArchivePage(comicId: 'c1', pageIndex: 0)],
       );
       await service.open(comicId: 'c1');
-      final pages = service.loadPages('c1');
+      final pages = service.loadPagesByComicId('c1');
       final checked = expectLater(
         pages,
         throwsA(isA<ReadSessionPageLoadException>()),
@@ -262,7 +262,7 @@ void main() {
       () async {
         final native = _ControlledNativeReaderPort()
           ..firstClose = Completer<void>();
-        final service = OpenReadSessionService(
+        final service = OpenReadSessionUseCase(
           comicLookup: createComicReadQuery(
             _FakeComicRepository(comic: _inputComic()),
           ),
@@ -300,7 +300,7 @@ void main() {
       final repo = _FakeComicRepository(comic: _inputComic())
         ..pendingLookup = pending.future;
       final native = _ControlledNativeReaderPort()..firstOpen.complete();
-      final service = OpenReadSessionService(
+      final service = OpenReadSessionUseCase(
         comicLookup: createComicReadQuery(repo),
         pageSource: _FakeComicPageSourcePort(
           pages: [ReadSessionArchivePage(comicId: 'c1', pageIndex: 0)],
@@ -332,7 +332,7 @@ void main() {
           ReadSessionArchivePage(comicId: 'c1', pageIndex: 1),
         ],
       );
-      final service = OpenReadSessionService(
+      final service = OpenReadSessionUseCase(
         comicLookup: createComicReadQuery(
           _FakeComicRepository(comic: _inputComic()),
         ),
@@ -342,7 +342,7 @@ void main() {
       );
       final ordinary = service.open(comicId: 'c1');
       final incognito = service.open(comicId: 'c1', incognito: true);
-      final listed = service.loadPages('c1');
+      final listed = service.loadPagesByComicId('c1');
       await native.entered.future;
       native.firstOpen.complete();
       expect((await ordinary).resumePageIndex, 2);
@@ -356,7 +356,7 @@ void main() {
       'a reopen waiting for uncancellable native work retains its own timeout',
       () async {
         final native = _ControlledNativeReaderPort();
-        final service = OpenReadSessionService(
+        final service = OpenReadSessionUseCase(
           comicLookup: createComicReadQuery(
             _FakeComicRepository(comic: _inputComic()),
           ),
@@ -395,7 +395,7 @@ void main() {
     test('close failure remains with its caller and late cleanup cannot replace it', () async {
       final error = StateError('native close');
       final native = _ControlledNativeReaderPort()..closeError = error;
-      final service = OpenReadSessionService(
+      final service = OpenReadSessionUseCase(
         comicLookup: createComicReadQuery(
           _FakeComicRepository(comic: _inputComic()),
         ),
@@ -427,7 +427,7 @@ void main() {
           final pages = _FakeComicPageSourcePort(
             pages: [ReadSessionArchivePage(comicId: 'c1', pageIndex: 0)],
           );
-          final service = OpenReadSessionService(
+          final service = OpenReadSessionUseCase(
             comicLookup: createComicReadQuery(
               _FakeComicRepository(comic: _inputComic()),
             ),
@@ -466,7 +466,7 @@ void main() {
         final pages = _FakeComicPageSourcePort(
           pages: [ReadSessionArchivePage(comicId: 'c1', pageIndex: 0)],
         );
-        final service = OpenReadSessionService(
+        final service = OpenReadSessionUseCase(
           comicLookup: createComicReadQuery(
             _FakeComicRepository(comic: _inputComic()),
           ),
@@ -499,7 +499,7 @@ void main() {
       () async {
         final resume = Completer<int?>();
         final entered = Completer<void>();
-        final service = OpenReadSessionService(
+        final service = OpenReadSessionUseCase(
           comicLookup: createComicReadQuery(
             _FakeComicRepository(comic: _inputComic()),
           ),
@@ -525,7 +525,7 @@ void main() {
     );
 
     test('open throws when comic is missing', () async {
-      final OpenReadSessionService service = _service(comic: null);
+      final OpenReadSessionUseCase service = _service(comic: null);
       expect(
         () => service.open(comicId: 'missing'),
         throwsA(isA<ReadSessionPageLoadException>()),
@@ -533,7 +533,7 @@ void main() {
     });
 
     test('open throws when page list is empty', () async {
-      final OpenReadSessionService service = _service(
+      final OpenReadSessionUseCase service = _service(
         pages: <ReadSessionPage>[],
       );
       expect(
@@ -544,7 +544,7 @@ void main() {
 
     test('open returns snapshot with clamped resume index', () async {
       final _FakeNativeReaderPort sessionPort = _FakeNativeReaderPort();
-      final OpenReadSessionService service = OpenReadSessionService(
+      final OpenReadSessionUseCase service = OpenReadSessionUseCase(
         comicLookup: createComicReadQuery(
           _FakeComicRepository(comic: _inputComic()),
         ),
@@ -568,7 +568,7 @@ void main() {
     });
 
     test('open uses page 1 when incognito', () async {
-      final OpenReadSessionService service = _service(
+      final OpenReadSessionUseCase service = _service(
         pages: <ReadSessionPage>[
           ReadSessionArchivePage(comicId: 'c1', pageIndex: 0),
         ],
@@ -584,7 +584,7 @@ void main() {
     });
 
     test('open uses page 1 when startFromFirstPage', () async {
-      final OpenReadSessionService service = _service(
+      final OpenReadSessionUseCase service = _service(
         pages: <ReadSessionPage>[
           ReadSessionArchivePage(comicId: 'c1', pageIndex: 0),
           ReadSessionArchivePage(comicId: 'c1', pageIndex: 1),
@@ -601,7 +601,7 @@ void main() {
     });
 
     test('wraps port failures as ReadSessionPageLoadException', () async {
-      final OpenReadSessionService service = _service(
+      final OpenReadSessionUseCase service = _service(
         loadError: StateError('io failed'),
       );
       expect(
@@ -614,7 +614,7 @@ void main() {
       final _FakeNativeReaderPort sessionPort = _FakeNativeReaderPort(
         openHang: Completer<void>().future,
       );
-      final OpenReadSessionService service = OpenReadSessionService(
+      final OpenReadSessionUseCase service = OpenReadSessionUseCase(
         comicLookup: createComicReadQuery(
           _FakeComicRepository(comic: _inputComic()),
         ),
@@ -643,7 +643,7 @@ void main() {
     });
 
     test('open classifies empty pages as invalidOrEmptyContent', () async {
-      final OpenReadSessionService service = _service(
+      final OpenReadSessionUseCase service = _service(
         pages: <ReadSessionPage>[],
       );
       await expectLater(
@@ -659,7 +659,7 @@ void main() {
     });
 
     test('open classifies missing comic as resourceNotFound', () async {
-      final OpenReadSessionService service = OpenReadSessionService(
+      final OpenReadSessionUseCase service = OpenReadSessionUseCase(
         comicLookup: createComicReadQuery(_FakeComicRepository(comic: null)),
         pageSource: _FakeComicPageSourcePort(pages: <ReadSessionPage>[]),
         readResumePage: _FakeReadingHistoryCommands().readResumePageIndex,
@@ -679,7 +679,7 @@ void main() {
 
     test('close delegates to session port', () async {
       final _FakeNativeReaderPort sessionPort = _FakeNativeReaderPort();
-      final OpenReadSessionService service = OpenReadSessionService(
+      final OpenReadSessionUseCase service = OpenReadSessionUseCase(
         comicLookup: createComicReadQuery(
           _FakeComicRepository(comic: _inputComic()),
         ),
@@ -701,7 +701,7 @@ void main() {
           ReadSessionArchivePage(comicId: 'c1', pageIndex: 1),
         ],
       );
-      final OpenReadSessionService service = OpenReadSessionService(
+      final OpenReadSessionUseCase service = OpenReadSessionUseCase(
         comicLookup: createComicReadQuery(
           _FakeComicRepository(comic: _inputComic()),
         ),
@@ -711,7 +711,7 @@ void main() {
       );
 
       final OpenedReadSession snapshot = await service.open(comicId: 'c1');
-      final List<ReadSessionPage> pages = await service.loadPages('c1');
+      final List<ReadSessionPage> pages = await service.loadPagesByComicId('c1');
 
       expect(snapshot.pages, pages);
       expect(pageSource.loadPagesCallCount, 1);
@@ -724,7 +724,7 @@ void main() {
           ReadSessionArchivePage(comicId: 'c1', pageIndex: 0),
         ],
       );
-      final OpenReadSessionService service = _service(pageSource: pageSource);
+      final OpenReadSessionUseCase service = _service(pageSource: pageSource);
 
       await service.open(comicId: 'c1');
       await service.close('c1');
@@ -742,10 +742,10 @@ void main() {
             Uint8List.fromList(<int>[1, 2, 3]),
           ),
         );
-        final OpenReadSessionService service = _service(pageSource: pageSource);
+        final OpenReadSessionUseCase service = _service(pageSource: pageSource);
 
         final ReaderPagePayload payload = await service.loadReaderPage(
-          comicId: 'c1',
+          sessionKey: 'c1',
           archivePageIndex: 2,
         );
 
@@ -754,7 +754,7 @@ void main() {
     );
 
     test('loadReaderPage throws when comic is missing', () async {
-      final OpenReadSessionService service = OpenReadSessionService(
+      final OpenReadSessionUseCase service = OpenReadSessionUseCase(
         comicLookup: createComicReadQuery(_FakeComicRepository(comic: null)),
         pageSource: _FakeComicPageSourcePort(pages: <ReadSessionPage>[]),
         readResumePage: _FakeReadingHistoryCommands().readResumePageIndex,
@@ -762,7 +762,7 @@ void main() {
       );
 
       expect(
-        () => service.loadReaderPage(comicId: 'missing', archivePageIndex: 0),
+        () => service.loadReaderPage(sessionKey: 'missing', archivePageIndex: 0),
         throwsA(isA<ReadSessionPageLoadException>()),
       );
     });
@@ -771,7 +771,7 @@ void main() {
       final _FakeComicPageSourcePort pageSource = _FakeComicPageSourcePort(
         pages: <ReadSessionPage>[],
       );
-      final OpenReadSessionService service = OpenReadSessionService(
+      final OpenReadSessionUseCase service = OpenReadSessionUseCase(
         comicLookup: createComicReadQuery(
           _FakeComicRepository(
             comic: _inputComic().copyWith.resourceInfo(
@@ -785,7 +785,7 @@ void main() {
       );
 
       await service.prefetchPages(
-        comicId: 'c1',
+        sessionKey: 'c1',
         archivePageIndexes: <int>[0, 1],
         generation: 1,
       );
@@ -797,10 +797,10 @@ void main() {
       final _FakeComicPageSourcePort pageSource = _FakeComicPageSourcePort(
         pages: <ReadSessionPage>[],
       );
-      final OpenReadSessionService service = _service(pageSource: pageSource);
+      final OpenReadSessionUseCase service = _service(pageSource: pageSource);
 
       await service.prefetchPages(
-        comicId: 'c1',
+        sessionKey: 'c1',
         archivePageIndexes: <int>[0, 2],
         generation: 3,
       );
@@ -814,29 +814,29 @@ void main() {
       final _FakeComicPageSourcePort pageSource = _FakeComicPageSourcePort(
         pages: <ReadSessionPage>[],
       );
-      final OpenReadSessionService service = _service(pageSource: pageSource);
+      final OpenReadSessionUseCase service = _service(pageSource: pageSource);
 
-      await service.clearPageCache(comicId: 'c1');
+      await service.clearPageCache(sessionKey: 'c1');
 
       expect(pageSource.clearedComicIds, <String>['c1']);
     });
 
     group('page index convention', () {
       test('uiToArchivePageIndex converts 1-based to 0-based', () {
-        expect(OpenReadSessionService.uiToArchivePageIndex(1), 0);
-        expect(OpenReadSessionService.uiToArchivePageIndex(5), 4);
+        expect(OpenReadSessionUseCase.uiToArchivePageIndex(1), 0);
+        expect(OpenReadSessionUseCase.uiToArchivePageIndex(5), 4);
       });
 
       test('clampOneBasedResumeIndex clamps to total pages', () {
         expect(
-          OpenReadSessionService.clampOneBasedResumeIndex(
+          OpenReadSessionUseCase.clampOneBasedResumeIndex(
             storedPageIndex: 99,
             totalPages: 3,
           ),
           3,
         );
         expect(
-          OpenReadSessionService.clampOneBasedResumeIndex(
+          OpenReadSessionUseCase.clampOneBasedResumeIndex(
             storedPageIndex: null,
             totalPages: 3,
           ),

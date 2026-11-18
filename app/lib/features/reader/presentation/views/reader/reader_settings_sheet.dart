@@ -21,11 +21,14 @@ import 'package:material_symbols_icons/symbols.dart';
 abstract final class ReaderSettingsSheet {
   ReaderSettingsSheet._();
 
-  static Future<void> show(BuildContext context) {
+  static Future<void> show(
+    BuildContext context, {
+    bool seriesAutoPlayModes = true,
+  }) {
     return ReaderAdaptivePanel.show<void>(
       context,
       title: context.l10n.readerSettingsTitle,
-      body: const _ReaderSettingsBody(),
+      body: _ReaderSettingsBody(seriesAutoPlayModes: seriesAutoPlayModes),
     );
   }
 }
@@ -37,7 +40,9 @@ final List<int> _kWebtoonMarginOptions = List<int>.generate(
 );
 
 class _ReaderSettingsBody extends ConsumerWidget {
-  const _ReaderSettingsBody();
+  const _ReaderSettingsBody({this.seriesAutoPlayModes = true});
+
+  final bool seriesAutoPlayModes;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -46,6 +51,9 @@ class _ReaderSettingsBody extends ConsumerWidget {
     final ReadingPreferencesController controller = ref.read(
       readingPreferencesControllerProvider,
     );
+    final List<AutoPlayMode> autoPlayOptions = seriesAutoPlayModes
+        ? AutoPlayMode.values
+        : const <AutoPlayMode>[AutoPlayMode.comicOnce, AutoPlayMode.comicLoop];
 
     final ReadingMode mode = prefs.readingMode;
     final ReaderModeCategory category = mode.category;
@@ -97,8 +105,10 @@ class _ReaderSettingsBody extends ConsumerWidget {
               onTap: () => _pickOption<AutoPlayMode>(
                 context,
                 title: l10n.readerSettingsAutoPlayMode,
-                options: AutoPlayMode.values,
-                current: prefs.autoPlayMode,
+                options: autoPlayOptions,
+                current: autoPlayOptions.contains(prefs.autoPlayMode)
+                    ? prefs.autoPlayMode
+                    : AutoPlayMode.comicOnce,
                 labelOf: l10n.autoPlayModeLabel,
                 onSelected: (AutoPlayMode value) {
                   unawaited(

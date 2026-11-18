@@ -1,6 +1,6 @@
 import 'package:hentai_library/shared/application/navigation/app_routes.dart';
 import 'package:hentai_library/features/reader/application/open_reader_args.dart';
-import 'package:hentai_library/features/reader/application/read_session_application_service.dart';
+import 'package:hentai_library/features/reader/application/manage_read_session_use_case.dart';
 import 'package:hentai_library/features/reader/presentation/providers/session_providers.dart';
 import 'package:hentai_library/features/reader/presentation/routing/reader_route_args.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/reader_auto_play_carry.dart';
@@ -40,8 +40,8 @@ class ReaderSeriesNavigation extends _$ReaderSeriesNavigation {
         false;
     ref.read(readerAutoPlayCarryProvider.notifier).arm(carryAutoPlay);
 
-    final ReadSessionApplicationService sessions = ref.read(
-      readSessionApplicationServiceProvider,
+    final ManageReadSessionUseCase sessions = ref.read(
+      manageReadSessionUseCaseProvider,
     );
     int? currentPageIndex;
     if (!currentSession.incognito) {

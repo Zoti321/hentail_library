@@ -3,11 +3,16 @@ part of 'reader_view_model.dart';
 /// 系列边界提示与翻页命令（#307）：由 [ReaderViewModel] 以 mixin 组合。（自动播放见 reader_view_model_auto_play.dart）
 mixin _ReaderViewModelNavigation on _$ReaderViewModel {
   void _notifyPageChanged(int pageIndex) {
+    final ReaderUiState? current = state.asData?.value;
     final ReaderViewModelKey key = ref.$arg as ReaderViewModelKey;
-    if (key.incognito || key.source.isImageSet) {
+    final bool persist =
+        current?.capabilities.persistProgress ??
+        ReadSessionCapabilities.from(key.source, incognito: key.incognito)
+            .persistProgress;
+    if (key.incognito || !persist) {
       return;
     }
-    ref.read(readSessionApplicationServiceProvider).updatePage(pageIndex);
+    ref.read(manageReadSessionUseCaseProvider).updatePage(pageIndex);
   }
 
   void _updateDataState(ReaderUiState Function(ReaderUiState) updater) {

@@ -23,12 +23,18 @@ Future<void> setComicCoverFromReader(
     ref,
     viewKey: viewKey,
     notStateReadyMessage: l10n.readerStateNotReady,
-    action: (ReaderUiState state) => ref
-        .read(readerCoverEditorProvider.notifier)
-        .setComicCover(
-          state.comic,
-          pageIndex: readerCoverPageIndex(state.currentIndex),
-        ),
+    action: (ReaderUiState state) {
+      final comic = state.comic;
+      if (comic == null) {
+        throw StateError('Comic cover requires a Comic Read session');
+      }
+      return ref
+          .read(readerCoverEditorProvider.notifier)
+          .setComicCover(
+            comic,
+            pageIndex: readerCoverPageIndex(state.currentIndex),
+          );
+    },
     successMessage: l10n.readerComicCoverSet,
     failureMessage: (Object error) => l10n.readerComicCoverSetFailed('$error'),
   );
@@ -47,13 +53,19 @@ Future<void> setSeriesCoverFromReader(
     ref,
     viewKey: viewKey,
     notStateReadyMessage: l10n.readerStateNotReady,
-    action: (ReaderUiState state) => ref
-        .read(readerCoverEditorProvider.notifier)
-        .setSeriesCover(
-          seriesId.trim(),
-          state.comic,
-          pageIndex: readerCoverPageIndex(state.currentIndex),
-        ),
+    action: (ReaderUiState state) {
+      final comic = state.comic;
+      if (comic == null) {
+        throw StateError('Series cover requires a Comic Read session');
+      }
+      return ref
+          .read(readerCoverEditorProvider.notifier)
+          .setSeriesCover(
+            seriesId.trim(),
+            comic,
+            pageIndex: readerCoverPageIndex(state.currentIndex),
+          );
+    },
     successMessage: l10n.readerSeriesCoverSet,
     failureMessage: (Object error) => l10n.readerSeriesCoverSetFailed('$error'),
   );
