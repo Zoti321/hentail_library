@@ -124,16 +124,17 @@ fn write_zip(path: &Path, entries: &[(&str, &[u8])]) {
 fn session_pages_follow_catalog_order_and_start_index() {
     common::with_global_db(|| {
         let fixture = Fixture::new("reader_session_order.sqlite");
-        write_file(&fixture.root.join("loose.jpg"), b"loose-bytes");
+        // ADR-0062: first-level folder is the Image set; root loose files are ignored.
+        write_file(&fixture.root.join("album/loose.jpg"), b"loose-bytes");
         write_zip(
-            &fixture.root.join("pack.zip"),
+            &fixture.root.join("album/pack.zip"),
             &[("002.png", b"zip-two"), ("001.png", b"zip-one")],
         );
-        write_file(&fixture.root.join("album/01.jpg"), b"album-bytes");
+        write_file(&fixture.root.join("ignored.jpg"), b"root-loose-ignored");
         fixture.sync();
 
-        let root_id = fixture.set_id("");
-        let session = fixture.open(&root_id, 1).expect("open at index 1");
+        let set_id = fixture.set_id("album");
+        let session = fixture.open(&set_id, 1).expect("open at index 1");
         let order: Vec<String> = session
             .pages
             .iter()
@@ -141,10 +142,14 @@ fn session_pages_follow_catalog_order_and_start_index() {
             .collect();
         assert_eq!(
             order,
-            vec!["loose.jpg#", "pack.zip#001.png", "pack.zip#002.png"]
+            vec![
+                "album/loose.jpg#",
+                "album/pack.zip#001.png",
+                "album/pack.zip#002.png"
+            ]
         );
         assert_eq!(session.start_index, 1);
-        assert!(fixture.open(&root_id, 3).is_err());
+        assert!(fixture.open(&set_id, 3).is_err());
         assert!(fixture.open("missing-set", 0).is_err());
     });
 }
@@ -153,17 +158,17 @@ fn session_pages_follow_catalog_order_and_start_index() {
 fn session_loads_raw_bytes_for_loose_and_archive_pages() {
     common::with_global_db(|| {
         let fixture = Fixture::new("reader_session_bytes.sqlite");
-        write_file(&fixture.root.join("loose.jpg"), b"loose-bytes");
+        write_file(&fixture.root.join("album/loose.jpg"), b"loose-bytes");
         write_zip(
-            &fixture.root.join("pack.zip"),
+            &fixture.root.join("album/pack.zip"),
             &[("002.png", b"zip-two"), ("001.png", b"zip-one")],
         );
         fixture.sync();
 
-        let root_id = fixture.set_id("");
-        assert_eq!(fixture.load(0, &root_id).unwrap(), b"loose-bytes");
-        assert_eq!(fixture.load(1, &root_id).unwrap(), b"zip-one");
-        assert_eq!(fixture.load(2, &root_id).unwrap(), b"zip-two");
+        let set_id = fixture.set_id("album");
+        assert_eq!(fixture.load(0, &set_id).unwrap(), b"loose-bytes");
+        assert_eq!(fixture.load(1, &set_id).unwrap(), b"zip-one");
+        assert_eq!(fixture.load(2, &set_id).unwrap(), b"zip-two");
     });
 }
 
@@ -171,14 +176,14 @@ fn session_loads_raw_bytes_for_loose_and_archive_pages() {
 fn session_never_writes_comic_reading_history() {
     common::with_global_db(|| {
         let fixture = Fixture::new("reader_session_history.sqlite");
-        write_file(&fixture.root.join("loose.jpg"), b"loose-bytes");
+        write_file(&fixture.root.join("album/loose.jpg"), b"loose-bytes");
         fixture.sync();
 
-        let root_id = fixture.set_id("");
+        let set_id = fixture.set_id("album");
         let before = fixture.comic_history_rows();
-        let session = fixture.open(&root_id, 0).expect("open");
+        let session = fixture.open(&set_id, 0).expect("open");
         assert_eq!(session.pages.len(), 1);
-        fixture.load(0, &root_id).expect("load");
+        fixture.load(0, &set_id).expect("load");
         assert_eq!(fixture.comic_history_rows(), before);
     });
 }
@@ -187,11 +192,11 @@ fn session_never_writes_comic_reading_history() {
 fn session_rejects_carrier_paths_escaping_library_root() {
     common::with_global_db(|| {
         let fixture = Fixture::new("reader_session_traversal.sqlite");
-        write_file(&fixture.root.join("loose.jpg"), b"loose-bytes");
+        write_file(&fixture.root.join("album/loose.jpg"), b"loose-bytes");
         fixture.sync();
         let forged = hentai_core::ImageSetImageDto {
             image_set_image_id: "forged".into(),
-            image_set_id: fixture.set_id(""),
+            image_set_id: fixture.set_id("album"),
             library_id: fixture.library_id.clone(),
             carrier_relative_path: "../outside.jpg".into(),
             member_path: String::new(),
@@ -209,11 +214,11 @@ fn session_rejects_carrier_paths_escaping_library_root() {
 fn page_read_rejects_an_image_from_another_library_before_reading_a_same_named_file() {
     common::with_global_db(|| {
         let fixture = Fixture::new("reader_session_owner.sqlite");
-        write_file(&fixture.root.join("loose.jpg"), b"selected-library");
+        write_file(&fixture.root.join("album/loose.jpg"), b"selected-library");
         fixture.sync();
-        let session = fixture.open(&fixture.set_id(""), 0).expect("session");
+        let session = fixture.open(&fixture.set_id("album"), 0).expect("session");
         let other_root = fixture._temp.path().join("other-pics");
-        write_file(&other_root.join("loose.jpg"), b"wrong-library");
+        write_file(&other_root.join("album/loose.jpg"), b"wrong-library");
         let other = fixture.runtime.block_on(async {
             create_image_set_local_library(&other_root.to_string_lossy(), Some("Other"))
                 .await
@@ -228,7 +233,9 @@ fn page_read_rejects_an_image_from_another_library_before_reading_a_same_named_f
         let error = result.expect_err("a page cannot be resolved against another library");
         assert_eq!(error.code, HentaiErrorCode::Validation);
         assert_eq!(
-            fixture.load(0, &fixture.set_id("")).expect("original page"),
+            fixture
+                .load(0, &fixture.set_id("album"))
+                .expect("original page"),
             b"selected-library"
         );
     });
@@ -238,10 +245,10 @@ fn page_read_rejects_an_image_from_another_library_before_reading_a_same_named_f
 fn page_read_rejects_a_comic_library_even_when_the_carrier_exists() {
     common::with_global_db(|| {
         let fixture = Fixture::new("reader_session_catalog_kind.sqlite");
-        write_file(&fixture.root.join("loose.jpg"), b"selected-library");
+        write_file(&fixture.root.join("album/loose.jpg"), b"selected-library");
         fixture.sync();
         let mut image = fixture
-            .open(&fixture.set_id(""), 0)
+            .open(&fixture.set_id("album"), 0)
             .expect("session")
             .pages
             .remove(0);
