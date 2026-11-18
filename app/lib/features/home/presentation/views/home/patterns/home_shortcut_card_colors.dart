@@ -16,4 +16,11 @@ abstract final class HomeShortcutCardColors {
 
   static Color trashForeground(M3EColorScheme scheme) =>
       scheme.onSecondaryContainer;
+
+  /// 与媒体页资源总览卡同系 primaryContainer，和历史 / 垃圾桶错开色阶。
+  static Color mediaBackground(M3EColorScheme scheme) =>
+      scheme.primaryContainer;
+
+  static Color mediaForeground(M3EColorScheme scheme) =>
+      scheme.onPrimaryContainer;
 }

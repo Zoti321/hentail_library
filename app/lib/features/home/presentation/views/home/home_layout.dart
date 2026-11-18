@@ -1,14 +1,17 @@
-import 'package:hentai_library/features/home/presentation/l10n/home_l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/design-system/design_system.dart';
+import 'package:hentai_library/features/home/presentation/l10n/home_l10n.dart';
 import 'package:hentai_library/features/home/presentation/views/home/home_page_metrics.dart';
+import 'package:hentai_library/features/home/presentation/views/home/patterns/home_aggregate_stats_section.dart';
+import 'package:hentai_library/features/home/presentation/views/home/patterns/home_bento_stat_card.dart';
+import 'package:hentai_library/features/home/presentation/views/home/patterns/home_page_header.dart';
+import 'package:hentai_library/features/home/presentation/views/home/patterns/home_shortcut_card_colors.dart';
+import 'package:hentai_library/features/reading_stats/public.dart';
 import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/patterns/home/home_aggregate_counts.dart';
-import 'package:hentai_library/features/home/presentation/views/home/patterns/home_aggregate_stats_section.dart';
-import 'package:hentai_library/features/reading_stats/public.dart';
-import 'package:hentai_library/features/home/presentation/views/home/patterns/home_page_header.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 /// 生产首页（MD3E）：问候 + 页头 + 聚合统计（含快捷 bento）+ 库列表。
 class HomeLayout extends StatelessWidget {
@@ -89,16 +92,32 @@ class HomeLayout extends StatelessWidget {
                     onOpenCharacters: onOpenCharacters,
                     onOpenTags: onOpenTags,
                   ),
-                  if (onOpenMedia != null)
-                    Card(
-                      child: ListTile(
-                        leading: const Icon(Icons.perm_media_outlined),
-                        title: Text(l10n.mediaTitle),
-                        subtitle: Text(l10n.mediaSubtitle),
-                        trailing: const Icon(Icons.chevron_right),
-                        onTap: onOpenMedia,
+                  if (onOpenMedia != null) ...<Widget>[
+                    SizedBox(
+                      height: HomePageMetrics.sectionVerticalSpacing(
+                        sizeClass,
                       ),
                     ),
+                    HomeBentoStatCard(
+                      label: l10n.mediaTitle,
+                      caption: l10n.mediaSubtitle,
+                      icon: Symbols.perm_media,
+                      backgroundColor: HomeShortcutCardColors.mediaBackground(
+                        scheme,
+                      ),
+                      onBackgroundColor:
+                          HomeShortcutCardColors.mediaForeground(scheme),
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(28),
+                        topRight: Radius.circular(12),
+                        bottomLeft: Radius.circular(12),
+                        bottomRight: Radius.circular(28),
+                      ),
+                      layout: HomeBentoStatLayout.shortcut,
+                      minHeight: 104,
+                      onPressed: onOpenMedia,
+                    ),
+                  ],
                   SizedBox(
                     height: HomePageMetrics.sectionVerticalSpacing(sizeClass),
                   ),

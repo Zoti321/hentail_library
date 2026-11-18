@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/features/home/presentation/views/home/home_page.dart';
+import 'package:hentai_library/features/home/presentation/views/home/home_layout.dart';
 import 'package:hentai_library/features/home/presentation/views/home/patterns/home_aggregate_stats_section.dart';
 import 'package:hentai_library/features/home/presentation/views/home/patterns/home_page_copy.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/home_library_management_section.dart';
@@ -79,6 +79,7 @@ void main() {
           ),
           onOpenHistory: () {},
           onOpenTrash: () {},
+          onOpenMedia: () {},
           libraryManagementSection: HomeLibraryManagementSection(
             libraries: HomePagePreviewData.sampleLibraries(),
             onAddLocalLibrary: () {},
@@ -96,6 +97,8 @@ void main() {
     expect(find.text('查看阅读记录'), findsOneWidget);
     expect(find.text('垃圾桶'), findsOneWidget);
     expect(find.text('可恢复删除'), findsOneWidget);
+    expect(find.text('媒体'), findsOneWidget);
+    expect(find.text('查看本地漫画资源的元数据写入概况。'), findsOneWidget);
     expect(find.text('进入'), findsNothing);
     expect(find.textContaining('2552'), findsOneWidget);
     expect(find.text('我的漫画库'), findsOneWidget);
