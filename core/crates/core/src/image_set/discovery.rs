@@ -29,7 +29,8 @@ pub(crate) struct CarrierObs {
     pub listing: Listing,
 }
 
-/// One Image set folder (or the Library root). `complete` is false when any directory under it failed to list.
+/// One first-level Image set (directory or root-level archive). `complete` is false when any
+/// directory under a folder set failed to list.
 pub(crate) struct SetObs {
     pub relative_path: String,
     pub complete: bool,
@@ -64,7 +65,6 @@ pub(crate) fn observe_library(
         sets: Vec::new(),
         warnings: Vec::new(),
     };
-    let mut root_set = SetObs::new("");
     for entry in &entries {
         if handle.is_cancelled() {
             return Ok(None);
@@ -83,11 +83,27 @@ pub(crate) fn observe_library(
                 obs.sets.push(set);
             }
             ResourceKind::File => {
-                classify_file(entry, &entry.name, &mut root_set, prior, &mut obs.warnings)
+                // Library-root loose images are out of catalog. First-level archives are Image sets.
+                let path = Path::new(&entry.location);
+                if is_comic_image_extension(&extension_lower(path)) {
+                    continue;
+                }
+                let Some(kind) = CarrierKind::archive_for_path(path) else {
+                    continue;
+                };
+                let mut set = SetObs::new(&entry.name);
+                push_archive_carrier(
+                    entry,
+                    &entry.name,
+                    kind,
+                    &mut set,
+                    prior,
+                    &mut obs.warnings,
+                );
+                obs.sets.push(set);
             }
         }
     }
-    obs.sets.push(root_set);
     Ok((!handle.is_cancelled()).then_some(obs))
 }
 
@@ -137,6 +153,17 @@ fn classify_file(
     let Some(kind) = CarrierKind::archive_for_path(path) else {
         return;
     };
+    push_archive_carrier(entry, relative_path, kind, set, prior, warnings);
+}
+
+fn push_archive_carrier(
+    entry: &ResourceEntry,
+    relative_path: &str,
+    kind: CarrierKind,
+    set: &mut SetObs,
+    prior: &PriorCarrierStats,
+    warnings: &mut Vec<String>,
+) {
     let listing = match observe_listing(&entry.location, relative_path, kind, prior) {
         Ok(listing) => listing,
         Err(err) => {

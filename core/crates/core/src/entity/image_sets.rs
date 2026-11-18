@@ -6,10 +6,11 @@ pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub image_set_id: String,
     pub library_id: String,
-    /// `/`-separated path under the Library root; empty for the Library root image set.
+    /// `/`-separated path under the Library root (first-level folder or archive name).
     pub relative_path: String,
-    /// Folder basename; empty for the Library root image set.
+    /// Folder basename or archive file name.
     pub name: String,
+    /// Legacy flag; new sync no longer creates Library root image sets (ADR-0062).
     pub is_root: bool,
 }
 

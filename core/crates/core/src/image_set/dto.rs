@@ -6,9 +6,9 @@ use crate::resource::extension_lower;
 pub struct ImageSetDto {
     pub image_set_id: String,
     pub library_id: String,
-    /// `/`-separated path under the Library root; empty for the Library root image set.
+    /// `/`-separated path under the Library root (first-level folder or archive name).
     pub relative_path: String,
-    /// Folder basename; empty for the Library root image set.
+    /// Folder basename or archive file name.
     pub name: String,
     pub is_root: bool,
 }

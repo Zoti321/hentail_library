@@ -7,7 +7,7 @@ use crate::util::natural_sort::compare_filename_natural;
 
 use super::dto::{ImageSetDto, ImageSetImageDto};
 
-/// Image sets of one library: Library root image set first, then natural order by name.
+/// Image sets of one library in natural order by name (legacy `is_root` rows still sort first).
 pub async fn list_image_sets(library_id: &str) -> Result<Vec<ImageSetDto>, HentaiError> {
     let db = connection()?;
     let mut rows = image_sets::Entity::find()

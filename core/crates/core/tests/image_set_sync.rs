@@ -124,11 +124,10 @@ fn folder_and_root_discover_sets_with_nested_flattened() {
 
         fixture.sync();
 
+        // Library-root loose images are ignored; empty first-level dirs are not sets.
         assert_eq!(
             fixture.catalog(),
             vec![
-                "set \"\"",
-                "img rootonly.jpg #  loose",
                 "set \"album1\"",
                 "img album1/01.jpg #  loose",
                 "img album1/nested/02.png #  loose",
@@ -155,14 +154,28 @@ fn zip_and_root_archives_discover_members_by_entry_path() {
         assert_eq!(
             fixture.catalog(),
             vec![
-                "set \"\"",
-                "img root.zip # 000.jpg zip",
                 "set \"album3\"",
                 "img album3/nested/deep.zip # a/001.png zip",
                 "img album3/pack.cbz # 000.jpg zip",
                 "img album3/pack.cbz # 001.jpg zip",
+                "set \"root.zip\"",
+                "img root.zip # 000.jpg zip",
             ]
         );
+    });
+}
+
+#[test]
+fn empty_root_archive_and_empty_folder_are_not_image_sets() {
+    common::with_global_db(|| {
+        let fixture = Fixture::new("empty_carriers.sqlite");
+        write_zip(&fixture.root.join("empty.zip"), &[("readme.txt", b"text")]);
+        write_file(&fixture.root.join("empty_dir/readme.txt"), b"text");
+        write_file(&fixture.root.join("ignored.jpg"), b"img");
+
+        fixture.sync();
+
+        assert!(fixture.catalog().is_empty());
     });
 }
 
@@ -194,8 +207,6 @@ fn removed_loose_image_disappears_on_next_sync() {
         assert_eq!(
             fixture.catalog(),
             vec![
-                "set \"\"",
-                "img rootonly.jpg #  loose",
                 "set \"album1\"",
                 "img album1/nested/02.png #  loose",
                 "set \"album2\"",
@@ -240,8 +251,6 @@ fn missing_first_level_folder_removes_its_set() {
         assert_eq!(
             fixture.catalog(),
             vec![
-                "set \"\"",
-                "img rootonly.jpg #  loose",
                 "set \"album1\"",
                 "img album1/01.jpg #  loose",
                 "img album1/nested/02.png #  loose",

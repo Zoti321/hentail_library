@@ -140,3 +140,4 @@ Accepted | Superseded by ADR-000N | Deprecated
 | [0059](./0059-single-nightly-dart-test-run.md) | Single nightly Dart test run | Accepted; supersedes ADR-0018 separate nightly UI job |
 | [0060](./0060-page-image-fidelity-source-resolution.md) | Page image fidelity at source resolution | Accepted |
 | [0061](./0061-read-session-capabilities.md) | Multi-source Read session and Capabilities | Accepted; partially supersedes ADR-0005 comicId-only entry wording |
+| [0062](./0062-image-set-discovery-boundary.md) | Image set discovery boundary | Accepted; supersedes first-iteration Library root image set mapping |
