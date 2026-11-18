@@ -434,14 +434,16 @@ pub async fn update_library_settings(
     let mut active: libraries::ActiveModel = model.clone().into();
     active.name = Set(trimmed_name.to_string());
     if is_image_set_catalog(&model.catalog_kind) {
-        if scan_on_startup || scan_interval != ScanInterval::Disabled {
-            return Err(HentaiError::validation("Image set library 仅支持手动同步"));
-        }
         if !groups.is_empty() {
             return Err(HentaiError::validation(
                 "Image set library 不支持 Comic 格式多选",
             ));
         }
+        // Keep formats empty; allow startup/interval scan like other Local libraries (#599).
+        active.enabled_resource_format_categories =
+            Set(serialize_resource_format_categories(&[]));
+        active.scan_on_startup = Set(if scan_on_startup { 1 } else { 0 });
+        active.scan_interval = Set(scan_interval.as_str().to_string());
     } else {
         active.enabled_resource_format_categories =
             Set(serialize_resource_format_categories(&groups));

@@ -4,8 +4,10 @@ mod common;
 
 use hentai_core::library_write::try_acquire_library_write_lock;
 use hentai_core::{
-    create_image_set_local_library, create_local_library, delete_library, init_db_at_path,
-    list_libraries, update_library_settings, update_local_library_root, ScanInterval,
+    create_image_set_local_library, create_local_library, create_sync_handle, delete_library,
+    init_db_at_path, list_image_set_images, list_image_sets, list_libraries, sync_library,
+    update_library_settings, update_local_library_root, ResourceFormatCategory, ScanInterval,
+    SyncScanMode,
 };
 use tempfile::TempDir;
 
@@ -88,7 +90,7 @@ fn local_roots_reject_equal_or_nested_across_catalog_kinds() {
 }
 
 #[test]
-fn image_set_library_rejects_root_remap_and_keeps_files_on_delete() {
+fn image_set_library_allows_scan_settings_and_keeps_files_on_delete() {
     common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
         let db_path = temp.path().join("image_set_delete.sqlite");
@@ -105,19 +107,7 @@ fn image_set_library_rejects_root_remap_and_keeps_files_on_delete() {
                     .await
                     .expect("create");
 
-            let remap_err = update_local_library_root(
-                &library.library_id,
-                &temp.path().join("other").to_string_lossy(),
-            )
-            .await
-            .expect_err("image set root remap");
-            assert!(
-                remap_err.message.contains("不支持更改 Local root"),
-                "{}",
-                remap_err.message
-            );
-
-            let settings_err = update_library_settings(
+            let updated = update_library_settings(
                 &library.library_id,
                 "Renamed",
                 vec![],
@@ -125,22 +115,24 @@ fn image_set_library_rejects_root_remap_and_keeps_files_on_delete() {
                 ScanInterval::Hourly,
             )
             .await
-            .expect_err("image set scheduled sync");
-            assert!(
-                settings_err.message.contains("手动同步"),
-                "{}",
-                settings_err.message
-            );
+            .expect("image set startup/interval settings");
+            assert!(updated.scan_on_startup);
+            assert_eq!(updated.scan_interval, ScanInterval::Hourly);
 
-            update_library_settings(
+            let formats_err = update_library_settings(
                 &library.library_id,
                 "Renamed",
-                vec![],
-                false,
-                ScanInterval::Disabled,
+                vec![ResourceFormatCategory::Archive],
+                true,
+                ScanInterval::Hourly,
             )
             .await
-            .expect("rename only");
+            .expect_err("image set rejects comic formats");
+            assert!(
+                formats_err.message.contains("格式多选"),
+                "{}",
+                formats_err.message
+            );
 
             delete_library(&library.library_id)
                 .await
@@ -150,6 +142,108 @@ fn image_set_library_rejects_root_remap_and_keeps_files_on_delete() {
                 "library row removed"
             );
             assert!(marker.exists(), "disk files must remain");
+        });
+    });
+}
+
+#[test]
+fn image_set_library_root_remap_preserves_relative_catalog_ids() {
+    common::with_global_db(|| {
+        let temp = TempDir::new().expect("tempdir");
+        let db_path = temp.path().join("image_set_remap.sqlite");
+        let root = temp.path().join("images");
+        let moved = temp.path().join("images_moved");
+        std::fs::create_dir_all(root.join("album")).expect("mkdir album");
+        std::fs::write(root.join("album/01.jpg"), b"img").expect("write");
+
+        let runtime = tokio::runtime::Runtime::new().expect("runtime");
+        runtime.block_on(async {
+            init_db_at_path(&db_path).await.expect("init");
+            let library =
+                create_image_set_local_library(&root.to_string_lossy(), Some("Illustrations"))
+                    .await
+                    .expect("create");
+            sync_library(
+                create_sync_handle(),
+                SyncScanMode::Full,
+                false,
+                Some(library.library_id.as_str()),
+                vec![],
+                |_| {},
+            )
+            .await
+            .expect("sync");
+
+            let before_sets = list_image_sets(&library.library_id).await.expect("sets");
+            assert_eq!(before_sets.len(), 1);
+            let set_id = before_sets[0].image_set_id.clone();
+            let before_images = list_image_set_images(&library.library_id, &set_id)
+                .await
+                .expect("images");
+            assert_eq!(before_images.len(), 1);
+            let image_id = before_images[0].image_set_image_id.clone();
+
+            std::fs::rename(&root, &moved).expect("move root");
+            let updated = update_local_library_root(
+                &library.library_id,
+                &moved.to_string_lossy(),
+            )
+            .await
+            .expect("remap");
+            assert_eq!(updated.library_id, library.library_id);
+            assert_eq!(updated.root_path, moved.to_string_lossy());
+
+            let after_sets = list_image_sets(&library.library_id).await.expect("sets after");
+            assert_eq!(after_sets.len(), 1);
+            assert_eq!(after_sets[0].image_set_id, set_id);
+            let after_images = list_image_set_images(&library.library_id, &set_id)
+                .await
+                .expect("images after");
+            assert_eq!(after_images[0].image_set_image_id, image_id);
+        });
+    });
+}
+
+#[test]
+fn image_set_library_unreadable_root_updates_path_without_dropping_catalog() {
+    common::with_global_db(|| {
+        let temp = TempDir::new().expect("tempdir");
+        let db_path = temp.path().join("image_set_unreadable.sqlite");
+        let root = temp.path().join("images");
+        std::fs::create_dir_all(root.join("album")).expect("mkdir");
+        std::fs::write(root.join("album/01.jpg"), b"img").expect("write");
+        let missing = temp.path().join("missing_root");
+
+        let runtime = tokio::runtime::Runtime::new().expect("runtime");
+        runtime.block_on(async {
+            init_db_at_path(&db_path).await.expect("init");
+            let library =
+                create_image_set_local_library(&root.to_string_lossy(), Some("Illustrations"))
+                    .await
+                    .expect("create");
+            sync_library(
+                create_sync_handle(),
+                SyncScanMode::Full,
+                false,
+                Some(library.library_id.as_str()),
+                vec![],
+                |_| {},
+            )
+            .await
+            .expect("sync");
+            let before = list_image_sets(&library.library_id).await.expect("sets");
+            assert_eq!(before.len(), 1);
+
+            let updated = update_local_library_root(
+                &library.library_id,
+                &missing.to_string_lossy(),
+            )
+            .await
+            .expect("save unreadable root");
+            assert_eq!(updated.root_path, missing.to_string_lossy());
+            let after = list_image_sets(&library.library_id).await.expect("sets after");
+            assert_eq!(after.len(), 1);
+            assert_eq!(after[0].image_set_id, before[0].image_set_id);
         });
     });
 }

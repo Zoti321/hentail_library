@@ -8,13 +8,14 @@ void main() {
 
   LocalLibrary lib({
     required String id,
+    String catalogKind = 'comic',
     bool scanOnStartup = false,
     ScanInterval interval = ScanInterval.disabled,
   }) {
     return (
       libraryId: id,
       kind: 'local',
-      catalogKind: 'comic',
+      catalogKind: catalogKind,
       rootPath: '/$id',
       name: id,
       enabledResourceFormatCategories: const [],
@@ -34,6 +35,30 @@ void main() {
       lib(id: 'c', scanOnStartup: true),
     ]);
     expect(ids, ['a', 'c']);
+  });
+
+  test('startup and interval include Image set libraries', () {
+    final DateTime anchor = DateTime.utc(2026, 1, 1, 10);
+    final DateTime after = anchor.add(const Duration(hours: 1));
+    final List<LocalLibrary> libraries = <LocalLibrary>[
+      lib(
+        id: 'img',
+        catalogKind: 'image_set',
+        scanOnStartup: true,
+        interval: ScanInterval.hourly,
+      ),
+      lib(id: 'comic', scanOnStartup: false),
+    ];
+
+    expect(scheduler.libraryIdsForStartupScan(libraries), <String>['img']);
+    expect(
+      scheduler.libraryIdsDueForInterval(
+        libraries: libraries,
+        intervalAnchors: <String, DateTime>{'img': anchor},
+        now: after,
+      ),
+      <String>['img'],
+    );
   });
 
   test('disabled interval never due', () {
