@@ -58,11 +58,6 @@ async fn update_local_library_root_locked(id: &str, root: &str) -> Result<Librar
             "仅 Local library 可更新本地 Library root",
         ));
     }
-    if is_image_set_catalog(&model.catalog_kind) {
-        return Err(HentaiError::validation(
-            "Image set library 不支持更改 Local root",
-        ));
-    }
 
     let existing_libs = super::list_libraries().await?;
     ensure_local_root_not_nested(root, Some(id), &existing_libs)?;
@@ -71,7 +66,9 @@ async fn update_local_library_root_locked(id: &str, root: &str) -> Result<Librar
     let should_migrate = local_access().probe_root(root).is_ok();
     let txn = db.begin().await.map_err(map_db_err)?;
 
-    if should_migrate {
+    // Image set catalog rows are relative-path keyed within library_id; updating root_path
+    // preserves Image set / Image set image identity without comic/series rekeys (#600).
+    if should_migrate && !is_image_set_catalog(&model.catalog_kind) {
         migrate_local_library_root_rows(&txn, id, &old_root, root).await?;
     }
 

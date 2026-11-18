@@ -234,7 +234,7 @@ void main() {
       expect(repo.calls, isEmpty);
     });
 
-    test('image set root change is ignored without updateLocalRoot', () async {
+    test('image set root change calls updateLocalRoot', () async {
       final LocalLibrary original = _lib(
         kind: 'local',
         catalogKind: 'image_set',
@@ -248,13 +248,14 @@ void main() {
               .copyWith(rootPath: r'D:\images2', name: 'Beta')
               .submit(repo, original: original);
       expect(result, isA<LibraryFormApplySucceeded>());
-      expect((result as LibraryFormApplySucceeded).rootChanged, isFalse);
-      expect(repo.calls, <String>['updateSettings']);
+      expect((result as LibraryFormApplySucceeded).rootChanged, isTrue);
+      expect(repo.calls, <String>['updateLocalRoot', 'updateSettings']);
+      expect(repo.lastRoot, r'D:\images2');
       expect(repo.lastName, 'Beta');
     });
 
     test(
-      'image set edit keeps Local-only and root lock but allows scan settings',
+      'image set edit keeps Local-only and allows scan settings',
       () async {
         final original = _lib(
           kind: 'local',
@@ -266,12 +267,14 @@ void main() {
         final repo = _RecordingLibraryRepository();
         final events = _Events();
         final result = await SubmitLibraryFormUseCase(repo, events)(
-          LibraryForm.createRemote().copyWith(
-            name: 'Beta',
-            rootPath: 'https://example.com/dav',
+          LibraryForm.fromLibrary(original).copyWith(
+            isRemote: true,
+            username: 'user',
             password: 'secret',
+            name: 'Beta',
             scanOnStartup: true,
             scanInterval: ScanInterval.daily,
+            enabledResourceFormatCategories: ResourceFormatCategory.all,
           ),
           original: original,
         );

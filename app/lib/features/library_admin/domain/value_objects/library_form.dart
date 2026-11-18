@@ -34,7 +34,7 @@ abstract class LibraryForm with _$LibraryForm {
     );
   }
 
-  /// Image set：Local-only、无格式多选；可设启动/间隔扫描；根路径创建后仍锁定（改根另票）。
+  /// Image set：Local-only、无格式多选；可设启动/间隔扫描与改根。
   factory LibraryForm.createImageSetLocal() {
     return LibraryForm(
       isRemote: false,
@@ -125,11 +125,10 @@ final class LibraryFormApplySucceeded extends LibraryFormApplyResult {
 
 extension LibraryFormOps on LibraryForm {
   LibraryForm normalizedForEdit(LocalLibrary original) {
-    // Catalog/access kind and Image set roots belong to the saved Library.
+    // Catalog/access kind belong to the saved Library; Local root may change for Image sets.
     return copyWith(
       isRemote: isRemoteLibrary(original),
       isImageSet: isImageSetLibrary(original),
-      rootPath: isImageSetLibrary(original) ? original.rootPath : rootPath,
     ).normalized;
   }
 

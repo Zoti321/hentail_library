@@ -43,9 +43,6 @@ class _LibraryEditFormState extends State<LibraryEditForm> {
 
   bool get _isImageSet => widget.form.isImageSet;
 
-  /// Image set 编辑时根路径只读（创建后锁定）。
-  bool get _rootLocked => _isImageSet && !widget.isCreate;
-
   List<_LibraryEditTab> get _tabs => _isRemote
       ? const <_LibraryEditTab>[
           _LibraryEditTab.general,
@@ -146,12 +143,10 @@ class _LibraryEditFormState extends State<LibraryEditForm> {
         rootPath: _isRemote ? null : form.rootPath,
         rootError: _isRemote ? null : validation?.rootError,
         enabled: widget.enabled,
-        onBrowseRoot: _isRemote || _rootLocked
-            ? null
-            : () => widget.onBrowseRoot?.call(),
+        onBrowseRoot: _isRemote ? null : () => widget.onBrowseRoot?.call(),
         onNameChanged: (String value) =>
             _patch((LibraryForm f) => f.copyWith(name: value)),
-        onRootChanged: _isRemote || _rootLocked
+        onRootChanged: _isRemote
             ? null
             : (String value) =>
                   _patch((LibraryForm f) => f.copyWith(rootPath: value)),
