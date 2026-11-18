@@ -8,6 +8,9 @@ import 'package:hentai_library/features/image_set_library/domain/image_set_reade
 abstract interface class ImageSetRepository {
   Future<List<ImageSet>> listImageSets(String libraryId);
 
+  /// 至少有一张图片的图集，按 Image set catalog query 默认顺序（显示名称自然序）。
+  Future<List<ImageSet>> listNonEmptyImageSets(String libraryId);
+
   Future<List<ImageSetImage>> listImageSetImages(
     String libraryId,
     String imageSetId,

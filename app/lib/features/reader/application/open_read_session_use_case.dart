@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:hentai_library/features/reader/application/read_session_page_load_exception.dart';
 import 'package:hentai_library/features/reader/domain/comic_page_source_port.dart';
+import 'package:hentai_library/features/reader/domain/image_set_navigation.dart';
 import 'package:hentai_library/features/reader/domain/image_set_read_port.dart';
 import 'package:hentai_library/features/reader/domain/native_reader_port.dart';
 import 'package:hentai_library/features/reader/domain/opened_read_session.dart';
@@ -157,6 +158,16 @@ class OpenReadSessionUseCase {
 
   ReadSessionSource? openedSource(String sessionKey) =>
       _openedPages[sessionKey]?.source;
+
+  /// Cross–Image set neighbours of [source] in its library's catalog order.
+  Future<ImageSetNavigation> loadImageSetNavigation(
+    ImageSetReadSessionSource source,
+  ) async => ImageSetNavigation.around(
+    await _requireImageSetPort().listNavigableImageSets(
+      libraryId: source.libraryId,
+    ),
+    source.imageSetId,
+  );
 
   Future<void> close(String sessionKey) async {
     final _OpenedPages? opened = _openedPages.remove(sessionKey);

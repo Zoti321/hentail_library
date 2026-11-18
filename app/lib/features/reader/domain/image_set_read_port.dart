@@ -1,5 +1,7 @@
 import 'dart:typed_data';
 
+import 'package:hentai_library/features/reader/domain/image_set_navigation.dart';
+
 /// Reader-owned Image set page descriptor（避免 reader → image_set_library 依赖）。
 class ImageSetReadPage {
   const ImageSetReadPage({
@@ -52,4 +54,9 @@ abstract class ImageSetReadPort {
   });
 
   Future<Uint8List> loadPageBytes(ImageSetReadPage page);
+
+  /// Non-empty Image sets of [libraryId] in Image set catalog order.
+  Future<List<ImageSetNavItem>> listNavigableImageSets({
+    required String libraryId,
+  });
 }

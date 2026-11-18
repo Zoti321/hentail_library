@@ -10,6 +10,7 @@ void main() {
       );
       expect(caps.persistProgress, isTrue);
       expect(caps.seriesNavigation, isTrue);
+      expect(caps.imageSetNavigation, isFalse);
       expect(caps.coverActions, isTrue);
       expect(caps.nativeSession, isTrue);
       expect(caps.nativePrefetch, isTrue);
@@ -27,7 +28,7 @@ void main() {
       expect(caps.exitPolicy, ReadSessionExitPolicy.goToComicDetail);
     });
 
-    test('Image set disables Comic-only capabilities and pops on exit', () {
+    test('Image set enables only Image set navigation and pops on exit', () {
       final caps = ReadSessionCapabilities.from(
         const ImageSetReadSessionSource(
           libraryId: 'lib',
@@ -37,6 +38,7 @@ void main() {
       );
       expect(caps.persistProgress, isFalse);
       expect(caps.seriesNavigation, isFalse);
+      expect(caps.imageSetNavigation, isTrue);
       expect(caps.coverActions, isFalse);
       expect(caps.nativeSession, isFalse);
       expect(caps.nativePrefetch, isFalse);

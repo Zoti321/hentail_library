@@ -1,8 +1,10 @@
 import 'dart:typed_data';
 
+import 'package:hentai_library/features/image_set_library/domain/image_set.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_image.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_reader_session.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_repository.dart';
+import 'package:hentai_library/features/reader/domain/image_set_navigation.dart';
 import 'package:hentai_library/features/reader/domain/image_set_read_port.dart';
 
 /// composition：把 image_set_library repository 接到 Reader [ImageSetReadPort]。
@@ -42,6 +44,16 @@ class ImageSetReadPortAdapter implements ImageSetReadPort {
   Future<Uint8List> loadPageBytes(ImageSetReadPage page) {
     return _repository.loadPageBytes(page.libraryId, _toDomainImage(page));
   }
+
+  @override
+  Future<List<ImageSetNavItem>> listNavigableImageSets({
+    required String libraryId,
+  }) async => <ImageSetNavItem>[
+    for (final ImageSet set in await _repository.listNonEmptyImageSets(
+      libraryId,
+    ))
+      ImageSetNavItem(imageSetId: set.imageSetId, title: set.name),
+  ];
 
   static ImageSetReadPage _toReadPage(ImageSetImage image, int index) {
     return ImageSetReadPage(

@@ -12,9 +12,9 @@ The product module is `features/reader/` (ADR-0038). A **Read session** is its d
 - `ReadSessionPageIndex`, `ReadSessionException`: session values and rule failures in domain.
 - `OpenedReadSession`, `ReaderPagePayload`: domain read models/payloads (`OpenedReadSession` holds subject, source, capabilities, pages, resume index).
 - `NativeReaderPort`, `ComicPageSourcePort`, `ImageSetReadPort`, `ClipboardImagePort`: external capability contracts in domain.
-- `SpreadNavigation`, `AutoPlayBoundaryPolicy`, `PagePrefetchWindow`: pure domain policies.
+- `SpreadNavigation`, `AutoPlayBoundaryPolicy`, `PagePrefetchWindow`, `ImageSetNavigation`: pure domain policies (`ImageSetNavigation` is cross–Image set previous/next in catalog order, no wrap; gated by `ReadSessionCapabilities.imageSetNavigation`, distinct from Series navigation).
 - `OpenReaderArgs`: Comic application input, separate from the entity; Image set uses `ReadSessionSource` / route context.
-- `OpenReadSessionUseCase`, `ManageReadSessionUseCase`, `CopyPageImageUseCase`, `PrepareReaderContextUseCase`: application orchestration.
+- `OpenReadSessionUseCase`, `ManageReadSessionUseCase`, `CopyPageImageUseCase`, `PrepareReaderContextUseCase`: application orchestration. `ManageReadSessionUseCase.prepareImageSetSwitch` closes the current Image set session and returns a new `ImageSetReadSessionSource` (no `OpenReaderArgs`, no progress writes).
 - `ReadSessionPageLoadException`: application error mapping, distinct from a domain invariant failure.
 - `ReaderViewModel` / `ReaderUiState`: page commands and presentation state keyed by `sessionKey` + source.
 - `ReaderChromeNotifier`, `ReaderPrefetchNotifier`, `ReaderTapZone`: presentation concerns, not extra session aggregates.

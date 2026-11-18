@@ -1,7 +1,10 @@
 import 'package:hentai_library/features/reader/application/open_reader_args.dart';
 import 'package:hentai_library/features/reader/application/open_read_session_use_case.dart';
+import 'package:hentai_library/features/reader/application/read_session_page_load_exception.dart';
+import 'package:hentai_library/features/reader/domain/image_set_navigation.dart';
 import 'package:hentai_library/features/reader/domain/read_session.dart';
 import 'package:hentai_library/features/reader/domain/read_session_capabilities.dart';
+import 'package:hentai_library/features/reader/domain/read_session_source.dart';
 import 'package:hentai_library/features/reader/domain/reader_comic_ref.dart';
 import 'package:hentai_library/features/reading_history/public/reading_progress_commands.dart';
 import 'package:hentai_library/features/reading_stats/public/read_session_activity.dart';
@@ -13,7 +16,13 @@ typedef SeriesSwitchPlan = ({
   OpenReaderArgs nextSession,
 });
 
-/// Read session lifecycle：进度落盘 / 活动统计 / close / 系列切卷编排。
+/// 跨图集切换计划：当前会话已关闭，UI 用 [nextSource] 打开新的 Read session。
+typedef ImageSetSwitchPlan = ({
+  String closeSessionKey,
+  ImageSetReadSessionSource nextSource,
+});
+
+/// Read session lifecycle：进度落盘 / 活动统计 / close / 系列切卷与跨图集切换编排。
 class ManageReadSessionUseCase {
   ManageReadSessionUseCase({
     required this.openReadSession,
@@ -153,6 +162,36 @@ class ManageReadSessionUseCase {
         comicId: targetComicId,
         incognito: currentSession.incognito,
         startFromFirstPage: true,
+      ),
+    );
+  }
+
+  /// Image set sessions never persist progress, so switching only checks the
+  /// target is still a non-empty set of the same library and closes the current
+  /// session.
+  Future<ImageSetSwitchPlan> prepareImageSetSwitch({
+    required ImageSetReadSessionSource currentSession,
+    required String targetImageSetId,
+  }) async {
+    if (targetImageSetId == currentSession.imageSetId) {
+      throw ArgumentError.value(
+        targetImageSetId,
+        'targetImageSetId',
+        'must differ from current image set',
+      );
+    }
+    final ImageSetNavigation navigation = await openReadSession
+        .loadImageSetNavigation(currentSession);
+    if (!navigation.contains(targetImageSetId)) {
+      throw ReadSessionPageLoadException.imageSetNotFound(targetImageSetId);
+    }
+    await openReadSession.close(currentSession.sessionKey);
+    return (
+      closeSessionKey: currentSession.sessionKey,
+      nextSource: ImageSetReadSessionSource(
+        libraryId: currentSession.libraryId,
+        imageSetId: targetImageSetId,
+        startIndex: 0,
       ),
     );
   }

@@ -17,6 +17,7 @@ final class ReadSessionCapabilities {
   const ReadSessionCapabilities({
     required this.persistProgress,
     required this.seriesNavigation,
+    required this.imageSetNavigation,
     required this.coverActions,
     required this.nativeSession,
     required this.nativePrefetch,
@@ -29,6 +30,10 @@ final class ReadSessionCapabilities {
 
   /// Series volume navigation, catalog sheet, boundary prompts.
   final bool seriesNavigation;
+
+  /// Previous/next and open-by-id across non-empty Image sets of the same
+  /// library; each jump opens a new Read session source.
+  final bool imageSetNavigation;
 
   /// Set Comic/Series cover actions in the more menu.
   final bool coverActions;
@@ -52,6 +57,7 @@ final class ReadSessionCapabilities {
       ComicReadSessionSource() => ReadSessionCapabilities(
         persistProgress: !incognito,
         seriesNavigation: true,
+        imageSetNavigation: false,
         coverActions: true,
         nativeSession: true,
         nativePrefetch: true,
@@ -61,6 +67,7 @@ final class ReadSessionCapabilities {
       ImageSetReadSessionSource() => const ReadSessionCapabilities(
         persistProgress: false,
         seriesNavigation: false,
+        imageSetNavigation: true,
         coverActions: false,
         nativeSession: false,
         nativePrefetch: false,

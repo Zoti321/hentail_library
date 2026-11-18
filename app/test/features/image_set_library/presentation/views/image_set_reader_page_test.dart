@@ -11,6 +11,7 @@ import 'package:hentai_library/features/image_set_library/presentation/views/ima
 import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:hentai_library/features/reader/application/open_read_session_use_case.dart';
 import 'package:hentai_library/features/reader/domain/comic_page_source_port.dart';
+import 'package:hentai_library/features/reader/domain/image_set_navigation.dart';
 import 'package:hentai_library/features/reader/domain/image_set_read_port.dart';
 import 'package:hentai_library/features/reader/domain/native_reader_port.dart';
 import 'package:hentai_library/features/reader/domain/read_session_page.dart';
@@ -101,6 +102,11 @@ class _FakeImageSetReadPort implements ImageSetReadPort {
   @override
   Future<Uint8List> loadPageBytes(ImageSetReadPage page) async =>
       Uint8List.fromList(_png);
+
+  @override
+  Future<List<ImageSetNavItem>> listNavigableImageSets({
+    required String libraryId,
+  }) async => const <ImageSetNavItem>[];
 }
 
 class _StubComicLookup implements ComicReadQuery {
