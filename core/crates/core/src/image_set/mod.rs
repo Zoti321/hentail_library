@@ -16,7 +16,8 @@ mod writer;
 pub use catalog::{list_image_set_images, list_image_sets};
 pub use dto::{ImageSetDto, ImageSetImageDto};
 pub use meta::{
-    set_image_set_meta_locks, update_image_set_user_meta, SetImageSetMetaLocksDto,
-    UpdateImageSetUserMetaDto,
+    get_image_set_facets, set_image_set_meta_locks, update_image_set_facets,
+    update_image_set_user_meta, ImageSetFacetsDto, SetImageSetMetaLocksDto,
+    UpdateImageSetFacetsDto, UpdateImageSetUserMetaDto,
 };
 pub(crate) use orchestrator::sync_image_set_library;

@@ -43,10 +43,10 @@ pub use author::{
     fetch_author_names_page_result, fetch_authors_page, fetch_authors_page_result,
     get_author_detail, list_all_author_names, list_all_authors, list_author_links,
     list_author_names_for_form, list_distinct_author_names, load_author_image, reject_author_merge,
-    rename_author, rename_author_identity, replace_comic_authors, resolve_author_image,
-    update_author_link, watch_authors, AuthorDetailDto, AuthorFacetCountDto, AuthorIdentity,
-    AuthorImageRef, AuthorImageSlot, AuthorImageSource, AuthorLinkDto, AuthorLinkPlatform,
-    AuthorTopComicDto, PagedAuthorIdentitiesDto, PagedAuthorNamesDto,
+    rename_author, rename_author_identity, replace_comic_authors, replace_image_set_authors,
+    resolve_author_image, update_author_link, watch_authors, AuthorDetailDto, AuthorFacetCountDto,
+    AuthorIdentity, AuthorImageRef, AuthorImageSlot, AuthorImageSource, AuthorLinkDto,
+    AuthorLinkPlatform, AuthorTopComicDto, PagedAuthorIdentitiesDto, PagedAuthorNamesDto,
 };
 pub use character::{list_all_characters, list_distinct_characters};
 pub use comic::{
@@ -78,8 +78,9 @@ pub use home::{
     LibraryHomeStatDto,
 };
 pub use image_set::{
-    list_image_set_images, list_image_sets, set_image_set_meta_locks, update_image_set_user_meta,
-    ImageSetDto, ImageSetImageDto, SetImageSetMetaLocksDto, UpdateImageSetUserMetaDto,
+    get_image_set_facets, list_image_set_images, list_image_sets, set_image_set_meta_locks,
+    update_image_set_facets, update_image_set_user_meta, ImageSetDto, ImageSetFacetsDto,
+    ImageSetImageDto, SetImageSetMetaLocksDto, UpdateImageSetFacetsDto, UpdateImageSetUserMetaDto,
 };
 pub use library::{
     clear_remote_library_credentials, create_image_set_local_library, create_local_library,
@@ -105,8 +106,9 @@ pub use named_facet::{
     count_named_facet_attachments_batch, delete_named_facet_by_names,
     fetch_management_facet_names_page, fetch_named_facet_names_page, fetch_named_facet_page,
     list_all_named_facet_names, list_distinct_named_facet_names, list_named_facet_for_form,
-    merge_named_facet_name, rename_named_facet_name, replace_comic_named_facet, JunctionNamedFacet,
-    ManagementFacetKind, NamedFacetFormEntry, PagedStringNamesDto,
+    merge_named_facet_name, rename_named_facet_name, replace_comic_named_facet,
+    replace_image_set_named_facet, JunctionNamedFacet, ManagementFacetKind, NamedFacetFormEntry,
+    PagedStringNamesDto,
 };
 pub use parody::{list_all_parodies, list_distinct_parodies};
 pub use probe::rebuild_snapshot_from_scan_items;

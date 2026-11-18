@@ -55,6 +55,24 @@ impl JunctionNamedFacet {
         }
     }
 
+    /// Image set bindings on the same dictionary (no Metadata field lock).
+    pub fn image_set_junction_table(self) -> &'static str {
+        match self {
+            Self::Tag => "image_set_tags",
+            Self::Parody => "image_set_parodies",
+            Self::Character => "image_set_characters",
+        }
+    }
+
+    /// `(junction, owner column)` for every owner bound to this dictionary; dictionary
+    /// rename/merge must rewrite all of them before the old dictionary row cascades away.
+    fn owner_junctions(self) -> [(&'static str, &'static str); 2] {
+        [
+            (self.junction_table(), "comic_id"),
+            (self.image_set_junction_table(), "image_set_id"),
+        ]
+    }
+
     pub fn junction_name_column(self) -> &'static str {
         match self {
             Self::Tag => "tag_name",
@@ -127,14 +145,76 @@ pub async fn replace_comic_named_facet<C: ConnectionTrait>(
     comic_id: &str,
     names: &[String],
 ) -> Result<(), HentaiError> {
-    let junction = facet.junction_table();
+    replace_owner_named_facet(
+        db,
+        facet,
+        facet.junction_table(),
+        "comic_id",
+        comic_id,
+        names,
+    )
+    .await
+}
+
+/// Replace-all Image set bindings for one dictionary facet; same name rules as Comic.
+pub async fn replace_image_set_named_facet<C: ConnectionTrait>(
+    db: &C,
+    facet: JunctionNamedFacet,
+    image_set_id: &str,
+    names: &[String],
+) -> Result<(), HentaiError> {
+    replace_owner_named_facet(
+        db,
+        facet,
+        facet.image_set_junction_table(),
+        "image_set_id",
+        image_set_id,
+        names,
+    )
+    .await
+}
+
+/// Names of one dictionary facet bound to one Image set (name ASC).
+pub async fn load_image_set_named_facet<C: ConnectionTrait>(
+    db: &C,
+    facet: JunctionNamedFacet,
+    image_set_id: &str,
+) -> Result<Vec<String>, HentaiError> {
+    let junction = facet.image_set_junction_table();
+    let name_col = facet.junction_name_column();
+    let rows = db
+        .query_all(Statement::from_sql_and_values(
+            sea_orm::DatabaseBackend::Sqlite,
+            format!(
+                "SELECT {name_col} FROM {junction} WHERE image_set_id = ? ORDER BY {name_col} ASC"
+            ),
+            [Value::String(Some(Box::new(image_set_id.to_string())))],
+        ))
+        .await
+        .map_err(map_db_err)?;
+    rows.into_iter()
+        .map(|row| {
+            row.try_get_by_index::<String>(0)
+                .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))
+        })
+        .collect()
+}
+
+async fn replace_owner_named_facet<C: ConnectionTrait>(
+    db: &C,
+    facet: JunctionNamedFacet,
+    junction: &str,
+    owner_col: &str,
+    owner_id: &str,
+    names: &[String],
+) -> Result<(), HentaiError> {
     let name_col = facet.junction_name_column();
     let dict = facet.dict_table();
 
     db.execute(Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
-        format!("DELETE FROM {junction} WHERE comic_id = ?"),
-        [Value::String(Some(Box::new(comic_id.to_string())))],
+        format!("DELETE FROM {junction} WHERE {owner_col} = ?"),
+        [Value::String(Some(Box::new(owner_id.to_string())))],
     ))
     .await
     .map_err(map_db_err)?;
@@ -152,9 +232,9 @@ pub async fn replace_comic_named_facet<C: ConnectionTrait>(
 
         db.execute(Statement::from_sql_and_values(
             sea_orm::DatabaseBackend::Sqlite,
-            format!("INSERT INTO {junction} (comic_id, {name_col}) VALUES (?, ?)"),
+            format!("INSERT INTO {junction} ({owner_col}, {name_col}) VALUES (?, ?)"),
             [
-                Value::String(Some(Box::new(comic_id.to_string()))),
+                Value::String(Some(Box::new(owner_id.to_string()))),
                 Value::String(Some(Box::new(name.clone()))),
             ],
         ))
@@ -391,7 +471,6 @@ async fn rename_named_facet_name_locked(
     let db = connection()?;
     let txn = db.begin().await.map_err(map_db_err)?;
     let dict = facet.dict_table();
-    let junction = facet.junction_table();
     let name_col = facet.junction_name_column();
     let captured = capture_facet_writeback(&txn, facet, "?", vec![old_name.into()]).await?;
 
@@ -403,16 +482,18 @@ async fn rename_named_facet_name_locked(
     .await
     .map_err(map_db_err)?;
 
-    txn.execute(Statement::from_sql_and_values(
-        sea_orm::DatabaseBackend::Sqlite,
-        format!("UPDATE {junction} SET {name_col} = ? WHERE {name_col} = ?"),
-        [
-            Value::String(Some(Box::new(new_name.to_string()))),
-            Value::String(Some(Box::new(old_name.to_string()))),
-        ],
-    ))
-    .await
-    .map_err(map_db_err)?;
+    for (junction, _) in facet.owner_junctions() {
+        txn.execute(Statement::from_sql_and_values(
+            sea_orm::DatabaseBackend::Sqlite,
+            format!("UPDATE {junction} SET {name_col} = ? WHERE {name_col} = ?"),
+            [
+                Value::String(Some(Box::new(new_name.to_string()))),
+                Value::String(Some(Box::new(old_name.to_string()))),
+            ],
+        ))
+        .await
+        .map_err(map_db_err)?;
+    }
 
     txn.execute(Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
@@ -454,7 +535,6 @@ async fn merge_named_facet_name_locked(
     let db = connection()?;
     let txn = db.begin().await.map_err(map_db_err)?;
     let dict = facet.dict_table();
-    let junction = facet.junction_table();
     let name_col = facet.junction_name_column();
     let captured = capture_facet_writeback(&txn, facet, "?", vec![source.into()]).await?;
 
@@ -472,26 +552,28 @@ async fn merge_named_facet_name_locked(
         }
     }
 
-    txn.execute(Statement::from_sql_and_values(
-        sea_orm::DatabaseBackend::Sqlite,
-        format!(
-            "INSERT OR IGNORE INTO {junction} (comic_id, {name_col}) \
-             SELECT comic_id, ? FROM {junction} WHERE {name_col} = ?"
-        ),
-        [
-            Value::String(Some(Box::new(target.to_string()))),
-            Value::String(Some(Box::new(source.to_string()))),
-        ],
-    ))
-    .await
-    .map_err(map_db_err)?;
-    txn.execute(Statement::from_sql_and_values(
-        sea_orm::DatabaseBackend::Sqlite,
-        format!("DELETE FROM {junction} WHERE {name_col} = ?"),
-        [Value::String(Some(Box::new(source.to_string())))],
-    ))
-    .await
-    .map_err(map_db_err)?;
+    for (junction, owner_col) in facet.owner_junctions() {
+        txn.execute(Statement::from_sql_and_values(
+            sea_orm::DatabaseBackend::Sqlite,
+            format!(
+                "INSERT OR IGNORE INTO {junction} ({owner_col}, {name_col}) \
+                 SELECT {owner_col}, ? FROM {junction} WHERE {name_col} = ?"
+            ),
+            [
+                Value::String(Some(Box::new(target.to_string()))),
+                Value::String(Some(Box::new(source.to_string()))),
+            ],
+        ))
+        .await
+        .map_err(map_db_err)?;
+        txn.execute(Statement::from_sql_and_values(
+            sea_orm::DatabaseBackend::Sqlite,
+            format!("DELETE FROM {junction} WHERE {name_col} = ?"),
+            [Value::String(Some(Box::new(source.to_string())))],
+        ))
+        .await
+        .map_err(map_db_err)?;
+    }
     txn.execute(Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
         format!("DELETE FROM {dict} WHERE name = ?"),

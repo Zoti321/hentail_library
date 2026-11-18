@@ -414,10 +414,36 @@ pub async fn replace_comic_authors<C: ConnectionTrait>(
     comic_id: &str,
     author_names: &[String],
 ) -> Result<(), HentaiError> {
+    replace_owner_authors(db, "comic_authors", "comic_id", comic_id, author_names).await
+}
+
+/// Replace-all Author bindings of one Image set on the global `authors` dictionary.
+pub async fn replace_image_set_authors<C: ConnectionTrait>(
+    db: &C,
+    image_set_id: &str,
+    author_names: &[String],
+) -> Result<(), HentaiError> {
+    replace_owner_authors(
+        db,
+        "image_set_authors",
+        "image_set_id",
+        image_set_id,
+        author_names,
+    )
+    .await
+}
+
+async fn replace_owner_authors<C: ConnectionTrait>(
+    db: &C,
+    junction: &str,
+    owner_col: &str,
+    owner_id: &str,
+    author_names: &[String],
+) -> Result<(), HentaiError> {
     db.execute(Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
-        "DELETE FROM comic_authors WHERE comic_id = ?",
-        [Value::from(comic_id.to_string())],
+        format!("DELETE FROM {junction} WHERE {owner_col} = ?"),
+        [Value::from(owner_id.to_string())],
     ))
     .await
     .map_err(map_db_err)?;
@@ -426,13 +452,31 @@ pub async fn replace_comic_authors<C: ConnectionTrait>(
         let id = ensure_author_id(db, &name).await?;
         db.execute(Statement::from_sql_and_values(
             sea_orm::DatabaseBackend::Sqlite,
-            "INSERT INTO comic_authors (comic_id, author_id) VALUES (?, ?)",
-            [Value::from(comic_id.to_string()), Value::from(id)],
+            format!("INSERT INTO {junction} ({owner_col}, author_id) VALUES (?, ?)"),
+            [Value::from(owner_id.to_string()), Value::from(id)],
         ))
         .await
         .map_err(map_db_err)?;
     }
     Ok(())
+}
+
+/// Author display names bound to one Image set (name ASC).
+pub async fn load_image_set_author_names<C: ConnectionTrait>(
+    db: &C,
+    image_set_id: &str,
+) -> Result<Vec<String>, HentaiError> {
+    let rows = db
+        .query_all(Statement::from_sql_and_values(
+            sea_orm::DatabaseBackend::Sqlite,
+            "SELECT a.name FROM image_set_authors j \
+             INNER JOIN authors a ON a.id = j.author_id \
+             WHERE j.image_set_id = ? ORDER BY a.name ASC",
+            [Value::from(image_set_id.to_string())],
+        ))
+        .await
+        .map_err(map_db_err)?;
+    rows.into_iter().map(|row| string_column(&row, 0)).collect()
 }
 
 pub async fn load_author_names_for_comics<C: ConnectionTrait>(

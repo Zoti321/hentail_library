@@ -252,6 +252,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   dco_decode_box_autoadd_update_comic_user_meta_frb_dto(dynamic raw);
 
   @protected
+  UpdateImageSetFacetsDto dco_decode_box_autoadd_update_image_set_facets_dto(
+    dynamic raw,
+  );
+
+  @protected
   UpdateSeriesUserMetaDto dco_decode_box_autoadd_update_series_user_meta_dto(
     dynamic raw,
   );
@@ -328,6 +333,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ImageSetDto dco_decode_image_set_dto(dynamic raw);
+
+  @protected
+  ImageSetFacetsDto dco_decode_image_set_facets_dto(dynamic raw);
 
   @protected
   ImageSetImageDto dco_decode_image_set_image_dto(dynamic raw);
@@ -770,6 +778,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  UpdateImageSetFacetsDto dco_decode_update_image_set_facets_dto(dynamic raw);
+
+  @protected
   UpdateSeriesUserMetaDto dco_decode_update_series_user_meta_dto(dynamic raw);
 
   @protected
@@ -1046,6 +1057,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  UpdateImageSetFacetsDto sse_decode_box_autoadd_update_image_set_facets_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   UpdateSeriesUserMetaDto sse_decode_box_autoadd_update_series_user_meta_dto(
     SseDeserializer deserializer,
   );
@@ -1146,6 +1162,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ImageSetDto sse_decode_image_set_dto(SseDeserializer deserializer);
+
+  @protected
+  ImageSetFacetsDto sse_decode_image_set_facets_dto(
+    SseDeserializer deserializer,
+  );
 
   @protected
   ImageSetImageDto sse_decode_image_set_image_dto(SseDeserializer deserializer);
@@ -1700,6 +1721,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  UpdateImageSetFacetsDto sse_decode_update_image_set_facets_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   UpdateSeriesUserMetaDto sse_decode_update_series_user_meta_dto(
     SseDeserializer deserializer,
   );
@@ -2034,6 +2060,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_box_autoadd_update_image_set_facets_dto(
+    UpdateImageSetFacetsDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_box_autoadd_update_series_user_meta_dto(
     UpdateSeriesUserMetaDto self,
     SseSerializer serializer,
@@ -2161,6 +2193,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_image_set_dto(ImageSetDto self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_image_set_facets_dto(
+    ImageSetFacetsDto self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_image_set_image_dto(
@@ -2852,6 +2890,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_update_comic_user_meta_frb_dto(
     UpdateComicUserMetaFrbDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_update_image_set_facets_dto(
+    UpdateImageSetFacetsDto self,
     SseSerializer serializer,
   );
 

@@ -1,11 +1,13 @@
 use hentai_core::{
-    list_image_set_images as core_list_images, list_image_sets as core_list_sets,
-    load_image_set_page_bytes as core_load_image_set_page_bytes,
+    get_image_set_facets as core_get_facets, list_image_set_images as core_list_images,
+    list_image_sets as core_list_sets, load_image_set_page_bytes as core_load_image_set_page_bytes,
     open_image_set_reader as core_open_image_set_reader,
-    set_image_set_meta_locks as core_set_meta_locks,
+    set_image_set_meta_locks as core_set_meta_locks, update_image_set_facets as core_update_facets,
     update_image_set_user_meta as core_update_meta, ImageSetDto as CoreImageSet,
-    ImageSetImageDto as CoreImageSetImage, ImageSetReaderSessionDto as CoreImageSetReaderSession,
-    SetImageSetMetaLocksDto as CoreSetMetaLocks, UpdateImageSetUserMetaDto as CoreUpdateMeta,
+    ImageSetFacetsDto as CoreFacets, ImageSetImageDto as CoreImageSetImage,
+    ImageSetReaderSessionDto as CoreImageSetReaderSession,
+    SetImageSetMetaLocksDto as CoreSetMetaLocks, UpdateImageSetFacetsDto as CoreUpdateFacets,
+    UpdateImageSetUserMetaDto as CoreUpdateMeta,
 };
 
 use super::init::HentaiErrorDto;
@@ -93,6 +95,61 @@ pub async fn set_image_set_name_locked_frb(
     core_set_meta_locks(&image_set_id, CoreSetMetaLocks { name: Some(locked) })
         .await
         .map_err(HentaiErrorDto::from)
+}
+
+/// Author / Tag / Parody / Character bindings (each name ASC).
+#[derive(Debug, Clone)]
+pub struct ImageSetFacetsDto {
+    pub authors: Vec<String>,
+    pub tags: Vec<String>,
+    pub parodies: Vec<String>,
+    pub characters: Vec<String>,
+}
+
+impl From<CoreFacets> for ImageSetFacetsDto {
+    fn from(value: CoreFacets) -> Self {
+        Self {
+            authors: value.authors,
+            tags: value.tags,
+            parodies: value.parodies,
+            characters: value.characters,
+        }
+    }
+}
+
+/// Replace-all facet patch (`None` = leave unchanged, empty = clear).
+#[derive(Debug, Clone, Default)]
+pub struct UpdateImageSetFacetsDto {
+    pub authors: Option<Vec<String>>,
+    pub tags: Option<Vec<String>>,
+    pub parodies: Option<Vec<String>>,
+    pub characters: Option<Vec<String>>,
+}
+
+pub async fn get_image_set_facets_frb(
+    image_set_id: String,
+) -> Result<ImageSetFacetsDto, HentaiErrorDto> {
+    core_get_facets(&image_set_id)
+        .await
+        .map(ImageSetFacetsDto::from)
+        .map_err(HentaiErrorDto::from)
+}
+
+pub async fn update_image_set_facets_frb(
+    image_set_id: String,
+    patch: UpdateImageSetFacetsDto,
+) -> Result<(), HentaiErrorDto> {
+    core_update_facets(
+        &image_set_id,
+        CoreUpdateFacets {
+            authors: patch.authors,
+            tags: patch.tags,
+            parodies: patch.parodies,
+            characters: patch.characters,
+        },
+    )
+    .await
+    .map_err(HentaiErrorDto::from)
 }
 
 #[derive(Debug, Clone)]

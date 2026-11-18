@@ -11,7 +11,7 @@ import 'init.dart';
 
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `clone`, `clone`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`
 
 Future<List<ImageSetDto>> listImageSetsFrb({required String libraryId}) =>
     RustLib.instance.api.crateApiImageSetListImageSetsFrb(libraryId: libraryId);
@@ -40,6 +40,19 @@ Future<void> setImageSetNameLockedFrb({
 }) => RustLib.instance.api.crateApiImageSetSetImageSetNameLockedFrb(
   imageSetId: imageSetId,
   locked: locked,
+);
+
+Future<ImageSetFacetsDto> getImageSetFacetsFrb({required String imageSetId}) =>
+    RustLib.instance.api.crateApiImageSetGetImageSetFacetsFrb(
+      imageSetId: imageSetId,
+    );
+
+Future<void> updateImageSetFacetsFrb({
+  required String imageSetId,
+  required UpdateImageSetFacetsDto patch,
+}) => RustLib.instance.api.crateApiImageSetUpdateImageSetFacetsFrb(
+  imageSetId: imageSetId,
+  patch: patch,
 );
 
 /// Opens an Image set Read session in catalog order; `start_index` is 0-based.
@@ -99,6 +112,38 @@ class ImageSetDto {
           name == other.name &&
           isRoot == other.isRoot &&
           nameLocked == other.nameLocked;
+}
+
+/// Author / Tag / Parody / Character bindings (each name ASC).
+class ImageSetFacetsDto {
+  final List<String> authors;
+  final List<String> tags;
+  final List<String> parodies;
+  final List<String> characters;
+
+  const ImageSetFacetsDto({
+    required this.authors,
+    required this.tags,
+    required this.parodies,
+    required this.characters,
+  });
+
+  @override
+  int get hashCode =>
+      authors.hashCode ^
+      tags.hashCode ^
+      parodies.hashCode ^
+      characters.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ImageSetFacetsDto &&
+          runtimeType == other.runtimeType &&
+          authors == other.authors &&
+          tags == other.tags &&
+          parodies == other.parodies &&
+          characters == other.characters;
 }
 
 class ImageSetImageDto {
@@ -173,4 +218,39 @@ class ImageSetReaderSessionDto {
           imageSetId == other.imageSetId &&
           pages == other.pages &&
           startIndex == other.startIndex;
+}
+
+/// Replace-all facet patch (`None` = leave unchanged, empty = clear).
+class UpdateImageSetFacetsDto {
+  final List<String>? authors;
+  final List<String>? tags;
+  final List<String>? parodies;
+  final List<String>? characters;
+
+  const UpdateImageSetFacetsDto({
+    this.authors,
+    this.tags,
+    this.parodies,
+    this.characters,
+  });
+
+  static Future<UpdateImageSetFacetsDto> default_() =>
+      RustLib.instance.api.crateApiImageSetUpdateImageSetFacetsDtoDefault();
+
+  @override
+  int get hashCode =>
+      authors.hashCode ^
+      tags.hashCode ^
+      parodies.hashCode ^
+      characters.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is UpdateImageSetFacetsDto &&
+          runtimeType == other.runtimeType &&
+          authors == other.authors &&
+          tags == other.tags &&
+          parodies == other.parodies &&
+          characters == other.characters;
 }
