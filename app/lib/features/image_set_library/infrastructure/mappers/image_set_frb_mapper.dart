@@ -8,6 +8,7 @@ ImageSet imageSetFromFrb(rust.ImageSetDto dto) => ImageSet(
   relativePath: dto.relativePath,
   name: dto.name,
   isRoot: dto.isRoot,
+  nameLocked: dto.nameLocked,
 );
 
 ImageSetImage imageSetImageFromFrb(rust.ImageSetImageDto dto) => ImageSetImage(

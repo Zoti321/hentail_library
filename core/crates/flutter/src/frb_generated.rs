@@ -40,7 +40,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.13.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 915490999;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1601548391;
 
 // Section: executor
 
@@ -4181,6 +4181,47 @@ fn wire__crate__api__logging__set_diagnostic_logging_frb_impl(
         },
     )
 }
+fn wire__crate__api__image_set__set_image_set_name_locked_frb_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "set_image_set_name_locked_frb",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_image_set_id = <String>::sse_decode(&mut deserializer);
+            let api_locked = <bool>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, crate::api::init::HentaiErrorDto>(
+                    (move || async move {
+                        let output_ok = crate::api::image_set::set_image_set_name_locked_frb(
+                            api_image_set_id,
+                            api_locked,
+                        )
+                        .await?;
+                        std::result::Result::Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
 fn wire__crate__api__sync__set_remote_library_credentials_frb_impl(
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -4629,6 +4670,47 @@ fn wire__crate__api__comic__update_comic_user_meta_frb_dto_default_impl(
                         Ok::<_, ()>(crate::api::comic::UpdateComicUserMetaFrbDto::default())?;
                     std::result::Result::Ok(output_ok)
                 })())
+            }
+        },
+    )
+}
+fn wire__crate__api__image_set__update_image_set_name_frb_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "update_image_set_name_frb",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_image_set_id = <String>::sse_decode(&mut deserializer);
+            let api_name = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, crate::api::init::HentaiErrorDto>(
+                    (move || async move {
+                        let output_ok = crate::api::image_set::update_image_set_name_frb(
+                            api_image_set_id,
+                            api_name,
+                        )
+                        .await?;
+                        std::result::Result::Ok(output_ok)
+                    })()
+                    .await,
+                )
             }
         },
     )
@@ -6201,12 +6283,14 @@ impl SseDecode for crate::api::image_set::ImageSetDto {
         let mut var_relativePath = <String>::sse_decode(deserializer);
         let mut var_name = <String>::sse_decode(deserializer);
         let mut var_isRoot = <bool>::sse_decode(deserializer);
+        let mut var_nameLocked = <bool>::sse_decode(deserializer);
         return crate::api::image_set::ImageSetDto {
             image_set_id: var_imageSetId,
             library_id: var_libraryId,
             relative_path: var_relativePath,
             name: var_name,
             is_root: var_isRoot,
+            name_locked: var_nameLocked,
         };
     }
 }
@@ -8503,94 +8587,106 @@ fn pde_ffi_dispatcher_primary_impl(
             rust_vec_len,
             data_len,
         ),
-        114 => wire__crate__api__resource_metadata__set_resource_metadata_enabled_impl(
+        113 => wire__crate__api__image_set__set_image_set_name_locked_frb_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        116 => wire__crate__api__series__set_series_meta_locks_dto_default_impl(
+        115 => wire__crate__api__resource_metadata__set_resource_metadata_enabled_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        120 => wire__crate__api__sync__sync_library_frb_impl(port, ptr, rust_vec_len, data_len),
-        121 => {
+        117 => wire__crate__api__series__set_series_meta_locks_dto_default_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        121 => wire__crate__api__sync__sync_library_frb_impl(port, ptr, rust_vec_len, data_len),
+        122 => {
             wire__crate__api__comic_trash__trash_comics_frb_impl(port, ptr, rust_vec_len, data_len)
         }
-        122 => {
+        123 => {
             wire__crate__api__author__update_author_link_frb_impl(port, ptr, rust_vec_len, data_len)
         }
-        124 => wire__crate__api__comic__update_comic_user_meta_frb_dto_default_impl(
+        125 => wire__crate__api__comic__update_comic_user_meta_frb_dto_default_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        131 => wire__crate__api__series__update_series_user_meta_dto_default_impl(
+        126 => wire__crate__api__image_set__update_image_set_name_frb_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        133 => wire__crate__api__resource_verification__verify_comic_resource_frb_impl(
+        133 => wire__crate__api__series__update_series_user_meta_dto_default_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        134 => wire__crate__api__author__watch_authors_frb_impl(port, ptr, rust_vec_len, data_len),
-        135 => wire__crate__api__comic__watch_comic_changes_impl(port, ptr, rust_vec_len, data_len),
-        136 => wire__crate__api__home__watch_continue_reading_top5_frb_impl(
+        135 => wire__crate__api__resource_verification__verify_comic_resource_frb_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        137 => wire__crate__api__home__watch_home_library_alerts_frb_impl(
+        136 => wire__crate__api__author__watch_authors_frb_impl(port, ptr, rust_vec_len, data_len),
+        137 => wire__crate__api__comic__watch_comic_changes_impl(port, ptr, rust_vec_len, data_len),
+        138 => wire__crate__api__home__watch_continue_reading_top5_frb_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        138 => wire__crate__api__home__watch_home_page_counts_frb_impl(
+        139 => wire__crate__api__home__watch_home_library_alerts_frb_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        139 => wire__crate__api__series__watch_home_series_comic_order_map_frb_impl(
+        140 => wire__crate__api__home__watch_home_page_counts_frb_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        140 => wire__crate__api__home__watch_library_home_stats_frb_impl(
+        141 => wire__crate__api__series__watch_home_series_comic_order_map_frb_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        141 => wire__crate__api__reading_activity__watch_reading_activity_stats_frb_impl(
+        142 => wire__crate__api__home__watch_library_home_stats_frb_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        142 => wire__crate__api__history__watch_reading_history_changes_frb_impl(
+        143 => wire__crate__api__reading_activity__watch_reading_activity_stats_frb_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        143 => wire__crate__api__home__watch_recently_added_on_home_frb_impl(
+        144 => wire__crate__api__history__watch_reading_history_changes_frb_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        144 => wire__crate__api__thumbnail__watch_thumbnail_events_frb_impl(
+        145 => wire__crate__api__home__watch_recently_added_on_home_frb_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        146 => wire__crate__api__thumbnail__watch_thumbnail_events_frb_impl(
             port,
             ptr,
             rust_vec_len,
@@ -8700,55 +8796,55 @@ fn pde_ffi_dispatcher_sync_impl(
         112 => {
             wire__crate__api__logging__set_diagnostic_logging_frb_impl(ptr, rust_vec_len, data_len)
         }
-        113 => wire__crate__api__sync__set_remote_library_credentials_frb_impl(
+        114 => wire__crate__api__sync__set_remote_library_credentials_frb_impl(
             ptr,
             rust_vec_len,
             data_len,
         ),
-        115 => wire__crate__api__series__set_series_item_sort_order_locked_frb_impl(
+        116 => wire__crate__api__series__set_series_item_sort_order_locked_frb_impl(
             ptr,
             rust_vec_len,
             data_len,
         ),
-        117 => {
+        118 => {
             wire__crate__api__series__set_series_meta_locks_frb_impl(ptr, rust_vec_len, data_len)
         }
-        118 => wire__crate__api__thumbnail__set_series_thumbnail_from_page_frb_impl(
+        119 => wire__crate__api__thumbnail__set_series_thumbnail_from_page_frb_impl(
             ptr,
             rust_vec_len,
             data_len,
         ),
-        119 => wire__crate__api__shutdown__shutdown_app_data_frb_impl(ptr, rust_vec_len, data_len),
-        123 => {
+        120 => wire__crate__api__shutdown__shutdown_app_data_frb_impl(ptr, rust_vec_len, data_len),
+        124 => {
             wire__crate__api__comic__update_comic_user_meta_frb_impl(ptr, rust_vec_len, data_len)
         }
-        125 => wire__crate__api__library__update_library_resource_format_categories_frb_impl(
+        127 => wire__crate__api__library__update_library_resource_format_categories_frb_impl(
             ptr,
             rust_vec_len,
             data_len,
         ),
-        126 => {
+        128 => {
             wire__crate__api__library__update_library_settings_frb_impl(ptr, rust_vec_len, data_len)
         }
-        127 => wire__crate__api__library__update_library_sidebar_layout_frb_impl(
+        129 => wire__crate__api__library__update_library_sidebar_layout_frb_impl(
             ptr,
             rust_vec_len,
             data_len,
         ),
-        128 => wire__crate__api__library__update_local_library_root_frb_impl(
+        130 => wire__crate__api__library__update_local_library_root_frb_impl(
             ptr,
             rust_vec_len,
             data_len,
         ),
-        129 => {
+        131 => {
             wire__crate__api__library__update_remote_library_frb_impl(ptr, rust_vec_len, data_len)
         }
-        130 => wire__crate__api__series__update_series_item_sort_order_frb_impl(
+        132 => wire__crate__api__series__update_series_item_sort_order_frb_impl(
             ptr,
             rust_vec_len,
             data_len,
         ),
-        132 => {
+        134 => {
             wire__crate__api__series__update_series_user_meta_frb_impl(ptr, rust_vec_len, data_len)
         }
         _ => unreachable!(),
@@ -9507,6 +9603,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::image_set::ImageSetDto {
             self.relative_path.into_into_dart().into_dart(),
             self.name.into_into_dart().into_dart(),
             self.is_root.into_into_dart().into_dart(),
+            self.name_locked.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -11779,6 +11876,7 @@ impl SseEncode for crate::api::image_set::ImageSetDto {
         <String>::sse_encode(self.relative_path, serializer);
         <String>::sse_encode(self.name, serializer);
         <bool>::sse_encode(self.is_root, serializer);
+        <bool>::sse_encode(self.name_locked, serializer);
     }
 }
 

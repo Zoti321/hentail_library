@@ -1,8 +1,11 @@
 use hentai_core::{
     list_image_set_images as core_list_images, list_image_sets as core_list_sets,
     load_image_set_page_bytes as core_load_image_set_page_bytes,
-    open_image_set_reader as core_open_image_set_reader, ImageSetDto as CoreImageSet,
+    open_image_set_reader as core_open_image_set_reader,
+    set_image_set_meta_locks as core_set_meta_locks,
+    update_image_set_user_meta as core_update_meta, ImageSetDto as CoreImageSet,
     ImageSetImageDto as CoreImageSetImage, ImageSetReaderSessionDto as CoreImageSetReaderSession,
+    SetImageSetMetaLocksDto as CoreSetMetaLocks, UpdateImageSetUserMetaDto as CoreUpdateMeta,
 };
 
 use super::init::HentaiErrorDto;
@@ -14,6 +17,7 @@ pub struct ImageSetDto {
     pub relative_path: String,
     pub name: String,
     pub is_root: bool,
+    pub name_locked: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -35,6 +39,7 @@ impl From<CoreImageSet> for ImageSetDto {
             relative_path: value.relative_path,
             name: value.name,
             is_root: value.is_root,
+            name_locked: value.name_locked,
         }
     }
 }
@@ -67,6 +72,26 @@ pub async fn list_image_set_images_frb(
     core_list_images(&library_id, &image_set_id)
         .await
         .map(|rows| rows.into_iter().map(ImageSetImageDto::from).collect())
+        .map_err(HentaiErrorDto::from)
+}
+
+/// Writes the user name; a written name is auto-locked.
+pub async fn update_image_set_name_frb(
+    image_set_id: String,
+    name: String,
+) -> Result<(), HentaiErrorDto> {
+    core_update_meta(&image_set_id, CoreUpdateMeta { name: Some(name) })
+        .await
+        .map_err(HentaiErrorDto::from)
+}
+
+/// Sets the name Metadata field lock only; unlocking does not rescan.
+pub async fn set_image_set_name_locked_frb(
+    image_set_id: String,
+    locked: bool,
+) -> Result<(), HentaiErrorDto> {
+    core_set_meta_locks(&image_set_id, CoreSetMetaLocks { name: Some(locked) })
+        .await
         .map_err(HentaiErrorDto::from)
 }
 

@@ -92,14 +92,7 @@ pub(crate) fn observe_library(
                     continue;
                 };
                 let mut set = SetObs::new(&entry.name);
-                push_archive_carrier(
-                    entry,
-                    &entry.name,
-                    kind,
-                    &mut set,
-                    prior,
-                    &mut obs.warnings,
-                );
+                push_archive_carrier(entry, &entry.name, kind, &mut set, prior, &mut obs.warnings);
                 obs.sets.push(set);
             }
         }

@@ -18,6 +18,7 @@ mod field;
 mod multi_value;
 mod normalize;
 mod series;
+mod text;
 
 pub use auto_lock::{series_auto_locks, ComicAutoLocks, SeriesAutoLocks};
 pub use comic::{merge_kept_scan_with_existing, merge_refresh_scan_with_existing};
@@ -25,3 +26,4 @@ pub use field::{ComicMetaField, ComicMetaStorage, SeriesMetaField};
 pub use multi_value::{merge_multi_value, MultiValueOp, MultiValuePatch};
 pub use normalize::{normalize_match_tokens, normalize_names, normalize_tag_expression_tokens};
 pub use series::{merge_series_name, resolve_member_sort_order, series_name_needs_write};
+pub use text::{merge_scanned_text, scanned_text_needs_write};

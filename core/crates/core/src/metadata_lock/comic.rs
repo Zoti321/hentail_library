@@ -1,9 +1,7 @@
 use crate::comic::{ComicAuthorDto, ComicDto, ComicMetaLocks};
 use crate::util::decode_basic_html_entities;
 
-fn scanned_text_present(value: &str) -> bool {
-    !value.trim().is_empty()
-}
+use super::text::{merge_scanned_text, scanned_text_present};
 
 fn scanned_optional_text_present(value: &Option<String>) -> bool {
     value
@@ -13,12 +11,7 @@ fn scanned_optional_text_present(value: &Option<String>) -> bool {
 }
 
 fn merge_title(locked: bool, existing: &str, scanned: &str) -> String {
-    let raw = if locked || !scanned_text_present(scanned) {
-        existing
-    } else {
-        scanned
-    };
-    decode_basic_html_entities(raw)
+    decode_basic_html_entities(&merge_scanned_text(locked, existing, scanned))
 }
 
 fn merge_optional_text(

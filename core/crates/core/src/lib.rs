@@ -77,7 +77,10 @@ pub use home::{
     HomeLibraryAlertDto, HomeLibraryAlertKindDto, HomePageCountsDto, HomeRecentlyAddedDto,
     LibraryHomeStatDto,
 };
-pub use image_set::{list_image_set_images, list_image_sets, ImageSetDto, ImageSetImageDto};
+pub use image_set::{
+    list_image_set_images, list_image_sets, set_image_set_meta_locks, update_image_set_user_meta,
+    ImageSetDto, ImageSetImageDto, SetImageSetMetaLocksDto, UpdateImageSetUserMetaDto,
+};
 pub use library::{
     clear_remote_library_credentials, create_image_set_local_library, create_local_library,
     create_remote_library, delete_library, is_image_set_catalog, library_id_from_root,

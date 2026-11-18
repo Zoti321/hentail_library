@@ -8,10 +8,11 @@ pub struct Model {
     pub library_id: String,
     /// `/`-separated path under the Library root (first-level folder or archive name).
     pub relative_path: String,
-    /// Folder basename or archive file name.
+    /// Display name; sync scan source is the `relative_path` basename.
     pub name: String,
     /// Legacy flag; new sync no longer creates Library root image sets (ADR-0062).
     pub is_root: bool,
+    pub name_locked: bool,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

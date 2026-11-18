@@ -28,6 +28,7 @@ pub async fn list_image_sets(library_id: &str) -> Result<Vec<ImageSetDto>, Henta
             relative_path: row.relative_path,
             name: row.name,
             is_root: row.is_root,
+            name_locked: row.name_locked,
         })
         .collect())
 }

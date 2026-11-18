@@ -1,23 +1,13 @@
-fn scanned_text_present(value: &str) -> bool {
-    !value.trim().is_empty()
-}
+use super::text::{merge_scanned_text, scanned_text_needs_write};
 
-/// Folder-derived Series name under Metadata field lock.
-///
-/// Unlocked + non-empty folder name → folder name; otherwise keep existing.
+/// Folder-derived Series name under Metadata field lock ([`merge_scanned_text`]).
 pub fn merge_series_name(name_locked: bool, existing_name: &str, folder_name: &str) -> String {
-    if name_locked || !scanned_text_present(folder_name) {
-        existing_name.to_string()
-    } else {
-        folder_name.to_string()
-    }
+    merge_scanned_text(name_locked, existing_name, folder_name)
 }
 
 /// Whether sync / Metadata refresh should write Series.name.
 pub fn series_name_needs_write(name_locked: bool, existing_name: &str, folder_name: &str) -> bool {
-    !name_locked
-        && scanned_text_present(folder_name)
-        && merge_series_name(false, existing_name, folder_name) != existing_name
+    scanned_text_needs_write(name_locked, existing_name, folder_name)
 }
 
 /// Komga-style SeriesItem order: locked keep value; unlocked use 1-based natural index.

@@ -24,6 +24,24 @@ Future<List<ImageSetImageDto>> listImageSetImagesFrb({
   imageSetId: imageSetId,
 );
 
+/// Writes the user name; a written name is auto-locked.
+Future<void> updateImageSetNameFrb({
+  required String imageSetId,
+  required String name,
+}) => RustLib.instance.api.crateApiImageSetUpdateImageSetNameFrb(
+  imageSetId: imageSetId,
+  name: name,
+);
+
+/// Sets the name Metadata field lock only; unlocking does not rescan.
+Future<void> setImageSetNameLockedFrb({
+  required String imageSetId,
+  required bool locked,
+}) => RustLib.instance.api.crateApiImageSetSetImageSetNameLockedFrb(
+  imageSetId: imageSetId,
+  locked: locked,
+);
+
 /// Opens an Image set Read session in catalog order; `start_index` is 0-based.
 Future<ImageSetReaderSessionDto> openImageSetReaderFrb({
   required String libraryId,
@@ -50,6 +68,7 @@ class ImageSetDto {
   final String relativePath;
   final String name;
   final bool isRoot;
+  final bool nameLocked;
 
   const ImageSetDto({
     required this.imageSetId,
@@ -57,6 +76,7 @@ class ImageSetDto {
     required this.relativePath,
     required this.name,
     required this.isRoot,
+    required this.nameLocked,
   });
 
   @override
@@ -65,7 +85,8 @@ class ImageSetDto {
       libraryId.hashCode ^
       relativePath.hashCode ^
       name.hashCode ^
-      isRoot.hashCode;
+      isRoot.hashCode ^
+      nameLocked.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -76,7 +97,8 @@ class ImageSetDto {
           libraryId == other.libraryId &&
           relativePath == other.relativePath &&
           name == other.name &&
-          isRoot == other.isRoot;
+          isRoot == other.isRoot &&
+          nameLocked == other.nameLocked;
 }
 
 class ImageSetImageDto {

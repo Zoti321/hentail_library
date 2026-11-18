@@ -1,6 +1,7 @@
 use hentai_core::comic::{ComicDto, ComicMetaLocks};
 use hentai_core::metadata_lock::{
-    merge_kept_scan_with_existing, merge_series_name, resolve_member_sort_order, series_auto_locks,
+    merge_kept_scan_with_existing, merge_scanned_text, merge_series_name,
+    resolve_member_sort_order, scanned_text_needs_write, series_auto_locks,
     series_name_needs_write, ComicAutoLocks, ComicMetaField, SeriesMetaField,
 };
 
@@ -188,6 +189,31 @@ fn series_name_unlocked_empty_folder_keeps_existing() {
 #[test]
 fn series_name_needs_write_false_when_unchanged() {
     assert!(!series_name_needs_write(false, "同名", "同名"));
+}
+
+#[test]
+fn scanned_text_locked_keeps_existing() {
+    assert_eq!(merge_scanned_text(true, "用户名", "扫描名"), "用户名");
+    assert!(!scanned_text_needs_write(true, "用户名", "扫描名"));
+}
+
+#[test]
+fn scanned_text_unlocked_nonempty_scan_overwrites() {
+    assert_eq!(merge_scanned_text(false, "旧名", "扫描名"), "扫描名");
+    assert!(scanned_text_needs_write(false, "旧名", "扫描名"));
+}
+
+#[test]
+fn scanned_text_unlocked_empty_or_blank_scan_does_not_clear() {
+    for scanned in ["", "   "] {
+        assert_eq!(merge_scanned_text(false, "旧名", scanned), "旧名");
+        assert!(!scanned_text_needs_write(false, "旧名", scanned));
+    }
+}
+
+#[test]
+fn scanned_text_needs_write_false_when_unchanged() {
+    assert!(!scanned_text_needs_write(false, "同名", "同名"));
 }
 
 #[test]

@@ -440,8 +440,7 @@ pub async fn update_library_settings(
             ));
         }
         // Keep formats empty; allow startup/interval scan like other Local libraries (#599).
-        active.enabled_resource_format_categories =
-            Set(serialize_resource_format_categories(&[]));
+        active.enabled_resource_format_categories = Set(serialize_resource_format_categories(&[]));
         active.scan_on_startup = Set(if scan_on_startup { 1 } else { 0 });
         active.scan_interval = Set(scan_interval.as_str().to_string());
     } else {

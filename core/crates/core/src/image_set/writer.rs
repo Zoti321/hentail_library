@@ -1,3 +1,4 @@
+use sea_orm::sea_query::Expr;
 use sea_orm::{ColumnTrait, DatabaseTransaction, EntityTrait, QueryFilter};
 
 use crate::db::map_db_err;
@@ -32,6 +33,16 @@ pub(crate) async fn apply_image_set_plan(
     for chunk in plan.sets_delete.chunks(CHUNK) {
         image_sets::Entity::delete_many()
             .filter(image_sets::Column::ImageSetId.is_in(chunk.to_vec()))
+            .exec(txn)
+            .await
+            .map_err(map_db_err)?;
+    }
+    for (id, name) in &plan.sets_update {
+        // A user write committed after planning wins over the stale scan merge.
+        image_sets::Entity::update_many()
+            .col_expr(image_sets::Column::Name, Expr::value(name.clone()))
+            .filter(image_sets::Column::ImageSetId.eq(id.as_str()))
+            .filter(image_sets::Column::NameLocked.eq(false))
             .exec(txn)
             .await
             .map_err(map_db_err)?;

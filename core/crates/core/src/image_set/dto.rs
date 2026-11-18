@@ -8,9 +8,11 @@ pub struct ImageSetDto {
     pub library_id: String,
     /// `/`-separated path under the Library root (first-level folder or archive name).
     pub relative_path: String,
-    /// Folder basename or archive file name.
+    /// Display name; sync scan source is the folder basename or archive file name.
     pub name: String,
     pub is_root: bool,
+    /// Metadata field lock on `name`; sync keeps a locked name.
+    pub name_locked: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

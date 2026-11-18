@@ -8,8 +8,9 @@ use std::path::{Path, PathBuf};
 
 use hentai_core::{
     cancel_sync, connection, create_image_set_local_library, create_sync_handle, delete_library,
-    init_db_at_path, list_image_set_images, list_image_sets, sync_library, HentaiError, SyncHandle,
-    SyncLibraryProgressDto, SyncScanMode,
+    init_db_at_path, list_image_set_images, list_image_sets, set_image_set_meta_locks,
+    sync_library, update_image_set_user_meta, HentaiError, ImageSetDto, SetImageSetMetaLocksDto,
+    SyncHandle, SyncLibraryProgressDto, SyncScanMode, UpdateImageSetUserMetaDto,
 };
 use sea_orm::{ConnectionTrait, DatabaseBackend, Statement};
 use tempfile::TempDir;
@@ -82,6 +83,35 @@ impl Fixture {
             }
             lines
         })
+    }
+
+    fn set(&self, relative_path: &str) -> ImageSetDto {
+        self.runtime
+            .block_on(list_image_sets(&self.library_id))
+            .expect("sets")
+            .into_iter()
+            .find(|set| set.relative_path == relative_path)
+            .expect("set present")
+    }
+
+    fn rename(&self, relative_path: &str, name: &str) -> Result<(), HentaiError> {
+        let id = self.set(relative_path).image_set_id;
+        self.runtime.block_on(update_image_set_user_meta(
+            &id,
+            UpdateImageSetUserMetaDto {
+                name: Some(name.to_string()),
+            },
+        ))
+    }
+
+    fn set_name_lock(&self, relative_path: &str, locked: bool) {
+        let id = self.set(relative_path).image_set_id;
+        self.runtime
+            .block_on(set_image_set_meta_locks(
+                &id,
+                SetImageSetMetaLocksDto { name: Some(locked) },
+            ))
+            .expect("set lock");
     }
 }
 
@@ -337,6 +367,72 @@ fn failed_catalog_write_rolls_back_and_retry_converges() {
         assert!(fixture
             .catalog()
             .contains(&"img album5/new.jpg #  loose".to_string()));
+    });
+}
+
+#[test]
+fn new_image_sets_take_basename_unlocked() {
+    common::with_global_db(|| {
+        let fixture = Fixture::new("name_new.sqlite");
+        layout_folder_and_root(&fixture.root);
+        common::write_cbz(&fixture.root.join("root.zip"), 1);
+        fixture.sync();
+
+        let album = fixture.set("album1");
+        assert_eq!(album.name, "album1");
+        assert!(!album.name_locked);
+        assert_eq!(fixture.set("root.zip").name, "root.zip");
+    });
+}
+
+#[test]
+fn user_name_write_auto_locks_and_survives_sync() {
+    common::with_global_db(|| {
+        let fixture = Fixture::new("name_locked.sqlite");
+        layout_folder_and_root(&fixture.root);
+        fixture.sync();
+
+        fixture.rename("album1", "  我的图集  ").expect("rename");
+        let renamed = fixture.set("album1");
+        assert_eq!(renamed.name, "我的图集");
+        assert!(renamed.name_locked);
+
+        fixture.sync();
+        let after = fixture.set("album1");
+        assert_eq!(after.name, "我的图集");
+        assert!(after.name_locked);
+    });
+}
+
+#[test]
+fn unlock_alone_keeps_name_until_next_sync_overwrites_with_basename() {
+    common::with_global_db(|| {
+        let fixture = Fixture::new("name_unlock.sqlite");
+        layout_folder_and_root(&fixture.root);
+        fixture.sync();
+        fixture.rename("album1", "我的图集").expect("rename");
+
+        fixture.set_name_lock("album1", false);
+        let unlocked = fixture.set("album1");
+        assert_eq!(unlocked.name, "我的图集");
+        assert!(!unlocked.name_locked);
+
+        fixture.sync();
+        assert_eq!(fixture.set("album1").name, "album1");
+    });
+}
+
+#[test]
+fn blank_user_name_is_rejected() {
+    common::with_global_db(|| {
+        let fixture = Fixture::new("name_blank.sqlite");
+        layout_folder_and_root(&fixture.root);
+        fixture.sync();
+
+        assert!(fixture.rename("album1", "   ").is_err());
+        let album = fixture.set("album1");
+        assert_eq!(album.name, "album1");
+        assert!(!album.name_locked);
     });
 }
 

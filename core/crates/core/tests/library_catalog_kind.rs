@@ -184,16 +184,15 @@ fn image_set_library_root_remap_preserves_relative_catalog_ids() {
             let image_id = before_images[0].image_set_image_id.clone();
 
             std::fs::rename(&root, &moved).expect("move root");
-            let updated = update_local_library_root(
-                &library.library_id,
-                &moved.to_string_lossy(),
-            )
-            .await
-            .expect("remap");
+            let updated = update_local_library_root(&library.library_id, &moved.to_string_lossy())
+                .await
+                .expect("remap");
             assert_eq!(updated.library_id, library.library_id);
             assert_eq!(updated.root_path, moved.to_string_lossy());
 
-            let after_sets = list_image_sets(&library.library_id).await.expect("sets after");
+            let after_sets = list_image_sets(&library.library_id)
+                .await
+                .expect("sets after");
             assert_eq!(after_sets.len(), 1);
             assert_eq!(after_sets[0].image_set_id, set_id);
             let after_images = list_image_set_images(&library.library_id, &set_id)
@@ -234,14 +233,14 @@ fn image_set_library_unreadable_root_updates_path_without_dropping_catalog() {
             let before = list_image_sets(&library.library_id).await.expect("sets");
             assert_eq!(before.len(), 1);
 
-            let updated = update_local_library_root(
-                &library.library_id,
-                &missing.to_string_lossy(),
-            )
-            .await
-            .expect("save unreadable root");
+            let updated =
+                update_local_library_root(&library.library_id, &missing.to_string_lossy())
+                    .await
+                    .expect("save unreadable root");
             assert_eq!(updated.root_path, missing.to_string_lossy());
-            let after = list_image_sets(&library.library_id).await.expect("sets after");
+            let after = list_image_sets(&library.library_id)
+                .await
+                .expect("sets after");
             assert_eq!(after.len(), 1);
             assert_eq!(after[0].image_set_id, before[0].image_set_id);
         });

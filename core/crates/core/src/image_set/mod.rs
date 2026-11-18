@@ -8,10 +8,15 @@ mod catalog;
 mod discovery;
 mod dto;
 mod ids;
+mod meta;
 mod orchestrator;
 mod plan;
 mod writer;
 
 pub use catalog::{list_image_set_images, list_image_sets};
 pub use dto::{ImageSetDto, ImageSetImageDto};
+pub use meta::{
+    set_image_set_meta_locks, update_image_set_user_meta, SetImageSetMetaLocksDto,
+    UpdateImageSetUserMetaDto,
+};
 pub(crate) use orchestrator::sync_image_set_library;

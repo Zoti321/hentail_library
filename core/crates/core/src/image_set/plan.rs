@@ -1,6 +1,7 @@
 use std::collections::{BTreeSet, HashMap, HashSet};
 
 use crate::entity::{image_set_carriers, image_set_images, image_sets};
+use crate::metadata_lock::merge_scanned_text;
 
 use super::discovery::{CarrierObs, LibraryObs, Listing, SetObs};
 use super::dto::CarrierKind;
@@ -18,6 +19,8 @@ pub(crate) struct PriorCatalog {
 #[derive(Default)]
 pub(crate) struct ImageSetPlan {
     pub sets_insert: Vec<image_sets::Model>,
+    /// `(image_set_id, name)` for kept sets whose unlocked name follows a new scan basename.
+    pub sets_update: Vec<(String, String)>,
     pub sets_delete: Vec<String>,
     /// Carrier paths whose row is deleted; changed carriers appear here and in `carriers_insert`.
     pub carriers_delete: Vec<String>,
@@ -147,12 +150,21 @@ pub(crate) fn plan_image_set_sync(
         images.retain(|image| seen.insert(image.image_set_image_id.clone()));
         let keep_set = !images.is_empty() || (!complete && prior_set_by_rel.contains_key(rel));
         if keep_set {
+            let scanned = rel.rsplit('/').next().unwrap_or(rel);
+            let (name, name_locked) = match prior_set_by_rel.get(rel) {
+                Some(p) => (
+                    merge_scanned_text(p.name_locked, &p.name, scanned),
+                    p.name_locked,
+                ),
+                None => (scanned.to_string(), false),
+            };
             desired_sets.push(image_sets::Model {
                 image_set_id: set_id,
                 library_id: library_id.to_string(),
                 relative_path: rel.to_string(),
-                name: rel.to_string(),
+                name,
                 is_root: rel.is_empty(),
+                name_locked,
             });
             desired_images.extend(images);
             desired_carriers.extend(carriers);
@@ -169,7 +181,11 @@ fn diff(
     desired_images: Vec<image_set_images::Model>,
     desired_carriers: Vec<image_set_carriers::Model>,
 ) -> ImageSetPlan {
-    let prior_set_ids: HashSet<&str> = prior.sets.iter().map(|s| s.image_set_id.as_str()).collect();
+    let prior_sets: HashMap<&str, &image_sets::Model> = prior
+        .sets
+        .iter()
+        .map(|s| (s.image_set_id.as_str(), s))
+        .collect();
     let desired_set_ids: HashSet<&str> = desired_sets
         .iter()
         .map(|s| s.image_set_id.as_str())
@@ -216,8 +232,17 @@ fn diff(
     ImageSetPlan {
         sets_insert: desired_sets
             .iter()
-            .filter(|s| !prior_set_ids.contains(s.image_set_id.as_str()))
+            .filter(|s| !prior_sets.contains_key(s.image_set_id.as_str()))
             .cloned()
+            .collect(),
+        sets_update: desired_sets
+            .iter()
+            .filter(|s| {
+                prior_sets
+                    .get(s.image_set_id.as_str())
+                    .is_some_and(|p| p.name != s.name)
+            })
+            .map(|s| (s.image_set_id.clone(), s.name.clone()))
             .collect(),
         sets_delete: prior
             .sets
