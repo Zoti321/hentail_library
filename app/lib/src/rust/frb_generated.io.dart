@@ -186,7 +186,25 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PlatformInt64 dco_decode_box_autoadd_i_64(dynamic raw);
 
   @protected
+  ImageSetAuthorGroupDto dco_decode_box_autoadd_image_set_author_group_dto(
+    dynamic raw,
+  );
+
+  @protected
+  ImageSetCarrierShapeDto dco_decode_box_autoadd_image_set_carrier_shape_dto(
+    dynamic raw,
+  );
+
+  @protected
+  ImageSetFilterDto dco_decode_box_autoadd_image_set_filter_dto(dynamic raw);
+
+  @protected
   ImageSetImageDto dco_decode_box_autoadd_image_set_image_dto(dynamic raw);
+
+  @protected
+  ImageSetSortOptionDto dco_decode_box_autoadd_image_set_sort_option_dto(
+    dynamic raw,
+  );
 
   @protected
   MatchTierDto dco_decode_box_autoadd_match_tier_dto(dynamic raw);
@@ -332,16 +350,40 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PlatformInt64 dco_decode_i_64(dynamic raw);
 
   @protected
+  ImageSetAuthorGroupDto dco_decode_image_set_author_group_dto(dynamic raw);
+
+  @protected
+  ImageSetCarrierShapeDto dco_decode_image_set_carrier_shape_dto(dynamic raw);
+
+  @protected
+  ImageSetCatalogItemDto dco_decode_image_set_catalog_item_dto(dynamic raw);
+
+  @protected
   ImageSetDto dco_decode_image_set_dto(dynamic raw);
 
   @protected
+  ImageSetFacetFilterDto dco_decode_image_set_facet_filter_dto(dynamic raw);
+
+  @protected
   ImageSetFacetsDto dco_decode_image_set_facets_dto(dynamic raw);
+
+  @protected
+  ImageSetFilterDto dco_decode_image_set_filter_dto(dynamic raw);
+
+  @protected
+  ImageSetGroupingDto dco_decode_image_set_grouping_dto(dynamic raw);
 
   @protected
   ImageSetImageDto dco_decode_image_set_image_dto(dynamic raw);
 
   @protected
   ImageSetReaderSessionDto dco_decode_image_set_reader_session_dto(dynamic raw);
+
+  @protected
+  ImageSetSortFieldDto dco_decode_image_set_sort_field_dto(dynamic raw);
+
+  @protected
+  ImageSetSortOptionDto dco_decode_image_set_sort_option_dto(dynamic raw);
 
   @protected
   ImportComicMetadataResultDto dco_decode_import_comic_metadata_result_dto(
@@ -408,6 +450,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<HomeRecentlyAddedDto> dco_decode_list_home_recently_added_dto(
+    dynamic raw,
+  );
+
+  @protected
+  List<ImageSetCatalogItemDto> dco_decode_list_image_set_catalog_item_dto(
     dynamic raw,
   );
 
@@ -540,6 +587,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PlatformInt64? dco_decode_opt_box_autoadd_i_64(dynamic raw);
 
   @protected
+  ImageSetAuthorGroupDto? dco_decode_opt_box_autoadd_image_set_author_group_dto(
+    dynamic raw,
+  );
+
+  @protected
+  ImageSetCarrierShapeDto?
+  dco_decode_opt_box_autoadd_image_set_carrier_shape_dto(dynamic raw);
+
+  @protected
   MatchTierDto? dco_decode_opt_box_autoadd_match_tier_dto(dynamic raw);
 
   @protected
@@ -598,6 +654,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   PagedComicResultDto dco_decode_paged_comic_result_dto(dynamic raw);
+
+  @protected
+  PagedImageSetCatalogDto dco_decode_paged_image_set_catalog_dto(dynamic raw);
 
   @protected
   PagedReadingHistoryDto dco_decode_paged_reading_history_dto(dynamic raw);
@@ -973,7 +1032,27 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PlatformInt64 sse_decode_box_autoadd_i_64(SseDeserializer deserializer);
 
   @protected
+  ImageSetAuthorGroupDto sse_decode_box_autoadd_image_set_author_group_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  ImageSetCarrierShapeDto sse_decode_box_autoadd_image_set_carrier_shape_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  ImageSetFilterDto sse_decode_box_autoadd_image_set_filter_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   ImageSetImageDto sse_decode_box_autoadd_image_set_image_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  ImageSetSortOptionDto sse_decode_box_autoadd_image_set_sort_option_dto(
     SseDeserializer deserializer,
   );
 
@@ -1161,10 +1240,40 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PlatformInt64 sse_decode_i_64(SseDeserializer deserializer);
 
   @protected
+  ImageSetAuthorGroupDto sse_decode_image_set_author_group_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  ImageSetCarrierShapeDto sse_decode_image_set_carrier_shape_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  ImageSetCatalogItemDto sse_decode_image_set_catalog_item_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   ImageSetDto sse_decode_image_set_dto(SseDeserializer deserializer);
 
   @protected
+  ImageSetFacetFilterDto sse_decode_image_set_facet_filter_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   ImageSetFacetsDto sse_decode_image_set_facets_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  ImageSetFilterDto sse_decode_image_set_filter_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  ImageSetGroupingDto sse_decode_image_set_grouping_dto(
     SseDeserializer deserializer,
   );
 
@@ -1173,6 +1282,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ImageSetReaderSessionDto sse_decode_image_set_reader_session_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  ImageSetSortFieldDto sse_decode_image_set_sort_field_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  ImageSetSortOptionDto sse_decode_image_set_sort_option_dto(
     SseDeserializer deserializer,
   );
 
@@ -1257,6 +1376,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<HomeRecentlyAddedDto> sse_decode_list_home_recently_added_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  List<ImageSetCatalogItemDto> sse_decode_list_image_set_catalog_item_dto(
     SseDeserializer deserializer,
   );
 
@@ -1415,6 +1539,17 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PlatformInt64? sse_decode_opt_box_autoadd_i_64(SseDeserializer deserializer);
 
   @protected
+  ImageSetAuthorGroupDto? sse_decode_opt_box_autoadd_image_set_author_group_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  ImageSetCarrierShapeDto?
+  sse_decode_opt_box_autoadd_image_set_carrier_shape_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   MatchTierDto? sse_decode_opt_box_autoadd_match_tier_dto(
     SseDeserializer deserializer,
   );
@@ -1481,6 +1616,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   PagedComicResultDto sse_decode_paged_comic_result_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  PagedImageSetCatalogDto sse_decode_paged_image_set_catalog_dto(
     SseDeserializer deserializer,
   );
 
@@ -1958,8 +2098,32 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_box_autoadd_image_set_author_group_dto(
+    ImageSetAuthorGroupDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_box_autoadd_image_set_carrier_shape_dto(
+    ImageSetCarrierShapeDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_box_autoadd_image_set_filter_dto(
+    ImageSetFilterDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_box_autoadd_image_set_image_dto(
     ImageSetImageDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_box_autoadd_image_set_sort_option_dto(
+    ImageSetSortOptionDto self,
     SseSerializer serializer,
   );
 
@@ -2192,11 +2356,47 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_i_64(PlatformInt64 self, SseSerializer serializer);
 
   @protected
+  void sse_encode_image_set_author_group_dto(
+    ImageSetAuthorGroupDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_image_set_carrier_shape_dto(
+    ImageSetCarrierShapeDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_image_set_catalog_item_dto(
+    ImageSetCatalogItemDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_image_set_dto(ImageSetDto self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_image_set_facet_filter_dto(
+    ImageSetFacetFilterDto self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_image_set_facets_dto(
     ImageSetFacetsDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_image_set_filter_dto(
+    ImageSetFilterDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_image_set_grouping_dto(
+    ImageSetGroupingDto self,
     SseSerializer serializer,
   );
 
@@ -2209,6 +2409,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_image_set_reader_session_dto(
     ImageSetReaderSessionDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_image_set_sort_field_dto(
+    ImageSetSortFieldDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_image_set_sort_option_dto(
+    ImageSetSortOptionDto self,
     SseSerializer serializer,
   );
 
@@ -2308,6 +2520,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_home_recently_added_dto(
     List<HomeRecentlyAddedDto> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_image_set_catalog_item_dto(
+    List<ImageSetCatalogItemDto> self,
     SseSerializer serializer,
   );
 
@@ -2519,6 +2737,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_opt_box_autoadd_image_set_author_group_dto(
+    ImageSetAuthorGroupDto? self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_opt_box_autoadd_image_set_carrier_shape_dto(
+    ImageSetCarrierShapeDto? self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_opt_box_autoadd_match_tier_dto(
     MatchTierDto? self,
     SseSerializer serializer,
@@ -2602,6 +2832,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_paged_comic_result_dto(
     PagedComicResultDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_paged_image_set_catalog_dto(
+    PagedImageSetCatalogDto self,
     SseSerializer serializer,
   );
 

@@ -7,11 +7,12 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../frb_generated.dart';
+import 'comic.dart';
 import 'init.dart';
 
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `clone`, `clone`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`
 
 Future<List<ImageSetDto>> listImageSetsFrb({required String libraryId}) =>
     RustLib.instance.api.crateApiImageSetListImageSetsFrb(libraryId: libraryId);
@@ -22,6 +23,19 @@ Future<List<ImageSetImageDto>> listImageSetImagesFrb({
 }) => RustLib.instance.api.crateApiImageSetListImageSetImagesFrb(
   libraryId: libraryId,
   imageSetId: imageSetId,
+);
+
+/// One clamped page of the Image set catalog (filter / sort / Author grouping).
+Future<PagedImageSetCatalogDto> fetchImageSetsPageFrb({
+  required PageRequestDto request,
+  required ImageSetFilterDto filter,
+  required ImageSetSortOptionDto sort,
+  required ImageSetGroupingDto grouping,
+}) => RustLib.instance.api.crateApiImageSetFetchImageSetsPageFrb(
+  request: request,
+  filter: filter,
+  sort: sort,
+  grouping: grouping,
 );
 
 /// Writes the user name; a written name is auto-locked.
@@ -75,6 +89,61 @@ Future<Uint8List> loadImageSetPageBytesFrb({
   image: image,
 );
 
+class ImageSetAuthorGroupDto {
+  final PlatformInt64 authorId;
+  final String name;
+
+  const ImageSetAuthorGroupDto({required this.authorId, required this.name});
+
+  @override
+  int get hashCode => authorId.hashCode ^ name.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ImageSetAuthorGroupDto &&
+          runtimeType == other.runtimeType &&
+          authorId == other.authorId &&
+          name == other.name;
+}
+
+enum ImageSetCarrierShapeDto { directory, rootArchive }
+
+class ImageSetCatalogItemDto {
+  final ImageSetDto imageSet;
+  final PlatformInt64 imageCount;
+  final PlatformInt64 createdAt;
+  final ImageSetCarrierShapeDto carrierShape;
+  final ImageSetAuthorGroupDto? groupAuthor;
+
+  const ImageSetCatalogItemDto({
+    required this.imageSet,
+    required this.imageCount,
+    required this.createdAt,
+    required this.carrierShape,
+    this.groupAuthor,
+  });
+
+  @override
+  int get hashCode =>
+      imageSet.hashCode ^
+      imageCount.hashCode ^
+      createdAt.hashCode ^
+      carrierShape.hashCode ^
+      groupAuthor.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ImageSetCatalogItemDto &&
+          runtimeType == other.runtimeType &&
+          imageSet == other.imageSet &&
+          imageCount == other.imageCount &&
+          createdAt == other.createdAt &&
+          carrierShape == other.carrierShape &&
+          groupAuthor == other.groupAuthor;
+}
+
 class ImageSetDto {
   final String imageSetId;
   final String libraryId;
@@ -114,6 +183,28 @@ class ImageSetDto {
           nameLocked == other.nameLocked;
 }
 
+/// Facet bucket: any bound name (case-insensitive) OR, when `unassigned`, no binding.
+class ImageSetFacetFilterDto {
+  final List<String> any;
+  final bool unassigned;
+
+  const ImageSetFacetFilterDto({required this.any, required this.unassigned});
+
+  static Future<ImageSetFacetFilterDto> default_() =>
+      RustLib.instance.api.crateApiImageSetImageSetFacetFilterDtoDefault();
+
+  @override
+  int get hashCode => any.hashCode ^ unassigned.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ImageSetFacetFilterDto &&
+          runtimeType == other.runtimeType &&
+          any == other.any &&
+          unassigned == other.unassigned;
+}
+
 /// Author / Tag / Parody / Character bindings (each name ASC).
 class ImageSetFacetsDto {
   final List<String> authors;
@@ -145,6 +236,53 @@ class ImageSetFacetsDto {
           parodies == other.parodies &&
           characters == other.characters;
 }
+
+/// Catalog query filter for one Image set library; buckets AND-combine.
+class ImageSetFilterDto {
+  final String libraryId;
+  final ImageSetFacetFilterDto authors;
+  final ImageSetFacetFilterDto tags;
+  final ImageSetFacetFilterDto parodies;
+  final ImageSetFacetFilterDto characters;
+  final ImageSetCarrierShapeDto? carrierShape;
+  final bool requireImages;
+
+  const ImageSetFilterDto({
+    required this.libraryId,
+    required this.authors,
+    required this.tags,
+    required this.parodies,
+    required this.characters,
+    this.carrierShape,
+    required this.requireImages,
+  });
+
+  @override
+  int get hashCode =>
+      libraryId.hashCode ^
+      authors.hashCode ^
+      tags.hashCode ^
+      parodies.hashCode ^
+      characters.hashCode ^
+      carrierShape.hashCode ^
+      requireImages.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ImageSetFilterDto &&
+          runtimeType == other.runtimeType &&
+          libraryId == other.libraryId &&
+          authors == other.authors &&
+          tags == other.tags &&
+          parodies == other.parodies &&
+          characters == other.characters &&
+          carrierShape == other.carrierShape &&
+          requireImages == other.requireImages;
+}
+
+/// `ByAuthor` repeats a multi-author set once per matching Author group; unassigned group last.
+enum ImageSetGroupingDto { none, byAuthor }
 
 class ImageSetImageDto {
   final String imageSetImageId;
@@ -218,6 +356,62 @@ class ImageSetReaderSessionDto {
           imageSetId == other.imageSetId &&
           pages == other.pages &&
           startIndex == other.startIndex;
+}
+
+enum ImageSetSortFieldDto {
+  name,
+  imageCount,
+  createdAt,
+  relativePath;
+
+  static Future<ImageSetSortFieldDto> default_() =>
+      RustLib.instance.api.crateApiImageSetImageSetSortFieldDtoDefault();
+}
+
+class ImageSetSortOptionDto {
+  final ImageSetSortFieldDto field;
+  final bool descending;
+
+  const ImageSetSortOptionDto({required this.field, required this.descending});
+
+  @override
+  int get hashCode => field.hashCode ^ descending.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ImageSetSortOptionDto &&
+          runtimeType == other.runtimeType &&
+          field == other.field &&
+          descending == other.descending;
+}
+
+class PagedImageSetCatalogDto {
+  final List<ImageSetCatalogItemDto> items;
+  final PlatformInt64 totalCount;
+  final int page;
+  final int pageSize;
+
+  const PagedImageSetCatalogDto({
+    required this.items,
+    required this.totalCount,
+    required this.page,
+    required this.pageSize,
+  });
+
+  @override
+  int get hashCode =>
+      items.hashCode ^ totalCount.hashCode ^ page.hashCode ^ pageSize.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PagedImageSetCatalogDto &&
+          runtimeType == other.runtimeType &&
+          items == other.items &&
+          totalCount == other.totalCount &&
+          page == other.page &&
+          pageSize == other.pageSize;
 }
 
 /// Replace-all facet patch (`None` = leave unchanged, empty = clear).

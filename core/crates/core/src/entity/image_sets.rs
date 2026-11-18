@@ -13,6 +13,8 @@ pub struct Model {
     /// Legacy flag; new sync no longer creates Library root image sets (ADR-0062).
     pub is_root: bool,
     pub name_locked: bool,
+    /// Catalog insertion time (epoch ms); kept across syncs while the set exists.
+    pub created_at: i64,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

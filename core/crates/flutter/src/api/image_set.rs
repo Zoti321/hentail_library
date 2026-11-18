@@ -1,15 +1,17 @@
 use hentai_core::{
-    get_image_set_facets as core_get_facets, list_image_set_images as core_list_images,
-    list_image_sets as core_list_sets, load_image_set_page_bytes as core_load_image_set_page_bytes,
+    fetch_image_sets_page as core_fetch_page, get_image_set_facets as core_get_facets,
+    list_image_set_images as core_list_images, list_image_sets as core_list_sets,
+    load_image_set_page_bytes as core_load_image_set_page_bytes,
     open_image_set_reader as core_open_image_set_reader,
     set_image_set_meta_locks as core_set_meta_locks, update_image_set_facets as core_update_facets,
     update_image_set_user_meta as core_update_meta, ImageSetDto as CoreImageSet,
     ImageSetFacetsDto as CoreFacets, ImageSetImageDto as CoreImageSetImage,
-    ImageSetReaderSessionDto as CoreImageSetReaderSession,
+    ImageSetReaderSessionDto as CoreImageSetReaderSession, ImageSetSortFieldDto as CoreSortField,
     SetImageSetMetaLocksDto as CoreSetMetaLocks, UpdateImageSetFacetsDto as CoreUpdateFacets,
     UpdateImageSetUserMetaDto as CoreUpdateMeta,
 };
 
+use super::comic::PageRequestDto;
 use super::init::HentaiErrorDto;
 
 #[derive(Debug, Clone)]
@@ -74,6 +76,177 @@ pub async fn list_image_set_images_frb(
     core_list_images(&library_id, &image_set_id)
         .await
         .map(|rows| rows.into_iter().map(ImageSetImageDto::from).collect())
+        .map_err(HentaiErrorDto::from)
+}
+
+/// Facet bucket: any bound name (case-insensitive) OR, when `unassigned`, no binding.
+#[derive(Debug, Clone, Default)]
+pub struct ImageSetFacetFilterDto {
+    pub any: Vec<String>,
+    pub unassigned: bool,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ImageSetCarrierShapeDto {
+    Directory,
+    RootArchive,
+}
+
+/// Catalog query filter for one Image set library; buckets AND-combine.
+#[derive(Debug, Clone)]
+pub struct ImageSetFilterDto {
+    pub library_id: String,
+    pub authors: ImageSetFacetFilterDto,
+    pub tags: ImageSetFacetFilterDto,
+    pub parodies: ImageSetFacetFilterDto,
+    pub characters: ImageSetFacetFilterDto,
+    pub carrier_shape: Option<ImageSetCarrierShapeDto>,
+    pub require_images: bool,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum ImageSetSortFieldDto {
+    #[default]
+    Name,
+    ImageCount,
+    CreatedAt,
+    RelativePath,
+}
+
+#[derive(Debug, Clone)]
+pub struct ImageSetSortOptionDto {
+    pub field: ImageSetSortFieldDto,
+    pub descending: bool,
+}
+
+/// `ByAuthor` repeats a multi-author set once per matching Author group; unassigned group last.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ImageSetGroupingDto {
+    None,
+    ByAuthor,
+}
+
+#[derive(Debug, Clone)]
+pub struct ImageSetAuthorGroupDto {
+    pub author_id: i64,
+    pub name: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct ImageSetCatalogItemDto {
+    pub image_set: ImageSetDto,
+    pub image_count: i64,
+    pub created_at: i64,
+    pub carrier_shape: ImageSetCarrierShapeDto,
+    pub group_author: Option<ImageSetAuthorGroupDto>,
+}
+
+#[derive(Debug, Clone)]
+pub struct PagedImageSetCatalogDto {
+    pub items: Vec<ImageSetCatalogItemDto>,
+    pub total_count: i64,
+    pub page: i32,
+    pub page_size: i32,
+}
+
+impl From<ImageSetFacetFilterDto> for hentai_core::ImageSetFacetFilterDto {
+    fn from(value: ImageSetFacetFilterDto) -> Self {
+        Self {
+            any: value.any,
+            unassigned: value.unassigned,
+        }
+    }
+}
+
+impl From<ImageSetCarrierShapeDto> for hentai_core::ImageSetCarrierShapeDto {
+    fn from(value: ImageSetCarrierShapeDto) -> Self {
+        match value {
+            ImageSetCarrierShapeDto::Directory => Self::Directory,
+            ImageSetCarrierShapeDto::RootArchive => Self::RootArchive,
+        }
+    }
+}
+
+impl From<hentai_core::ImageSetCarrierShapeDto> for ImageSetCarrierShapeDto {
+    fn from(value: hentai_core::ImageSetCarrierShapeDto) -> Self {
+        match value {
+            hentai_core::ImageSetCarrierShapeDto::Directory => Self::Directory,
+            hentai_core::ImageSetCarrierShapeDto::RootArchive => Self::RootArchive,
+        }
+    }
+}
+
+impl From<ImageSetFilterDto> for hentai_core::ImageSetFilterDto {
+    fn from(value: ImageSetFilterDto) -> Self {
+        Self {
+            library_id: value.library_id,
+            authors: value.authors.into(),
+            tags: value.tags.into(),
+            parodies: value.parodies.into(),
+            characters: value.characters.into(),
+            carrier_shape: value.carrier_shape.map(Into::into),
+            require_images: value.require_images,
+        }
+    }
+}
+
+impl From<ImageSetSortOptionDto> for hentai_core::ImageSetSortOptionDto {
+    fn from(value: ImageSetSortOptionDto) -> Self {
+        Self {
+            field: match value.field {
+                ImageSetSortFieldDto::Name => CoreSortField::Name,
+                ImageSetSortFieldDto::ImageCount => CoreSortField::ImageCount,
+                ImageSetSortFieldDto::CreatedAt => CoreSortField::CreatedAt,
+                ImageSetSortFieldDto::RelativePath => CoreSortField::RelativePath,
+            },
+            descending: value.descending,
+        }
+    }
+}
+
+impl From<ImageSetGroupingDto> for hentai_core::ImageSetGroupingDto {
+    fn from(value: ImageSetGroupingDto) -> Self {
+        match value {
+            ImageSetGroupingDto::None => Self::None,
+            ImageSetGroupingDto::ByAuthor => Self::ByAuthor,
+        }
+    }
+}
+
+impl From<hentai_core::PagedImageSetCatalogDto> for PagedImageSetCatalogDto {
+    fn from(value: hentai_core::PagedImageSetCatalogDto) -> Self {
+        Self {
+            items: value
+                .items
+                .into_iter()
+                .map(|item| ImageSetCatalogItemDto {
+                    image_set: item.image_set.into(),
+                    image_count: item.image_count,
+                    created_at: item.created_at,
+                    carrier_shape: item.carrier_shape.into(),
+                    group_author: item.group_author.map(|author| ImageSetAuthorGroupDto {
+                        author_id: author.author_id,
+                        name: author.name,
+                    }),
+                })
+                .collect(),
+            total_count: value.total_count,
+            page: value.page,
+            page_size: value.page_size,
+        }
+    }
+}
+
+/// One clamped page of the Image set catalog (filter / sort / Author grouping).
+pub async fn fetch_image_sets_page_frb(
+    request: PageRequestDto,
+    filter: ImageSetFilterDto,
+    sort: ImageSetSortOptionDto,
+    grouping: ImageSetGroupingDto,
+) -> Result<PagedImageSetCatalogDto, HentaiErrorDto> {
+    core_fetch_page(request.into(), filter.into(), sort.into(), grouping.into())
+        .await
+        .map(PagedImageSetCatalogDto::from)
         .map_err(HentaiErrorDto::from)
 }
 

@@ -78,9 +78,12 @@ pub use home::{
     LibraryHomeStatDto,
 };
 pub use image_set::{
-    get_image_set_facets, list_image_set_images, list_image_sets, set_image_set_meta_locks,
-    update_image_set_facets, update_image_set_user_meta, ImageSetDto, ImageSetFacetsDto,
-    ImageSetImageDto, SetImageSetMetaLocksDto, UpdateImageSetFacetsDto, UpdateImageSetUserMetaDto,
+    fetch_image_sets_page, get_image_set_facets, list_image_set_images, list_image_sets,
+    set_image_set_meta_locks, update_image_set_facets, update_image_set_user_meta,
+    ImageSetAuthorGroupDto, ImageSetCarrierShapeDto, ImageSetCatalogItemDto, ImageSetDto,
+    ImageSetFacetFilterDto, ImageSetFacetsDto, ImageSetFilterDto, ImageSetGroupingDto,
+    ImageSetImageDto, ImageSetSortFieldDto, ImageSetSortOptionDto, PagedImageSetCatalogDto,
+    SetImageSetMetaLocksDto, UpdateImageSetFacetsDto, UpdateImageSetUserMetaDto,
 };
 pub use library::{
     clear_remote_library_credentials, create_image_set_local_library, create_local_library,

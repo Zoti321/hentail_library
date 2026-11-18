@@ -1,5 +1,6 @@
 use sea_orm::{ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, TransactionTrait};
 
+use crate::comic::now_ms;
 use crate::db::map_db_err;
 use crate::entity::{image_set_carriers, image_set_images, image_sets};
 use crate::error::HentaiError;
@@ -52,7 +53,7 @@ pub(crate) async fn sync_image_set_library(
     let Some(obs) = observe_library(root, &prior_stats, handle)? else {
         return Ok(None);
     };
-    let plan = plan_image_set_sync(library_id, &obs, &prior);
+    let plan = plan_image_set_sync(library_id, &obs, &prior, now_ms());
     emit(progress(SyncLibraryPhaseDto::WritingDb, 0, None));
 
     let txn = db.begin().await.map_err(map_db_err)?;

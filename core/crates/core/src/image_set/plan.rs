@@ -31,10 +31,12 @@ pub(crate) struct ImageSetPlan {
     pub warnings: Vec<String>,
 }
 
+/// `now_ms` stamps the catalog insertion time of newly inserted sets.
 pub(crate) fn plan_image_set_sync(
     library_id: &str,
     obs: &LibraryObs,
     prior: &PriorCatalog,
+    now_ms: i64,
 ) -> ImageSetPlan {
     let mut images_by_set: HashMap<&str, Vec<&image_set_images::Model>> = HashMap::new();
     for image in &prior.images {
@@ -151,12 +153,13 @@ pub(crate) fn plan_image_set_sync(
         let keep_set = !images.is_empty() || (!complete && prior_set_by_rel.contains_key(rel));
         if keep_set {
             let scanned = rel.rsplit('/').next().unwrap_or(rel);
-            let (name, name_locked) = match prior_set_by_rel.get(rel) {
+            let (name, name_locked, created_at) = match prior_set_by_rel.get(rel) {
                 Some(p) => (
                     merge_scanned_text(p.name_locked, &p.name, scanned),
                     p.name_locked,
+                    p.created_at,
                 ),
-                None => (scanned.to_string(), false),
+                None => (scanned.to_string(), false, now_ms),
             };
             desired_sets.push(image_sets::Model {
                 image_set_id: set_id,
@@ -165,6 +168,7 @@ pub(crate) fn plan_image_set_sync(
                 name,
                 is_root: rel.is_empty(),
                 name_locked,
+                created_at,
             });
             desired_images.extend(images);
             desired_carriers.extend(carriers);

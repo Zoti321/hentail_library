@@ -39,6 +39,9 @@ _Avoid_: Comic metadata pipeline for Image sets, Library display name as the Ima
 **Image set sync**: Reconciliation of an Image set library with its Library root (manual, startup, or scheduled): discover Image sets and Image set images, then remove catalog records only where a complete observation confirms absence. An inaccessible root, cancelled sync or failed write preserves all records. A still-present archive or directory tree that cannot be fully listed preserves its prior images and may warn without counting as deletion evidence. Unchanged carriers may skip re-listing. Successful commits are library-scoped and atomic; warnings on incomplete carriers do not block success for fully observed carriers.
 _Avoid_: applying Comic orphan deletion when archive parse returns empty, treating an unreadable root as an empty library, inventing a Library root image set for ignored root loose files.
 
+**Image set catalog query**: The Image set library's own filter/sort/group page query. Sorts by display name, image count, catalog insertion time (when sync first catalogued the set) or relative path; filters by Author / Tag / Parody / Character (any bound name, or unassigned) and carrier shape (directory set vs root-archive set); Author grouping repeats a multi-author set once per matching Author group, with unassigned sets last. Its default order (display name, natural) is the Image set catalog order.
+_Avoid_: assembling Image set browse through Comic/Series browse facades, progress/rating/content-hash query dimensions for Image sets.
+
 **Home page**: Default `/home` route with continue-reading, Recently added on Home, Home page counts, Reading activity stats and dismissible Home library alerts. Presentation belongs to home; counts/activity belong to reading_stats. It has no permanent global sync action. ADR-0020.
 _Avoid_: current-Library dashboard, Home scan, Home dashboard.
 
