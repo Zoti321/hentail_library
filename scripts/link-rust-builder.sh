@@ -1,49 +1,76 @@
 #!/usr/bin/env bash
-# 将 app/rust_builder/rust 链接到 core/crates/flutter（Cargokit / FRB 构建所需）。
-# Windows 使用目录 junction（无需管理员权限）；Unix 使用符号链接。
+# Link app/rust_builder/rust -> core/crates/flutter (Cargokit / FRB).
+# Unix: symlink. Windows (Git Bash/MSYS/Cygwin): directory junction.
 set -euo pipefail
 
-REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-JUNCTION="$REPO_ROOT/app/rust_builder/rust"
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+LINK_PATH="$REPO_ROOT/app/rust_builder/rust"
 TARGET="$REPO_ROOT/core/crates/flutter"
 
-if [[ ! -f "$TARGET/Cargo.toml" ]]; then
-  echo "error: 未找到 $TARGET/Cargo.toml" >&2
+die() {
+  echo "error: $*" >&2
   exit 1
-fi
+}
 
-if [[ -e "$JUNCTION" || -L "$JUNCTION" ]]; then
-  if [[ "$JUNCTION" -ef "$TARGET" ]]; then
-    echo "Rust 链接已就绪: $JUNCTION"
+[[ -f "$TARGET/Cargo.toml" ]] || die "未找到 $TARGET/Cargo.toml"
+
+if [[ -e "$LINK_PATH" || -L "$LINK_PATH" ]]; then
+  if [[ "$LINK_PATH" -ef "$TARGET" ]]; then
+    echo "Rust 链接已就绪: $LINK_PATH"
     exit 0
   fi
-  echo "error: 路径已存在且不是目标链接，请人工核对: $JUNCTION" >&2
-  exit 1
+  die "路径已存在且不是目标链接，请人工核对: $LINK_PATH"
 fi
 
 is_windows() {
   case "$(uname -s 2>/dev/null || true)" in
-    MINGW*|MSYS*|CYGWIN*) return 0 ;;
+    MINGW* | MSYS* | CYGWIN*) return 0 ;;
   esac
   [[ "${OS:-}" == "Windows_NT" ]]
 }
 
-if is_windows; then
-  to_win() {
-    if command -v cygpath >/dev/null 2>&1; then
-      cygpath -w "$1"
+to_win_path() {
+  if command -v cygpath >/dev/null 2>&1; then
+    cygpath -w "$1"
+  else
+    # Fallback: /e/foo -> E:\foo
+    printf '%s' "$1" | sed -e 's|^/\([a-zA-Z]\)/|\1:\\|' -e 's|/|\\|g'
+  fi
+}
+
+create_windows_junction() {
+  local link_win target_win
+  link_win="$(to_win_path "$LINK_PATH")"
+  target_win="$(to_win_path "$TARGET")"
+
+  if command -v powershell.exe >/dev/null 2>&1 || command -v pwsh.exe >/dev/null 2>&1; then
+    local ps
+    if command -v powershell.exe >/dev/null 2>&1; then
+      ps=powershell.exe
     else
-      printf '%s' "$1" | sed -e 's|^/\([a-zA-Z]\)/|\1:\\|' -e 's|/|\\|g'
+      ps=pwsh.exe
     fi
-  }
-  junction_win="$(to_win "$JUNCTION")"
-  target_win="$(to_win "$TARGET")"
-  # cmd mklink 在 Git Bash 下引号易被错误拆分；用 PowerShell 更稳妥。
-  HENTAI_RUST_LINK_PATH="$junction_win" HENTAI_RUST_LINK_TARGET="$target_win" \
-    powershell.exe -NoProfile -Command \
+    # Env vars avoid Git Bash mangling quoted paths for PowerShell.
+    HENTAI_RUST_LINK_PATH="$link_win" HENTAI_RUST_LINK_TARGET="$target_win" \
+      "$ps" -NoProfile -Command \
       '$ErrorActionPreference = "Stop"; New-Item -ItemType Junction -Path $env:HENTAI_RUST_LINK_PATH -Target $env:HENTAI_RUST_LINK_TARGET | Out-Null'
+    return
+  fi
+
+  if command -v cmd.exe >/dev/null 2>&1; then
+    cmd.exe //c mklink /J "$link_win" "$target_win" >/dev/null
+    return
+  fi
+
+  die "Windows 上需要 powershell.exe/pwsh.exe 或 cmd.exe 以创建 junction"
+}
+
+mkdir -p "$(dirname "$LINK_PATH")"
+
+if is_windows; then
+  create_windows_junction
 else
-  ln -s ../../core/crates/flutter "$JUNCTION"
+  ln -s ../../core/crates/flutter "$LINK_PATH"
 fi
 
-echo "已链接 $JUNCTION -> core/crates/flutter"
+echo "已链接 $LINK_PATH -> core/crates/flutter"

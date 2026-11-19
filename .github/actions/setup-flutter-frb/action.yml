@@ -54,16 +54,10 @@ runs:
       with:
         workspaces: core
 
-    - name: Fetch native dependencies (Unix)
-      if: inputs.fetch-native-deps == 'true' && runner.os != 'Windows'
+    - name: Fetch native dependencies
+      if: inputs.fetch-native-deps == 'true'
       shell: bash
       run: bash "${GITHUB_WORKSPACE}/core/vendor/fetch-native-deps.sh"
-
-    - name: Fetch native dependencies (Windows)
-      if: inputs.fetch-native-deps == 'true' && runner.os == 'Windows'
-      shell: pwsh
-      run: |
-        pwsh -NoProfile -File "${env:GITHUB_WORKSPACE}/core/vendor/fetch-native-deps.ps1"
 
     - name: Link rust_builder to core crate
       if: inputs.link-rust-builder == 'true'

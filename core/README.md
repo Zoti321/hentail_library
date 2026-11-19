@@ -12,11 +12,8 @@ Rust workspace：`hentai-core`（业务逻辑）+ `hentai_flutter`（FRB cdylib�
 仅 Rust 侧开发时，可单独获取原生依赖（详见 [`vendor/README.md`](vendor/README.md)）：
 
 ```bash
-# Linux / macOS / Git Bash
+# Linux / macOS / Windows Git Bash
 ./vendor/fetch-native-deps.sh
-
-# Windows PowerShell
-./vendor/fetch-native-deps.ps1
 ```
 
 ```bash

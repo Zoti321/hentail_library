@@ -39,7 +39,7 @@ Flutter 本地开发推荐在仓库根目录运行 `scripts/setup-dev.sh`（含�
 仅下载 pdfium：
 
 ```bash
-# Linux / macOS / Git Bash — 默认当前 host（macOS 拉双架构）
+# Linux / macOS / Windows Git Bash — 默认当前 host（macOS 拉双架构）
 ./core/vendor/fetch-native-deps.sh
 
 # Android ABI（arm / arm64 / x86 / x64）
@@ -47,11 +47,6 @@ Flutter 本地开发推荐在仓库根目录运行 `scripts/setup-dev.sh`（含�
 
 # iOS（真机 arm64 + 模拟器 arm64/x64）
 ./core/vendor/fetch-native-deps.sh --ios
-
-# Windows PowerShell
-./core/vendor/fetch-native-deps.ps1
-./core/vendor/fetch-native-deps.ps1 --android
-./core/vendor/fetch-native-deps.ps1 --ios
 ```
 
 也可 `--platform=android-arm64,ios-device-arm64` 精确指定。
