@@ -62,10 +62,12 @@ pub struct ReaderPageCacheRequest {
 
 impl ReaderPageCacheRequest {
     // Reserve before dispatch: worker scheduling must not decide request ownership.
+    #[must_use]
     pub fn begin(comic_id: &str) -> Self {
         Self::begin_with(comic_id, false)
     }
 
+    #[must_use]
     pub fn begin_clear(comic_id: &str) -> Self {
         Self::begin_with(comic_id, true)
     }
@@ -196,7 +198,7 @@ impl ReaderCache {
             return Err(HentaiError::reader_invalid_content("页面数据为空"));
         }
         let dir = self.comic_cache_dir(comic_id, source);
-        fs::create_dir_all(&dir).map_err(map_io_err)?;
+        fs::create_dir_all(&dir).map_err(|e| map_io_err(&e))?;
         let extension = image_extension(bytes);
         let file_path = dir.join(format!("{page_index:0PAGE_FILE_WIDTH$}.{extension}"));
         // Temp name must not match `{index}.` prefix so concurrent lookups never see a
@@ -205,8 +207,7 @@ impl ReaderCache {
             ".partial_{page_index:0PAGE_FILE_WIDTH$}_{}",
             std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
-                .map(|d| d.as_nanos())
-                .unwrap_or(0)
+                .map_or(0, |d| d.as_nanos())
         ));
         if let Err(err) = write_bytes_atomic(&tmp_path, bytes) {
             let _ = fs::remove_file(&tmp_path);
@@ -215,7 +216,7 @@ impl ReaderCache {
         remove_existing_page_files(&dir, page_index)?;
         if let Err(err) = fs::rename(&tmp_path, &file_path) {
             let _ = fs::remove_file(&tmp_path);
-            return Err(map_io_err(err));
+            return Err(map_io_err(&err));
         }
         Ok(file_path)
     }
@@ -235,9 +236,9 @@ impl ReaderCache {
             .copied()
             .map(normalize_page_index)
             .collect::<Result<HashSet<i32>, HentaiError>>()?;
-        for entry in fs::read_dir(&dir).map_err(map_io_err)? {
-            let entry = entry.map_err(map_io_err)?;
-            if !entry.file_type().map_err(map_io_err)?.is_file() {
+        for entry in fs::read_dir(&dir).map_err(|e| map_io_err(&e))? {
+            let entry = entry.map_err(|e| map_io_err(&e))?;
+            if !entry.file_type().map_err(|e| map_io_err(&e))?.is_file() {
                 continue;
             }
             let Some(index) = page_index_from_file_name(&entry.file_name().to_string_lossy())
@@ -265,7 +266,7 @@ impl ReaderCache {
                     remove_tree_best_effort(&dir);
                     std::thread::sleep(std::time::Duration::from_millis(1));
                 }
-                Err(err) => return Err(map_io_err(err)),
+                Err(err) => return Err(map_io_err(&err)),
             }
         }
 
@@ -275,8 +276,7 @@ impl ReaderCache {
             ".trash_{comic_id}_{}",
             std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
-                .map(|d| d.as_millis())
-                .unwrap_or(0)
+                .map_or(0, |d| d.as_millis())
         ));
         match fs::rename(&dir, &trash) {
             Ok(()) => {
@@ -298,6 +298,7 @@ impl ReaderCache {
     }
 }
 
+#[must_use]
 pub fn image_extension(bytes: &[u8]) -> &'static str {
     if bytes.len() >= 3 && bytes[0] == 0xFF && bytes[1] == 0xD8 && bytes[2] == 0xFF {
         "jpg"
@@ -352,18 +353,18 @@ fn find_cached_page_file(dir: &Path, page_index: i32) -> Option<PathBuf> {
 }
 
 fn write_bytes_atomic(path: &Path, bytes: &[u8]) -> Result<(), HentaiError> {
-    let mut file = fs::File::create(path).map_err(map_io_err)?;
-    file.write_all(bytes).map_err(map_io_err)?;
-    file.sync_all().map_err(map_io_err)?;
+    let mut file = fs::File::create(path).map_err(|e| map_io_err(&e))?;
+    file.write_all(bytes).map_err(|e| map_io_err(&e))?;
+    file.sync_all().map_err(|e| map_io_err(&e))?;
     Ok(())
 }
 
 fn remove_existing_page_files(dir: &Path, page_index: i32) -> Result<(), HentaiError> {
     let prefix = format!("{page_index:0PAGE_FILE_WIDTH$}.");
-    for entry in fs::read_dir(dir).map_err(map_io_err)? {
-        let entry = entry.map_err(map_io_err)?;
+    for entry in fs::read_dir(dir).map_err(|e| map_io_err(&e))? {
+        let entry = entry.map_err(|e| map_io_err(&e))?;
         if entry.file_name().to_string_lossy().starts_with(&prefix) {
-            fs::remove_file(entry.path()).map_err(map_io_err)?;
+            fs::remove_file(entry.path()).map_err(|e| map_io_err(&e))?;
         }
     }
     Ok(())
@@ -374,7 +375,7 @@ fn page_index_from_file_name(name: &str) -> Option<i32> {
     stem.parse::<i32>().ok()
 }
 
-fn map_io_err(error: std::io::Error) -> HentaiError {
+fn map_io_err(error: &std::io::Error) -> HentaiError {
     HentaiError::reader_invalid_content(error.to_string())
 }
 
@@ -402,7 +403,7 @@ fn remove_tree_best_effort(path: &Path) {
     };
     for entry in entries.flatten() {
         let child = entry.path();
-        let is_dir = entry.file_type().map(|t| t.is_dir()).unwrap_or(false);
+        let is_dir = entry.file_type().is_ok_and(|t| t.is_dir());
         if is_dir {
             remove_tree_best_effort(&child);
             let _ = fs::remove_dir(&child);

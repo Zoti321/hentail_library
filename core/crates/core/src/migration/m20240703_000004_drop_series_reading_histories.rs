@@ -4,7 +4,7 @@ use sea_orm_migration::prelude::*;
 #[derive(DeriveMigrationName)]
 pub struct Migration;
 
-const SQL_INSERT_MISSING: &str = r#"
+const SQL_INSERT_MISSING: &str = r"
 INSERT INTO comic_reading_histories (comic_id, title, last_read_time, page_index)
 SELECT srh.last_read_comic_id, c.title, srh.last_read_time, srh.page_index
 FROM series_reading_histories srh
@@ -12,9 +12,9 @@ INNER JOIN comics c ON c.comic_id = srh.last_read_comic_id
 WHERE NOT EXISTS (
   SELECT 1 FROM comic_reading_histories crh WHERE crh.comic_id = srh.last_read_comic_id
 )
-"#;
+";
 
-const SQL_UPDATE_NEWER: &str = r#"
+const SQL_UPDATE_NEWER: &str = r"
 UPDATE comic_reading_histories
 SET title = (
       SELECT c.title FROM comics c
@@ -34,7 +34,7 @@ WHERE EXISTS (
   WHERE srh.last_read_comic_id = comic_reading_histories.comic_id
     AND srh.last_read_time > comic_reading_histories.last_read_time
 )
-"#;
+";
 
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {

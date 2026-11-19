@@ -18,6 +18,7 @@ const SERIES_JOIN_CLAUSE: &str = " LEFT JOIN series_items si ON si.comic_id = c.
 
 impl ComicGrouping {
     /// 排序是否需要 Library root 路径参与。
+    #[must_use]
     pub fn needs_library_root(self) -> bool {
         match self {
             Self::None => false,
@@ -26,6 +27,7 @@ impl ComicGrouping {
     }
 
     /// 额外的关联（JOIN）片段；`None` 时仅由排序字段决定是否需要 JOIN。
+    #[must_use]
     pub fn join_clause(self, sort_field: ComicSortFieldDto, retention_cutoff_ms: i64) -> String {
         match self {
             Self::None => sort_field_join_clause(sort_field, retention_cutoff_ms),

@@ -28,7 +28,7 @@ pub(super) fn file_digest(path: &Path) -> Result<Option<String>, HentaiError> {
         Err(err) => return Err(io_error(err)),
     };
     let mut hash = Sha256::new();
-    let mut buffer = [0; 65536];
+    let mut buffer = vec![0_u8; 65536];
     loop {
         let count = file.read(&mut buffer).map_err(io_error)?;
         if count == 0 {
@@ -150,7 +150,8 @@ fn prepare_zip(
                 ));
             }
             metadata_index = Some(index);
-            metadata_name = entry.name().to_owned();
+            metadata_name.clear();
+            metadata_name.push_str(entry.name());
             let mut xml = String::new();
             entry.read_to_string(&mut xml).map_err(io_error)?;
             existing = Some(xml);
@@ -198,8 +199,33 @@ fn prepare_zip(
         writer.finish().map_err(io_error)?;
     }
     output.as_file_mut().sync_all().map_err(io_error)?;
+    verify_zip_metadata_output(
+        output.path(),
+        &metadata_name,
+        &xml,
+        &mut member_hashes,
+        source,
+        &before_digest,
+    )?;
+    let after_digest = file_digest(output.path())?.ok_or_else(|| io_error("Output is missing"))?;
+    Ok(PreparedLocalWrite {
+        target: source.to_owned(),
+        temporary: output,
+        before_digest: Some(before_digest),
+        after_digest,
+    })
+}
+
+fn verify_zip_metadata_output(
+    output_path: &Path,
+    metadata_name: &str,
+    xml: &str,
+    member_hashes: &mut BTreeMap<String, String>,
+    source: &Path,
+    before_digest: &str,
+) -> Result<(), HentaiError> {
     let mut verified =
-        ZipArchive::new(File::open(output.path()).map_err(io_error)?).map_err(io_error)?;
+        ZipArchive::new(File::open(output_path).map_err(io_error)?).map_err(io_error)?;
     for index in 0..verified.len() {
         let mut entry = verified.by_index(index).map_err(io_error)?;
         if entry.name() == metadata_name {
@@ -218,21 +244,15 @@ fn prepare_zip(
     if !member_hashes.is_empty() {
         return Err(io_error("Archive members lost"));
     }
-    if file_digest(source)?.as_deref() != Some(&before_digest) {
+    if file_digest(source)?.as_deref() != Some(before_digest) {
         return Err(io_error("Source changed while preparing output"));
     }
-    let after_digest = file_digest(output.path())?.ok_or_else(|| io_error("Output is missing"))?;
-    Ok(PreparedLocalWrite {
-        target: source.to_owned(),
-        temporary: output,
-        before_digest: Some(before_digest),
-        after_digest,
-    })
+    Ok(())
 }
 
 pub(super) fn digest_stream(stream: &mut impl Read) -> Result<String, HentaiError> {
     let mut hash = Sha256::new();
-    let mut buffer = [0; 65536];
+    let mut buffer = vec![0_u8; 65536];
     loop {
         let count = stream.read(&mut buffer).map_err(io_error)?;
         if count == 0 {

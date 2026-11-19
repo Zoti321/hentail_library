@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
 //! Image set discovery, persistence and manual sync (#584).
 
 mod common;
@@ -205,7 +207,7 @@ fn empty_root_archive_and_empty_folder_are_not_image_sets() {
 
         fixture.sync();
 
-        assert!(fixture.catalog().is_empty());
+        assert_eq!(fixture.catalog().len(), 0);
     });
 }
 
@@ -442,13 +444,13 @@ fn deleting_library_cascades_image_set_catalog() {
         let fixture = Fixture::new("delete_cascade.sqlite");
         layout_folder_and_root(&fixture.root);
         fixture.sync();
-        assert!(!fixture.catalog().is_empty());
+        assert_ne!(fixture.catalog().len(), 0);
 
         fixture
             .runtime
             .block_on(delete_library(&fixture.library_id))
             .expect("delete");
 
-        assert!(fixture.catalog().is_empty());
+        assert_eq!(fixture.catalog().len(), 0);
     });
 }

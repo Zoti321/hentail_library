@@ -91,26 +91,27 @@ pub struct LibraryWriteTxn {
 
 impl LibraryWriteTxn {
     /// 事务句柄，供接收 `ConnectionTrait` 的写路径使用。
+    #[must_use]
     pub fn txn(&self) -> &DatabaseTransaction {
         &self.txn
     }
 
     pub async fn commit(self) -> Result<(), HentaiError> {
-        self.txn.commit().await.map_err(map_db_err)?;
+        self.txn.commit().await.map_err(|e| map_db_err(&e))?;
         crate::revision::notify_committed();
         Ok(())
     }
 
     /// 显式回滚（等价于未提交就 drop，但回滚在本调用内完成）。
     pub async fn rollback(self) -> Result<(), HentaiError> {
-        self.txn.rollback().await.map_err(map_db_err)
+        self.txn.rollback().await.map_err(|e| map_db_err(&e))
     }
 }
 
 pub async fn begin_library_write_txn() -> Result<LibraryWriteTxn, HentaiError> {
     let guard = try_acquire_library_write_lock()?;
     let db = connection()?;
-    let txn = db.begin().await.map_err(map_db_err)?;
+    let txn = db.begin().await.map_err(|e| map_db_err(&e))?;
     Ok(LibraryWriteTxn { txn, _guard: guard })
 }
 

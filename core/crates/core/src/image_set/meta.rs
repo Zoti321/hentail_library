@@ -35,7 +35,7 @@ pub async fn update_image_set_user_meta(
     let mut active: image_sets::ActiveModel = find_image_set(&db, image_set_id).await?.into();
     active.name = Set(name.to_string());
     active.name_locked = Set(true);
-    active.update(&connection()?).await.map_err(map_db_err)?;
+    active.update(&connection()?).await.map_err(|e| map_db_err(&e))?;
     crate::revision::notify_committed();
     Ok(())
 }
@@ -51,7 +51,7 @@ pub async fn set_image_set_meta_locks(
     let db = connection()?;
     let mut active: image_sets::ActiveModel = find_image_set(&db, image_set_id).await?.into();
     active.name_locked = Set(name_locked);
-    active.update(&connection()?).await.map_err(map_db_err)?;
+    active.update(&connection()?).await.map_err(|e| map_db_err(&e))?;
     crate::revision::notify_committed();
     Ok(())
 }
@@ -92,7 +92,7 @@ pub async fn update_image_set_facets(
     patch: UpdateImageSetFacetsDto,
 ) -> Result<(), HentaiError> {
     let db = connection()?;
-    let txn = db.begin().await.map_err(map_db_err)?;
+    let txn = db.begin().await.map_err(|e| map_db_err(&e))?;
     find_image_set(&txn, image_set_id).await?;
     if let Some(authors) = &patch.authors {
         replace_image_set_authors(&txn, image_set_id, authors).await?;
@@ -106,7 +106,7 @@ pub async fn update_image_set_facets(
             replace_image_set_named_facet(&txn, facet, image_set_id, names).await?;
         }
     }
-    txn.commit().await.map_err(map_db_err)?;
+    txn.commit().await.map_err(|e| map_db_err(&e))?;
     crate::revision::notify_committed();
     Ok(())
 }
@@ -118,6 +118,6 @@ async fn find_image_set<C: ConnectionTrait>(
     image_sets::Entity::find_by_id(image_set_id)
         .one(db)
         .await
-        .map_err(map_db_err)?
+        .map_err(|e| map_db_err(&e))?
         .ok_or_else(|| HentaiError::validation(format!("图集不存在: {image_set_id}")))
 }

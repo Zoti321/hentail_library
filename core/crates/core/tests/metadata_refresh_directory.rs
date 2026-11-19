@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
 mod common;
 
 use std::path::Path;
@@ -98,7 +100,7 @@ fn refresh_directory_metadata(locked_title: bool) {
                     current.locks.description && current.locks.authors && current.locks.languages
                 );
                 assert_eq!(hentai_core::revision::notify_count(), notifications + 1);
-            })
+            });
         });
     }
 }
@@ -136,7 +138,7 @@ fn directory_refresh_rejects_a_folder_that_no_longer_qualifies_without_writing()
                 assert_eq!(after.title, before.title);
                 assert_eq!(after.last_updated_at, before.last_updated_at);
                 assert_eq!(hentai_core::revision::notify_count(), notifications);
-            })
+            });
         });
     }
 }
@@ -175,6 +177,6 @@ fn series_and_library_refresh_include_image_directory_resources() {
             assert_eq!(current.resource_type, "dir");
             assert_eq!(current.page_count, 2);
         }
-    })
+    });
     });
 }

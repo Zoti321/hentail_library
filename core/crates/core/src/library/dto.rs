@@ -32,6 +32,7 @@ pub enum ScanInterval {
 }
 
 impl ScanInterval {
+    #[must_use]
     pub fn as_str(self) -> &'static str {
         match self {
             Self::Disabled => "disabled",
@@ -44,6 +45,7 @@ impl ScanInterval {
     }
 
     /// Staleness window for Home library alert; `None` when interval is disabled.
+    #[must_use]
     pub fn staleness_threshold_ms(self) -> Option<i64> {
         match self {
             Self::Disabled => None,
@@ -107,6 +109,7 @@ pub(crate) fn catalog_kind_from_stored(raw: &str) -> String {
         .to_string()
 }
 
+#[must_use]
 pub fn is_image_set_catalog(catalog_kind: &str) -> bool {
     catalog_kind
         .trim()
@@ -121,7 +124,8 @@ pub struct LibrarySidebarPlacement {
     pub sidebar_order: i32,
 }
 
-/// SHA1 of `library:` + normalize_path_for_key(root) — distinct from comic_id.
+/// SHA1 of `library:` + `normalize_path_for_key(root)` — distinct from `comic_id`.
+#[must_use]
 pub fn library_id_from_root(root: &str) -> String {
     let normalized = normalize_path_for_key(root);
     let mut hasher = Sha1::new();
@@ -131,10 +135,11 @@ pub fn library_id_from_root(root: &str) -> String {
 }
 
 pub fn serialize_resource_format_categories(groups: &[ResourceFormatCategory]) -> String {
-    let names: Vec<&str> = groups.iter().map(resource_format_category_name).collect();
+    let names: Vec<&str> = groups.iter().copied().map(resource_format_category_name).collect();
     serde_json::to_string(&names).unwrap_or_else(|_| "[]".to_string())
 }
 
+#[must_use]
 pub fn parse_resource_format_categories_json(raw: &str) -> Vec<ResourceFormatCategory> {
     let Ok(names) = serde_json::from_str::<Vec<String>>(raw) else {
         return DEFAULT_RESOURCE_FORMAT_CATEGORIES.to_vec();
@@ -159,7 +164,7 @@ pub fn parse_resource_format_categories_json(raw: &str) -> Vec<ResourceFormatCat
     }
 }
 
-pub(crate) fn resource_format_category_name(group: &ResourceFormatCategory) -> &'static str {
+pub(crate) fn resource_format_category_name(group: ResourceFormatCategory) -> &'static str {
     match group {
         ResourceFormatCategory::Folder => "folder",
         ResourceFormatCategory::Pdf => "pdf",

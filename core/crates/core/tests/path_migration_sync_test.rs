@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
 mod common;
 
 use std::collections::HashMap;
@@ -106,7 +108,7 @@ fn unverified_unique_rename_does_not_transfer_user_metadata_or_history() {
             assert_eq!(plan.migrated_count, 0);
             assert_eq!(plan.removed_ids, vec![old_id.clone()]);
             assert_eq!(plan.added_count, 1);
-            assert!(plan.migrations.is_empty());
+            assert_eq!(plan.migrations.len(), 0);
 
             apply_scan_replace_plan(&db, &plan, "")
                 .await
@@ -119,7 +121,7 @@ fn unverified_unique_rename_does_not_transfer_user_metadata_or_history() {
                 .expect("new comic");
             assert_eq!(migrated.path, new_path.to_string_lossy());
             assert_ne!(migrated.title, "用户标题");
-            assert!(migrated.tags.is_empty());
+            assert_eq!(migrated.tags, Vec::<String>::new());
             assert!(!migrated.locks.title && !migrated.locks.tags);
             assert!(get_reading_by_comic_id(&new_id).await.unwrap().is_none());
         });

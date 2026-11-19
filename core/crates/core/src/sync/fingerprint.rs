@@ -8,6 +8,7 @@ use crate::resource::{
 use sea_orm::{ConnectionTrait, Statement};
 use sha2::{Digest, Sha256};
 use std::collections::HashMap;
+use std::fmt::Write as _;
 use std::io::Read;
 
 pub(crate) struct StoredFingerprint {
@@ -23,12 +24,12 @@ pub(crate) async fn load_fingerprints(
 ) -> Result<HashMap<String, StoredFingerprint>, HentaiError> {
     db.query_all(Statement::from_sql_and_values(db.get_database_backend(),
         "SELECT f.* FROM comic_content_fingerprints f JOIN comics c ON c.comic_id = f.comic_id WHERE c.library_id = ?",
-        [library_id.into()])).await.map_err(map_db_err)?.into_iter().map(|row| {
-        Ok((row.try_get("", "comic_id").map_err(map_db_err)?, StoredFingerprint {
-            digest: row.try_get("", "digest").map_err(map_db_err)?,
-            resource_type: row.try_get("", "resource_type").map_err(map_db_err)?,
-            modified_ms: row.try_get("", "modified_ms").map_err(map_db_err)?,
-            size: row.try_get("", "size").map_err(map_db_err)?,
+        [library_id.into()])).await.map_err(|e| map_db_err(&e))?.into_iter().map(|row| {
+        Ok((row.try_get("", "comic_id").map_err(|e| map_db_err(&e))?, StoredFingerprint {
+            digest: row.try_get("", "digest").map_err(|e| map_db_err(&e))?,
+            resource_type: row.try_get("", "resource_type").map_err(|e| map_db_err(&e))?,
+            modified_ms: row.try_get("", "modified_ms").map_err(|e| map_db_err(&e))?,
+            size: row.try_get("", "size").map_err(|e| map_db_err(&e))?,
         }))
     }).collect()
 }
@@ -95,7 +96,7 @@ fn hash_file(
     }
     let mut stream = access.open_stream(path)?;
     let mut hasher = Sha256::new();
-    let mut buffer = [0u8; 65536];
+    let mut buffer = vec![0_u8; 65536];
     let mut total = 0u64;
     loop {
         if handle.is_cancelled() {
@@ -107,7 +108,7 @@ fn hash_file(
         if count == 0 {
             break;
         }
-        total += count as u64;
+        total += crate::util::usize_to_u64(count);
         hasher.update(&buffer[..count]);
     }
     if total != before.size || access.stat(path)?.as_ref() != Some(&before) {
@@ -135,13 +136,11 @@ pub(crate) fn resource_content_digest(
     if resource_type != "dir" {
         return hash_file(access, path, handle).map(|digest| {
             digest.map(|digest| {
-                format!(
-                    "sha256-file-v1:{}",
-                    digest
-                        .iter()
-                        .map(|byte| format!("{byte:02x}"))
-                        .collect::<String>()
-                )
+                let mut hex = String::with_capacity(digest.len() * 2);
+                for byte in &digest {
+                    let _ = write!(hex, "{byte:02x}");
+                }
+                format!("sha256-file-v1:{hex}")
             })
         });
     }
@@ -169,7 +168,7 @@ pub(crate) fn resource_content_digest(
         ));
     }
     let mut hasher = Sha256::new();
-    hasher.update((pages.len() as u64).to_le_bytes());
+    hasher.update(crate::util::usize_to_u64(pages.len()).to_le_bytes());
     let mut observations = Vec::new();
     for page in &pages {
         observations.push(access.stat(&page.location)?);
@@ -212,7 +211,7 @@ pub(crate) async fn store_fingerprint(
     if let (Some(digest), Some((modified, size))) = (&item.content_digest, item.observed_stat) {
         db.execute(Statement::from_sql_and_values(db.get_database_backend(),
             "INSERT INTO comic_content_fingerprints (comic_id, digest, resource_type, modified_ms, size) VALUES (?, ?, ?, ?, ?) ON CONFLICT(comic_id) DO UPDATE SET digest = excluded.digest, resource_type = excluded.resource_type, modified_ms = excluded.modified_ms, size = excluded.size",
-            vec![item.comic.comic_id.clone().into(), digest.clone().into(), item.resource_type.clone().into(), modified.into(), size.into()])).await.map_err(map_db_err)?;
+            vec![item.comic.comic_id.clone().into(), digest.clone().into(), item.resource_type.clone().into(), modified.into(), size.into()])).await.map_err(|e| map_db_err(&e))?;
     } else {
         db.execute(Statement::from_sql_and_values(
             db.get_database_backend(),
@@ -220,7 +219,7 @@ pub(crate) async fn store_fingerprint(
             [item.comic.comic_id.clone().into()],
         ))
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     }
 
     Ok(())

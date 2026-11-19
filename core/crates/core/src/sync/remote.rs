@@ -2,7 +2,7 @@
 
 use std::path::Path;
 
-use crate::comic::{now_ms, ComicDto};
+use crate::comic::{now_ms, ComicDto, ComicMetaLocks};
 use crate::comic_id::comic_id_from_normalized_path;
 use crate::error::HentaiError;
 use crate::library::normalize_webdav_root;
@@ -21,7 +21,8 @@ pub enum RemoteScanOutcome {
     Scanned(Vec<ScanItem>),
 }
 
-/// SHA1 of a normalized WebDAV resource URL (ADR-0001 remote location key).
+/// SHA1 of a normalized `WebDAV` resource URL (ADR-0001 remote location key).
+#[must_use]
 pub fn comic_id_for_remote_location(location: &str) -> String {
     let normalized = normalize_remote_location_key(location);
     if normalized.is_empty() {
@@ -30,6 +31,7 @@ pub fn comic_id_for_remote_location(location: &str) -> String {
     comic_id_from_normalized_path(&normalized)
 }
 
+#[must_use]
 pub fn normalize_remote_location_key(location: &str) -> String {
     // allow_http=true: identity key must not reject stored http roots.
     normalize_webdav_root(location, true).unwrap_or_else(|_| {
@@ -41,7 +43,7 @@ pub fn normalize_remote_location_key(location: &str) -> String {
     })
 }
 
-/// Probe Remote root via [ResourceAccess]; on transport/auth failure skip without scanning.
+/// Probe Remote root via [`ResourceAccess`]; on transport/auth failure skip without scanning.
 pub fn scan_remote_lightweight(
     access: &dyn ResourceAccess,
     root: &str,
@@ -162,7 +164,7 @@ fn register_remote_file(
         comic_id: comic_id_for_remote_location(&path),
         path: path.clone(),
         resource_type: resource_type.to_string(),
-        resource_size: stat.size as i64,
+        resource_size: crate::util::u64_to_i64(stat.size),
         created_at: now,
         last_updated_at: modified,
         title,
@@ -177,7 +179,7 @@ fn register_remote_file(
         languages: vec![],
         parodies: vec![],
         characters: vec![],
-        locks: Default::default(),
+        locks: ComicMetaLocks::default(),
         library_id: String::new(),
     };
     Ok(Some(ScanItem::from_resource(comic)))

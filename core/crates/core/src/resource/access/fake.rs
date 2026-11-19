@@ -14,7 +14,7 @@ enum FakeNode {
     File { bytes: Vec<u8>, modified_ms: i64 },
 }
 
-/// In-memory [ResourceAccess] for sync / open-stream tests without a real FS or WebDAV.
+/// In-memory [`ResourceAccess`] for sync / open-stream tests without a real FS or `WebDAV`.
 #[derive(Debug, Default, Clone)]
 pub struct FakeResourceAccess {
     nodes: BTreeMap<String, FakeNode>,
@@ -22,6 +22,7 @@ pub struct FakeResourceAccess {
 }
 
 impl FakeResourceAccess {
+    #[must_use]
     pub fn new() -> Self {
         Self::default()
     }
@@ -55,13 +56,15 @@ impl FakeResourceAccess {
     }
 
     pub fn insert_dir(&mut self, location: impl Into<String>) {
-        let location = normalize_fake_location(location.into());
+        let raw = location.into();
+        let location = normalize_fake_location(&raw);
         self.ensure_ancestors(&location);
         self.nodes.insert(location, FakeNode::Dir);
     }
 
     pub fn insert_file(&mut self, location: impl Into<String>, bytes: impl Into<Vec<u8>>) {
-        let location = normalize_fake_location(location.into());
+        let raw = location.into();
+        let location = normalize_fake_location(&raw);
         self.ensure_ancestors(&location);
         self.nodes.insert(
             location,
@@ -73,7 +76,7 @@ impl FakeResourceAccess {
     }
 
     pub fn set_modified_ms(&mut self, location: &str, modified_ms: i64) {
-        let location = normalize_fake_location(location.to_string());
+        let location = normalize_fake_location(location);
         if let Some(FakeNode::File {
             modified_ms: slot, ..
         }) = self.nodes.get_mut(&location)
@@ -106,7 +109,7 @@ impl FakeResourceAccess {
 impl ResourceAccess for FakeResourceAccess {
     fn list(&self, location: &str) -> Result<Vec<ResourceEntry>, HentaiError> {
         self.ensure_reachable()?;
-        let location = normalize_fake_location(location.to_string());
+        let location = normalize_fake_location(location);
         match self.nodes.get(&location) {
             Some(FakeNode::Dir) => {}
             Some(FakeNode::File { .. }) => {
@@ -121,7 +124,7 @@ impl ResourceAccess for FakeResourceAccess {
             }
         }
         let prefix = if location.ends_with('/') {
-            location.clone()
+            location
         } else {
             format!("{location}/")
         };
@@ -150,7 +153,7 @@ impl ResourceAccess for FakeResourceAccess {
 
     fn stat(&self, location: &str) -> Result<Option<ResourceStat>, HentaiError> {
         self.ensure_reachable()?;
-        let location = normalize_fake_location(location.to_string());
+        let location = normalize_fake_location(location);
         Ok(match self.nodes.get(&location) {
             Some(FakeNode::Dir) => Some(ResourceStat {
                 kind: ResourceKind::Dir,
@@ -159,7 +162,7 @@ impl ResourceAccess for FakeResourceAccess {
             }),
             Some(FakeNode::File { bytes, modified_ms }) => Some(ResourceStat {
                 kind: ResourceKind::File,
-                size: bytes.len() as u64,
+                size: crate::util::usize_to_u64(bytes.len()),
                 modified_ms: *modified_ms,
             }),
             None => None,
@@ -168,7 +171,7 @@ impl ResourceAccess for FakeResourceAccess {
 
     fn open_stream(&self, location: &str) -> Result<ResourceStream, HentaiError> {
         self.ensure_reachable()?;
-        let location = normalize_fake_location(location.to_string());
+        let location = normalize_fake_location(location);
         match self.nodes.get(&location) {
             Some(FakeNode::File { bytes, .. }) => Ok(Box::new(Cursor::new(bytes.clone()))),
             Some(FakeNode::Dir) => Err(HentaiError::validation(format!(
@@ -181,7 +184,7 @@ impl ResourceAccess for FakeResourceAccess {
     }
 }
 
-fn normalize_fake_location(raw: String) -> String {
+fn normalize_fake_location(raw: &str) -> String {
     let mut s = raw.replace('\\', "/");
     while s.ends_with('/') && s.len() > 1 {
         s.pop();

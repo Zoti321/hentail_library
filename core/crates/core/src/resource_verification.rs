@@ -61,15 +61,15 @@ pub(crate) async fn load_fingerprints(
                     .collect::<Vec<sea_orm::Value>>(),
             ))
             .await
-            .map_err(map_db_err)?;
+            .map_err(|e| map_db_err(&e))?;
         for row in rows {
             fingerprints.insert(
-                row.try_get("", "comic_id").map_err(map_db_err)?,
+                row.try_get("", "comic_id").map_err(|e| map_db_err(&e))?,
                 ResourceFingerprint {
-                    digest: row.try_get("", "digest").map_err(map_db_err)?,
-                    resource_type: row.try_get("", "resource_type").map_err(map_db_err)?,
-                    modified_ms: row.try_get("", "modified_ms").map_err(map_db_err)?,
-                    size: row.try_get("", "size").map_err(map_db_err)?,
+                    digest: row.try_get("", "digest").map_err(|e| map_db_err(&e))?,
+                    resource_type: row.try_get("", "resource_type").map_err(|e| map_db_err(&e))?,
+                    modified_ms: row.try_get("", "modified_ms").map_err(|e| map_db_err(&e))?,
+                    size: row.try_get("", "size").map_err(|e| map_db_err(&e))?,
                 },
             );
         }
@@ -108,7 +108,7 @@ fn verify_with(
     baseline: Option<&ResourceFingerprint>,
     mode: ResourceVerificationMode,
 ) -> Result<ResourceVerificationResult, HentaiError> {
-    use ResourceVerificationStatus::*;
+    use ResourceVerificationStatus::{Missing, ObservationChanged, BaselineUnavailable, Indeterminate, NotDetected, ContentMatches, ContentChanged};
     let Some(stat) = access.stat(path)? else {
         return Ok(ResourceVerificationResult {
             status: Missing,

@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
 //! Named metadata facet seam: junction replace + dict list + library-scoped distinct.
 
 mod common;

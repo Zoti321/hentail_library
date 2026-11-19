@@ -1,7 +1,7 @@
 use sea_orm::{ConnectionTrait, Statement};
 use sea_orm_migration::prelude::*;
 
-/// Remote library registration: username + allow_http on libraries (password stays out of SQLite).
+/// Remote library registration: username + `allow_http` on libraries (password stays out of SQLite).
 #[derive(DeriveMigrationName)]
 pub struct Migration;
 

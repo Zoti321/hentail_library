@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::path::PathBuf;
 
+#[cfg(not(miri))]
 use rayon::prelude::*;
 
 use crate::comic::ComicDto;
@@ -37,6 +38,7 @@ enum ScanMetadataSource {
 }
 
 impl ScanItem {
+    #[must_use]
     pub fn from_resource(comic: ComicDto) -> Self {
         Self {
             path: comic.path.clone(),
@@ -79,11 +81,11 @@ impl ScanItem {
             ScanMetadataSource::Catalog => {
                 // Reuse did not parse metadata; an old projection is not a scan value.
                 let mut refreshed = current.clone();
-                refreshed.path = self.comic.path.clone();
-                refreshed.resource_type = self.comic.resource_type.clone();
+                refreshed.path.clone_from(&self.comic.path);
+                refreshed.resource_type.clone_from(&self.comic.resource_type);
                 refreshed.resource_size = self.comic.resource_size;
                 if !self.comic.library_id.is_empty() {
-                    refreshed.library_id = self.comic.library_id.clone();
+                    refreshed.library_id.clone_from(&self.comic.library_id);
                 }
                 refreshed
             }
@@ -171,16 +173,20 @@ pub fn scan_roots_with(
     if handle.is_cancelled() {
         return Ok(vec![]);
     }
-    let parsed: Vec<Result<Option<ScanItem>, HentaiError>> = candidates
-        .par_iter()
-        .map(|path| {
-            if handle.is_cancelled() {
-                Ok(None)
-            } else {
-                resolve_scan_item(access, path, ctx, force_full_parse, enabled_groups)
-            }
-        })
-        .collect();
+    // Rayon/crossbeam-epoch hits Stacked Borrows under Miri; keep sequential there.
+    let map_one = |path: &String| {
+        if handle.is_cancelled() {
+            Ok(None)
+        } else {
+            resolve_scan_item(access, path, ctx, force_full_parse, enabled_groups)
+        }
+    };
+    #[cfg(miri)]
+    let parsed: Vec<Result<Option<ScanItem>, HentaiError>> =
+        candidates.iter().map(map_one).collect();
+    #[cfg(not(miri))]
+    let parsed: Vec<Result<Option<ScanItem>, HentaiError>> =
+        candidates.par_iter().map(map_one).collect();
     let mut items = Vec::new();
     for result in parsed {
         if let Some(item) = result? {

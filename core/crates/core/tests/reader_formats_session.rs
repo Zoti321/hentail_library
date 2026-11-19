@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
 use hentai_core::ReaderSessionRead;
 mod common;
 
@@ -96,7 +98,7 @@ fn load_reader_page_preserves_archive_cache_lifetimes() {
                     .expect("reload");
                 match second {
                     ReaderPageDto::FilePath { path: cached_again } => {
-                        assert_eq!(cached, cached_again)
+                        assert_eq!(cached, cached_again);
                     }
                     ReaderPageDto::Bytes { .. } => {
                         panic!("expected cached file path on second load")
@@ -211,7 +213,7 @@ fn write_minimal_one_page_pdf(path: &std::path::Path) {
     pdf.push_str(&format!("0 {}\n", objects.len() + 1));
     pdf.push_str("0000000000 65535 f \n");
     for offset in offsets.iter().skip(1) {
-        pdf.push_str(&format!("{:010} 00000 n \n", offset));
+        pdf.push_str(&format!("{offset:010} 00000 n \n"));
     }
     pdf.push_str(&format!(
         "trailer\n<< /Size {} /Root 1 0 R >>\nstartxref\n{}\n%%EOF\n",

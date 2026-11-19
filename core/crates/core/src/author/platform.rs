@@ -2,8 +2,8 @@ use std::net::{IpAddr, SocketAddr};
 use std::time::Duration;
 
 use async_trait::async_trait;
+use regex::Regex;
 use reqwest::header::{HeaderMap, HeaderValue, ACCEPT, CONTENT_TYPE, ORIGIN, USER_AGENT};
-use scraper::{Html, Selector};
 use serde_json::Value;
 use url::Url;
 
@@ -56,7 +56,7 @@ impl HttpTransport for RestrictedHttpTransport {
     ) -> Result<FetchResponse, HentaiError> {
         let mut current = url.clone();
         for redirect_count in 0..=MAX_REDIRECTS {
-            validate_remote_url(&current).await?;
+            validate_remote_url(&current)?;
             let host = current
                 .host_str()
                 .ok_or_else(|| HentaiError::validation("remote URL has no host"))?;
@@ -203,8 +203,7 @@ fn profile_request(
         .to_ascii_lowercase();
     let segments: Vec<&str> = profile_url
         .path_segments()
-        .map(|parts| parts.filter(|part| !part.is_empty()).collect())
-        .unwrap_or_default();
+        .map_or_default(|parts| parts.filter(|part| !part.is_empty()).collect());
     let request = match platform {
         AuthorLinkPlatform::Pixiv => {
             if !domain_matches(&host, "pixiv.net") {
@@ -218,7 +217,7 @@ fn profile_request(
                 url: Url::parse(&format!(
                     "https://www.pixiv.net/ajax/user/{user_id}?full=1&lang=en"
                 ))
-                .expect("static Pixiv URL"),
+                .map_err(|error| HentaiError::validation(error.to_string()))?,
                 headers: default_headers("application/json"),
                 parser: Parser::Pixiv,
             }
@@ -235,7 +234,7 @@ fn profile_request(
                 url: Url::parse(&format!(
                     "https://cdn.syndication.twimg.com/widgets/followbutton/info.json?screen_names={handle}"
                 ))
-                .expect("static X URL"),
+                .map_err(|error| HentaiError::validation(error.to_string()))?,
                 headers: default_headers("application/json"),
                 parser: Parser::X,
             }
@@ -269,7 +268,7 @@ fn profile_request(
                 url: Url::parse(&format!(
                     "https://api.fanbox.cc/creator.get?creatorId={creator}"
                 ))
-                .expect("static FANBOX URL"),
+                .map_err(|error| HentaiError::validation(error.to_string()))?,
                 headers,
                 parser: Parser::Fanbox,
             }
@@ -337,8 +336,7 @@ fn discord_link_shape_supported(profile_url: &Url) -> bool {
     }
     let segments: Vec<&str> = profile_url
         .path_segments()
-        .map(|parts| parts.filter(|part| !part.is_empty()).collect())
-        .unwrap_or_default();
+        .map_or_default(|parts| parts.filter(|part| !part.is_empty()).collect());
     match segments.as_slice() {
         [_code] => host == "discord.gg",
         ["invite", _code] => true,
@@ -348,7 +346,7 @@ fn discord_link_shape_supported(profile_url: &Url) -> bool {
 }
 
 fn parse_pixiv(bytes: &[u8]) -> Result<PlatformProfile, HentaiError> {
-    let json: Value = serde_json::from_slice(bytes).map_err(parse_error)?;
+    let json: Value = serde_json::from_slice(bytes).map_err(|e| parse_error(&e))?;
     let body = &json["body"];
     Ok(PlatformProfile {
         display_name: string_at(body, &["name"]),
@@ -358,7 +356,7 @@ fn parse_pixiv(bytes: &[u8]) -> Result<PlatformProfile, HentaiError> {
 }
 
 fn parse_x(bytes: &[u8]) -> Result<PlatformProfile, HentaiError> {
-    let json: Value = serde_json::from_slice(bytes).map_err(parse_error)?;
+    let json: Value = serde_json::from_slice(bytes).map_err(|e| parse_error(&e))?;
     let body = json
         .as_array()
         .and_then(|items| items.first())
@@ -373,7 +371,7 @@ fn parse_x(bytes: &[u8]) -> Result<PlatformProfile, HentaiError> {
 }
 
 fn parse_fanbox(bytes: &[u8]) -> Result<PlatformProfile, HentaiError> {
-    let json: Value = serde_json::from_slice(bytes).map_err(parse_error)?;
+    let json: Value = serde_json::from_slice(bytes).map_err(|e| parse_error(&e))?;
     let body = &json["body"];
     Ok(PlatformProfile {
         display_name: string_at(body, &["user", "name"])
@@ -386,28 +384,23 @@ fn parse_fanbox(bytes: &[u8]) -> Result<PlatformProfile, HentaiError> {
 fn parse_open_graph(bytes: &[u8], base: &Url) -> Result<PlatformProfile, HentaiError> {
     let html =
         std::str::from_utf8(bytes).map_err(|error| HentaiError::validation(error.to_string()))?;
-    let document = Html::parse_document(html);
-    let selector = Selector::parse("meta[property], meta[name]")
-        .map_err(|error| HentaiError::validation(error.to_string()))?;
+    // Avoid `scraper`/`selectors`: Selector::parse hits known servo_arc
+    // Stacked Borrows UB under Miri (servo/stylo#299). OG only needs meta attrs.
     let mut title = None;
     let mut image = None;
-    for element in document.select(&selector) {
-        let value = element.value();
-        let key = value
-            .attr("property")
-            .or_else(|| value.attr("name"))
-            .unwrap_or_default()
-            .to_ascii_lowercase();
-        let content = value
-            .attr("content")
+    for attrs in meta_tags(html) {
+        let key = html_attr(attrs, "property")
+            .or_else(|| html_attr(attrs, "name"))
+            .map_or_default(str::to_ascii_lowercase);
+        let content = html_attr(attrs, "content")
             .map(str::trim)
-            .filter(|v| !v.is_empty());
+            .filter(|value| !value.is_empty());
         match key.as_str() {
             "og:title" | "twitter:title" if title.is_none() => title = content.map(str::to_string),
             "og:image" | "twitter:image" if image.is_none() => {
                 image = content
                     .and_then(|raw| base.join(raw).ok())
-                    .map(|url| url.to_string())
+                    .map(|url| url.to_string());
             }
             _ => {}
         }
@@ -417,6 +410,61 @@ fn parse_open_graph(bytes: &[u8], base: &Url) -> Result<PlatformProfile, HentaiE
         avatar_url: image.clone(),
         background_url: image,
     })
+}
+
+fn meta_tags(html: &str) -> impl Iterator<Item = &str> {
+    static META_TAG: std::sync::OnceLock<Option<Regex>> = std::sync::OnceLock::new();
+    let pattern = META_TAG.get_or_init(|| Regex::new(r"(?is)<meta\b[^>]*>").ok());
+    pattern
+        .iter()
+        .flat_map(|re| re.find_iter(html).map(|m| m.as_str()))
+}
+
+fn html_attr<'a>(tag: &'a str, name: &str) -> Option<&'a str> {
+    let bytes = tag.as_bytes();
+    let name_bytes = name.as_bytes();
+    let mut i = 0;
+    while i + name_bytes.len() < bytes.len() {
+        let window = &bytes[i..];
+        if window.len() >= name_bytes.len()
+            && window[..name_bytes.len()].eq_ignore_ascii_case(name_bytes)
+            && (i == 0 || !bytes[i - 1].is_ascii_alphanumeric())
+        {
+            let mut j = i + name_bytes.len();
+            while j < bytes.len() && bytes[j].is_ascii_whitespace() {
+                j += 1;
+            }
+            if j >= bytes.len() || bytes[j] != b'=' {
+                i += 1;
+                continue;
+            }
+            j += 1;
+            while j < bytes.len() && bytes[j].is_ascii_whitespace() {
+                j += 1;
+            }
+            if j >= bytes.len() {
+                return None;
+            }
+            let quote = bytes[j];
+            if quote == b'"' || quote == b'\'' {
+                let start = j + 1;
+                let end = bytes[start..]
+                    .iter()
+                    .position(|&b| b == quote)
+                    .map(|offset| start + offset)?;
+                return std::str::from_utf8(&bytes[start..end]).ok();
+            }
+            let start = j;
+            let end = start
+                + bytes[start..]
+                    .iter()
+                    .position(|&b| b.is_ascii_whitespace() || b == b'>' || b == b'/')
+                    .unwrap_or(bytes.len() - start);
+            return std::str::from_utf8(&bytes[start..end]).ok();
+        }
+        i += 1;
+    }
+    None
 }
 
 fn string_at(value: &Value, path: &[&str]) -> Option<String> {
@@ -448,7 +496,7 @@ fn valid_handle(value: &str) -> bool {
         && value.chars().all(|c| c.is_ascii_alphanumeric() || c == '_')
 }
 
-async fn validate_remote_url(url: &Url) -> Result<(), HentaiError> {
+fn validate_remote_url(url: &Url) -> Result<(), HentaiError> {
     if !matches!(url.scheme(), "http" | "https") {
         return Err(HentaiError::validation("only HTTP(S) URLs are allowed"));
     }
@@ -498,7 +546,7 @@ fn is_public_ip(ip: IpAddr) -> bool {
     }
 }
 
-fn parse_error(error: serde_json::Error) -> HentaiError {
+fn parse_error(error: &serde_json::Error) -> HentaiError {
     HentaiError::validation(format!("invalid platform profile response: {error}"))
 }
 
@@ -762,21 +810,12 @@ mod tests {
 
     #[tokio::test]
     async fn downloader_rejects_unsafe_urls_content_and_size() {
-        assert!(
-            validate_remote_url(&Url::parse("ftp://example.com/image.png").unwrap())
-                .await
-                .is_err()
-        );
+        assert!(validate_remote_url(&Url::parse("ftp://example.com/image.png").unwrap()).is_err());
         assert!(validate_remote_url(
             &Url::parse("https://user:pass@example.com/image.png").unwrap()
         )
-        .await
         .is_err());
-        assert!(
-            validate_remote_url(&Url::parse("https://localhost/image.png").unwrap())
-                .await
-                .is_err()
-        );
+        assert!(validate_remote_url(&Url::parse("https://localhost/image.png").unwrap()).is_err());
 
         let not_image = FixtureTransport::new(fixture_response(
             "https://cdn.example/image.png",

@@ -80,11 +80,11 @@ fn with_comic_lock<T>(comic_id: &str, f: impl FnOnce() -> T) -> T {
         LOCKS
             .get_or_init(Default::default)
             .lock()
-            .unwrap_or_else(|poisoned| poisoned.into_inner())
+            .unwrap_or_else(std::sync::PoisonError::into_inner)
     };
     let lock = Arc::clone(locks().entry(comic_id.to_string()).or_default());
     let result = {
-        let _guard = lock.lock().unwrap_or_else(|poisoned| poisoned.into_inner());
+        let _guard = lock.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
         f()
     };
     let mut map = locks();
@@ -95,7 +95,7 @@ fn with_comic_lock<T>(comic_id: &str, f: impl FnOnce() -> T) -> T {
     result
 }
 
-/// 高清规格：长边 ≤ [HD_MAX_LONG_EDGE] 时原样返回源字节，否则 Lanczos3 缩放后重新编码。
+/// 高清规格：长边 ≤ [`HD_MAX_LONG_EDGE`] 时原样返回源字节，否则 Lanczos3 缩放后重新编码。
 pub fn encode_hd_image(source_bytes: &[u8]) -> Result<Vec<u8>, HentaiError> {
     let (width, height) = ImageReader::new(Cursor::new(source_bytes))
         .with_guessed_format()

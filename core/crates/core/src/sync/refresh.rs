@@ -59,7 +59,7 @@ pub(crate) async fn refresh_comic_metadata_locked(comic_id: &str) -> Result<(), 
     refresh_comic_metadata_snapshot(&db, resolved.as_dyn(), existing).await
 }
 
-/// Injected-access refresh (FakeResourceAccess / tests).
+/// Injected-access refresh (`FakeResourceAccess` / tests).
 ///
 /// File I/O (stat + parse) happens before the transaction opens, per ADR-0026:
 /// the transaction covers exactly one Comic's write set, one Comic at a time.
@@ -94,7 +94,7 @@ async fn refresh_comic_metadata_snapshot(
         )));
     }
 
-    let txn = db.begin().await.map_err(map_db_err)?;
+    let txn = db.begin().await.map_err(|e| map_db_err(&e))?;
     let current = find_visible_comic_by_id_in(&txn, &existing.comic_id)
         .await?
         .ok_or_else(|| {
@@ -122,7 +122,7 @@ async fn refresh_comic_metadata_snapshot(
             existing.path
         )));
     }
-    txn.commit().await.map_err(map_db_err)?;
+    txn.commit().await.map_err(|e| map_db_err(&e))?;
     crate::revision::notify_committed();
     Ok(())
 }
@@ -147,7 +147,7 @@ async fn refresh_series_metadata_locked(
     let series_row = Series::find_by_id(series_id.to_string())
         .one(&db)
         .await
-        .map_err(map_db_err)?
+        .map_err(|e| map_db_err(&e))?
         .ok_or_else(|| HentaiError::validation(format!("系列不存在: {series_id}")))?;
 
     let comic_ids: Vec<String> = SeriesItems::find()
@@ -165,12 +165,12 @@ async fn refresh_series_metadata_locked(
         .order_by_asc(series_items::Column::ComicId)
         .all(&db)
         .await
-        .map_err(map_db_err)?
+        .map_err(|e| map_db_err(&e))?
         .into_iter()
         .map(|row| row.comic_id)
         .collect();
 
-    let total = comic_ids.len() as i32;
+    let total = crate::util::usize_to_i32(comic_ids.len());
     let mut succeeded = 0i32;
     let mut failed = 0i32;
     let mut cancelled = false;
@@ -193,7 +193,7 @@ async fn refresh_series_metadata_locked(
             }
         }
         emit(RefreshSeriesProgressDto {
-            current: (index as i32) + 1,
+            current: crate::util::usize_to_i32(index) + 1,
             total,
             comic_id: Some(comic_id.clone()),
             succeeded,
@@ -260,12 +260,12 @@ async fn refresh_library_metadata_locked(
         .order_by_asc(comics::Column::ComicId)
         .all(&db)
         .await
-        .map_err(map_db_err)?
+        .map_err(|e| map_db_err(&e))?
         .into_iter()
         .map(|row| row.comic_id)
         .collect();
 
-    let total = comic_ids.len() as i32;
+    let total = crate::util::usize_to_i32(comic_ids.len());
     let mut succeeded = 0i32;
     let mut failed = 0i32;
     let mut cancelled = false;
@@ -288,7 +288,7 @@ async fn refresh_library_metadata_locked(
             }
         }
         emit(RefreshSeriesProgressDto {
-            current: (index as i32) + 1,
+            current: crate::util::usize_to_i32(index) + 1,
             total,
             comic_id: Some(comic_id.clone()),
             succeeded,
@@ -302,7 +302,7 @@ async fn refresh_library_metadata_locked(
             .filter(series::Column::LibraryId.eq(library_id))
             .all(&db)
             .await
-            .map_err(map_db_err)?;
+            .map_err(|e| map_db_err(&e))?;
         for series_row in series_rows {
             if handle.is_cancelled() {
                 cancelled = true;

@@ -18,7 +18,7 @@ const COMIC_COVER_DIR: &str = "comic_cover";
 const PLATFORM_IMAGE_DIR: &str = "platform_image";
 const PARTIAL_PREFIX: &str = ".partial_";
 
-/// Comic 高清封面缓存键：源版本（modified_ms + size）或页码变化即换键。
+/// Comic `高清封面缓存键：源版本（modified_ms` + size）或页码变化即换键。
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ComicCoverKey<'a> {
     pub comic_id: &'a str,
@@ -76,6 +76,7 @@ impl ImageCache {
         }
     }
 
+    #[must_use]
     pub fn read_comic_cover(&self, key: &ComicCoverKey<'_>) -> Option<Vec<u8>> {
         let path = self.comic_dir(key.comic_id).join(key.file_name());
         let bytes = fs::read(&path).ok()?;
@@ -90,20 +91,19 @@ impl ImageCache {
         bytes: &[u8],
     ) -> Result<(), HentaiError> {
         let dir = self.comic_dir(key.comic_id);
-        fs::create_dir_all(&dir).map_err(map_io_err)?;
+        fs::create_dir_all(&dir).map_err(|e| map_io_err(&e))?;
         let file_name = key.file_name();
         let tmp_path = dir.join(format!(
             "{PARTIAL_PREFIX}{}",
             SystemTime::now()
                 .duration_since(SystemTime::UNIX_EPOCH)
-                .map(|d| d.as_nanos())
-                .unwrap_or(0)
+                .map_or(0, |d| d.as_nanos())
         ));
         if let Err(err) = write_file(&tmp_path, bytes) {
             let _ = fs::remove_file(&tmp_path);
             return Err(err);
         }
-        for entry in fs::read_dir(&dir).map_err(map_io_err)?.flatten() {
+        for entry in fs::read_dir(&dir).map_err(|e| map_io_err(&e))?.flatten() {
             let name = entry.file_name().to_string_lossy().into_owned();
             if name != file_name && !name.starts_with(PARTIAL_PREFIX) {
                 let _ = fs::remove_file(entry.path());
@@ -111,7 +111,7 @@ impl ImageCache {
         }
         if let Err(err) = fs::rename(&tmp_path, dir.join(&file_name)) {
             let _ = fs::remove_file(&tmp_path);
-            return Err(map_io_err(err));
+            return Err(map_io_err(&err));
         }
         if self.evict_in_background {
             let cache = self.clone();
@@ -124,6 +124,7 @@ impl ImageCache {
         Ok(())
     }
 
+    #[must_use]
     pub fn read_platform_image(&self, key: &PlatformImageKey<'_>) -> Option<Vec<u8>> {
         let path = self.platform_path(key);
         let bytes = fs::read(&path).ok()?;
@@ -140,13 +141,12 @@ impl ImageCache {
         let dir = path
             .parent()
             .ok_or_else(|| HentaiError::validation("invalid platform image cache path"))?;
-        fs::create_dir_all(dir).map_err(map_io_err)?;
+        fs::create_dir_all(dir).map_err(|e| map_io_err(&e))?;
         let tmp_path = dir.join(format!(
             "{PARTIAL_PREFIX}{}",
             SystemTime::now()
                 .duration_since(SystemTime::UNIX_EPOCH)
-                .map(|d| d.as_nanos())
-                .unwrap_or(0)
+                .map_or(0, |d| d.as_nanos())
         ));
         if let Err(err) = write_file(&tmp_path, bytes) {
             let _ = fs::remove_file(&tmp_path);
@@ -154,7 +154,7 @@ impl ImageCache {
         }
         if let Err(err) = fs::rename(&tmp_path, &path) {
             let _ = fs::remove_file(&tmp_path);
-            return Err(map_io_err(err));
+            return Err(map_io_err(&err));
         }
         self.spawn_eviction();
         Ok(())
@@ -168,7 +168,7 @@ impl ImageCache {
         for slot in ["avatar", "background"] {
             let path = dir.join(format!("{slot}.img"));
             if path.is_file() {
-                fs::remove_file(path).map_err(map_io_err)?;
+                fs::remove_file(path).map_err(|e| map_io_err(&e))?;
             }
         }
         if dir.is_dir() {
@@ -221,7 +221,7 @@ impl ImageCache {
         if !dir.is_dir() {
             return Ok(());
         }
-        for entry in fs::read_dir(&dir).map_err(map_io_err)?.flatten() {
+        for entry in fs::read_dir(&dir).map_err(|e| map_io_err(&e))?.flatten() {
             let name = entry.file_name().to_string_lossy().into_owned();
             if !keep_comic_ids.contains(&name) {
                 let _ = fs::remove_dir_all(entry.path());
@@ -275,7 +275,7 @@ fn run_startup_maintenance() -> Result<(), HentaiError> {
             .into_tuple()
             .all(&db),
     )
-    .map_err(db::map_db_err)?;
+    .map_err(|err| db::map_db_err(&err))?;
     cache.prune_comic_covers(&comic_ids.into_iter().collect())?;
     cache.enforce_limit()
 }
@@ -287,12 +287,12 @@ fn touch(path: &Path) {
 }
 
 fn write_file(path: &Path, bytes: &[u8]) -> Result<(), HentaiError> {
-    let mut file = fs::File::create(path).map_err(map_io_err)?;
-    file.write_all(bytes).map_err(map_io_err)?;
-    file.sync_all().map_err(map_io_err)
+    let mut file = fs::File::create(path).map_err(|e| map_io_err(&e))?;
+    file.write_all(bytes).map_err(|e| map_io_err(&e))?;
+    file.sync_all().map_err(|e| map_io_err(&e))
 }
 
-fn map_io_err(err: std::io::Error) -> HentaiError {
+fn map_io_err(err: &std::io::Error) -> HentaiError {
     HentaiError::validation(format!("图片缓存读写失败: {err}"))
 }
 

@@ -37,7 +37,7 @@ pub async fn thumbnail_needs_generation(
     let cached = ComicThumbnails::find_by_id(comic.comic_id.clone())
         .one(db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     let Some(cached) = cached else {
         return Ok(true);
     };
@@ -75,8 +75,7 @@ pub async fn store_thumbnail_for_comic_with(
     };
     let now = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
-        .map(|d| d.as_millis() as i64)
-        .unwrap_or(0);
+        .map_or(0, |d| crate::util::milliseconds_to_i64(d.as_millis()));
     let active = comic_thumbnails::ActiveModel {
         comic_id: Set(comic.comic_id.clone()),
         thumbnail: Set(jpeg),
@@ -100,7 +99,7 @@ pub async fn store_thumbnail_for_comic_with(
         )
         .exec(db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     Ok(true)
 }
 
@@ -237,8 +236,7 @@ fn load_zip_cover(
         let ext = Path::new(&name)
             .extension()
             .and_then(|e| e.to_str())
-            .map(|e| format!(".{}", e.to_lowercase()))
-            .unwrap_or_default();
+            .map_or_default(|e| format!(".{}", e.to_lowercase()));
         if is_comic_image_extension(&ext) {
             entries.push((name, i));
         }
@@ -284,8 +282,7 @@ fn load_epub_cover(
         let ext = Path::new(&name)
             .extension()
             .and_then(|e| e.to_str())
-            .map(|e| format!(".{}", e.to_lowercase()))
-            .unwrap_or_default();
+            .map_or_default(|e| format!(".{}", e.to_lowercase()));
         if is_comic_image_extension(&ext) {
             images.push((name, i));
         }

@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
 mod common;
 
 use hentai_core::{
@@ -162,9 +164,9 @@ fn fetch_series_comics_metadata_omits_empty_language_parody_character() {
                 .await
                 .expect("fetch metadata");
 
-            assert!(metadata.languages.is_empty());
-            assert!(metadata.parodies.is_empty());
-            assert!(metadata.characters.is_empty());
+            assert_eq!(metadata.languages.len(), 0);
+            assert_eq!(metadata.parodies.len(), 0);
+            assert_eq!(metadata.characters.len(), 0);
         });
     });
 }

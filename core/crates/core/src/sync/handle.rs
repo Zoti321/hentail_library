@@ -6,6 +6,7 @@ pub struct SyncHandle {
     pub(crate) cancelled: Arc<AtomicBool>,
 }
 
+#[must_use]
 pub fn create_sync_handle() -> SyncHandle {
     SyncHandle {
         cancelled: Arc::new(AtomicBool::new(false)),
@@ -17,6 +18,7 @@ pub fn cancel_sync(handle: &SyncHandle) {
 }
 
 impl SyncHandle {
+    #[must_use]
     pub fn is_cancelled(&self) -> bool {
         self.cancelled.load(Ordering::Relaxed)
     }

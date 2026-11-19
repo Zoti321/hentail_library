@@ -10,6 +10,7 @@ pub enum SeriesGrouping {
 
 impl SeriesGrouping {
     /// ORDER BY 中、用户排序之前的分组前缀（不含 prefer root）。
+    #[must_use]
     pub fn order_prefix(self) -> Option<&'static str> {
         match self {
             Self::None => None,

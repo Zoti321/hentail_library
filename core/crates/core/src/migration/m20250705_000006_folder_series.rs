@@ -4,7 +4,7 @@ use sea_orm_migration::prelude::*;
 #[derive(DeriveMigrationName)]
 pub struct Migration;
 
-const SQL_CREATE_SERIES: &str = r#"
+const SQL_CREATE_SERIES: &str = r"
 CREATE TABLE IF NOT EXISTS series (
   series_id TEXT NOT NULL PRIMARY KEY,
   folder_path TEXT NOT NULL UNIQUE,
@@ -13,9 +13,9 @@ CREATE TABLE IF NOT EXISTS series (
     CHECK (serialization_status IN ('unknown', 'ongoing', 'ended', 'hiatus')),
   total_count INTEGER NULL CHECK (total_count IS NULL OR total_count > 0)
 )
-"#;
+";
 
-const SQL_CREATE_SERIES_ITEMS: &str = r#"
+const SQL_CREATE_SERIES_ITEMS: &str = r"
 CREATE TABLE IF NOT EXISTS series_items (
   series_id TEXT NOT NULL,
   comic_id TEXT NOT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS series_items (
   FOREIGN KEY (series_id) REFERENCES series(series_id) ON DELETE CASCADE,
   FOREIGN KEY (comic_id) REFERENCES comics(comic_id) ON DELETE CASCADE
 )
-"#;
+";
 
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {

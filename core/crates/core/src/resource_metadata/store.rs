@@ -29,40 +29,40 @@ async fn enabled_in(db: &impl ConnectionTrait, library_id: &str) -> Result<bool,
         DatabaseBackend::Sqlite,
         "SELECT w.enabled FROM resource_metadata_libraries w JOIN libraries l USING(library_id) WHERE w.library_id = ? AND l.kind = 'local'",
         [library_id.into()],
-    )).await.map_err(map_db_err)?;
+    )).await.map_err(|e| map_db_err(&e))?;
     row.map(|row| row.try_get::<i64>("", "enabled").map(|value| value == 1))
         .transpose()
         .map(|value| value.unwrap_or(false))
-        .map_err(map_db_err)
+        .map_err(|e| map_db_err(&e))
 }
 
 pub async fn set_enabled(library_id: &str, enabled: bool) -> Result<(), HentaiError> {
     with_library_write(|| async {
         let db = connection()?;
-        let txn = db.begin().await.map_err(map_db_err)?;
+        let txn = db.begin().await.map_err(|e| map_db_err(&e))?;
         let row = txn.query_one(Statement::from_sql_and_values(
             DatabaseBackend::Sqlite, "SELECT kind FROM libraries WHERE library_id = ?", [library_id.into()],
-        )).await.map_err(map_db_err)?.ok_or_else(|| HentaiError::validation("Library is unavailable"))?;
-        if row.try_get::<String>("", "kind").map_err(map_db_err)? != "local" {
+        )).await.map_err(|e| map_db_err(&e))?.ok_or_else(|| HentaiError::validation("Library is unavailable"))?;
+        if row.try_get::<String>("", "kind").map_err(|e| map_db_err(&e))? != "local" {
             return Err(HentaiError::validation("Resource metadata embedding is only available for Local libraries"));
         }
         let previous = enabled_in(&txn, library_id).await?;
         txn.execute(Statement::from_sql_and_values(DatabaseBackend::Sqlite,
             "INSERT INTO resource_metadata_libraries(library_id, enabled) VALUES (?, ?) ON CONFLICT(library_id) DO UPDATE SET enabled = excluded.enabled",
             [library_id.into(), i64::from(enabled).into()],
-        )).await.map_err(map_db_err)?;
+        )).await.map_err(|e| map_db_err(&e))?;
         if enabled && !previous {
             let comics = txn.query_all(Statement::from_sql_and_values(DatabaseBackend::Sqlite,
                 "SELECT comic_id FROM comics WHERE library_id = ? AND deleted_at IS NULL", [library_id.into()],
-            )).await.map_err(map_db_err)?;
+            )).await.map_err(|e| map_db_err(&e))?;
             for row in comics {
-                let id: String = row.try_get("", "comic_id").map_err(map_db_err)?;
+                let id: String = row.try_get("", "comic_id").map_err(|e| map_db_err(&e))?;
                 if let Some(comic) = find_visible_comic_by_id_in(&txn, &id).await? {
                     enqueue_in(&txn, &id, MetadataWriteIntent::full(MetadataSnapshot::from(&comic))).await?;
                 }
             }
         }
-        txn.commit().await.map_err(map_db_err)?;
+        txn.commit().await.map_err(|e| map_db_err(&e))?;
         crate::revision::notify_committed();
         Ok(())
     }).await
@@ -118,9 +118,9 @@ pub(super) async fn enqueue_in(
             [comic_id.into()],
         ))
         .await
-        .map_err(map_db_err)?
+        .map_err(|e| map_db_err(&e))?
     {
-        let raw: String = row.try_get("", "fields").map_err(map_db_err)?;
+        let raw: String = row.try_get("", "fields").map_err(|e| map_db_err(&e))?;
         intent.fields.extend(decode_fields(&raw)?);
     }
     let fields = encode_fields(&intent.fields)?;
@@ -131,7 +131,7 @@ pub(super) async fn enqueue_in(
          ON CONFLICT(comic_id) DO UPDATE SET revision = revision + 1, fields = excluded.fields, snapshot = excluded.snapshot,
             state = CASE WHEN recovery IS NULL THEN 'pending' ELSE state END, attempts = 0, due_at = 0, error = NULL",
         [comic_id.into(), fields.into(), snapshot.into()],
-    )).await.map_err(map_db_err)?;
+    )).await.map_err(|e| map_db_err(&e))?;
     Ok(())
 }
 
@@ -206,15 +206,15 @@ pub async fn status_for_comic(comic_id: &str) -> Result<Option<WritebackStatus>,
          LEFT JOIN resource_metadata_libraries w USING(library_id)
          LEFT JOIN resource_metadata_jobs j USING(comic_id)
          WHERE c.comic_id = ? AND c.deleted_at IS NULL AND l.kind = 'local'", [comic_id.into()],
-    )).await.map_err(map_db_err)?;
+    )).await.map_err(|e| map_db_err(&e))?;
     row.map(|row| {
         Ok(WritebackStatus {
-            comic_id: row.try_get("", "comic_id").map_err(map_db_err)?,
-            state: row.try_get("", "state").map_err(map_db_err)?,
-            revision: row.try_get("", "revision").map_err(map_db_err)?,
-            applied_revision: row.try_get("", "applied_revision").map_err(map_db_err)?,
-            last_success_at: row.try_get("", "last_success_at").map_err(map_db_err)?,
-            error: row.try_get("", "error").map_err(map_db_err)?,
+            comic_id: row.try_get("", "comic_id").map_err(|e| map_db_err(&e))?,
+            state: row.try_get("", "state").map_err(|e| map_db_err(&e))?,
+            revision: row.try_get("", "revision").map_err(|e| map_db_err(&e))?,
+            applied_revision: row.try_get("", "applied_revision").map_err(|e| map_db_err(&e))?,
+            last_success_at: row.try_get("", "last_success_at").map_err(|e| map_db_err(&e))?,
+            error: row.try_get("", "error").map_err(|e| map_db_err(&e))?,
         })
     })
     .transpose()

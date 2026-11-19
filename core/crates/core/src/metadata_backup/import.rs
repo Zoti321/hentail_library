@@ -102,7 +102,7 @@ enum ResolvedMatchTier {
 }
 
 struct ComicMatchIndex {
-    existing_ids: HashMap<String, ()>,
+    existing_ids: HashSet<String>,
     by_normalized_path: HashMap<String, Vec<String>>,
     by_library_relative: HashMap<(String, String), Vec<String>>,
 }
@@ -113,7 +113,7 @@ pub fn peek_metadata_backup_manifest(bytes: &[u8]) -> Result<MetadataBackupManif
         schema_version: payload.schema_version,
         exported_at: payload.exported_at,
         app_version: payload.app_version,
-        comic_count: payload.comics.len() as u32,
+        comic_count: crate::util::usize_to_u32(payload.comics.len()),
         include_orphan_facets: payload.options.include_orphan_facets,
         library_id: payload.options.library_id,
     })
@@ -253,9 +253,9 @@ async fn build_match_index(db: &DatabaseConnection) -> Result<ComicMatchIndex, H
                 .to_string(),
         ))
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
 
-    let mut existing_ids = HashMap::new();
+    let mut existing_ids = HashSet::new();
     let mut by_normalized_path: HashMap<String, Vec<String>> = HashMap::new();
     let mut by_library_relative: HashMap<(String, String), Vec<String>> = HashMap::new();
 
@@ -271,7 +271,7 @@ async fn build_match_index(db: &DatabaseConnection) -> Result<ComicMatchIndex, H
             .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?;
         let root_path = row.try_get_by_index::<Option<String>>(3).ok().flatten();
 
-        existing_ids.insert(comic_id.clone(), ());
+        existing_ids.insert(comic_id.clone());
 
         let normalized_path = normalize_path_for_key(&path);
         if !normalized_path.is_empty() {
@@ -299,7 +299,7 @@ async fn build_match_index(db: &DatabaseConnection) -> Result<ComicMatchIndex, H
 }
 
 fn resolve_match(index: &ComicMatchIndex, record: &ComicExportRecord) -> MatchOutcome {
-    if index.existing_ids.contains_key(&record.comic_id) {
+    if index.existing_ids.contains(&record.comic_id) {
         return MatchOutcome::Found {
             comic_id: record.comic_id.clone(),
             tier: ResolvedMatchTier::ComicId,
@@ -377,17 +377,19 @@ async fn count_new_orphan_names<C: ConnectionTrait>(
             format!("SELECT name FROM {dict}"),
         ))
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
 
     let existing: HashSet<String> = rows
         .into_iter()
         .filter_map(|row| row.try_get_by_index::<String>(0).ok())
         .collect();
 
-    Ok(unique
-        .into_iter()
-        .filter(|name| !existing.contains(name))
-        .count() as u32)
+    Ok(crate::util::usize_to_u32(
+        unique
+            .into_iter()
+            .filter(|name| !existing.contains(name))
+            .count(),
+    ))
 }
 
 async fn apply_comic_record(
@@ -397,7 +399,7 @@ async fn apply_comic_record(
 ) -> Result<(), HentaiError> {
     // One transaction per record: the metadata row, the junction tables and the
     // auto-locks land together (the library write lock is held by the import entry).
-    let txn = db.begin().await.map_err(map_db_err)?;
+    let txn = db.begin().await.map_err(|e| map_db_err(&e))?;
     update_comic_user_meta_in(
         &txn,
         comic_id,
@@ -417,7 +419,7 @@ async fn apply_comic_record(
     // All nine fields are written, so the auto-lock (ADR-0007) already pins every lock
     // column; an extra set_comic_meta_locks(true × 9) pass would be a second transaction
     // with no additional effect.
-    txn.commit().await.map_err(map_db_err)?;
+    txn.commit().await.map_err(|e| map_db_err(&e))?;
     crate::revision::notify_committed();
     Ok(())
 }
@@ -471,7 +473,7 @@ async fn upsert_orphan_names<C: ConnectionTrait>(
             [Value::String(Some(Box::new(trimmed.to_string())))],
         ))
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     }
     Ok(())
 }
@@ -502,12 +504,12 @@ mod tests {
     }
 
     fn index_with(ids: &[(&str, &str, &str, Option<&str>)]) -> ComicMatchIndex {
-        let mut existing_ids = HashMap::new();
+        let mut existing_ids = HashSet::new();
         let mut by_normalized_path: HashMap<String, Vec<String>> = HashMap::new();
         let mut by_library_relative: HashMap<(String, String), Vec<String>> = HashMap::new();
 
         for (comic_id, path, library_id, relative) in ids {
-            existing_ids.insert(comic_id.to_string(), ());
+            existing_ids.insert(comic_id.to_string());
             let normalized = normalize_path_for_key(path);
             if !normalized.is_empty() {
                 by_normalized_path

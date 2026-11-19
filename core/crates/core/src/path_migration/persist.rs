@@ -58,7 +58,7 @@ async fn apply_comic_rekey<C: ConnectionTrait>(
     let deleted_at = Comics::find_by_id(from_id.clone())
         .one(db)
         .await
-        .map_err(map_db_err)?
+        .map_err(|e| map_db_err(&e))?
         .and_then(|row| row.deleted_at);
 
     let comic_active = comics::ActiveModel {
@@ -74,7 +74,7 @@ async fn apply_comic_rekey<C: ConnectionTrait>(
     Comics::insert(comic_active)
         .exec(db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
 
     let meta_active = comic_meta::ActiveModel {
         comic_id: Set(to_id.clone()),
@@ -98,7 +98,7 @@ async fn apply_comic_rekey<C: ConnectionTrait>(
     ComicMeta::insert(meta_active)
         .exec(db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
 
     for table in COMIC_CHILD_TABLES {
         rekey_comic_child_table(db, table, from_id, to_id).await?;
@@ -108,13 +108,13 @@ async fn apply_comic_rekey<C: ConnectionTrait>(
     Comics::delete_by_id(from_id.clone())
         .exec(db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     Ok(())
 }
 
 /// 批量 rekey Series（参与调用方事务）。
 ///
-/// 目标 series_id 仍被占用时延后处理，避免迁移环；仍无法推进则跳过，
+/// 目标 `series_id` 仍被占用时延后处理，避免迁移环；仍无法推进则跳过，
 /// 交由后续 orphan / series rebuild 收尾。
 pub(crate) async fn apply_series_rekeys<C: ConnectionTrait>(
     db: &C,
@@ -131,7 +131,7 @@ pub(crate) async fn apply_series_rekeys<C: ConnectionTrait>(
             let target_exists = Series::find_by_id(migration.to_series_id.clone())
                 .one(db)
                 .await
-                .map_err(map_db_err)?
+                .map_err(|e| map_db_err(&e))?
                 .is_some();
             if target_exists {
                 deferred.push(migration);
@@ -157,7 +157,7 @@ async fn apply_series_rekey<C: ConnectionTrait>(
     let Some(row) = Series::find_by_id(from_id.clone())
         .one(db)
         .await
-        .map_err(map_db_err)?
+        .map_err(|e| map_db_err(&e))?
     else {
         return Ok(());
     };
@@ -179,7 +179,7 @@ async fn apply_series_rekey<C: ConnectionTrait>(
         total_count_locked: Set(row.total_count_locked),
         library_id: Set(row.library_id.clone()),
     };
-    Series::insert(active).exec(db).await.map_err(map_db_err)?;
+    Series::insert(active).exec(db).await.map_err(|e| map_db_err(&e))?;
     db.execute(Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
         "UPDATE series_items SET series_id = ? WHERE series_id = ?",
@@ -189,12 +189,12 @@ async fn apply_series_rekey<C: ConnectionTrait>(
         ],
     ))
     .await
-    .map_err(map_db_err)?;
+    .map_err(|e| map_db_err(&e))?;
     rekey_reference_column(db, "series_thumbnails", "series_id", from_id, to_id).await?;
     Series::delete_by_id(from_id.clone())
         .exec(db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     Ok(())
 }
 
@@ -213,7 +213,7 @@ async fn rekey_comic_child_table<C: ConnectionTrait>(
         ],
     ))
     .await
-    .map_err(map_db_err)?;
+    .map_err(|e| map_db_err(&e))?;
     Ok(())
 }
 
@@ -233,7 +233,7 @@ async fn rekey_reference_column<C: ConnectionTrait>(
         ],
     ))
     .await
-    .map_err(map_db_err)?;
+    .map_err(|e| map_db_err(&e))?;
     Ok(())
 }
 
@@ -281,6 +281,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[cfg_attr(miri, ignore = "sqlite/FFI unavailable under miri")]
     async fn comic_child_tables_cover_all_comic_id_columns() {
         let with_comic_id = tables_with_comic_id().await;
 

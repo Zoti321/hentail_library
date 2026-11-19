@@ -1,14 +1,15 @@
+#[must_use]
 pub fn compare_filename_natural(a: &str, b: &str) -> std::cmp::Ordering {
     let a_parts = split_natural(a);
     let b_parts = split_natural(b);
     for (ap, bp) in a_parts.iter().zip(b_parts.iter()) {
         match (ap.parse::<u64>(), bp.parse::<u64>()) {
             (Ok(na), Ok(nb)) => match na.cmp(&nb) {
-                std::cmp::Ordering::Equal => continue,
+                std::cmp::Ordering::Equal => {}
                 other => return other,
             },
             _ => match ap.cmp(bp) {
-                std::cmp::Ordering::Equal => continue,
+                std::cmp::Ordering::Equal => {}
                 other => return other,
             },
         }
@@ -22,11 +23,13 @@ pub fn compare_filename_natural(a: &str, b: &str) -> std::cmp::Ordering {
 /// SQL `ORDER BY sort_key` matches natural numeric ordering (e.g. `Vol 2` < `Vol 10`).
 pub const SORT_KEY_NUMERIC_WIDTH: usize = 20;
 
+#[must_use]
 pub fn compute_sort_key(display: &str) -> String {
+    use std::fmt::Write as _;
     let mut out = String::with_capacity(display.len());
     for part in split_natural(display) {
         if let Ok(n) = part.parse::<u64>() {
-            out.push_str(&format!("{n:0width$}", width = SORT_KEY_NUMERIC_WIDTH));
+            let _ = write!(out, "{n:0SORT_KEY_NUMERIC_WIDTH$}");
         } else {
             for ch in part.chars() {
                 out.push(ch.to_ascii_lowercase());

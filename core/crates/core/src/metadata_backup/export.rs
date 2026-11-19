@@ -110,7 +110,7 @@ async fn load_export_comic_ids(
             values,
         ))
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     rows.into_iter()
         .map(|row| {
             row.try_get_by_index::<String>(0)
@@ -128,7 +128,7 @@ async fn load_library_roots(
             "SELECT library_id, root_path FROM libraries".to_string(),
         ))
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     rows.into_iter()
         .map(|row| {
             let library_id = row
@@ -169,7 +169,7 @@ async fn load_orphan_names(
             sql,
         ))
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     rows.into_iter()
         .map(|row| {
             row.try_get_by_index::<String>(0)
@@ -206,7 +206,7 @@ fn utc_now_rfc3339() -> String {
     let minutes = (day_seconds % 3_600) / 60;
     let seconds = day_seconds % 60;
 
-    let (year, month, day) = civil_from_days(days as i64);
+    let (year, month, day) = civil_from_days(crate::util::u64_to_i64(days));
     format!("{year:04}-{month:02}-{day:02}T{hours:02}:{minutes:02}:{seconds:02}.{millis:03}Z")
 }
 
@@ -214,9 +214,9 @@ fn utc_now_rfc3339() -> String {
 fn civil_from_days(days: i64) -> (i32, u32, u32) {
     let z = days + 719_468;
     let era = if z >= 0 { z } else { z - 146_096 } / 146_097;
-    let doe = (z - era * 146_097) as u32;
+    let doe = crate::util::i64_to_u32(z - era * 146_097);
     let yoe = (doe - doe / 1_460 + doe / 365 - doe / 1_460) / 365;
-    let y = yoe as i32 + era as i32 * 400;
+    let y = crate::util::u32_to_i32(yoe) + crate::util::i64_to_i32(era) * 400;
     let doy = doe - (365 * yoe + yoe / 4 - yoe / 100);
     let mp = (5 * doy + 2) / 153;
     let d = doy - (153 * mp + 2) / 5 + 1;

@@ -184,7 +184,7 @@ fn observe_listing(
         .stat(location)?
         .filter(|stat| stat.kind == ResourceKind::File)
         .ok_or_else(|| HentaiError::validation("压缩包不存在或不是文件"))?;
-    let key = (stat.size as i64, stat.modified_ms);
+    let key = (crate::util::u64_to_i64(stat.size), stat.modified_ms);
     if prior.get(relative_path) == Some(&key) {
         return Ok(Listing::Unchanged);
     }

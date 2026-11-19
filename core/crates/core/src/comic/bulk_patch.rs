@@ -79,7 +79,7 @@ async fn apply_patch_to_one(
     patch: &ComicMetadataBulkPatch,
 ) -> Result<PatchOutcome, HentaiError> {
     let db = connection()?;
-    let txn = db.begin().await.map_err(map_db_err)?;
+    let txn = db.begin().await.map_err(|e| map_db_err(&e))?;
     let comic = find_visible_comic_by_id_in(&txn, comic_id)
         .await?
         .filter(|comic| comic.library_id == library_id)
@@ -155,11 +155,11 @@ async fn apply_patch_to_one(
     }
 
     if !changed {
-        txn.commit().await.map_err(map_db_err)?;
+        txn.commit().await.map_err(|e| map_db_err(&e))?;
         return Ok(PatchOutcome::Unchanged);
     }
     update_comic_user_meta_in(&txn, &comic.comic_id, meta).await?;
-    txn.commit().await.map_err(map_db_err)?;
+    txn.commit().await.map_err(|e| map_db_err(&e))?;
     crate::revision::notify_committed();
     Ok(PatchOutcome::Succeeded)
 }

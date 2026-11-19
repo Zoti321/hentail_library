@@ -19,7 +19,7 @@ use super::retention::reading_history_within_retention;
 
 pub async fn record_reading(dto: &ReadingHistoryDto) -> Result<(), HentaiError> {
     let db = connection()?;
-    let txn = db.begin().await.map_err(map_db_err)?;
+    let txn = db.begin().await.map_err(|e| map_db_err(&e))?;
     let model = comic_reading_histories::ActiveModel {
         comic_id: Set(dto.comic_id.clone()),
         title: Set(decode_basic_html_entities(&dto.title)),
@@ -38,9 +38,9 @@ pub async fn record_reading(dto: &ReadingHistoryDto) -> Result<(), HentaiError> 
         )
         .exec(&txn)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     purge_expired_reading_histories(&txn).await?;
-    txn.commit().await.map_err(map_db_err)?;
+    txn.commit().await.map_err(|e| map_db_err(&e))?;
     crate::revision::notify_committed();
     Ok(())
 }
@@ -53,7 +53,7 @@ pub async fn purge_expired_reading_histories<C: ConnectionTrait>(
         .filter(comic_reading_histories::Column::LastReadTime.lt(cutoff))
         .exec(db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     Ok(res.rows_affected)
 }
 
@@ -69,7 +69,7 @@ pub async fn normalize_reading_history_titles<C: ConnectionTrait>(
     let rows = ComicReadingHistories::find()
         .all(db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     let mut updated = 0usize;
     for row in rows {
         let decoded = decode_basic_html_entities(&row.title);
@@ -78,7 +78,7 @@ pub async fn normalize_reading_history_titles<C: ConnectionTrait>(
         }
         let mut active: comic_reading_histories::ActiveModel = row.into();
         active.title = Set(decoded);
-        active.update(db).await.map_err(map_db_err)?;
+        active.update(db).await.map_err(|e| map_db_err(&e))?;
         updated += 1;
     }
     Ok(updated)
@@ -91,7 +91,7 @@ pub async fn get_reading_by_comic_id(
     let row = ComicReadingHistories::find_by_id(comic_id)
         .one(&db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     let Some(row) = row else {
         return Ok(None);
     };
@@ -103,7 +103,7 @@ pub async fn get_reading_by_comic_id(
     Ok(items.pop())
 }
 
-/// 库浏览封面进度条：仅 comic_id + page_index，不含标题 enrich。
+/// 库浏览封面进度条：仅 `comic_id` + `page_index，不含标题` enrich。
 pub async fn list_read_page_indexes() -> Result<Vec<super::dto::ReadPageIndexDto>, HentaiError> {
     let db = connection()?;
     let rows = ComicReadingHistories::find()
@@ -112,7 +112,7 @@ pub async fn list_read_page_indexes() -> Result<Vec<super::dto::ReadPageIndexDto
         .filter(comic_reading_histories::Column::PageIndex.is_not_null())
         .all(&db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     Ok(rows
         .into_iter()
         .filter_map(|row| {
@@ -133,7 +133,7 @@ pub async fn list_all_reading() -> Result<Vec<ReadingHistoryDto>, HentaiError> {
         .order_by_desc(comic_reading_histories::Column::LastReadTime)
         .all(&db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     let items: Vec<ReadingHistoryDto> = rows.into_iter().map(map_reading_row).collect();
     enrich_page_counts(&db, items).await
 }
@@ -148,9 +148,10 @@ pub async fn fetch_reading_page(
     let query = reading_history_list_query(keyword.as_deref());
     let paginator = query
         .order_by_desc(comic_reading_histories::Column::LastReadTime)
-        .paginate(&db, request.page_size.max(1) as u64);
-    let total_count = paginator.num_items().await.map_err(map_db_err)? as i64;
-    let window = paginate(request, total_count).clamped();
+        .paginate(&db, crate::util::i32_to_u64(request.page_size.max(1)));
+    let total_count =
+        crate::util::u64_to_i64(paginator.num_items().await.map_err(|e| map_db_err(&e))?);
+    let window = paginate(&request, total_count).clamped();
     if total_count <= 0 {
         return Ok(PagedReadingHistoryDto {
             items: vec![],
@@ -160,9 +161,9 @@ pub async fn fetch_reading_page(
         });
     }
     let rows = paginator
-        .fetch_page(window.page as u64 - 1)
+        .fetch_page(crate::util::i32_to_u64(window.page).saturating_sub(1))
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     let items: Vec<ReadingHistoryDto> = rows.into_iter().map(map_reading_row).collect();
     let items = enrich_page_counts(&db, items).await?;
     Ok(PagedReadingHistoryDto {
@@ -199,9 +200,9 @@ pub async fn delete_reading_by_comic_id(comic_id: &str) -> Result<i32, HentaiErr
     let res = ComicReadingHistories::delete_by_id(comic_id)
         .exec(&db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     crate::revision::notify_committed();
-    Ok(res.rows_affected as i32)
+    Ok(crate::util::u64_to_i32(res.rows_affected))
 }
 
 pub async fn delete_reading_by_comic_ids(comic_ids: &[String]) -> Result<i32, HentaiError> {
@@ -213,9 +214,9 @@ pub async fn delete_reading_by_comic_ids(comic_ids: &[String]) -> Result<i32, He
         .filter(comic_reading_histories::Column::ComicId.is_in(comic_ids.to_vec()))
         .exec(&db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     crate::revision::notify_committed();
-    Ok(res.rows_affected as i32)
+    Ok(crate::util::u64_to_i32(res.rows_affected))
 }
 
 pub async fn clear_all_reading() -> Result<i32, HentaiError> {
@@ -228,9 +229,9 @@ async fn clear_all_reading_locked() -> Result<i32, HentaiError> {
         .filter(not_trashed_history_expr())
         .exec(&db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     crate::revision::notify_committed();
-    Ok(res.rows_affected as i32)
+    Ok(crate::util::u64_to_i32(res.rows_affected))
 }
 
 /// 库 revision 变更通知；不拉全表（Dart 侧自行分页或轻量 list）。
@@ -266,7 +267,7 @@ async fn enrich_page_counts<C: ConnectionTrait>(
         .filter(comic_meta::Column::ComicId.is_in(comic_ids))
         .all(db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     let counts: HashMap<String, i32> = metas
         .into_iter()
         .map(|meta| (meta.comic_id, meta.page_count))

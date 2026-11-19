@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
 mod common;
 
 use std::path::{Path, PathBuf};
@@ -241,7 +243,7 @@ fn trash_hides_comic_from_browse_surfaces_and_keeps_record() {
             )
             .await
             .expect("tag search");
-            assert!(by_tag.is_empty());
+            assert_eq!(by_tag.len(), 0);
             assert!(!history_ids().await.contains(&solo));
             let tags =
                 list_distinct_named_facet_names(JunctionNamedFacet::Tag, Some(library.library_id))
@@ -257,7 +259,7 @@ fn trash_hides_comic_from_browse_surfaces_and_keeps_record() {
 
             let mut counts = None;
             let _ = watch_home_page_counts(false, capture(&mut counts)).await;
-            assert_eq!(counts.expect("counts").comic_count as i64, count_before - 1);
+            assert_eq!(i64::from(counts.expect("counts").comic_count), count_before - 1);
             let mut continue_reading = None;
             let _ = watch_continue_reading_top5(false, capture(&mut continue_reading)).await;
             assert!(continue_reading
@@ -309,7 +311,7 @@ fn restore_brings_back_metadata_locks_and_history() {
             assert_eq!(comic.title, "Custom");
             assert_eq!(comic.tags, vec!["kept".to_string()]);
             assert!(comic.locks.title && comic.locks.tags);
-            assert!(trashed_ids().await.is_empty());
+            assert_eq!(trashed_ids().await.len(), 0);
         });
         open_reader(&solo, &fixture.solo.to_string_lossy(), "cbz").expect("restored opens");
         close_reader(&solo);
@@ -450,7 +452,7 @@ fn sync_keeps_trashed_comic_and_orphan_cleanup_removes_it_when_resource_gone() {
             std::fs::remove_file(&fixture.solo).expect("manual delete");
             sync(&library).await;
             assert!(find_comic_by_id(&solo).await.expect("find").is_none());
-            assert!(trashed_ids().await.is_empty());
+            assert_eq!(trashed_ids().await.len(), 0);
         });
     });
 }
@@ -490,7 +492,7 @@ fn purge_local_deletes_resource_and_record() {
             assert_eq!(result.succeeded, 1);
             assert_eq!(result.failed, 0);
             assert!(find_comic_by_id(&a).await.expect("find").is_none());
-            assert!(trashed_ids().await.is_empty());
+            assert_eq!(trashed_ids().await.len(), 0);
         });
         assert!(
             !fixture.series_a.exists(),
@@ -512,7 +514,7 @@ fn purge_rejects_comics_not_in_trash() {
 
             assert_eq!(result.succeeded, 0);
             assert_eq!(result.failed, 1);
-            assert!(!result.error_samples.is_empty());
+            assert_ne!(result.error_samples.len(), 0);
             assert!(find_comic_by_id(&solo).await.expect("find").is_some());
         });
         assert!(fixture.solo.exists());
@@ -681,7 +683,7 @@ fn delete_library_clears_trashed_records_without_touching_disk() {
                 .expect("delete lib");
 
             assert!(find_comic_by_id(&solo).await.expect("find").is_none());
-            assert!(trashed_ids().await.is_empty());
+            assert_eq!(trashed_ids().await.len(), 0);
         });
         assert!(fixture.solo.exists());
     });
@@ -730,7 +732,7 @@ fn metadata_backup_export_excludes_trash_and_import_keeps_trash() {
             .await
             .expect("meta");
             let result = import_comic_metadata(&full).await.expect("import");
-            assert!(result.errors.is_empty());
+            assert_eq!(result.errors.len(), 0);
             let comic = find_comic_by_id(&solo).await.expect("find").expect("comic");
             assert_eq!(comic.title, "Backed Up");
             assert_eq!(trashed_ids().await, vec![solo.clone()]);
@@ -750,7 +752,7 @@ fn trash_restore_purge_fail_fast_while_library_write_lock_held() {
                 assert!(restore_comics(vec![solo.clone()]).await.is_err());
                 assert!(purge_comics(vec![solo.clone()]).await.is_err());
             }
-            assert!(trashed_ids().await.is_empty());
+            assert_eq!(trashed_ids().await.len(), 0);
             trash_comics(vec![solo.clone()])
                 .await
                 .expect("trash after release");

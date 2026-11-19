@@ -32,9 +32,9 @@ pub struct ComicScanMigration {
 }
 
 struct IdDiff {
-    removed_ids: HashSet<String>,
-    added_ids: HashSet<String>,
-    kept_ids: HashSet<String>,
+    removed: HashSet<String>,
+    added: HashSet<String>,
+    kept: HashSet<String>,
 }
 
 pub async fn build_scan_replace_plan(
@@ -57,49 +57,22 @@ pub async fn build_scan_replace_plan(
     let existing_ids: HashSet<String> = existing_by_id.keys().cloned().collect();
     let id_diff = compute_id_diff(&existing_ids, &scanned_ids);
     let stored = super::fingerprint::load_fingerprints(db, library_id).await?;
-    let mut removed_by_digest: HashMap<(String, String), Vec<String>> = HashMap::new();
-    let mut added_by_digest: HashMap<(String, String), Vec<String>> = HashMap::new();
-    for id in &id_diff.removed_ids {
-        if let Some(old) = stored.get(id) {
-            removed_by_digest
-                .entry((old.resource_type.clone(), old.digest.clone()))
-                .or_default()
-                .push(id.clone());
-        }
-    }
-    for id in &id_diff.added_ids {
-        if let Some(digest) = &unique[id].content_digest {
-            added_by_digest
-                .entry((unique[id].resource_type.clone(), digest.clone()))
-                .or_default()
-                .push(id.clone());
-        }
-    }
-    let migration_pairs: Vec<ComicMigrationPair> = removed_by_digest
-        .into_iter()
-        .filter_map(|(digest, from)| {
-            let to = added_by_digest.get(&digest)?;
-            (from.len() == 1 && to.len() == 1).then(|| ComicMigrationPair {
-                from_comic_id: from[0].clone(),
-                to_comic_id: to[0].clone(),
-            })
-        })
-        .collect();
+    let migration_pairs = content_digest_migration_pairs(&id_diff, &stored, &unique);
     let (migrated_from_ids, migrated_to_ids) = migrated_id_sets(&migration_pairs);
     let migrations = build_migrations(&migration_pairs, &unique);
     let series_migrations =
         detect_series_migrations_for_library(db, library_id, &migrations).await?;
     let removed_ids: Vec<String> = id_diff
-        .removed_ids
+        .removed
         .difference(&migrated_from_ids)
         .cloned()
         .collect();
     let added_ids: HashSet<String> = id_diff
-        .added_ids
+        .added
         .difference(&migrated_to_ids)
         .cloned()
         .collect();
-    let kept_ids = &id_diff.kept_ids;
+    let kept_ids = &id_diff.kept;
     let mut thumbnail_invalidated = Vec::new();
     let mut to_upsert = Vec::new();
     for (id, row) in &unique {
@@ -122,7 +95,7 @@ pub async fn build_scan_replace_plan(
     let remote = Libraries::find_by_id(library_id)
         .one(db)
         .await
-        .map_err(map_db_err)?
+        .map_err(|e| map_db_err(&e))?
         .is_some_and(|library| library.kind == "remote");
     let thumbnail_targets = if remote {
         Vec::new()
@@ -138,9 +111,9 @@ pub async fn build_scan_replace_plan(
     };
     Ok(ComicScanReplacePlan {
         removed_ids,
-        added_count: added_ids.len() as i32,
-        kept_count: kept_ids.len() as i32,
-        migrated_count: migrations.len() as i32,
+        added_count: crate::util::usize_to_i32(added_ids.len()),
+        kept_count: crate::util::usize_to_i32(kept_ids.len()),
+        migrated_count: crate::util::usize_to_i32(migrations.len()),
         migrations,
         series_migrations,
         to_upsert,
@@ -186,7 +159,7 @@ async fn load_series_membership_for_library(
         .filter(crate::entity::series::Column::LibraryId.eq(library_id))
         .all(db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     let existing_series_ids: HashSet<String> =
         series_rows.iter().map(|r| r.series_id.clone()).collect();
     if existing_series_ids.is_empty() {
@@ -196,7 +169,7 @@ async fn load_series_membership_for_library(
         .filter(crate::entity::series_items::Column::SeriesId.is_in(existing_series_ids.clone()))
         .all(db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     let mut members_by_series: HashMap<String, Vec<String>> = HashMap::new();
     for series_id in &existing_series_ids {
         members_by_series.entry(series_id.clone()).or_default();
@@ -220,10 +193,45 @@ fn dedupe_scanned(scanned: Vec<ScanItem>) -> HashMap<String, ScanItem> {
 
 fn compute_id_diff(existing_ids: &HashSet<String>, scanned_ids: &HashSet<String>) -> IdDiff {
     IdDiff {
-        removed_ids: existing_ids.difference(scanned_ids).cloned().collect(),
-        added_ids: scanned_ids.difference(existing_ids).cloned().collect(),
-        kept_ids: existing_ids.intersection(scanned_ids).cloned().collect(),
+        removed: existing_ids.difference(scanned_ids).cloned().collect(),
+        added: scanned_ids.difference(existing_ids).cloned().collect(),
+        kept: existing_ids.intersection(scanned_ids).cloned().collect(),
     }
+}
+
+fn content_digest_migration_pairs(
+    id_diff: &IdDiff,
+    stored: &HashMap<String, super::fingerprint::StoredFingerprint>,
+    unique: &HashMap<String, ScanItem>,
+) -> Vec<ComicMigrationPair> {
+    let mut removed_by_digest: HashMap<(String, String), Vec<String>> = HashMap::new();
+    let mut added_by_digest: HashMap<(String, String), Vec<String>> = HashMap::new();
+    for id in &id_diff.removed {
+        if let Some(old) = stored.get(id) {
+            removed_by_digest
+                .entry((old.resource_type.clone(), old.digest.clone()))
+                .or_default()
+                .push(id.clone());
+        }
+    }
+    for id in &id_diff.added {
+        if let Some(digest) = &unique[id].content_digest {
+            added_by_digest
+                .entry((unique[id].resource_type.clone(), digest.clone()))
+                .or_default()
+                .push(id.clone());
+        }
+    }
+    removed_by_digest
+        .into_iter()
+        .filter_map(|(digest, from)| {
+            let to = added_by_digest.get(&digest)?;
+            (from.len() == 1 && to.len() == 1).then(|| ComicMigrationPair {
+                from_comic_id: from[0].clone(),
+                to_comic_id: to[0].clone(),
+            })
+        })
+        .collect()
 }
 
 fn build_migrations(
@@ -244,7 +252,7 @@ fn build_migrations(
 
 async fn load_all_comics(db: &DatabaseConnection) -> Result<Vec<ComicDto>, HentaiError> {
     use crate::comic::repository::load_comics_ordered;
-    let rows = Comics::find().all(db).await.map_err(map_db_err)?;
+    let rows = Comics::find().all(db).await.map_err(|e| map_db_err(&e))?;
     let ids: Vec<String> = rows.into_iter().map(|r| r.comic_id).collect();
     load_comics_ordered(db, ids).await
 }
@@ -260,7 +268,7 @@ async fn load_comics_for_library(
         .filter(crate::entity::comics::Column::LibraryId.eq(library_id))
         .all(db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     let ids: Vec<String> = rows.into_iter().map(|r| r.comic_id).collect();
     load_comics_ordered(db, ids).await
 }
@@ -299,7 +307,7 @@ async fn needs_thumbnail_generation(
 pub async fn load_thumbnail_stats(
     db: &DatabaseConnection,
 ) -> Result<HashMap<String, (i64, i64)>, HentaiError> {
-    let rows = ComicThumbnails::find().all(db).await.map_err(map_db_err)?;
+    let rows = ComicThumbnails::find().all(db).await.map_err(|e| map_db_err(&e))?;
     let mut map = HashMap::new();
     for row in rows {
         if let (Some(ms), Some(size)) = (row.source_modified_ms, row.source_size) {
@@ -320,7 +328,7 @@ pub async fn load_existing_comics_map(
 }
 
 pub async fn load_saved_paths(db: &DatabaseConnection) -> Result<Vec<String>, HentaiError> {
-    let rows = Libraries::find().all(db).await.map_err(map_db_err)?;
+    let rows = Libraries::find().all(db).await.map_err(|e| map_db_err(&e))?;
     Ok(rows.into_iter().map(|r| r.root_path).collect())
 }
 
@@ -337,7 +345,7 @@ pub async fn count_comic_ids_for_library(
             )))],
         ))
         .await
-        .map_err(map_db_err)?
+        .map_err(|e| map_db_err(&e))?
         .ok_or_else(|| HentaiError::db_query_failed("count comics 无结果", None))?;
     row.try_get_by_index::<i64>(0)
         .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))

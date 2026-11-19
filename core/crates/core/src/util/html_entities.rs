@@ -3,6 +3,7 @@
 //! 支持常见命名实体与十/十六进制数字实体；未识别片段原样保留。
 
 /// 解码常见 HTML/XML 实体。已干净的字符串幂等返回。
+#[must_use]
 pub fn decode_basic_html_entities(input: &str) -> String {
     if !input.contains('&') {
         return input.to_string();
@@ -13,7 +14,9 @@ pub fn decode_basic_html_entities(input: &str) -> String {
     let mut i = 0;
     while i < bytes.len() {
         if bytes[i] != b'&' {
-            let ch = input[i..].chars().next().unwrap();
+            let Some(ch) = input[i..].chars().next() else {
+                break;
+            };
             out.push(ch);
             i += ch.len_utf8();
             continue;

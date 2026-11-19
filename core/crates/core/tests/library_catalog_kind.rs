@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
 //! Catalog kind: Comic vs Image set library creation, nesting, and delete.
 
 mod common;
@@ -36,11 +38,11 @@ fn create_image_set_and_comic_libraries_keep_orthogonal_catalog_kind() {
 
             assert_eq!(comic.kind, "local");
             assert_eq!(comic.catalog_kind, "comic");
-            assert!(!comic.enabled_resource_format_categories.is_empty());
+            assert_ne!(comic.enabled_resource_format_categories.len(), 0);
 
             assert_eq!(image.kind, "local");
             assert_eq!(image.catalog_kind, "image_set");
-            assert!(image.enabled_resource_format_categories.is_empty());
+            assert_eq!(image.enabled_resource_format_categories.len(), 0);
             assert!(!image.scan_on_startup);
             assert_eq!(image.scan_interval, ScanInterval::Disabled);
 

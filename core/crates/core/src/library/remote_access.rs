@@ -1,4 +1,4 @@
-//! Resolve [ResourceAccess] for a Comic + in-memory Remote Basic credentials.
+//! Resolve [`ResourceAccess`] for a Comic + in-memory Remote Basic credentials.
 
 use std::collections::HashMap;
 use std::sync::{Mutex, OnceLock};
@@ -42,6 +42,7 @@ pub fn clear_remote_library_credentials() {
     }
 }
 
+#[must_use]
 pub fn remote_password_for(library_id: &str) -> Option<String> {
     remote_passwords()
         .lock()
@@ -64,7 +65,7 @@ impl ResolvedAccess {
     }
 }
 
-/// Look up Library for [comic] and build Local or WebDAV access.
+/// Look up Library for [comic] and build Local or `WebDAV` access.
 pub fn resolve_access_for_comic(comic: &ComicDto) -> Result<ResolvedAccess, HentaiError> {
     if comic.library_id.trim().is_empty() {
         return Ok(ResolvedAccess::Local(local_access()));

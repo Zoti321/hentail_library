@@ -3,7 +3,7 @@ use url::Url;
 
 use crate::error::HentaiError;
 
-/// Normalize a WebDAV Library root for identity / storage.
+/// Normalize a `WebDAV` Library root for identity / storage.
 ///
 /// - Trims whitespace
 /// - Defaults scheme to `https` when omitted
@@ -50,12 +50,12 @@ pub fn normalize_webdav_root(raw: &str, allow_http: bool) -> Result<String, Hent
         ));
     }
 
-    if parsed.host_str().map(str::is_empty).unwrap_or(true) {
+    if parsed.host_str().is_none_or(str::is_empty) {
         return Err(HentaiError::validation("WebDAV 根 URL 缺少主机名"));
     }
 
     // Lowercase host for stable identity.
-    if let Some(host) = parsed.host_str().map(|h| h.to_ascii_lowercase()) {
+    if let Some(host) = parsed.host_str().map(str::to_ascii_lowercase) {
         let _ = parsed.set_host(Some(&host));
     }
     parsed.set_fragment(None);
@@ -79,7 +79,8 @@ pub fn normalize_webdav_root(raw: &str, allow_http: bool) -> Result<String, Hent
     Ok(out)
 }
 
-/// SHA1 of `library:` + normalized WebDAV root — same hasher family as local roots.
+/// SHA1 of `library:` + normalized `WebDAV` root — same hasher family as local roots.
+#[must_use]
 pub fn library_id_from_webdav_root(normalized_root: &str) -> String {
     let mut hasher = Sha1::new();
     hasher.update(b"library:");
@@ -89,13 +90,12 @@ pub fn library_id_from_webdav_root(normalized_root: &str) -> String {
 
 fn looks_like_scheme(raw: &str) -> bool {
     raw.split_once("://")
-        .map(|(scheme, _)| {
+        .is_some_and(|(scheme, _)| {
             !scheme.is_empty()
                 && scheme
                     .bytes()
                     .all(|b| b.is_ascii_alphanumeric() || b == b'+' || b == b'-' || b == b'.')
         })
-        .unwrap_or(false)
 }
 
 #[cfg(test)]

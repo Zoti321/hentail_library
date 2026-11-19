@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
 mod common;
 
 use std::collections::HashMap;
@@ -155,7 +157,7 @@ fn unverified_folder_rename_creates_default_series() {
                 .await
                 .expect("plan");
             assert_eq!(plan.migrated_count, 0);
-            assert!(plan.series_migrations.is_empty());
+            assert_eq!(plan.series_migrations.len(), 0);
             apply_scan_replace_plan(&db, &plan, "")
                 .await
                 .expect("apply");
@@ -280,7 +282,7 @@ fn partial_member_move_keeps_old_series_state_and_creates_default_destination() 
                 .await
                 .expect("plan");
             assert_eq!(plan.migrated_count, 0);
-            assert!(plan.series_migrations.is_empty());
+            assert_eq!(plan.series_migrations.len(), 0);
             apply_scan_replace_plan(&db, &plan, "")
                 .await
                 .expect("apply");
@@ -352,7 +354,7 @@ fn ambiguous_comic_fingerprints_skip_series_migration() {
                 .await
                 .expect("plan");
             assert_eq!(plan.migrated_count, 0);
-            assert!(plan.series_migrations.is_empty());
+            assert_eq!(plan.series_migrations.len(), 0);
             apply_scan_replace_plan(&db, &plan, "")
                 .await
                 .expect("apply");
@@ -478,7 +480,7 @@ fn unverified_member_move_keeps_destination_state_without_source_order() {
                 .await
                 .expect("migration plan");
             assert_eq!(plan.migrated_count, 0);
-            assert!(plan.migrations.is_empty());
+            assert_eq!(plan.migrations.len(), 0);
             assert!(
                 plan.series_migrations.is_empty(),
                 "occupied target Series is not rekeyed"

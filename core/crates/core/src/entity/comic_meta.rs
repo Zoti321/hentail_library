@@ -1,5 +1,7 @@
 use sea_orm::entity::prelude::*;
 
+/// `SeaORM` column map: each `*_locked` bool is its own SQLite column.
+#[expect(clippy::struct_excessive_bools)]
 #[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel)]
 #[sea_orm(table_name = "comic_meta")]
 pub struct Model {

@@ -1,4 +1,4 @@
-//! First-open / refresh physical metadata writeback (page_count etc.).
+//! First-open / refresh physical metadata writeback (`page_count` etc.).
 
 use sea_orm::{DatabaseConnection, TransactionTrait};
 
@@ -75,7 +75,7 @@ async fn reconcile(
     if access.stat(&read.path)?.as_ref() != Some(&read.source_stat) {
         return Ok(());
     }
-    let txn = db.begin().await.map_err(map_db_err)?;
+    let txn = db.begin().await.map_err(|e| map_db_err(&e))?;
     let Some(current) = find_visible_comic_by_id_in(&txn, &read.comic_id).await? else {
         return Ok(());
     };
@@ -86,27 +86,24 @@ async fn reconcile(
     {
         return Ok(());
     }
-    let merged = match parsed {
-        Some(parsed) => {
-            let mut scanned = parsed_to_comic(&parsed);
-            if scanned.page_count <= 0 {
-                scanned.page_count = page_count;
-            }
-            scanned.path = current.path.clone();
-            scanned.library_id = current.library_id.clone();
-            merge_refresh_scan_with_existing(&scanned, &current)
+    let merged = if let Some(parsed) = parsed {
+        let mut scanned = parsed_to_comic(&parsed);
+        if scanned.page_count <= 0 {
+            scanned.page_count = page_count;
         }
-        None => {
-            let mut comic = current;
-            comic.page_count = page_count;
-            comic
-        }
+        scanned.path.clone_from(&current.path);
+        scanned.library_id.clone_from(&current.library_id);
+        merge_refresh_scan_with_existing(&scanned, &current)
+    } else {
+        let mut comic = current;
+        comic.page_count = page_count;
+        comic
     };
     let skipped = upsert_comics(&txn, &[merged]).await?;
     if !skipped.is_empty() {
         return Ok(());
     }
-    txn.commit().await.map_err(map_db_err)?;
+    txn.commit().await.map_err(|e| map_db_err(&e))?;
     crate::revision::notify_committed();
     tracing::info!(
         comic_id = read.comic_id,

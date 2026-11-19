@@ -26,14 +26,14 @@ pub async fn load_reading_activity_stats(
     let row = db
         .query_one(Statement::from_string(db.get_database_backend(), sql))
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     let finished_count = row
         .as_ref()
-        .map(|row| row.try_get::<i64>("", "finished_count").unwrap_or(0) as i32)
-        .unwrap_or(0);
+        .map_or(0, |row| {
+            crate::util::i64_to_i32(row.try_get::<i64>("", "finished_count").unwrap_or(0))
+        });
     let total_duration_ms = row
-        .map(|row| row.try_get::<i64>("", "total_duration_ms").unwrap_or(0))
-        .unwrap_or(0);
+        .map_or(0, |row| row.try_get::<i64>("", "total_duration_ms").unwrap_or(0));
 
     Ok(ReadingActivityStatsDto {
         finished_count,
@@ -53,7 +53,7 @@ pub async fn watch_reading_activity_stats(
     Ok(())
 }
 
-/// Idempotent Finished comic mark（粘性：已存在则保留原 finished_at）。
+/// Idempotent Finished comic mark（粘性：已存在则保留原 `finished_at`）。
 pub async fn upsert_finished_comic_mark(
     comic_id: &str,
     finished_at_ms: i64,
@@ -74,7 +74,7 @@ async fn upsert_finished_comic_mark_on<C: ConnectionTrait>(
         [comic_id.into(), finished_at_ms.into()],
     ))
     .await
-    .map_err(map_db_err)?;
+    .map_err(|e| map_db_err(&e))?;
     Ok(())
 }
 
@@ -103,7 +103,7 @@ async fn add_reading_duration_ms_on<C: ConnectionTrait>(
         [delta_ms.into(), updated_at.into()],
     ))
     .await
-    .map_err(map_db_err)?;
+    .map_err(|e| map_db_err(&e))?;
     Ok(())
 }
 
@@ -114,14 +114,14 @@ pub async fn record_reading_activity(
     mark_finished: bool,
 ) -> Result<(), HentaiError> {
     let db = connection()?;
-    let txn = db.begin().await.map_err(map_db_err)?;
+    let txn = db.begin().await.map_err(|e| map_db_err(&e))?;
     if let Some(delta) = add_duration_ms {
         add_reading_duration_ms_on(&txn, delta).await?;
     }
     if mark_finished {
         upsert_finished_comic_mark_on(&txn, comic_id, now_ms()).await?;
     }
-    txn.commit().await.map_err(map_db_err)?;
+    txn.commit().await.map_err(|e| map_db_err(&e))?;
     crate::revision::notify_committed();
     Ok(())
 }
@@ -143,9 +143,9 @@ pub async fn backfill_finished_comics_from_history_on(
             BACKFILL_FINISHED_FROM_HISTORY_SQL.to_string(),
         ))
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     crate::revision::notify_committed();
-    Ok(result.rows_affected() as i32)
+    Ok(crate::util::u64_to_i32(result.rows_affected()))
 }
 
 /// 与 migration / FRB 共用的回填 SQL（`INSERT OR IGNORE` 幂等）。
@@ -181,6 +181,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[cfg_attr(miri, ignore = "sqlite/FFI unavailable under miri")]
     async fn missing_duration_singleton_preserves_the_nonzero_finished_count() {
         let db = snapshot_fixture().await;
 
@@ -191,6 +192,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[cfg_attr(miri, ignore = "sqlite/FFI unavailable under miri")]
     async fn duration_snapshot_preserves_large_i64_values_exactly() {
         let db = snapshot_fixture().await;
         let duration_ms: i64 = 9_007_199_254_740_993;
@@ -209,6 +211,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[cfg_attr(miri, ignore = "sqlite/FFI unavailable under miri")]
     async fn missing_duration_table_propagates_a_query_error_instead_of_a_zero_snapshot() {
         let db = snapshot_fixture().await;
         db.execute_unprepared("ALTER TABLE reading_duration_total RENAME TO unavailable_duration")
@@ -227,6 +230,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[cfg_attr(miri, ignore = "sqlite/FFI unavailable under miri")]
     async fn empty_tables_yield_zero_snapshot() {
         let db = Database::connect("sqlite::memory:")
             .await
@@ -269,6 +273,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[cfg_attr(miri, ignore = "sqlite/FFI unavailable under miri")]
     async fn finished_count_excludes_trashed_and_missing_comics() {
         let db = Database::connect("sqlite::memory:")
             .await
@@ -321,6 +326,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[cfg_attr(miri, ignore = "sqlite/FFI unavailable under miri")]
     async fn backfill_marks_last_page_history_without_touching_duration() {
         let db = Database::connect("sqlite::memory:")
             .await
@@ -404,6 +410,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[cfg_attr(miri, ignore = "sqlite/FFI unavailable under miri")]
     async fn clearing_history_leaves_marks_and_duration() {
         let db = Database::connect("sqlite::memory:")
             .await

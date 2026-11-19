@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
 use hentai_core::ReaderSessionRead;
 use std::path::PathBuf;
 

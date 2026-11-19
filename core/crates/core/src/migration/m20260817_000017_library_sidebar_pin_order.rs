@@ -52,7 +52,7 @@ async fn backfill_sidebar_order(manager: &SchemaManager<'_>) -> Result<(), DbErr
                 manager.get_database_backend(),
                 "UPDATE libraries SET pinned = 1, sidebar_order = ? WHERE library_id = ?",
                 [
-                    sea_orm::Value::Int(Some(index as i32)),
+                    sea_orm::Value::Int(Some(crate::util::usize_to_i32(index))),
                     sea_orm::Value::String(Some(Box::new(library_id))),
                 ],
             ))

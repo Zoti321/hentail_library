@@ -15,6 +15,7 @@ impl ResourceFormatCategory {
         ResourceFormatCategory::Archive,
     ];
 
+    #[must_use]
     pub fn resource_types(self) -> &'static [&'static str] {
         match self {
             ResourceFormatCategory::Folder => &["dir"],
@@ -25,6 +26,7 @@ impl ResourceFormatCategory {
     }
 }
 
+#[must_use]
 pub fn resource_type_enabled(
     resource_type: &str,
     enabled_groups: &[ResourceFormatCategory],

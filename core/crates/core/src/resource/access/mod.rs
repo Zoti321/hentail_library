@@ -1,7 +1,7 @@
 //! Resource access — list / stat / open-stream over Resources.
 //!
-//! Local uses the filesystem; tests inject [FakeResourceAccess]. Remote
-//! uses [WebDavResourceAccess] (`reqwest_dav` + Basic).
+//! Local uses the filesystem; tests inject [`FakeResourceAccess`]. Remote
+//! uses [`WebDavResourceAccess`] (`reqwest_dav` + Basic).
 
 mod deadline;
 mod fake;
@@ -25,7 +25,7 @@ pub enum ResourceKind {
     Dir,
 }
 
-/// Attributes from [ResourceAccess::stat].
+/// Attributes from [`ResourceAccess::stat`].
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ResourceStat {
     pub kind: ResourceKind,
@@ -33,16 +33,16 @@ pub struct ResourceStat {
     pub modified_ms: i64,
 }
 
-/// One child from [ResourceAccess::list].
+/// One child from [`ResourceAccess::list`].
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ResourceEntry {
     pub name: String,
-    /// Full location key: local filesystem path, or absolute WebDAV URL under a Remote root.
+    /// Full location key: local filesystem path, or absolute `WebDAV` URL under a Remote root.
     pub location: String,
     pub kind: ResourceKind,
 }
 
-/// Read + seek stream from [ResourceAccess::open_stream].
+/// Read + seek stream from [`ResourceAccess::open_stream`].
 pub trait ResourceReadSeek: Read + Seek + Send {}
 impl<T: Read + Seek + Send> ResourceReadSeek for T {}
 
@@ -63,11 +63,11 @@ pub trait ResourceAccess: Send + Sync {
 
 pub(crate) fn system_time_to_ms(time: SystemTime) -> i64 {
     time.duration_since(UNIX_EPOCH)
-        .map(|d| d.as_millis() as i64)
-        .unwrap_or(0)
+        .map_or(0, |d| crate::util::milliseconds_to_i64(d.as_millis()))
 }
 
 /// Default Local adapter for production call sites.
+#[must_use]
 pub fn local_access() -> &'static LocalResourceAccess {
     static LOCAL: LocalResourceAccess = LocalResourceAccess;
     &LOCAL

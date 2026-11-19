@@ -22,6 +22,7 @@ pub struct MultiValuePatch {
 
 /// `Add` appends values that are not present yet (first-seen order kept), `Remove` drops every
 /// value listed in the patch, `Replace` takes the patch list as the whole new list.
+#[must_use]
 pub fn merge_multi_value(current: &[String], patch: &MultiValuePatch) -> Vec<String> {
     match patch.op {
         MultiValueOp::Add => {

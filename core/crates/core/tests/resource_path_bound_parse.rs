@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
 use std::path::{Path, PathBuf};
 
 use hentai_core::resource::{
@@ -88,7 +90,7 @@ fn formats() -> Vec<FormatFixture> {
 fn path_bound_parse_consumes_streams_at_locations_without_http_prefixes() {
     for fixture in formats() {
         let location = format!("/memory/Original title.{}", fixture.extension);
-        let size = fixture.bytes.len() as i64;
+        let size = hentai_core::util::usize_to_i64(fixture.bytes.len());
         let mut access = FakeResourceAccess::new();
         access.insert_file(&location, fixture.bytes);
         let parsed = parse_file_with(&access, &location).unwrap().unwrap();
@@ -137,7 +139,10 @@ fn path_bound_local_entry_points_preserve_source_metadata() {
             assert_eq!(parsed.title, "Original title");
             assert_eq!(parsed.page_count, fixture.pages);
             assert_eq!(parsed.resource_type, fixture.resource_type);
-            assert_eq!(parsed.resource_size, fixture.bytes.len() as i64);
+            assert_eq!(
+                parsed.resource_size,
+                hentai_core::util::usize_to_i64(fixture.bytes.len())
+            );
         }
     }
 }
@@ -190,7 +195,7 @@ fn path_bound_parse_uses_adapter_local_paths_and_source_stats() {
         assert_eq!(parsed.path, location);
         assert_eq!(parsed.title, "Original title");
         assert_eq!(parsed.page_count, fixture.pages);
-        assert_eq!(parsed.resource_size, stat.size as i64);
+        assert_eq!(parsed.resource_size, hentai_core::util::u64_to_i64(stat.size));
     }
 }
 

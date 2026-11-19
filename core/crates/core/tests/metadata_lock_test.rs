@@ -1,8 +1,11 @@
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
 use hentai_core::comic::{ComicDto, ComicMetaLocks};
 use hentai_core::metadata_lock::{
     merge_kept_scan_with_existing, merge_scanned_text, merge_series_name,
     resolve_member_sort_order, scanned_text_needs_write, series_auto_locks,
-    series_name_needs_write, ComicAutoLocks, ComicMetaField, SeriesMetaField,
+    series_name_needs_write, ComicAutoLocks, ComicMetaField, SeriesAutoLockInputs,
+    SeriesMetaField,
 };
 
 fn comic(id: &str, path: &str, resource_type: &str, title: &str, page_count: i32) -> ComicDto {
@@ -340,7 +343,10 @@ fn merge_locked_characters_preserves_existing() {
 
 #[test]
 fn series_auto_locks_includes_clear_total_count() {
-    let locks = series_auto_locks(false, false, true);
+    let locks = series_auto_locks(SeriesAutoLockInputs {
+        total_count: true,
+        ..SeriesAutoLockInputs::default()
+    });
     assert!(locks.get(SeriesMetaField::TotalCount));
     assert!(!locks.get(SeriesMetaField::Name));
     assert_eq!(locks.written(), vec![SeriesMetaField::TotalCount]);

@@ -28,8 +28,7 @@ pub(crate) fn resolve_library_name(explicit: Option<&str>, derived: String) -> S
     explicit
         .map(str::trim)
         .filter(|s| !s.is_empty())
-        .map(str::to_string)
-        .unwrap_or(derived)
+        .map_or(derived, str::to_string)
 }
 
 pub async fn list_libraries() -> Result<Vec<LibraryDto>, HentaiError> {
@@ -40,7 +39,7 @@ pub async fn list_libraries() -> Result<Vec<LibraryDto>, HentaiError> {
         .order_by_asc(libraries::Column::RootPath)
         .all(&db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     Ok(rows.into_iter().map(model_to_dto).collect())
 }
 
@@ -49,8 +48,7 @@ pub(crate) fn next_pinned_sidebar_order(libs: &[LibraryDto]) -> i32 {
         .filter(|lib| lib.pinned)
         .map(|lib| lib.sidebar_order)
         .max()
-        .map(|max| max + 1)
-        .unwrap_or(0)
+        .map_or(0, |max| max + 1)
 }
 
 /// Replace every Library's pin group and Library sidebar order.
@@ -81,21 +79,21 @@ pub async fn update_library_sidebar_layout(
     }
 
     let db = connection()?;
-    let txn = db.begin().await.map_err(map_db_err)?;
+    let txn = db.begin().await.map_err(|e| map_db_err(&e))?;
     for placement in &placements {
         txn.execute(Statement::from_sql_and_values(
             sea_orm::DatabaseBackend::Sqlite,
             "UPDATE libraries SET pinned = ?, sidebar_order = ? WHERE library_id = ?",
             [
-                sea_orm::Value::Int(Some(if placement.pinned { 1 } else { 0 })),
+                sea_orm::Value::Int(Some(i32::from(placement.pinned))),
                 sea_orm::Value::Int(Some(placement.sidebar_order)),
                 sea_orm::Value::String(Some(Box::new(placement.library_id.trim().to_string()))),
             ],
         ))
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     }
-    txn.commit().await.map_err(map_db_err)?;
+    txn.commit().await.map_err(|e| map_db_err(&e))?;
     crate::revision::notify_committed();
     list_libraries().await
 }
@@ -129,7 +127,7 @@ async fn create_local_library_with_catalog(
     if let Some(existing) = Libraries::find_by_id(library_id.clone())
         .one(&db)
         .await
-        .map_err(map_db_err)?
+        .map_err(|e| map_db_err(&e))?
     {
         return existing_local_or_conflict(existing, catalog_kind);
     }
@@ -138,7 +136,7 @@ async fn create_local_library_with_catalog(
         .filter(libraries::Column::RootPath.eq(root))
         .one(&db)
         .await
-        .map_err(map_db_err)?
+        .map_err(|e| map_db_err(&e))?
     {
         return existing_local_or_conflict(existing, catalog_kind);
     }
@@ -190,7 +188,7 @@ async fn create_local_library_with_catalog(
     Libraries::insert(active)
         .exec(&db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     crate::revision::notify_committed();
     Ok(dto)
 }
@@ -222,7 +220,7 @@ pub async fn create_remote_library(
     if let Some(existing) = Libraries::find_by_id(library_id.clone())
         .one(&db)
         .await
-        .map_err(map_db_err)?
+        .map_err(|e| map_db_err(&e))?
     {
         return update_existing_remote(existing, &root, &user, allow_http).await;
     }
@@ -230,7 +228,7 @@ pub async fn create_remote_library(
         .filter(libraries::Column::RootPath.eq(root.clone()))
         .one(&db)
         .await
-        .map_err(map_db_err)?
+        .map_err(|e| map_db_err(&e))?
     {
         return update_existing_remote(existing, &root, &user, allow_http).await;
     }
@@ -263,7 +261,7 @@ pub async fn create_remote_library(
         )),
         created_at: Set(dto.created_at),
         username: Set(user),
-        allow_http: Set(if allow_http { 1 } else { 0 }),
+        allow_http: Set(i32::from(allow_http)),
         scan_on_startup: Set(0),
         scan_interval: Set(ScanInterval::Disabled.as_str().to_string()),
         pinned: Set(1),
@@ -274,7 +272,7 @@ pub async fn create_remote_library(
     Libraries::insert(active)
         .exec(&db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     crate::revision::notify_committed();
     Ok(dto)
 }
@@ -295,7 +293,7 @@ pub async fn update_remote_library(
     let Some(model) = Libraries::find_by_id(id.to_string())
         .one(&db)
         .await
-        .map_err(map_db_err)?
+        .map_err(|e| map_db_err(&e))?
     else {
         return Err(HentaiError::validation(format!("Library 不存在: {id}")));
     };
@@ -310,7 +308,7 @@ pub async fn update_remote_library(
         .filter(libraries::Column::RootPath.eq(root.clone()))
         .one(&db)
         .await
-        .map_err(map_db_err)?
+        .map_err(|e| map_db_err(&e))?
     {
         if other.library_id != id {
             return Err(HentaiError::validation("WebDAV 根已被其他 Library 使用"));
@@ -335,8 +333,8 @@ pub(crate) async fn update_existing_remote(
     let mut active: libraries::ActiveModel = model.into();
     active.root_path = Set(root.to_string());
     active.username = Set(username.to_string());
-    active.allow_http = Set(if allow_http { 1 } else { 0 });
-    let updated = active.update(&db).await.map_err(map_db_err)?;
+    active.allow_http = Set(i32::from(allow_http));
+    let updated = active.update(&db).await.map_err(|e| map_db_err(&e))?;
     crate::revision::notify_committed();
     Ok(model_to_dto(updated))
 }
@@ -354,12 +352,12 @@ async fn delete_library_locked(id: &str) -> Result<(), HentaiError> {
     let existing = Libraries::find_by_id(id.to_string())
         .one(&db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     if existing.is_none() {
         return Ok(());
     }
 
-    let txn = db.begin().await.map_err(map_db_err)?;
+    let txn = db.begin().await.map_err(|e| map_db_err(&e))?;
     crate::probe::delete_snapshots_for_library(&txn, id).await?;
     let comic_ids = load_comic_ids_for_library(&txn, id).await?;
     delete_comics_side_effects(&txn, &comic_ids).await?;
@@ -369,12 +367,12 @@ async fn delete_library_locked(id: &str) -> Result<(), HentaiError> {
         [sea_orm::Value::String(Some(Box::new(id.to_string())))],
     ))
     .await
-    .map_err(map_db_err)?;
+    .map_err(|e| map_db_err(&e))?;
     Libraries::delete_by_id(id.to_string())
         .exec(&txn)
         .await
-        .map_err(map_db_err)?;
-    txn.commit().await.map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
+    txn.commit().await.map_err(|e| map_db_err(&e))?;
     crate::revision::notify_committed();
     Ok(())
 }
@@ -391,7 +389,7 @@ pub async fn update_library_resource_format_categories(
     let Some(model) = Libraries::find_by_id(id.to_string())
         .one(&db)
         .await
-        .map_err(map_db_err)?
+        .map_err(|e| map_db_err(&e))?
     else {
         return Err(HentaiError::validation(format!("Library 不存在: {id}")));
     };
@@ -403,7 +401,7 @@ pub async fn update_library_resource_format_categories(
     // Empty list is intentional (user may disable all groups until next sync).
     let mut active: libraries::ActiveModel = model.into();
     active.enabled_resource_format_categories = Set(serialize_resource_format_categories(&groups));
-    let updated = active.update(&db).await.map_err(map_db_err)?;
+    let updated = active.update(&db).await.map_err(|e| map_db_err(&e))?;
     crate::revision::notify_committed();
     Ok(model_to_dto(updated))
 }
@@ -427,7 +425,7 @@ pub async fn update_library_settings(
     let Some(model) = Libraries::find_by_id(id.to_string())
         .one(&db)
         .await
-        .map_err(map_db_err)?
+        .map_err(|e| map_db_err(&e))?
     else {
         return Err(HentaiError::validation(format!("Library 不存在: {id}")));
     };
@@ -441,15 +439,15 @@ pub async fn update_library_settings(
         }
         // Keep formats empty; allow startup/interval scan like other Local libraries (#599).
         active.enabled_resource_format_categories = Set(serialize_resource_format_categories(&[]));
-        active.scan_on_startup = Set(if scan_on_startup { 1 } else { 0 });
+        active.scan_on_startup = Set(i32::from(scan_on_startup));
         active.scan_interval = Set(scan_interval.as_str().to_string());
     } else {
         active.enabled_resource_format_categories =
             Set(serialize_resource_format_categories(&groups));
-        active.scan_on_startup = Set(if scan_on_startup { 1 } else { 0 });
+        active.scan_on_startup = Set(i32::from(scan_on_startup));
         active.scan_interval = Set(scan_interval.as_str().to_string());
     }
-    let updated = active.update(&db).await.map_err(map_db_err)?;
+    let updated = active.update(&db).await.map_err(|e| map_db_err(&e))?;
     crate::revision::notify_committed();
     Ok(model_to_dto(updated))
 }
@@ -457,14 +455,14 @@ pub async fn update_library_settings(
 /// Used when migrating legacy app-level `autoScan: true` onto every Library.
 pub async fn set_all_libraries_scan_on_startup(enabled: bool) -> Result<(), HentaiError> {
     let db = connection()?;
-    let flag = if enabled { 1 } else { 0 };
+    let flag = i32::from(enabled);
     db.execute(Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
         "UPDATE libraries SET scan_on_startup = ?",
         [sea_orm::Value::Int(Some(flag))],
     ))
     .await
-    .map_err(map_db_err)?;
+    .map_err(|e| map_db_err(&e))?;
     crate::revision::notify_committed();
     Ok(())
 }
@@ -474,7 +472,7 @@ pub async fn find_library_by_id(library_id: &str) -> Result<Option<LibraryDto>, 
     let row = Libraries::find_by_id(library_id.to_string())
         .one(&db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     Ok(row.map(model_to_dto))
 }
 
@@ -500,7 +498,7 @@ pub(crate) async fn load_comic_ids_for_library<C: ConnectionTrait>(
             )))],
         ))
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     rows.into_iter()
         .map(|row| {
             row.try_get_by_index::<String>(0)

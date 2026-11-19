@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
 mod common;
 
 use std::io::Read;
@@ -298,8 +300,8 @@ fn dictionary_changes_and_trash_restore_schedule_only_committed_current_metadata
                         .unwrap()
                         .unwrap(),
                 );
-                assert!(imported.authors.is_empty());
-                assert!(imported.tags.is_empty());
+                assert_eq!(imported.authors.len(), 0);
+                assert_eq!(imported.tags.len(), 0);
             });
         },
     );
@@ -355,7 +357,7 @@ fn cbz_execution_roundtrips_all_metadata_and_updates_observations_without_page_c
             assert!(process_next().await.unwrap());
             let imported = hentai_core::resource::parsed_to_comic(&hentai_core::resource::parse_file(std::path::Path::new(&comic.path)).unwrap().unwrap());
             assert_eq!(imported.description, None);
-            assert!(imported.tags.is_empty());
+            assert_eq!(imported.tags.len(), 0);
             assert_eq!(imported.author_names(), current.author_names());
         });
         },
@@ -378,7 +380,7 @@ fn replacement_success_followed_by_database_failure_is_recovered_without_rewriti
             assert_eq!(status.state, "failed");
             assert!(status.error.unwrap().contains("observation blocked"));
             let bytes = std::fs::read(&comic.path).unwrap();
-            assert_ne!(bytes.len() as i64, comic.resource_size);
+            assert_ne!(hentai_core::util::usize_to_i64(bytes.len()), comic.resource_size);
             assert!(!process_next().await.unwrap(), "failed work must respect backoff");
             db.execute_unprepared("DROP TRIGGER fail_observation; UPDATE resource_metadata_jobs SET due_at = 0").await.unwrap();
             assert!(process_next().await.unwrap());

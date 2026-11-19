@@ -192,7 +192,7 @@ impl SessionStore {
     }
 
     /// Evict idle (`ref_count == 0`) sessions until at or under the soft cap.
-    /// In-use sessions are never evicted; the store may temporarily exceed [MAX_SESSIONS].
+    /// In-use sessions are never evicted; the store may temporarily exceed [`MAX_SESSIONS`].
     fn evict_if_needed(&mut self) {
         while self.order.len() > MAX_SESSIONS {
             let Some(oldest_idle) = self
@@ -283,9 +283,8 @@ fn acquire_reader_with(
         return Err(HentaiError::reader_session_not_open(comic_id));
     }
 
-    if let Some(existing) = store.sessions.get(comic_id) {
-        if existing.normalized_path == normalized_path {
-            let existing = store.sessions.get_mut(comic_id).expect("session exists");
+    match store.sessions.get_mut(comic_id) {
+        Some(existing) if existing.normalized_path == normalized_path => {
             existing.ref_count = existing.ref_count.saturating_add(1);
             if !existing.reuse_logged {
                 existing.reuse_logged = true;
@@ -295,12 +294,15 @@ fn acquire_reader_with(
             store.touch(comic_id);
             return Ok(read);
         }
-        if existing.ref_count > 0 {
+        Some(existing) if existing.ref_count > 0 => {
             return Err(HentaiError::reader_kind_mismatch(format!(
                 "阅读会话仍在使用中，无法切换路径: {comic_id}"
             )));
         }
-        store.remove_session(comic_id);
+        Some(_) => {
+            store.remove_session(comic_id);
+        }
+        None => {}
     }
 
     // Release the store lock while opening the backend (can be slow / I/O).
@@ -315,9 +317,8 @@ fn acquire_reader_with(
     }
 
     // Another acquire may have won the race; reuse if path matches.
-    if let Some(existing) = store.sessions.get(comic_id) {
-        if existing.normalized_path == normalized_path {
-            let existing = store.sessions.get_mut(comic_id).expect("session exists");
+    match store.sessions.get_mut(comic_id) {
+        Some(existing) if existing.normalized_path == normalized_path => {
             existing.ref_count = existing.ref_count.saturating_add(1);
             if !existing.reuse_logged {
                 existing.reuse_logged = true;
@@ -327,12 +328,15 @@ fn acquire_reader_with(
             store.touch(comic_id);
             return Ok(read);
         }
-        if existing.ref_count > 0 {
+        Some(existing) if existing.ref_count > 0 => {
             return Err(HentaiError::reader_kind_mismatch(format!(
                 "阅读会话仍在使用中，无法切换路径: {comic_id}"
             )));
         }
-        store.remove_session(comic_id);
+        Some(_) => {
+            store.remove_session(comic_id);
+        }
+        None => {}
     }
 
     let session = CachedSession {
@@ -396,7 +400,7 @@ pub fn open_reader(comic_id: &str, path: &str, resource_type: &str) -> Result<()
     acquire_reader(comic_id, path, resource_type, identity).map(|_| ())
 }
 
-/// Test / injected-access open (FakeResourceAccess, etc.).
+/// Test / injected-access open (`FakeResourceAccess`, etc.).
 pub fn open_reader_with(
     access: &dyn ResourceAccess,
     comic_id: &str,
@@ -569,7 +573,7 @@ mod tests {
         open_reader_with(&access, comic_id, location, "cbz").unwrap();
         let session = ReaderSessionRead::capture(comic_id).unwrap();
         assert!(session.source_version.is_none());
-        let page = load_reader_page(ReaderPageRead::capture(comic_id).unwrap(), 0).unwrap();
+        let page = load_reader_page(&ReaderPageRead::capture(comic_id).unwrap(), 0).unwrap();
         assert!(
             matches!(page, crate::reader::ReaderPageDto::Bytes { data } if data == b"uncached-page")
         );
@@ -595,7 +599,7 @@ mod tests {
             HentaiErrorCode::ReaderInvalidContent
         );
         assert_eq!(
-            crate::reader::load_reader_page(page, 0).unwrap_err().code,
+            crate::reader::load_reader_page(&page, 0).unwrap_err().code,
             HentaiErrorCode::ReaderInvalidContent
         );
         close_reader(comic_id);
@@ -621,19 +625,21 @@ mod tests {
 
     #[test]
     fn path_bound_sevenz_rejects_a_changed_source_before_reopening_it() {
+        // Prebuilt fixture: sevenz_rust's LZMA encoder hits Stacked Borrows UB under Miri.
+        const CB7: &[u8] = include_bytes!(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/tests/fixtures/snapshot_page.cb7"
+        ));
         let root = tempfile::tempdir().unwrap().keep();
-        let pages = root.join("pages");
-        std::fs::create_dir(&pages).unwrap();
-        std::fs::write(pages.join("1.jpg"), b"page-one").unwrap();
         let path = root.join("mutable.cb7");
-        sevenz_rust::compress_to_path(&pages, &path).unwrap();
+        std::fs::write(&path, CB7).unwrap();
         let location = path.to_string_lossy();
         let comic_id = "source_sevenz_changed";
         open_reader_with(local_access(), comic_id, &location, "cb7").unwrap();
         let read = ReaderSessionRead::capture(comic_id).unwrap();
         assert_eq!(
             super::super::open::load_page_bytes(&read, 0).unwrap(),
-            b"page-one"
+            b"snapshot-page"
         );
         std::fs::write(&path, b"changed-7z-source").unwrap();
         let error = super::super::open::load_page_bytes(&read, 0).unwrap_err();
@@ -704,7 +710,7 @@ mod tests {
                 HentaiErrorCode::ReaderSessionNotOpen
             );
             assert_eq!(
-                load_reader_page(old_page, 0).unwrap_err().code,
+                load_reader_page(&old_page, 0).unwrap_err().code,
                 HentaiErrorCode::ReaderSessionNotOpen
             );
             let current = ReaderSessionRead::capture(comic_id).unwrap();

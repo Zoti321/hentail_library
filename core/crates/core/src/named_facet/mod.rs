@@ -28,6 +28,7 @@ pub enum ManagementFacetKind {
 }
 
 impl ManagementFacetKind {
+    #[must_use]
     pub fn junction(self) -> Option<JunctionNamedFacet> {
         match self {
             Self::Author => None,
@@ -39,6 +40,7 @@ impl ManagementFacetKind {
 }
 
 impl JunctionNamedFacet {
+    #[must_use]
     pub fn dict_table(self) -> &'static str {
         match self {
             Self::Tag => "tags",
@@ -47,6 +49,7 @@ impl JunctionNamedFacet {
         }
     }
 
+    #[must_use]
     pub fn junction_table(self) -> &'static str {
         match self {
             Self::Tag => "comic_tags",
@@ -56,6 +59,7 @@ impl JunctionNamedFacet {
     }
 
     /// Image set bindings on the same dictionary (no Metadata field lock).
+    #[must_use]
     pub fn image_set_junction_table(self) -> &'static str {
         match self {
             Self::Tag => "image_set_tags",
@@ -73,6 +77,7 @@ impl JunctionNamedFacet {
         ]
     }
 
+    #[must_use]
     pub fn junction_name_column(self) -> &'static str {
         match self {
             Self::Tag => "tag_name",
@@ -82,6 +87,7 @@ impl JunctionNamedFacet {
     }
 
     /// Library-scoped distinct attached names (ORDER BY name COLLATE NOCASE).
+    #[must_use]
     pub fn distinct_attached_sql(self) -> String {
         let visible = visible_comic_sql("c");
         let junction = self.junction_table();
@@ -98,6 +104,7 @@ impl JunctionNamedFacet {
     /// Form picker candidates: name + global attachment count.
     ///
     /// Order: `attachment_count` DESC, then `name` ASC. Unused dictionary rows are 0.
+    #[must_use]
     pub fn form_listing_sql(self) -> String {
         let dict = self.dict_table();
         let junction = self.junction_table();
@@ -115,6 +122,7 @@ impl JunctionNamedFacet {
     /// Management page candidates: name + global attachment count.
     ///
     /// Order: `name` ASC (matches legacy management paging). Unused dictionary rows are 0.
+    #[must_use]
     pub fn management_page_sql(self) -> String {
         let dict = self.dict_table();
         let junction = self.junction_table();
@@ -131,7 +139,7 @@ impl JunctionNamedFacet {
     }
 }
 
-/// Named metadata facet row for Comic metadata form MultiSelect candidates.
+/// Named metadata facet row for Comic metadata form `MultiSelect` candidates.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct NamedFacetFormEntry {
     pub name: String,
@@ -191,7 +199,7 @@ pub async fn load_image_set_named_facet<C: ConnectionTrait>(
             [Value::String(Some(Box::new(image_set_id.to_string())))],
         ))
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     rows.into_iter()
         .map(|row| {
             row.try_get_by_index::<String>(0)
@@ -217,7 +225,7 @@ async fn replace_owner_named_facet<C: ConnectionTrait>(
         [Value::String(Some(Box::new(owner_id.to_string())))],
     ))
     .await
-    .map_err(map_db_err)?;
+    .map_err(|e| map_db_err(&e))?;
 
     // Trimmed, empty-free, first-seen order — dictionary and junction rows agree.
     let names = crate::metadata_lock::normalize_names(names);
@@ -228,7 +236,7 @@ async fn replace_owner_named_facet<C: ConnectionTrait>(
             [Value::String(Some(Box::new(name.clone())))],
         ))
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
 
         db.execute(Statement::from_sql_and_values(
             sea_orm::DatabaseBackend::Sqlite,
@@ -239,7 +247,7 @@ async fn replace_owner_named_facet<C: ConnectionTrait>(
             ],
         ))
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     }
     Ok(())
 }
@@ -255,7 +263,7 @@ pub async fn list_all_named_facet_names(
             format!("SELECT name FROM {dict} ORDER BY name ASC"),
         ))
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     rows.into_iter()
         .map(|row| {
             row.try_get_by_index::<String>(0)
@@ -273,7 +281,7 @@ pub async fn count_all_named_facet_names(facet: JunctionNamedFacet) -> Result<i6
             format!("SELECT COUNT(*) FROM {dict}"),
         ))
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     rows.into_iter()
         .next()
         .ok_or_else(|| HentaiError::db_query_failed("count row missing".to_string(), None))
@@ -296,7 +304,7 @@ pub async fn fetch_named_facet_page(
             [Value::Int(Some(limit)), Value::Int(Some(offset))],
         ))
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     rows.into_iter()
         .map(|row| {
             let name = row
@@ -330,7 +338,7 @@ pub async fn fetch_named_facet_names_page(
     use crate::comic::pagination::paginate;
 
     let total = count_all_named_facet_names(facet).await?;
-    let window = paginate(request, total).clamped();
+    let window = paginate(&request, total).clamped();
     if total <= 0 {
         return Ok(PagedStringNamesDto {
             items: vec![],
@@ -339,7 +347,7 @@ pub async fn fetch_named_facet_names_page(
             page_size: window.page_size,
         });
     }
-    let items = fetch_named_facet_page(facet, window.page_size, window.offset as i32).await?;
+    let items = fetch_named_facet_page(facet, window.page_size, crate::util::i64_to_i32(window.offset)).await?;
     Ok(PagedStringNamesDto {
         items,
         total_count: total,
@@ -371,7 +379,13 @@ pub async fn fetch_management_facet_names_page(
             })
         }
         ManagementFacetKind::Tag | ManagementFacetKind::Parody | ManagementFacetKind::Character => {
-            fetch_named_facet_names_page(facet.junction().expect("dictionary facet"), request).await
+            fetch_named_facet_names_page(
+                facet
+                    .junction()
+                    .ok_or_else(|| HentaiError::validation("dictionary facet required"))?,
+                request,
+            )
+            .await
         }
     }
 }
@@ -391,7 +405,7 @@ pub async fn list_distinct_named_facet_names(
             [Value::String(Some(Box::new(library_id)))],
         ))
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     rows.into_iter()
         .map(|row| {
             row.try_get_by_index::<String>(0)
@@ -412,7 +426,7 @@ pub async fn add_named_facet_name(
         [Value::String(Some(Box::new(name.to_string())))],
     ))
     .await
-    .map_err(map_db_err)?;
+    .map_err(|e| map_db_err(&e))?;
     crate::revision::notify_committed();
     Ok(())
 }
@@ -432,7 +446,7 @@ async fn delete_named_facet_by_names_locked(
     names: Vec<String>,
 ) -> Result<(), HentaiError> {
     let db = connection()?;
-    let txn = db.begin().await.map_err(map_db_err)?;
+    let txn = db.begin().await.map_err(|e| map_db_err(&e))?;
     let dict = facet.dict_table();
     let placeholders = std::iter::repeat_n("?", names.len())
         .collect::<Vec<_>>()
@@ -448,9 +462,9 @@ async fn delete_named_facet_by_names_locked(
         values,
     ))
     .await
-    .map_err(map_db_err)?;
+    .map_err(|e| map_db_err(&e))?;
     crate::resource_metadata::record_affected_in(&txn, captured).await?;
-    txn.commit().await.map_err(map_db_err)?;
+    txn.commit().await.map_err(|e| map_db_err(&e))?;
     crate::revision::notify_committed();
     Ok(())
 }
@@ -469,7 +483,7 @@ async fn rename_named_facet_name_locked(
     new_name: &str,
 ) -> Result<(), HentaiError> {
     let db = connection()?;
-    let txn = db.begin().await.map_err(map_db_err)?;
+    let txn = db.begin().await.map_err(|e| map_db_err(&e))?;
     let dict = facet.dict_table();
     let name_col = facet.junction_name_column();
     let captured = capture_facet_writeback(&txn, facet, "?", vec![old_name.into()]).await?;
@@ -480,7 +494,7 @@ async fn rename_named_facet_name_locked(
         [Value::String(Some(Box::new(new_name.to_string())))],
     ))
     .await
-    .map_err(map_db_err)?;
+    .map_err(|e| map_db_err(&e))?;
 
     for (junction, _) in facet.owner_junctions() {
         txn.execute(Statement::from_sql_and_values(
@@ -492,7 +506,7 @@ async fn rename_named_facet_name_locked(
             ],
         ))
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     }
 
     txn.execute(Statement::from_sql_and_values(
@@ -501,10 +515,10 @@ async fn rename_named_facet_name_locked(
         [Value::String(Some(Box::new(old_name.to_string())))],
     ))
     .await
-    .map_err(map_db_err)?;
+    .map_err(|e| map_db_err(&e))?;
 
     crate::resource_metadata::record_affected_in(&txn, captured).await?;
-    txn.commit().await.map_err(map_db_err)?;
+    txn.commit().await.map_err(|e| map_db_err(&e))?;
     crate::revision::notify_committed();
     Ok(())
 }
@@ -533,7 +547,7 @@ async fn merge_named_facet_name_locked(
     }
 
     let db = connection()?;
-    let txn = db.begin().await.map_err(map_db_err)?;
+    let txn = db.begin().await.map_err(|e| map_db_err(&e))?;
     let dict = facet.dict_table();
     let name_col = facet.junction_name_column();
     let captured = capture_facet_writeback(&txn, facet, "?", vec![source.into()]).await?;
@@ -546,7 +560,7 @@ async fn merge_named_facet_name_locked(
                 [Value::String(Some(Box::new(name.to_string())))],
             ))
             .await
-            .map_err(map_db_err)?;
+            .map_err(|e| map_db_err(&e))?;
         if rows.is_empty() {
             return Err(HentaiError::validation(format!("{label}不存在: {name}")));
         }
@@ -565,14 +579,14 @@ async fn merge_named_facet_name_locked(
             ],
         ))
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
         txn.execute(Statement::from_sql_and_values(
             sea_orm::DatabaseBackend::Sqlite,
             format!("DELETE FROM {junction} WHERE {name_col} = ?"),
             [Value::String(Some(Box::new(source.to_string())))],
         ))
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     }
     txn.execute(Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
@@ -580,9 +594,9 @@ async fn merge_named_facet_name_locked(
         [Value::String(Some(Box::new(source.to_string())))],
     ))
     .await
-    .map_err(map_db_err)?;
+    .map_err(|e| map_db_err(&e))?;
     crate::resource_metadata::record_affected_in(&txn, captured).await?;
-    txn.commit().await.map_err(map_db_err)?;
+    txn.commit().await.map_err(|e| map_db_err(&e))?;
     crate::revision::notify_committed();
     Ok(())
 }
@@ -605,10 +619,10 @@ async fn capture_facet_writeback(
             values,
         ))
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     let ids = rows
         .into_iter()
-        .map(|row| row.try_get("", "comic_id").map_err(map_db_err))
+        .map(|row| row.try_get("", "comic_id").map_err(|e| map_db_err(&e)))
         .collect::<Result<Vec<String>, _>>()?;
     crate::resource_metadata::capture_affected_in(db, ids).await
 }
@@ -626,7 +640,7 @@ pub async fn list_named_facet_for_form(
             facet.form_listing_sql(),
         ))
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     rows.into_iter()
         .map(|row| {
             let name = row
@@ -660,7 +674,7 @@ pub async fn count_named_facet_attachments(
             [Value::String(Some(Box::new(name.to_string())))],
         ))
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     rows.into_iter()
         .next()
         .ok_or_else(|| HentaiError::db_query_failed("count row missing".to_string(), None))
@@ -703,7 +717,7 @@ pub async fn count_named_facet_attachments_batch(
             values,
         ))
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
 
     let mut counted = std::collections::HashMap::<String, i64>::with_capacity(rows.len());
     for row in rows {

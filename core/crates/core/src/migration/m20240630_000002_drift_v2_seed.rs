@@ -9,7 +9,7 @@ use sea_orm_migration::prelude::*;
 #[derive(DeriveMigrationName)]
 pub struct Migration;
 
-const SQL: &str = r#"
+const SQL: &str = r"
 CREATE TABLE IF NOT EXISTS comics (
   comic_id TEXT NOT NULL PRIMARY KEY,
   path TEXT NOT NULL,
@@ -88,7 +88,7 @@ CREATE TABLE IF NOT EXISTS series_reading_histories (
   page_index INTEGER,
   FOREIGN KEY(series_id) REFERENCES series(series_id) ON DELETE CASCADE
 );
-"#;
+";
 
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {

@@ -3,11 +3,8 @@ use crate::util::decode_basic_html_entities;
 
 use super::text::{merge_scanned_text, scanned_text_present};
 
-fn scanned_optional_text_present(value: &Option<String>) -> bool {
-    value
-        .as_ref()
-        .map(|s| scanned_text_present(s))
-        .unwrap_or(false)
+fn scanned_optional_text_present(value: Option<&String>) -> bool {
+    value.is_some_and(|s| scanned_text_present(s))
 }
 
 fn merge_title(locked: bool, existing: &str, scanned: &str) -> String {
@@ -16,13 +13,13 @@ fn merge_title(locked: bool, existing: &str, scanned: &str) -> String {
 
 fn merge_optional_text(
     locked: bool,
-    existing: &Option<String>,
-    scanned: &Option<String>,
+    existing: Option<&String>,
+    scanned: Option<&String>,
 ) -> Option<String> {
     if locked || !scanned_optional_text_present(scanned) {
-        existing.clone()
+        existing.cloned()
     } else {
-        scanned.clone()
+        scanned.cloned()
     }
 }
 
@@ -80,11 +77,13 @@ fn merge_author_refs(
 ///
 /// `page_count`: when source path/type unchanged, keep existing (lightweight Remote
 /// sync registers placeholder `1` and must not clobber a real count filled on open).
+#[must_use]
 pub fn merge_kept_scan_with_existing(scanned: &ComicDto, existing: &ComicDto) -> ComicDto {
     merge_scan_with_existing(scanned, existing, /*prefer_scanned_pages=*/ false)
 }
 
 /// Metadata refresh / first-open writeback: always take scanned `page_count` when > 0.
+#[must_use]
 pub fn merge_refresh_scan_with_existing(scanned: &ComicDto, existing: &ComicDto) -> ComicDto {
     merge_scan_with_existing(scanned, existing, /*prefer_scanned_pages=*/ true)
 }
@@ -119,8 +118,8 @@ fn merge_scan_with_existing(
         page_count,
         description: merge_optional_text(
             locks.description,
-            &existing.description,
-            &scanned.description,
+            existing.description.as_ref(),
+            scanned.description.as_ref(),
         ),
         published_at: merge_optional_ms(
             locks.published_at,

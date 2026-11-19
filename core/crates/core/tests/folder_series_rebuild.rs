@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
 mod common;
 
 use hentai_core::sync::series_rebuild::rebuild_series_from_comics;

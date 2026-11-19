@@ -1,6 +1,6 @@
-//! Resource discovery & parse — Resource → [ParsedResource].
+//! Resource discovery & parse — Resource → [`ParsedResource`].
 //!
-//! I/O goes through [access] (filesystem, WebDAV or injected streams).
+//! I/O goes through [access] (filesystem, `WebDAV` or injected streams).
 //! Library sync / Metadata refresh consume parse. formats / reader /
 //! thumbnail use [media] helpers and [access] (no dependency on sync).
 

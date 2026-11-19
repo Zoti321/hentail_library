@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
 mod common;
 
 use hentai_core::{connection, find_series_item_by_comic_id, init_db_at_path};

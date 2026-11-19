@@ -46,8 +46,7 @@ pub struct ThumbnailBatchResult {
 fn now_ms() -> i64 {
     std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
-        .map(|d| d.as_millis() as i64)
-        .unwrap_or(0)
+        .map_or(0, |d| crate::util::milliseconds_to_i64(d.as_millis()))
 }
 
 pub async fn find_thumbnail_by_comic_id(
@@ -60,7 +59,7 @@ pub async fn find_thumbnail_by_comic_id(
     let row = ComicThumbnails::find_by_id(comic_id)
         .one(&db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     Ok(row.map(|r| ComicThumbnailDto {
         thumbnail: r.thumbnail,
         source_modified_ms: r.source_modified_ms.unwrap_or(0),
@@ -84,7 +83,7 @@ pub async fn find_thumbnail_cover_meta(
         .into_tuple()
         .one(&db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     Ok(
         row.map(|(is_user_set, source_page_index)| ThumbnailCoverMeta {
             is_user_set,
@@ -137,7 +136,7 @@ pub async fn set_comic_thumbnail_from_page(
         )
         .exec(&db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     Ok(())
 }
 
@@ -179,7 +178,7 @@ pub async fn set_series_thumbnail_from_page(
         )
         .exec(&db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     Ok(())
 }
 
@@ -194,7 +193,7 @@ pub async fn find_series_thumbnail_by_series_id(
     let row = SeriesThumbnails::find_by_id(series_id)
         .one(&db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     Ok(row.map(|r| SeriesThumbnailDto {
         thumbnail: r.thumbnail,
         source_comic_id: r.source_comic_id,
@@ -202,20 +201,20 @@ pub async fn find_series_thumbnail_by_series_id(
     }))
 }
 
-/// 系列封面解析：自定义系列缩略图优先，否则回退到 sort_order 最大的**可见**成员漫画
+/// 系列封面解析：自定义系列缩略图优先，否则回退到 `sort_order` 最大的**可见**成员漫画
 ///（跳过 Comic trash，ADR-0023）。
 pub async fn resolve_series_cover(series_id: &str) -> Result<SeriesCoverSource, HentaiError> {
-    if let Some(custom) = find_series_thumbnail_by_series_id(series_id).await? {
-        return Ok(SeriesCoverSource::CustomThumbnail {
-            thumbnail: custom.thumbnail,
-        });
-    }
-
     use crate::comic::visibility::visible_comic_id_sql;
     use crate::db::{connection, map_db_err};
     use crate::entity::series_items;
     use sea_orm::sea_query::Expr;
     use sea_orm::{ColumnTrait, EntityTrait, QueryFilter, QueryOrder};
+
+    if let Some(custom) = find_series_thumbnail_by_series_id(series_id).await? {
+        return Ok(SeriesCoverSource::CustomThumbnail {
+            thumbnail: custom.thumbnail,
+        });
+    }
 
     let db = connection()?;
     let items = series_items::Entity::find()
@@ -225,7 +224,7 @@ pub async fn resolve_series_cover(series_id: &str) -> Result<SeriesCoverSource, 
         .order_by_asc(series_items::Column::ComicId)
         .all(&db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
 
     let Some(best) = items.into_iter().next() else {
         return Ok(SeriesCoverSource::Missing);
@@ -247,7 +246,7 @@ pub async fn delete_thumbnails_by_comic_ids(comic_ids: Vec<String>) -> Result<()
         .filter(comic_thumbnails::Column::ComicId.is_in(comic_ids))
         .exec(&db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     Ok(())
 }
 
@@ -257,7 +256,7 @@ pub async fn generate_thumbnails(
     handle: &SyncHandle,
     mut on_progress: impl FnMut(i32, i32, Option<String>),
 ) -> Result<ThumbnailBatchResult, HentaiError> {
-    let total = targets.len() as i32;
+    let total = crate::util::usize_to_i32(targets.len());
     let mut done = 0i32;
     let mut failed = 0i32;
     for comic in targets {
@@ -267,8 +266,7 @@ pub async fn generate_thumbnails(
         on_progress(done, total, Some(comic.path.clone()));
         match store_thumbnail_for_comic(db, comic).await {
             Ok(true) => {}
-            Ok(false) => failed += 1,
-            Err(_) => failed += 1,
+            Ok(false) | Err(_) => failed += 1,
         }
         done += 1;
         on_progress(done, total, Some(comic.path.clone()));

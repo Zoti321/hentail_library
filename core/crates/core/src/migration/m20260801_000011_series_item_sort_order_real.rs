@@ -1,7 +1,7 @@
 use sea_orm::Statement;
 use sea_orm_migration::prelude::*;
 
-/// SeriesItem.sort_order → REAL；新增 sort_order_locked（Komga 式锁定）。
+/// `SeriesItem.sort_order` → REAL；新增 `sort_order_locked（Komga` 式锁定）。
 ///
 /// 使用单连接 `execute_unprepared` 批量执行，避免连接池上 PRAGMA/DDL 跨连接失效。
 #[derive(DeriveMigrationName)]
@@ -20,7 +20,7 @@ impl MigrationTrait for Migration {
         manager
             .get_connection()
             .execute_unprepared(
-                r#"
+                r"
 PRAGMA foreign_keys=OFF;
 CREATE TABLE __series_items_v2 (
   series_id TEXT NOT NULL,
@@ -37,7 +37,7 @@ INSERT INTO __series_items_v2 (series_id, comic_id, sort_order, sort_order_locke
 DROP TABLE series_items;
 ALTER TABLE __series_items_v2 RENAME TO series_items;
 PRAGMA foreign_keys=ON;
-"#,
+",
             )
             .await?;
         Ok(())
@@ -68,7 +68,6 @@ async fn column_exists(
     let rows = manager.get_connection().query_all(stmt).await?;
     Ok(rows.iter().any(|row| {
         row.try_get_by_index::<String>(1)
-            .map(|name| name == column)
-            .unwrap_or(false)
+            .is_ok_and(|name| name == column)
     }))
 }

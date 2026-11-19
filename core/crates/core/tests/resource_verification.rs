@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
 mod common;
 
 use hentai_core::resource_verification::{
@@ -34,7 +36,7 @@ fn persisted_fingerprint_is_projected_and_verification_never_accepts_a_new_basel
             assert!(fingerprint.digest.starts_with("sha256-file-v1:"));
             assert_eq!(
                 fingerprint.size,
-                std::fs::metadata(&path).unwrap().len() as i64
+                hentai_core::util::u64_to_i64(std::fs::metadata(&path).unwrap().len())
             );
             assert_eq!(
                 verify_comic_resource(&id, ResourceVerificationMode::Quick)

@@ -30,7 +30,7 @@ pub async fn load_snapshot_map(
         .filter(library_resource_snapshots::Column::LibraryId.eq(library_id))
         .all(db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     Ok(rows
         .into_iter()
         .map(|row| {
@@ -49,9 +49,9 @@ pub async fn rebuild_snapshot_from_scan_items(
     scan_items: &[ScanItem],
 ) -> Result<(), HentaiError> {
     let rows = prepare_snapshot(library_id, library, scan_items)?;
-    let txn = db.begin().await.map_err(map_db_err)?;
+    let txn = db.begin().await.map_err(|e| map_db_err(&e))?;
     replace_snapshot_in(&txn, library_id, rows).await?;
-    txn.commit().await.map_err(map_db_err)?;
+    txn.commit().await.map_err(|e| map_db_err(&e))?;
     Ok(())
 }
 
@@ -99,12 +99,12 @@ pub(crate) async fn replace_snapshot_in(
         .filter(library_resource_snapshots::Column::LibraryId.eq(library_id))
         .exec(db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     for row in rows {
         LibraryResourceSnapshots::insert(row)
             .exec(db)
             .await
-            .map_err(map_db_err)?;
+            .map_err(|e| map_db_err(&e))?;
     }
     Ok(())
 }
@@ -117,7 +117,7 @@ pub async fn delete_snapshots_for_library<C: ConnectionTrait>(
         .filter(library_resource_snapshots::Column::LibraryId.eq(library_id))
         .exec(db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     Ok(())
 }
 
@@ -134,7 +134,7 @@ pub async fn snapshot_row_count(
             )))],
         ))
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     Ok(row
         .and_then(|r| r.try_get::<i64>("", "c").ok())
         .unwrap_or(0))

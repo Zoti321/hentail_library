@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
 //! Image set catalog query: filter / sort / group / page (#603).
 
 mod common;
@@ -516,14 +518,15 @@ fn require_images_drops_empty_sets_and_library_scope_isolates_catalogs() {
             ),
             ["a2", "a10", "b", "pack.cbz"]
         );
-        assert!(fixture
-            .paths(
+        assert_eq!(
+            fixture.paths(
                 ImageSetFilterDto {
                     library_id: "other-library".to_string(),
                     ..Default::default()
                 },
                 Default::default()
-            )
-            .is_empty());
+            ),
+            Vec::<String>::new()
+        );
     });
 }

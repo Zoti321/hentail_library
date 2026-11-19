@@ -1,3 +1,18 @@
+#![cfg_attr(
+    test,
+    allow(
+        clippy::unwrap_used,
+        clippy::expect_used,
+        clippy::panic,
+        clippy::needless_raw_string_hashes,
+        unused_must_use,
+        clippy::cast_possible_wrap,
+        clippy::assert_is_empty,
+        clippy::stable_sort_primitive,
+        clippy::redundant_clone
+    )
+)]
+
 #[cfg(test)]
 extern crate self as hentai_core;
 

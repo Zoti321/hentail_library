@@ -50,6 +50,7 @@ pub struct MetadataWriteIntent {
 }
 
 impl MetadataWriteIntent {
+    #[must_use]
     pub fn full(snapshot: MetadataSnapshot) -> Self {
         Self {
             snapshot,
@@ -57,6 +58,7 @@ impl MetadataWriteIntent {
         }
     }
 
+    #[must_use]
     pub fn changed(previous: &MetadataSnapshot, snapshot: MetadataSnapshot) -> Self {
         let fields = ComicMetaField::ALL
             .iter()
@@ -120,6 +122,7 @@ impl MetadataSnapshot {
     }
 
     /// Unsupported/malformed extension fields fall back to their standard projection.
+    #[must_use]
     pub fn with_extension(mut self, raw: &str) -> Self {
         let Ok(extension) = serde_json::from_str::<Extension>(raw) else {
             return self;
@@ -134,7 +137,8 @@ impl MetadataSnapshot {
             match field {
                 ComicMetaField::Title => {
                     if let Some(value) = value.as_str() {
-                        self.title = value.to_owned();
+                        self.title.clear();
+                        self.title.push_str(value);
                     }
                 }
                 ComicMetaField::Description => {
@@ -149,7 +153,8 @@ impl MetadataSnapshot {
                 }
                 ComicMetaField::ContentRating => {
                     if let Some(value @ ("unknown" | "safe" | "r18")) = value.as_str() {
-                        self.content_rating = value.to_owned();
+                        self.content_rating.clear();
+                        self.content_rating.push_str(value);
                     }
                 }
                 ComicMetaField::Languages => {

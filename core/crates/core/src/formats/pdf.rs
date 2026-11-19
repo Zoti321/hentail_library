@@ -11,29 +11,40 @@ pub struct PdfBackend {
     pub path: String,
     pub page_count: i32,
     /// Keeps a temp file alive when the PDF was materialized from Remote access.
-    pub(crate) _remote_temp: Option<tempfile::NamedTempFile>,
+    pub(crate) remote_temp: Option<tempfile::NamedTempFile>,
 }
 
 fn bind_pdfium() -> Result<Pdfium, HentaiError> {
-    #[cfg(target_os = "android")]
+    #[cfg(miri)]
     {
-        // Packaged next to libhentai_flutter.so in jniLibs (also NEEDED).
-        // Do not fall back to system libpdfium — it is older / inaccessible on many APIs.
-        let bindings = Pdfium::bind_to_library("libpdfium.so")
-            .map_err(|e| map_archive_err("pdfium 绑定失败", e))?;
-        return Ok(Pdfium::new(bindings));
+        return Err(HentaiError::validation("pdfium unavailable under miri"));
     }
-    #[cfg(target_os = "ios")]
+    #[cfg(not(miri))]
     {
-        return bind_pdfium_ios();
-    }
-    #[cfg(not(any(target_os = "android", target_os = "ios")))]
-    {
-        let lib_dir = env!("HENTAI_PDFIUM_LIB_DIR");
-        let lib_path = Pdfium::pdfium_platform_library_name_at_path(lib_dir);
-        let bindings =
-            Pdfium::bind_to_library(lib_path).map_err(|e| map_archive_err("pdfium 绑定失败", e))?;
-        Ok(Pdfium::new(bindings))
+        #[cfg(target_os = "android")]
+        {
+            // Packaged next to libhentai_flutter.so in jniLibs (also NEEDED).
+            // Do not fall back to system libpdfium — it is older / inaccessible on many APIs.
+            let bindings = Pdfium::bind_to_library("libpdfium.so")
+                .map_err(|e| map_archive_err("pdfium 绑定失败", e))?;
+            return Ok(Pdfium::new(bindings));
+        }
+        #[cfg(target_os = "ios")]
+        {
+            return bind_pdfium_ios();
+        }
+        #[cfg(not(any(target_os = "android", target_os = "ios")))]
+        {
+            // build.rs sets this; option_env keeps `cargo miri` / skipped build scripts from
+            // failing at compile time when the not(miri) arm is still type-checked.
+            let lib_dir = option_env!("HENTAI_PDFIUM_LIB_DIR").ok_or_else(|| {
+                HentaiError::validation("HENTAI_PDFIUM_LIB_DIR unset (run core/vendor/fetch-native-deps.sh)")
+            })?;
+            let lib_path = Pdfium::pdfium_platform_library_name_at_path(lib_dir);
+            let bindings = Pdfium::bind_to_library(lib_path)
+                .map_err(|e| map_archive_err("pdfium 绑定失败", e))?;
+            Ok(Pdfium::new(bindings))
+        }
     }
 }
 
@@ -77,7 +88,7 @@ pub fn count_pdf_pages(file: &Path) -> Result<Option<i32>, HentaiError> {
     if count == 0 {
         return Ok(None);
     }
-    Ok(Some(count as i32))
+    Ok(Some(i32::from(count)))
 }
 
 type PdfEmbeddedMeta = (Option<String>, Vec<String>, Option<String>, Option<i64>);
@@ -90,29 +101,29 @@ pub fn read_pdf_embedded_meta(file: &Path) -> Result<PdfEmbeddedMeta, HentaiErro
     let metadata = document.metadata();
     let title = metadata
         .get(PdfDocumentMetadataTagType::Title)
-        .map(metadata_tag_text)
+        .map(|tag| metadata_tag_text(&tag))
         .filter(|s| !s.is_empty());
     let authors = metadata
         .get(PdfDocumentMetadataTagType::Author)
-        .map(metadata_tag_text)
-        .map(split_pdf_authors)
-        .unwrap_or_default();
+        .map(|tag| metadata_tag_text(&tag))
+        .map_or_else(Vec::new, |raw| split_pdf_authors(&raw));
     let description = metadata
         .get(PdfDocumentMetadataTagType::Subject)
-        .map(metadata_tag_text)
+        .map(|tag| metadata_tag_text(&tag))
         .filter(|s| !s.is_empty());
     let published_at = metadata
         .get(PdfDocumentMetadataTagType::CreationDate)
-        .map(metadata_tag_text)
-        .and_then(|raw| parse_pdf_date_to_ms(&raw));
+        .map(|tag| metadata_tag_text(&tag))
+        .as_deref()
+        .and_then(parse_pdf_date_to_ms);
     Ok((title, authors, description, published_at))
 }
 
-fn metadata_tag_text(tag: PdfDocumentMetadataTag) -> String {
+fn metadata_tag_text(tag: &PdfDocumentMetadataTag) -> String {
     tag.value().trim().to_string()
 }
 
-fn split_pdf_authors(raw: String) -> Vec<String> {
+fn split_pdf_authors(raw: &str) -> Vec<String> {
     raw.split([',', ';'])
         .map(str::trim)
         .filter(|s| !s.is_empty())
@@ -128,7 +139,7 @@ fn parse_pdf_date_to_ms(raw: &str) -> Option<i64> {
     let digits: String = trimmed
         .chars()
         .take(14)
-        .filter(|c| c.is_ascii_digit())
+        .filter(char::is_ascii_digit)
         .collect();
     if digits.len() < 8 {
         return None;
@@ -153,24 +164,24 @@ fn date_to_utc_ms(
     use std::time::{Duration, SystemTime, UNIX_EPOCH};
     let days_from_ce = days_from_civil(year, month, day)?;
     let secs =
-        days_from_ce as i64 * 86_400 + hour as i64 * 3600 + minute as i64 * 60 + second as i64;
+        i64::from(days_from_ce) * 86_400 + i64::from(hour) * 3600 + i64::from(minute) * 60 + i64::from(second);
     SystemTime::UNIX_EPOCH
-        .checked_add(Duration::from_secs(secs.max(0) as u64))
+        .checked_add(Duration::from_secs(crate::util::i64_to_u64_nonnegative(secs.max(0))))
         .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
-        .map(|d| d.as_millis() as i64)
+        .map(|d| crate::util::milliseconds_to_i64(d.as_millis()))
 }
 
-/// Algorithm from http://howardhinnant.github.io/date_algorithms.html
+/// Algorithm from <http://howardhinnant.github.io/date_algorithms.html>
 fn days_from_civil(year: i32, month: u32, day: u32) -> Option<u32> {
     if !(1..=12).contains(&month) || !(1..=31).contains(&day) {
         return None;
     }
-    let y = if month <= 2 { year - 1 } else { year } as u32;
+    let y = crate::util::i32_to_u32(if month <= 2 { year - 1 } else { year });
     let era = y / 400;
     let yoe = y - era * 400;
     let doy = (153 * (if month > 2 { month - 3 } else { month + 9 }) + 2) / 5 + day - 1;
     let doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;
-    Some(era * 146097 + doe - 719468)
+    Some(era * 146_097 + doe - 719_468)
 }
 
 pub fn open_pdf_backend(file: &Path) -> Result<PdfBackend, HentaiError> {
@@ -184,7 +195,7 @@ pub fn open_pdf_backend(file: &Path) -> Result<PdfBackend, HentaiError> {
     Ok(PdfBackend {
         path: file.to_string_lossy().to_string(),
         page_count,
-        _remote_temp: None,
+        remote_temp: None,
     })
 }
 
@@ -193,12 +204,12 @@ pub fn open_pdf_backend_kept(
     keep: tempfile::NamedTempFile,
 ) -> Result<PdfBackend, HentaiError> {
     let mut backend = open_pdf_backend(file)?;
-    backend._remote_temp = Some(keep);
+    backend.remote_temp = Some(keep);
     Ok(backend)
 }
 
 pub fn read_pdf_page(backend: &PdfBackend, page_index: usize) -> Result<Vec<u8>, HentaiError> {
-    if page_index >= backend.page_count as usize {
+    if page_index >= crate::util::i32_to_usize(backend.page_count) {
         return Err(HentaiError::reader_invalid_content(format!(
             "页索引越界: index={page_index} count={}",
             backend.page_count
@@ -210,7 +221,7 @@ pub fn read_pdf_page(backend: &PdfBackend, page_index: usize) -> Result<Vec<u8>,
         .map_err(|e| HentaiError::reader_invalid_content(format!("pdf 打开失败: {e}")))?;
     let page = document
         .pages()
-        .get(page_index as u16)
+        .get(crate::util::usize_to_u16(page_index))
         .map_err(|e| HentaiError::reader_invalid_content(format!("pdf 页读取失败: {e}")))?;
     let render_config = PdfRenderConfig::new()
         .set_target_width(1600)

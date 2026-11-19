@@ -53,6 +53,7 @@ impl ComicMetaField {
 
     /// Lock key and `ComicMetaLocks` serde key; the `comic_meta` value column when
     /// [`Self::storage`] is [`ComicMetaStorage::Column`].
+    #[must_use]
     pub const fn as_str(self) -> &'static str {
         match self {
             ComicMetaField::Title => "title",
@@ -68,6 +69,7 @@ impl ComicMetaField {
     }
 
     /// `comic_meta` lock column; a user meta write for this field sets it to `true`.
+    #[must_use]
     pub const fn lock_column(self) -> &'static str {
         match self {
             ComicMetaField::Title => "title_locked",
@@ -83,6 +85,7 @@ impl ComicMetaField {
     }
 
     /// Where this field's value rows live (ADR-0007 field table).
+    #[must_use]
     pub const fn storage(self) -> ComicMetaStorage {
         match self {
             ComicMetaField::Title
@@ -116,6 +119,7 @@ impl ComicMetaField {
     ///
     /// This is a declared contract pinned by `scan_sources_match_adr_0007`, not a runtime switch:
     /// each field's merge path has its own signature, so the rule lives in `metadata_lock::comic`.
+    #[must_use]
     pub const fn has_scan_source(self) -> bool {
         match self {
             ComicMetaField::Title
@@ -131,11 +135,19 @@ impl ComicMetaField {
     }
 
     /// Position in [`Self::ALL`]; the table is the only ordering source.
-    pub fn index(self) -> usize {
-        Self::ALL
-            .iter()
-            .position(|field| *field == self)
-            .expect("ComicMetaField::ALL must contain every variant")
+    #[must_use]
+    pub const fn index(self) -> usize {
+        match self {
+            ComicMetaField::Title => 0,
+            ComicMetaField::Description => 1,
+            ComicMetaField::PublishedAt => 2,
+            ComicMetaField::ContentRating => 3,
+            ComicMetaField::Authors => 4,
+            ComicMetaField::Tags => 5,
+            ComicMetaField::Languages => 6,
+            ComicMetaField::Parodies => 7,
+            ComicMetaField::Characters => 8,
+        }
     }
 }
 
@@ -157,6 +169,7 @@ impl SeriesMetaField {
 
     /// `series` value column and lock-flag base (`{as_str}_locked`); the guard test
     /// `series_locks_mirror_the_field_table` keeps it aligned with `SeriesMetaLocks`'s field names.
+    #[must_use]
     pub const fn as_str(self) -> &'static str {
         match self {
             SeriesMetaField::Name => "name",
@@ -166,6 +179,7 @@ impl SeriesMetaField {
     }
 
     /// `series` lock column; a user meta write for this field sets it to `true`.
+    #[must_use]
     pub const fn lock_column(self) -> &'static str {
         match self {
             SeriesMetaField::Name => "name_locked",
@@ -177,16 +191,19 @@ impl SeriesMetaField {
     /// Only the folder name is derived from the Library; status and count are user-only, so
     /// Library sync never rewrites them (ADR-0007). Declared contract, pinned by
     /// `scan_sources_match_adr_0007`; the merge itself lives in `metadata_lock::series`.
+    #[must_use]
     pub const fn has_scan_source(self) -> bool {
         matches!(self, SeriesMetaField::Name)
     }
 
     /// Position in [`Self::ALL`]; the table is the only ordering source.
-    pub fn index(self) -> usize {
-        Self::ALL
-            .iter()
-            .position(|field| *field == self)
-            .expect("SeriesMetaField::ALL must contain every variant")
+    #[must_use]
+    pub const fn index(self) -> usize {
+        match self {
+            SeriesMetaField::Name => 0,
+            SeriesMetaField::SerializationStatus => 1,
+            SeriesMetaField::TotalCount => 2,
+        }
     }
 }
 
@@ -254,6 +271,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[cfg_attr(miri, ignore = "sqlite/FFI unavailable under miri")]
     async fn comic_meta_columns_cover_every_field() {
         let schema = migrated_schema().await;
         let columns = schema.columns_of("comic_meta");
@@ -294,6 +312,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[cfg_attr(miri, ignore = "sqlite/FFI unavailable under miri")]
     async fn series_columns_cover_every_field() {
         let schema = migrated_schema().await;
         let columns = schema.columns_of("series");

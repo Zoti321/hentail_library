@@ -15,6 +15,7 @@ use std::collections::BTreeSet;
 
 /// Names as they are stored: trimmed, empties dropped, first-seen duplicates removed; order and
 /// case preserved.
+#[must_use]
 pub fn normalize_names(source: &[String]) -> Vec<String> {
     let mut out: Vec<String> = Vec::with_capacity(source.len());
     for value in source {
@@ -29,6 +30,7 @@ pub fn normalize_names(source: &[String]) -> Vec<String> {
 
 /// Filter / query input: trimmed and lowercased, empties dropped; order and duplicates kept
 /// (duplicates are harmless in an `IN (...)` predicate).
+#[must_use]
 pub fn normalize_match_tokens(source: &[String]) -> Vec<String> {
     source
         .iter()
@@ -39,6 +41,7 @@ pub fn normalize_match_tokens(source: &[String]) -> Vec<String> {
 
 /// One tag-boolean-expression operand: trimmed and lowercased, empties dropped, deduplicated,
 /// sorted — a candidate set for the `lower(...) IN (...)` predicate of tag-expression search.
+#[must_use]
 pub fn normalize_tag_expression_tokens(source: &[String]) -> Vec<String> {
     let mut set = BTreeSet::new();
     for value in source {

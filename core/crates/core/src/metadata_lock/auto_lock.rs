@@ -17,11 +17,13 @@ impl ComicAutoLocks {
         Self { flags }
     }
 
+    #[must_use]
     pub fn get(self, field: ComicMetaField) -> bool {
         self.flags[field.index()]
     }
 
     /// Written fields, in field-table order.
+    #[must_use]
     pub fn written(self) -> Vec<ComicMetaField> {
         ComicMetaField::ALL
             .iter()
@@ -30,6 +32,7 @@ impl ComicAutoLocks {
             .collect()
     }
 
+    #[must_use]
     pub fn any(self) -> bool {
         self.flags.iter().any(|flag| *flag)
     }
@@ -52,11 +55,13 @@ impl SeriesAutoLocks {
         Self { flags }
     }
 
+    #[must_use]
     pub fn get(self, field: SeriesMetaField) -> bool {
         self.flags[field.index()]
     }
 
     /// Written fields, in field-table order.
+    #[must_use]
     pub fn written(self) -> Vec<SeriesMetaField> {
         SeriesMetaField::ALL
             .iter()
@@ -65,21 +70,27 @@ impl SeriesAutoLocks {
             .collect()
     }
 
+    #[must_use]
     pub fn any(self) -> bool {
         self.flags.iter().any(|flag| *flag)
     }
 }
 
+/// Which Series user-meta fields were present in a write (feeds auto-lock).
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct SeriesAutoLockInputs {
+    pub name: bool,
+    pub serialization_status: bool,
+    pub total_count: bool,
+}
+
 /// Named-argument form of [`SeriesAutoLocks::from_written`] for the Series user-meta write.
-pub fn series_auto_locks(
-    name: bool,
-    serialization_status: bool,
-    total_count: bool,
-) -> SeriesAutoLocks {
+#[must_use]
+pub fn series_auto_locks(inputs: SeriesAutoLockInputs) -> SeriesAutoLocks {
     SeriesAutoLocks::from_written(|field| match field {
-        SeriesMetaField::Name => name,
-        SeriesMetaField::SerializationStatus => serialization_status,
-        SeriesMetaField::TotalCount => total_count,
+        SeriesMetaField::Name => inputs.name,
+        SeriesMetaField::SerializationStatus => inputs.serialization_status,
+        SeriesMetaField::TotalCount => inputs.total_count,
     })
 }
 
@@ -117,17 +128,29 @@ mod tests {
             .written()
             .is_empty());
         assert_eq!(
-            series_auto_locks(true, false, false).written(),
+            series_auto_locks(SeriesAutoLockInputs {
+                name: true,
+                ..SeriesAutoLockInputs::default()
+            })
+            .written(),
             vec![SeriesMetaField::Name]
         );
         assert_eq!(
-            series_auto_locks(false, true, false).written(),
+            series_auto_locks(SeriesAutoLockInputs {
+                serialization_status: true,
+                ..SeriesAutoLockInputs::default()
+            })
+            .written(),
             vec![SeriesMetaField::SerializationStatus]
         );
         assert_eq!(
-            series_auto_locks(false, false, true).written(),
+            series_auto_locks(SeriesAutoLockInputs {
+                total_count: true,
+                ..SeriesAutoLockInputs::default()
+            })
+            .written(),
             vec![SeriesMetaField::TotalCount]
         );
-        assert!(!series_auto_locks(false, false, false).any());
+        assert!(!series_auto_locks(SeriesAutoLockInputs::default()).any());
     }
 }

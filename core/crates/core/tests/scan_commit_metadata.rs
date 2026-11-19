@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
 mod common;
 
 use std::collections::HashMap;
@@ -101,7 +103,7 @@ fn scan_commit_preserves_user_values_locks_and_page_count_written_after_planning
             );
             assert_eq!(current.page_count, 37);
             assert_eq!(hentai_core::revision::notify_count(), notifications + 1);
-        })
+        });
     });
 }
 
@@ -139,7 +141,7 @@ fn scan_commit_uses_source_values_after_a_lock_is_released_after_planning() {
             let current = find_comic_by_id(&existing.comic_id).await.unwrap().unwrap();
             assert_eq!(current.title, "New source title");
             assert!(!current.locks.title);
-        })
+        });
     });
 }
 
@@ -178,7 +180,7 @@ fn scan_commit_missing_source_metadata_keeps_the_latest_unlocked_value() {
                 Some("Newest unlocked summary")
             );
             assert!(!current.locks.description);
-        })
+        });
     });
 }
 
@@ -230,7 +232,7 @@ fn scan_reuse_does_not_treat_an_old_projection_as_resource_metadata() {
             let current = find_comic_by_id(&existing.comic_id).await.unwrap().unwrap();
             assert_eq!(current.title, "Newest unlocked title");
             assert!(!current.locks.title);
-        })
+        });
     });
 }
 
@@ -243,7 +245,7 @@ fn unverified_scan_move_does_not_transfer_latest_user_metadata() {
             let plan = build_scan_replace_plan(&db, vec![item(moved.clone())], "")
                 .await
                 .unwrap();
-            assert!(plan.migrations.is_empty());
+            assert_eq!(plan.migrations.len(), 0);
             update_comic_user_meta(
                 &existing.comic_id,
                 UpdateComicUserMetaDto {
@@ -263,8 +265,8 @@ fn unverified_scan_move_does_not_transfer_latest_user_metadata() {
                 .is_none());
             let current = find_comic_by_id(&moved.comic_id).await.unwrap().unwrap();
             assert_eq!(current.title, "New source title");
-            assert!(current.languages.is_empty());
-            assert!(current.tags.is_empty());
+            assert_eq!(current.languages.len(), 0);
+            assert_eq!(current.tags.len(), 0);
             assert_eq!(current.author_names(), moved.author_names());
             assert!(
                 !current.locks.title
@@ -272,7 +274,7 @@ fn unverified_scan_move_does_not_transfer_latest_user_metadata() {
                     && !current.locks.tags
                     && !current.locks.authors
             );
-        })
+        });
     });
 }
 
@@ -302,7 +304,7 @@ fn scan_commit_does_not_recreate_a_kept_comic_removed_after_planning() {
                 .unwrap()
                 .is_none());
             assert_eq!(hentai_core::revision::notify_count(), notifications);
-        })
+        });
     });
 }
 
@@ -329,7 +331,7 @@ fn scan_commit_preserves_trash_only_for_kept_comics() {
                     hentai_core::is_comic_trashed(&target_id).await.unwrap(),
                     destination == LOCATION
                 );
-            })
+            });
         });
     }
 }
@@ -386,7 +388,7 @@ fn scan_reuse_requires_the_catalog_record_it_reused() {
                     .unwrap()
                     .is_none());
                 assert_eq!(hentai_core::revision::notify_count(), notifications);
-            })
+            });
         });
     }
 }

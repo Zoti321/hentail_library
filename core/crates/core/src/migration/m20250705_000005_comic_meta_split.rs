@@ -4,7 +4,7 @@ use sea_orm_migration::prelude::*;
 #[derive(DeriveMigrationName)]
 pub struct Migration;
 
-const SQL_CREATE_COMIC_META: &str = r#"
+const SQL_CREATE_COMIC_META: &str = r"
 CREATE TABLE IF NOT EXISTS comic_meta (
   comic_id TEXT NOT NULL PRIMARY KEY,
   title TEXT NOT NULL,
@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS comic_meta (
   published_at INTEGER,
   FOREIGN KEY(comic_id) REFERENCES comics(comic_id) ON DELETE CASCADE
 )
-"#;
+";
 
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
@@ -97,8 +97,7 @@ impl MigrationTrait for Migration {
 fn unix_now_ms() -> i64 {
     std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
-        .map(|d| d.as_millis() as i64)
-        .unwrap_or(0)
+        .map_or(0, |d| crate::util::milliseconds_to_i64(d.as_millis()))
 }
 
 async fn table_exists(manager: &SchemaManager<'_>, table: &str) -> Result<bool, DbErr> {
@@ -121,8 +120,7 @@ async fn column_exists(
     let rows = manager.get_connection().query_all(stmt).await?;
     Ok(rows.iter().any(|row| {
         row.try_get_by_index::<String>(1)
-            .map(|name| name == column)
-            .unwrap_or(false)
+            .is_ok_and(|name| name == column)
     }))
 }
 

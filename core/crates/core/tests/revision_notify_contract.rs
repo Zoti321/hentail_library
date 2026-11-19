@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
 //! Revision 通知的契约：写路径提交后必须唤醒订阅者。
 //!
 //! 改造后不再轮询 `PRAGMA data_version`，watch 流完全依赖写路径显式
@@ -197,8 +199,10 @@ fn dictionary_delete_sql_failure_keeps_names_without_notification() {
                 hentai_core::add_named_facet_name(facet, "retained")
                     .await
                     .expect("seed dictionary name");
+                // SQLite trigger names are DB-global; keep one unique name per facet table.
+                let trigger = format!("block_dictionary_delete_{}", facet.dict_table());
                 db.execute_unprepared(&format!(
-                    "CREATE TRIGGER block_dictionary_delete BEFORE DELETE ON {} \
+                    "CREATE TRIGGER {trigger} BEFORE DELETE ON {} \
                      BEGIN SELECT RAISE(ABORT, 'dictionary delete blocked'); END",
                     facet.dict_table(),
                 ))
@@ -222,7 +226,7 @@ fn dictionary_delete_sql_failure_keeps_names_without_notification() {
                     .contains(&"retained".to_string()));
                 assert_eq!(revision::notify_count(), notifications);
                 assert!(!changes.has_changed().expect("revision remains open"));
-                db.execute_unprepared("DROP TRIGGER block_dictionary_delete")
+                db.execute_unprepared(&format!("DROP TRIGGER IF EXISTS {trigger}"))
                     .await
                     .expect("remove injected failure");
                 hentai_core::delete_named_facet_by_names(facet, vec!["retained".to_string()])

@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
 use std::io::{Cursor, Write};
 
 use hentai_core::resource::{parse_resource_with, FakeResourceAccess};
@@ -29,7 +31,7 @@ fn resource_kind_dispatches_files_to_their_format_parser() {
     zip.write_all(b"<ComicInfo><Title>Embedded title</Title></ComicInfo>")
         .unwrap();
     let bytes = zip.finish().unwrap().into_inner();
-    let size = bytes.len() as i64;
+    let size = hentai_core::util::usize_to_i64(bytes.len());
     let location = "/resources/book.cbz";
     let mut access = FakeResourceAccess::new();
     access.insert_file(location, bytes);

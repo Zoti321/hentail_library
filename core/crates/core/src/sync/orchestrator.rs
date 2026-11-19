@@ -18,7 +18,9 @@ use super::dto::{
     SyncScanMode,
 };
 use super::handle::SyncHandle;
-use super::plan::{build_scan_replace_plan, load_existing_comics_map, load_thumbnail_stats};
+use super::plan::{
+    build_scan_replace_plan, load_existing_comics_map, load_thumbnail_stats, ComicScanReplacePlan,
+};
 use super::remote::{scan_remote_lightweight, RemoteScanOutcome};
 use super::scanner::{scan_roots_excluding, ScanContext, ScanItem};
 use super::writer::apply_scan_replace_plan_in;
@@ -89,7 +91,8 @@ async fn sync_library_locked(
         };
 
     if targets.is_empty() {
-        return sync_noop(&mut emit).await;
+        sync_noop(&mut emit);
+        return Ok(());
     }
 
     let mut last_progress: Option<SyncLibraryProgressDto> = None;
@@ -153,7 +156,7 @@ async fn sync_library_locked(
             Some(message),
         ));
     } else {
-        sync_noop(&mut emit).await?;
+        sync_noop(&mut emit);
     }
     Ok(())
 }
@@ -164,7 +167,7 @@ enum SyncOneOutcome {
     None,
 }
 
-async fn sync_noop(emit: &mut impl FnMut(SyncLibraryProgressDto)) -> Result<(), HentaiError> {
+fn sync_noop(emit: &mut impl FnMut(SyncLibraryProgressDto)) {
     log_sync_phase(SyncLibraryPhaseDto::Done, SyncLibraryRouteDto::NoRootsNoop);
     emit(progress(
         SyncLibraryPhaseDto::Done,
@@ -181,7 +184,6 @@ async fn sync_noop(emit: &mut impl FnMut(SyncLibraryProgressDto)) -> Result<(), 
         None,
         None,
     ));
-    Ok(())
 }
 
 #[tracing::instrument(
@@ -238,7 +240,7 @@ async fn sync_one_library(
         &library.enabled_resource_format_categories,
     )?;
     for item in &mut scan_items {
-        item.comic.library_id = library.library_id.clone();
+        item.comic.library_id.clone_from(&library.library_id);
     }
     if !super::fingerprint::prepare_content_fingerprints(
         db,
@@ -323,7 +325,7 @@ async fn sync_remote_library(
         RemoteScanOutcome::Scanned(items) => items,
     };
     for item in &mut scan_items {
-        item.comic.library_id = library.library_id.clone();
+        item.comic.library_id.clone_from(&library.library_id);
     }
     if !super::fingerprint::prepare_content_fingerprints(
         db,
@@ -461,27 +463,7 @@ where
     if return_if_cancelled(handle, "scanning") {
         return Ok(None);
     }
-    let mut counts = LibrarySyncCountsDto::default();
-    let mut accepted_total = 0i32;
-    for item in &scan_items {
-        counts.bump(&item.resource_type);
-        accepted_total += 1;
-        emit(progress(
-            SyncLibraryPhaseDto::Scanning,
-            SyncLibraryRouteDto::WithRoots,
-            Some(item.path.clone()),
-            accepted_total,
-            counts.clone(),
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-        ));
-    }
+    let (counts, accepted_total) = emit_scan_progress(&scan_items, emit);
     if return_if_cancelled(handle, "scanning_progress") {
         return Ok(None);
     }
@@ -515,45 +497,13 @@ where
     if return_if_cancelled(handle, "snapshot_prepared") {
         return Ok(None);
     }
-    let txn = db.begin().await.map_err(map_db_err)?;
-    let writes: Result<(), HentaiError> = async {
-        apply_scan_replace_plan_in(&txn, &plan, library_id).await?;
-        replace_snapshot_in(&txn, library_id, rows).await?;
-        record_library_sync_success_in(&txn, library_id).await?;
-        Ok(())
-    }
-    .await;
-    if let Err(error) = writes {
-        txn.rollback().await.map_err(map_db_err)?;
-        return Err(error);
-    }
-    if return_if_cancelled(handle, "before_commit") {
-        txn.rollback().await.map_err(map_db_err)?;
+    if !commit_scan_replace(db, handle, library_id, &plan, rows).await? {
         return Ok(None);
     }
-    txn.commit().await.map_err(map_db_err)?;
     clear_reader_sessions();
     crate::revision::notify_committed();
-    let mut maintenance_warning = None;
-
-    let thumb_total = if enqueue_thumbs {
-        let thumbnail_targets = plan.thumbnail_generation_targets.clone();
-        let thumb_total = thumbnail_targets.len() as i32;
-        if !thumbnail_targets.is_empty() {
-            let comic_ids: Vec<String> = thumbnail_targets
-                .iter()
-                .map(|c| c.comic_id.clone())
-                .collect();
-            if let Err(error) = enqueue(comic_ids).await {
-                maintenance_warning = Some(format!(
-                    "Sync committed; thumbnail maintenance failed: {error}"
-                ));
-            }
-        }
-        thumb_total
-    } else {
-        0
-    };
+    let (thumb_total, maintenance_warning) =
+        enqueue_thumbnail_maintenance(enqueue_thumbs, &plan, enqueue).await;
 
     tracing::info!(
         accepted_total,
@@ -570,7 +520,7 @@ where
         None,
         accepted_total,
         counts,
-        Some(plan.removed_ids.len() as i32),
+        Some(crate::util::usize_to_i32(plan.removed_ids.len())),
         Some(plan.added_count),
         Some(plan.kept_count),
         if plan.migrated_count > 0 {
@@ -591,6 +541,94 @@ where
         }),
         maintenance_warning,
     )))
+}
+
+fn emit_scan_progress(
+    scan_items: &[ScanItem],
+    emit: &mut impl FnMut(SyncLibraryProgressDto),
+) -> (LibrarySyncCountsDto, i32) {
+    let mut counts = LibrarySyncCountsDto::default();
+    let mut accepted_total = 0i32;
+    for item in scan_items {
+        counts.bump(&item.resource_type);
+        accepted_total += 1;
+        emit(progress(
+            SyncLibraryPhaseDto::Scanning,
+            SyncLibraryRouteDto::WithRoots,
+            Some(item.path.clone()),
+            accepted_total,
+            counts.clone(),
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+        ));
+    }
+    (counts, accepted_total)
+}
+
+/// Returns `Ok(false)` when cancelled before commit (transaction rolled back).
+async fn commit_scan_replace(
+    db: &sea_orm::DatabaseConnection,
+    handle: &SyncHandle,
+    library_id: &str,
+    plan: &ComicScanReplacePlan,
+    rows: Vec<crate::entity::library_resource_snapshots::ActiveModel>,
+) -> Result<bool, HentaiError> {
+    let txn = db.begin().await.map_err(|e| map_db_err(&e))?;
+    let writes: Result<(), HentaiError> = async {
+        apply_scan_replace_plan_in(&txn, plan, library_id).await?;
+        replace_snapshot_in(&txn, library_id, rows).await?;
+        record_library_sync_success_in(&txn, library_id).await?;
+        Ok(())
+    }
+    .await;
+    if let Err(error) = writes {
+        txn.rollback().await.map_err(|e| map_db_err(&e))?;
+        return Err(error);
+    }
+    if return_if_cancelled(handle, "before_commit") {
+        txn.rollback().await.map_err(|e| map_db_err(&e))?;
+        return Ok(false);
+    }
+    txn.commit().await.map_err(|e| map_db_err(&e))?;
+    Ok(true)
+}
+
+async fn enqueue_thumbnail_maintenance<F, Fut>(
+    enqueue_thumbs: bool,
+    plan: &ComicScanReplacePlan,
+    enqueue: F,
+) -> (i32, Option<String>)
+where
+    F: FnOnce(Vec<String>) -> Fut,
+    Fut: std::future::Future<Output = Result<(), HentaiError>>,
+{
+    if !enqueue_thumbs {
+        return (0, None);
+    }
+    let thumbnail_targets = &plan.thumbnail_generation_targets;
+    let thumb_total = crate::util::usize_to_i32(thumbnail_targets.len());
+    if thumbnail_targets.is_empty() {
+        return (thumb_total, None);
+    }
+    let comic_ids: Vec<String> = thumbnail_targets
+        .iter()
+        .map(|c| c.comic_id.clone())
+        .collect();
+    match enqueue(comic_ids).await {
+        Ok(()) => (thumb_total, None),
+        Err(error) => (
+            thumb_total,
+            Some(format!(
+                "Sync committed; thumbnail maintenance failed: {error}"
+            )),
+        ),
+    }
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -634,6 +672,7 @@ mod test_common;
 mod completion_tests {
     use super::*;
     #[test]
+    #[cfg_attr(miri, ignore = "sqlite/FFI unavailable under miri")]
     fn maintenance_failure_reports_committed_success_and_invalidates_reader() {
         test_common::with_global_db(|| {
             let root = tempfile::tempdir().unwrap().keep();
@@ -691,7 +730,7 @@ mod completion_tests {
                         .unwrap(),
                     1
                 );
-                assert!(crate::reader::load_reader_page(old, 0).is_err());
+                assert!(crate::reader::load_reader_page(&old, 0).is_err());
             });
         });
     }

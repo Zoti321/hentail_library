@@ -28,7 +28,9 @@ fn refresh_locks() -> &'static Mutex<HashMap<i64, Arc<tokio::sync::Mutex<()>>>> 
 /// 竞态窗口不可达；否则可能留下无 DB 行引用的孤儿缓存文件，甚至旧内容覆盖新内容。
 /// 不要绕过此锁直接调用刷新路径，也不要让 link 的增改删跳过此锁。
 pub(crate) fn author_refresh_lock(author_id: i64) -> Arc<tokio::sync::Mutex<()>> {
-    let mut locks = refresh_locks().lock().expect("author refresh locks");
+    let mut locks = refresh_locks()
+        .lock()
+        .unwrap_or_else(std::sync::PoisonError::into_inner);
     locks
         .entry(author_id)
         .or_insert_with(|| Arc::new(tokio::sync::Mutex::new(())))
@@ -96,11 +98,11 @@ async fn resolve_cached_author_image_on<C: ConnectionTrait>(
                 match slot {
                     AuthorImageSlot::Avatar => {
                         result.avatar_link_id = Some(link.id);
-                        result.avatar_image_url = cache_row.image_url.clone();
+                        result.avatar_image_url = cache_row.image_url;
                     }
                     AuthorImageSlot::Background => {
                         result.background_link_id = Some(link.id);
-                        result.background_image_url = cache_row.image_url.clone();
+                        result.background_image_url = cache_row.image_url;
                     }
                 }
                 break;
@@ -177,7 +179,7 @@ async fn refresh_author_images_with<C: ConnectionTrait>(
                 ],
             ))
             .await
-            .map_err(map_db_err)?;
+            .map_err(|e| map_db_err(&e))?;
         }
         for (slot, image_url) in [
             (AuthorImageSlot::Avatar, profile.avatar_url),
@@ -271,7 +273,7 @@ async fn link_is_current<C: ConnectionTrait>(db: &C, link: &LinkRow) -> Result<b
             ],
         ))
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     Ok(row.is_some())
 }
 
@@ -289,7 +291,7 @@ async fn creative_links<C: ConnectionTrait>(
             [Value::from(author_id)],
         ))
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     rows.into_iter()
         .map(|row| {
             let platform = row
@@ -331,7 +333,7 @@ async fn cache_row<C: ConnectionTrait>(
             [Value::from(link_id), Value::from(slot.as_str().to_string())],
         ))
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     row.map(|row| {
         Ok(CacheRow {
             profile_url: row
@@ -371,7 +373,7 @@ async fn update_checked_at<C: ConnectionTrait>(
         ],
     ))
     .await
-    .map_err(map_db_err)?;
+    .map_err(|e| map_db_err(&e))?;
     Ok(())
 }
 
@@ -406,18 +408,18 @@ async fn upsert_cache_row<C: ConnectionTrait>(
         ],
     ))
     .await
-    .map_err(map_db_err)?;
+    .map_err(|e| map_db_err(&e))?;
     Ok(())
 }
 
 fn unix_now() -> i64 {
     SystemTime::now()
         .duration_since(UNIX_EPOCH)
-        .map(|duration| duration.as_secs() as i64)
-        .unwrap_or(0)
+        .map_or(0, |duration| duration.as_secs().cast_signed())
 }
 
 impl AuthorImageSlot {
+    #[must_use]
     pub fn as_str(self) -> &'static str {
         match self {
             Self::Avatar => "avatar",
@@ -629,6 +631,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[cfg_attr(miri, ignore = "sqlite/FFI unavailable under miri")]
     async fn source_selection_uses_platform_then_sort_key_and_keeps_slots_independent() {
         let db = fixture_db().await;
         let temp = tempfile::TempDir::new().expect("tempdir");
@@ -707,6 +710,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[cfg_attr(miri, ignore = "sqlite/FFI unavailable under miri")]
     async fn ttl_skips_fresh_network_and_expired_profile_failure_keeps_old_slots() {
         let db = fixture_db().await;
         let temp = tempfile::TempDir::new().expect("tempdir");
@@ -748,6 +752,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[cfg_attr(miri, ignore = "sqlite/FFI unavailable under miri")]
     async fn refresh_updates_successful_slot_and_preserves_failed_slot() {
         let db = fixture_db().await;
         let temp = tempfile::TempDir::new().expect("tempdir");
@@ -831,6 +836,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[cfg_attr(miri, ignore = "sqlite/FFI unavailable under miri")]
     async fn missing_file_with_unchanged_url_is_downloaded_again() {
         let db = fixture_db().await;
         let temp = tempfile::TempDir::new().expect("tempdir");
@@ -887,6 +893,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[cfg_attr(miri, ignore = "sqlite/FFI unavailable under miri")]
     async fn stale_task_does_not_write_after_link_version_changes() {
         let db = fixture_db().await;
         let temp = tempfile::TempDir::new().expect("tempdir");
@@ -945,6 +952,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[cfg_attr(miri, ignore = "sqlite/FFI unavailable under miri")]
     async fn author_refresh_lock_makes_concurrent_refresh_single_flight() {
         let db = fixture_db().await;
         let temp = tempfile::TempDir::new().expect("tempdir");

@@ -15,7 +15,7 @@ pub fn load_page_list(read: &ReaderSessionRead) -> Result<ReaderPageListDto, Hen
     let list = read.with_backend(|backend| match backend {
         ReaderBackend::Dir(dir) => Ok(ReaderPageListDto {
             resource_type: "dir".to_string(),
-            page_count: dir.files.len() as i32,
+            page_count: crate::util::usize_to_i32(dir.files.len()),
             dir_page_paths: dir
                 .files
                 .iter()
@@ -23,23 +23,23 @@ pub fn load_page_list(read: &ReaderSessionRead) -> Result<ReaderPageListDto, Hen
                 .collect(),
         }),
         ReaderBackend::Zip(zip) => Ok(ReaderPageListDto {
-            resource_type: resource_type.to_string(),
-            page_count: zip.entry_indices.len() as i32,
+            resource_type: resource_type.clone(),
+            page_count: crate::util::usize_to_i32(zip.entry_indices.len()),
             dir_page_paths: vec![],
         }),
         ReaderBackend::Epub(epub) => Ok(ReaderPageListDto {
             resource_type: "epub".to_string(),
-            page_count: epub.image_entries.len() as i32,
+            page_count: crate::util::usize_to_i32(epub.image_entries.len()),
             dir_page_paths: vec![],
         }),
         ReaderBackend::Rar(rar) => Ok(ReaderPageListDto {
-            resource_type: resource_type.to_string(),
-            page_count: rar.entry_names.len() as i32,
+            resource_type: resource_type.clone(),
+            page_count: crate::util::usize_to_i32(rar.entry_names.len()),
             dir_page_paths: vec![],
         }),
         ReaderBackend::SevenZ(sevenz) => Ok(ReaderPageListDto {
-            resource_type: resource_type.to_string(),
-            page_count: sevenz.entry_names.len() as i32,
+            resource_type: resource_type.clone(),
+            page_count: crate::util::usize_to_i32(sevenz.entry_names.len()),
             dir_page_paths: vec![],
         }),
         ReaderBackend::Pdf(pdf) => Ok(ReaderPageListDto {

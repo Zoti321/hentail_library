@@ -10,7 +10,7 @@ use super::{is_comic_image_name, map_archive_err, map_reader_err, sort_archive_e
 pub struct SevenZBackend {
     pub path: PathBuf,
     pub entry_names: Vec<String>,
-    pub(crate) _remote_temp: Option<tempfile::NamedTempFile>,
+    pub(crate) remote_temp: Option<tempfile::NamedTempFile>,
 }
 
 pub fn count_sevenz_images(file: &Path) -> Result<Option<i32>, HentaiError> {
@@ -18,7 +18,7 @@ pub fn count_sevenz_images(file: &Path) -> Result<Option<i32>, HentaiError> {
     if names.is_empty() {
         return Ok(None);
     }
-    Ok(Some(names.len() as i32))
+    Ok(Some(crate::util::usize_to_i32(names.len())))
 }
 
 pub fn open_sevenz_backend(file: &Path) -> Result<SevenZBackend, HentaiError> {
@@ -32,7 +32,7 @@ pub fn open_sevenz_backend(file: &Path) -> Result<SevenZBackend, HentaiError> {
     Ok(SevenZBackend {
         path: file.to_path_buf(),
         entry_names,
-        _remote_temp: None,
+        remote_temp: None,
     })
 }
 
@@ -41,7 +41,7 @@ pub fn open_sevenz_backend_kept(
     keep: tempfile::NamedTempFile,
 ) -> Result<SevenZBackend, HentaiError> {
     let mut backend = open_sevenz_backend(file)?;
-    backend._remote_temp = Some(keep);
+    backend.remote_temp = Some(keep);
     Ok(backend)
 }
 

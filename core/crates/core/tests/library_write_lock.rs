@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
 //! ADR-0026: cross-comic bulk writes fail fast while the library write lock is held.
 
 mod common;

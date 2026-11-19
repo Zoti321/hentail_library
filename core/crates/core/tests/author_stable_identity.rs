@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
 //! Author 稳定身份：迁移附着、rename 保 links、delete 级联、详情聚合、链接 CRUD、筛选按 id。
 
 mod common;
@@ -121,7 +123,7 @@ fn comic_dto_carries_author_stable_id() {
             let series_meta = hentai_core::fetch_series_comics_metadata("no-such-series")
                 .await
                 .expect("empty series ok");
-            assert!(series_meta.authors.is_empty());
+            assert_eq!(series_meta.authors.len(), 0);
         });
     });
 }
@@ -183,10 +185,10 @@ fn identity_rename_targets_the_original_author_after_its_old_name_is_reused() {
             assert_eq!(links.len(), 1);
             assert_eq!(links[0].id, link.id);
             assert_eq!(links[0].url, "https://example.com/alice");
-            assert!(list_author_links(replacement.id)
+            assert_eq!(list_author_links(replacement.id)
                 .await
                 .expect("replacement links")
-                .is_empty());
+                .len(), 0);
             let comic = hentai_core::find_comic_by_id("identity-comic")
                 .await
                 .expect("comic")
@@ -305,7 +307,7 @@ fn rename_keeps_links_delete_cascades_and_filter_uses_id() {
                 .expect("count")
                 .expect("row");
             assert_eq!(remaining.try_get_by_index::<i64>(0).expect("n"), 0);
-            assert!(list_author_links(id).await.expect("gone").is_empty());
+            assert_eq!(list_author_links(id).await.expect("gone").len(), 0);
         });
     });
 }
@@ -463,10 +465,10 @@ fn author_link_crud_validates_url() {
             delete_author_link(created.id, link.id)
                 .await
                 .expect("delete");
-            assert!(list_author_links(created.id)
-                .await
-                .expect("list")
-                .is_empty());
+            assert_eq!(
+                list_author_links(created.id).await.expect("list").len(),
+                0
+            );
             let missing = delete_author_link(created.id, link.id).await;
             assert!(missing.is_err());
             let other = add_author("OtherOwner").await.expect("other");
@@ -505,7 +507,8 @@ fn expired_platform_image_remains_available_until_refresh_succeeds() {
                 ))
                 .await
                 .expect("link")
-                .last_insert_id() as i64;
+                .last_insert_id();
+            let link_id = hentai_core::util::u64_to_i64(link_id);
             db.execute(Statement::from_sql_and_values(
                 sea_orm::DatabaseBackend::Sqlite,
                 "INSERT INTO author_image_cache \
@@ -556,7 +559,8 @@ fn deleting_author_link_removes_cache_rows_and_files() {
                 ))
                 .await
                 .expect("link")
-                .last_insert_id() as i64;
+                .last_insert_id();
+            let link_id = hentai_core::util::u64_to_i64(link_id);
             let cache = ImageCache::app().expect("cache");
             for slot in ["avatar", "background"] {
                 db.execute(Statement::from_sql_and_values(
@@ -624,7 +628,8 @@ fn link_update_invalidates_both_slots_while_author_rename_keeps_cache() {
                 ))
                 .await
                 .expect("link")
-                .last_insert_id() as i64;
+                .last_insert_id();
+            let link_id = hentai_core::util::u64_to_i64(link_id);
             let cache = ImageCache::app().expect("cache");
             for slot in ["avatar", "background"] {
                 db.execute(Statement::from_sql_and_values(

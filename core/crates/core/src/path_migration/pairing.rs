@@ -4,6 +4,7 @@
 //! 落库见 [`super::persist`]。
 
 use std::collections::{HashMap, HashSet};
+use std::hash::BuildHasher;
 
 use crate::comic::ComicDto;
 use crate::series_id::{folder_path_from_comic_path, series_id_from_folder_path};
@@ -16,6 +17,7 @@ pub struct ResourceFingerprint {
 }
 
 impl ResourceFingerprint {
+    #[must_use]
     pub fn from_comic(comic: &ComicDto) -> Self {
         Self {
             resource_type: comic.resource_type.clone(),
@@ -45,9 +47,10 @@ pub struct SeriesMigrationPair {
 }
 
 /// 在 removed / added 集合间按资源指纹做 1:1 唯一配对。
-pub fn detect_path_migration_pairs(
-    removed: &HashMap<String, ComicDto>,
-    added: &HashMap<String, ComicDto>,
+#[must_use]
+pub fn detect_path_migration_pairs<S: BuildHasher>(
+    removed: &HashMap<String, ComicDto, S>,
+    added: &HashMap<String, ComicDto, S>,
 ) -> Vec<ComicMigrationPair> {
     let removed_by_fp = group_ids_by_fingerprint(removed);
     let added_by_fp = group_ids_by_fingerprint(added);
@@ -70,6 +73,7 @@ pub fn detect_path_migration_pairs(
     pairs
 }
 
+#[must_use]
 pub fn migrated_id_sets(pairs: &[ComicMigrationPair]) -> (HashSet<String>, HashSet<String>) {
     let mut from_ids = HashSet::new();
     let mut to_ids = HashSet::new();
@@ -82,13 +86,14 @@ pub fn migrated_id_sets(pairs: &[ComicMigrationPair]) -> (HashSet<String>, HashS
 
 /// F0：Comic 弱指纹 1:1 配对已知后，若 Folder series 全部成员均迁到同一新父路径则 rekey Series。
 ///
-/// - `members_by_series`：旧 series_id → 成员 comic_id
-/// - `from_comic_to_new_path`：迁出 comic_id → 新资源路径
-/// - `existing_series_ids`：库内现有 series_id（用于避开仍被占用的目标）
-pub fn detect_series_path_migration_pairs(
-    members_by_series: &HashMap<String, Vec<String>>,
-    from_comic_to_new_path: &HashMap<String, String>,
-    existing_series_ids: &HashSet<String>,
+/// - `members_by_series`：旧 `series_id` → 成员 `comic_id`
+/// - `from_comic_to_new_path`：迁出 `comic_id` → 新资源路径
+/// - `existing_series_ids`：库内现有 `series_id（用于避开仍被占用的目标`）
+#[must_use]
+pub fn detect_series_path_migration_pairs<S: BuildHasher>(
+    members_by_series: &HashMap<String, Vec<String>, S>,
+    from_comic_to_new_path: &HashMap<String, String, S>,
+    existing_series_ids: &HashSet<String, S>,
 ) -> Vec<SeriesMigrationPair> {
     let mut candidates: Vec<SeriesMigrationPair> = Vec::new();
     for (from_series_id, members) in members_by_series {
@@ -111,7 +116,9 @@ pub fn detect_series_path_migration_pairs(
         if !all_migrated || new_folders.len() != 1 {
             continue;
         }
-        let to_folder_path = new_folders.into_iter().next().expect("len == 1");
+        let Some(to_folder_path) = new_folders.into_iter().next() else {
+            continue;
+        };
         let to_series_id = series_id_from_folder_path(&to_folder_path);
         if to_series_id == *from_series_id {
             continue;
@@ -143,7 +150,8 @@ pub fn detect_series_path_migration_pairs(
         .collect()
 }
 
-/// 由 Comic 迁移结果构造「旧 comic_id → 新资源路径」映射，供 F0 使用。
+/// 由 Comic 迁移结果构造「旧 `comic_id` → 新资源路径」映射，供 F0 使用。
+#[must_use]
 pub fn comic_migration_new_paths(migrations: &[ComicMigration]) -> HashMap<String, String> {
     migrations
         .iter()
@@ -151,8 +159,8 @@ pub fn comic_migration_new_paths(migrations: &[ComicMigration]) -> HashMap<Strin
         .collect()
 }
 
-fn group_ids_by_fingerprint(
-    comics: &HashMap<String, ComicDto>,
+fn group_ids_by_fingerprint<S: BuildHasher>(
+    comics: &HashMap<String, ComicDto, S>,
 ) -> HashMap<ResourceFingerprint, Vec<String>> {
     let mut grouped: HashMap<ResourceFingerprint, Vec<String>> = HashMap::new();
     for (comic_id, comic) in comics {

@@ -25,7 +25,7 @@ impl MigrationTrait for Migration {
                 .get_connection()
                 .execute(Statement::from_string(
                     manager.get_database_backend(),
-                    r#"
+                    r"
 CREATE TABLE series_thumbnails (
   series_id TEXT NOT NULL PRIMARY KEY,
   thumbnail BLOB NOT NULL,
@@ -34,7 +34,7 @@ CREATE TABLE series_thumbnails (
   source_page_index INTEGER NOT NULL,
   FOREIGN KEY(series_id) REFERENCES series(series_id) ON DELETE CASCADE
 )
-"#
+"
                     .to_string(),
                 ))
                 .await?;
@@ -67,7 +67,6 @@ async fn column_exists(
     let rows = manager.get_connection().query_all(stmt).await?;
     Ok(rows.iter().any(|row| {
         row.try_get_by_index::<String>(1)
-            .map(|name| name == column)
-            .unwrap_or(false)
+            .is_ok_and(|name| name == column)
     }))
 }

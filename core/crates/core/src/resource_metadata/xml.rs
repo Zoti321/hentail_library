@@ -27,7 +27,7 @@ pub(super) fn nodes(xml: &str) -> Result<Vec<Node>, HentaiError> {
     let mut nodes = Vec::new();
     let mut roots = 0;
     loop {
-        let before = reader.buffer_position() as usize;
+        let before = crate::util::u64_to_usize(reader.buffer_position());
         let (namespace, event) = reader.read_resolved_event().map_err(io_error)?;
         let namespace = match namespace {
             ResolveResult::Bound(ns) => String::from_utf8_lossy(ns.as_ref()).into_owned(),
@@ -53,7 +53,7 @@ pub(super) fn nodes(xml: &str) -> Result<Vec<Node>, HentaiError> {
                         ))
                     })
                     .collect::<Result<Vec<_>, HentaiError>>()?;
-                let after = reader.buffer_position() as usize;
+                let after = crate::util::u64_to_usize(reader.buffer_position());
                 let node = Node {
                     name: String::from_utf8_lossy(start.local_name().as_ref()).into_owned(),
                     namespace,
@@ -75,7 +75,7 @@ pub(super) fn nodes(xml: &str) -> Result<Vec<Node>, HentaiError> {
                     .pop()
                     .ok_or_else(|| io_error("Unmatched XML closing tag"))?;
                 node.content.end = before;
-                node.range.end = reader.buffer_position() as usize;
+                node.range.end = crate::util::u64_to_usize(reader.buffer_position());
                 nodes.push(node);
             }
             Event::Text(text) => {

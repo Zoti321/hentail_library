@@ -44,12 +44,12 @@ pub(crate) async fn record_library_sync_success_in(
     let mut active: libraries::ActiveModel = Libraries::find_by_id(library_id.to_string())
         .one(db)
         .await
-        .map_err(map_db_err)?
+        .map_err(|e| map_db_err(&e))?
         .ok_or_else(|| HentaiError::validation(format!("Library 不存在: {library_id}")))?
         .into();
     active.last_successful_sync_at = Set(Some(now));
     active.last_sync_error = Set(None);
-    active.update(db).await.map_err(map_db_err)?;
+    active.update(db).await.map_err(|e| map_db_err(&e))?;
     Ok(())
 }
 
@@ -65,11 +65,11 @@ pub async fn record_library_sync_failure(
     let mut active: libraries::ActiveModel = Libraries::find_by_id(library_id.to_string())
         .one(&db)
         .await
-        .map_err(map_db_err)?
+        .map_err(|e| map_db_err(&e))?
         .ok_or_else(|| HentaiError::validation(format!("Library 不存在: {library_id}")))?
         .into();
     active.last_sync_error = Set(Some(trimmed.to_string()));
-    active.update(&db).await.map_err(map_db_err)?;
+    active.update(&db).await.map_err(|e| map_db_err(&e))?;
     crate::revision::notify_committed();
     Ok(())
 }

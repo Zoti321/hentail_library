@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
 //! Image set Read session (#586): catalog order, start index, raw bytes, no Comic history.
 
 mod common;

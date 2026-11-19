@@ -190,8 +190,7 @@ fn open_zip(access: &dyn ResourceAccess, location: &str) -> Result<ZipBackend, H
         let ext = Path::new(&name)
             .extension()
             .and_then(|e| e.to_str())
-            .map(|e| format!(".{}", e.to_lowercase()))
-            .unwrap_or_default();
+            .map_or_default(|e| format!(".{}", e.to_lowercase()));
         if is_comic_image_extension(&ext) {
             entries.push((i, name));
         }
@@ -314,15 +313,14 @@ fn collect_epub_image_indices(archive: &mut StreamArchive) -> Result<Vec<usize>,
         let ext = Path::new(&name)
             .extension()
             .and_then(|e| e.to_str())
-            .map(|e| format!(".{}", e.to_lowercase()))
-            .unwrap_or_default();
+            .map_or_default(|e| format!(".{}", e.to_lowercase()));
         if is_comic_image_extension(&ext) {
             name_to_index.insert(name.clone(), i);
             all_images.push((i, name));
         }
     }
 
-    let spine_names = collect_epub_spine_image_names(archive)?;
+    let spine_names = collect_epub_spine_image_names(archive);
     if !spine_names.is_empty() {
         let mut indices = Vec::with_capacity(spine_names.len());
         for name in spine_names {
@@ -530,15 +528,14 @@ mod tests {
 
     #[test]
     fn path_bound_snapshot_uses_stream_capability_instead_of_location_scheme() {
-        let root = tempfile::tempdir().expect("tempdir").keep();
-        let pages = root.join("pages");
-        std::fs::create_dir(&pages).expect("pages");
-        std::fs::write(pages.join("001.jpg"), b"snapshot-page").expect("page");
-        let archive = root.join("source.cb7");
-        sevenz_rust::compress_to_path(&pages, &archive).expect("archive");
+        // Prebuilt fixture: sevenz_rust's LZMA encoder hits Stacked Borrows UB under Miri.
+        const CB7: &[u8] = include_bytes!(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/tests/fixtures/snapshot_page.cb7"
+        ));
         let location = "/memory/source.cb7";
         let mut access = FakeResourceAccess::new();
-        access.insert_file(location, std::fs::read(archive).expect("archive bytes"));
+        access.insert_file(location, CB7.to_vec());
         let opened = open_backend_with(&access, location, "cb7").expect("open snapshot");
         assert!(opened.local_source.is_none());
         access.insert_file(location, b"replaced-source");
@@ -584,7 +581,7 @@ mod tests {
             panic!("expected epub");
         };
         let mut archive = epub.archive.lock().expect("lock");
-        let spine = collect_epub_spine_image_names(&mut *archive).expect("spine");
+        let spine = collect_epub_spine_image_names(&mut *archive);
         drop(archive);
         assert!(!spine.is_empty());
         assert_eq!(epub.image_entries.len(), spine.len());

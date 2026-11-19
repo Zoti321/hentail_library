@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
 mod common;
 
 use hentai_core::{connection, find_comics_by_ids, init_db_at_path};
@@ -77,7 +79,7 @@ fn find_comics_by_ids_empty_returns_empty_without_rows() {
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
             let rows = find_comics_by_ids(vec![]).await.expect("empty batch find");
-            assert!(rows.is_empty());
+            assert_eq!(rows.len(), 0);
         });
     });
 }

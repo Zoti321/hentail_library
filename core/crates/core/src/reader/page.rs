@@ -23,7 +23,7 @@ impl ReaderPageRead {
 }
 
 pub fn load_reader_page(
-    read: ReaderPageRead,
+    read: &ReaderPageRead,
     page_index: i32,
 ) -> Result<ReaderPageDto, HentaiError> {
     let session = &read.session;
@@ -554,7 +554,7 @@ mod tests {
     #[test]
     fn missing_session_remains_a_hard_error() {
         let error = ReaderPageRead::capture("foreground_missing_session")
-            .and_then(|read| load_reader_page(read, 0))
+            .and_then(|read| load_reader_page(&read, 0))
             .unwrap_err();
         assert_eq!(
             error.code,

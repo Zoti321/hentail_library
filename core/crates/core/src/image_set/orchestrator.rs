@@ -56,7 +56,7 @@ pub(crate) async fn sync_image_set_library(
     let plan = plan_image_set_sync(library_id, &obs, &prior, now_ms());
     emit(progress(SyncLibraryPhaseDto::WritingDb, 0, None));
 
-    let txn = db.begin().await.map_err(map_db_err)?;
+    let txn = db.begin().await.map_err(|e| map_db_err(&e))?;
     let writes: Result<(), HentaiError> = async {
         apply_image_set_plan(&txn, library_id, &plan).await?;
         record_library_sync_success_in(&txn, library_id).await?;
@@ -64,14 +64,14 @@ pub(crate) async fn sync_image_set_library(
     }
     .await;
     if let Err(error) = writes {
-        txn.rollback().await.map_err(map_db_err)?;
+        txn.rollback().await.map_err(|e| map_db_err(&e))?;
         return Err(error);
     }
     if handle.is_cancelled() {
-        txn.rollback().await.map_err(map_db_err)?;
+        txn.rollback().await.map_err(|e| map_db_err(&e))?;
         return Ok(None);
     }
-    txn.commit().await.map_err(map_db_err)?;
+    txn.commit().await.map_err(|e| map_db_err(&e))?;
     crate::revision::notify_committed();
 
     tracing::info!(
@@ -92,29 +92,29 @@ async fn load_prior(
             .filter(image_sets::Column::LibraryId.eq(library_id))
             .all(db)
             .await
-            .map_err(map_db_err)?,
+            .map_err(|e| map_db_err(&e))?,
         images: image_set_images::Entity::find()
             .filter(image_set_images::Column::LibraryId.eq(library_id))
             .all(db)
             .await
-            .map_err(map_db_err)?,
+            .map_err(|e| map_db_err(&e))?,
         carriers: image_set_carriers::Entity::find()
             .filter(image_set_carriers::Column::LibraryId.eq(library_id))
             .all(db)
             .await
-            .map_err(map_db_err)?,
+            .map_err(|e| map_db_err(&e))?,
     })
 }
 
 fn success_progress(plan: &ImageSetPlan) -> SyncLibraryProgressDto {
     let mut done = progress(
         SyncLibraryPhaseDto::WritingDb,
-        plan.kept_count as i32 + plan.images_insert.len() as i32,
+        crate::util::usize_to_i32(plan.kept_count) + crate::util::usize_to_i32(plan.images_insert.len()),
         (!plan.warnings.is_empty()).then(|| plan.warnings.join("\n")),
     );
-    done.added_count = Some(plan.images_insert.len() as i32);
-    done.removed_count = Some(plan.images_delete.len() as i32);
-    done.kept_count = Some(plan.kept_count as i32);
+    done.added_count = Some(crate::util::usize_to_i32(plan.images_insert.len()));
+    done.removed_count = Some(crate::util::usize_to_i32(plan.images_delete.len()));
+    done.kept_count = Some(crate::util::usize_to_i32(plan.kept_count));
     done
 }
 

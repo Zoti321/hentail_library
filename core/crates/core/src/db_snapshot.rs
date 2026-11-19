@@ -12,16 +12,14 @@ use crate::migration::Migrator;
 const SNAPSHOT_DIR_NAME: &str = "internal_db_snapshots";
 const MAX_SNAPSHOT_FILES: usize = 2;
 
-/// 在 SeaORM migration 前创建 SQLite Online Backup 快照（失败仅记录日志，不阻塞 migration）。
+/// 在 `SeaORM` migration 前创建 SQLite Online Backup 快照（失败仅记录日志，不阻塞 migration）。
 pub async fn maybe_snapshot_before_migration(db_file_path: &Path) -> Result<(), HentaiError> {
     if !should_create_snapshot(db_file_path).await? {
         return Ok(());
     }
 
     let snapshot_dir = db_file_path
-        .parent()
-        .map(|dir| dir.join(SNAPSHOT_DIR_NAME))
-        .unwrap_or_else(|| PathBuf::from(SNAPSHOT_DIR_NAME));
+        .parent().map_or_else(|| PathBuf::from(SNAPSHOT_DIR_NAME), |dir| dir.join(SNAPSHOT_DIR_NAME));
 
     match create_snapshot(db_file_path, &snapshot_dir) {
         Ok(path) => {
@@ -63,10 +61,10 @@ async fn should_create_snapshot(db_file_path: &Path) -> Result<bool, HentaiError
 async fn count_pending_migrations(db_file_path: &Path) -> Result<usize, HentaiError> {
     let conn = open_readonly_migration_probe(db_file_path)
         .await
-        .map_err(crate::db::map_db_err)?;
+        .map_err(|e| crate::db::map_db_err(&e))?;
     let pending = Migrator::get_pending_migrations(&conn)
         .await
-        .map_err(crate::db::map_db_err)?;
+        .map_err(|e| crate::db::map_db_err(&e))?;
     Ok(pending.len())
 }
 
@@ -119,7 +117,7 @@ fn snapshot_file_name() -> String {
     let hours = day_seconds / 3_600;
     let minutes = (day_seconds % 3_600) / 60;
     let seconds = day_seconds % 60;
-    let (year, month, day) = civil_from_days(days as i64);
+    let (year, month, day) = civil_from_days(crate::util::u64_to_i64(days));
     format!("snapshot-{year:04}{month:02}{day:02}-{hours:02}{minutes:02}{seconds:02}.sqlite")
 }
 
@@ -162,9 +160,9 @@ fn prune_old_snapshots(snapshot_dir: &Path, max_files: usize) -> Result<(), Hent
 fn civil_from_days(days: i64) -> (i32, u32, u32) {
     let z = days + 719_468;
     let era = if z >= 0 { z } else { z - 146_096 } / 146_097;
-    let doe = (z - era * 146_097) as u32;
+    let doe = crate::util::i64_to_u32(z - era * 146_097);
     let yoe = (doe - doe / 1_460 + doe / 365 - doe / 1_460) / 365;
-    let y = yoe as i32 + era as i32 * 400;
+    let y = crate::util::u32_to_i32(yoe) + crate::util::i64_to_i32(era) * 400;
     let doy = doe - (365 * yoe + yoe / 4 - yoe / 100);
     let mp = (5 * doy + 2) / 153;
     let d = doy - (153 * mp + 2) / 5 + 1;
@@ -179,6 +177,7 @@ mod tests {
     use tempfile::TempDir;
 
     #[test]
+    #[cfg_attr(miri, ignore = "sqlite/FFI unavailable under miri")]
     fn backup_produces_valid_sqlite() {
         let temp = TempDir::new().expect("tempdir");
         let source = temp.path().join("source.sqlite");

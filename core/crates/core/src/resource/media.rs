@@ -3,6 +3,7 @@ use std::path::Path;
 const COMIC_IMAGE_EXTENSIONS: &[&str] = &[".jpg", ".jpeg", ".png", ".webp", ".bmp", ".gif"];
 
 /// Resource types that support thumbnail generation from disk content.
+#[must_use]
 pub fn can_generate_thumbnail(resource_type: &str) -> bool {
     matches!(
         resource_type,
@@ -10,18 +11,20 @@ pub fn can_generate_thumbnail(resource_type: &str) -> bool {
     )
 }
 
+#[must_use]
 pub fn is_comic_image_extension(ext: &str) -> bool {
     let lower = ext.to_lowercase();
     COMIC_IMAGE_EXTENSIONS.contains(&lower.as_str())
 }
 
+#[must_use]
 pub fn extension_lower(path: &Path) -> String {
     path.extension()
         .and_then(|e| e.to_str())
-        .map(|e| format!(".{}", e.to_lowercase()))
-        .unwrap_or_default()
+        .map_or_default(|e| format!(".{}", e.to_lowercase()))
 }
 
+#[must_use]
 pub fn basename(path: &Path) -> String {
     path.file_name()
         .and_then(|n| n.to_str())
@@ -29,6 +32,7 @@ pub fn basename(path: &Path) -> String {
         .to_string()
 }
 
+#[must_use]
 pub fn basename_without_extension(path: &Path) -> String {
     path.file_stem()
         .and_then(|n| n.to_str())

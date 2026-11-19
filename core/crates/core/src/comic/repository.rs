@@ -36,7 +36,7 @@ pub async fn count_all() -> Result<i64, HentaiError> {
             ),
         ))
         .await
-        .map_err(map_db_err)?
+        .map_err(|e| map_db_err(&e))?
         .ok_or_else(|| HentaiError::db_query_failed("count_all 无结果", None))?;
     row.try_get_by_index::<i64>(0)
         .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))
@@ -102,7 +102,7 @@ async fn fetch_comics_page_ids(
         });
     }
     let total_count = count_filtered(&db, &filter).await?;
-    let window = paginate(request, total_count).clamped();
+    let window = paginate(&request, total_count).clamped();
     if total_count <= 0 {
         return Ok(ComicsPageIds {
             comic_ids: vec![],
@@ -118,7 +118,7 @@ async fn fetch_comics_page_ids(
         grouping,
         library_root_path.as_deref(),
         window.page_size,
-        window.offset as i32,
+        crate::util::i64_to_i32(window.offset),
     );
     let comic_ids = query_string_ids(&db, &ids_query).await?;
     Ok(ComicsPageIds {
@@ -161,7 +161,7 @@ pub(crate) async fn find_visible_comic_by_id_in(
         .filter(comics::Column::DeletedAt.is_null())
         .one(db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     if visible.is_none() {
         return Ok(None);
     }
@@ -204,7 +204,7 @@ pub async fn search_by_keyword_page(
 ) -> Result<PagedComicResultDto, HentaiError> {
     let q = keyword.trim().to_lowercase();
     if q.is_empty() {
-        let window = paginate(request, 0);
+        let window = paginate(&request, 0);
         return Ok(PagedComicResultDto {
             items: vec![],
             total_count: 0,
@@ -213,7 +213,7 @@ pub async fn search_by_keyword_page(
         });
     }
     let Some(library_id) = crate::library::resolve_browse_library_id(library_id).await? else {
-        let window = paginate(request, 0);
+        let window = paginate(&request, 0);
         return Ok(PagedComicResultDto {
             items: vec![],
             total_count: 0,
@@ -238,12 +238,12 @@ pub async fn search_by_keyword_page(
     let total_count = db
         .query_one(count_stmt)
         .await
-        .map_err(map_db_err)?
+        .map_err(|e| map_db_err(&e))?
         .ok_or_else(|| HentaiError::db_query_failed("search count 无结果", None))?
         .try_get_by_index::<i64>(0)
         .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?;
     // 越界页保持原样：本路径是顺序翻页（由 `has_next` 驱动），不钳到末页。
-    let window = paginate(request, total_count);
+    let window = paginate(&request, total_count);
     let offset = window.offset;
     let page = window.page;
     let page_size = window.page_size;
@@ -260,7 +260,7 @@ pub async fn search_by_keyword_page(
         vec![
             Value::String(Some(Box::new(library_id))),
             Value::String(Some(Box::new(format!("%{q}%")))),
-            Value::BigInt(Some(page_size as i64)),
+            Value::BigInt(Some(i64::from(page_size))),
             Value::BigInt(Some(offset)),
         ],
     );
@@ -338,7 +338,7 @@ async fn count_metadata_expression_comics(
             values,
         ))
         .await
-        .map_err(map_db_err)?
+        .map_err(|e| map_db_err(&e))?
         .ok_or_else(|| HentaiError::db_query_failed("metadata expression count 无结果", None))?;
     row.try_get_by_index::<i64>(0)
         .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))
@@ -413,7 +413,7 @@ pub async fn search_by_tag_expression_page(
         resolve_metadata_expression_terms(must_include, optional_or, must_exclude, library_id)
             .await?
     else {
-        let window = paginate(request, 0);
+        let window = paginate(&request, 0);
         return Ok(PagedComicResultDto {
             items: vec![],
             total_count: 0,
@@ -424,7 +424,7 @@ pub async fn search_by_tag_expression_page(
     let db = connection()?;
     let total_count = count_metadata_expression_comics(&db, &terms).await?;
     if total_count <= 0 {
-        let window = paginate(request, 0);
+        let window = paginate(&request, 0);
         return Ok(PagedComicResultDto {
             items: vec![],
             total_count: 0,
@@ -433,11 +433,11 @@ pub async fn search_by_tag_expression_page(
         });
     }
     // 越界页保持原样，只把窗口按总行数截断（与关键字搜索同属顺序翻页路径）。
-    let window = paginate(request, total_count);
+    let window = paginate(&request, total_count);
     let comic_ids = query_metadata_expression_comic_ids(
         &db,
         &terms,
-        Some(window.page_size as i64),
+        Some(i64::from(window.page_size)),
         window.offset,
     )
     .await?;
@@ -460,7 +460,7 @@ async fn count_filtered(
     let row = db
         .query_one(stmt)
         .await
-        .map_err(map_db_err)?
+        .map_err(|e| map_db_err(&e))?
         .ok_or_else(|| HentaiError::db_query_failed("count 无结果", None))?;
     row.try_get_by_index::<i64>(0)
         .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))
@@ -482,7 +482,7 @@ async fn query_ids_from_stmt(
     db: &DatabaseConnection,
     stmt: Statement,
 ) -> Result<Vec<String>, HentaiError> {
-    let rows = db.query_all(stmt).await.map_err(map_db_err)?;
+    let rows = db.query_all(stmt).await.map_err(|e| map_db_err(&e))?;
     rows.into_iter()
         .map(|row| {
             row.try_get_by_index::<String>(0)
@@ -502,12 +502,12 @@ pub async fn load_comics_ordered(
         .filter(Expr::col(comics::Column::ComicId).is_in(comic_ids.clone()))
         .all(db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     let meta_models = ComicMeta::find()
         .filter(Expr::col(comic_meta::Column::ComicId).is_in(comic_ids.clone()))
         .all(db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     let mut by_id: HashMap<String, comics::Model> = models
         .into_iter()
         .map(|m| (m.comic_id.clone(), m))
@@ -569,7 +569,7 @@ pub async fn load_comics_ordered(
     Ok(result)
 }
 
-/// 浏览列表瘦加载：仅 comics + comic_meta 的标题/页数，不拉关系表。
+/// 浏览列表瘦加载：仅 comics + `comic_meta` 的标题/页数，不拉关系表。
 async fn load_comics_browse_ordered(
     db: &DatabaseConnection,
     comic_ids: Vec<String>,
@@ -581,12 +581,12 @@ async fn load_comics_browse_ordered(
         .filter(Expr::col(comics::Column::ComicId).is_in(comic_ids.clone()))
         .all(db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     let meta_models = ComicMeta::find()
         .filter(Expr::col(comic_meta::Column::ComicId).is_in(comic_ids.clone()))
         .all(db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     let mut by_id: HashMap<String, comics::Model> = models
         .into_iter()
         .map(|m| (m.comic_id.clone(), m))
@@ -626,7 +626,7 @@ async fn load_last_read_times(
         .filter(comic_reading_histories::Column::LastReadTime.gte(cutoff))
         .all(db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     Ok(rows
         .into_iter()
         .map(|row| (row.comic_id, row.last_read_time))
@@ -642,7 +642,7 @@ async fn load_tag_names(
         .order_by_asc(comic_tags::Column::TagName)
         .all(db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     let mut map: HashMap<String, Vec<String>> = HashMap::new();
     for row in rows {
         map.entry(row.comic_id).or_default().push(row.tag_name);
@@ -659,7 +659,7 @@ async fn load_parody_names(
         .order_by_asc(comic_parodies::Column::ParodyName)
         .all(db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     let mut map: HashMap<String, Vec<String>> = HashMap::new();
     for row in rows {
         map.entry(row.comic_id).or_default().push(row.parody_name);
@@ -676,7 +676,7 @@ async fn load_character_names(
         .order_by_asc(comic_characters::Column::CharacterName)
         .all(db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     let mut map: HashMap<String, Vec<String>> = HashMap::new();
     for row in rows {
         map.entry(row.comic_id)

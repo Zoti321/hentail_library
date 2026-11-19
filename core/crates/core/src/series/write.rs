@@ -7,7 +7,8 @@ use crate::db::{connection, map_db_err};
 use crate::entity::{prelude::*, series, series_items};
 use crate::error::HentaiError;
 use crate::metadata_lock::{
-    merge_series_name, series_auto_locks, series_name_needs_write, SeriesMetaField,
+    merge_series_name, series_auto_locks, series_name_needs_write, SeriesAutoLockInputs,
+    SeriesMetaField,
 };
 use crate::series_id::series_name_from_folder_path;
 use crate::util::compute_sort_key;
@@ -16,11 +17,11 @@ pub(crate) async fn refresh_series_name_from_folder(
     db: &DatabaseConnection,
     series_id: &str,
 ) -> Result<(), HentaiError> {
-    let txn = db.begin().await.map_err(map_db_err)?;
+    let txn = db.begin().await.map_err(|e| map_db_err(&e))?;
     let current = Series::find_by_id(series_id)
         .one(&txn)
         .await
-        .map_err(map_db_err)?
+        .map_err(|e| map_db_err(&e))?
         .ok_or_else(|| HentaiError::validation(format!("系列不存在: {series_id}")))?;
     let folder_name = series_name_from_folder_path(&current.folder_path);
     if !series_name_needs_write(current.name_locked, &current.name, &folder_name) {
@@ -30,8 +31,8 @@ pub(crate) async fn refresh_series_name_from_folder(
     let mut active: series::ActiveModel = current.into();
     active.name_sort_key = Set(compute_sort_key(&merged_name));
     active.name = Set(merged_name);
-    active.update(&txn).await.map_err(map_db_err)?;
-    txn.commit().await.map_err(map_db_err)?;
+    active.update(&txn).await.map_err(|e| map_db_err(&e))?;
+    txn.commit().await.map_err(|e| map_db_err(&e))?;
     crate::revision::notify_committed();
     Ok(())
 }
@@ -53,6 +54,7 @@ pub struct SetSeriesMetaLocksDto {
 }
 
 impl SetSeriesMetaLocksDto {
+    #[must_use]
     pub fn any(&self) -> bool {
         SeriesMetaField::ALL
             .iter()
@@ -60,6 +62,7 @@ impl SetSeriesMetaLocksDto {
     }
 
     /// `Some(locked)` when this patch sets `field`'s lock, `None` when it leaves it unchanged.
+    #[must_use]
     pub fn patch(&self, field: SeriesMetaField) -> Option<bool> {
         match field {
             SeriesMetaField::Name => self.name,
@@ -93,14 +96,14 @@ pub async fn update_series_user_meta(
     let existing = Series::find_by_id(series_id)
         .one(&db)
         .await
-        .map_err(map_db_err)?
+        .map_err(|e| map_db_err(&e))?
         .ok_or_else(|| HentaiError::validation(format!("系列不存在: {series_id}")))?;
 
-    let auto_locks = series_auto_locks(
-        meta.name.is_some(),
-        meta.serialization_status.is_some(),
-        meta.total_count.is_some() || meta.clear_total_count,
-    );
+    let auto_locks = series_auto_locks(SeriesAutoLockInputs {
+        name: meta.name.is_some(),
+        serialization_status: meta.serialization_status.is_some(),
+        total_count: meta.total_count.is_some() || meta.clear_total_count,
+    });
     let mut active: series::ActiveModel = existing.into();
     if let Some(name) = meta.name {
         let trimmed = name.trim();
@@ -121,7 +124,7 @@ pub async fn update_series_user_meta(
     for field in auto_locks.written() {
         apply_series_lock(&mut active, field, true);
     }
-    active.update(&db).await.map_err(map_db_err)?;
+    active.update(&db).await.map_err(|e| map_db_err(&e))?;
     crate::revision::notify_committed();
     Ok(())
 }
@@ -137,7 +140,7 @@ pub async fn set_series_meta_locks(
     let existing = Series::find_by_id(series_id)
         .one(&db)
         .await
-        .map_err(map_db_err)?
+        .map_err(|e| map_db_err(&e))?
         .ok_or_else(|| HentaiError::validation(format!("系列不存在: {series_id}")))?;
 
     let mut active: series::ActiveModel = existing.into();
@@ -146,7 +149,7 @@ pub async fn set_series_meta_locks(
             apply_series_lock(&mut active, field, locked);
         }
     }
-    active.update(&db).await.map_err(map_db_err)?;
+    active.update(&db).await.map_err(|e| map_db_err(&e))?;
     crate::revision::notify_committed();
     Ok(())
 }
@@ -173,7 +176,7 @@ pub async fn update_series_item_sort_order(
         .filter(series_items::Column::ComicId.eq(comic_id))
         .one(&db)
         .await
-        .map_err(map_db_err)?
+        .map_err(|e| map_db_err(&e))?
         .ok_or_else(|| {
             HentaiError::validation(format!("系列成员不存在: {series_id}/{comic_id}"))
         })?;
@@ -181,7 +184,7 @@ pub async fn update_series_item_sort_order(
     let mut active: series_items::ActiveModel = existing.into();
     active.sort_order = Set(sort_order);
     active.sort_order_locked = Set(true);
-    active.update(&db).await.map_err(map_db_err)?;
+    active.update(&db).await.map_err(|e| map_db_err(&e))?;
     crate::revision::notify_committed();
     Ok(())
 }
@@ -203,14 +206,14 @@ pub async fn set_series_item_sort_order_locked(
         .filter(series_items::Column::ComicId.eq(comic_id))
         .one(&db)
         .await
-        .map_err(map_db_err)?
+        .map_err(|e| map_db_err(&e))?
         .ok_or_else(|| {
             HentaiError::validation(format!("系列成员不存在: {series_id}/{comic_id}"))
         })?;
 
     let mut active: series_items::ActiveModel = existing.into();
     active.sort_order_locked = Set(locked);
-    active.update(&db).await.map_err(map_db_err)?;
+    active.update(&db).await.map_err(|e| map_db_err(&e))?;
     crate::revision::notify_committed();
     Ok(())
 }
@@ -249,10 +252,19 @@ mod tests {
     #[test]
     fn auto_locks_follow_the_written_fields() {
         assert_eq!(
-            series_auto_locks(true, false, false).written(),
+            series_auto_locks(SeriesAutoLockInputs {
+                name: true,
+                ..SeriesAutoLockInputs::default()
+            })
+            .written(),
             vec![SeriesMetaField::Name]
         );
-        assert!(series_auto_locks(false, true, true).any());
-        assert!(!series_auto_locks(false, false, false).any());
+        assert!(series_auto_locks(SeriesAutoLockInputs {
+            serialization_status: true,
+            total_count: true,
+            ..SeriesAutoLockInputs::default()
+        })
+        .any());
+        assert!(!series_auto_locks(SeriesAutoLockInputs::default()).any());
     }
 }

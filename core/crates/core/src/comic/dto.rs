@@ -68,6 +68,7 @@ impl Default for ComicFilterDto {
 }
 
 impl ComicFilterDto {
+    #[must_use]
     pub fn normalized(self) -> Self {
         Self {
             show_r18: self.show_r18,
@@ -102,6 +103,9 @@ fn normalize_query(raw: Option<String>) -> Option<String> {
 }
 
 /// Per-field locks for Comic metadata (Komga-style). Default: all unlocked.
+///
+/// FRB / JSON wire shape requires one bool per field name; a bitset would need custom serde.
+#[expect(clippy::struct_excessive_bools)]
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ComicMetaLocks {
     pub title: bool,
@@ -171,12 +175,14 @@ pub struct ComicDto {
 
 impl ComicDto {
     /// Author 显示名列表：写路径（`replace_comic_authors`）与变更比对用；id 不参与。
+    #[must_use]
     pub fn author_names(&self) -> Vec<String> {
         self.authors.iter().map(|a| a.name.clone()).collect()
     }
 }
 
 /// 由名字列表构造无 id 的引用投影（扫描 / 用户新输入）。
+#[must_use]
 pub fn author_refs_from_names(names: &[String]) -> Vec<ComicAuthorDto> {
     names
         .iter()
@@ -196,11 +202,13 @@ pub fn single_language(languages: &[String]) -> Vec<String> {
 }
 
 /// Serialize the optional Language for the legacy JSON-list column.
+#[must_use]
 pub fn serialize_languages(languages: &[String]) -> String {
     serde_json::to_string(&single_language(languages)).unwrap_or_else(|_| "[]".to_string())
 }
 
 /// Parse Language list; invalid JSON → empty (unset).
+#[must_use]
 pub fn parse_languages_json(raw: &str) -> Vec<String> {
     let Ok(values) = serde_json::from_str::<Vec<String>>(raw) else {
         return Vec::new();
@@ -259,9 +267,9 @@ pub struct PagedComicBrowseResultDto {
     pub page_size: i32,
 }
 
+#[must_use]
 pub fn now_ms() -> i64 {
     std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
-        .map(|d| d.as_millis() as i64)
-        .unwrap_or(0)
+        .map_or(0, |d| crate::util::milliseconds_to_i64(d.as_millis()))
 }

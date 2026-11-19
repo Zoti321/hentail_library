@@ -25,123 +25,170 @@ fn invalid(message: impl Into<String>) -> HentaiError {
 
 fn parse(xml: &str) -> Result<Document, HentaiError> {
     let mut reader = NsReader::from_str(xml);
-    let mut depth = 0;
-    let mut root_seen = false;
-    let mut close = 0;
-    let mut empty_root = false;
-    let mut children = Vec::new();
-    let mut current: Option<Child> = None;
-    let mut seen = HashSet::new();
+    let mut state = ParseState::default();
     loop {
-        let before = reader.buffer_position() as usize;
+        let before = crate::util::u64_to_usize(reader.buffer_position());
         let (namespace, event) = reader
             .read_resolved_event()
             .map_err(|err| invalid(err.to_string()))?;
-        let application_ns = matches!(&namespace, ResolveResult::Bound(ns) if ns.as_ref() == EXTENSION_NAMESPACE.as_bytes());
-        let standard_ns = matches!(namespace, ResolveResult::Unbound);
         if matches!(namespace, ResolveResult::Unknown(_)) {
             return Err(invalid("Unbound namespace prefix"));
         }
+        let ns = match &namespace {
+            ResolveResult::Bound(ns) if ns.as_ref() == EXTENSION_NAMESPACE.as_bytes() => {
+                ComicInfoNs::Application
+            }
+            ResolveResult::Unbound => ComicInfoNs::Standard,
+            _ => ComicInfoNs::Other,
+        };
         match event {
             Event::Start(ref start) | Event::Empty(ref start) => {
-                let empty = matches!(event, Event::Empty(_));
-                for attribute in start.attributes() {
-                    attribute
-                        .map_err(|err| invalid(err.to_string()))?
-                        .decode_and_unescape_value(reader.decoder())
-                        .map_err(|err| invalid(err.to_string()))?;
-                }
-                let name = String::from_utf8_lossy(start.local_name().as_ref()).into_owned();
-                if depth == 0 {
-                    if root_seen || name != "ComicInfo" || !standard_ns {
-                        return Err(invalid("Expected one unnamespaced ComicInfo root"));
-                    }
-                    root_seen = true;
-                    empty_root = empty;
-                    if empty {
-                        close = before;
-                    }
-                } else if depth == 1 {
-                    let key = if application_ns && name == "Metadata" {
-                        "@extension".to_owned()
-                    } else if standard_ns {
-                        name
-                    } else {
-                        String::new()
-                    };
-                    if owned_key(&key) && !seen.insert(key.clone()) {
-                        return Err(invalid(format!("Conflicting duplicate {key}")));
-                    }
-                    let child = Child {
-                        key,
-                        range: before..reader.buffer_position() as usize,
-                        text: String::new(),
-                    };
-                    if empty {
-                        children.push(child);
-                    } else {
-                        current = Some(child);
-                    }
-                } else if current.as_ref().is_some_and(|child| owned_key(&child.key)) {
-                    return Err(invalid("Metadata scalar contains nested elements"));
-                }
-                if !empty {
-                    depth += 1;
-                }
+                parse_start_or_empty(&mut reader, &mut state, before, ns, start, &event)?;
             }
             Event::End(_) => {
-                if depth == 0 {
-                    return Err(invalid("Unexpected closing element"));
-                }
-                depth -= 1;
-                if depth == 1 {
-                    if let Some(mut child) = current.take() {
-                        child.range.end = reader.buffer_position() as usize;
-                        children.push(child);
-                    }
-                } else if depth == 0 {
-                    close = before;
-                }
+                let after = crate::util::u64_to_usize(reader.buffer_position());
+                parse_end(&mut state, before, after)?;
             }
             Event::Text(text) => {
-                let text = text.unescape().map_err(|err| invalid(err.to_string()))?;
-                if !valid_xml_text(&text) {
-                    return Err(invalid("Forbidden XML character"));
-                }
-                if depth == 0 && !text.trim().is_empty() {
-                    return Err(invalid("Text outside document root"));
-                }
-                if depth == 2 {
-                    if let Some(child) = &mut current {
-                        child.text.push_str(&text);
-                    }
-                }
+                parse_text(&mut state, &text)?;
             }
             Event::CData(text) => {
-                if depth == 0 {
-                    return Err(invalid("CDATA outside document root"));
-                }
-                if depth == 2 {
-                    if let Some(child) = &mut current {
-                        child
-                            .text
-                            .push_str(&text.decode().map_err(|err| invalid(err.to_string()))?);
-                    }
-                }
+                parse_cdata(&mut state, &text)?;
             }
             Event::DocType(_) => return Err(invalid("DTD is unsupported")),
             Event::Eof => break,
             _ => {}
         }
     }
-    if !root_seen || depth != 0 {
+    if !state.root_seen || state.depth != 0 {
         return Err(invalid("Incomplete document"));
     }
     Ok(Document {
-        children,
-        close,
-        empty_root,
+        children: state.children,
+        close: state.close,
+        empty_root: state.empty_root,
     })
+}
+
+#[derive(Default)]
+struct ParseState {
+    depth: usize,
+    root_seen: bool,
+    close: usize,
+    empty_root: bool,
+    children: Vec<Child>,
+    current: Option<Child>,
+    seen: HashSet<String>,
+}
+
+#[derive(Clone, Copy)]
+enum ComicInfoNs {
+    Application,
+    Standard,
+    Other,
+}
+
+fn parse_start_or_empty(
+    reader: &mut NsReader<&[u8]>,
+    state: &mut ParseState,
+    before: usize,
+    ns: ComicInfoNs,
+    start: &quick_xml::events::BytesStart<'_>,
+    event: &Event,
+) -> Result<(), HentaiError> {
+    let empty = matches!(event, Event::Empty(_));
+    for attribute in start.attributes() {
+        attribute
+            .map_err(|err| invalid(err.to_string()))?
+            .decode_and_unescape_value(reader.decoder())
+            .map_err(|err| invalid(err.to_string()))?;
+    }
+    let name = String::from_utf8_lossy(start.local_name().as_ref()).into_owned();
+    if state.depth == 0 {
+        if state.root_seen || name != "ComicInfo" || !matches!(ns, ComicInfoNs::Standard) {
+            return Err(invalid("Expected one unnamespaced ComicInfo root"));
+        }
+        state.root_seen = true;
+        state.empty_root = empty;
+        if empty {
+            state.close = before;
+        }
+    } else if state.depth == 1 {
+        let key = match ns {
+            ComicInfoNs::Application if name == "Metadata" => "@extension".to_owned(),
+            ComicInfoNs::Standard => name,
+            ComicInfoNs::Application | ComicInfoNs::Other => String::new(),
+        };
+        if owned_key(&key) && !state.seen.insert(key.clone()) {
+            return Err(invalid(format!("Conflicting duplicate {key}")));
+        }
+        let child = Child {
+            key,
+            range: before..crate::util::u64_to_usize(reader.buffer_position()),
+            text: String::new(),
+        };
+        if empty {
+            state.children.push(child);
+        } else {
+            state.current = Some(child);
+        }
+    } else if state
+        .current
+        .as_ref()
+        .is_some_and(|child| owned_key(&child.key))
+    {
+        return Err(invalid("Metadata scalar contains nested elements"));
+    }
+    if !empty {
+        state.depth += 1;
+    }
+    Ok(())
+}
+
+fn parse_end(state: &mut ParseState, before: usize, after: usize) -> Result<(), HentaiError> {
+    if state.depth == 0 {
+        return Err(invalid("Unexpected closing element"));
+    }
+    state.depth -= 1;
+    if state.depth == 1 {
+        if let Some(mut child) = state.current.take() {
+            child.range.end = after;
+            state.children.push(child);
+        }
+    } else if state.depth == 0 {
+        state.close = before;
+    }
+    Ok(())
+}
+
+fn parse_text(state: &mut ParseState, text: &quick_xml::events::BytesText<'_>) -> Result<(), HentaiError> {
+    let text = text.unescape().map_err(|err| invalid(err.to_string()))?;
+    if !valid_xml_text(&text) {
+        return Err(invalid("Forbidden XML character"));
+    }
+    if state.depth == 0 && !text.trim().is_empty() {
+        return Err(invalid("Text outside document root"));
+    }
+    if state.depth == 2 {
+        if let Some(child) = &mut state.current {
+            child.text.push_str(&text);
+        }
+    }
+    Ok(())
+}
+
+fn parse_cdata(state: &mut ParseState, text: &quick_xml::events::BytesCData<'_>) -> Result<(), HentaiError> {
+    if state.depth == 0 {
+        return Err(invalid("CDATA outside document root"));
+    }
+    if state.depth == 2 {
+        if let Some(child) = &mut state.current {
+            child
+                .text
+                .push_str(&text.decode().map_err(|err| invalid(err.to_string()))?);
+        }
+    }
+    Ok(())
 }
 
 fn owned_key(key: &str) -> bool {
@@ -254,6 +301,26 @@ pub fn update_comic_info(
     {
         return Err(invalid("Metadata contains a forbidden XML character"));
     }
+    let mut replacements = comic_info_replacements(intent, snapshot);
+    let extension = document
+        .children
+        .iter()
+        .find(|child| child.key == "@extension")
+        .map(|child| child.text.as_str());
+    let extension = intent.extension_json(extension)?;
+    let extension_xml = format!(
+        "<hl:Metadata xmlns:hl=\"{EXTENSION_NAMESPACE}\">{}</hl:Metadata>",
+        quick_xml::escape::escape(&extension)
+    );
+    let output = merge_comic_info_document(source, &document, &mut replacements, &extension_xml)?;
+    parse(&output)?;
+    Ok(output)
+}
+
+fn comic_info_replacements(
+    intent: &MetadataWriteIntent,
+    snapshot: &MetadataSnapshot,
+) -> BTreeMap<String, String> {
     let mut replacements = BTreeMap::new();
     let mut put = |key: &str, value: String| {
         replacements.insert(key.to_owned(), value);
@@ -262,7 +329,7 @@ pub fn update_comic_info(
         match field {
             ComicMetaField::Title => put("Title", snapshot.title.clone()),
             ComicMetaField::Description => {
-                put("Summary", snapshot.description.clone().unwrap_or_default())
+                put("Summary", snapshot.description.clone().unwrap_or_default());
             }
             ComicMetaField::PublishedAt => {
                 let date = snapshot
@@ -270,18 +337,15 @@ pub fn update_comic_info(
                     .map(|ms| civil_date(ms.div_euclid(86_400_000)));
                 put(
                     "Year",
-                    date.map(|(y, _, _)| y.to_string())
-                        .unwrap_or_else(|| "-1".to_owned()),
+                    date.map_or_else(|| "-1".to_owned(), |(y, _, _)| y.to_string()),
                 );
                 put(
                     "Month",
-                    date.map(|(_, m, _)| m.to_string())
-                        .unwrap_or_else(|| "-1".to_owned()),
+                    date.map_or_else(|| "-1".to_owned(), |(_, m, _)| m.to_string()),
                 );
                 put(
                     "Day",
-                    date.map(|(_, _, d)| d.to_string())
-                        .unwrap_or_else(|| "-1".to_owned()),
+                    date.map_or_else(|| "-1".to_owned(), |(_, _, d)| d.to_string()),
                 );
             }
             ComicMetaField::Authors => put("Writer", snapshot.authors.join(", ")),
@@ -311,16 +375,15 @@ pub fn update_comic_info(
             ComicMetaField::Parodies => {}
         }
     }
-    let extension = document
-        .children
-        .iter()
-        .find(|child| child.key == "@extension")
-        .map(|child| child.text.as_str());
-    let extension = intent.extension_json(extension)?;
-    let extension_xml = format!(
-        "<hl:Metadata xmlns:hl=\"{EXTENSION_NAMESPACE}\">{}</hl:Metadata>",
-        quick_xml::escape::escape(&extension)
-    );
+    replacements
+}
+
+fn merge_comic_info_document(
+    source: &str,
+    document: &Document,
+    replacements: &mut BTreeMap<String, String>,
+    extension_xml: &str,
+) -> Result<String, HentaiError> {
     let mut output = String::new();
     let mut cursor = 0;
     let existing_keys: HashSet<_> = document
@@ -342,12 +405,14 @@ pub fn update_comic_info(
                 .peek()
                 .is_some_and(|(key, _)| schema_rank(key) < schema_rank(&child.key))
             {
-                let (key, value) = additions.next().expect("peeked addition");
+                let Some((key, value)) = additions.next() else {
+                    break;
+                };
                 output.push_str(&element(&key, &value));
             }
         }
         let replacement = if child.key == "@extension" {
-            Some(extension_xml.clone())
+            Some(extension_xml.to_owned())
         } else {
             replacements
                 .remove(&child.key)
@@ -382,13 +447,12 @@ pub fn update_comic_info(
         .iter()
         .any(|child| child.key == "@extension")
     {
-        output.push_str(&extension_xml);
+        output.push_str(extension_xml);
     }
     if document.empty_root {
         output.push_str("</ComicInfo>");
     }
     output.push_str(&source[cursor..]);
-    parse(&output)?;
     Ok(output)
 }
 
@@ -456,7 +520,7 @@ pub(super) fn civil_date(days: i64) -> (i64, i64, i64) {
     let z = days + 719_468;
     let era = z.div_euclid(146_097);
     let doe = z - era * 146_097;
-    let yoe = (doe - doe / 1460 + doe / 36524 - doe / 146096) / 365;
+    let yoe = (doe - doe / 1460 + doe / 36524 - doe / 146_096) / 365;
     let mut year = yoe + era * 400;
     let doy = doe - (365 * yoe + yoe / 4 - yoe / 100);
     let mp = (5 * doy + 2) / 153;
@@ -475,7 +539,7 @@ fn date_ms(year: i64, month: i64, day: i64) -> Option<i64> {
     let yoe = y - era * 400;
     let mp = month + if month > 2 { -3 } else { 9 };
     let days =
-        era * 146097 + yoe * 365 + yoe / 4 - yoe / 100 + (153 * mp + 2) / 5 + day - 1 - 719468;
+        era * 146_097 + yoe * 365 + yoe / 4 - yoe / 100 + (153 * mp + 2) / 5 + day - 1 - 719_468;
     (civil_date(days) == (year, month, day)).then_some(days * 86_400_000)
 }
 

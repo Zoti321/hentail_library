@@ -1,25 +1,36 @@
 use std::env;
 use std::path::{Path, PathBuf};
+use std::process;
 
 fn main() {
-    let manifest_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").expect("CARGO_MANIFEST_DIR"));
-    let vendor_root = manifest_dir.join("../../vendor");
-    let target = env::var("TARGET").expect("TARGET");
+    // Miri cannot load vendored natives; define a dummy when the build script runs
+    // under CARGO_CFG_MIRI. pdf.rs also uses option_env! for skipped-build-script cases.
+    if env::var_os("CARGO_CFG_MIRI").is_some() {
+        println!("cargo:rustc-env=HENTAI_PDFIUM_LIB_DIR=/miri-unavailable");
+        return;
+    }
+
+    let Ok(manifest_dir) = env::var("CARGO_MANIFEST_DIR") else {
+        fail("CARGO_MANIFEST_DIR is unset");
+    };
+    let vendor_root = PathBuf::from(manifest_dir).join("../../vendor");
+    let Ok(target) = env::var("TARGET") else {
+        fail("TARGET is unset");
+    };
     let platform_dir = resolve_vendor_dir(&vendor_root, &target);
 
     if !platform_dir.is_dir() {
-        panic!(
+        fail(&format!(
             "缺少原生依赖目录: {}。请先运行 core/vendor/fetch-native-deps（Android 需加 --android）。",
             platform_dir.display()
-        );
+        ));
     }
 
-    let pdfium_lib = find_pdfium_library(&platform_dir);
-    if pdfium_lib.is_none() {
-        panic!(
+    if find_pdfium_library(&platform_dir).is_none() {
+        fail(&format!(
             "在 {} 中未找到 pdfium 动态库（pdfium.dll / libpdfium.so / libpdfium.dylib）。",
             platform_dir.display()
-        );
+        ));
     }
 
     let lib_dir = platform_dir
@@ -52,6 +63,12 @@ fn main() {
     println!("cargo:rustc-env=HENTAI_PDFIUM_LIB_DIR={lib_dir}");
 }
 
+fn fail(message: &str) -> ! {
+    eprintln!("cargo:warning={message}");
+    eprintln!("error: {message}");
+    process::exit(1);
+}
+
 fn resolve_vendor_dir(vendor_root: &Path, target: &str) -> PathBuf {
     if let Ok(dir) = env::var("HENTAI_VENDOR_DIR") {
         return PathBuf::from(dir);
@@ -66,7 +83,7 @@ fn resolve_vendor_dir(vendor_root: &Path, target: &str) -> PathBuf {
         } else if target.contains("arm") {
             "android-arm"
         } else {
-            panic!("不支持的 Android 目标平台 triple: {target}");
+            fail(&format!("不支持的 Android 目标平台 triple: {target}"));
         }
     } else if target.contains("windows") {
         if target.contains("aarch64") {
@@ -99,7 +116,7 @@ fn resolve_vendor_dir(vendor_root: &Path, target: &str) -> PathBuf {
             "macos-x86_64"
         }
     } else {
-        panic!("不支持的目标平台 triple: {target}");
+        fail(&format!("不支持的目标平台 triple: {target}"));
     };
     vendor_root.join(folder)
 }

@@ -3,11 +3,11 @@ use sea_orm_migration::prelude::*;
 
 /// Ensures the current schema exists for installs that already applied earlier
 /// migrations while `m20240630_000002_drift_v2_seed` was still a no-op
-/// (empty DB, no tables, but seaql_migrations fully populated).
+/// (empty DB, no tables, but `seaql_migrations` fully populated).
 #[derive(DeriveMigrationName)]
 pub struct Migration;
 
-const SQL: &str = r#"
+const SQL: &str = r"
 CREATE TABLE IF NOT EXISTS comics (
   comic_id TEXT NOT NULL PRIMARY KEY,
   path TEXT NOT NULL,
@@ -110,7 +110,7 @@ CREATE TABLE IF NOT EXISTS series_reading_histories (
   page_index INTEGER,
   FOREIGN KEY(series_id) REFERENCES series(series_id) ON DELETE CASCADE
 );
-"#;
+";
 
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {

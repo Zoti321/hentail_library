@@ -22,11 +22,11 @@ pub async fn rebuild_series_from_comics<C: ConnectionTrait>(
             .filter(crate::entity::comics::Column::LibraryId.eq(id))
             .all(db)
             .await
-            .map_err(crate::db::map_db_err)?,
+            .map_err(|e| crate::db::map_db_err(&e))?,
         None => Comics::find()
             .all(db)
             .await
-            .map_err(crate::db::map_db_err)?,
+            .map_err(|e| crate::db::map_db_err(&e))?,
     };
     let mut groups: HashMap<String, Vec<(String, String)>> = HashMap::new();
     let mut group_library: HashMap<String, String> = HashMap::new();
@@ -53,11 +53,11 @@ pub async fn rebuild_series_from_comics<C: ConnectionTrait>(
             .filter(crate::entity::series::Column::LibraryId.eq(id))
             .all(db)
             .await
-            .map_err(crate::db::map_db_err)?,
+            .map_err(|e| crate::db::map_db_err(&e))?,
         None => Series::find()
             .all(db)
             .await
-            .map_err(crate::db::map_db_err)?,
+            .map_err(|e| crate::db::map_db_err(&e))?,
     };
     let rewrite_comic_ids: Vec<String> = groups
         .values()
@@ -72,7 +72,7 @@ pub async fn rebuild_series_from_comics<C: ConnectionTrait>(
             .filter(series_items::Column::ComicId.is_in(rewrite_comic_ids.clone()))
             .all(db)
             .await
-            .map_err(crate::db::map_db_err)?
+            .map_err(|e| crate::db::map_db_err(&e))?
             .into_iter()
             .filter(|item| item.sort_order_locked)
             .map(|item| (item.comic_id, item.sort_order))
@@ -84,7 +84,7 @@ pub async fn rebuild_series_from_comics<C: ConnectionTrait>(
             Series::delete_by_id(row.series_id)
                 .exec(db)
                 .await
-                .map_err(crate::db::map_db_err)?;
+                .map_err(|e| crate::db::map_db_err(&e))?;
         }
     }
 
@@ -95,70 +95,84 @@ pub async fn rebuild_series_from_comics<C: ConnectionTrait>(
             .filter(series_items::Column::ComicId.is_in(rewrite_comic_ids))
             .exec(db)
             .await
-            .map_err(crate::db::map_db_err)?;
+            .map_err(|e| crate::db::map_db_err(&e))?;
     }
 
     let mut folder_paths: Vec<String> = groups.keys().cloned().collect();
     folder_paths.sort();
 
     for folder_path in folder_paths {
-        let mut entries = groups
-            .remove(&folder_path)
-            .expect("folder path comes from groups keys");
-        entries.sort_by(|a, b| compare_paths_by_filename(&a.1, &b.1));
-        let series_id = series_id_from_folder_path(&folder_path);
-        let name = series_name_from_folder_path(&folder_path);
+        let Some(mut entries) = groups.remove(&folder_path) else {
+            continue;
+        };
         let series_library_id = group_library.get(&folder_path).cloned().unwrap_or_default();
-        let existing = Series::find_by_id(series_id.clone())
-            .one(db)
-            .await
-            .map_err(crate::db::map_db_err)?;
-
-        if let Some(existing_row) = existing {
-            let mut active: series::ActiveModel = existing_row.clone().into();
-            active.folder_path = Set(folder_path.clone());
-            active.library_id = Set(series_library_id);
-            // serialization_status / total_count have no scan source → never overwritten.
-            let merged_name =
-                merge_series_name(existing_row.name_locked, &existing_row.name, &name);
-            active.name_sort_key = Set(compute_sort_key(&merged_name));
-            active.name = Set(merged_name);
-            active.update(db).await.map_err(crate::db::map_db_err)?;
-        } else {
-            Series::insert(series::ActiveModel {
-                series_id: Set(series_id.clone()),
-                folder_path: Set(folder_path.clone()),
-                name_sort_key: Set(compute_sort_key(&name)),
-                name: Set(name),
-                serialization_status: Set("unknown".to_string()),
-                total_count: Set(None),
-                name_locked: Set(false),
-                serialization_status_locked: Set(false),
-                total_count_locked: Set(false),
-                library_id: Set(series_library_id),
-            })
-            .exec(db)
-            .await
-            .map_err(crate::db::map_db_err)?;
-        }
-
-        for (index, (comic_id, _)) in entries.iter().enumerate() {
-            let (sort_order, sort_order_locked) = resolve_member_sort_order(
-                locked_orders.get(comic_id).copied(),
-                (index as i32 + 1) as f64,
-            );
-            SeriesItems::insert(series_items::ActiveModel {
-                series_id: Set(series_id.clone()),
-                comic_id: Set(comic_id.clone()),
-                sort_order: Set(sort_order),
-                sort_order_locked: Set(sort_order_locked),
-            })
-            .exec(db)
-            .await
-            .map_err(crate::db::map_db_err)?;
-        }
+        upsert_folder_series(db, &folder_path, series_library_id, &mut entries, &locked_orders)
+            .await?;
     }
 
+    Ok(())
+}
+
+async fn upsert_folder_series<C: ConnectionTrait>(
+    db: &C,
+    folder_path: &str,
+    series_library_id: String,
+    entries: &mut [(String, String)],
+    locked_orders: &HashMap<String, f64>,
+) -> Result<(), HentaiError> {
+    entries.sort_by(|a, b| compare_paths_by_filename(&a.1, &b.1));
+    let series_id = series_id_from_folder_path(folder_path);
+    let name = series_name_from_folder_path(folder_path);
+    let existing = Series::find_by_id(series_id.clone())
+        .one(db)
+        .await
+        .map_err(|e| crate::db::map_db_err(&e))?;
+
+    if let Some(existing_row) = existing {
+        let mut active: series::ActiveModel = existing_row.clone().into();
+        active.folder_path = Set(folder_path.to_owned());
+        active.library_id = Set(series_library_id);
+        // serialization_status / total_count have no scan source → never overwritten.
+        let merged_name = merge_series_name(existing_row.name_locked, &existing_row.name, &name);
+        active.name_sort_key = Set(compute_sort_key(&merged_name));
+        active.name = Set(merged_name);
+        active
+            .update(db)
+            .await
+            .map_err(|e| crate::db::map_db_err(&e))?;
+    } else {
+        Series::insert(series::ActiveModel {
+            series_id: Set(series_id.clone()),
+            folder_path: Set(folder_path.to_owned()),
+            name_sort_key: Set(compute_sort_key(&name)),
+            name: Set(name),
+            serialization_status: Set("unknown".to_string()),
+            total_count: Set(None),
+            name_locked: Set(false),
+            serialization_status_locked: Set(false),
+            total_count_locked: Set(false),
+            library_id: Set(series_library_id),
+        })
+        .exec(db)
+        .await
+        .map_err(|e| crate::db::map_db_err(&e))?;
+    }
+
+    for (index, (comic_id, _)) in entries.iter().enumerate() {
+        let (sort_order, sort_order_locked) = resolve_member_sort_order(
+            locked_orders.get(comic_id).copied(),
+            f64::from(crate::util::usize_to_i32(index) + 1),
+        );
+        SeriesItems::insert(series_items::ActiveModel {
+            series_id: Set(series_id.clone()),
+            comic_id: Set(comic_id.clone()),
+            sort_order: Set(sort_order),
+            sort_order_locked: Set(sort_order_locked),
+        })
+        .exec(db)
+        .await
+        .map_err(|e| crate::db::map_db_err(&e))?;
+    }
     Ok(())
 }
 
@@ -188,7 +202,7 @@ fn compare_natural(a: &str, b: &str) -> std::cmp::Ordering {
                 let a_num = read_number(&mut a_chars);
                 let b_num = read_number(&mut b_chars);
                 match a_num.cmp(&b_num) {
-                    std::cmp::Ordering::Equal => continue,
+                    std::cmp::Ordering::Equal => {}
                     other => return other,
                 }
             }
@@ -216,7 +230,10 @@ where
         if !ch.is_ascii_digit() {
             break;
         }
-        value = value * 10 + (ch as u64 - b'0' as u64);
+        let Some(digit) = ch.to_digit(10) else {
+            break;
+        };
+        value = value * 10 + u64::from(digit);
         chars.next();
     }
     value

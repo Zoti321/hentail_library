@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
 mod common;
 
 use std::fs::File;
@@ -47,9 +49,9 @@ fn saved_paths_migrate_to_local_libraries_preserving_comic_ids() {
         write_image_comic(&comic_b);
 
         let comic_a_id = comic_id_from_path(&comic_a.to_string_lossy());
-        let comic_b_id = comic_id_from_path(&comic_b.to_string_lossy());
+        let comic_in_b_id = comic_id_from_path(&comic_b.to_string_lossy());
         let lib_a_id = library_id_from_root(&root_a.to_string_lossy());
-        let lib_b_id = library_id_from_root(&root_b.to_string_lossy());
+        let lib_in_b_id = library_id_from_root(&root_b.to_string_lossy());
 
         let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
@@ -68,7 +70,7 @@ fn saved_paths_migrate_to_local_libraries_preserving_comic_ids() {
                 ),
                 (
                     root_b.to_string_lossy().to_string(),
-                    comic_b_id.clone(),
+                    comic_in_b_id.clone(),
                     comic_b.to_string_lossy().to_string(),
                 ),
             ] {
@@ -99,20 +101,20 @@ fn saved_paths_migrate_to_local_libraries_preserving_comic_ids() {
             assert_eq!(libraries.len(), 2);
             let ids: Vec<String> = libraries.iter().map(|l| l.library_id.clone()).collect();
             assert!(ids.contains(&lib_a_id));
-            assert!(ids.contains(&lib_b_id));
+            assert!(ids.contains(&lib_in_b_id));
 
             let a = find_comic_by_id(&comic_a_id)
                 .await
                 .expect("find a")
                 .expect("comic a");
-            let b = find_comic_by_id(&comic_b_id)
+            let b = find_comic_by_id(&comic_in_b_id)
                 .await
                 .expect("find b")
                 .expect("comic b");
             assert_eq!(a.comic_id, comic_a_id);
-            assert_eq!(b.comic_id, comic_b_id);
+            assert_eq!(b.comic_id, comic_in_b_id);
             assert_eq!(a.library_id, lib_a_id);
-            assert_eq!(b.library_id, lib_b_id);
+            assert_eq!(b.library_id, lib_in_b_id);
 
             let db = connection().expect("db");
             let leftover = db

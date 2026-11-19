@@ -15,18 +15,17 @@ use super::media::is_comic_image_extension;
 /// Fixed-layout / manga EPUBs usually put one XHTML (or image) per spine item;
 /// filenames are often content hashes, so ZIP / natural filename order is wrong.
 /// Returns empty when the package has no usable spine images (caller may fall back).
-pub fn collect_epub_spine_image_names<R: Read + Seek>(
-    archive: &mut ZipArchive<R>,
-) -> Result<Vec<String>, HentaiError> {
+#[must_use]
+pub fn collect_epub_spine_image_names<R: Read + Seek>(archive: &mut ZipArchive<R>) -> Vec<String> {
     let Ok(opf_path) = find_opf_path(archive) else {
-        return Ok(Vec::new());
+        return Vec::new();
     };
     let Ok(opf) = read_zip_entry_string(archive, &opf_path) else {
-        return Ok(Vec::new());
+        return Vec::new();
     };
     let opf_dir = parent_dir(&opf_path);
     let Some((manifest, spine)) = parse_opf_manifest_and_spine(&opf) else {
-        return Ok(Vec::new());
+        return Vec::new();
     };
 
     let mut names = Vec::with_capacity(spine.len());
@@ -53,7 +52,7 @@ pub fn collect_epub_spine_image_names<R: Read + Seek>(
             names.push(entry_name);
         }
     }
-    Ok(names)
+    names
 }
 
 fn find_opf_path<R: Read + Seek>(archive: &mut ZipArchive<R>) -> Result<String, HentaiError> {
@@ -215,15 +214,7 @@ fn iter_image_refs(content: &str) -> impl Iterator<Item = &str> {
             let after = &rest[start + key.len()..];
             if let Some(end) = after.find('"') {
                 let value = &after[..end];
-                let lower = value.to_ascii_lowercase();
-                if key != "href=\""
-                    || lower.ends_with(".jpg")
-                    || lower.ends_with(".jpeg")
-                    || lower.ends_with(".png")
-                    || lower.ends_with(".webp")
-                    || lower.ends_with(".gif")
-                    || lower.ends_with(".bmp")
-                {
+                if key != "href=\"" || is_comic_image_href(value) {
                     out.push(value);
                 }
                 rest = &after[end + 1..];
@@ -233,6 +224,13 @@ fn iter_image_refs(content: &str) -> impl Iterator<Item = &str> {
         }
     }
     out.into_iter()
+}
+
+fn is_comic_image_href(value: &str) -> bool {
+    Path::new(value)
+        .extension()
+        .and_then(|ext| ext.to_str())
+        .is_some_and(is_comic_image_extension)
 }
 
 fn resolve_archive_name<R: Read + Seek>(archive: &mut ZipArchive<R>, path: &str) -> Option<String> {
@@ -269,8 +267,7 @@ fn extension_of(path: &str) -> String {
     Path::new(path)
         .extension()
         .and_then(|e| e.to_str())
-        .map(|e| format!(".{}", e.to_ascii_lowercase()))
-        .unwrap_or_default()
+        .map_or_default(|e| format!(".{}", e.to_ascii_lowercase()))
 }
 
 fn parent_dir(path: &str) -> String {

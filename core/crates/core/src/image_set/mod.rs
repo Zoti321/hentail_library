@@ -1,6 +1,6 @@
 //! Image set catalog for Image set libraries: discovery, persistence and manual sync (#584).
 //!
-//! Sync is reached from [crate::sync::sync_library] via `is_image_set_catalog`; it never
+//! Sync is reached from [`crate::sync::sync_library`] via `is_image_set_catalog`; it never
 //! writes Comic or Series records.
 
 mod archive_list;

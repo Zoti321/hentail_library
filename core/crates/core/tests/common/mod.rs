@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
 //! Shared DB fixture helpers for hentai-core integration tests.
 //!
 //! New integration tests must use these helpers instead of copying

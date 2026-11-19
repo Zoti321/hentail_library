@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
 //! 迁移不得把 `foreign_keys=OFF` 的连接留在连接池里。
 //!
 //! `PRAGMA foreign_keys` 是连接级状态，而迁移拿到的 `SchemaManager` 背后是连接池

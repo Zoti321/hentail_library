@@ -42,9 +42,8 @@ pub fn load_author_image(
             slot,
         );
     }
-    let comic_id = match (source, comic_id) {
-        (AuthorImageSource::ComicCover, Some(comic_id)) => comic_id,
-        _ => return Ok(None),
+    let (AuthorImageSource::ComicCover, Some(comic_id)) = (source, comic_id) else {
+        return Ok(None);
     };
     let Some(comic) = block_on(find_comic_by_id(&comic_id))? else {
         return Ok(None);

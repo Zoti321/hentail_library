@@ -39,6 +39,7 @@ pub struct SetComicMetaLocksDto {
 
 impl UpdateComicUserMetaDto {
     /// Whether this write sets `field`; a written field is auto-locked (ADR-0007).
+    #[must_use]
     pub fn is_written(&self, field: ComicMetaField) -> bool {
         match field {
             ComicMetaField::Title => self.title.is_some(),
@@ -55,6 +56,7 @@ impl UpdateComicUserMetaDto {
 }
 
 impl SetComicMetaLocksDto {
+    #[must_use]
     pub fn any(&self) -> bool {
         ComicMetaField::ALL
             .iter()
@@ -62,6 +64,7 @@ impl SetComicMetaLocksDto {
     }
 
     /// `Some(locked)` when this patch sets `field`'s lock, `None` when it leaves it unchanged.
+    #[must_use]
     pub fn patch(&self, field: ComicMetaField) -> Option<bool> {
         match field {
             ComicMetaField::Title => self.title,
@@ -99,7 +102,7 @@ pub async fn touch_comic<C: ConnectionTrait>(db: &C, comic_id: &str) -> Result<(
         last_updated_at: Set(now_ms()),
         ..Default::default()
     };
-    active.update(db).await.map_err(map_db_err)?;
+    active.update(db).await.map_err(|e| map_db_err(&e))?;
     Ok(())
 }
 
@@ -108,9 +111,9 @@ pub async fn update_comic_user_meta(
     meta: UpdateComicUserMetaDto,
 ) -> Result<(), HentaiError> {
     let db = connection()?;
-    let txn = db.begin().await.map_err(map_db_err)?;
+    let txn = db.begin().await.map_err(|e| map_db_err(&e))?;
     update_comic_user_meta_in(&txn, comic_id, meta).await?;
-    txn.commit().await.map_err(map_db_err)?;
+    txn.commit().await.map_err(|e| map_db_err(&e))?;
     crate::revision::notify_committed();
     Ok(())
 }
@@ -167,7 +170,7 @@ pub(crate) async fn update_comic_user_meta_in<C: ConnectionTrait>(
         for field in auto_locks.written() {
             apply_comic_lock(&mut active, field, true);
         }
-        active.update(db).await.map_err(map_db_err)?;
+        active.update(db).await.map_err(|e| map_db_err(&e))?;
         meta_touched = true;
     }
     if let Some(authors) = meta.authors {
@@ -201,7 +204,7 @@ pub async fn set_comic_meta_locks(
         return Ok(());
     }
     let db = connection()?;
-    let txn = db.begin().await.map_err(map_db_err)?;
+    let txn = db.begin().await.map_err(|e| map_db_err(&e))?;
     let mut active = comic_meta::ActiveModel {
         comic_id: Set(comic_id.to_string()),
         ..Default::default()
@@ -211,9 +214,9 @@ pub async fn set_comic_meta_locks(
             apply_comic_lock(&mut active, field, locked);
         }
     }
-    active.update(&txn).await.map_err(map_db_err)?;
+    active.update(&txn).await.map_err(|e| map_db_err(&e))?;
     touch_comic(&txn, comic_id).await?;
-    txn.commit().await.map_err(map_db_err)?;
+    txn.commit().await.map_err(|e| map_db_err(&e))?;
     crate::revision::notify_committed();
     Ok(())
 }

@@ -5,6 +5,7 @@ use super::{
 use crate::{error::HentaiError, metadata_lock::ComicMetaField};
 use std::{
     collections::BTreeMap,
+    fmt::Write as _,
     fs::File,
     io::{Read, Write},
     path::Path,
@@ -33,6 +34,7 @@ fn opf_path<R: Read + std::io::Seek>(archive: &mut ZipArchive<R>) -> Result<Stri
     Ok(paths[0].clone())
 }
 
+#[must_use]
 pub fn container_package_path(container: &str) -> Option<String> {
     let paths = xml::nodes(container)
         .ok()?
@@ -53,7 +55,8 @@ pub fn read_opf(opf: &str) -> Result<MetadataSnapshot, HentaiError> {
         if node.namespace == DC {
             match node.name.as_str() {
                 "title" if snapshot.title.is_empty() => {
-                    snapshot.title = node.text.trim().to_owned()
+                    snapshot.title.clear();
+                    snapshot.title.push_str(node.text.trim());
                 }
                 "creator" => {
                     for author in node
@@ -71,7 +74,7 @@ pub fn read_opf(opf: &str) -> Result<MetadataSnapshot, HentaiError> {
                 "subject" => snapshot.tags.push(node.text.clone()),
                 "date" => snapshot.published_at = super::comic_info::parse_date(&node.text),
                 "language" if snapshot.language.is_none() => {
-                    snapshot.language = Some(language_name(&node.text))
+                    snapshot.language = Some(language_name(&node.text));
                 }
                 _ => {}
             }
@@ -124,6 +127,17 @@ fn update_opf(opf: &str, intent: &MetadataWriteIntent) -> Result<String, HentaiE
     if metadata.empty {
         return Err(io_error("Invalid empty EPUB metadata"));
     }
+    let fields = opf_intent_fields(intent);
+    let mut edits = Vec::new();
+    let mut additions = String::new();
+    push_epub3_hl_prefix_edits(opf, package, &mut edits)?;
+    apply_opf_dc_edits(&nodes, metadata, &fields, &mut edits, &mut additions)?;
+    apply_opf_extension_and_modified(intent, &nodes, version, &mut edits, &mut additions)?;
+    edits.push((metadata.content.end..metadata.content.end, additions));
+    xml::replace(opf, edits)
+}
+
+fn opf_intent_fields(intent: &MetadataWriteIntent) -> BTreeMap<&'static str, Vec<String>> {
     let mut fields: BTreeMap<&str, Vec<String>> = BTreeMap::new();
     for field in &intent.fields {
         match field {
@@ -182,47 +196,66 @@ fn update_opf(opf: &str, intent: &MetadataWriteIntent) -> Result<String, HentaiE
             _ => {}
         }
     }
-    let mut edits = Vec::new();
-    let mut additions = String::new();
-    if version.starts_with("3.") {
-        let prefix = package.attr("prefix").unwrap_or_default();
-        if prefix.split_whitespace().any(|part| part == "hl:")
-            && !prefix.contains(&format!("hl: {EXTENSION_NAMESPACE}"))
-        {
-            return Err(io_error(
-                "EPUB hl metadata prefix is already bound differently",
-            ));
-        }
-        if !prefix.contains(&format!("hl: {EXTENSION_NAMESPACE}")) {
-            let opening = &opf[package.range.start..package.content.start];
-            let opening = if prefix.is_empty() {
-                format!(
-                    "{} prefix=\"hl: {EXTENSION_NAMESPACE}\">",
-                    &opening[..opening.len() - 1]
-                )
-            } else {
-                let quote_double = format!("prefix=\"{}\"", xml::escaped(prefix));
-                let quote_single = format!("prefix='{}'", prefix);
-                let replacement = format!(
-                    "prefix=\"{} hl: {EXTENSION_NAMESPACE}\"",
-                    xml::escaped(prefix)
-                );
-                if opening.contains(&quote_double) {
-                    opening.replace(&quote_double, &replacement)
-                } else if opening.contains(&quote_single) {
-                    opening.replace(&quote_single, &replacement)
-                } else {
-                    return Err(io_error("Unsupported EPUB prefix attribute spelling"));
-                }
-            };
-            edits.push((package.range.start..package.content.start, opening));
-        }
+    fields
+}
+
+fn push_epub3_hl_prefix_edits(
+    opf: &str,
+    package: &xml::Node,
+    edits: &mut Vec<(std::ops::Range<usize>, String)>,
+) -> Result<(), HentaiError> {
+    let version = package.attr("version").unwrap_or_default();
+    if !version.starts_with("3.") {
+        return Ok(());
     }
+    let prefix = package.attr("prefix").unwrap_or_default();
+    if prefix.split_whitespace().any(|part| part == "hl:")
+        && !prefix.contains(&format!("hl: {EXTENSION_NAMESPACE}"))
+    {
+        return Err(io_error(
+            "EPUB hl metadata prefix is already bound differently",
+        ));
+    }
+    if prefix.contains(&format!("hl: {EXTENSION_NAMESPACE}")) {
+        return Ok(());
+    }
+    let opening = &opf[package.range.start..package.content.start];
+    let opening = if prefix.is_empty() {
+        format!(
+            "{} prefix=\"hl: {EXTENSION_NAMESPACE}\">",
+            &opening[..opening.len() - 1]
+        )
+    } else {
+        let quote_double = format!("prefix=\"{}\"", xml::escaped(prefix));
+        let quote_single = format!("prefix='{prefix}'");
+        let replacement = format!(
+            "prefix=\"{} hl: {EXTENSION_NAMESPACE}\"",
+            xml::escaped(prefix)
+        );
+        if opening.contains(&quote_double) {
+            opening.replace(&quote_double, &replacement)
+        } else if opening.contains(&quote_single) {
+            opening.replace(&quote_single, &replacement)
+        } else {
+            return Err(io_error("Unsupported EPUB prefix attribute spelling"));
+        }
+    };
+    edits.push((package.range.start..package.content.start, opening));
+    Ok(())
+}
+
+fn apply_opf_dc_edits(
+    nodes: &[xml::Node],
+    metadata: &xml::Node,
+    fields: &BTreeMap<&str, Vec<String>>,
+    edits: &mut Vec<(std::ops::Range<usize>, String)>,
+    additions: &mut String,
+) -> Result<(), HentaiError> {
     for (name, values) in fields {
         let existing = nodes
             .iter()
             .filter(|node| {
-                node.depth == metadata.depth + 1 && node.namespace == DC && node.name == name
+                node.depth == metadata.depth + 1 && node.namespace == DC && node.name == *name
             })
             .collect::<Vec<_>>();
         for node in existing.iter().skip(values.len()) {
@@ -252,12 +285,23 @@ fn update_opf(opf: &str, intent: &MetadataWriteIntent) -> Result<String, HentaiE
             }
         }
         for value in values.iter().skip(existing.len()) {
-            additions.push_str(&format!(
+            let _ = write!(
+                additions,
                 "<dc:{name} xmlns:dc=\"{DC}\">{}</dc:{name}>",
                 xml::escaped(value)
-            ));
+            );
         }
     }
+    Ok(())
+}
+
+fn apply_opf_extension_and_modified(
+    intent: &MetadataWriteIntent,
+    nodes: &[xml::Node],
+    version: &str,
+    edits: &mut Vec<(std::ops::Range<usize>, String)>,
+    additions: &mut String,
+) -> Result<(), HentaiError> {
     let extension_nodes = nodes
         .iter()
         .filter(|node| is_extension(node))
@@ -313,13 +357,13 @@ fn update_opf(opf: &str, intent: &MetadataWriteIntent) -> Result<String, HentaiE
                 format!("<meta property=\"dcterms:modified\">{timestamp}</meta>"),
             ));
         } else {
-            additions.push_str(&format!(
+            let _ = write!(
+                additions,
                 "<meta property=\"dcterms:modified\">{timestamp}</meta>"
-            ));
+            );
         }
     }
-    edits.push((metadata.content.end..metadata.content.end, additions));
-    xml::replace(opf, edits)
+    Ok(())
 }
 
 pub(super) fn prepare_epub(

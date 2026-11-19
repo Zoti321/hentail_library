@@ -18,7 +18,7 @@ use super::media::{
 };
 use super::stat::read_resource_size_with;
 
-/// Disk Resource after parse — not a Comic; Library sync maps via [parsed_to_comic].
+/// Disk Resource after parse — not a Comic; Library sync maps via [`parsed_to_comic`].
 #[derive(Debug, Clone)]
 pub struct ParsedResource {
     pub path: String,
@@ -32,6 +32,7 @@ pub struct ParsedResource {
     pub metadata: Option<crate::resource_metadata::MetadataSnapshot>,
 }
 
+#[must_use]
 pub fn comic_id_for_path(path: &str) -> String {
     comic_id_from_path(path)
 }
@@ -119,17 +120,17 @@ pub fn parse_directory_with(
         "dir",
         basename(Path::new(location)),
         vec![],
-        files.len() as i32,
+        crate::util::usize_to_i32(files.len()),
         None,
         None,
     )?;
     if let Some(parsed) = &mut parsed {
         if let Some(meta) = metadata {
             if !meta.title.trim().is_empty() {
-                parsed.title = meta.title.clone();
+                parsed.title.clone_from(&meta.title);
             }
-            parsed.authors = meta.authors.clone();
-            parsed.description = meta.description.clone();
+            parsed.authors.clone_from(&meta.authors);
+            parsed.description.clone_from(&meta.description);
             parsed.published_at = meta.published_at;
             parsed.metadata = Some(meta);
         }
@@ -150,18 +151,16 @@ pub fn parse_zip_archive_with(
     resource_type: &str,
 ) -> Result<Option<ParsedResource>, HentaiError> {
     let stream = access.open_stream(location)?;
-    let mut archive = match ZipArchive::new(BufReader::new(stream)) {
-        Ok(archive) => archive,
-        Err(_) => return Ok(None),
+    let Ok(mut archive) = ZipArchive::new(BufReader::new(stream)) else {
+        return Ok(None);
     };
     let mut page_count = 0i32;
     let mut comic_info_xml: Option<String> = None;
     let mut root_info = None;
     let mut nested_count = 0;
     for i in 0..archive.len() {
-        let mut entry = match archive.by_index(i) {
-            Ok(entry) => entry,
-            Err(_) => return Ok(None),
+        let Ok(mut entry) = archive.by_index(i) else {
+            return Ok(None);
         };
         let name = entry.name().replace('\\', "/");
         if entry.is_dir() || name.ends_with('/') {
@@ -182,8 +181,7 @@ pub fn parse_zip_archive_with(
         let ext = Path::new(&name)
             .extension()
             .and_then(|e| e.to_str())
-            .map(|e| format!(".{}", e.to_lowercase()))
-            .unwrap_or_default();
+            .map_or_default(|e| format!(".{}", e.to_lowercase()));
         if is_comic_image_extension(&ext) {
             page_count += 1;
         }
@@ -196,8 +194,7 @@ pub fn parse_zip_archive_with(
     let meta = root_info
         .or(comic_info_xml)
         .as_deref()
-        .map(parse_comic_info_xml)
-        .unwrap_or_default();
+        .map_or_default(parse_comic_info_xml);
     let title = if meta.title.trim().is_empty() {
         basename_without_extension(Path::new(location))
     } else {
@@ -325,10 +322,10 @@ fn parse_image_archive_with(
         )?;
         if let (Some(parsed), Some(metadata)) = (&mut parsed, metadata) {
             if !metadata.title.trim().is_empty() {
-                parsed.title = metadata.title.clone();
+                parsed.title.clone_from(&metadata.title);
             }
-            parsed.authors = metadata.authors.clone();
-            parsed.description = metadata.description.clone();
+            parsed.authors.clone_from(&metadata.authors);
+            parsed.description.clone_from(&metadata.description);
             parsed.published_at = metadata.published_at;
             parsed.metadata = Some(metadata);
         }
@@ -389,13 +386,13 @@ fn parse_pdf_with(
             crate::resource_metadata::read_pdf_metadata(file),
         ) {
             if !metadata.title.is_empty() {
-                parsed.title = metadata.title.clone();
+                parsed.title.clone_from(&metadata.title);
             }
             if !metadata.authors.is_empty() {
-                parsed.authors = metadata.authors.clone();
+                parsed.authors.clone_from(&metadata.authors);
             }
             if metadata.description.is_some() {
-                parsed.description = metadata.description.clone();
+                parsed.description.clone_from(&metadata.description);
             }
             if metadata.published_at.is_some() {
                 parsed.published_at = metadata.published_at;
@@ -415,17 +412,14 @@ pub fn parse_epub_with(
     location: &str,
 ) -> Result<Option<ParsedResource>, HentaiError> {
     let stream = access.open_stream(location)?;
-    let mut archive = match ZipArchive::new(BufReader::new(stream)) {
-        Ok(a) => a,
-        Err(_) => return Ok(None),
+    let Ok(mut archive) = ZipArchive::new(BufReader::new(stream)) else {
+        return Ok(None);
     };
-    let opf_path = match find_opf_path(&mut archive) {
-        Ok(p) => p,
-        Err(_) => return Ok(None),
+    let Ok(opf_path) = find_opf_path(&mut archive) else {
+        return Ok(None);
     };
-    let opf_content = match read_zip_entry_string(&mut archive, &opf_path) {
-        Ok(c) => c,
-        Err(_) => return Ok(None),
+    let Ok(opf_content) = read_zip_entry_string(&mut archive, &opf_path) else {
+        return Ok(None);
     };
     let meta = parse_opf_metadata(&opf_content);
     let embedded = crate::resource_metadata::read_opf(&opf_content).ok();
@@ -447,13 +441,13 @@ pub fn parse_epub_with(
     )?;
     if let (Some(parsed), Some(metadata)) = (&mut parsed, embedded) {
         if !metadata.title.is_empty() {
-            parsed.title = metadata.title.clone();
+            parsed.title.clone_from(&metadata.title);
         }
         if !metadata.authors.is_empty() {
-            parsed.authors = metadata.authors.clone();
+            parsed.authors.clone_from(&metadata.authors);
         }
         if metadata.description.is_some() {
-            parsed.description = metadata.description.clone();
+            parsed.description.clone_from(&metadata.description);
         }
         if metadata.published_at.is_some() {
             parsed.published_at = metadata.published_at;
@@ -556,23 +550,23 @@ fn date_to_utc_ms(
 ) -> Option<i64> {
     let days_from_ce = days_from_civil(year, month, day)?;
     let secs =
-        days_from_ce as i64 * 86_400 + hour as i64 * 3600 + minute as i64 * 60 + second as i64;
+        i64::from(days_from_ce) * 86_400 + i64::from(hour) * 3600 + i64::from(minute) * 60 + i64::from(second);
     UNIX_EPOCH
-        .checked_add(Duration::from_secs(secs.max(0) as u64))
+        .checked_add(Duration::from_secs(crate::util::i64_to_u64_nonnegative(secs.max(0))))
         .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
-        .map(|d| d.as_millis() as i64)
+        .map(|d| crate::util::milliseconds_to_i64(d.as_millis()))
 }
 
 fn days_from_civil(year: i32, month: u32, day: u32) -> Option<u32> {
     if !(1..=12).contains(&month) || !(1..=31).contains(&day) {
         return None;
     }
-    let y = if month <= 2 { year - 1 } else { year } as u32;
+    let y = crate::util::i32_to_u32(if month <= 2 { year - 1 } else { year });
     let era = y / 400;
     let yoe = y - era * 400;
     let doy = (153 * (if month > 2 { month - 3 } else { month + 9 }) + 2) / 5 + day - 1;
     let doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;
-    Some(era * 146097 + doe - 719468)
+    Some(era * 146_097 + doe - 719_468)
 }
 
 fn extract_xml_text(line: &str) -> Option<String> {
@@ -585,9 +579,9 @@ fn extract_xml_text(line: &str) -> Option<String> {
 fn count_epub_images<R: std::io::Read + std::io::Seek>(
     archive: &mut ZipArchive<R>,
 ) -> Result<i32, HentaiError> {
-    let spine = collect_epub_spine_image_names(archive)?;
+    let spine = collect_epub_spine_image_names(archive);
     if !spine.is_empty() {
-        return Ok(spine.len() as i32);
+        return Ok(crate::util::usize_to_i32(spine.len()));
     }
     let mut count = 0i32;
     for i in 0..archive.len() {
@@ -601,8 +595,7 @@ fn count_epub_images<R: std::io::Read + std::io::Seek>(
         let ext = Path::new(&name)
             .extension()
             .and_then(|e| e.to_str())
-            .map(|e| format!(".{}", e.to_lowercase()))
-            .unwrap_or_default();
+            .map_or_default(|e| format!(".{}", e.to_lowercase()));
         if is_comic_image_extension(&ext) {
             count += 1;
         }
@@ -610,6 +603,7 @@ fn count_epub_images<R: std::io::Read + std::io::Seek>(
     Ok(count)
 }
 
+#[must_use]
 pub fn parsed_to_comic(parsed: &ParsedResource) -> crate::comic::ComicDto {
     let now = now_ms();
     let metadata = parsed.metadata.clone().unwrap_or_default();

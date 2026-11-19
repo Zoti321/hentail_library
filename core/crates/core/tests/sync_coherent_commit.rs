@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
 mod common;
 
 use hentai_core::entity::prelude::Libraries;
@@ -319,7 +321,7 @@ fn source_change_after_scan_preserves_successful_baseline() {
                     .unwrap()
                     .unwrap()
                     .resource_size,
-                std::fs::metadata(&path).unwrap().len() as i64
+                hentai_core::util::u64_to_i64(std::fs::metadata(&path).unwrap().len())
             );
             assert_ne!(
                 probe::load_snapshot_map(&db, &library.library_id)

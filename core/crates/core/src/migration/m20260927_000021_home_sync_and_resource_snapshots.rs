@@ -29,7 +29,7 @@ impl MigrationTrait for Migration {
             manager
                 .get_connection()
                 .execute_unprepared(
-                    r#"
+                    r"
 CREATE TABLE IF NOT EXISTS library_resource_snapshots (
   library_id TEXT NOT NULL,
   location_key TEXT NOT NULL,
@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS library_resource_snapshots (
   size INTEGER NOT NULL,
   PRIMARY KEY (library_id, location_key)
 )
-"#,
+",
                 )
                 .await?;
         }

@@ -28,14 +28,13 @@ pub fn init_db(app_data_dir: &str, db_file_name: &str) -> Result<(), HentaiError
 }
 
 pub fn shutdown_db() {
-    crate::runtime::block_on(shutdown_db_async())
+    crate::runtime::block_on(shutdown_db_async());
 }
 
 pub async fn shutdown_db_async() {
     let main_conn = {
-        let mut guard = match db_conn_slot().write() {
-            Ok(guard) => guard,
-            Err(_) => return,
+        let Ok(mut guard) = db_conn_slot().write() else {
+            return;
         };
         guard.take()
     };
@@ -70,7 +69,7 @@ pub async fn init_db_async(app_data_dir: &str, db_file_name: &str) -> Result<(),
     tracing::debug!(path = %db_file_path.display(), "opening database connection");
     let conn = open_connection(&db_file_path).await.map_err(|err| {
         tracing::error!(path = %db_file_path.display(), error = %err, "database connection failed");
-        map_db_err(err)
+        map_db_err(&err)
     })?;
 
     {
@@ -117,7 +116,7 @@ pub fn connection() -> Result<DatabaseConnection, HentaiError> {
 /// 测试专用：打开任意 SQLite 文件并登记连接。
 pub async fn init_db_at_path(db_file_path: impl AsRef<Path>) -> Result<(), HentaiError> {
     let db_file_path = db_file_path.as_ref().to_path_buf();
-    let conn = open_connection(&db_file_path).await.map_err(map_db_err)?;
+    let conn = open_connection(&db_file_path).await.map_err(|e| map_db_err(&e))?;
     {
         let mut guard = db_config_slot()
             .write()
@@ -202,8 +201,7 @@ async fn seed_drift_v2_if_needed(conn: &DatabaseConnection) -> Result<(), DbErr>
 fn chrono_like_unix_ms() -> i64 {
     std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
-        .map(|d| d.as_millis() as i64)
-        .unwrap_or(0)
+        .map_or(0, |d| crate::util::milliseconds_to_i64(d.as_millis()))
 }
 
 async fn table_exists(conn: &DatabaseConnection, table: &str) -> Result<bool, DbErr> {
@@ -214,7 +212,8 @@ async fn table_exists(conn: &DatabaseConnection, table: &str) -> Result<bool, Db
     Ok(conn.query_one(stmt).await?.is_some())
 }
 
-pub fn map_db_err(err: DbErr) -> HentaiError {
+#[must_use]
+pub fn map_db_err(err: &DbErr) -> HentaiError {
     HentaiError {
         code: HentaiErrorCode::DbQueryFailed,
         message: err.to_string(),

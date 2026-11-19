@@ -16,10 +16,10 @@ pub(crate) async fn delete_comics_side_effects(
     db: &DatabaseTransaction,
     comic_ids: &[String],
 ) -> Result<(), HentaiError> {
+    const BATCH_SIZE: usize = 500;
     if comic_ids.is_empty() {
         return Ok(());
     }
-    const BATCH_SIZE: usize = 500;
     for chunk in comic_ids.chunks(BATCH_SIZE) {
         delete_comics_side_effects_batch(db, chunk).await?;
     }
@@ -44,28 +44,28 @@ async fn delete_comics_side_effects_batch(
         values.clone(),
     ))
     .await
-    .map_err(map_db_err)?;
+    .map_err(|e| map_db_err(&e))?;
     db.execute(Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
         format!("DELETE FROM comic_finished_marks WHERE comic_id IN ({placeholders})"),
         values.clone(),
     ))
     .await
-    .map_err(map_db_err)?;
+    .map_err(|e| map_db_err(&e))?;
     db.execute(Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
         format!("DELETE FROM series_items WHERE comic_id IN ({placeholders})"),
         values.clone(),
     ))
     .await
-    .map_err(map_db_err)?;
+    .map_err(|e| map_db_err(&e))?;
     db.execute(Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
         format!("DELETE FROM comics WHERE comic_id IN ({placeholders})"),
         values,
     ))
     .await
-    .map_err(map_db_err)?;
+    .map_err(|e| map_db_err(&e))?;
     Ok(())
 }
 
@@ -86,129 +86,158 @@ pub(crate) async fn upsert_comics(
             skipped_without_pages.push(comic.comic_id.clone());
             continue;
         }
-        let existing_comic = Comics::find_by_id(comic.comic_id.clone())
-            .one(db)
-            .await
-            .map_err(map_db_err)?;
-        let existing_meta = ComicMeta::find_by_id(comic.comic_id.clone())
-            .one(db)
-            .await
-            .map_err(map_db_err)?;
-        let is_new = existing_comic.is_none();
-        let now = now_ms();
-        let created_at = if is_new { now } else { comic.created_at };
-        let mut changed = is_new;
-        if let Some(ref row) = existing_comic {
-            changed |= row.path != comic.path
-                || row.resource_type != comic.resource_type
-                || row.resource_size != comic.resource_size;
-        }
-        if let Some(ref row) = existing_meta {
-            changed |= row.title != comic.title
-                || row.content_rating != comic.content_rating
-                || row.page_count != comic.page_count
-                || row.description != comic.description
-                || row.published_at != comic.published_at;
-        }
-        if !is_new {
-            let existing_authors = load_author_names_for_comic(db, &comic.comic_id).await?;
-            let existing_tags = load_tag_names_for_comic(db, &comic.comic_id).await?;
-            changed |= existing_authors != comic.author_names() || existing_tags != comic.tags;
-        }
-        let last_updated_at = if changed { now } else { comic.last_updated_at };
-
-        let comic_active = comics::ActiveModel {
-            comic_id: Set(comic.comic_id.clone()),
-            path: Set(comic.path.clone()),
-            resource_type: Set(comic.resource_type.clone()),
-            resource_size: Set(comic.resource_size),
-            created_at: Set(created_at),
-            last_updated_at: Set(last_updated_at),
-            library_id: Set(comic.library_id.clone()),
-            // Not in the conflict update list: sync keeps Comic trash as-is.
-            deleted_at: NotSet,
-        };
-        Comics::insert(comic_active)
-            .on_conflict(
-                sea_orm::sea_query::OnConflict::column(comics::Column::ComicId)
-                    .update_columns([
-                        comics::Column::Path,
-                        comics::Column::ResourceType,
-                        comics::Column::ResourceSize,
-                        comics::Column::LastUpdatedAt,
-                        comics::Column::LibraryId,
-                    ])
-                    .to_owned(),
-            )
-            .exec(db)
-            .await
-            .map_err(map_db_err)?;
-
-        let meta_active = comic_meta::ActiveModel {
-            comic_id: Set(comic.comic_id.clone()),
-            title: Set(comic.title.clone()),
-            title_sort_key: Set(compute_sort_key(&comic.title)),
-            content_rating: Set(comic.content_rating.clone()),
-            page_count: Set(comic.page_count),
-            description: Set(comic.description.clone()),
-            published_at: Set(comic.published_at),
-            title_locked: Set(comic.locks.title),
-            description_locked: Set(comic.locks.description),
-            published_at_locked: Set(comic.locks.published_at),
-            content_rating_locked: Set(comic.locks.content_rating),
-            authors_locked: Set(comic.locks.authors),
-            tags_locked: Set(comic.locks.tags),
-            languages: Set(crate::comic::serialize_languages(&comic.languages)),
-            languages_locked: Set(comic.locks.languages),
-            parodies_locked: Set(comic.locks.parodies),
-            characters_locked: Set(comic.locks.characters),
-        };
-        ComicMeta::insert(meta_active)
-            .on_conflict(
-                sea_orm::sea_query::OnConflict::column(comic_meta::Column::ComicId)
-                    .update_columns([
-                        comic_meta::Column::Title,
-                        comic_meta::Column::TitleSortKey,
-                        comic_meta::Column::ContentRating,
-                        comic_meta::Column::PageCount,
-                        comic_meta::Column::Description,
-                        comic_meta::Column::PublishedAt,
-                        comic_meta::Column::TitleLocked,
-                        comic_meta::Column::DescriptionLocked,
-                        comic_meta::Column::PublishedAtLocked,
-                        comic_meta::Column::ContentRatingLocked,
-                        comic_meta::Column::AuthorsLocked,
-                        comic_meta::Column::TagsLocked,
-                        comic_meta::Column::Languages,
-                        comic_meta::Column::LanguagesLocked,
-                        comic_meta::Column::ParodiesLocked,
-                        comic_meta::Column::CharactersLocked,
-                    ])
-                    .to_owned(),
-            )
-            .exec(db)
-            .await
-            .map_err(map_db_err)?;
-
-        crate::author::replace_comic_authors(db, &comic.comic_id, &comic.author_names()).await?;
-        replace_comic_named_facet(db, JunctionNamedFacet::Tag, &comic.comic_id, &comic.tags)
-            .await?;
-        replace_comic_named_facet(
-            db,
-            JunctionNamedFacet::Parody,
-            &comic.comic_id,
-            &comic.parodies,
-        )
-        .await?;
-        replace_comic_named_facet(
-            db,
-            JunctionNamedFacet::Character,
-            &comic.comic_id,
-            &comic.characters,
-        )
-        .await?;
+        upsert_single_comic(db, comic).await?;
     }
     Ok(skipped_without_pages)
+}
+
+async fn upsert_single_comic(
+    db: &DatabaseTransaction,
+    comic: &ComicDto,
+) -> Result<(), HentaiError> {
+    let existing_comic = Comics::find_by_id(comic.comic_id.clone())
+        .one(db)
+        .await
+        .map_err(|e| map_db_err(&e))?;
+    let existing_meta = ComicMeta::find_by_id(comic.comic_id.clone())
+        .one(db)
+        .await
+        .map_err(|e| map_db_err(&e))?;
+    let is_new = existing_comic.is_none();
+    let now = now_ms();
+    let created_at = if is_new { now } else { comic.created_at };
+    let mut changed = is_new;
+    if let Some(ref row) = existing_comic {
+        changed |= row.path != comic.path
+            || row.resource_type != comic.resource_type
+            || row.resource_size != comic.resource_size;
+    }
+    if let Some(ref row) = existing_meta {
+        changed |= row.title != comic.title
+            || row.content_rating != comic.content_rating
+            || row.page_count != comic.page_count
+            || row.description != comic.description
+            || row.published_at != comic.published_at;
+    }
+    if !is_new {
+        let existing_authors = load_author_names_for_comic(db, &comic.comic_id).await?;
+        let existing_tags = load_tag_names_for_comic(db, &comic.comic_id).await?;
+        changed |= existing_authors != comic.author_names() || existing_tags != comic.tags;
+    }
+    let last_updated_at = if changed { now } else { comic.last_updated_at };
+    insert_comic_row(db, comic, created_at, last_updated_at).await?;
+    insert_comic_meta_row(db, comic).await?;
+    replace_comic_junction_facets(db, comic).await
+}
+
+async fn insert_comic_row(
+    db: &DatabaseTransaction,
+    comic: &ComicDto,
+    created_at: i64,
+    last_updated_at: i64,
+) -> Result<(), HentaiError> {
+    let comic_active = comics::ActiveModel {
+        comic_id: Set(comic.comic_id.clone()),
+        path: Set(comic.path.clone()),
+        resource_type: Set(comic.resource_type.clone()),
+        resource_size: Set(comic.resource_size),
+        created_at: Set(created_at),
+        last_updated_at: Set(last_updated_at),
+        library_id: Set(comic.library_id.clone()),
+        // Not in the conflict update list: sync keeps Comic trash as-is.
+        deleted_at: NotSet,
+    };
+    Comics::insert(comic_active)
+        .on_conflict(
+            sea_orm::sea_query::OnConflict::column(comics::Column::ComicId)
+                .update_columns([
+                    comics::Column::Path,
+                    comics::Column::ResourceType,
+                    comics::Column::ResourceSize,
+                    comics::Column::LastUpdatedAt,
+                    comics::Column::LibraryId,
+                ])
+                .to_owned(),
+        )
+        .exec(db)
+        .await
+        .map_err(|e| map_db_err(&e))?;
+    Ok(())
+}
+
+async fn insert_comic_meta_row(
+    db: &DatabaseTransaction,
+    comic: &ComicDto,
+) -> Result<(), HentaiError> {
+    let meta_active = comic_meta::ActiveModel {
+        comic_id: Set(comic.comic_id.clone()),
+        title: Set(comic.title.clone()),
+        title_sort_key: Set(compute_sort_key(&comic.title)),
+        content_rating: Set(comic.content_rating.clone()),
+        page_count: Set(comic.page_count),
+        description: Set(comic.description.clone()),
+        published_at: Set(comic.published_at),
+        title_locked: Set(comic.locks.title),
+        description_locked: Set(comic.locks.description),
+        published_at_locked: Set(comic.locks.published_at),
+        content_rating_locked: Set(comic.locks.content_rating),
+        authors_locked: Set(comic.locks.authors),
+        tags_locked: Set(comic.locks.tags),
+        languages: Set(crate::comic::serialize_languages(&comic.languages)),
+        languages_locked: Set(comic.locks.languages),
+        parodies_locked: Set(comic.locks.parodies),
+        characters_locked: Set(comic.locks.characters),
+    };
+    ComicMeta::insert(meta_active)
+        .on_conflict(
+            sea_orm::sea_query::OnConflict::column(comic_meta::Column::ComicId)
+                .update_columns([
+                    comic_meta::Column::Title,
+                    comic_meta::Column::TitleSortKey,
+                    comic_meta::Column::ContentRating,
+                    comic_meta::Column::PageCount,
+                    comic_meta::Column::Description,
+                    comic_meta::Column::PublishedAt,
+                    comic_meta::Column::TitleLocked,
+                    comic_meta::Column::DescriptionLocked,
+                    comic_meta::Column::PublishedAtLocked,
+                    comic_meta::Column::ContentRatingLocked,
+                    comic_meta::Column::AuthorsLocked,
+                    comic_meta::Column::TagsLocked,
+                    comic_meta::Column::Languages,
+                    comic_meta::Column::LanguagesLocked,
+                    comic_meta::Column::ParodiesLocked,
+                    comic_meta::Column::CharactersLocked,
+                ])
+                .to_owned(),
+        )
+        .exec(db)
+        .await
+        .map_err(|e| map_db_err(&e))?;
+    Ok(())
+}
+
+async fn replace_comic_junction_facets(
+    db: &DatabaseTransaction,
+    comic: &ComicDto,
+) -> Result<(), HentaiError> {
+    crate::author::replace_comic_authors(db, &comic.comic_id, &comic.author_names()).await?;
+    replace_comic_named_facet(db, JunctionNamedFacet::Tag, &comic.comic_id, &comic.tags).await?;
+    replace_comic_named_facet(
+        db,
+        JunctionNamedFacet::Parody,
+        &comic.comic_id,
+        &comic.parodies,
+    )
+    .await?;
+    replace_comic_named_facet(
+        db,
+        JunctionNamedFacet::Character,
+        &comic.comic_id,
+        &comic.characters,
+    )
+    .await?;
+    Ok(())
 }
 
 async fn load_author_names_for_comic<C: ConnectionTrait>(
@@ -227,7 +256,7 @@ async fn load_tag_names_for_comic<C: ConnectionTrait>(
         .filter(comic_tags::Column::ComicId.eq(comic_id))
         .all(db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     let mut names: Vec<String> = rows.into_iter().map(|r| r.tag_name).collect();
     names.sort();
     Ok(names)
@@ -324,6 +353,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[cfg_attr(miri, ignore = "sqlite/FFI unavailable under miri")]
     async fn purge_removes_finished_mark_but_not_duration() {
         let db = purge_fixture().await;
         let txn = db.begin().await.unwrap();
@@ -356,6 +386,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[cfg_attr(miri, ignore = "sqlite/FFI unavailable under miri")]
     async fn final_comic_delete_failure_rolls_back_all_relations_and_preserves_duration() {
         let db = purge_fixture().await;
         db.execute_unprepared(

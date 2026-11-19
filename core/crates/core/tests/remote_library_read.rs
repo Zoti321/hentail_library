@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
 use hentai_core::ReaderSessionRead;
 mod common;
 
@@ -141,7 +143,7 @@ fn fake_remote_cbz_open_lists_and_reads_pages() {
         0,
     )
     .expect("page0");
-    assert!(!page0.is_empty());
+    assert_ne!(page0.len(), 0);
     close_reader("c1");
 }
 

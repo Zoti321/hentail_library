@@ -23,7 +23,7 @@ pub fn read_resource_size_with(
     if stat.kind != ResourceKind::File {
         return Ok(None);
     }
-    Ok(Some(stat.size as i64))
+    Ok(Some(stat.size.cast_signed()))
 }
 
 fn compute_dir_image_files_size(
@@ -41,7 +41,7 @@ fn compute_dir_image_files_size(
             let Some(stat) = access.stat(&entry.location)? else {
                 continue;
             };
-            total += stat.size as i64;
+            total += stat.size.cast_signed();
         }
     }
     if total <= 0 {

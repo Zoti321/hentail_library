@@ -5,10 +5,12 @@ pub const READING_HISTORY_RETENTION_DAYS: i64 = 365;
 const MS_PER_DAY: i64 = 86_400_000;
 
 /// `last_read_time` 低于此值（毫秒）的记录视为已过期。
+#[must_use]
 pub fn reading_history_retention_cutoff_ms(now_ms: i64) -> i64 {
     now_ms.saturating_sub(READING_HISTORY_RETENTION_DAYS * MS_PER_DAY)
 }
 
+#[must_use]
 pub fn reading_history_within_retention(last_read_time_ms: i64, now_ms: i64) -> bool {
     last_read_time_ms >= reading_history_retention_cutoff_ms(now_ms)
 }

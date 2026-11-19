@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
 //! Image set Author / Tag / Parody / Character bindings on global dictionaries (#602).
 
 mod common;
@@ -132,7 +134,7 @@ fn facets_write_normalized_and_read_back_from_global_dictionaries() {
                 characters: names(&["Rin", "Saber"]),
             }
         );
-        assert!(fixture.facets(&fixture.id("album2")) == ImageSetFacetsDto::default());
+        assert_eq!(fixture.facets(&fixture.id("album2")), ImageSetFacetsDto::default());
         fixture.runtime.block_on(async {
             assert!(list_all_author_names()
                 .await
@@ -166,7 +168,7 @@ fn facet_write_replaces_given_fields_and_leaves_others() {
 
         let facets = fixture.facets(&id);
         assert_eq!(facets.tags, names(&["tag3"]));
-        assert!(facets.characters.is_empty());
+        assert_eq!(facets.characters.len(), 0);
         assert_eq!(facets.authors, names(&["作者A", "作者B"]));
         assert_eq!(facets.parodies, names(&["Fate"]));
     });

@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
 mod common;
 
 use std::fs::{self, File};
@@ -998,7 +1000,7 @@ fn series_and_library_refresh_exclude_comics_already_in_trash() {
             progress.clear();
             let library_result =
                 refresh_library_metadata(&library.library_id, &create_sync_handle(), |p| {
-                    progress.push(p)
+                    progress.push(p);
                 })
                 .await
                 .unwrap();
@@ -1061,7 +1063,10 @@ fn cancel_before_series_name_update(without_members: bool) {
                 let committed_members = i32::from(!without_members);
                 assert_eq!((succeeded, failed), (committed_members, 0));
                 assert_eq!(find_series_by_id(&series_id).await.unwrap().unwrap().name, "Opening name");
-                assert_eq!(hentai_core::revision::notify_count(), notifications + committed_members as u64);
+                assert_eq!(
+                    hentai_core::revision::notify_count(),
+                    notifications + hentai_core::util::i32_to_u64(committed_members)
+                );
             }
         });
     });

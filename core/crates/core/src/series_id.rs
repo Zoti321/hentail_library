@@ -2,6 +2,7 @@ use std::path::Path;
 
 use crate::comic_id::{comic_id_from_normalized_path, normalize_path_for_key};
 
+#[must_use]
 pub fn folder_path_from_comic_path(comic_path: &str) -> Option<String> {
     let normalized = normalize_path_for_key(comic_path);
     if normalized.is_empty() {
@@ -15,11 +16,13 @@ pub fn folder_path_from_comic_path(comic_path: &str) -> Option<String> {
     Some(normalize_path_for_key(&parent_str))
 }
 
+#[must_use]
 pub fn series_id_from_folder_path(folder_path: &str) -> String {
     let normalized = normalize_path_for_key(folder_path);
     comic_id_from_normalized_path(&normalized)
 }
 
+#[must_use]
 pub fn series_name_from_folder_path(folder_path: &str) -> String {
     let normalized = normalize_path_for_key(folder_path);
     Path::new(&normalized)

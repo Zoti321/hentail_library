@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
 mod common;
 
 use std::path::Path;
@@ -114,7 +116,7 @@ fn local_sync_unreadable_root_keeps_existing_comics() {
             let done = last_done(&events);
             assert!(
                 done.error_message.as_ref().is_some_and(|m| !m.is_empty()),
-                "must warn when the saved root is gone or unreadable"
+                "must warn when the saved root is gone or unreachable"
             );
             assert!(
                 find_comic_by_id(&comic_id).await.unwrap().is_some(),

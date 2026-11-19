@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
 mod common;
 
 use hentai_core::replace_comic_authors;
@@ -309,7 +311,7 @@ fn needs_metadata_combines_with_other_filters_and_count_matches_pages() {
 
         let (all, total_all) = fetch_ids(pdf_needs_metadata, 50).await;
         assert_eq!(all, vec!["a-pdf-blank", "b-pdf-blank", "c-pdf-blank"]);
-        assert_eq!(total_all, all.len() as i64);
+        assert_eq!(total_all, hentai_core::util::usize_to_i64(all.len()));
 
         let (unfiltered, unfiltered_total) = fetch_ids(
             ComicFilterDto {

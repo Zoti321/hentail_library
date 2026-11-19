@@ -4,7 +4,7 @@ use super::{
 };
 use crate::{error::HentaiError, metadata_lock::ComicMetaField};
 use lopdf::{dictionary, Document, IncrementalDocument, Object, Stream, StringFormat};
-use std::{io::Write, path::Path};
+use std::{fmt::Write as _, io::Write, path::Path};
 const DC: &str = "http://purl.org/dc/elements/1.1/";
 const RDF: &str = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
 
@@ -64,7 +64,7 @@ fn read_xmp(raw: &str) -> Result<MetadataSnapshot, HentaiError> {
                         _ => first.as_str(),
                     }
                     .to_owned(),
-                )
+                );
             }
             _ => {}
         }
@@ -109,6 +109,27 @@ fn update_xmp(existing: Option<&str>, intent: &MetadataWriteIntent) -> Result<St
         .ok_or_else(|| io_error("Missing document XMP description"))?;
     let mut edits = Vec::new();
     let mut additions = String::new();
+    apply_xmp_field_edits(&nodes, &descriptions, intent, &mut edits, &mut additions)?;
+    apply_xmp_extension_edit(intent, &nodes, &mut edits, &mut additions)?;
+    if description.empty {
+        let opening = &raw[description.range.start..description.range.end - 2];
+        edits.push((
+            description.range.clone(),
+            format!("{opening}>{additions}</rdf:Description>"),
+        ));
+    } else {
+        edits.push((description.content.end..description.content.end, additions));
+    }
+    xml::replace(raw, edits)
+}
+
+fn apply_xmp_field_edits(
+    nodes: &[xml::Node],
+    descriptions: &[&xml::Node],
+    intent: &MetadataWriteIntent,
+    edits: &mut Vec<(std::ops::Range<usize>, String)>,
+    additions: &mut String,
+) -> Result<(), HentaiError> {
     for field in &intent.fields {
         let (name, values, array) = match field {
             ComicMetaField::Title => ("title", vec![intent.snapshot.title.clone()], "Alt"),
@@ -166,27 +187,32 @@ fn update_xmp(existing: Option<&str>, intent: &MetadataWriteIntent) -> Result<St
         if existing.len() > 1 {
             return Err(io_error("Conflicting document XMP properties"));
         }
-        let items = values
-            .iter()
-            .map(|value| {
-                format!(
-                    "<rdf:li{}>{}</rdf:li>",
-                    if array == "Alt" {
-                        " xml:lang=\"x-default\""
-                    } else {
-                        ""
-                    },
-                    xml::escaped(value)
-                )
-            })
-            .collect::<String>();
-        let element = format!("<dc:{name} xmlns:dc=\"{DC}\" xmlns:rdf=\"{RDF}\"><rdf:{array}>{items}</rdf:{array}></dc:{name}>");
+        let mut items = String::new();
+        for value in values {
+            let lang = if array == "Alt" {
+                " xml:lang=\"x-default\""
+            } else {
+                ""
+            };
+            let _ = write!(items, "<rdf:li{lang}>{}</rdf:li>", xml::escaped(value.as_str()));
+        }
+        let element =
+            format!("<dc:{name} xmlns:dc=\"{DC}\" xmlns:rdf=\"{RDF}\"><rdf:{array}>{items}</rdf:{array}></dc:{name}>");
         if let Some(node) = existing.first() {
             edits.push((node.range.clone(), element));
         } else {
             additions.push_str(&element);
         }
     }
+    Ok(())
+}
+
+fn apply_xmp_extension_edit(
+    intent: &MetadataWriteIntent,
+    nodes: &[xml::Node],
+    edits: &mut Vec<(std::ops::Range<usize>, String)>,
+    additions: &mut String,
+) -> Result<(), HentaiError> {
     let extensions = nodes
         .iter()
         .filter(|node| node.namespace == EXTENSION_NAMESPACE && node.name == "Metadata")
@@ -204,16 +230,7 @@ fn update_xmp(existing: Option<&str>, intent: &MetadataWriteIntent) -> Result<St
     } else {
         additions.push_str(&element);
     }
-    if description.empty {
-        let opening = &raw[description.range.start..description.range.end - 2];
-        edits.push((
-            description.range.clone(),
-            format!("{opening}>{additions}</rdf:Description>"),
-        ));
-    } else {
-        edits.push((description.content.end..description.content.end, additions));
-    }
-    xml::replace(raw, edits)
+    Ok(())
 }
 
 pub(super) fn prepare_pdf(
@@ -247,6 +264,25 @@ pub(super) fn prepare_pdf(
         intent
     };
     let metadata = update_xmp(existing.as_deref(), intent)?;
+    let pages = document.get_pages();
+    let output = build_incremental_pdf_output(source, bytes.clone(), document, metadata, intent)?;
+    verify_incremental_pdf(output.path(), &bytes, &pages, source, &before_digest)?;
+    let after_digest = file_digest(output.path())?.ok_or_else(|| io_error("PDF output missing"))?;
+    Ok(PreparedLocalWrite {
+        target: source.to_owned(),
+        temporary: output,
+        before_digest: Some(before_digest),
+        after_digest,
+    })
+}
+
+fn build_incremental_pdf_output(
+    source: &Path,
+    bytes: Vec<u8>,
+    document: Document,
+    metadata: String,
+    intent: &MetadataWriteIntent,
+) -> Result<tempfile::NamedTempFile, HentaiError> {
     let root = document
         .trailer
         .get(b"Root")
@@ -257,8 +293,7 @@ pub(super) fn prepare_pdf(
         .get(b"Info")
         .and_then(Object::as_reference)
         .ok();
-    let pages = document.get_pages();
-    let mut incremental = IncrementalDocument::create_from(bytes.clone(), document);
+    let mut incremental = IncrementalDocument::create_from(bytes, document);
     incremental
         .opt_clone_object_to_new_document(root)
         .map_err(io_error)?;
@@ -302,11 +337,11 @@ pub(super) fn prepare_pdf(
             ComicMetaField::Tags => ("Keywords", intent.snapshot.tags.join(", ")),
             _ => continue,
         };
-        let mut bytes = vec![0xfe, 0xff];
+        let mut utf16 = vec![0xfe, 0xff];
         for unit in value.encode_utf16() {
-            bytes.extend_from_slice(&unit.to_be_bytes());
+            utf16.extend_from_slice(&unit.to_be_bytes());
         }
-        info_dict.set(name, Object::String(bytes, StringFormat::Hexadecimal));
+        info_dict.set(name, Object::String(utf16, StringFormat::Hexadecimal));
     }
     let mut output = tempfile::Builder::new()
         .prefix(".hlwriteback-")
@@ -322,32 +357,36 @@ pub(super) fn prepare_pdf(
         .map_err(io_error)?;
     output.as_file_mut().flush().map_err(io_error)?;
     output.as_file_mut().sync_all().map_err(io_error)?;
-    let written = std::fs::read(output.path()).map_err(io_error)?;
-    if !written.starts_with(&bytes) {
+    Ok(output)
+}
+
+fn verify_incremental_pdf(
+    output: &Path,
+    original_bytes: &[u8],
+    pages: &std::collections::BTreeMap<u32, lopdf::ObjectId>,
+    source: &Path,
+    before_digest: &str,
+) -> Result<(), HentaiError> {
+    let written = std::fs::read(output).map_err(io_error)?;
+    if !written.starts_with(original_bytes) {
         return Err(io_error(
             "PDF incremental write did not preserve original bytes",
         ));
     }
     let verified = Document::load_mem(&written).map_err(io_error)?;
-    if verified.get_pages() != pages {
+    if verified.get_pages() != *pages {
         return Err(io_error("PDF page tree changed"));
     }
+    let previous = Document::load_mem(original_bytes).map_err(io_error)?;
     for id in pages.values() {
-        if verified.get_page_content(*id) != incremental.get_prev_documents().get_page_content(*id)
-        {
+        if verified.get_page_content(*id) != previous.get_page_content(*id) {
             return Err(io_error("PDF content changed"));
         }
     }
-    if file_digest(source)?.as_deref() != Some(&before_digest) {
+    if file_digest(source)?.as_deref() != Some(before_digest) {
         return Err(io_error("PDF source changed"));
     }
-    let after_digest = file_digest(output.path())?.ok_or_else(|| io_error("PDF output missing"))?;
-    Ok(PreparedLocalWrite {
-        target: source.to_owned(),
-        temporary: output,
-        before_digest: Some(before_digest),
-        after_digest,
-    })
+    Ok(())
 }
 
 #[cfg(test)]

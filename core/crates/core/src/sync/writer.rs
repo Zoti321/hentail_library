@@ -20,9 +20,9 @@ pub async fn apply_scan_replace_plan(
     plan: &ComicScanReplacePlan,
     library_id: &str,
 ) -> Result<(), HentaiError> {
-    let txn = db.begin().await.map_err(map_db_err)?;
+    let txn = db.begin().await.map_err(|e| map_db_err(&e))?;
     apply_scan_replace_plan_in(&txn, plan, library_id).await?;
-    txn.commit().await.map_err(map_db_err)?;
+    txn.commit().await.map_err(|e| map_db_err(&e))?;
     crate::revision::notify_committed();
     Ok(())
 }
@@ -71,7 +71,7 @@ pub(crate) async fn apply_scan_replace_plan_in(
                 HentaiError::validation(format!("待迁移漫画已移除: {}", migration.from_comic_id))
             })?;
             let mut to_comic = migration.scanned.merge_with_catalog(Some(source))?;
-            to_comic.comic_id = migration.scanned.comic.comic_id.clone();
+            to_comic.comic_id.clone_from(&migration.scanned.comic.comic_id);
             Ok(ComicMigration {
                 from_comic_id: migration.from_comic_id.clone(),
                 to_comic,
@@ -91,7 +91,7 @@ pub(crate) async fn apply_scan_replace_plan_in(
             )
             .exec(txn)
             .await
-            .map_err(map_db_err)?;
+            .map_err(|e| map_db_err(&e))?;
     }
     let skipped = upsert_comics(txn, &to_upsert).await?;
     if !skipped.is_empty() {
@@ -113,20 +113,20 @@ pub(crate) async fn apply_scan_replace_plan_in(
 }
 
 pub async fn clear_all_comics(db: &DatabaseConnection) -> Result<i32, HentaiError> {
-    let count = count_comics(db).await? as i32;
+    let count = crate::util::i64_to_i32(count_comics(db).await?);
     if count == 0 {
         return Ok(0);
     }
-    let txn = db.begin().await.map_err(map_db_err)?;
+    let txn = db.begin().await.map_err(|e| map_db_err(&e))?;
     for table in ["comic_reading_histories", "series_items", "comics"] {
         txn.execute(Statement::from_string(
             sea_orm::DatabaseBackend::Sqlite,
             format!("DELETE FROM {table}"),
         ))
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     }
-    txn.commit().await.map_err(map_db_err)?;
+    txn.commit().await.map_err(|e| map_db_err(&e))?;
     crate::revision::notify_committed();
     Ok(count)
 }
@@ -136,17 +136,17 @@ pub async fn clear_comics_for_library(
     library_id: &str,
 ) -> Result<i32, HentaiError> {
     let comic_ids = load_comic_ids_for_library(db, library_id).await?;
-    let count = comic_ids.len() as i32;
+    let count = crate::util::usize_to_i32(comic_ids.len());
     if count == 0 {
         // Still clear orphan series for this library.
         Series::delete_many()
             .filter(crate::entity::series::Column::LibraryId.eq(library_id))
             .exec(db)
             .await
-            .map_err(map_db_err)?;
+            .map_err(|e| map_db_err(&e))?;
         return Ok(0);
     }
-    let txn = db.begin().await.map_err(map_db_err)?;
+    let txn = db.begin().await.map_err(|e| map_db_err(&e))?;
     delete_comics_side_effects(&txn, &comic_ids).await?;
     txn.execute(Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
@@ -156,8 +156,8 @@ pub async fn clear_comics_for_library(
         )))],
     ))
     .await
-    .map_err(map_db_err)?;
-    txn.commit().await.map_err(map_db_err)?;
+    .map_err(|e| map_db_err(&e))?;
+    txn.commit().await.map_err(|e| map_db_err(&e))?;
     crate::revision::notify_committed();
     Ok(count)
 }
@@ -175,7 +175,7 @@ async fn load_comic_ids_for_library(
             )))],
         ))
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     rows.into_iter()
         .map(|row| {
             row.try_get_by_index::<String>(0)
@@ -191,7 +191,7 @@ async fn count_comics(db: &DatabaseConnection) -> Result<i64, HentaiError> {
             "SELECT COUNT(*) FROM comics".to_string(),
         ))
         .await
-        .map_err(map_db_err)?
+        .map_err(|e| map_db_err(&e))?
         .ok_or_else(|| HentaiError::db_query_failed("count ???", None))?;
     row.try_get_by_index::<i64>(0)
         .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))

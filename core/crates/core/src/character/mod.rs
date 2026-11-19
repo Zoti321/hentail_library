@@ -3,6 +3,7 @@ use crate::named_facet::{
     list_all_named_facet_names, list_distinct_named_facet_names, JunctionNamedFacet,
 };
 
+#[must_use]
 pub fn distinct_characters_sql() -> String {
     JunctionNamedFacet::Character.distinct_attached_sql()
 }

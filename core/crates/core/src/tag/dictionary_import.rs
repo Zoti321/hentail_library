@@ -45,7 +45,7 @@ pub async fn import_tag_dictionary(
         .filter(tags::Column::Name.is_in(candidates.clone()))
         .all(&db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     let existing: HashSet<String> = existing_rows.into_iter().map(|row| row.name).collect();
 
     let mut to_insert = Vec::new();
@@ -58,11 +58,11 @@ pub async fn import_tag_dictionary(
         }
     }
 
-    let added = to_insert.len() as u32;
+    let added = crate::util::usize_to_u32(to_insert.len());
     if !to_insert.is_empty() {
-        let txn = db.begin().await.map_err(map_db_err)?;
+        let txn = db.begin().await.map_err(|e| map_db_err(&e))?;
         insert_tag_names_ignore_conflict(&txn, &to_insert).await?;
-        txn.commit().await.map_err(map_db_err)?;
+        txn.commit().await.map_err(|e| map_db_err(&e))?;
         crate::revision::notify_committed();
     }
 
@@ -97,7 +97,7 @@ async fn insert_tag_names_ignore_conflict(
             .do_nothing()
             .exec(conn)
             .await
-            .map_err(map_db_err)?;
+            .map_err(|e| map_db_err(&e))?;
     }
 
     Ok(())
@@ -105,8 +105,7 @@ async fn insert_tag_names_ignore_conflict(
 
 fn collect_candidate_names(payload: TagDictionaryPayload) -> (Vec<String>, u32) {
     let raw_tags = match payload {
-        TagDictionaryPayload::Wrapped { tags } => tags,
-        TagDictionaryPayload::Flat(tags) => tags,
+        TagDictionaryPayload::Wrapped { tags } | TagDictionaryPayload::Flat(tags) => tags,
     };
 
     let mut seen = HashSet::new();

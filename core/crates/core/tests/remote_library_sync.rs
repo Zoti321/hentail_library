@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
 mod common;
 
 use hentai_core::resource::{FakeResourceAccess, ResourceAccess};
@@ -54,8 +56,16 @@ fn remote_lightweight_scan_registers_files_by_extension_not_folders() {
     assert!(types.contains(&"pdf"));
     assert!(types.contains(&"epub"));
     assert!(!types.contains(&"dir"));
-    assert!(!items.iter().any(|i| i.path.ends_with(".txt")));
-    assert!(!items.iter().any(|i| i.path.ends_with(".jpg")));
+    assert!(!items.iter().any(|i| {
+        std::path::Path::new(&i.path)
+            .extension()
+            .is_some_and(|ext| ext.eq_ignore_ascii_case("txt"))
+    }));
+    assert!(!items.iter().any(|i| {
+        std::path::Path::new(&i.path)
+            .extension()
+            .is_some_and(|ext| ext.eq_ignore_ascii_case("jpg"))
+    }));
     assert!(items.iter().all(|i| i.comic.page_count == 1));
 
     let cbz = items.iter().find(|i| i.resource_type == "cbz").unwrap();

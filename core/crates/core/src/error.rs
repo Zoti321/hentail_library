@@ -12,7 +12,7 @@ pub enum HentaiErrorCode {
     ReaderSessionNotOpen,
     /// Remote library transport / DNS / connect failure.
     RemoteUnreachable,
-    /// WebDAV Basic auth rejected.
+    /// `WebDAV` Basic auth rejected.
     RemoteAuthFailed,
     /// TLS / certificate problems talking to Remote library.
     RemoteTlsFailed,
@@ -135,6 +135,7 @@ impl HentaiError {
         }
     }
 
+    #[must_use]
     pub fn is_remote_access_failure(&self) -> bool {
         matches!(
             self.code,

@@ -82,7 +82,7 @@ pub fn prefetch_reader_pages(
     request.prefetch(session, page_indexes)
 }
 
-pub fn clear_reader_page_cache(request: ReaderPageCacheRequest) -> Result<(), HentaiError> {
+pub fn clear_reader_page_cache(request: &ReaderPageCacheRequest) -> Result<(), HentaiError> {
     // A late clear worker cannot delete a newer window's cache.
     request.clear_with(|| ReaderCache::app()?.clear_comic(&request.comic_id))
 }

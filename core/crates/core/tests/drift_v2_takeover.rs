@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
 mod common;
 
 use std::collections::HashSet;
@@ -267,7 +269,10 @@ fn fetch_series_comics_page_returns_ordered_comics() {
             )
             .await
             .expect("comics page");
-            assert_eq!(comics_page.total_count, author_series.items.len() as i64);
+            assert_eq!(
+                comics_page.total_count,
+                hentai_core::util::usize_to_i64(author_series.items.len())
+            );
             assert_eq!(comics_page.items.len(), 1);
             assert_eq!(
                 comics_page.items[0].comic.comic_id,

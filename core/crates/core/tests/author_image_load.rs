@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
 //! Author image 统一取图：按来源解析到 Comic 封面，返回高清字节。
 
 mod common;

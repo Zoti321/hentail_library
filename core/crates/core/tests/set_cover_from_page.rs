@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
 mod common;
 
 use std::fs;
@@ -74,7 +76,7 @@ fn set_comic_thumbnail_from_page_marks_user_set_cover() {
             .block_on(find_thumbnail_by_comic_id(comic_id))
             .expect("find")
             .expect("thumbnail exists");
-        assert!(!thumb.thumbnail.is_empty());
+        assert_ne!(thumb.thumbnail.len(), 0);
         assert!(thumb.is_user_set);
 
         let archive_path = temp.join("comic.cbz");
@@ -198,7 +200,7 @@ fn sync_does_not_regenerate_user_set_comic_thumbnail_after_source_change() {
         let comic = ComicDto {
             resource_fingerprint: None,
             comic_id: comic_id.to_string(),
-            path: path.clone(),
+            path,
             resource_type: "dir".to_string(),
             resource_size: 1,
             created_at: 1,
@@ -295,7 +297,7 @@ fn series_custom_thumbnail_is_preferred_over_fallback() {
             .block_on(find_series_thumbnail_by_series_id(series_id))
             .expect("find")
             .expect("custom series thumbnail exists");
-        assert!(!custom.thumbnail.is_empty());
+        assert_ne!(custom.thumbnail.len(), 0);
 
         let resolved = runtime
             .block_on(resolve_series_cover(series_id))

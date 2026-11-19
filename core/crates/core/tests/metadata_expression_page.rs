@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
 //! Metadata-expression catalog search uses SQL COUNT/LIMIT/OFFSET (not in-memory slice).
 
 mod common;
@@ -108,7 +110,7 @@ fn metadata_expression_page_uses_sql_window() {
                 .await
                 .expect("empty expression");
                 assert_eq!(empty.total_count, 0);
-                assert!(empty.items.is_empty());
+                assert_eq!(empty.items.len(), 0);
             });
         },
     );

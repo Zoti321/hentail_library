@@ -1,7 +1,7 @@
 //! Bounded Local Resource access helpers.
 //!
 //! Unreachable mounts (NAS/SMB) can block indefinitely inside `std::fs`. We run
-//! probes on a worker thread and fail with [HentaiError::timed_out] when the
+//! probes on a worker thread and fail with [`HentaiError::timed_out`] when the
 //! deadline elapses. The worker may outlive the call on a stuck I/O; that is
 //! preferred over hanging the Read session forever.
 

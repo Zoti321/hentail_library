@@ -40,8 +40,8 @@ pub async fn fetch_image_sets_page(
     if grouping == ImageSetGroupingDto::ByAuthor {
         items = group_by_author(&db, &filter, items).await?;
     }
-    let total_count = items.len() as i64;
-    let window = paginate(request, total_count).clamped();
+    let total_count = crate::util::usize_to_i64(items.len());
+    let window = paginate(&request, total_count).clamped();
     if total_count == 0 {
         return Ok(PagedImageSetCatalogDto {
             items: vec![],
@@ -52,8 +52,8 @@ pub async fn fetch_image_sets_page(
     }
     let items = items
         .into_iter()
-        .skip(window.offset as usize)
-        .take(window.page_size as usize)
+        .skip(crate::util::i64_to_usize(window.offset))
+        .take(crate::util::i32_to_usize(window.page_size))
         .collect();
     Ok(PagedImageSetCatalogDto {
         items,
@@ -98,7 +98,7 @@ async fn load_items(
             values,
         ))
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     rows.iter().map(item_from_row).collect()
 }
 
@@ -234,7 +234,7 @@ async fn group_by_author(
             [text(&filter.library_id)],
         ))
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     let mut authors_by_set: HashMap<String, Vec<ImageSetAuthorGroupDto>> = HashMap::new();
     for row in rows {
         let get_err = |e: sea_orm::DbErr| HentaiError::db_query_failed(e.to_string(), None);
@@ -251,8 +251,7 @@ async fn group_by_author(
     for item in items {
         let bound = authors_by_set
             .get(&item.image_set.image_set_id)
-            .map(Vec::as_slice)
-            .unwrap_or(&[]);
+            .map_or(&[][..], Vec::as_slice);
         if bound.is_empty() {
             groups.push((None, item));
             continue;

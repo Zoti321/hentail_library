@@ -88,7 +88,7 @@ pub async fn trash_comics(comic_ids: Vec<String>) -> Result<(), HentaiError> {
                 values,
             ))
             .await
-            .map_err(map_db_err)?;
+            .map_err(|e| map_db_err(&e))?;
     }
     write.commit().await?;
     crate::revision::notify_committed();
@@ -112,10 +112,10 @@ pub async fn restore_comics(comic_ids: Vec<String>) -> Result<(), HentaiError> {
             sea_orm::DatabaseBackend::Sqlite,
             format!("SELECT comic_id FROM comics WHERE deleted_at IS NOT NULL AND comic_id IN ({placeholders})"),
             values.clone(),
-        )).await.map_err(map_db_err)?;
+        )).await.map_err(|e| map_db_err(&e))?;
         restored.extend(
             rows.into_iter()
-                .map(|row| row.try_get::<String>("", "comic_id").map_err(map_db_err))
+                .map(|row| row.try_get::<String>("", "comic_id").map_err(|e| map_db_err(&e)))
                 .collect::<Result<Vec<_>, _>>()?,
         );
         write
@@ -126,7 +126,7 @@ pub async fn restore_comics(comic_ids: Vec<String>) -> Result<(), HentaiError> {
                 values,
             ))
             .await
-            .map_err(map_db_err)?;
+            .map_err(|e| map_db_err(&e))?;
     }
     for id in restored {
         crate::resource_metadata::reschedule_in(write.txn(), &id).await?;
@@ -184,9 +184,9 @@ fn push_error_sample(result: &mut ComicPurgeResultDto, message: String) {
 }
 
 async fn rebuild_series_after_purge(db: &DatabaseConnection) -> Result<(), HentaiError> {
-    let txn = db.begin().await.map_err(map_db_err)?;
+    let txn = db.begin().await.map_err(|e| map_db_err(&e))?;
     rebuild_series_from_comics(&txn, None).await?;
-    txn.commit().await.map_err(map_db_err)?;
+    txn.commit().await.map_err(|e| map_db_err(&e))?;
     crate::revision::notify_committed();
     Ok(())
 }
@@ -194,9 +194,9 @@ async fn rebuild_series_after_purge(db: &DatabaseConnection) -> Result<(), Henta
 async fn purge_one(db: &DatabaseConnection, target: &PurgeTarget) -> Result<(), HentaiError> {
     close_reader(&target.comic_id);
     maybe_delete_local_resource(target)?;
-    let txn = db.begin().await.map_err(map_db_err)?;
+    let txn = db.begin().await.map_err(|e| map_db_err(&e))?;
     delete_comics_side_effects(&txn, std::slice::from_ref(&target.comic_id)).await?;
-    txn.commit().await.map_err(map_db_err)?;
+    txn.commit().await.map_err(|e| map_db_err(&e))?;
     crate::revision::notify_committed();
     Ok(())
 }
@@ -208,7 +208,7 @@ pub async fn fetch_trashed_comics_page(
     let db = connection()?;
     let total_count = count_trashed_comics().await?.total;
     // 越界页保持原样：本路径是顺序翻页，不钳到末页。
-    let window = paginate(request, total_count);
+    let window = paginate(&request, total_count);
     let page = window.page;
     let page_size = window.page_size;
     let offset = window.offset;
@@ -224,12 +224,12 @@ pub async fn fetch_trashed_comics_page(
              ORDER BY c.deleted_at DESC, c.comic_id ASC \
              LIMIT ? OFFSET ?",
             [
-                Value::BigInt(Some(page_size as i64)),
+                Value::BigInt(Some(i64::from(page_size))),
                 Value::BigInt(Some(offset)),
             ],
         ))
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     let mut items = Vec::with_capacity(rows.len());
     for row in rows {
         items.push(TrashedComicDto {
@@ -276,7 +276,7 @@ pub async fn count_trashed_comics() -> Result<TrashedComicCountsDto, HentaiError
             [Value::String(Some(Box::new(KIND_REMOTE.to_string())))],
         ))
         .await
-        .map_err(map_db_err)?
+        .map_err(|e| map_db_err(&e))?
         .ok_or_else(|| HentaiError::db_query_failed("trash count 无结果", None))?;
     let total = row
         .try_get_by_index::<i64>(0)
@@ -291,7 +291,7 @@ pub async fn count_trashed_comics() -> Result<TrashedComicCountsDto, HentaiError
     })
 }
 
-/// 「全部永久删除」用：全部处于 trash 的 comic_id。
+/// 「全部永久删除」用：全部处于 trash 的 `comic_id`。
 pub async fn list_trashed_comic_ids() -> Result<Vec<String>, HentaiError> {
     let db = connection()?;
     let rows = db
@@ -302,7 +302,7 @@ pub async fn list_trashed_comic_ids() -> Result<Vec<String>, HentaiError> {
                 .to_string(),
         ))
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     rows.iter().map(|row| row_string(row, 0)).collect()
 }
 
@@ -316,7 +316,7 @@ pub async fn is_comic_trashed(comic_id: &str) -> Result<bool, HentaiError> {
             [Value::String(Some(Box::new(comic_id.to_string())))],
         ))
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     Ok(row.is_some())
 }
 
@@ -339,7 +339,7 @@ async fn load_purge_targets<C: ConnectionTrait>(
                 values,
             ))
             .await
-            .map_err(map_db_err)?;
+            .map_err(|e| map_db_err(&e))?;
         for row in &rows {
             let target = PurgeTarget {
                 comic_id: row_string(row, 0)?,

@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
 mod common;
 
 use hentai_core::{
@@ -310,7 +312,7 @@ fn preview_import_does_not_write_db_including_orphan_facets() {
 
             let comic = find_comic_by_id("c1").await.expect("find").expect("exists");
             assert_eq!(comic.title, "旧标题");
-            assert!(comic.tags.is_empty());
+            assert_eq!(comic.tags.len(), 0);
 
             let tag_count_after = db
                 .query_one(Statement::from_string(

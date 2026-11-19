@@ -250,7 +250,7 @@ async fn load_continue_reading(
         continue_reading_sql(exclude_r18, reading_history_retention_cutoff_ms(now_ms())),
         r18_values(exclude_r18, 1),
     );
-    let rows = db.query_all(stmt).await.map_err(map_db_err)?;
+    let rows = db.query_all(stmt).await.map_err(|e| map_db_err(&e))?;
     rows.into_iter()
         .map(|row| {
             Ok(HomeContinueReadingDto {
@@ -272,7 +272,7 @@ async fn load_recently_added(
         recently_added_sql(exclude_r18),
         r18_values(exclude_r18, 1),
     );
-    let rows = db.query_all(stmt).await.map_err(map_db_err)?;
+    let rows = db.query_all(stmt).await.map_err(|e| map_db_err(&e))?;
     rows.into_iter()
         .map(|row| {
             Ok(HomeRecentlyAddedDto {
@@ -295,7 +295,7 @@ async fn load_library_home_stats(
         library_stats_sql(exclude_r18),
         r18_values(exclude_r18, 2),
     );
-    let rows = db.query_all(stmt).await.map_err(map_db_err)?;
+    let rows = db.query_all(stmt).await.map_err(|e| map_db_err(&e))?;
     rows.into_iter()
         .map(|row| {
             Ok(LibraryHomeStatDto {
@@ -319,7 +319,7 @@ async fn load_counts(
         counts_sql(exclude_r18),
         r18_values(exclude_r18, 2),
     );
-    let row = db.query_one(stmt).await.map_err(map_db_err)?;
+    let row = db.query_one(stmt).await.map_err(|e| map_db_err(&e))?;
     let Some(row) = row else {
         return Ok(HomePageCountsDto::default());
     };
@@ -338,7 +338,7 @@ async fn load_home_library_alerts(
     let models = crate::entity::prelude::Libraries::find()
         .all(db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     let now = now_ms();
     let mut alerts = Vec::new();
     for model in models {
@@ -405,8 +405,9 @@ async fn is_stale_sync(
 }
 
 fn stale_days_for(model: &crate::entity::libraries::Model, now_ms: i64) -> Option<i32> {
+    const DAY_MS: i64 = 24 * 60 * 60 * 1000;
     let last = model.last_successful_sync_at?;
-    let days = ((now_ms - last).max(0) as f64 / (24.0 * 60.0 * 60.0 * 1000.0)).floor() as i32;
+    let days = crate::util::i64_to_i32((now_ms - last).max(0) / DAY_MS);
     Some(days.max(1))
 }
 
@@ -421,7 +422,7 @@ async fn count_comics_for_library(
             vec![Value::from(library_id)],
         ))
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     Ok(row
         .and_then(|r| r.try_get::<i32>("", "c").ok())
         .unwrap_or(0))

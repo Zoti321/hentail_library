@@ -9,12 +9,13 @@ use super::{
     system_time_to_ms, ResourceAccess, ResourceEntry, ResourceKind, ResourceStat, ResourceStream,
 };
 
-/// Local filesystem [ResourceAccess]. Location keys are OS path strings
+/// Local filesystem [`ResourceAccess`]. Location keys are OS path strings
 /// (same comicId path semantics as today).
 #[derive(Debug, Default, Clone, Copy)]
 pub struct LocalResourceAccess;
 
 impl LocalResourceAccess {
+    #[must_use]
     pub fn path_for(location: &str) -> PathBuf {
         PathBuf::from(location)
     }
@@ -61,7 +62,7 @@ impl ResourceAccess for LocalResourceAccess {
 
 fn list_unbounded(location: &str) -> Result<Vec<ResourceEntry>, HentaiError> {
     let dir = Path::new(location);
-    let entries = std::fs::read_dir(dir).map_err(|e| map_local_io_error("目录扫描失败", dir, e))?;
+    let entries = std::fs::read_dir(dir).map_err(|e| map_local_io_error("目录扫描失败", dir, &e))?;
     let mut out = Vec::new();
     for entry in entries {
         let entry = entry.map_err(|e| HentaiError::validation(e.to_string()))?;
@@ -92,7 +93,7 @@ fn stat_unbounded(location: &str) -> Result<Option<ResourceStat>, HentaiError> {
         Ok(meta) => meta,
         Err(e) if e.kind() == ErrorKind::NotFound => return Ok(None),
         Err(e) => {
-            return Err(map_local_io_error("stat 失败", path, e));
+            return Err(map_local_io_error("stat 失败", path, &e));
         }
     };
     let kind = if meta.is_dir() {
@@ -102,7 +103,7 @@ fn stat_unbounded(location: &str) -> Result<Option<ResourceStat>, HentaiError> {
     } else {
         return Ok(None);
     };
-    let modified_ms = meta.modified().ok().map(system_time_to_ms).unwrap_or(0);
+    let modified_ms = meta.modified().ok().map_or(0, system_time_to_ms);
     Ok(Some(ResourceStat {
         kind,
         size: meta.len(),
@@ -112,11 +113,11 @@ fn stat_unbounded(location: &str) -> Result<Option<ResourceStat>, HentaiError> {
 
 fn open_stream_unbounded(location: &str) -> Result<ResourceStream, HentaiError> {
     let path = Path::new(location);
-    let file = File::open(path).map_err(|e| map_local_io_error("打开失败", path, e))?;
+    let file = File::open(path).map_err(|e| map_local_io_error("打开失败", path, &e))?;
     Ok(Box::new(BufReader::new(file)))
 }
 
-fn map_local_io_error(prefix: &str, path: &Path, err: std::io::Error) -> HentaiError {
+fn map_local_io_error(prefix: &str, path: &Path, err: &std::io::Error) -> HentaiError {
     let kind = err.kind();
     if kind == ErrorKind::NotFound {
         return HentaiError::reader_not_found(path.display().to_string());

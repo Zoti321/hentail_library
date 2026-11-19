@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
 use std::fs::File;
 use std::io::Write;
 use std::path::Path;
@@ -100,7 +102,7 @@ fn write_minimal_pdf_with_metadata(
     pdf.push_str(&format!("0 {}\n", objects.len() + 1));
     pdf.push_str("0000000000 65535 f \n");
     for offset in offsets.iter().skip(1) {
-        pdf.push_str(&format!("{:010} 00000 n \n", offset));
+        pdf.push_str(&format!("{offset:010} 00000 n \n"));
     }
     pdf.push_str(&format!(
         "trailer\n<< /Size {} /Root 1 0 R /Info 4 0 R >>\nstartxref\n{}\n%%EOF\n",
@@ -126,12 +128,16 @@ fn utc_ms(year: i32, month: u32, day: u32) -> i64 {
 fn utc_ms_at(year: i32, month: u32, day: u32, hour: u32, minute: u32, second: u32) -> i64 {
     use std::time::{Duration, UNIX_EPOCH};
     let days_from_ce = days_from_civil(year, month, day).expect("valid date");
-    let secs =
-        days_from_ce as i64 * 86_400 + hour as i64 * 3600 + minute as i64 * 60 + second as i64;
+    let secs = i64::from(days_from_ce) * 86_400
+        + i64::from(hour) * 3600
+        + i64::from(minute) * 60
+        + i64::from(second);
     UNIX_EPOCH
-        .checked_add(Duration::from_secs(secs.max(0) as u64))
+        .checked_add(Duration::from_secs(
+            hentai_core::util::i64_to_u64_nonnegative(secs.max(0)),
+        ))
         .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
-        .map(|d| d.as_millis() as i64)
+        .map(|d| hentai_core::util::milliseconds_to_i64(d.as_millis()))
         .expect("ms")
 }
 
@@ -139,7 +145,7 @@ fn days_from_civil(year: i32, month: u32, day: u32) -> Option<u32> {
     if !(1..=12).contains(&month) || !(1..=31).contains(&day) {
         return None;
     }
-    let y = if month <= 2 { year - 1 } else { year } as u32;
+    let y = hentai_core::util::i32_to_u32(if month <= 2 { year - 1 } else { year });
     let era = y / 400;
     let yoe = y - era * 400;
     let doy = (153 * (if month > 2 { month - 3 } else { month + 9 }) + 2) / 5 + day - 1;
@@ -231,7 +237,7 @@ fn parse_cbz_without_comic_info_falls_back_to_filename() {
         .expect("resource");
 
     assert_eq!(parsed.title, "fallback");
-    assert!(parsed.authors.is_empty());
+    assert_eq!(parsed.authors.len(), 0);
     assert!(parsed.description.is_none());
     assert!(parsed.published_at.is_none());
 }
@@ -397,7 +403,7 @@ fn write_minimal_pdf_with_page_count(path: &Path, page_count: u32) {
     pdf.push_str(&format!("0 {}\n", objects.len() + 1));
     pdf.push_str("0000000000 65535 f \n");
     for offset in offsets.iter().skip(1) {
-        pdf.push_str(&format!("{:010} 00000 n \n", offset));
+        pdf.push_str(&format!("{offset:010} 00000 n \n"));
     }
     pdf.push_str(&format!(
         "trailer\n<< /Size {} /Root 1 0 R >>\nstartxref\n{}\n%%EOF\n",
@@ -420,7 +426,7 @@ fn parse_pdf_missing_metadata_fields_are_none() {
     let parsed = parse_file(&path).expect("parse").expect("resource");
 
     assert_eq!(parsed.title, "bare");
-    assert!(parsed.authors.is_empty());
+    assert_eq!(parsed.authors.len(), 0);
     assert!(parsed.description.is_none());
     assert_eq!(parsed.published_at, Some(utc_ms(2024, 1, 1)));
 }

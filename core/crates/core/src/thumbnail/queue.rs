@@ -151,28 +151,17 @@ impl ThumbnailQueue {
         let (ready, progress) = {
             let mut inner = self.inner.lock().await;
             inner.in_flight.remove(comic_id);
-            match outcome {
-                Ok(true) => {
-                    inner.negative_cache.remove(comic_id);
-                    inner.stats.done += 1;
-                    (true, true)
-                }
-                Ok(false) => {
-                    inner
-                        .negative_cache
-                        .insert(comic_id.to_string(), Instant::now());
-                    inner.stats.failed += 1;
-                    inner.stats.done += 1;
-                    (false, true)
-                }
-                Err(_) => {
-                    inner
-                        .negative_cache
-                        .insert(comic_id.to_string(), Instant::now());
-                    inner.stats.failed += 1;
-                    inner.stats.done += 1;
-                    (false, true)
-                }
+            if matches!(outcome, Ok(true)) {
+                inner.negative_cache.remove(comic_id);
+                inner.stats.done += 1;
+                (true, true)
+            } else {
+                inner
+                    .negative_cache
+                    .insert(comic_id.to_string(), Instant::now());
+                inner.stats.failed += 1;
+                inner.stats.done += 1;
+                (false, true)
             }
         };
         if progress {
@@ -334,7 +323,7 @@ pub async fn ensure_thumbnail(
 
     let rx = queue.register_waiter(comic_id).await;
     tokio::select! {
-        _ = tokio::time::sleep(CRITICAL_WAIT_TIMEOUT) => {}
+        () = tokio::time::sleep(CRITICAL_WAIT_TIMEOUT) => {}
         _ = rx => {}
     }
     find_thumbnail_by_comic_id(comic_id).await
@@ -362,7 +351,7 @@ pub async fn watch_thumbnail_events(
     loop {
         match rx.recv().await {
             Ok(event) => emit(event)?,
-            Err(broadcast::error::RecvError::Lagged(_)) => continue,
+            Err(broadcast::error::RecvError::Lagged(_)) => {}
             Err(broadcast::error::RecvError::Closed) => break,
         }
     }

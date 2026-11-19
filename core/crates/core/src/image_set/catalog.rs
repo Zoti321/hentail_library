@@ -14,7 +14,7 @@ pub async fn list_image_sets(library_id: &str) -> Result<Vec<ImageSetDto>, Henta
         .filter(image_sets::Column::LibraryId.eq(library_id))
         .all(&db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     rows.sort_by(|a, b| {
         b.is_root
             .cmp(&a.is_root)
@@ -44,7 +44,7 @@ pub async fn list_image_set_images(
         .filter(image_set_images::Column::ImageSetId.eq(image_set_id))
         .all(&db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     rows.sort_by(|a, b| compare_filename_natural(&location_key(a), &location_key(b)));
     Ok(rows
         .into_iter()

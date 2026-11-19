@@ -19,6 +19,7 @@ static NOTIFY_COUNT: AtomicU64 = AtomicU64::new(0);
 /// 订阅库变更。返回的接收端在写入提交后被唤醒。
 ///
 /// 广播值只是单调递增的代号，仅表示「变了」。
+#[must_use]
 pub fn subscribe() -> watch::Receiver<u64> {
     sender().subscribe()
 }

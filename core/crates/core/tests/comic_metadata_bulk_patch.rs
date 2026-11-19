@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
 mod common;
 
 use hentai_core::{
@@ -276,7 +278,7 @@ fn bulk_patch_cancel_stops_after_first_comic() {
             assert_eq!(result.succeeded, 0);
 
             let c2 = find_comic_by_id("c2").await.expect("find").expect("exists");
-            assert!(c2.tags.is_empty());
+            assert_eq!(c2.tags.len(), 0);
         });
     });
 }
@@ -312,7 +314,7 @@ fn bulk_patch_cancel_before_loop_processes_nothing() {
             assert_eq!(result.failed, 0);
 
             let c1 = find_comic_by_id("c1").await.expect("find").expect("exists");
-            assert!(c1.tags.is_empty());
+            assert_eq!(c1.tags.len(), 0);
         });
     });
 }
@@ -419,7 +421,7 @@ fn bulk_patch_missing_id_counts_failed() {
 
             assert_eq!(result.succeeded, 1);
             assert_eq!(result.failed, 1);
-            assert!(!result.error_samples.is_empty());
+            assert_ne!(result.error_samples.len(), 0);
         });
     });
 }

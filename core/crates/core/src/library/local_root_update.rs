@@ -49,7 +49,7 @@ async fn update_local_library_root_locked(id: &str, root: &str) -> Result<Librar
     let Some(model) = Libraries::find_by_id(id.to_string())
         .one(&db)
         .await
-        .map_err(map_db_err)?
+        .map_err(|e| map_db_err(&e))?
     else {
         return Err(HentaiError::validation(format!("Library 不存在: {id}")));
     };
@@ -64,7 +64,7 @@ async fn update_local_library_root_locked(id: &str, root: &str) -> Result<Librar
 
     let old_root = model.root_path.clone();
     let should_migrate = local_access().probe_root(root).is_ok();
-    let txn = db.begin().await.map_err(map_db_err)?;
+    let txn = db.begin().await.map_err(|e| map_db_err(&e))?;
 
     // Image set catalog rows are relative-path keyed within library_id; updating root_path
     // preserves Image set / Image set image identity without comic/series rekeys (#600).
@@ -74,8 +74,8 @@ async fn update_local_library_root_locked(id: &str, root: &str) -> Result<Librar
 
     let mut active: libraries::ActiveModel = model.into();
     active.root_path = Set(root.to_string());
-    let updated = active.update(&txn).await.map_err(map_db_err)?;
-    txn.commit().await.map_err(map_db_err)?;
+    let updated = active.update(&txn).await.map_err(|e| map_db_err(&e))?;
+    txn.commit().await.map_err(|e| map_db_err(&e))?;
     crate::revision::notify_committed();
     clear_reader_sessions();
     Ok(model_to_dto(updated))
@@ -135,7 +135,7 @@ async fn rekey_local_root_series<C: ConnectionTrait>(
         .filter(crate::entity::series::Column::LibraryId.eq(library_id))
         .all(db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     let mut migrations = Vec::new();
     for row in rows {
         let Some(new_folder_path) = remap_root_relative_path(&row.folder_path, old_root, new_root)
@@ -150,7 +150,7 @@ async fn rekey_local_root_series<C: ConnectionTrait>(
             continue;
         }
         migrations.push(SeriesMigrationPair {
-            from_series_id: row.series_id.clone(),
+            from_series_id: row.series_id,
             to_series_id: new_series_id,
             to_folder_path: new_folder_path,
         });
@@ -205,12 +205,12 @@ async fn load_comics_ordered_for_connection<C: ConnectionTrait>(
         .filter(crate::entity::comics::Column::ComicId.is_in(comic_ids.to_vec()))
         .all(db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     let meta_models = ComicMeta::find()
         .filter(crate::entity::comic_meta::Column::ComicId.is_in(comic_ids.to_vec()))
         .all(db)
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     let author_map = crate::author::load_comic_authors_for_comics(db, comic_ids).await?;
     let tag_map = load_named_rows(
         db,
@@ -325,7 +325,7 @@ async fn load_last_read_times_for_comics<C: ConnectionTrait>(
             values,
         ))
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     let mut out = HashMap::new();
     for row in rows {
         let comic_id = row
@@ -364,7 +364,7 @@ async fn load_named_rows<C: ConnectionTrait>(
             values,
         ))
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     let mut out: HashMap<String, Vec<String>> = HashMap::new();
     for row in rows {
         let comic_id = row
@@ -391,7 +391,7 @@ async fn load_comic_ids_for_library<C: ConnectionTrait>(
             )))],
         ))
         .await
-        .map_err(map_db_err)?;
+        .map_err(|e| map_db_err(&e))?;
     rows.into_iter()
         .map(|row| {
             row.try_get_by_index::<String>(0)

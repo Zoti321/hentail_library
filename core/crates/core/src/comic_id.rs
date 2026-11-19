@@ -1,6 +1,7 @@
 use sha1::{Digest, Sha1};
 
 /// 与 Dart `PathNormalizer.normalizeForKey` 对齐的跨平台路径键。
+#[must_use]
 pub fn normalize_path_for_key(raw_path: &str) -> String {
     let trimmed = raw_path.trim();
     if trimmed.is_empty() {
@@ -24,6 +25,7 @@ pub fn normalize_path_for_key(raw_path: &str) -> String {
 }
 
 /// 与 Dart `generateComicId(normalizedPath)` 对齐：SHA1(utf8) 小写 hex。
+#[must_use]
 pub fn comic_id_from_path(raw_path: &str) -> String {
     let normalized = normalize_path_for_key(raw_path);
     if normalized.is_empty() {
@@ -32,6 +34,7 @@ pub fn comic_id_from_path(raw_path: &str) -> String {
     comic_id_from_normalized_path(&normalized)
 }
 
+#[must_use]
 pub fn comic_id_from_normalized_path(normalized_path: &str) -> String {
     let mut hasher = Sha1::new();
     hasher.update(normalized_path.as_bytes());

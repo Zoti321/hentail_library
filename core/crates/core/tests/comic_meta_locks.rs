@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
 mod common;
 
 use hentai_core::{
@@ -103,7 +105,7 @@ fn update_comic_user_meta_persists_languages_and_auto_locks() {
             .expect("clear languages");
 
             let cleared = find_comic_by_id("c1").await.expect("find").expect("exists");
-            assert!(cleared.languages.is_empty());
+            assert_eq!(cleared.languages.len(), 0);
             assert!(cleared.locks.languages);
         });
     });
@@ -148,7 +150,7 @@ fn update_comic_user_meta_persists_parodies_and_auto_locks() {
             .expect("clear parodies");
 
             let cleared = find_comic_by_id("c1").await.expect("find").expect("exists");
-            assert!(cleared.parodies.is_empty());
+            assert_eq!(cleared.parodies.len(), 0);
             assert!(cleared.locks.parodies);
         });
     });
@@ -193,7 +195,7 @@ fn update_comic_user_meta_persists_characters_and_auto_locks() {
             .expect("clear characters");
 
             let cleared = find_comic_by_id("c1").await.expect("find").expect("exists");
-            assert!(cleared.characters.is_empty());
+            assert_eq!(cleared.characters.len(), 0);
             assert!(cleared.locks.characters);
         });
     });

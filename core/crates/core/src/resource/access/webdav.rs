@@ -1,4 +1,4 @@
-//! WebDAV [ResourceAccess] via `reqwest_dav` (Basic auth).
+//! `WebDAV` [`ResourceAccess`] via `reqwest_dav` (Basic auth).
 
 use std::io::Cursor;
 use std::sync::Mutex;
@@ -17,12 +17,12 @@ use super::{ResourceAccess, ResourceEntry, ResourceKind, ResourceStat, ResourceS
 pub const WEBDAV_CONNECT_TIMEOUT: Duration = Duration::from_secs(15);
 pub const WEBDAV_REQUEST_TIMEOUT: Duration = Duration::from_secs(30);
 
-/// WebDAV adapter. Location keys are absolute http(s) URLs under the library root.
+/// `WebDAV` adapter. Location keys are absolute http(s) URLs under the library root.
 pub struct WebDavResourceAccess {
     client: Client,
     /// Origin + path prefix used when joining relative PROPFIND hrefs, e.g. `https://host/dav`.
     root_url: String,
-    /// Cached Depth::1 listings keyed by directory location.
+    /// Cached `Depth::1` listings keyed by directory location.
     list_cache: Mutex<Option<(String, Vec<ResourceEntry>)>>,
 }
 
@@ -175,7 +175,7 @@ impl ResourceAccess for WebDavResourceAccess {
                     if abs.trim_end_matches('/') == location {
                         return Ok(Some(ResourceStat {
                             kind: ResourceKind::File,
-                            size: content_length.max(0) as u64,
+                            size: crate::util::i64_to_u64_nonnegative(content_length.max(0)),
                             modified_ms: last_modified.timestamp_millis(),
                         }));
                     }
@@ -259,6 +259,7 @@ mod tests {
     use std::net::TcpListener;
 
     #[test]
+    #[cfg_attr(miri, ignore = "reqwest/aws-lc TLS init unsupported under miri")]
     fn stat_distinguishes_missing_from_auth_and_server_failures() {
         for status in [404, 401, 500] {
             let listener = TcpListener::bind("127.0.0.1:0").unwrap();
@@ -298,6 +299,10 @@ mod tests {
             }
             server.join().unwrap();
         }
+    }
+
+    #[test]
+    fn field_not_found_decode_is_not_a_missing_resource() {
         let error = reqwest_dav::types::Error::Decode(
             reqwest_dav::types::DecodeError::FieldNotFound(reqwest_dav::types::FieldError {
                 field: "404 not found".into(),

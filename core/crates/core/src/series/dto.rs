@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+/// Browse filter wire DTO: several independent bool toggles (FRB / JSON).
+#[expect(clippy::struct_excessive_bools)]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SeriesFilterDto {
     pub show_r18: bool,
@@ -34,6 +36,7 @@ impl Default for SeriesFilterDto {
 }
 
 impl SeriesFilterDto {
+    #[must_use]
     pub fn normalized(self) -> Self {
         Self {
             show_r18: self.show_r18,

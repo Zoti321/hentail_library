@@ -44,17 +44,17 @@ pub async fn query_media_overview(show_r18: bool) -> Result<MediaOverview, Henta
             [show_r18.into()],
         ))
         .await
-        .map_err(map_db_err)?
+        .map_err(|e| map_db_err(&e))?
         .ok_or_else(|| HentaiError::validation("Media overview missing"))?;
     Ok(MediaOverview {
-        total: row.try_get("", "total").map_err(map_db_err)?,
-        disabled: row.try_get("", "disabled").map_err(map_db_err)?,
-        pending: row.try_get("", "pending").map_err(map_db_err)?,
-        processing: row.try_get("", "processing").map_err(map_db_err)?,
-        completed: row.try_get("", "completed").map_err(map_db_err)?,
-        failed: row.try_get("", "failed").map_err(map_db_err)?,
-        unsupported: row.try_get("", "unsupported").map_err(map_db_err)?,
-        local_libraries: row.try_get("", "local_libraries").map_err(map_db_err)?,
-        enabled_libraries: row.try_get("", "enabled_libraries").map_err(map_db_err)?,
+        total: row.try_get("", "total").map_err(|e| map_db_err(&e))?,
+        disabled: row.try_get("", "disabled").map_err(|e| map_db_err(&e))?,
+        pending: row.try_get("", "pending").map_err(|e| map_db_err(&e))?,
+        processing: row.try_get("", "processing").map_err(|e| map_db_err(&e))?,
+        completed: row.try_get("", "completed").map_err(|e| map_db_err(&e))?,
+        failed: row.try_get("", "failed").map_err(|e| map_db_err(&e))?,
+        unsupported: row.try_get("", "unsupported").map_err(|e| map_db_err(&e))?,
+        local_libraries: row.try_get("", "local_libraries").map_err(|e| map_db_err(&e))?,
+        enabled_libraries: row.try_get("", "enabled_libraries").map_err(|e| map_db_err(&e))?,
     })
 }

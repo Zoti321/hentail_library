@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+
 mod common;
 
 use std::path::Path;
@@ -58,12 +60,12 @@ fn update_local_library_root_keeps_library_id_and_rejects_nesting() {
         let root_a = temp.as_path().join("lib_a");
         let root_b = temp.as_path().join("lib_b");
         let root_a_child = root_a.join("nested");
-        let root_b_child = root_b.join("child");
+        let child_under_b = root_b.join("child");
         let root_a_moved = temp.as_path().join("lib_a_moved");
         std::fs::create_dir_all(&root_a).expect("mkdir a");
         std::fs::create_dir_all(&root_b).expect("mkdir b");
         std::fs::create_dir_all(&root_a_child).expect("mkdir nested");
-        std::fs::create_dir_all(&root_b_child).expect("mkdir b/child");
+        std::fs::create_dir_all(&child_under_b).expect("mkdir b/child");
         std::fs::create_dir_all(&root_a_moved).expect("mkdir moved");
 
         let db_path = common::create_fixture_db(temp.as_path());
@@ -79,7 +81,7 @@ fn update_local_library_root_keeps_library_id_and_rejects_nesting() {
                 .expect("create b");
 
             let nested_other =
-                update_local_library_root(&lib_a.library_id, &root_b_child.to_string_lossy())
+                update_local_library_root(&lib_a.library_id, &child_under_b.to_string_lossy())
                     .await
                     .expect_err("nested under other library should fail");
             assert!(
