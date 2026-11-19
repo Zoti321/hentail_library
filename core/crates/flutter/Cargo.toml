@@ -8,8 +8,22 @@ license.workspace = true
 [lib]
 crate-type = ["cdylib", "staticlib"]
 
+# Cannot use lints.workspace = true while overriding rust.unexpected_cfgs for FRB.
 [lints.rust]
 unexpected_cfgs = { level = "allow", check-cfg = ['cfg(frb_expand)'] }
+
+[lints.clippy]
+# Keep in sync with [workspace.lints.clippy] in core/Cargo.toml (cannot use lints.workspace).
+# Groups first (lower priority) so named lints below can override.
+pedantic = { level = "warn", priority = -1 }
+# Restriction / high-signal extras (not whole nursery / restriction groups).
+dbg_macro = "warn"
+todo = "warn"
+unimplemented = "warn"
+unwrap_used = "warn"
+expect_used = "warn"
+panic = "warn"
+redundant_clone = "warn"
 
 [dependencies]
 flutter_rust_bridge = "=2.13.0"

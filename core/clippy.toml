@@ -1,0 +1,5 @@
+# Prefer fixing call sites over raising these ceilings.
+too-many-arguments-threshold = 7
+cognitive-complexity-threshold = 30
+# Pedantic bool-param lint companion (also gated in workspace.lints).
+max-fn-params-bools = 1

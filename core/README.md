@@ -20,8 +20,13 @@ Rust workspace：`hentai-core`（业务逻辑）+ `hentai_flutter`（FRB cdylib�
 ```
 
 ```bash
-cd core && cargo test --workspace
+# Prefer nextest (same as Gate rust-test). Falls back: cargo test --workspace
+cd core && cargo nextest run --workspace --profile ci
 ```
+
+Release cdylib size knobs and bloat analysis: [docs/engineering/rust-binary-size.md](../docs/engineering/rust-binary-size.md).
+
+Pure-Rust fuzz targets live under `fuzz/` (Nightly CI: `.github/workflows/nightly.yml`).
 
 Golden fixture：`tests/fixtures/comic_id_vectors.json`（可用 `cd app && dart run tool/generate_comic_id_vectors.dart` 从 Dart 重新生成）。
 

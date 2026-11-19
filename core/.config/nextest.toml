@@ -1,0 +1,8 @@
+# cargo-nextest config for the core/ workspace root.
+# See https://nexte.st/docs/configuration/
+
+[profile.default]
+# Local runs fail fast by default.
+
+[profile.ci]
+fail-fast = false

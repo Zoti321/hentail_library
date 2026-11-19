@@ -8,7 +8,8 @@
 - [浏览模块边界](library-browse-zones.md)：browse、comic、series 的协作。
 - [领域命名](ddd-domain-naming.md)、[Reader 命名](reader-ddd-lexicon.md)：类型与文件命名。
 - [设计系统](design-system.md)：组件边界、本地化、Widgetbook 与验证。
-- [测试与 CI](gate.md)：本地 Gate、测试缝、manifest 与慢轨。
+- [测试与 CI](gate.md)：GitHub Actions Gate / Nightly、测试缝、manifest 与慢轨。
+- [Rust binary size](rust-binary-size.md)：FRB cdylib release knobs、APK 三件套与 bloat 分析。
 - [维护操作](maintainer.md)：日志支持与标签字典导入。
 - [文件元数据写入](metadata-writeback.md)：独立模块、格式映射、扩展协议与验证；[RAR 写入限制](rar-metadata-writing.md)。
 

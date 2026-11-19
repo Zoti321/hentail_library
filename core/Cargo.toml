@@ -7,6 +7,19 @@ edition = "2021"
 license = "MIT"
 version = "0.1.0"
 
+[workspace.lints.clippy]
+# Groups first (lower priority) so named lints below can override.
+pedantic = { level = "warn", priority = -1 }
+# Restriction / high-signal extras (not whole nursery / restriction groups).
+dbg_macro = "warn"
+todo = "warn"
+unimplemented = "warn"
+unwrap_used = "warn"
+expect_used = "warn"
+panic = "warn"
+redundant_clone = "warn"
+# No warning-level allows: fix findings (real docs / pub(crate) / code changes).
+
 # Patch unrar-ng-sys so cross-compiles from Windows use target OS (not host)
 # when selecting Windows-only UnRAR sources; also Android lutimes fallback.
 [patch.crates-io]
@@ -17,3 +30,12 @@ unrar-ng-sys = { path = "vendor/crates/unrar-ng-sys" }
 [profile.dev]
 debug = "line-tables-only"
 strip = "debuginfo"
+
+# Mobile cdylib size: prefer size over peak speed; keep vectorization via "s" (not "z").
+# Flutter profile builds also use this profile via Cargokit.
+[profile.release]
+opt-level = "s"
+lto = "thin"
+codegen-units = 1
+strip = true
+panic = "abort"
