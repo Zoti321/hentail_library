@@ -68,9 +68,15 @@ if [[ $SKIP_NATIVE_DEPS -eq 0 ]]; then
 fi
 
 echo "开发环境初始化完成。"
+if command -v rustc >/dev/null 2>&1; then
+  echo "当前 Rust: $(rustc --version 2>/dev/null)"
+  echo "版本由仓库根 rust-toolchain.toml 固定；若过旧请执行: rustup update"
+else
+  echo "未检测到 rustc；请安装 rustup 并进入本仓库以应用 rust-toolchain.toml。"
+fi
 if command -v flutter >/dev/null 2>&1; then
   echo "当前 Flutter: $(flutter --version 2>/dev/null | head -n 1)"
-  echo "工具链版本以 .github/workflows/gate.yml 为准。"
+  echo "Flutter 版本以 .github/workflows/gate.yml 为准。"
 else
   echo "未检测到 flutter 命令；请按 .github/workflows/gate.yml 安装 SDK 后再进入 app/。"
 fi

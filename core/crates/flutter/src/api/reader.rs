@@ -93,7 +93,7 @@ pub async fn load_reader_page_frb(
 ) -> Result<ReaderPageDto, HentaiErrorDto> {
     let read = tokio::task::block_in_place(|| ReaderPageRead::capture(&comic_id))
         .map_err(HentaiErrorDto::from)?;
-    tokio::task::spawn_blocking(move || load_reader_page(read, page_index).map(ReaderPageDto::from))
+    tokio::task::spawn_blocking(move || load_reader_page(&read, page_index).map(ReaderPageDto::from))
         .await
         .map_err(|error| {
             HentaiErrorDto::from(hentai_core::HentaiError::reader_invalid_content(
@@ -134,7 +134,7 @@ fn capture_session(comic_id: &str) -> Result<ReaderSessionRead, HentaiErrorDto> 
 #[flutter_rust_bridge::frb]
 pub async fn clear_reader_page_cache_frb(comic_id: String) -> Result<(), HentaiErrorDto> {
     let request = ReaderPageCacheRequest::begin_clear(&comic_id);
-    tokio::task::spawn_blocking(move || clear_reader_page_cache(request))
+    tokio::task::spawn_blocking(move || clear_reader_page_cache(&request))
         .await
         .map_err(|error| {
             HentaiErrorDto::from(hentai_core::HentaiError::reader_invalid_content(

@@ -106,7 +106,7 @@ fn sync_cancellation_preserves_baseline_and_commit_revokes_reader() {
             )
             .await
             .unwrap();
-            assert!(reader::load_reader_page(old_read, 0).is_err());
+            assert!(reader::load_reader_page(&old_read, 0).is_err());
             assert_eq!(
                 probe::load_snapshot_map(&db, &library.library_id)
                     .await
@@ -210,7 +210,7 @@ fn committed_sync_rejects_decode_already_running_without_waiting_for_codec() {
             reader::open_reader_with(&access, &comic_id, &path.to_string_lossy(), "cbz").unwrap();
             let read = reader::ReaderPageRead::capture(&comic_id).unwrap();
             armed.store(true, Ordering::SeqCst);
-            let worker = std::thread::spawn(move || reader::load_reader_page(read, 0));
+            let worker = std::thread::spawn(move || reader::load_reader_page(&read, 0));
             entered_rx.recv_timeout(Duration::from_secs(5)).unwrap();
             let committed = tokio::time::timeout(
                 Duration::from_secs(5),
@@ -232,7 +232,7 @@ fn committed_sync_rejects_decode_already_running_without_waiting_for_codec() {
             );
             reader::open_reader(&comic_id, &path.to_string_lossy(), "cbz").unwrap();
             assert!(reader::load_reader_page(
-                reader::ReaderPageRead::capture(&comic_id).unwrap(),
+                &reader::ReaderPageRead::capture(&comic_id).unwrap(),
                 0
             )
             .is_ok());

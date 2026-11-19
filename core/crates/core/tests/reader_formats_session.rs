@@ -26,7 +26,7 @@ fn load_reader_page_cache_versions_follow_remote_resource_snapshots() {
     }
 
     fn cached_path(comic_id: &str) -> String {
-        match load_reader_page(ReaderPageRead::capture(comic_id).unwrap(), 0).unwrap() {
+        match load_reader_page(&ReaderPageRead::capture(comic_id).unwrap(), 0).unwrap() {
             ReaderPageDto::FilePath { path } => path,
             ReaderPageDto::Bytes { .. } => panic!("versioned source should use disk cache"),
         }
@@ -88,13 +88,13 @@ fn load_reader_page_preserves_archive_cache_lifetimes() {
         let path = zip_path.to_string_lossy().to_string();
         open_reader("cache-comic", &path, "cbz").expect("open");
         let page = ReaderPageRead::capture("cache-comic")
-            .and_then(|read| load_reader_page(read, 0))
+            .and_then(|read| load_reader_page(&read, 0))
             .expect("load");
         match page {
             ReaderPageDto::FilePath { path: cached } => {
                 assert!(std::path::Path::new(&cached).exists());
                 let second = ReaderPageRead::capture("cache-comic")
-                    .and_then(|read| load_reader_page(read, 0))
+                    .and_then(|read| load_reader_page(&read, 0))
                     .expect("reload");
                 match second {
                     ReaderPageDto::FilePath { path: cached_again } => {
@@ -111,7 +111,7 @@ fn load_reader_page_preserves_archive_cache_lifetimes() {
         let _clear = ReaderPageCacheRequest::begin_clear("cache-comic");
         let after_clear = ReaderPageRead::capture("cache-comic").unwrap();
         for read in [before_clear, after_clear] {
-            let page = load_reader_page(read, 0).expect("load during clear");
+            let page = load_reader_page(&read, 0).expect("load during clear");
             match page {
                 ReaderPageDto::Bytes { data } => assert_eq!(data, b"\xFF\xD8\xFFpage-one"),
                 ReaderPageDto::FilePath { .. } => {
@@ -121,17 +121,17 @@ fn load_reader_page_preserves_archive_cache_lifetimes() {
         }
         let _prefetch = ReaderPageCacheRequest::begin("cache-comic");
         let page = ReaderPageRead::capture("cache-comic")
-            .and_then(|read| load_reader_page(read, 0))
+            .and_then(|read| load_reader_page(&read, 0))
             .expect("load after superseding clear");
         assert!(matches!(page, ReaderPageDto::FilePath { .. }));
         let obsolete = ReaderPageRead::capture("cache-comic").unwrap();
         close_reader("cache-comic");
         open_reader("cache-comic", &path, "cbz").unwrap();
-        let error = load_reader_page(obsolete, 0).unwrap_err();
+        let error = load_reader_page(&obsolete, 0).unwrap_err();
         assert_eq!(error.code, HentaiErrorCode::ReaderSessionNotOpen);
         let current = ReaderPageRead::capture("cache-comic").unwrap();
         assert!(matches!(
-            load_reader_page(current, 0).unwrap(),
+            load_reader_page(&current, 0).unwrap(),
             ReaderPageDto::FilePath { .. }
         ));
         close_reader("cache-comic");
@@ -297,7 +297,7 @@ fn zip_reader_session_reuses_archive_for_multiple_pages() {
 #[test]
 fn load_reader_page_without_open_returns_session_not_open() {
     let err = ReaderPageRead::capture("no-session")
-        .and_then(|read| load_reader_page(read, 0))
+        .and_then(|read| load_reader_page(&read, 0))
         .expect_err("not open");
     assert_eq!(err.code, HentaiErrorCode::ReaderSessionNotOpen);
 }
@@ -323,11 +323,11 @@ fn close_reader_then_load_reader_page_returns_session_not_open() {
         let path = zip_path.to_string_lossy().to_string();
         open_reader("closed-comic", &path, "cbz").expect("open");
         ReaderPageRead::capture("closed-comic")
-            .and_then(|read| load_reader_page(read, 0))
+            .and_then(|read| load_reader_page(&read, 0))
             .expect("load while open");
         close_reader("closed-comic");
         let err = ReaderPageRead::capture("closed-comic")
-            .and_then(|read| load_reader_page(read, 0))
+            .and_then(|read| load_reader_page(&read, 0))
             .expect_err("after close");
         assert_eq!(err.code, HentaiErrorCode::ReaderSessionNotOpen);
     });

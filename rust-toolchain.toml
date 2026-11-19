@@ -1,3 +1,5 @@
 [toolchain]
-channel = "stable"
+# Pin to a concrete stable: CI uses dtolnay/rust-toolchain@stable (rolling).
+# Option/Result::map_or_default needs >= 1.98; keep local clones from drifting stale.
+channel = "1.100.0"
 components = ["rustfmt", "clippy"]

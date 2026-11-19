@@ -111,6 +111,9 @@ jobs:
 
       - name: Setup Rust nightly
         uses: dtolnay/rust-toolchain@nightly
+        with:
+          # Override repo rust-toolchain.toml (pinned stable) for fuzz.
+          toolchain: nightly
 
       - uses: Swatinem/rust-cache@v2
         with:
@@ -138,6 +141,8 @@ jobs:
       - name: Setup Rust nightly with miri
         uses: dtolnay/rust-toolchain@nightly
         with:
+          # Override repo rust-toolchain.toml (pinned stable) for miri.
+          toolchain: nightly
           components: miri, rust-src
 
       - uses: Swatinem/rust-cache@v2
