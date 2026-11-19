@@ -32,6 +32,8 @@ migrate_working_dir/
 .pub/
 build/
 /coverage/
+# Accidental local SDK unpack at repo root (use Flutter's bundled dart-sdk)
+/dart-sdk/
 
 # Rust
 core/target/
