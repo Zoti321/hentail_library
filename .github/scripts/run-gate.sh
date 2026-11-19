@@ -1,28 +1,25 @@
 #!/usr/bin/env bash
-# 本地复现 Gate workflow（.github/workflows/gate.yml）的 gate-* 硬门禁。
-# CI 各 job 直接调用本脚本对应子命令，保证本地与 CI 命令同源。
+# CI-only Gate entry for .github/workflows/gate.yml and release-verify.
+# Not a local developer entrypoint.
 set -euo pipefail
 
-REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 APP_DIR="$REPO_ROOT/app"
 CORE_MANIFEST="$REPO_ROOT/core/Cargo.toml"
 GATE_MANIFEST="$APP_DIR/test/gate/manifest.txt"
 
 usage() {
   cat <<'EOF'
-用法: ./scripts/run-gate.sh [子命令...]
+用法: bash .github/scripts/run-gate.sh [子命令...]
 
 子命令（缺省为 all，按顺序执行）:
   rust-lint       cargo fmt --check + cargo clippy -D warnings
-  rust-test       cargo test（core/ workspace）
+  rust-test       cargo nextest run（core/ workspace，--profile ci）
   codegen-drift   FRB generate + build_runner，随后检查 git 工作区无漂移
   dart-static     dart format --set-exit-if-changed + flutter analyze
   dart-lint       dart_code_linter 规则门禁（app/lib + app/test，硬失败）
   dart-test       cargo build hentai_flutter（FRB 线缝用）+ flutter test ← app/test/gate/manifest.txt
   all             以上全部
-
-示例:
-  ./scripts/run-gate.sh dart-static dart-test
 EOF
 }
 
@@ -39,7 +36,11 @@ run_rust_lint() {
 
 run_rust_test() {
   echo "==> gate-rust-test"
-  cargo test --manifest-path "$CORE_MANIFEST"
+  if ! cargo nextest --version >/dev/null 2>&1; then
+    echo "cargo-nextest 未安装。运行: cargo install cargo-nextest --locked" >&2
+    return 1
+  fi
+  cargo nextest run --manifest-path "$CORE_MANIFEST" --workspace --profile ci
 }
 
 run_codegen_drift() {

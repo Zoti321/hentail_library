@@ -27,7 +27,7 @@ MD3E Lab（`app/lib/md3e/`，见 ADR-0030）已完成 UI 范围收口，设置�
 1. **Cutover 单位是 feature**（`GLOSSARY.md` 中 **MD3E Cutover**）。同一 feature 内允许 **spec 分批**：先发布 spec，实现时再拆实施票；spec 批次之间不要求同时完成。feature 的 Cutover 完成判定仍以下列四条同时满足为准：
    1. 该 feature 的生产路由全部渲染 MD3E 页面；
    2. 对应的 Baseline 页面与组件已从该 feature 中删除，不保留双轨；
-   3. 门禁全部通过（`./scripts/run-gate.sh` 与导入边界测试）；
+   3. 门禁全部通过（GitHub Actions Gate 与导入边界测试）；
    4. 维护者在本地完成手动测试并确认。
 
 2. **组件归属**：

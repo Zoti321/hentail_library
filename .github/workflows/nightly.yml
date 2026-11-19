@@ -81,7 +81,7 @@ jobs:
       - name: Run hentai-core coverage
         env:
           RUST_COVERAGE_HTML: "1"
-        run: bash scripts/run-rust-coverage.sh
+        run: bash .github/scripts/run-rust-coverage.sh
 
       - name: Zip HTML coverage report
         working-directory: target/rust-coverage
@@ -100,3 +100,49 @@ jobs:
           name: rust-coverage-html
           path: target/rust-coverage/rust-coverage-html.zip
           retention-days: 30
+
+  nightly-rust-fuzz:
+    name: nightly · rust fuzz
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Rust nightly
+        uses: dtolnay/rust-toolchain@nightly
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: core
+
+      - name: Fetch native dependencies
+        run: bash "${GITHUB_WORKSPACE}/core/vendor/fetch-native-deps.sh"
+
+      - name: Install cargo-fuzz
+        uses: taiki-e/install-action@cargo-fuzz
+
+      - name: Run timed fuzz targets
+        env:
+          RUST_FUZZ_MAX_TOTAL_TIME: "120"
+        run: bash .github/scripts/run-rust-fuzz.sh
+
+  nightly-rust-miri:
+    name: nightly · rust miri
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Rust nightly with miri
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: miri, rust-src
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: core
+
+      - name: Run filtered miri lib tests
+        run: bash .github/scripts/run-rust-miri.sh

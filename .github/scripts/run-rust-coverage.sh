@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Canonical hentai-core line coverage via cargo-llvm-cov (Nightly + Gate + local rust-coverage).
+# CI-only hentai-core line coverage via cargo-llvm-cov (Nightly).
 # Same package scope and ignore rules as gate-rust-test product code; see docs/engineering/gate.md.
 # cargo-llvm-cov 0.9+ cannot pass --lcov and --html on the same invocation; use report subcommands.
 set -euo pipefail
 
-REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 CORE_MANIFEST="$REPO_ROOT/core/Cargo.toml"
 OUTPUT_DIR="${RUST_COVERAGE_OUTPUT_DIR:-$REPO_ROOT/target/rust-coverage}"
 LCOV_PATH="$OUTPUT_DIR/lcov.info"
@@ -15,15 +15,15 @@ RUST_COVERAGE_IGNORE_REGEX="${RUST_COVERAGE_IGNORE_REGEX:-(/vendor/|/crates/core
 
 usage() {
   cat <<'EOF'
-用法: ./scripts/run-rust-coverage.sh [选项]
+用法: bash .github/scripts/run-rust-coverage.sh [选项]
 
 环境变量:
   RUST_COVERAGE_OUTPUT_DIR     输出目录（默认 target/rust-coverage）
-  RUST_COVERAGE_FAIL_UNDER_LINES  若设置，行覆盖率低于该整数百分比时非零退出（Gate）
-  RUST_COVERAGE_HTML           设为 1 时额外生成 HTML（Nightly）；Gate 不设
+  RUST_COVERAGE_FAIL_UNDER_LINES  若设置，行覆盖率低于该整数百分比时非零退出
+  RUST_COVERAGE_HTML           设为 1 时额外生成 HTML（Nightly）
   RUST_COVERAGE_IGNORE_REGEX   覆盖默认 --ignore-filename-regex
 
-与 gate-rust-test 同 workspace 测试范围，指标仅 -p hentai-core 产品源码。
+指标仅 -p hentai-core 产品源码。
 EOF
 }
 

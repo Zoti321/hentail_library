@@ -4,8 +4,10 @@
 
 1. 在仓库根运行 `./scripts/setup-dev.sh`（Linux、macOS 或 Windows Git Bash）。工具链版本以 `.github/workflows/gate.yml` 为准。
 2. 进入 `app/` 执行 `flutter pub get`。修改代码生成输入后执行 `dart run build_runner build`；修改 ARB 后执行 `flutter gen-l10n`；修改 Rust FRB API 后执行 `flutter_rust_bridge_codegen generate`。
-3. 提交前运行 `./scripts/run-gate.sh`。UI 变更补跑受影响的组件或页面测试；需要排查整体回归时运行 `cd app && flutter test`。
+3. 硬门禁与 Nightly 只在 GitHub Actions 跑（见 `docs/engineering/gate.md`）。本地可按需跑受影响的 `cargo` / `flutter test`；工具链版本以 `.github/workflows/gate.yml` 为准，环境初始化见 `./scripts/setup-dev.sh`。
 4. 使用 [PR 模板](.github/pull_request_template.md)，写明行为变化、验证证据和未验证项。
+
+Rust 侧补充：`core/` 为 Cargo workspace；体积说明见 [rust-binary-size.md](docs/engineering/rust-binary-size.md)；Nightly 含 fuzz / miri（`.github/workflows/nightly.yml`）。
 
 PR 测试范围由 `app/test/gate/manifest.txt` 统一维护；目录项已覆盖的测试文件不重复列出。Nightly 用一次全量 `flutter test --coverage` 同时完成快慢轨回归和覆盖率采集；平台集成冒烟仍走 Watch。
 

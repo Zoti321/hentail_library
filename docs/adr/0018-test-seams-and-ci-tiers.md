@@ -27,11 +27,11 @@ ADR-0002 把业务逻辑放进 Rust，Dart 只剩 UI 与 FRB 薄边。但 CI 仍
 
 - 业务行为**只**在 Rust 缝断言。FRB 线缝只证明调用链可通，不复测业务。
 - **不做** Dart `*_repository_impl` 全流程 FRB 集成：那会形成第二套集成栈，与 Rust 缝重复且更脆。
-- 线缝测通过 `test/frb_wire/frb_wire_harness.dart` 定位宿主平台的 `hentai_flutter` 动态库（`core/target/{debug,release}/`，或 `HENTAI_FLUTTER_LIB`）；`scripts/run-gate.sh dart-test` 先 `cargo build -p hentai_flutter`。
+- 线缝测通过 `test/frb_wire/frb_wire_harness.dart` 定位宿主平台的 `hentai_flutter` 动态库（`core/target/{debug,release}/`，或 `HENTAI_FLUTTER_LIB`）；Gate 的 `dart-test` 步骤先 `cargo build -p hentai_flutter`。
 
 ### 2. CI 命名：`{tier}-{domain}-{intent}`
 
-Job id 是稳定契约，与文档、本地脚本一致；display name 用 `tier · domain intent` 形式。
+Job id 是稳定契约，与文档、workflow 一致；display name 用 `tier · domain intent` 形式。
 
 | Tier | 含义 | 合并策略 |
 |------|------|----------|
@@ -75,7 +75,7 @@ Watch (watch.yml)                workflow_dispatch / workflow_call
 └── watch-platform-linux-pdf     同上（Linux 桌面宿主 + xvfb）
 
 Release (release.yml)            tag v* / workflow_dispatch
-├── release-verify               scripts/run-gate.sh（= 完整 Gate）
+├── release-verify               .github/scripts/run-gate.sh（= 完整 Gate）
 ├── watch-platform-smokes        调用 watch.yml（全部 watch-platform-*）；并行跑，不挡发布
 ├── release-build-{windows,macos,linux,android,ios}   needs release-verify
 ├── release-publish              needs 全部 release-build-*
@@ -90,15 +90,15 @@ Manual build（非 tier；仅 workflow_dispatch）
 ### 3. 单一事实来源
 
 - `app/test/gate/manifest.txt` 是 `gate-dart-test` 的唯一路径来源；扩硬门禁只改 manifest 并在 PR 中列出。
-- 每个 `gate-*` job 只调用 `scripts/run-gate.sh <子命令>`；`release-verify` 复用同一脚本，保证发布前与 PR 门禁拓扑一致。
-- 操作细则（晋升检查清单、harness 用法、本地全量命令）写在 `docs/engineering/gate.md`，本 ADR 只记录决策。
+- 每个 `gate-*` job 只调用 `.github/scripts/run-gate.sh <子命令>`；`release-verify` 复用同一脚本，保证发布前与 PR 门禁拓扑一致。Gate / Nightly / Release 入口仅挂在 GitHub Actions（无本地门禁包装脚本）。
+- 操作细则（晋升检查清单、harness 用法）写在 `docs/engineering/gate.md`，本 ADR 只记录决策。
 
 ## Consequences
 
 ### Positive
 
 - PR 绿 = 全部 `gate-*` 通过、生成产物未漂移、Dart 能调通真实 Rust 库。
-- 本地 `./scripts/run-gate.sh` 与 CI 同源，失败可直接复现。
+- Gate 命令集中在 `.github/scripts/`，与 workflow 同源，避免本地/CI 分叉。
 - 新增门禁只需改 manifest，不再改 workflow。
 
 ### Negative

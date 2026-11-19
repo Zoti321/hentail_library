@@ -1,5 +1,5 @@
 # Gate：PR 硬门禁。跑完整 gate-*（Rust lint/test、codegen 漂移、Dart 静态分析与 hard-manifest 测试）。
-# 本地复现：scripts/run-gate.sh。详见 docs/engineering/gate.md。
+# 入口：.github/scripts/run-gate.sh（CI-only）。详见 docs/engineering/gate.md。
 # 触发：打开/更新 PR、push 到 main，或手动 workflow_dispatch。失败挡合并。
 name: Gate
 
@@ -39,7 +39,7 @@ jobs:
           run-pub-get: "false"
 
       - name: Check Rust formatting and Clippy
-        run: bash scripts/run-gate.sh rust-lint
+        run: bash .github/scripts/run-gate.sh rust-lint
 
   gate-rust-test:
     name: gate · rust test
@@ -59,8 +59,11 @@ jobs:
           run-build-runner: "false"
           run-pub-get: "false"
 
+      - name: Install cargo-nextest
+        uses: taiki-e/install-action@nextest
+
       - name: Run Rust workspace tests
-        run: bash scripts/run-gate.sh rust-test
+        run: bash .github/scripts/run-gate.sh rust-test
 
   gate-codegen-drift:
     name: gate · codegen drift
@@ -80,7 +83,7 @@ jobs:
           run-build-runner: "false"
 
       - name: Check codegen drift
-        run: bash scripts/run-gate.sh codegen-drift
+        run: bash .github/scripts/run-gate.sh codegen-drift
 
   gate-dart-static:
     name: gate · dart static
@@ -98,7 +101,7 @@ jobs:
           run-build-runner: "true"
 
       - name: Check Dart formatting and analysis
-        run: bash scripts/run-gate.sh dart-static
+        run: bash .github/scripts/run-gate.sh dart-static
 
   gate-dart-lint:
     name: gate · dart linter (dart_code_linter)
@@ -116,7 +119,7 @@ jobs:
           run-build-runner: "false"
 
       - name: Run dart_code_linter rules
-        run: bash scripts/run-gate.sh dart-lint
+        run: bash .github/scripts/run-gate.sh dart-lint
 
   gate-dart-test:
     name: gate · dart test (hard manifest)
@@ -134,4 +137,4 @@ jobs:
           run-build-runner: "true"
 
       - name: Run Dart hard-gate tests
-        run: bash scripts/run-gate.sh dart-test
+        run: bash .github/scripts/run-gate.sh dart-test

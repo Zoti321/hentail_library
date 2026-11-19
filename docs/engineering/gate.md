@@ -1,20 +1,18 @@
 # Tests and CI
 
-ADR-0018 defines the test seams. Rust owns sync/read/database business truth (ADR-0002). `.github/workflows/gate.yml` owns the PR job list and SDK/codegen versions; `scripts/run-gate.sh` supplies the same commands locally and in CI.
+ADR-0018 defines the test seams. Rust owns sync/read/database business truth (ADR-0002). `.github/workflows/gate.yml` owns the PR job list and SDK/codegen versions. Hard gates, Nightly coverage/fuzz/miri, and Release verify run only on GitHub Actions via [`.github/scripts/`](../../.github/scripts/).
 
 ## Run checks
 
-From the repository root, run `./scripts/run-gate.sh` for all hard gates, or pass relevant steps:
+There is no local gate wrapper. Rely on GitHub Actions (`Gate`, `Nightly`, `Release`) for the authoritative suite. For focused local work:
 
-```bash
-./scripts/run-gate.sh rust-lint rust-test
-./scripts/run-gate.sh dart-static dart-lint dart-test
-./scripts/run-gate.sh codegen-drift
-```
+- Rust: `cargo fmt` / `cargo clippy` / `cargo nextest` under `core/` (nextest profile `ci` matches Gate).
+- Dart: `dart format`, `flutter analyze`, and `flutter test <path>` from `app/` after building the host `hentai_flutter` cdylib when FRB wire tests need it.
+- Codegen: regenerate FRB / `build_runner` when you change bindings; Gate's `codegen-drift` job fails on uncommitted drift.
 
-Use `./scripts/run-gate.sh --help` for step details. `dart-test` first builds the host hentai_flutter cdylib, then runs `app/test/gate/manifest.txt`; Git Bash on Windows runs the entries in batches to stay within the operating system's command-line limit. `codegen-drift` regenerates FRB/build_runner outputs in place and compares all tracked/untracked changes under app/core with HEAD; commit relevant work before running it. Use a local SDK aligned with CI; CI treats analyzer info diagnostics as failures.
+Nightly runs timed fuzz and filtered Miri (nightly toolchain) through `.github/scripts/`. Release cdylib size notes: [rust-binary-size.md](rust-binary-size.md).
 
-For focused Flutter checks, run `flutter test <path>` from `app/`. For full UI regression checks, run `flutter test` after building the host cdylib. Regenerate localization with `flutter gen-l10n` when ARB inputs change. Platform smoke tests under `integration_test/` use `*_smoke_test.dart`, run through Watch/Release, and stay outside the hard manifest. Sync/WebDAV end-to-end business tests belong in Rust.
+Regenerate localization with `flutter gen-l10n` when ARB inputs change. Platform smoke tests under `integration_test/` use `*_smoke_test.dart`, run through Watch/Release, and stay outside the hard manifest. Sync/WebDAV end-to-end business tests belong in Rust.
 
 ## Test seams and harnesses
 
@@ -29,15 +27,7 @@ For focused Flutter checks, run `flutter test <path>` from `app/`. For full UI r
 
 The inventory's slow track is every test outside the expanded manifest. Nightly's `nightly-dart-coverage` job runs all `app/test` tests once with coverage, including both fast and slow tracks. ADR-0059 replaces the separate `nightly-dart-ui` run described in ADR-0018; no UI assertions are dropped. Nightly also collects hentai-core Rust coverage; see `.github/workflows/nightly.yml`. Platform integration tests remain in Watch and are outside this Dart coverage run.
 
-```bash
-python scripts/audit_dart_tests.py --summary-json
-python scripts/audit_dart_tests.py --json
-python scripts/audit_dart_tests.py --rubric candidate-retire --slow-only
-python scripts/audit_dart_tests.py --compile-smoke-only
-python -m unittest discover -s scripts -p test_audit_dart_tests.py
-```
-
-The rubric is an audit heuristic, not permission to delete tests: architecture-guard protects structural rules, thin-edge protects adapter/contract seams, ui-contract covers observable behavior, candidate-retire flags slow-track files for review. `--compile-smoke-only` flags files whose assertions only check imported symbols with `isNotNull`; verify each result manually because compilation already checks names, but a test may intentionally document its public API. The script reports live counts; do not copy count snapshots into this guide.
+When reviewing slow-track tests, treat rubrics as heuristics only (not permission to delete): architecture-guard for structural rules, thin-edge for adapter/contract seams, ui-contract for observable behavior, candidate-retire for slow-track files that may be demoted after review. Prefer real contract assertions over compile-smoke checks that only assert imported symbols with `isNotNull`.
 
 Demotion requires a PR listing each path, rubric and reason, plus manifest/self-test updates. Protect architecture/layout, FRB wire, thin-edge and minimum App/Lab smoke coverage unless paired with the corresponding rule/ADR migration. Keep a demoted test until a successful focused run or nightly validates it; retire it in a later PR linked to that decision. Check actual nightly path selection before claiming coverage. Moves retain existing assertions and fast-track coverage.
 

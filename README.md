@@ -78,7 +78,9 @@ flutter test
 flutter run -d windows   # 或其他平台
 ```
 
-- PR 硬门禁与本地 Gate：仓库根执行 `./scripts/run-gate.sh`（见 `docs/engineering/gate.md`）
+WSL 上跑 Linux 桌面目标时，WSLg 的 Wayland 常因协议错误导致窗口秒退；Linux runner 会在 WSL 下默认改用 X11（也可用 `GDK_BACKEND=x11 flutter run -d linux`）。
+
+- PR 硬门禁与 Nightly：GitHub Actions（见 `docs/engineering/gate.md`）
 - 合并前若改了 UI 或怀疑 widget 回归，再跑全量：`cd app && flutter test`
 - 新增/改动需代码生成的 Dart 模型或 Provider 后，同步跑 `build_runner`（业务持久化在 Rust/SeaORM，无 Drift DAO）
 - PR 说明使用仓库 [PR 模板](.github/pull_request_template.md)（Summary / Evidence / Merge danger）

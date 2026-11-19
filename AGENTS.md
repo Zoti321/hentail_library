@@ -6,7 +6,7 @@ Flutter lives in `app/`; Rust and FRB live in `core/`. Work in the current clone
 
 - Setup and product scope: [README.md](README.md). Contributor commands and documentation map: [CONTRIBUTING.md](CONTRIBUTING.md).
 - Domain vocabulary: [GLOSSARY.md](GLOSSARY.md). Read the relevant [ADRs](docs/adr/README.md) before changing a decision.
-- Tests and CI: [gate.md](docs/engineering/gate.md). Local entry: `./scripts/run-gate.sh`; executable rules live in `app/test/gate/` and `app/test/architecture/`.
+- Tests and CI: [gate.md](docs/engineering/gate.md). Hard gates and Nightly run on GitHub Actions (`.github/scripts/`); executable rules live in `app/test/gate/` and `app/test/architecture/`.
 
 ## Read for the task
 
