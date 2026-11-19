@@ -343,7 +343,7 @@ impl From<CoreImageSetReaderSession> for ImageSetReaderSessionDto {
                 .into_iter()
                 .map(ImageSetImageDto::from)
                 .collect(),
-            start_index: value.start_index as i32,
+            start_index: hentai_core::util::usize_to_i32(value.start_index),
         }
     }
 }

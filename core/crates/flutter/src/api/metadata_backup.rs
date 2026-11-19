@@ -35,10 +35,10 @@ pub struct MetadataBackupManifestDto {
 impl From<MetadataBackupManifest> for MetadataBackupManifestDto {
     fn from(value: MetadataBackupManifest) -> Self {
         Self {
-            schema_version: value.schema_version as i32,
+            schema_version: hentai_core::util::u32_to_i32(value.schema_version),
             exported_at: value.exported_at,
             app_version: value.app_version,
-            comic_count: value.comic_count as i32,
+            comic_count: hentai_core::util::u32_to_i32(value.comic_count),
             include_orphan_facets: value.include_orphan_facets,
             library_id: value.library_id,
         }
@@ -56,9 +56,9 @@ pub struct ImportComicMetadataResultDto {
 impl From<ImportComicMetadataResult> for ImportComicMetadataResultDto {
     fn from(value: ImportComicMetadataResult) -> Self {
         Self {
-            applied: value.applied as i32,
-            skipped_not_found: value.skipped_not_found as i32,
-            skipped_ambiguous: value.skipped_ambiguous as i32,
+            applied: hentai_core::util::u32_to_i32(value.applied),
+            skipped_not_found: hentai_core::util::u32_to_i32(value.skipped_not_found),
+            skipped_ambiguous: hentai_core::util::u32_to_i32(value.skipped_ambiguous),
             errors: value.errors,
         }
     }
@@ -150,10 +150,12 @@ pub struct PreviewImportComicMetadataResultDto {
 impl From<ImportPlan> for PreviewImportComicMetadataResultDto {
     fn from(value: ImportPlan) -> Self {
         Self {
-            would_apply: value.would_apply as i32,
-            skipped_not_found: value.skipped_not_found as i32,
-            skipped_ambiguous: value.skipped_ambiguous as i32,
-            would_upsert_orphan_facet_count: value.would_upsert_orphan_facet_count as i32,
+            would_apply: hentai_core::util::u32_to_i32(value.would_apply),
+            skipped_not_found: hentai_core::util::u32_to_i32(value.skipped_not_found),
+            skipped_ambiguous: hentai_core::util::u32_to_i32(value.skipped_ambiguous),
+            would_upsert_orphan_facet_count: hentai_core::util::u32_to_i32(
+                value.would_upsert_orphan_facet_count,
+            ),
             samples_would_apply: value
                 .samples_would_apply
                 .into_iter()

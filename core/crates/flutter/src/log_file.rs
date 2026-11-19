@@ -62,7 +62,8 @@ fn prune_old_backups(logs_dir: &Path) -> io::Result<()> {
             && path
                 .file_name()
                 .and_then(|name| name.to_str())
-                .is_some_and(|name| name.starts_with("rust_log_") && name.ends_with(".bak"))
+                .is_some_and(|name| name.starts_with("rust_log_"))
+            && path.extension().is_some_and(|ext| ext == "bak")
         {
             backups.push(path);
         }
@@ -117,7 +118,7 @@ mod tests {
         let dir = tempfile::tempdir().expect("tempdir");
         let log_path = dir.path().join(LOG_FILE_NAME);
         let mut file = File::create(&log_path).expect("create");
-        let payload = vec![b'x'; (MAX_FILE_SIZE_BYTES + 1) as usize];
+        let payload = vec![b'x'; hentai_core::util::u64_to_usize(MAX_FILE_SIZE_BYTES + 1)];
         file.write_all(&payload).expect("write");
         drop(file);
 

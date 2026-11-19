@@ -12,9 +12,11 @@ pub struct TagDictionaryImportResultDto {
 impl From<TagDictionaryImportResult> for TagDictionaryImportResultDto {
     fn from(value: TagDictionaryImportResult) -> Self {
         Self {
-            added: value.added as i32,
-            skipped_existing: value.skipped_existing as i32,
-            skipped_filtered_or_empty_or_dedupe: value.skipped_filtered_or_empty_or_dedupe as i32,
+            added: hentai_core::util::u32_to_i32(value.added),
+            skipped_existing: hentai_core::util::u32_to_i32(value.skipped_existing),
+            skipped_filtered_or_empty_or_dedupe: hentai_core::util::u32_to_i32(
+                value.skipped_filtered_or_empty_or_dedupe,
+            ),
         }
     }
 }

@@ -22,6 +22,16 @@
     clippy::borrow_deref_ref,
     clippy::uninlined_format_args,
     clippy::needless_borrow,
+    // FRB codegen patterns — do not hand-fix; regenerate overwrites this file.
+    clippy::semicolon_if_nothing_returned,
+    clippy::unimplemented,
+    clippy::similar_names,
+    clippy::wildcard_imports,
+    clippy::unwrap_used,
+    clippy::cast_possible_truncation,
+    clippy::cast_possible_wrap,
+    clippy::cast_sign_loss,
+    clippy::cast_lossless,
     mismatched_lifetime_syntaxes
 )]
 
