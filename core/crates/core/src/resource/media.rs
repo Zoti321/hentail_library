@@ -21,7 +21,7 @@ pub fn is_comic_image_extension(ext: &str) -> bool {
 pub fn extension_lower(path: &Path) -> String {
     path.extension()
         .and_then(|e| e.to_str())
-        .map_or_default(|e| format!(".{}", e.to_lowercase()))
+        .map(|e| format!(".{}", e.to_lowercase())).unwrap_or_default()
 }
 
 #[must_use]

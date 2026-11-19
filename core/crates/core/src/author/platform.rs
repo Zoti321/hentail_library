@@ -203,7 +203,7 @@ fn profile_request(
         .to_ascii_lowercase();
     let segments: Vec<&str> = profile_url
         .path_segments()
-        .map_or_default(|parts| parts.filter(|part| !part.is_empty()).collect());
+        .map(|parts| parts.filter(|part| !part.is_empty()).collect()).unwrap_or_default();
     let request = match platform {
         AuthorLinkPlatform::Pixiv => {
             if !domain_matches(&host, "pixiv.net") {
@@ -336,7 +336,7 @@ fn discord_link_shape_supported(profile_url: &Url) -> bool {
     }
     let segments: Vec<&str> = profile_url
         .path_segments()
-        .map_or_default(|parts| parts.filter(|part| !part.is_empty()).collect());
+        .map(|parts| parts.filter(|part| !part.is_empty()).collect()).unwrap_or_default();
     match segments.as_slice() {
         [_code] => host == "discord.gg",
         ["invite", _code] => true,
@@ -391,7 +391,7 @@ fn parse_open_graph(bytes: &[u8], base: &Url) -> Result<PlatformProfile, HentaiE
     for attrs in meta_tags(html) {
         let key = html_attr(attrs, "property")
             .or_else(|| html_attr(attrs, "name"))
-            .map_or_default(str::to_ascii_lowercase);
+            .map(str::to_ascii_lowercase).unwrap_or_default();
         let content = html_attr(attrs, "content")
             .map(str::trim)
             .filter(|value| !value.is_empty());

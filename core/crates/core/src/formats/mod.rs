@@ -34,7 +34,7 @@ pub(crate) fn is_comic_image_name(name: &str) -> bool {
     let ext = Path::new(&file_name)
         .extension()
         .and_then(|e| e.to_str())
-        .map_or_default(|e| format!(".{}", e.to_lowercase()));
+        .map(|e| format!(".{}", e.to_lowercase())).unwrap_or_default();
     is_comic_image_extension(&ext)
 }
 

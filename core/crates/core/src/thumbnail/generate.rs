@@ -236,7 +236,7 @@ fn load_zip_cover(
         let ext = Path::new(&name)
             .extension()
             .and_then(|e| e.to_str())
-            .map_or_default(|e| format!(".{}", e.to_lowercase()));
+            .map(|e| format!(".{}", e.to_lowercase())).unwrap_or_default();
         if is_comic_image_extension(&ext) {
             entries.push((name, i));
         }
@@ -282,7 +282,7 @@ fn load_epub_cover(
         let ext = Path::new(&name)
             .extension()
             .and_then(|e| e.to_str())
-            .map_or_default(|e| format!(".{}", e.to_lowercase()));
+            .map(|e| format!(".{}", e.to_lowercase())).unwrap_or_default();
         if is_comic_image_extension(&ext) {
             images.push((name, i));
         }

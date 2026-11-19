@@ -190,7 +190,7 @@ fn open_zip(access: &dyn ResourceAccess, location: &str) -> Result<ZipBackend, H
         let ext = Path::new(&name)
             .extension()
             .and_then(|e| e.to_str())
-            .map_or_default(|e| format!(".{}", e.to_lowercase()));
+            .map(|e| format!(".{}", e.to_lowercase())).unwrap_or_default();
         if is_comic_image_extension(&ext) {
             entries.push((i, name));
         }
@@ -313,7 +313,7 @@ fn collect_epub_image_indices(archive: &mut StreamArchive) -> Result<Vec<usize>,
         let ext = Path::new(&name)
             .extension()
             .and_then(|e| e.to_str())
-            .map_or_default(|e| format!(".{}", e.to_lowercase()));
+            .map(|e| format!(".{}", e.to_lowercase())).unwrap_or_default();
         if is_comic_image_extension(&ext) {
             name_to_index.insert(name.clone(), i);
             all_images.push((i, name));

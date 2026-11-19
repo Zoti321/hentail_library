@@ -181,7 +181,7 @@ pub fn parse_zip_archive_with(
         let ext = Path::new(&name)
             .extension()
             .and_then(|e| e.to_str())
-            .map_or_default(|e| format!(".{}", e.to_lowercase()));
+            .map(|e| format!(".{}", e.to_lowercase())).unwrap_or_default();
         if is_comic_image_extension(&ext) {
             page_count += 1;
         }
@@ -194,7 +194,7 @@ pub fn parse_zip_archive_with(
     let meta = root_info
         .or(comic_info_xml)
         .as_deref()
-        .map_or_default(parse_comic_info_xml);
+        .map(parse_comic_info_xml).unwrap_or_default();
     let title = if meta.title.trim().is_empty() {
         basename_without_extension(Path::new(location))
     } else {
@@ -595,7 +595,7 @@ fn count_epub_images<R: std::io::Read + std::io::Seek>(
         let ext = Path::new(&name)
             .extension()
             .and_then(|e| e.to_str())
-            .map_or_default(|e| format!(".{}", e.to_lowercase()));
+            .map(|e| format!(".{}", e.to_lowercase())).unwrap_or_default();
         if is_comic_image_extension(&ext) {
             count += 1;
         }

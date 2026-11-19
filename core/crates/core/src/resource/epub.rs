@@ -267,7 +267,7 @@ fn extension_of(path: &str) -> String {
     Path::new(path)
         .extension()
         .and_then(|e| e.to_str())
-        .map_or_default(|e| format!(".{}", e.to_ascii_lowercase()))
+        .map(|e| format!(".{}", e.to_ascii_lowercase())).unwrap_or_default()
 }
 
 fn parent_dir(path: &str) -> String {
