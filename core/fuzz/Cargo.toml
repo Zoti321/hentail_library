@@ -1,0 +1,37 @@
+[package]
+name = "hentai-core-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+hentai-core = { path = "../crates/core" }
+
+[[bin]]
+name = "comic_info"
+path = "fuzz_targets/comic_info.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "epub_opf"
+path = "fuzz_targets/epub_opf.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "normalize_and_sort"
+path = "fuzz_targets/normalize_and_sort.rs"
+test = false
+doc = false
+bench = false
+
+# Keep fuzz crate outside the parent workspace members list.
+[workspace]
+members = ["."]
