@@ -5,6 +5,7 @@ import 'package:hentai_library/features/image_set_library/application/load_image
 import 'package:hentai_library/features/image_set_library/domain/image_set.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_catalog_query.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_facets.dart';
+import 'package:hentai_library/features/image_set_library/domain/image_set_facets_patch.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_image.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_library_gates.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_reader_session.dart';
@@ -61,6 +62,18 @@ class _FakeRepository implements ImageSetRepository {
 
   @override
   Future<ImageSetFacets> fetchFacets(String imageSetId) =>
+      throw UnimplementedError();
+
+  @override
+  Future<void> updateName(String imageSetId, String name) =>
+      throw UnimplementedError();
+
+  @override
+  Future<void> setNameLocked(String imageSetId, {required bool locked}) =>
+      throw UnimplementedError();
+
+  @override
+  Future<void> updateFacets(String imageSetId, ImageSetFacetsPatch patch) =>
       throw UnimplementedError();
 
   @override
