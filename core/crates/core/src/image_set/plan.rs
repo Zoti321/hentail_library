@@ -338,7 +338,10 @@ fn diff(
     }
 }
 
-/// New images append after the set's current max `sort_order`; first sync ranks by location natural order.
+/// New images append after the set's current max `sort_order`.
+///
+/// First sync / append peers use hierarchical natural order: carrier path, then
+/// member path within that carrier (not a flat basename or flattened path key).
 fn assign_append_sort_orders(
     inserts: &mut [image_set_images::Model],
     prior: &[image_set_images::Model],
@@ -357,26 +360,24 @@ fn assign_append_sort_orders(
     }
     for (set_id, mut indexes) in indexes_by_set {
         indexes.sort_by(|&a, &b| {
-            compare_filename_natural(&location_key(&inserts[a]), &location_key(&inserts[b]))
-                .then_with(|| {
-                    inserts[a]
-                        .image_set_image_id
-                        .cmp(&inserts[b].image_set_image_id)
-                })
+            compare_filename_natural(
+                &inserts[a].carrier_relative_path,
+                &inserts[b].carrier_relative_path,
+            )
+            .then_with(|| {
+                compare_filename_natural(&inserts[a].member_path, &inserts[b].member_path)
+            })
+            .then_with(|| {
+                inserts[a]
+                    .image_set_image_id
+                    .cmp(&inserts[b].image_set_image_id)
+            })
         });
         let mut next = max_by_set.get(&set_id).copied().unwrap_or(-1).saturating_add(1);
         for index in indexes {
             inserts[index].sort_order = next;
             next = next.saturating_add(1);
         }
-    }
-}
-
-fn location_key(row: &image_set_images::Model) -> String {
-    if row.member_path.is_empty() {
-        row.carrier_relative_path.clone()
-    } else {
-        format!("{}/{}", row.carrier_relative_path, row.member_path)
     }
 }
 

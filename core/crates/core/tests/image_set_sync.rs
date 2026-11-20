@@ -508,6 +508,88 @@ fn workspace_list_honors_user_order_and_skips_excluded() {
 }
 
 #[test]
+fn multi_carrier_default_order_groups_by_carrier_then_member_natural() {
+    common::with_global_db(|| {
+        let fixture = Fixture::new("multi_carrier_order.sqlite");
+        // Basenames alone would order a.jpg before mid.jpg before z.jpg and shred carriers.
+        write_zip(
+            &fixture.root.join("album/early.zip"),
+            &[("z.jpg", b"z"), ("a.jpg", b"a")],
+        );
+        write_zip(
+            &fixture.root.join("album/late.zip"),
+            &[("m.jpg", b"m")],
+        );
+        write_file(&fixture.root.join("album/mid.jpg"), b"mid");
+        fixture.sync();
+        let set = fixture.set("album");
+        let images = fixture
+            .runtime
+            .block_on(list_image_set_images(&fixture.library_id, &set.image_set_id))
+            .expect("images");
+        let keys: Vec<(String, String, String)> = images
+            .iter()
+            .map(|i| {
+                (
+                    i.carrier_relative_path.clone(),
+                    i.member_path.clone(),
+                    i.name.clone(),
+                )
+            })
+            .collect();
+        assert_eq!(
+            keys,
+            vec![
+                (
+                    "album/early.zip".into(),
+                    "a.jpg".into(),
+                    "a.jpg".into(),
+                ),
+                (
+                    "album/early.zip".into(),
+                    "z.jpg".into(),
+                    "z.jpg".into(),
+                ),
+                (
+                    "album/late.zip".into(),
+                    "m.jpg".into(),
+                    "m.jpg".into(),
+                ),
+                ("album/mid.jpg".into(), String::new(), "mid.jpg".into()),
+            ]
+        );
+
+        // Resync must not rewrite existing workspace order.
+        fixture.runtime.block_on(async {
+            let db = connection().expect("db");
+            db.execute(Statement::from_string(
+                DatabaseBackend::Sqlite,
+                format!(
+                    "UPDATE image_set_images SET sort_order = 90 WHERE image_set_image_id = '{}';
+                     UPDATE image_set_images SET sort_order = 10 WHERE image_set_image_id = '{}';",
+                    images[0].image_set_image_id,
+                    images[3].image_set_image_id,
+                ),
+            ))
+            .await
+            .expect("bump orders");
+        });
+        fixture.sync();
+        let after = fixture
+            .runtime
+            .block_on(list_image_set_images(&fixture.library_id, &set.image_set_id))
+            .expect("images");
+        assert_eq!(
+            after
+                .iter()
+                .map(|i| i.name.as_str())
+                .collect::<Vec<_>>(),
+            vec!["z.jpg", "m.jpg", "mid.jpg", "a.jpg"]
+        );
+    });
+}
+
+#[test]
 fn sync_preserves_exclude_and_appends_new_images_after_user_order() {
     common::with_global_db(|| {
         let fixture = Fixture::new("workspace_sync.sqlite");
