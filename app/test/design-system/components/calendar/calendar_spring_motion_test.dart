@@ -591,7 +591,7 @@ void main() {
     const capturePath = String.fromEnvironment('CALENDAR_CAPTURE_PATH');
     if (capturePath.isEmpty) return;
     final font = FontLoader(kAppFontFamily)
-      ..addFont(rootBundle.load('assets/fonts/MiSans-Regular.ttf'));
+      ..addFont(rootBundle.load('assets/fonts/NotoSans-VariableFont_wdth_wght.ttf'));
     await font.load();
     final icons = FontLoader('MaterialIcons')
       ..addFont(rootBundle.load('fonts/MaterialIcons-Regular.otf'));

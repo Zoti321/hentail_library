@@ -128,7 +128,7 @@
   "localePreferenceZhCn": "中文",
   "localePreferenceEn": "English",
   "settingsFontLabel": "字体",
-  "fontPreferenceMiSans": "小米字体",
+  "fontPreferenceMiSans": "MI_Sans_Regular",
   "fontPreferenceNotoSans": "Noto Sans",
   "settingsThemeLabel": "主题",
   "themePreferenceSystem": "跟随系统",

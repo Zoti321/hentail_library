@@ -10,7 +10,7 @@ void main() {
       expect(setting.version, 6);
       expect(setting.colorSchemePreference, AppColorSchemePreference.brand);
       expect(setting.useDynamicColor, isFalse);
-      expect(setting.fontPreference, AppFontPreference.miSans);
+      expect(setting.fontPreference, AppFontPreference.notoSans);
       expect(setting.defaultLibraryDisplayTarget, LibraryDisplayTarget.comics);
     });
 
@@ -24,11 +24,11 @@ void main() {
       expect(setting.themePreference, AppThemePreference.dark);
       expect(setting.colorSchemePreference, AppColorSchemePreference.brand);
       expect(setting.useDynamicColor, isFalse);
-      expect(setting.fontPreference, AppFontPreference.miSans);
+      expect(setting.fontPreference, AppFontPreference.notoSans);
       expect(setting.defaultLibraryDisplayTarget, LibraryDisplayTarget.comics);
       expect(setting.toJson()['colorSchemePreference'], 'brand');
       expect(setting.toJson()['useDynamicColor'], isFalse);
-      expect(setting.toJson()['fontPreference'], 'miSans');
+      expect(setting.toJson()['fontPreference'], 'notoSans');
       expect(setting.toJson()['defaultLibraryDisplayTarget'], 'comics');
     });
 

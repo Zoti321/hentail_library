@@ -413,7 +413,7 @@ class SettingsOptionLabels {
   const SettingsOptionLabels({
     this.themeOptions = const <String>['深色', '浅色'],
     this.localeOptions = const <String>['简体中文', 'English'],
-    this.fontOptions = const <String>['小米字体', 'Noto Sans'],
+    this.fontOptions = const <String>['MI_Sans_Regular', 'Noto Sans'],
     this.defaultLibraryDisplayTargetOptions = const <String>['漫画', '系列'],
     this.readingModeOptions = kSettingsReadingModeLabels,
     this.autoPlayModeOptions = kSettingsAutoPlayModeLabels,
@@ -443,7 +443,7 @@ class SettingsLabState {
   const SettingsLabState({
     this.themeLabel = '深色',
     this.localeLabel = '简体中文',
-    this.fontLabel = '小米字体',
+    this.fontLabel = 'Noto Sans',
     this.defaultLibraryDisplayTargetLabel = '漫画',
     this.autoMetadataBackup = true,
     this.diagnosticMode = false,

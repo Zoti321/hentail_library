@@ -54,17 +54,17 @@ void main() {
       });
 
       expect(setting.version, 6);
-      expect(setting.fontPreference, AppFontPreference.miSans);
-      expect(setting.toJson()['fontPreference'], 'miSans');
+      expect(setting.fontPreference, AppFontPreference.notoSans);
+      expect(setting.toJson()['fontPreference'], 'notoSans');
     });
 
     test('round-trips explicit fontPreference', () {
       final AppSetting setting = AppSetting(
-        fontPreference: AppFontPreference.notoSans,
+        fontPreference: AppFontPreference.miSans,
       );
       expect(
         AppSetting.fromJson(setting.toJson()).fontPreference,
-        AppFontPreference.notoSans,
+        AppFontPreference.miSans,
       );
     });
 

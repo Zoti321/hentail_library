@@ -527,7 +527,7 @@ abstract class AppLocalizations {
   /// No description provided for @fontPreferenceMiSans.
   ///
   /// In zh, this message translates to:
-  /// **'小米字体'**
+  /// **'MI_Sans_Regular'**
   String get fontPreferenceMiSans;
 
   /// No description provided for @fontPreferenceNotoSans.

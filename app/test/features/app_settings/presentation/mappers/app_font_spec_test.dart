@@ -34,7 +34,10 @@ void main() {
         appFontSpecFor(AppFontPreference.notoSans).family,
         kAppFontFamilyNotoSans,
       );
-      expect(appFontSpecFor(AppFontPreference.miSans).family, kAppFontFamily);
+      expect(
+        appFontSpecFor(AppFontPreference.miSans).family,
+        kAppFontFamilyMiSans,
+      );
     });
   });
 

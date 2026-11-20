@@ -31,7 +31,7 @@ abstract class AppSetting with _$AppSetting {
     /// 系统动态配色：开启后以平台强调色为 seed（ADR-0037）。
     @Default(false) bool useDynamicColor,
     @Default(AppLocalePreference.system) AppLocalePreference localePreference,
-    @Default(AppFontPreference.miSans) AppFontPreference fontPreference,
+    @Default(AppFontPreference.notoSans) AppFontPreference fontPreference,
 
     /// 阅读模式持久化 id（`reader` 的 `ReadingMode` 值域，见 [ReadingPreferenceSchema]）。
     @JsonKey(name: 'readingMode')
@@ -183,7 +183,7 @@ enum AppLocalePreference {
   en,
 }
 
-/// UI 字体族：小米字体 / Noto Sans（SC/JP 仅作 i18n fallback，不进设置项）。
+/// UI 字体族：MI_Sans_Regular / Noto Sans（SC/JP 仅作 i18n fallback，不进设置项）。
 @JsonEnum(alwaysCreate: true)
 enum AppFontPreference {
   @JsonValue('miSans')

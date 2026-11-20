@@ -62,7 +62,7 @@ class _AppRootState extends ConsumerState<_AppRoot> {
           colorSchemePreference:
               setting?.colorSchemePreference ?? AppColorSchemePreference.brand,
           useDynamicColor: setting?.useDynamicColor ?? false,
-          fontPreference: setting?.fontPreference ?? AppFontPreference.miSans,
+          fontPreference: setting?.fontPreference ?? AppFontPreference.notoSans,
         );
       }),
     );

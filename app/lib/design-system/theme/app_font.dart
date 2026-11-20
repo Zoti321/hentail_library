@@ -7,8 +7,8 @@ const String kAppFontFamilyNotoSans = 'NotoSans';
 const String kAppFontFamilyNotoSansSc = 'NotoSansSC';
 const String kAppFontFamilyNotoSansJp = 'NotoSansJP';
 
-/// Default UI font（与历史硬编码 [kAppFontFamily] 对齐）。
-const String kAppFontFamily = kAppFontFamilyMiSans;
+/// Default UI font（与外观设置默认 [AppFontPreference.notoSans] 对齐）。
+const String kAppFontFamily = kAppFontFamilyNotoSans;
 
 /// CJK language variants bundled for i18n fallback（非设置可选项）。
 const List<String> kAppFontFamilyNotoCjkFallbacks = <String>[

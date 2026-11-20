@@ -258,7 +258,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsFontLabel => 'Font';
 
   @override
-  String get fontPreferenceMiSans => 'Mi Sans';
+  String get fontPreferenceMiSans => 'MI_Sans_Regular';
 
   @override
   String get fontPreferenceNotoSans => 'Noto Sans';

@@ -246,7 +246,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsFontLabel => '字体';
 
   @override
-  String get fontPreferenceMiSans => '小米字体';
+  String get fontPreferenceMiSans => 'MI_Sans_Regular';
 
   @override
   String get fontPreferenceNotoSans => 'Noto Sans';

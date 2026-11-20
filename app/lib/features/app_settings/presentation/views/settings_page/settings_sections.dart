@@ -192,7 +192,7 @@ class _FontTile extends ConsumerWidget {
     final AppFontPreference preference = ref.watch(
       settingsProvider.select(
         (AsyncValue<AppSetting> async) =>
-            async.asData?.value.fontPreference ?? AppFontPreference.miSans,
+            async.asData?.value.fontPreference ?? AppFontPreference.notoSans,
       ),
     );
     return SettingsNavigationTile(

@@ -33,7 +33,7 @@ Map<String, dynamic> migrateAppSettingJson(Map<String, dynamic> json) {
   migrated.putIfAbsent('useDynamicColor', () => false);
   migrated.putIfAbsent('colorSchemePreference', () => 'brand');
   migrated.putIfAbsent('preferLibraryRootSeries', () => true);
-  migrated.putIfAbsent('fontPreference', () => 'miSans');
+  migrated.putIfAbsent('fontPreference', () => 'notoSans');
   migrated.putIfAbsent('defaultLibraryDisplayTarget', () => 'comics');
   // 设置项仅保留 miSans / notoSans；旧 SC/JP 选项并入 Noto Sans。
   final Object? rawFont = migrated['fontPreference'];
