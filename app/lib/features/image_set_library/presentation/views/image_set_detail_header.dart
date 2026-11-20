@@ -45,7 +45,8 @@ class ImageSetDetailHeader extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             SizedBox(
-              width: 120,
+              key: const Key('imageSetDetailCover'),
+              width: 168,
               child: AspectRatio(
                 aspectRatio: 2 / 3,
                 child: ImageSetCover(

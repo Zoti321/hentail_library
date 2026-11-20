@@ -4,6 +4,7 @@ import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_catalog_query.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_library_gates.dart';
+import 'package:hentai_library/features/image_set_library/presentation/views/image_set_copy_images_action.dart';
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_detail_mutation_section.dart';
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_mutation_dialogs.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_facets.dart';
@@ -40,6 +41,7 @@ class ImageSetDetailPage extends ConsumerStatefulWidget {
 
 class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
   bool _manageMode = false;
+  bool _copying = false;
   final Set<String> _selectedIds = <String>{};
   late ImageSet _imageSet;
 
@@ -47,6 +49,37 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
   void initState() {
     super.initState();
     _imageSet = widget.imageSet;
+  }
+
+  bool get _canCopyIn {
+    final ImageSetLibraryGates? gates = ref
+        .watch(imageSetLibraryGatesProvider(widget.libraryId))
+        .asData
+        ?.value;
+    return gates?.resourceMutation == true &&
+        widget.carrierShape == ImageSetCarrierShape.directory;
+  }
+
+  Future<void> _copyImagesIn() async {
+    if (_copying || !_canCopyIn) {
+      return;
+    }
+    final List<String> paths = await pickImageSetCopySourcePaths(context);
+    if (paths.isEmpty || !mounted) {
+      return;
+    }
+    setState(() => _copying = true);
+    try {
+      await ref.read(imageSetCopyImagesInCommandProvider)(
+        widget.libraryId,
+        _imageSet.imageSetId,
+        paths,
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _copying = false);
+      }
+    }
   }
 
   ImageSetImagesKey get _imagesKey => (
@@ -205,6 +238,23 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
                               : null,
                           iconColor: theme.colorScheme.onSurfaceVariant,
                         ),
+                        if (_canCopyIn) ...<Widget>[
+                          SizedBox(width: theme.spacing.sm),
+                          M3EButton(
+                            key: const Key('imageSetDetailAdd'),
+                            onPressed: _copying ? null : _copyImagesIn,
+                            style: M3EButtonStyle.tonal,
+                            label: _copying
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : Text(l10n.imageSetMutationCopyImages),
+                          ),
+                        ],
                       ],
                     ),
             ),

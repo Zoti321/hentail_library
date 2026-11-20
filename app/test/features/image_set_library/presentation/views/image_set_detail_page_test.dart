@@ -405,7 +405,37 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('根目录压缩包图集不支持资源变更。'), findsOneWidget);
+    expect(find.byKey(const Key('imageSetDetailAdd')), findsNothing);
     expect(find.text('复制图片入库'), findsNothing);
+  });
+
+  testWidgets('detail cover is enlarged and tonal add shows when mutation on', (
+    WidgetTester tester,
+  ) async {
+    final _Probe probe = _Probe()
+      ..gates = const ImageSetLibraryGates(
+        resourceMutation: true,
+        managedLayout: false,
+      );
+    await _pumpDetail(tester, overrides: _overrides(probe));
+    await tester.pumpAndSettle();
+
+    final Size coverSize = tester.getSize(
+      find.byKey(const Key('imageSetDetailCover')),
+    );
+    expect(coverSize.width, greaterThanOrEqualTo(160));
+    expect(find.byKey(const Key('imageSetDetailAdd')), findsOneWidget);
+    expect(find.text('复制图片入库'), findsOneWidget);
+  });
+
+  testWidgets('tonal add hidden when resource mutation off', (
+    WidgetTester tester,
+  ) async {
+    final _Probe probe = _Probe();
+    await _pumpDetail(tester, overrides: _overrides(probe));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('imageSetDetailAdd')), findsNothing);
   });
 
   testWidgets('delete on disk confirm invokes command', (
