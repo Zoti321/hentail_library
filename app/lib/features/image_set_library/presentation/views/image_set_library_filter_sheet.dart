@@ -14,6 +14,8 @@ import 'package:material_symbols_icons/symbols.dart';
 const double _kSectionInset = 16;
 const double _kSortIconSlotWidth = 20;
 const double _kSortIconLabelGap = 8;
+const Duration _kFilterAccordionDuration = Duration(milliseconds: 200);
+const Curve _kFilterAccordionCurve = Curves.easeOutCubic;
 
 /// Adaptive filter/sort sheet for Image set browse (owner query; not Comic facade).
 abstract final class ImageSetLibraryFilterSheet {
@@ -26,7 +28,8 @@ abstract final class ImageSetLibraryFilterSheet {
       context,
     );
     final M3EThemeData m3e = withAppFontFamily(M3ETheme.of(context));
-    final String title = l10n.imageSetFilterSortTitle;
+    // Align sheet chrome title with comic library browse filter sheet.
+    final String title = l10n.libraryFilterSortTooltip;
     final Widget body = OverlayRouteScope(
       scope: scope,
       child: M3ETheme(
@@ -325,62 +328,74 @@ class _ImageSetFilterFields extends StatelessWidget {
   final TextEditingController characters;
   final VoidCallback onFacetTextChanged;
   final Future<void> Function(ImageSetBrowsePreferences next) onPrefsChanged;
-  final Future<void> Function(ImageSetBrowsePreferences base) onFacetPrefsChanged;
+  final Future<void> Function(ImageSetBrowsePreferences base)
+  onFacetPrefsChanged;
 
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     final M3EThemeData theme = M3ETheme.of(context);
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: _kSectionInset),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          SwitchListTile(
-            contentPadding: EdgeInsets.zero,
-            title: Text(l10n.imageSetFilterRequireImages),
-            value: prefs.requireImages,
-            onChanged: (bool value) =>
-                unawaited(onPrefsChanged(prefs.copyWith(requireImages: value))),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        _FilterAccordion(
+          title: l10n.imageSetFilterRequireImages,
+          child: _CheckboxOptionRow(
+            label: l10n.imageSetFilterRequireImages,
+            selected: prefs.requireImages,
+            onTap: () => unawaited(
+              onPrefsChanged(
+                prefs.copyWith(requireImages: !prefs.requireImages),
+              ),
+            ),
           ),
-          Text(
-            l10n.imageSetFilterCarrierShape,
-            style: theme.typeScale.titleSmall,
-          ),
-          SizedBox(height: theme.spacing.xs),
-          SegmentedButton<ImageSetCarrierShape?>(
-            segments: <ButtonSegment<ImageSetCarrierShape?>>[
-              ButtonSegment<ImageSetCarrierShape?>(
-                value: null,
-                label: Text(l10n.imageSetFilterCarrierAny),
-              ),
-              ButtonSegment<ImageSetCarrierShape?>(
-                value: ImageSetCarrierShape.directory,
-                label: Text(l10n.imageSetFilterCarrierDirectory),
-              ),
-              ButtonSegment<ImageSetCarrierShape?>(
-                value: ImageSetCarrierShape.rootArchive,
-                label: Text(l10n.imageSetFilterCarrierArchive),
-              ),
-            ],
-            selected: <ImageSetCarrierShape?>{prefs.carrierShape},
-            onSelectionChanged: (Set<ImageSetCarrierShape?> next) {
-              final ImageSetCarrierShape? shape = next.first;
-              unawaited(
-                onPrefsChanged(
-                  shape == null
-                      ? prefs.copyWith(clearCarrierShape: true)
-                      : prefs.copyWith(carrierShape: shape),
+        ),
+        _FilterAccordion(
+          title: l10n.imageSetFilterCarrierShape,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(
+              _kSectionInset,
+              0,
+              _kSectionInset,
+              8,
+            ),
+            child: SegmentedButton<ImageSetCarrierShape?>(
+              segments: <ButtonSegment<ImageSetCarrierShape?>>[
+                ButtonSegment<ImageSetCarrierShape?>(
+                  value: null,
+                  label: Text(l10n.imageSetFilterCarrierAny),
                 ),
-              );
-            },
+                ButtonSegment<ImageSetCarrierShape?>(
+                  value: ImageSetCarrierShape.directory,
+                  label: Text(l10n.imageSetFilterCarrierDirectory),
+                ),
+                ButtonSegment<ImageSetCarrierShape?>(
+                  value: ImageSetCarrierShape.rootArchive,
+                  label: Text(l10n.imageSetFilterCarrierArchive),
+                ),
+              ],
+              selected: <ImageSetCarrierShape?>{prefs.carrierShape},
+              onSelectionChanged: (Set<ImageSetCarrierShape?> next) {
+                final ImageSetCarrierShape? shape = next.first;
+                unawaited(
+                  onPrefsChanged(
+                    shape == null
+                        ? prefs.copyWith(clearCarrierShape: true)
+                        : prefs.copyWith(carrierShape: shape),
+                  ),
+                );
+              },
+            ),
           ),
-          SizedBox(height: theme.spacing.md),
-          _FacetField(
-            label: l10n.imageSetFilterAuthors,
+        ),
+        _FilterAccordion(
+          title: l10n.imageSetFilterAuthors,
+          child: _FacetAccordionBody(
             controller: authors,
+            fieldLabel: l10n.imageSetFilterAuthors,
             unassignedLabel: l10n.imageSetFilterAuthorsUnassigned,
             unassigned: prefs.authors.unassigned,
+            spacing: theme.spacing,
             onChanged: onFacetTextChanged,
             onUnassignedChanged: (bool value) => unawaited(
               onFacetPrefsChanged(
@@ -390,11 +405,15 @@ class _ImageSetFilterFields extends StatelessWidget {
               ),
             ),
           ),
-          _FacetField(
-            label: l10n.imageSetFilterTags,
+        ),
+        _FilterAccordion(
+          title: l10n.imageSetFilterTags,
+          child: _FacetAccordionBody(
             controller: tags,
+            fieldLabel: l10n.imageSetFilterTags,
             unassignedLabel: l10n.imageSetFilterTagsUnassigned,
             unassigned: prefs.tags.unassigned,
+            spacing: theme.spacing,
             onChanged: onFacetTextChanged,
             onUnassignedChanged: (bool value) => unawaited(
               onFacetPrefsChanged(
@@ -402,11 +421,15 @@ class _ImageSetFilterFields extends StatelessWidget {
               ),
             ),
           ),
-          _FacetField(
-            label: l10n.imageSetFilterParodies,
+        ),
+        _FilterAccordion(
+          title: l10n.imageSetFilterParodies,
+          child: _FacetAccordionBody(
             controller: parodies,
+            fieldLabel: l10n.imageSetFilterParodies,
             unassignedLabel: l10n.imageSetFilterParodiesUnassigned,
             unassigned: prefs.parodies.unassigned,
+            spacing: theme.spacing,
             onChanged: onFacetTextChanged,
             onUnassignedChanged: (bool value) => unawaited(
               onFacetPrefsChanged(
@@ -416,11 +439,15 @@ class _ImageSetFilterFields extends StatelessWidget {
               ),
             ),
           ),
-          _FacetField(
-            label: l10n.imageSetFilterCharacters,
+        ),
+        _FilterAccordion(
+          title: l10n.imageSetFilterCharacters,
+          child: _FacetAccordionBody(
             controller: characters,
+            fieldLabel: l10n.imageSetFilterCharacters,
             unassignedLabel: l10n.imageSetFilterCharactersUnassigned,
             unassigned: prefs.characters.unassigned,
+            spacing: theme.spacing,
             onChanged: onFacetTextChanged,
             onUnassignedChanged: (bool value) => unawaited(
               onFacetPrefsChanged(
@@ -430,7 +457,166 @@ class _ImageSetFilterFields extends StatelessWidget {
               ),
             ),
           ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Comic-aligned collapsible filter group (title + chevron).
+class _FilterAccordion extends StatefulWidget {
+  const _FilterAccordion({required this.title, required this.child});
+
+  final String title;
+  final Widget child;
+
+  @override
+  State<_FilterAccordion> createState() => _FilterAccordionState();
+}
+
+class _FilterAccordionState extends State<_FilterAccordion> {
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme cs = theme.colorScheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        InkWell(
+          onTap: () => setState(() => _expanded = !_expanded),
+          hoverColor: theme.hoverColor,
+          splashColor: theme.splashColor,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: _kSectionInset,
+              vertical: 10,
+            ),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: Text(
+                    widget.title,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                AnimatedRotation(
+                  turns: _expanded ? 0.5 : 0,
+                  duration: _kFilterAccordionDuration,
+                  curve: _kFilterAccordionCurve,
+                  child: Icon(
+                    LucideIcons.chevronDown,
+                    size: 16,
+                    color: cs.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        AnimatedSize(
+          duration: _kFilterAccordionDuration,
+          curve: _kFilterAccordionCurve,
+          alignment: Alignment.topCenter,
+          child: _expanded ? widget.child : const SizedBox.shrink(),
+        ),
+      ],
+    );
+  }
+}
+
+class _FacetAccordionBody extends StatelessWidget {
+  const _FacetAccordionBody({
+    required this.controller,
+    required this.fieldLabel,
+    required this.unassignedLabel,
+    required this.unassigned,
+    required this.spacing,
+    required this.onChanged,
+    required this.onUnassignedChanged,
+  });
+
+  final TextEditingController controller;
+  final String fieldLabel;
+  final String unassignedLabel;
+  final bool unassigned;
+  final M3ESpacing spacing;
+  final VoidCallback onChanged;
+  final ValueChanged<bool> onUnassignedChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        _kSectionInset,
+        0,
+        _kSectionInset,
+        spacing.sm,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          TextField(
+            controller: controller,
+            decoration: InputDecoration(labelText: fieldLabel),
+            onChanged: (_) => onChanged(),
+          ),
+          _CheckboxOptionRow(
+            label: unassignedLabel,
+            selected: unassigned,
+            onTap: () => onUnassignedChanged(!unassigned),
+            inset: false,
+          ),
         ],
+      ),
+    );
+  }
+}
+
+class _CheckboxOptionRow extends StatelessWidget {
+  const _CheckboxOptionRow({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+    this.inset = true,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+  final bool inset;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    return InkWell(
+      onTap: onTap,
+      hoverColor: theme.hoverColor,
+      splashColor: theme.splashColor,
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: inset ? _kSectionInset : 0,
+          vertical: 8,
+        ),
+        child: Row(
+          children: <Widget>[
+            SizedBox(
+              width: 20,
+              height: 20,
+              child: Checkbox(
+                value: selected,
+                onChanged: (_) => onTap(),
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                visualDensity: VisualDensity.compact,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(child: Text(label, style: theme.textTheme.bodyMedium)),
+          ],
+        ),
       ),
     );
   }
@@ -567,49 +753,6 @@ class _ImageSetSortRow extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _FacetField extends StatelessWidget {
-  const _FacetField({
-    required this.label,
-    required this.controller,
-    required this.unassignedLabel,
-    required this.unassigned,
-    required this.onChanged,
-    required this.onUnassignedChanged,
-  });
-
-  final String label;
-  final TextEditingController controller;
-  final String unassignedLabel;
-  final bool unassigned;
-  final VoidCallback onChanged;
-  final ValueChanged<bool> onUnassignedChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final M3EThemeData theme = M3ETheme.of(context);
-    return Padding(
-      padding: EdgeInsets.only(bottom: theme.spacing.md),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          TextField(
-            controller: controller,
-            decoration: InputDecoration(labelText: label),
-            onChanged: (_) => onChanged(),
-          ),
-          CheckboxListTile(
-            contentPadding: EdgeInsets.zero,
-            title: Text(unassignedLabel),
-            value: unassigned,
-            onChanged: (bool? value) => onUnassignedChanged(value ?? false),
-            controlAffinity: ListTileControlAffinity.leading,
-          ),
-        ],
       ),
     );
   }

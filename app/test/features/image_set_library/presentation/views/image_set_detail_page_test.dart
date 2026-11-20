@@ -436,13 +436,18 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('25 张'), findsOneWidget);
-    expect(find.byKey(const Key('imageSetDetailPager')), findsOneWidget);
     expect(find.byKey(const ValueKey<String>('i0')), findsOneWidget);
     expect(
       find.byKey(ValueKey<String>('i$kImageSetDetailImagePageSize')),
       findsNothing,
     );
 
+    await tester.scrollUntilVisible(
+      find.byKey(const Key('imageSetDetailPager'), skipOffstage: false),
+      200,
+    );
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('imageSetDetailPager')), findsOneWidget);
     await tester.tap(find.widgetWithText(PaginationPageButton, '2'));
     await tester.pumpAndSettle();
 

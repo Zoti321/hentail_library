@@ -251,6 +251,9 @@ void main() {
       findsOneWidget,
     );
     expect(find.byKey(const ValueKey<String>('imageSetFilterReset')), findsOneWidget);
+    expect(find.text('筛选、分组与排序'), findsOneWidget);
+    await tester.tap(find.text('作者（逗号分隔）'));
+    await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField).first, 'only-alpha');
     await tester.pump(const Duration(milliseconds: 400));
     await tester.pumpAndSettle();

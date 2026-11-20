@@ -510,10 +510,6 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
                   imageSet: _imageSet,
                   carrierShape: widget.carrierShape,
                 ),
-                if (pager != null) ...<Widget>[
-                  SizedBox(height: theme.spacing.md),
-                  pager,
-                ],
               ],
             ),
           ),
@@ -523,7 +519,7 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
             hasScrollBody: false,
             child: Center(child: Text(l10n.imageSetDetailEmpty)),
           )
-        else
+        else ...<Widget>[
           ImageSetRowGridSliver(
             key: const Key('imageSetDetailGallery'),
             itemCount: pageItems.length,
@@ -571,6 +567,17 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
               );
             },
           ),
+          if (pager != null)
+            SliverPadding(
+              padding: EdgeInsets.fromLTRB(
+                horizontalInset,
+                theme.spacing.md,
+                horizontalInset,
+                theme.spacing.sm,
+              ),
+              sliver: SliverToBoxAdapter(child: pager),
+            ),
+        ],
         SliverToBoxAdapter(child: SizedBox(height: theme.spacing.lg)),
       ],
     );

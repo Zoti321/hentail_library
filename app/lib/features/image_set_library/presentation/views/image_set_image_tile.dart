@@ -98,42 +98,13 @@ class ImageSetImageTile extends ConsumerWidget {
     final double opacity = image.excluded ? 0.45 : 1;
     final Color skeletonColor = theme.colorScheme.surfaceContainerHighest;
 
-    // Aspect is locked from header/codec probe before paint; solid fill sits
-    // under [Image.memory] so decode does not reflow neighbors.
-    final Widget imageBody = layout.when(
-      data: (ImageSetGalleryPageLayout page) => AspectRatio(
-        aspectRatio: page.aspectRatio,
-        child: Opacity(
-          opacity: opacity,
-          child: Stack(
-            fit: StackFit.expand,
-            children: <Widget>[
-              ColoredBox(color: skeletonColor),
-              Image.memory(
-                page.bytes,
-                fit: BoxFit.contain,
-                width: double.infinity,
-                height: double.infinity,
-                gaplessPlayback: true,
-                filterQuality: kCatalogImageFilterQuality,
-                errorBuilder: (
-                  BuildContext context,
-                  Object error,
-                  StackTrace? stackTrace,
-                ) => Icon(
-                  Icons.broken_image_outlined,
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      loading: () => AspectRatio(
-        aspectRatio: kImageSetGalleryFallbackAspectRatio,
-        child: ColoredBox(color: skeletonColor),
-      ),
-      error: (Object _, StackTrace _) => AspectRatio(
+    // Do not paint a fixed-grid skeleton: wait until aspect is probed, then
+    // lock AspectRatio and keep a solid fill under [Image.memory].
+    if (layout.isLoading) {
+      return const SizedBox.shrink();
+    }
+    if (layout.hasError) {
+      return AspectRatio(
         aspectRatio: kImageSetGalleryFallbackAspectRatio,
         child: ColoredBox(
           color: skeletonColor,
@@ -141,6 +112,35 @@ class ImageSetImageTile extends ConsumerWidget {
             Icons.broken_image_outlined,
             color: theme.colorScheme.onSurfaceVariant,
           ),
+        ),
+      );
+    }
+    final ImageSetGalleryPageLayout page = layout.requireValue;
+    final Widget imageBody = AspectRatio(
+      aspectRatio: page.aspectRatio,
+      child: Opacity(
+        opacity: opacity,
+        child: Stack(
+          fit: StackFit.expand,
+          children: <Widget>[
+            ColoredBox(color: skeletonColor),
+            Image.memory(
+              page.bytes,
+              fit: BoxFit.contain,
+              width: double.infinity,
+              height: double.infinity,
+              gaplessPlayback: true,
+              filterQuality: kCatalogImageFilterQuality,
+              errorBuilder: (
+                BuildContext context,
+                Object error,
+                StackTrace? stackTrace,
+              ) => Icon(
+                Icons.broken_image_outlined,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
         ),
       ),
     );
