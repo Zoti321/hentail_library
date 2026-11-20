@@ -407,6 +407,7 @@ pub async fn load_image_set_page_bytes_frb(
         member_path: image.member_path,
         carrier_kind: image.carrier_kind,
         name: image.name,
+        excluded: image.excluded,
     };
     core_load_image_set_page_bytes(&library_id, &core_image)
         .await
