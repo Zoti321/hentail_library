@@ -12,7 +12,7 @@ import 'init.dart';
 
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`
 
 Future<List<ImageSetDto>> listImageSetsFrb({required String libraryId}) =>
     RustLib.instance.api.crateApiImageSetListImageSetsFrb(libraryId: libraryId);
@@ -87,6 +87,52 @@ Future<Uint8List> loadImageSetPageBytesFrb({
 }) => RustLib.instance.api.crateApiImageSetLoadImageSetPageBytesFrb(
   libraryId: libraryId,
   image: image,
+);
+
+Future<ImageSetLibraryGatesDto> getImageSetLibraryGatesFrb({
+  required String libraryId,
+}) => RustLib.instance.api.crateApiImageSetGetImageSetLibraryGatesFrb(
+  libraryId: libraryId,
+);
+
+Future<void> setImageSetResourceMutationFrb({
+  required String libraryId,
+  required bool enabled,
+}) => RustLib.instance.api.crateApiImageSetSetImageSetResourceMutationFrb(
+  libraryId: libraryId,
+  enabled: enabled,
+);
+
+Future<void> setImageSetManagedLayoutFrb({
+  required String libraryId,
+  required bool enabled,
+}) => RustLib.instance.api.crateApiImageSetSetImageSetManagedLayoutFrb(
+  libraryId: libraryId,
+  enabled: enabled,
+);
+
+/// Catalog-only exclude/include for one or many Image set images.
+Future<void> setImageSetImagesExcludedFrb({
+  required String libraryId,
+  required String imageSetId,
+  required List<String> imageIds,
+  required bool excluded,
+}) => RustLib.instance.api.crateApiImageSetSetImageSetImagesExcludedFrb(
+  libraryId: libraryId,
+  imageSetId: imageSetId,
+  imageIds: imageIds,
+  excluded: excluded,
+);
+
+/// Authoritative full-set reorder (includes excluded members).
+Future<void> reorderImageSetImagesFrb({
+  required String libraryId,
+  required String imageSetId,
+  required List<String> orderedIds,
+}) => RustLib.instance.api.crateApiImageSetReorderImageSetImagesFrb(
+  libraryId: libraryId,
+  imageSetId: imageSetId,
+  orderedIds: orderedIds,
 );
 
 class ImageSetAuthorGroupDto {
@@ -325,6 +371,27 @@ class ImageSetImageDto {
           memberPath == other.memberPath &&
           carrierKind == other.carrierKind &&
           name == other.name;
+}
+
+class ImageSetLibraryGatesDto {
+  final bool resourceMutation;
+  final bool managedLayout;
+
+  const ImageSetLibraryGatesDto({
+    required this.resourceMutation,
+    required this.managedLayout,
+  });
+
+  @override
+  int get hashCode => resourceMutation.hashCode ^ managedLayout.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ImageSetLibraryGatesDto &&
+          runtimeType == other.runtimeType &&
+          resourceMutation == other.resourceMutation &&
+          managedLayout == other.managedLayout;
 }
 
 class ImageSetReaderSessionDto {

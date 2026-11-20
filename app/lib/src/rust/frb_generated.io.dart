@@ -377,6 +377,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ImageSetImageDto dco_decode_image_set_image_dto(dynamic raw);
 
   @protected
+  ImageSetLibraryGatesDto dco_decode_image_set_library_gates_dto(dynamic raw);
+
+  @protected
   ImageSetReaderSessionDto dco_decode_image_set_reader_session_dto(dynamic raw);
 
   @protected
@@ -1279,6 +1282,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ImageSetImageDto sse_decode_image_set_image_dto(SseDeserializer deserializer);
+
+  @protected
+  ImageSetLibraryGatesDto sse_decode_image_set_library_gates_dto(
+    SseDeserializer deserializer,
+  );
 
   @protected
   ImageSetReaderSessionDto sse_decode_image_set_reader_session_dto(
@@ -2403,6 +2411,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_image_set_image_dto(
     ImageSetImageDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_image_set_library_gates_dto(
+    ImageSetLibraryGatesDto self,
     SseSerializer serializer,
   );
 

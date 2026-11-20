@@ -7,11 +7,13 @@ mod archive_list;
 mod catalog;
 mod discovery;
 mod dto;
+mod gates;
 mod ids;
 mod meta;
 mod orchestrator;
 mod plan;
 mod query;
+mod workspace;
 mod writer;
 
 pub use catalog::{list_image_set_images, list_image_sets};
@@ -20,6 +22,10 @@ pub use dto::{
     ImageSetFacetFilterDto, ImageSetFilterDto, ImageSetGroupingDto, ImageSetImageDto,
     ImageSetSortFieldDto, ImageSetSortOptionDto, PagedImageSetCatalogDto,
 };
+pub use gates::{
+    get_image_set_library_gates, set_image_set_managed_layout, set_image_set_resource_mutation,
+    ImageSetLibraryGatesDto,
+};
 pub use meta::{
     get_image_set_facets, set_image_set_meta_locks, update_image_set_facets,
     update_image_set_user_meta, ImageSetFacetsDto, SetImageSetMetaLocksDto,
@@ -27,3 +33,4 @@ pub use meta::{
 };
 pub(crate) use orchestrator::sync_image_set_library;
 pub use query::fetch_image_sets_page;
+pub use workspace::{reorder_image_set_images, set_image_set_images_excluded};

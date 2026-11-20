@@ -1,11 +1,16 @@
 use hentai_core::{
     fetch_image_sets_page as core_fetch_page, get_image_set_facets as core_get_facets,
-    list_image_set_images as core_list_images, list_image_sets as core_list_sets,
-    load_image_set_page_bytes as core_load_image_set_page_bytes,
+    get_image_set_library_gates as core_get_gates, list_image_set_images as core_list_images,
+    list_image_sets as core_list_sets, load_image_set_page_bytes as core_load_image_set_page_bytes,
     open_image_set_reader as core_open_image_set_reader,
-    set_image_set_meta_locks as core_set_meta_locks, update_image_set_facets as core_update_facets,
-    update_image_set_user_meta as core_update_meta, ImageSetDto as CoreImageSet,
-    ImageSetFacetsDto as CoreFacets, ImageSetImageDto as CoreImageSetImage,
+    reorder_image_set_images as core_reorder_images,
+    set_image_set_images_excluded as core_set_excluded,
+    set_image_set_managed_layout as core_set_managed_layout,
+    set_image_set_meta_locks as core_set_meta_locks,
+    set_image_set_resource_mutation as core_set_resource_mutation,
+    update_image_set_facets as core_update_facets, update_image_set_user_meta as core_update_meta,
+    ImageSetDto as CoreImageSet, ImageSetFacetsDto as CoreFacets,
+    ImageSetImageDto as CoreImageSetImage, ImageSetLibraryGatesDto as CoreGates,
     ImageSetReaderSessionDto as CoreImageSetReaderSession, ImageSetSortFieldDto as CoreSortField,
     SetImageSetMetaLocksDto as CoreSetMetaLocks, UpdateImageSetFacetsDto as CoreUpdateFacets,
     UpdateImageSetUserMetaDto as CoreUpdateMeta,
@@ -380,6 +385,71 @@ pub async fn load_image_set_page_bytes_frb(
         name: image.name,
     };
     core_load_image_set_page_bytes(&library_id, &core_image)
+        .await
+        .map_err(HentaiErrorDto::from)
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ImageSetLibraryGatesDto {
+    pub resource_mutation: bool,
+    pub managed_layout: bool,
+}
+
+impl From<CoreGates> for ImageSetLibraryGatesDto {
+    fn from(value: CoreGates) -> Self {
+        Self {
+            resource_mutation: value.resource_mutation,
+            managed_layout: value.managed_layout,
+        }
+    }
+}
+
+pub async fn get_image_set_library_gates_frb(
+    library_id: String,
+) -> Result<ImageSetLibraryGatesDto, HentaiErrorDto> {
+    core_get_gates(&library_id)
+        .await
+        .map(ImageSetLibraryGatesDto::from)
+        .map_err(HentaiErrorDto::from)
+}
+
+pub async fn set_image_set_resource_mutation_frb(
+    library_id: String,
+    enabled: bool,
+) -> Result<(), HentaiErrorDto> {
+    core_set_resource_mutation(&library_id, enabled)
+        .await
+        .map_err(HentaiErrorDto::from)
+}
+
+pub async fn set_image_set_managed_layout_frb(
+    library_id: String,
+    enabled: bool,
+) -> Result<(), HentaiErrorDto> {
+    core_set_managed_layout(&library_id, enabled)
+        .await
+        .map_err(HentaiErrorDto::from)
+}
+
+/// Catalog-only exclude/include for one or many Image set images.
+pub async fn set_image_set_images_excluded_frb(
+    library_id: String,
+    image_set_id: String,
+    image_ids: Vec<String>,
+    excluded: bool,
+) -> Result<(), HentaiErrorDto> {
+    core_set_excluded(&library_id, &image_set_id, &image_ids, excluded)
+        .await
+        .map_err(HentaiErrorDto::from)
+}
+
+/// Authoritative full-set reorder (includes excluded members).
+pub async fn reorder_image_set_images_frb(
+    library_id: String,
+    image_set_id: String,
+    ordered_ids: Vec<String>,
+) -> Result<(), HentaiErrorDto> {
+    core_reorder_images(&library_id, &image_set_id, &ordered_ids)
         .await
         .map_err(HentaiErrorDto::from)
 }
