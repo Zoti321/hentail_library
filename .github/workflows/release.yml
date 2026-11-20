@@ -23,7 +23,7 @@ on:
         type: boolean
         default: false
       release_notes_header:
-        description: "Optional text prepended to CHANGELOG.md / fallback release notes"
+        description: "Optional text prepended to CHANGELOG.md release notes"
         required: false
         type: string
         default: ""
@@ -539,7 +539,15 @@ jobs:
           tag="${{ steps.meta.outputs.tag }}"
           version="${{ steps.meta.outputs.version }}"
           header="${{ github.event_name == 'workflow_dispatch' && github.event.inputs.release_notes_header || '' }}"
-          changelog_section="$(bash scripts/extract-changelog-section.sh "${version}" CHANGELOG.md || true)"
+          if [ ! -f CHANGELOG.md ]; then
+            echo "::error::CHANGELOG.md is missing; add Keep a Changelog entries before publishing ${tag}"
+            exit 1
+          fi
+          changelog_section="$(bash scripts/extract-changelog-section.sh "${version}" CHANGELOG.md)"
+          if [ -z "${changelog_section}" ]; then
+            echo "::error::CHANGELOG.md has no usable section for ${version}; move Unreleased notes into ## [${version}] - YYYY-MM-DD before tagging/publishing"
+            exit 1
+          fi
           generated="$(gh api \
             --method POST \
             "repos/${GITHUB_REPOSITORY}/releases/generate-notes" \
@@ -554,17 +562,7 @@ jobs:
               printf '%s\n\n' "${header}"
             fi
             echo '## 更新内容'
-            if [ -n "${changelog_section}" ]; then
-              printf '%s\n\n' "${changelog_section}"
-            else
-              echo "::warning::CHANGELOG.md has no usable section for ${version}; falling back to generate-notes"
-              normalized_bullets="$(printf '%s\n' "${generated}" | bash scripts/normalize-changelog-bullets.sh)"
-              if [ -n "${normalized_bullets}" ]; then
-                printf '%s\n\n' "${normalized_bullets}"
-              else
-                echo
-              fi
-            fi
+            printf '%s\n\n' "${changelog_section}"
             printf '%s\n\n' "${ios_notice}"
             printf '%s\n\n' "${windows_notice}"
             printf '%s\n' "${generated_footer}"
