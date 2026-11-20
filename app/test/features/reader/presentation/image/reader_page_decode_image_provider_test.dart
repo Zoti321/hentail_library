@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
@@ -22,48 +23,51 @@ Future<Uint8List> _pngBytes({required int width, required int height}) async {
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  test('pageDecodeSizeForImageBytes leaves ordinary pages uncapped', () async {
-    final Uint8List bytes = await _pngBytes(width: 40, height: 20);
-    final PageDecodeSize size = await pageDecodeSizeForImageBytes(bytes);
+  tearDown(() {
+    clearReaderImageCache();
+  });
 
-    expect(size.capped, isFalse);
-    expect(size.cacheWidth, isNull);
-    expect(size.cacheHeight, isNull);
+  test('obtainKey is path identity without probing dimensions', () async {
+    const ReaderPageDecodeImageProvider provider = ReaderPageDecodeImageProvider(
+      filePath: '/virtual/page.png',
+    );
+
+    final ReaderPageDecodeImageKey key = await provider.obtainKey(
+      ImageConfiguration.empty,
+    );
+
+    expect(key.path, '/virtual/page.png');
+    expect(key.memoryBytes, isNull);
+    expect(key.maxEdge, kReaderPageDecodeMaxEdge);
+  });
+
+  test('obtainKey uses identical memory bytes as identity', () async {
+    final Uint8List bytes = Uint8List.fromList(<int>[1, 2, 3]);
+    final ReaderPageDecodeImageProvider provider = ReaderPageDecodeImageProvider(
+      memoryBytes: bytes,
+    );
+
+    final ReaderPageDecodeImageKey key = await provider.obtainKey(
+      ImageConfiguration.empty,
+    );
+
+    expect(key.path, isNull);
+    expect(identical(key.memoryBytes, bytes), isTrue);
+  });
+
+  test('buildReaderImageProvider returns a max-edge provider for page bytes', () {
+    final ImageProvider<Object>? provider = buildReaderImageProvider(
+      memoryBytes: Uint8List.fromList(<int>[1, 2, 3]),
+    );
+
+    expect(provider, isA<ReaderPageDecodeImageProvider>());
+    final ReaderPageDecodeImageProvider typed =
+        provider! as ReaderPageDecodeImageProvider;
+    expect(typed.maxEdge, kReaderPageDecodeMaxEdge);
   });
 
   test(
-    'pageDecodeSizeForImageBytes caps when maxEdge is below source long edge',
-    () async {
-      final Uint8List bytes = await _pngBytes(width: 40, height: 20);
-      final PageDecodeSize size = await pageDecodeSizeForImageBytes(
-        bytes,
-        maxEdge: 20,
-      );
-
-      expect(size.capped, isTrue);
-      expect(size.cacheWidth, 20);
-      expect(size.cacheHeight, 10);
-    },
-  );
-
-  test(
-    'ReaderPageDecodeImageProvider obtainKey keeps null limits for ordinary pages',
-    () async {
-      final Uint8List bytes = await _pngBytes(width: 32, height: 16);
-      final ReaderPageDecodeImageProvider provider =
-          ReaderPageDecodeImageProvider(memoryBytes: bytes);
-
-      final ReaderPageDecodeImageKey key = await provider.obtainKey(
-        ImageConfiguration.empty,
-      );
-
-      expect(key.cacheWidth, isNull);
-      expect(key.cacheHeight, isNull);
-    },
-  );
-
-  test(
-    'ReaderPageDecodeImageProvider obtainKey applies max-edge without viewport size',
+    'loadImage caps decode when maxEdge is below source long edge',
     () async {
       final Uint8List bytes = await _pngBytes(width: 40, height: 20);
       final ReaderPageDecodeImageProvider provider =
@@ -72,25 +76,56 @@ void main() {
       final ReaderPageDecodeImageKey key = await provider.obtainKey(
         ImageConfiguration.empty,
       );
+      final ImageStreamCompleter completer = provider.loadImage(
+        key,
+        PaintingBinding.instance.instantiateImageCodecWithSize,
+      );
 
-      expect(key.cacheWidth, 20);
-      expect(key.cacheHeight, 10);
+      final ImageInfo info = await completer.completed;
+      expect(info.image.width, 20);
+      expect(info.image.height, 10);
+      info.dispose();
     },
   );
 
   test(
-    'buildReaderImageProvider returns a max-edge provider for page bytes',
-    () {
-      final ImageProvider<Object>? provider = buildReaderImageProvider(
-        memoryBytes: Uint8List.fromList(<int>[1, 2, 3]),
+    'loadImage keeps source resolution when within maxEdge',
+    () async {
+      final Uint8List bytes = await _pngBytes(width: 40, height: 20);
+      final ReaderPageDecodeImageProvider provider =
+          ReaderPageDecodeImageProvider(memoryBytes: bytes);
+
+      final ReaderPageDecodeImageKey key = await provider.obtainKey(
+        ImageConfiguration.empty,
+      );
+      final ImageStreamCompleter completer = provider.loadImage(
+        key,
+        PaintingBinding.instance.instantiateImageCodecWithSize,
       );
 
-      expect(provider, isA<ReaderPageDecodeImageProvider>());
-      final ReaderPageDecodeImageProvider typed =
-          provider! as ReaderPageDecodeImageProvider;
-      expect(typed.cacheWidth, isNull);
-      expect(typed.cacheHeight, isNull);
-      expect(typed.maxEdge, kReaderPageDecodeMaxEdge);
+      final ImageInfo info = await completer.completed;
+      expect(info.image.width, 40);
+      expect(info.image.height, 20);
+      info.dispose();
     },
   );
+}
+
+extension on ImageStreamCompleter {
+  Future<ImageInfo> get completed {
+    final Completer<ImageInfo> completer = Completer<ImageInfo>();
+    late ImageStreamListener listener;
+    listener = ImageStreamListener(
+      (ImageInfo info, bool synchronousCall) {
+        removeListener(listener);
+        completer.complete(info);
+      },
+      onError: (Object error, StackTrace? stackTrace) {
+        removeListener(listener);
+        completer.completeError(error, stackTrace);
+      },
+    );
+    addListener(listener);
+    return completer.future;
+  }
 }

@@ -15,7 +15,7 @@ import 'package:hentai_library/features/reader/domain/page_prefetch_window.dart'
 const String kReaderImageCacheName = 'reader';
 
 /// 短生命周期：预热读入的磁盘页字节，供显示侧复用同一 [Uint8List] 对象，
-/// 使 Memory provider 与 [precacheImage] 命中同一 [ImageCache] 钥匙。
+/// 避免 precache 后再读盘（与 [ImageCache] 中的解码位图正交）。
 final Map<String, Uint8List> _readerPathBytes = <String, Uint8List>{};
 
 void putReaderPathBytes(String path, Uint8List bytes) {
@@ -53,17 +53,8 @@ Future<void> forgetReaderCachedFile(String path) async {
   removeReaderPathBytes(trimmed);
   ensureReaderImageCacheConfigured();
   imageCaches[kReaderImageCacheName]?.evict(
-    ReaderPageDecodeImageKey(
-      bytes: Uint8List(0),
-      cacheWidth: null,
-      cacheHeight: null,
-      path: trimmed,
-    ),
+    ReaderPageDecodeImageKey(path: trimmed, maxEdge: kReaderPageDecodeMaxEdge),
   );
-  await ExtendedFileImageProvider(
-    File(trimmed),
-    imageCacheName: kReaderImageCacheName,
-  ).evict();
 }
 
 void clearReaderPathBytes() {
@@ -84,58 +75,23 @@ void clearReaderImageCache() {
   clearReaderPathBytes();
 }
 
-/// Probes encoded image dimensions and applies [pageDecodeSizeForSource].
-Future<PageDecodeSize> pageDecodeSizeForImageBytes(
-  Uint8List bytes, {
-  int maxEdge = kReaderPageDecodeMaxEdge,
-}) async {
-  if (bytes.isEmpty) {
-    return (cacheWidth: null, cacheHeight: null, capped: false);
-  }
-  final ui.ImmutableBuffer buffer = await ui.ImmutableBuffer.fromUint8List(
-    bytes,
-  );
-  final ui.ImageDescriptor descriptor = await ui.ImageDescriptor.encoded(
-    buffer,
-  );
-  try {
-    return pageDecodeSizeForSource(
-      sourceWidth: descriptor.width,
-      sourceHeight: descriptor.height,
-      maxEdge: maxEdge,
-    );
-  } finally {
-    descriptor.dispose();
-  }
-}
-
 ImageProvider<Object>? buildReaderImageProvider({
   String? filePath,
   Uint8List? memoryBytes,
-  int? cacheWidth,
-  int? cacheHeight,
 }) {
   ensureReaderImageCacheConfigured();
   final Uint8List? bytes = memoryBytes;
   if (bytes != null && bytes.isNotEmpty) {
-    return ReaderPageDecodeImageProvider(
-      memoryBytes: bytes,
-      cacheWidth: cacheWidth,
-      cacheHeight: cacheHeight,
-    );
+    return ReaderPageDecodeImageProvider(memoryBytes: bytes);
   }
   final String? resolvedPath = filePath?.trim();
   if (resolvedPath == null || resolvedPath.isEmpty) {
     return null;
   }
-  return ReaderPageDecodeImageProvider(
-    filePath: resolvedPath,
-    cacheWidth: cacheWidth,
-    cacheHeight: cacheHeight,
-  );
+  return ReaderPageDecodeImageProvider(filePath: resolvedPath);
 }
 
-/// 磁盘页缓存是否可交给 [ExtendedFileImageProvider]（存在且非空）。
+/// 磁盘页缓存是否可交给文件路径解码（存在且非空）。
 bool isUsableReaderCacheFile(String path) {
   final String trimmed = path.trim();
   if (trimmed.isEmpty) {
@@ -156,12 +112,10 @@ Future<void> precacheReaderImage({
   return precacheImage(provider, context);
 }
 
-/// 磁盘页预热：读入内存、登记 path→bytes，再 precache，使显示侧命中同一 provider。
+/// 磁盘页预热：读入内存、登记 path→bytes，再 precache，使显示侧免再读盘。
 Future<void> precacheReaderFilePath({
   required BuildContext context,
   required String filePath,
-  int? cacheWidth,
-  int? cacheHeight,
 }) async {
   final String trimmed = filePath.trim();
   if (!isUsableReaderCacheFile(trimmed)) {
@@ -175,8 +129,6 @@ Future<void> precacheReaderFilePath({
     putReaderPathBytes(trimmed, bytes);
     final ImageProvider<Object>? provider = buildReaderImageProvider(
       filePath: trimmed,
-      cacheWidth: cacheWidth,
-      cacheHeight: cacheHeight,
     );
     if (provider == null || !context.mounted) {
       return;
@@ -190,21 +142,13 @@ Future<void> precacheReaderFilePath({
 Future<void> precacheReaderPayload({
   required BuildContext context,
   required ReaderPagePayload page,
-  int? cacheWidth,
 }) async {
   if (!context.mounted) return;
   switch (page) {
     case ReaderPageFilePath(:final path):
-      await precacheReaderFilePath(
-        context: context,
-        filePath: path,
-        cacheWidth: cacheWidth,
-      );
+      await precacheReaderFilePath(context: context, filePath: path);
     case ReaderPageBytes(:final data):
-      final provider = buildReaderImageProvider(
-        memoryBytes: data,
-        cacheWidth: cacheWidth,
-      );
+      final provider = buildReaderImageProvider(memoryBytes: data);
       if (provider == null) return;
       try {
         await precacheReaderImage(context: context, provider: provider);
@@ -214,10 +158,11 @@ Future<void> precacheReaderPayload({
   }
 }
 
-/// Read session page [ImageProvider] that enforces max-edge decode safety.
+/// Read session page [ImageProvider] with max-edge decode safety.
 ///
-/// When [cacheWidth]/[cacheHeight] are both null, probes source size and
-/// applies [pageDecodeSizeForSource]; otherwise uses the explicit limits.
+/// [obtainKey] is cheap (path or bytes identity + [maxEdge] only). On cache
+/// miss, [loadImage] reads bytes once and decodes in a single pass via
+/// [ImageDecoderCallback] + [getTargetSize] applying [pageDecodeSizeForSource].
 @immutable
 class ReaderPageDecodeImageProvider
     extends ImageProvider<ReaderPageDecodeImageKey>
@@ -225,15 +170,11 @@ class ReaderPageDecodeImageProvider
   const ReaderPageDecodeImageProvider({
     this.filePath,
     this.memoryBytes,
-    this.cacheWidth,
-    this.cacheHeight,
     this.maxEdge = kReaderPageDecodeMaxEdge,
   });
 
   final String? filePath;
   final Uint8List? memoryBytes;
-  final int? cacheWidth;
-  final int? cacheHeight;
 
   /// Production default is [kReaderPageDecodeMaxEdge]; tests may lower it.
   final int maxEdge;
@@ -247,25 +188,22 @@ class ReaderPageDecodeImageProvider
   @override
   Future<ReaderPageDecodeImageKey> obtainKey(
     ImageConfiguration configuration,
-  ) async {
+  ) {
     ensureReaderImageCacheConfigured();
-    final Uint8List bytes = await _resolveBytes();
-    int? width = cacheWidth;
-    int? height = cacheHeight;
-    if (width == null && height == null) {
-      final PageDecodeSize size = await pageDecodeSizeForImageBytes(
-        bytes,
-        maxEdge: maxEdge,
-      );
-      width = size.cacheWidth;
-      height = size.cacheHeight;
-    }
     final String? path = filePath?.trim();
-    return ReaderPageDecodeImageKey(
-      bytes: bytes,
-      cacheWidth: width,
-      cacheHeight: height,
-      path: (path == null || path.isEmpty) ? null : path,
+    if (path != null && path.isNotEmpty) {
+      return SynchronousFuture<ReaderPageDecodeImageKey>(
+        ReaderPageDecodeImageKey(path: path, maxEdge: maxEdge),
+      );
+    }
+    final Uint8List? bytes = memoryBytes;
+    if (bytes == null || bytes.isEmpty) {
+      return Future<ReaderPageDecodeImageKey>.error(
+        StateError('ReaderPageDecodeImageProvider requires bytes or path'),
+      );
+    }
+    return SynchronousFuture<ReaderPageDecodeImageKey>(
+      ReaderPageDecodeImageKey(memoryBytes: bytes, maxEdge: maxEdge),
     );
   }
 
@@ -275,7 +213,7 @@ class ReaderPageDecodeImageProvider
     ImageDecoderCallback decode,
   ) {
     return MultiFrameImageStreamCompleter(
-      codec: _instantiateCodec(key),
+      codec: _instantiateCodec(key, decode),
       scale: 1,
       debugLabel: key.path ?? 'reader-page-bytes',
       informationCollector: () => <DiagnosticsNode>[
@@ -284,32 +222,44 @@ class ReaderPageDecodeImageProvider
     );
   }
 
-  Future<ui.Codec> _instantiateCodec(ReaderPageDecodeImageKey key) async {
+  /// Single decode pass: [decode]'s [getTargetSize] sees intrinsic size, then
+  /// [pageDecodeSizeForSource] chooses full resolution or max-edge targets.
+  Future<ui.Codec> _instantiateCodec(
+    ReaderPageDecodeImageKey key,
+    ImageDecoderCallback decode,
+  ) async {
+    final Uint8List bytes = await _resolveBytes(key);
     final ui.ImmutableBuffer buffer = await ui.ImmutableBuffer.fromUint8List(
-      key.bytes,
+      bytes,
     );
-    final ui.ImageDescriptor descriptor = await ui.ImageDescriptor.encoded(
+    return decode(
       buffer,
-    );
-    try {
-      if (key.cacheWidth != null || key.cacheHeight != null) {
-        return await descriptor.instantiateCodec(
-          targetWidth: key.cacheWidth,
-          targetHeight: key.cacheHeight,
+      getTargetSize: (int intrinsicWidth, int intrinsicHeight) {
+        final PageDecodeSize size = pageDecodeSizeForSource(
+          sourceWidth: intrinsicWidth,
+          sourceHeight: intrinsicHeight,
+          maxEdge: key.maxEdge,
         );
-      }
-      return await descriptor.instantiateCodec();
-    } finally {
-      descriptor.dispose();
-    }
+        if (!size.capped) {
+          return ui.TargetImageSize(
+            width: intrinsicWidth,
+            height: intrinsicHeight,
+          );
+        }
+        return ui.TargetImageSize(
+          width: size.cacheWidth,
+          height: size.cacheHeight,
+        );
+      },
+    );
   }
 
-  Future<Uint8List> _resolveBytes() async {
-    final Uint8List? memory = memoryBytes;
+  Future<Uint8List> _resolveBytes(ReaderPageDecodeImageKey key) async {
+    final Uint8List? memory = key.memoryBytes ?? memoryBytes;
     if (memory != null && memory.isNotEmpty) {
       return memory;
     }
-    final String? path = filePath?.trim();
+    final String? path = key.path ?? filePath?.trim();
     if (path == null || path.isEmpty) {
       throw StateError('ReaderPageDecodeImageProvider requires bytes or path');
     }
@@ -330,60 +280,49 @@ class ReaderPageDecodeImageProvider
     return other is ReaderPageDecodeImageProvider &&
         filePath == other.filePath &&
         identical(memoryBytes, other.memoryBytes) &&
-        cacheWidth == other.cacheWidth &&
-        cacheHeight == other.cacheHeight &&
         maxEdge == other.maxEdge;
   }
 
   @override
-  int get hashCode => Object.hash(
-    filePath,
-    identityHashCode(memoryBytes),
-    cacheWidth,
-    cacheHeight,
-    maxEdge,
-  );
+  int get hashCode =>
+      Object.hash(filePath, identityHashCode(memoryBytes), maxEdge);
 }
 
+/// Cheap cache identity for Read session page images.
 @immutable
 class ReaderPageDecodeImageKey {
   const ReaderPageDecodeImageKey({
-    required this.bytes,
-    required this.cacheWidth,
-    required this.cacheHeight,
     this.path,
+    this.memoryBytes,
+    required this.maxEdge,
   });
 
-  final Uint8List bytes;
-  final int? cacheWidth;
-  final int? cacheHeight;
   final String? path;
+  final Uint8List? memoryBytes;
+  final int maxEdge;
 
   @override
   bool operator ==(Object other) {
-    if (other is! ReaderPageDecodeImageKey) {
+    if (other is! ReaderPageDecodeImageKey || maxEdge != other.maxEdge) {
       return false;
     }
     final String? selfPath = path;
     final String? otherPath = other.path;
-    // File-backed pages: path is the stable cache identity (dims follow file).
     if (selfPath != null &&
         selfPath.isNotEmpty &&
         otherPath != null &&
         otherPath == selfPath) {
       return true;
     }
-    return identical(bytes, other.bytes) &&
-        cacheWidth == other.cacheWidth &&
-        cacheHeight == other.cacheHeight;
+    return identical(memoryBytes, other.memoryBytes);
   }
 
   @override
   int get hashCode {
     final String? selfPath = path;
     if (selfPath != null && selfPath.isNotEmpty) {
-      return selfPath.hashCode;
+      return Object.hash(selfPath, maxEdge);
     }
-    return Object.hash(identityHashCode(bytes), cacheWidth, cacheHeight);
+    return Object.hash(identityHashCode(memoryBytes), maxEdge);
   }
 }

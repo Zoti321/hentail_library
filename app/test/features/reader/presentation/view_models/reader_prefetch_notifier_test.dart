@@ -87,15 +87,13 @@ void main() {
       var mounted = true;
       final result = controller().precacheWindow(
         isMounted: () => mounted,
-        precachePage: (page, width) {
+        precachePage: (page) {
           decoded.add(page);
-          expect(width, 320);
           return pending.future;
         },
         comicId: 'comic',
         pageIndexesOneBased: {1, 2},
         imageList: images,
-        cacheWidth: 320,
       );
       expect(decoded, hasLength(1));
       mounted = false;
@@ -110,7 +108,7 @@ void main() {
     final decoded = <ReaderPagePayload>[];
     await controller().precacheWindow(
       isMounted: () => true,
-      precachePage: (page, _) async => decoded.add(page),
+      precachePage: (page) async => decoded.add(page),
       comicId: 'comic',
       pageIndexesOneBased: {1, 2},
       imageList: images,

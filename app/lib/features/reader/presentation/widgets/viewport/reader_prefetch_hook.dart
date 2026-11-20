@@ -36,8 +36,8 @@ void useReaderPrefetchWindow({
       // Defer warmWindow: useEffect can run during hook init/build, and
       // bumpGeneration must not modify providers mid-build (Riverpod assert).
       // Also lets viewport jumpToPage mount the landing page first.
-      // Page image fidelity: no viewport cacheWidth; max-edge safety is inside
-      // buildReaderImageProvider / ReaderPageDecodeImageProvider.
+      // Page image fidelity: no viewport cacheWidth; max-edge runs once inside
+      // ReaderPageDecodeImageProvider.loadImage (single decode + getTargetSize).
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!context.mounted) {
           return;
@@ -55,15 +55,11 @@ void useReaderPrefetchWindow({
           }
           await controller.precacheWindow(
             isMounted: () => context.mounted,
-            precachePage: (page, width) => precacheReaderPayload(
-              context: context,
-              page: page,
-              cacheWidth: width,
-            ),
+            precachePage: (page) =>
+                precacheReaderPayload(context: context, page: page),
             comicId: comicId,
             pageIndexesOneBased: targets,
             imageList: imageList,
-            cacheWidth: null,
             skipPageOneBased: centerPageOneBased,
           );
         }());

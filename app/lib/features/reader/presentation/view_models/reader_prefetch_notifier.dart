@@ -169,11 +169,10 @@ class ReaderPrefetchNotifier extends _$ReaderPrefetchNotifier {
 
   Future<void> precacheWindow({
     required bool Function() isMounted,
-    required Future<void> Function(ReaderPagePayload, int?) precachePage,
+    required Future<void> Function(ReaderPagePayload) precachePage,
     required String comicId,
     required Set<int> pageIndexesOneBased,
     required List<ReaderPageImageData> imageList,
-    int? cacheWidth,
     int? skipPageOneBased,
   }) async {
     if (pageIndexesOneBased.isEmpty || imageList.isEmpty) {
@@ -204,7 +203,6 @@ class ReaderPrefetchNotifier extends _$ReaderPrefetchNotifier {
         comicId: comicId,
         generation: generation,
         imageData: imageData,
-        cacheWidth: cacheWidth,
       );
     }
   }
@@ -223,14 +221,13 @@ class ReaderPrefetchNotifier extends _$ReaderPrefetchNotifier {
 
   Future<void> _precachePage({
     required bool Function() isMounted,
-    required Future<void> Function(ReaderPagePayload, int?) precachePage,
+    required Future<void> Function(ReaderPagePayload) precachePage,
     required String comicId,
     required int generation,
     required ReaderPageImageData imageData,
-    int? cacheWidth,
   }) async {
     if (imageData is ReaderDirPageImageData) {
-      await precachePage(ReaderPageFilePath(imageData.file.path), cacheWidth);
+      await precachePage(ReaderPageFilePath(imageData.file.path));
       return;
     }
     if (imageData is! ReaderArchivePageImageData) {
@@ -250,7 +247,7 @@ class ReaderPrefetchNotifier extends _$ReaderPrefetchNotifier {
         !isMounted()) {
       return;
     }
-    await precachePage(page, cacheWidth);
+    await precachePage(page);
   }
 
   Future<void> warmOpenComic({

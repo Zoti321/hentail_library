@@ -5,11 +5,12 @@ import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 
 /// Builds a reader-scoped [ImageProvider] (injected from read_session).
+///
+/// Reader decode size is owned by the provider (max-edge policy); do not pass
+/// viewport [cacheWidth]/[cacheHeight] here.
 typedef ReaderComicImageProviderBuilder = ImageProvider<Object>? Function({
   String? filePath,
   Uint8List? memoryBytes,
-  int? cacheWidth,
-  int? cacheHeight,
 });
 
 class AppComicImage extends StatelessWidget {
@@ -69,12 +70,7 @@ class AppComicImage extends StatelessWidget {
           readerImageProviderBuilder;
       final ImageProvider<Object>? provider = buildProvider == null
           ? null
-          : buildProvider(
-              filePath: filePath,
-              memoryBytes: memoryBytes,
-              cacheWidth: cacheWidth,
-              cacheHeight: cacheHeight,
-            );
+          : buildProvider(filePath: filePath, memoryBytes: memoryBytes);
       if (provider == null) {
         return errorWidget;
       }
