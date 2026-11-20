@@ -12,6 +12,10 @@ pub struct Model {
     pub member_path: String,
     pub carrier_kind: String,
     pub name: String,
+    /// Workspace user order within the Image set (ADR-0064).
+    pub sort_order: i64,
+    /// When true, hidden from default workspace list/Read (ADR-0064).
+    pub excluded: bool,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

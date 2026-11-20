@@ -13,6 +13,8 @@ pub mod comic_thumbnails;
 pub mod comics;
 pub mod image_set_carriers;
 pub mod image_set_images;
+pub mod image_set_submission_members;
+pub mod image_set_submissions;
 pub mod image_sets;
 pub mod libraries;
 pub mod library_resource_snapshots;
@@ -39,6 +41,8 @@ pub mod prelude {
     pub use super::comics::Entity as Comics;
     pub use super::image_set_carriers::Entity as ImageSetCarriers;
     pub use super::image_set_images::Entity as ImageSetImages;
+    pub use super::image_set_submission_members::Entity as ImageSetSubmissionMembers;
+    pub use super::image_set_submissions::Entity as ImageSetSubmissions;
     pub use super::image_sets::Entity as ImageSets;
     pub use super::libraries::Entity as Libraries;
     pub use super::library_resource_snapshots::Entity as LibraryResourceSnapshots;

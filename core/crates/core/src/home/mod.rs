@@ -453,6 +453,8 @@ mod tests {
             sidebar_order: 0,
             last_successful_sync_at,
             last_sync_error: last_sync_error.map(str::to_string),
+            image_set_resource_mutation: 0,
+            image_set_managed_layout: 0,
         }
     }
 

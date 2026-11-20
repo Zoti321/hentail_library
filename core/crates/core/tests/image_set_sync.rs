@@ -454,3 +454,183 @@ fn deleting_library_cascades_image_set_catalog() {
         assert_eq!(fixture.catalog().len(), 0);
     });
 }
+
+#[test]
+fn workspace_list_honors_user_order_and_skips_excluded() {
+    common::with_global_db(|| {
+        let fixture = Fixture::new("workspace_order.sqlite");
+        write_file(&fixture.root.join("album/a.jpg"), b"a");
+        write_file(&fixture.root.join("album/b.jpg"), b"b");
+        write_file(&fixture.root.join("album/c.jpg"), b"c");
+        fixture.sync();
+        let set = fixture.set("album");
+        let images = fixture
+            .runtime
+            .block_on(list_image_set_images(&fixture.library_id, &set.image_set_id))
+            .expect("images");
+        assert_eq!(
+            images
+                .iter()
+                .map(|i| i.name.as_str())
+                .collect::<Vec<_>>(),
+            vec!["a.jpg", "b.jpg", "c.jpg"]
+        );
+
+        fixture.runtime.block_on(async {
+            let db = connection().expect("db");
+            db.execute(Statement::from_string(
+                DatabaseBackend::Sqlite,
+                format!(
+                    "UPDATE image_set_images SET sort_order = 2 WHERE image_set_image_id = '{}';
+                     UPDATE image_set_images SET sort_order = 0 WHERE image_set_image_id = '{}';
+                     UPDATE image_set_images SET sort_order = 1, excluded = 1 WHERE image_set_image_id = '{}';",
+                    images[0].image_set_image_id,
+                    images[2].image_set_image_id,
+                    images[1].image_set_image_id,
+                ),
+            ))
+            .await
+            .expect("reorder+exclude");
+        });
+
+        let listed = fixture
+            .runtime
+            .block_on(list_image_set_images(&fixture.library_id, &set.image_set_id))
+            .expect("images");
+        assert_eq!(
+            listed
+                .iter()
+                .map(|i| i.name.as_str())
+                .collect::<Vec<_>>(),
+            vec!["c.jpg", "a.jpg"]
+        );
+    });
+}
+
+#[test]
+fn sync_preserves_exclude_and_appends_new_images_after_user_order() {
+    common::with_global_db(|| {
+        let fixture = Fixture::new("workspace_sync.sqlite");
+        write_file(&fixture.root.join("album/a.jpg"), b"a");
+        write_file(&fixture.root.join("album/b.jpg"), b"b");
+        fixture.sync();
+        let set = fixture.set("album");
+        let before = fixture
+            .runtime
+            .block_on(list_image_set_images(&fixture.library_id, &set.image_set_id))
+            .expect("images");
+        assert_eq!(before.len(), 2);
+
+        fixture.runtime.block_on(async {
+            let db = connection().expect("db");
+            db.execute(Statement::from_string(
+                DatabaseBackend::Sqlite,
+                format!(
+                    "UPDATE image_set_images SET excluded = 1 WHERE image_set_image_id = '{}';
+                     UPDATE image_set_images SET sort_order = 5 WHERE image_set_image_id = '{}';
+                     UPDATE image_set_images SET sort_order = 1 WHERE image_set_image_id = '{}';",
+                    before[0].image_set_image_id,
+                    before[1].image_set_image_id,
+                    before[0].image_set_image_id,
+                ),
+            ))
+            .await
+            .expect("mutate workspace");
+        });
+
+        write_file(&fixture.root.join("album/c.jpg"), b"c");
+        fixture.sync();
+
+        let listed = fixture
+            .runtime
+            .block_on(list_image_set_images(&fixture.library_id, &set.image_set_id))
+            .expect("images");
+        assert_eq!(
+            listed
+                .iter()
+                .map(|i| i.name.as_str())
+                .collect::<Vec<_>>(),
+            vec!["b.jpg", "c.jpg"]
+        );
+
+        fixture.runtime.block_on(async {
+            let db = connection().expect("db");
+            let rows = db
+                .query_all(Statement::from_string(
+                    DatabaseBackend::Sqlite,
+                    format!(
+                        "SELECT name, sort_order, excluded FROM image_set_images \
+                         WHERE image_set_id = '{}' ORDER BY sort_order, name",
+                        set.image_set_id
+                    ),
+                ))
+                .await
+                .expect("query");
+            let snapshot: Vec<(String, i64, i64)> = rows
+                .iter()
+                .map(|row| {
+                    (
+                        row.try_get::<String>("", "name").expect("name"),
+                        row.try_get::<i64>("", "sort_order").expect("order"),
+                        row.try_get::<i64>("", "excluded").expect("excluded"),
+                    )
+                })
+                .collect();
+            assert_eq!(
+                snapshot,
+                vec![
+                    ("a.jpg".into(), 1, 1),
+                    ("b.jpg".into(), 5, 0),
+                    ("c.jpg".into(), 6, 0),
+                ]
+            );
+        });
+    });
+}
+
+#[test]
+fn workspace_schema_has_submissions_and_library_gates() {
+    common::with_global_db(|| {
+        let fixture = Fixture::new("workspace_schema.sqlite");
+        fixture.runtime.block_on(async {
+            let db = connection().expect("db");
+            for table in [
+                "image_set_submissions",
+                "image_set_submission_members",
+            ] {
+                let rows = db
+                    .query_all(Statement::from_string(
+                        DatabaseBackend::Sqlite,
+                        format!(
+                            "SELECT 1 FROM sqlite_master WHERE type='table' AND name='{table}'"
+                        ),
+                    ))
+                    .await
+                    .expect("master");
+                assert!(!rows.is_empty(), "missing {table}");
+            }
+            let row = db
+                .query_one(Statement::from_string(
+                    DatabaseBackend::Sqlite,
+                    format!(
+                        "SELECT image_set_resource_mutation, image_set_managed_layout \
+                         FROM libraries WHERE library_id = '{}'",
+                        fixture.library_id
+                    ),
+                ))
+                .await
+                .expect("query")
+                .expect("library row");
+            assert_eq!(
+                row.try_get::<i64>("", "image_set_resource_mutation")
+                    .expect("mutation"),
+                0
+            );
+            assert_eq!(
+                row.try_get::<i64>("", "image_set_managed_layout")
+                    .expect("layout"),
+                0
+            );
+        });
+    });
+}

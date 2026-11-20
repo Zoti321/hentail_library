@@ -33,7 +33,7 @@ pub async fn list_image_sets(library_id: &str) -> Result<Vec<ImageSetDto>, Henta
         .collect())
 }
 
-/// Image set images of one set, in natural order of their location keys.
+/// Default workspace view: non-excluded images in user `sort_order` (ADR-0064).
 pub async fn list_image_set_images(
     library_id: &str,
     image_set_id: &str,
@@ -42,10 +42,15 @@ pub async fn list_image_set_images(
     let mut rows = image_set_images::Entity::find()
         .filter(image_set_images::Column::LibraryId.eq(library_id))
         .filter(image_set_images::Column::ImageSetId.eq(image_set_id))
+        .filter(image_set_images::Column::Excluded.eq(false))
         .all(&db)
         .await
         .map_err(|e| map_db_err(&e))?;
-    rows.sort_by(|a, b| compare_filename_natural(&location_key(a), &location_key(b)));
+    rows.sort_by(|a, b| {
+        a.sort_order
+            .cmp(&b.sort_order)
+            .then_with(|| a.image_set_image_id.cmp(&b.image_set_image_id))
+    });
     Ok(rows
         .into_iter()
         .map(|row| ImageSetImageDto {
@@ -58,12 +63,4 @@ pub async fn list_image_set_images(
             name: row.name,
         })
         .collect())
-}
-
-fn location_key(row: &image_set_images::Model) -> String {
-    if row.member_path.is_empty() {
-        row.carrier_relative_path.clone()
-    } else {
-        format!("{}/{}", row.carrier_relative_path, row.member_path)
-    }
 }

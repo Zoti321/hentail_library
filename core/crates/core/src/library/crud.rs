@@ -184,6 +184,8 @@ async fn create_local_library_with_catalog(
         sidebar_order: Set(sidebar_order),
         last_successful_sync_at: Set(None),
         last_sync_error: Set(None),
+        image_set_resource_mutation: Set(0),
+        image_set_managed_layout: Set(0),
     };
     Libraries::insert(active)
         .exec(&db)
@@ -268,6 +270,8 @@ pub async fn create_remote_library(
         sidebar_order: Set(sidebar_order),
         last_successful_sync_at: Set(None),
         last_sync_error: Set(None),
+        image_set_resource_mutation: Set(0),
+        image_set_managed_layout: Set(0),
     };
     Libraries::insert(active)
         .exec(&db)

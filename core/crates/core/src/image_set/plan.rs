@@ -2,6 +2,7 @@ use std::collections::{BTreeSet, HashMap, HashSet};
 
 use crate::entity::{image_set_carriers, image_set_images, image_sets};
 use crate::metadata_lock::merge_scanned_text;
+use crate::util::natural_sort::compare_filename_natural;
 
 use super::discovery::{CarrierObs, LibraryObs, Listing, SetObs};
 use super::dto::CarrierKind;
@@ -314,11 +315,15 @@ fn diff(
             .collect(),
         carriers_delete,
         carriers_insert,
-        images_insert: desired_images
-            .iter()
-            .filter(|i| !prior_images.contains_key(i.image_set_image_id.as_str()))
-            .cloned()
-            .collect(),
+        images_insert: {
+            let mut inserts: Vec<_> = desired_images
+                .iter()
+                .filter(|i| !prior_images.contains_key(i.image_set_image_id.as_str()))
+                .cloned()
+                .collect();
+            assign_append_sort_orders(&mut inserts, &prior.images);
+            inserts
+        },
         images_delete: prior
             .images
             .iter()
@@ -330,6 +335,48 @@ fn diff(
             .filter(|i| prior_images.contains_key(i.image_set_image_id.as_str()))
             .count(),
         warnings: obs.warnings.clone(),
+    }
+}
+
+/// New images append after the set's current max `sort_order`; first sync ranks by location natural order.
+fn assign_append_sort_orders(
+    inserts: &mut [image_set_images::Model],
+    prior: &[image_set_images::Model],
+) {
+    let mut max_by_set: HashMap<String, i64> = HashMap::new();
+    for image in prior {
+        let entry = max_by_set.entry(image.image_set_id.clone()).or_insert(-1);
+        *entry = (*entry).max(image.sort_order);
+    }
+    let mut indexes_by_set: HashMap<String, Vec<usize>> = HashMap::new();
+    for (index, image) in inserts.iter().enumerate() {
+        indexes_by_set
+            .entry(image.image_set_id.clone())
+            .or_default()
+            .push(index);
+    }
+    for (set_id, mut indexes) in indexes_by_set {
+        indexes.sort_by(|&a, &b| {
+            compare_filename_natural(&location_key(&inserts[a]), &location_key(&inserts[b]))
+                .then_with(|| {
+                    inserts[a]
+                        .image_set_image_id
+                        .cmp(&inserts[b].image_set_image_id)
+                })
+        });
+        let mut next = max_by_set.get(&set_id).copied().unwrap_or(-1).saturating_add(1);
+        for index in indexes {
+            inserts[index].sort_order = next;
+            next = next.saturating_add(1);
+        }
+    }
+}
+
+fn location_key(row: &image_set_images::Model) -> String {
+    if row.member_path.is_empty() {
+        row.carrier_relative_path.clone()
+    } else {
+        format!("{}/{}", row.carrier_relative_path, row.member_path)
     }
 }
 
@@ -387,5 +434,7 @@ fn image_row(
         member_path: member_path.to_string(),
         carrier_kind: kind.as_str().to_string(),
         name: name.to_string(),
+        sort_order: 0,
+        excluded: false,
     }
 }

@@ -30,6 +30,10 @@ pub struct Model {
     pub last_successful_sync_at: Option<i64>,
     /// Last sync failure message; null after a successful sync.
     pub last_sync_error: Option<String>,
+    /// Image set resource mutation opt-in (0/1); meaningful for Image set libraries.
+    pub image_set_resource_mutation: i32,
+    /// Image set managed layout opt-in (0/1); meaningful for Image set libraries.
+    pub image_set_managed_layout: i32,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
