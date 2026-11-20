@@ -330,7 +330,7 @@ _Avoid_: View as the display-shell suffix, Page without a production route.
 
 ## Reading
 
-**Reader**: Product module `features/reader/`: page IO, viewport/chrome, settings, Series volume navigation and Read session orchestration. ADR-0038; names in [reader-ddd-lexicon.md](docs/engineering/reader-ddd-lexicon.md).
+**Reader**: Product module `features/reader/`: page IO, viewport/chrome, settings, Series volume navigation and Read session orchestration. ADR-0038; names in [domain-naming.md](docs/engineering/domain-naming.md).
 _Avoid_: read_session module, Reading module ambiguous with history/stats.
 
 **Read session**: Lifecycle opened from a Read session source (Comic by comicId, or Image set by library/image-set identity and start index or Image set image identity), with options such as incognito. There are no standalone/Series session modes or seriesId input. Reading history and reading activity apply only to non-incognito Comic sessions; Image set sessions do not persist progress. Comic exit returns to the Comic detail page; Image set exit pops the stacked reader route. Image set sessions may move to the previous/next non-empty Image set of the same library in Image set catalog order (no wrap) or to an existing set by id; each move opens a new Read session source. Remote Comic Resources stream without whole-book disk caching. Entity/orchestration belong to Reader. ADR-0005/0038/0061.

@@ -106,4 +106,4 @@ UI 组合边不直接跨 feature import，改为 **Slot 契约**（`shared/ui/sl
 
 - ADR-0002、ADR-0033、ADR-0034、ADR-0035、ADR-0036、ADR-0039、ADR-0040、ADR-0041
 - GitHub [#490](https://github.com/Zoti321/hentail_library/issues/490)（S1 #491 / S2 #492 / S3 #493 / S4 #494）
-- `docs/engineering/shared-domain-ownership.md`、`docs/engineering/library-browse-zones.md`、`docs/engineering/gate.md`
+- `docs/engineering/shared-domain-ownership.md`、`docs/engineering/cross-feature-collaboration.md`、`docs/engineering/gate.md`

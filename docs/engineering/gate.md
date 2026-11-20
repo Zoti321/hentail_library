@@ -92,7 +92,7 @@ Run affected tests from `app/`; current rules and baselines are the source of tr
 - `test/gate/domain_event_rules_test.dart`: shared event vocabulary, permitted publishers and one bus implementation.
 - `test/design-system/design_system_boundary_test.dart`, `design_system_dependency_policy_test.dart`: independent UI dependencies and the sole explicit public entry.
 
-Regenerate a boundary baseline only for an intentional, reviewed architecture change; remove stale entries rather than expanding an exemption to make a move pass. See [layout](feature-data-layout.md), [collaboration](cross-feature-collaboration.md) and [design system](design-system.md) for the relevant decisions.
+Regenerate a boundary baseline only for an intentional, reviewed architecture change; remove stale entries rather than expanding an exemption to make a move pass. See [collaboration](cross-feature-collaboration.md), [ownership](shared-domain-ownership.md) and [design system](design-system.md) for the relevant decisions.
 
 ## Core consistency regressions
 

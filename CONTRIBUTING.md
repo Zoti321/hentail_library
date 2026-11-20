@@ -19,7 +19,7 @@ PR 测试范围由 `app/test/gate/manifest.txt` 统一维护；目录项已覆�
 - [AGENTS](AGENTS.md)：Agent 按任务读取的入口。
 - [GLOSSARY](GLOSSARY.md)：领域术语；issue、PR 和代码使用一致词汇。
 - [架构决策](docs/adr/README.md)：决策与修订关系。
-- [工程指南](docs/engineering/README.md)：目录职责、模块协作、设计系统、测试和维护操作。
+- [工程指南](docs/engineering/README.md)：模块协作、领域所有权/命名、设计系统、测试和维护操作。
 - [Issue 约定](docs/agents/issue-tracker.md)、[分拣标签](docs/agents/triage-labels.md)：GitHub 协作流程。
 - [脚本说明](scripts/README.md)：长期维护脚本及调用方。
 

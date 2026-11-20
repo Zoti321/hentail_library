@@ -15,7 +15,7 @@ ADR-0005 已统一 **Read session** 语义（仅 comicId；进度只写 Reading 
 1. Flutter Wayfinder product module 路径与门禁模块 id：**`read_session` → `reader`**（`app/lib/features/reader/`）。
 2. Glossary：**Reader** = 阅读器 product module；**Read session** = 领域会话概念，owner 落在 `features/reader/domain/`。
 3. 跨 feature 启动动词对齐模块：`openReader` / `ReaderLaunchPort`；打开的仍是一次 Read session（ADR-0005）。
-4. 命名词典与分层卫生（实体 `ReadSession`、application `OpenReadSessionService` / `CopyPageImageService`、port `NativeReaderPort` 等）随本 ADR 落地；细则见 `docs/engineering/reader-ddd-lexicon.md`。
+4. 命名词典与分层卫生（实体 `ReadSession`、application `OpenReadSessionService` / `CopyPageImageService`、port `NativeReaderPort` 等）随本 ADR 落地；细则见 `docs/engineering/domain-naming.md`。
 5. Rust `core/src/reader` **不改名**（已是 reader）。
 
 > **实现修订（2026-11-18）**：application 编排按 ADR-0050 改为具体 UseCase 命名（`OpenReadSessionUseCase` / `ManageReadSessionUseCase` / `CopyPageImageUseCase`）；多源会话与 Capabilities 见 ADR-0061。
@@ -35,4 +35,4 @@ ADR-0005 已统一 **Read session** 语义（仅 comicId；进度只写 Reading 
 
 - ADR-0005（Read session 语义不变）
 - ADR-0033 / ADR-0034（application 与 public 边界）
-- `docs/engineering/reader-ddd-lexicon.md`
+- `docs/engineering/domain-naming.md`

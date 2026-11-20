@@ -4,7 +4,7 @@
 
 Accepted; session-entry wording (comicId-only) partially superseded by ADR-0061. Comic progress, Series reading context and volume-switch rules remain in force.
 
-> **实现修订（2026-11-09）**：Flutter Wayfinder **product module** 目录由 `features/reader/` 更名为 `features/reader/`（ADR-0038）。本文 **Read session** 会话语义不变；模块路径与跨 feature 启动口见 ADR-0038 与 `docs/engineering/reader-ddd-lexicon.md`。
+> **实现修订（2026-11-09）**：Flutter Wayfinder **product module** 目录由 `features/reader/` 更名为 `features/reader/`（ADR-0038）。本文 **Read session** 会话语义不变；模块路径与跨 feature 启动口见 ADR-0038 与 `docs/engineering/domain-naming.md`。
 >
 > **实现修订（2026-11-18）**：Image set 经 `ReadSessionSource` 打开同一 Reader 模块；入口与能力组合见 ADR-0061。本文关于 Comic 进度、无痕与 Series context 的 Decision 仍适用。
 

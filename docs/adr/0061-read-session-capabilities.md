@@ -36,4 +36,4 @@ Shared needs (viewport, chrome/fullscreen, page fidelity, single-session auto-pl
 - ADR-0005 (Comic progress / Series context; entry wording superseded here)
 - ADR-0038 (Reader product module)
 - ADR-0060 (Page image fidelity for Comic and Image set)
-- `docs/engineering/reader-ddd-lexicon.md`
+- `docs/engineering/domain-naming.md`

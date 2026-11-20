@@ -8,7 +8,7 @@ Accepted；**Series owner 面与模块边由 [ADR-0042](0042-series-entity-owner
 
 ## Context
 
-`library_browse` 同时承担单本 Comic、Series、库页双 Tab 壳与作者详情，虽已有内部分区文档（`library-browse-zones.md`），但 **Wayfinder module id** 仍为单一 feature，cross-feature public 图、Application 编排与 Gate 模块图可读性不足。Epic [#436](https://github.com/Zoti321/hentail_library/issues/436) 已将多数 Dart 域真源 owner 化；[#457](https://github.com/Zoti321/hentail_library/issues/457) 将 Comic 与 Series **物理模块**从 browse 壳拆出，并与 ADR-0033（Application）、ADR-0034（public only）、ADR-0035（Catalog Shared Kernel 留 shared）对齐。
+`library_browse` 同时承担单本 Comic、Series、库页双 Tab 壳与作者详情，虽已有内部分区约定（现并入 `docs/engineering/cross-feature-collaboration.md`），但 **Wayfinder module id** 仍为单一 feature，cross-feature public 图、Application 编排与 Gate 模块图可读性不足。Epic [#436](https://github.com/Zoti321/hentail_library/issues/436) 已将多数 Dart 域真源 owner 化；[#457](https://github.com/Zoti321/hentail_library/issues/457) 将 Comic 与 Series **物理模块**从 browse 壳拆出，并与 ADR-0033（Application）、ADR-0034（public only）、ADR-0035（Catalog Shared Kernel 留 shared）对齐。
 
 ## Decision
 
@@ -43,7 +43,7 @@ Accepted；**Series owner 面与模块边由 [ADR-0042](0042-series-entity-owner
 
 ### 4. 文档取代关系
 
-- **`library-browse-zones.md`** 中「不新增 Wayfinder module」表述由本 ADR **supersede**；分区表修订为三 module + browse 壳保留路径。
+- 原 browse 分区文档中「不新增 Wayfinder module」表述由本 ADR **supersede**；现行壳协作见 `docs/engineering/cross-feature-collaboration.md`（三 module + browse 壳）。
 - **`shared-domain-ownership.md`** owner 表同步：`comic` / `series` / `library_browse` 分列；Series 归属细节见 ADR-0042。
 
 ## Consequences
