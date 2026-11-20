@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/image_set_library/application/load_image_set_catalog_page_use_case.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_catalog_query.dart';
+import 'package:hentai_library/features/image_set_library/domain/image_set_facets.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_image.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_library_gates.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_reader_session.dart';
@@ -57,6 +58,10 @@ class _FakeRepository implements ImageSetRepository {
       pageSize: request.pageSize,
     );
   }
+
+  @override
+  Future<ImageSetFacets> fetchFacets(String imageSetId) =>
+      throw UnimplementedError();
 
   @override
   Future<List<ImageSet>> listImageSets(String libraryId) =>

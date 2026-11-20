@@ -1,9 +1,25 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_catalog_query.dart';
+import 'package:hentai_library/features/image_set_library/domain/image_set_facets.dart';
 import 'package:hentai_library/features/image_set_library/infrastructure/mappers/image_set_frb_mapper.dart';
 import 'package:hentai_library/src/rust/api/image_set.dart' as rust;
 
 void main() {
+  test('maps ImageSetFacetsDto into domain facets', () {
+    const rust.ImageSetFacetsDto dto = rust.ImageSetFacetsDto(
+      authors: <String>['Alice'],
+      tags: <String>['tag'],
+      parodies: <String>['p'],
+      characters: <String>['c'],
+    );
+
+    final ImageSetFacets facets = imageSetFacetsFromFrb(dto);
+    expect(facets.authors, <String>['Alice']);
+    expect(facets.tags, <String>['tag']);
+    expect(facets.parodies, <String>['p']);
+    expect(facets.characters, <String>['c']);
+  });
+
   test('maps browse preferences into Core filter/sort/grouping DTOs', () {
     const ImageSetBrowsePreferences preferences = ImageSetBrowsePreferences(
       authors: ImageSetFacetFilter(any: <String>{'b', 'a'}, unassigned: false),

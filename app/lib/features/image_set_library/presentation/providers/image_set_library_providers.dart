@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set.dart';
+import 'package:hentai_library/features/image_set_library/domain/image_set_facets.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_image.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_reader_entry.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_reader_session.dart';
@@ -15,6 +16,7 @@ typedef ImageSetSyncCommand = Future<ImageSetSyncOutcome> Function(
 typedef ImageSetReaderEntryCommand = void Function(ImageSetReaderEntry entry);
 typedef ImageSetImagesKey = ({String libraryId, String imageSetId});
 typedef ImageSetPageBytesKey = ({String libraryId, ImageSetImage image});
+typedef ImageSetFacetsQuery = Future<ImageSetFacets> Function(String imageSetId);
 
 /// Image set 目录读取 query（由 composition 绑定 use case）。
 final Provider<Future<List<ImageSet>> Function(String libraryId)>
@@ -24,6 +26,10 @@ final Provider<
   Future<List<ImageSetImage>> Function(String libraryId, String imageSetId)
 >
 imageSetImagesQueryProvider = requiredProvider('imageSetImagesQueryProvider');
+
+/// Facet bindings query（composition 绑定 use case；不走 Comic metadata）。
+final Provider<ImageSetFacetsQuery> imageSetFacetsQueryProvider =
+    requiredProvider('imageSetFacetsQueryProvider');
 
 /// 手动同步 command：复用 library_admin 扫描 run 并映射终态。
 final Provider<ImageSetSyncCommand> syncImageSetLibraryCommandProvider =
@@ -66,6 +72,12 @@ final imageSetImagesProvider = FutureProvider.autoDispose
         key.libraryId,
         key.imageSetId,
       );
+    });
+
+final imageSetFacetsProvider = FutureProvider.autoDispose
+    .family<ImageSetFacets, String>((Ref ref, String imageSetId) {
+      ref.watch(libraryRevisionStateProvider.select((s) => s.revision));
+      return ref.watch(imageSetFacetsQueryProvider)(imageSetId);
     });
 
 final imageSetReaderSessionProvider = FutureProvider.autoDispose

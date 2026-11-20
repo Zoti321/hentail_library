@@ -6,6 +6,7 @@ import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_browse_preferences_repository.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_catalog_query.dart';
+import 'package:hentai_library/features/image_set_library/domain/image_set_facets.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_image.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_reader_entry.dart';
 import 'package:hentai_library/features/image_set_library/presentation/providers/image_set_browse_providers.dart';
@@ -139,6 +140,9 @@ List<Override> _overrides(_Probe probe, {LibrarySyncState sync = _idle}) {
           imageSetId == _alpha.imageSetId
           ? _alphaImages
           : const <ImageSetImage>[],
+    ),
+    imageSetFacetsQueryProvider.overrideWithValue(
+      (String imageSetId) async => ImageSetFacets.empty,
     ),
     imageSetPageBytesQueryProvider.overrideWithValue(
       (String libraryId, ImageSetImage image) async => _png1x1,

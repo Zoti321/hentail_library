@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:hentai_library/features/image_set_library/domain/image_set.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_catalog_query.dart';
+import 'package:hentai_library/features/image_set_library/domain/image_set_facets.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_image.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_library_gates.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_reader_session.dart';
@@ -73,6 +74,14 @@ class ImageSetRepositoryImpl implements ImageSetRepository {
       return pagedImageSetCatalogFromFrb(dto);
     },
     fallbackMessage: '读取图集失败',
+  );
+
+  @override
+  Future<ImageSetFacets> fetchFacets(String imageSetId) => guardFrb(
+    () async => imageSetFacetsFromFrb(
+      await rust.getImageSetFacetsFrb(imageSetId: imageSetId),
+    ),
+    fallbackMessage: '读取图集元数据失败',
   );
 
   @override

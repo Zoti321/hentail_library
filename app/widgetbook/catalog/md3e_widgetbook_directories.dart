@@ -19,9 +19,13 @@ import 'package:hentai_library/features/comic_trash/presentation/views/trash/tra
 
 import '../hosts/md3e_history_browse_page_lab_host.dart';
 import '../preview/md3e_history_browse_page_preview_data.dart';
+import '../hosts/md3e_image_set_detail_page_lab_host.dart';
+import '../hosts/md3e_image_set_library_page_lab_host.dart';
+import '../preview/md3e_image_set_browse_preview_data.dart';
 import '../lab/pages/library_browse_page.dart';
 import '../hosts/md3e_management_browse_page_lab_host.dart';
 import '../hosts/md3e_settings_page_lab_host.dart';
+import 'package:hentai_library/features/image_set_library/domain/image_set_facets.dart';
 
 import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_page.dart';
 
@@ -470,6 +474,70 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                   name: 'Responsive · viewport addon',
                   builder: (BuildContext context) => Md3eWidgetbookScope(
                     child: _md3eComicDetailPageKnobsPreview(context),
+                  ),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'ImageSetLibraryPage',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Populated grid',
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
+                    child: ImageSetLibraryPageLabHost(),
+                  ),
+                ),
+                WidgetbookUseCase(
+                  name: 'Populated list',
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
+                    child: ImageSetLibraryPageLabHost(
+                      initialViewMode: CatalogViewMode.list,
+                    ),
+                  ),
+                ),
+                WidgetbookUseCase(
+                  name: 'Loading',
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
+                    child: ImageSetLibraryPageLabHost(
+                      scenario: ImageSetLibraryLabScenario.loading,
+                    ),
+                  ),
+                ),
+                WidgetbookUseCase(
+                  name: 'Empty',
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
+                    child: ImageSetLibraryPageLabHost(
+                      scenario: ImageSetLibraryLabScenario.empty,
+                    ),
+                  ),
+                ),
+                WidgetbookUseCase(
+                  name: 'Filter sheet · sample filters',
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
+                    child: ImageSetLibraryPageLabHost(
+                      initialPreferences:
+                          Md3eImageSetBrowsePreviewData.activeFilters,
+                      openFilterSheet: true,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'ImageSetDetailPage',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'With facets',
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
+                    child: ImageSetDetailPageLabHost(),
+                  ),
+                ),
+                WidgetbookUseCase(
+                  name: 'Without facets',
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
+                    child: ImageSetDetailPageLabHost(
+                      facets: ImageSetFacets.empty,
+                    ),
                   ),
                 ),
               ],

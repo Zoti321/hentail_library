@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/image_set_library/application/load_image_set_catalog_page_use_case.dart';
+import 'package:hentai_library/features/image_set_library/application/load_image_set_facets_use_case.dart';
 import 'package:hentai_library/features/image_set_library/application/load_image_set_images_use_case.dart';
 import 'package:hentai_library/features/image_set_library/application/load_image_sets_use_case.dart';
 import 'package:hentai_library/features/image_set_library/application/open_image_set_reader_use_case.dart';
@@ -20,6 +21,9 @@ List<Override> imageSetLibraryOverrides() {
   final LoadImageSetsUseCase loadSets = LoadImageSetsUseCase(repository);
   final LoadImageSetCatalogPageUseCase loadCatalogPage =
       LoadImageSetCatalogPageUseCase(repository);
+  final LoadImageSetFacetsUseCase loadFacets = LoadImageSetFacetsUseCase(
+    repository,
+  );
   final LoadImageSetImagesUseCase loadImages = LoadImageSetImagesUseCase(
     repository,
   );
@@ -35,6 +39,7 @@ List<Override> imageSetLibraryOverrides() {
     imageSetBrowsePreferencesRepositoryProvider.overrideWithValue(
       const ImageSetBrowsePreferencesRepositoryImpl(),
     ),
+    imageSetFacetsQueryProvider.overrideWithValue(loadFacets.call),
     imageSetImagesQueryProvider.overrideWithValue(loadImages.call),
     syncImageSetLibraryCommandProvider.overrideWith(
       (Ref ref) =>

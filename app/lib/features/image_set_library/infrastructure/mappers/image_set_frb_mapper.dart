@@ -1,5 +1,6 @@
 import 'package:hentai_library/features/image_set_library/domain/image_set.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_catalog_query.dart';
+import 'package:hentai_library/features/image_set_library/domain/image_set_facets.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_image.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_library_gates.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_submission.dart';
@@ -83,6 +84,14 @@ ImageSet imageSetFromFrb(rust.ImageSetDto dto) => ImageSet(
   isRoot: dto.isRoot,
   nameLocked: dto.nameLocked,
 );
+
+ImageSetFacets imageSetFacetsFromFrb(rust.ImageSetFacetsDto dto) =>
+    ImageSetFacets(
+      authors: List<String>.from(dto.authors),
+      tags: List<String>.from(dto.tags),
+      parodies: List<String>.from(dto.parodies),
+      characters: List<String>.from(dto.characters),
+    );
 
 ImageSetImage imageSetImageFromFrb(rust.ImageSetImageDto dto) => ImageSetImage(
   imageSetImageId: dto.imageSetImageId,

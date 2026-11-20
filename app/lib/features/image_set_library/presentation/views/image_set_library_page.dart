@@ -23,10 +23,14 @@ class ImageSetLibraryPage extends ConsumerStatefulWidget {
     super.key,
     required this.libraryId,
     required this.displayName,
+    this.initialViewMode = CatalogViewMode.grid,
   });
 
   final String libraryId;
   final String displayName;
+
+  /// Lab / tests may start in list; production browse defaults to grid.
+  final CatalogViewMode initialViewMode;
 
   @override
   ConsumerState<ImageSetLibraryPage> createState() =>
@@ -35,7 +39,7 @@ class ImageSetLibraryPage extends ConsumerStatefulWidget {
 
 class _ImageSetLibraryPageState extends ConsumerState<ImageSetLibraryPage> {
   final ScrollController _listScrollController = ScrollController();
-  CatalogViewMode _viewMode = CatalogViewMode.grid;
+  late CatalogViewMode _viewMode = widget.initialViewMode;
 
   @override
   void dispose() {

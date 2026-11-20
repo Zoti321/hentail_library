@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:hentai_library/features/image_set_library/domain/image_set.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_catalog_query.dart';
+import 'package:hentai_library/features/image_set_library/domain/image_set_facets.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_image.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_library_gates.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_reader_session.dart';
@@ -21,6 +22,9 @@ abstract interface class ImageSetRepository {
     required PageRequest request,
     required ImageSetBrowsePreferences preferences,
   });
+
+  /// Author / Tag / Parody / Character bindings for [imageSetId].
+  Future<ImageSetFacets> fetchFacets(String imageSetId);
 
   Future<List<ImageSetImage>> listImageSetImages(
     String libraryId,
