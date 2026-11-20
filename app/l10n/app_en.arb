@@ -60,7 +60,7 @@
   "imageSetDetailManageEnter": "Manage workspace",
   "imageSetDetailManageExit": "Done",
   "imageSetDetailManageExclude": "Exclude",
-  "imageSetDetailManageInclude": "Include",
+  "imageSetDetailManageInclude": "Unexclude",
   "imageSetDetailManageSelectAll": "Select all",
   "imageSetDetailManageClearSelection": "Clear",
   "imageSetDetailManageSelectedCount": "{count} selected",

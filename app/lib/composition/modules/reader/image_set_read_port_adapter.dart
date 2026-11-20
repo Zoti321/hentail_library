@@ -28,9 +28,10 @@ class ImageSetReadPortAdapter implements ImageSetReadPort {
       for (int i = 0; i < session.pages.length; i++)
         _toReadPage(session.pages[i], i),
     ];
-    final String title = pages.isEmpty
-        ? imageSetId
-        : (pages.first.name.isNotEmpty ? pages.first.name : imageSetId);
+    final String title = await _resolveImageSetTitle(
+      libraryId: libraryId,
+      imageSetId: imageSetId,
+    );
     return ImageSetOpenedReadSession(
       libraryId: session.libraryId,
       imageSetId: session.imageSetId,
@@ -38,6 +39,23 @@ class ImageSetReadPortAdapter implements ImageSetReadPort {
       pages: pages,
       startIndex: session.startIndex,
     );
+  }
+
+  Future<String> _resolveImageSetTitle({
+    required String libraryId,
+    required String imageSetId,
+  }) async {
+    final List<ImageSet> sets = await _repository.listImageSets(libraryId);
+    for (final ImageSet set in sets) {
+      if (set.imageSetId == imageSetId) {
+        final String name = set.name.trim();
+        if (name.isNotEmpty) {
+          return name;
+        }
+        break;
+      }
+    }
+    return imageSetId;
   }
 
   @override

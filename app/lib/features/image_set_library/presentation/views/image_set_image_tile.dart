@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_image.dart';
 import 'package:hentai_library/features/image_set_library/presentation/providers/image_set_library_providers.dart';
 import 'package:hentai_library/l10n/app_localizations.dart';
@@ -9,7 +10,13 @@ import 'package:hentai_library/shared/ui/image/catalog_image_filter_quality.dart
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// Image set detail tile: page-bytes decode, no caption, intrinsic aspect.
+/// Reserved strip band height for submission affinity (reorder-ready cell geometry).
+const double kImageSetAffinityStripBandHeight = 8;
+
+/// Default cover aspect before bytes decode (anti-jitter).
+const double kImageSetGalleryAspectRatio = 2 / 3;
+
+/// Image set detail gallery cell: fixed aspect skeleton, affinity band, selection.
 class ImageSetImageTile extends ConsumerWidget {
   const ImageSetImageTile({
     super.key,
@@ -18,6 +25,7 @@ class ImageSetImageTile extends ConsumerWidget {
     this.onTap,
     this.onLongPress,
     this.onSecondaryTapDown,
+    this.onSelectionChanged,
     this.selected = false,
     this.selectionMode = false,
     this.compactWidth,
@@ -29,10 +37,11 @@ class ImageSetImageTile extends ConsumerWidget {
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
   final GestureTapDownCallback? onSecondaryTapDown;
+  final ValueChanged<bool>? onSelectionChanged;
   final bool selected;
   final bool selectionMode;
 
-  /// When set, tile uses fixed width; otherwise full width grid cell.
+  /// When set, tile uses fixed width; otherwise fills the grid cell.
   final double? compactWidth;
 
   /// Stable indexes into this Image set's submissions list (multi = stacked strips).
@@ -46,96 +55,118 @@ class ImageSetImageTile extends ConsumerWidget {
       imageSetPageBytesProvider((libraryId: libraryId, image: image)),
     );
     final double opacity = image.excluded ? 0.45 : 1;
-    final Widget thumbnail = Opacity(
-      opacity: opacity,
-      child: bytes.when(
-        data: (Uint8List data) => Image.memory(
-          data,
-          fit: BoxFit.fitWidth,
-          width: compactWidth ?? double.infinity,
-          gaplessPlayback: true,
-          filterQuality: kCatalogImageFilterQuality,
-          errorBuilder: (
-            BuildContext context,
-            Object error,
-            StackTrace? stackTrace,
-          ) => _TilePlaceholder(theme: theme, broken: true, width: compactWidth),
-        ),
-        loading: () => AspectRatio(
-          aspectRatio: 2 / 3,
-          child: _TilePlaceholder(theme: theme, width: compactWidth),
-        ),
-        error: (Object _, StackTrace _) => AspectRatio(
-          aspectRatio: 2 / 3,
-          child: _TilePlaceholder(theme: theme, broken: true, width: compactWidth),
+    final Color skeletonColor = theme.colorScheme.surfaceContainerHighest;
+
+    final Widget imageBody = AspectRatio(
+      aspectRatio: kImageSetGalleryAspectRatio,
+      child: Opacity(
+        opacity: opacity,
+        child: bytes.when(
+          data: (Uint8List data) => Image.memory(
+            data,
+            fit: BoxFit.cover,
+            width: double.infinity,
+            height: double.infinity,
+            gaplessPlayback: true,
+            filterQuality: kCatalogImageFilterQuality,
+            errorBuilder: (
+              BuildContext context,
+              Object error,
+              StackTrace? stackTrace,
+            ) => ColoredBox(
+              color: skeletonColor,
+              child: Icon(
+                Icons.broken_image_outlined,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+          loading: () => ColoredBox(color: skeletonColor),
+          error: (Object _, StackTrace _) => ColoredBox(
+            color: skeletonColor,
+            child: Icon(
+              Icons.broken_image_outlined,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
         ),
       ),
     );
 
-  final Widget content = Stack(
-      fit: StackFit.passthrough,
+    final Widget cell = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        thumbnail,
-        if (image.excluded)
-          Positioned(
-            left: theme.spacing.xs,
-            top: theme.spacing.xs,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest.withValues(
-                  alpha: 0.92,
+        SizedBox(
+          height: kImageSetAffinityStripBandHeight,
+          child: affinitySubmissionIndexes.isEmpty
+              ? const SizedBox.expand()
+              : KeyedSubtree(
+                  key: Key('imageSetAffinityStrips-${image.imageSetImageId}'),
+                  child: Column(
+                    children: <Widget>[
+                      for (final int index in affinitySubmissionIndexes)
+                        Expanded(
+                          child: ColoredBox(
+                            key: Key(
+                              'imageSetAffinityStrip-${image.imageSetImageId}-$index',
+                            ),
+                            color: _affinityStripColor(
+                              theme.colorScheme,
+                              index,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
-                borderRadius: BorderRadius.circular(theme.spacing.xs),
-              ),
-              child: Padding(
-                padding: EdgeInsets.all(theme.spacing.xs),
-                child: Text(
-                  l10n.imageSetDetailExcludedBadge,
-                  style: theme.typeScale.labelSmall.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
+        ),
+        Stack(
+          fit: StackFit.passthrough,
+          children: <Widget>[
+            imageBody,
+            if (image.excluded)
+              Positioned(
+                left: theme.spacing.xs,
+                bottom: theme.spacing.xs,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surfaceContainerHighest.withValues(
+                      alpha: 0.92,
+                    ),
+                    borderRadius: BorderRadius.circular(theme.spacing.xs),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(theme.spacing.xs),
+                    child: Text(
+                      l10n.imageSetDetailExcludedBadge,
+                      style: theme.typeScale.labelSmall.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
-          ),
-        if (selectionMode)
-          Positioned(
-            right: theme.spacing.xs,
-            top: theme.spacing.xs,
-            child: Icon(
-              selected ? Icons.check_circle : Icons.circle_outlined,
-              color: selected
-                  ? theme.colorScheme.primary
-                  : theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
-      ],
-    );
-
-    final Widget tiled = affinitySubmissionIndexes.isEmpty
-        ? content
-        : Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              KeyedSubtree(
-                key: Key('imageSetAffinityStrips-${image.imageSetImageId}'),
-                child: Column(
-                  children: <Widget>[
-                    for (final int index in affinitySubmissionIndexes)
-                      ColoredBox(
-                        key: Key(
-                          'imageSetAffinityStrip-${image.imageSetImageId}-$index',
-                        ),
-                        color: _affinityStripColor(theme.colorScheme, index),
-                        child: SizedBox(height: theme.spacing.xs / 2),
-                      ),
-                  ],
+            if (selectionMode)
+              Positioned(
+                left: kComicCardSelectionInset,
+                top: kComicCardSelectionInset,
+                child: M3ECheckbox(
+                  value: selected,
+                  onChanged: onSelectionChanged == null
+                      ? null
+                      : (bool? value) {
+                          if (value == null) {
+                            return;
+                          }
+                          onSelectionChanged!(value);
+                        },
                 ),
               ),
-              content,
-            ],
-          );
+          ],
+        ),
+      ],
+    );
 
     return Material(
       color: theme.colorScheme.surfaceContainerHigh,
@@ -144,8 +175,8 @@ class ImageSetImageTile extends ConsumerWidget {
         onLongPress: onLongPress,
         onSecondaryTapDown: onSecondaryTapDown,
         child: compactWidth != null
-            ? SizedBox(width: compactWidth, child: tiled)
-            : tiled,
+            ? SizedBox(width: compactWidth, child: cell)
+            : cell,
       ),
     );
   }
@@ -159,32 +190,4 @@ Color _affinityStripColor(M3EColorScheme scheme, int submissionIndex) {
     scheme.error,
   ];
   return palette[submissionIndex % palette.length];
-}
-
-class _TilePlaceholder extends StatelessWidget {
-  const _TilePlaceholder({
-    required this.theme,
-    this.broken = false,
-    this.width,
-  });
-
-  final M3EThemeData theme;
-  final bool broken;
-  final double? width;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: width,
-      child: ColoredBox(
-        color: theme.colorScheme.surfaceContainerHigh,
-        child: Center(
-          child: Icon(
-            broken ? Icons.broken_image_outlined : Icons.image_outlined,
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
-        ),
-      ),
-    );
-  }
 }

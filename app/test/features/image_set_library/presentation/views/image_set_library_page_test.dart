@@ -8,7 +8,9 @@ import 'package:hentai_library/features/image_set_library/domain/image_set_brows
 import 'package:hentai_library/features/image_set_library/domain/image_set_catalog_query.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_facets.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_image.dart';
+import 'package:hentai_library/features/image_set_library/domain/image_set_library_gates.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_reader_entry.dart';
+import 'package:hentai_library/features/image_set_library/domain/image_set_submission.dart';
 import 'package:hentai_library/features/image_set_library/presentation/providers/image_set_browse_providers.dart';
 import 'package:hentai_library/features/image_set_library/presentation/providers/image_set_library_providers.dart';
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_card.dart';
@@ -172,6 +174,22 @@ List<Override> _overrides(_Probe probe, {LibrarySyncState sync = _idle}) {
           ? _alphaImages
           : const <ImageSetImage>[],
     ),
+    imageSetWorkspaceImagesQueryProvider.overrideWithValue(
+      (String libraryId, String imageSetId) async =>
+          imageSetId == _alpha.imageSetId
+          ? _alphaImages
+          : const <ImageSetImage>[],
+    ),
+    imageSetSubmissionsQueryProvider.overrideWithValue(
+      (String libraryId, String imageSetId) async =>
+          const <ImageSetSubmission>[],
+    ),
+    imageSetLibraryGatesQueryProvider.overrideWithValue(
+      (_) async => const ImageSetLibraryGates(
+        resourceMutation: false,
+        managedLayout: false,
+      ),
+    ),
     imageSetFacetsQueryProvider.overrideWithValue(
       (String imageSetId) async => ImageSetFacets.empty,
     ),
@@ -206,10 +224,7 @@ void main() {
     await _pumpPage(tester, _overrides(probe));
     await tester.pumpAndSettle();
 
-    expect(
-      find.byKey(const ValueKey<String>('imageSetFilterSort')),
-      findsOneWidget,
-    );
+    expect(find.bySemanticsLabel('打开筛选、分组与排序'), findsOneWidget);
     expect(find.byType(CatalogViewModeButtonGroup), findsOneWidget);
     expect(find.byType(ImageSetCard), findsNWidgets(2));
     expect(find.byType(ImageSetCover), findsWidgets);
@@ -228,15 +243,16 @@ void main() {
     await _pumpPage(tester, _overrides(probe));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byKey(const ValueKey<String>('imageSetFilterSort')));
+    await tester.tap(find.bySemanticsLabel('打开筛选、分组与排序'));
     await tester.pumpAndSettle();
 
-    expect(find.byKey(const ValueKey<String>('imageSetFilterSortBody')), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey<String>('imageSetFilterSortBody')),
+      findsOneWidget,
+    );
+    expect(find.byKey(const ValueKey<String>('imageSetFilterReset')), findsOneWidget);
     await tester.enterText(find.byType(TextField).first, 'only-alpha');
-    final Finder apply = find.byKey(const ValueKey<String>('imageSetFilterApply'));
-    await tester.ensureVisible(apply);
-    await tester.pumpAndSettle();
-    await tester.tap(apply);
+    await tester.pump(const Duration(milliseconds: 400));
     await tester.pumpAndSettle();
 
     expect(find.byType(ImageSetCard), findsOneWidget);

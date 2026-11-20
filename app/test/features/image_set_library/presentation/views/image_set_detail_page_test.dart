@@ -359,43 +359,32 @@ void main() {
     expect(exclude.onPressed, isNull);
   });
 
-  testWidgets('lists submissions with member counts and empty state', (
+  testWidgets('取消排除 only when selection contains excluded members', (
     WidgetTester tester,
   ) async {
     final _Probe probe = _Probe();
-    probe.submissions = const <ImageSetSubmission>[
-      ImageSetSubmission(
-        submissionId: 's1',
-        libraryId: 'img-1',
-        imageSetId: 'a',
-        name: 'Pack A',
-        memberImageIds: <String>['i1', 'i2'],
-      ),
-    ];
     await _pumpDetail(tester, overrides: _overrides(probe));
     await tester.pumpAndSettle();
+    await _enterSelectionViaLongPress(tester);
 
-    expect(find.text('投稿'), findsOneWidget);
-    expect(find.text('Pack A'), findsOneWidget);
-    expect(find.text('2 张成员'), findsOneWidget);
-    expect(find.textContaining('尚无投稿'), findsNothing);
+    expect(find.text('取消排除'), findsNothing);
+
+    await tester.tap(find.byKey(const ValueKey<String>('i2')));
+    await tester.pump();
+
+    expect(find.text('取消排除'), findsOneWidget);
   });
 
-  testWidgets('create submission invokes command with trimmed name', (
+  testWidgets('detail browse has no bottom submissions section', (
     WidgetTester tester,
   ) async {
     final _Probe probe = _Probe();
     await _pumpDetail(tester, overrides: _overrides(probe));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('新建'));
-    await tester.pumpAndSettle();
-    await tester.enterText(find.byType(TextField), '  night set  ');
-    await tester.pump();
-    await tester.tap(find.widgetWithText(M3EButton, '保存'));
-    await tester.pumpAndSettle();
-
-    expect(probe.createSubmissionNames, <String>['night set']);
+    expect(find.text('投稿'), findsNothing);
+    expect(find.textContaining('尚无投稿'), findsNothing);
+    expect(find.text('新建'), findsNothing);
   });
 
   testWidgets('root archive shows unsupported copy when mutation enabled', (
@@ -436,9 +425,17 @@ void main() {
       ),
     );
     _alphaImages = many;
-    await _pumpDetail(tester, overrides: _overrides(probe));
+    await _pumpDetail(
+      tester,
+      overrides: _overrides(
+        probe,
+        browseImages: many,
+        workspaceImages: many,
+      ),
+    );
     await tester.pumpAndSettle();
 
+    expect(find.text('25 张'), findsOneWidget);
     expect(find.byKey(const Key('imageSetDetailPager')), findsOneWidget);
     expect(find.byKey(const ValueKey<String>('i0')), findsOneWidget);
     expect(
@@ -446,11 +443,6 @@ void main() {
       findsNothing,
     );
 
-    await tester.scrollUntilVisible(
-      find.byKey(const Key('imageSetDetailPager')),
-      200,
-    );
-    await tester.pumpAndSettle();
     await tester.tap(find.widgetWithText(PaginationPageButton, '2'));
     await tester.pumpAndSettle();
 

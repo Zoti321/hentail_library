@@ -7,7 +7,13 @@ import 'package:hentai_library/features/image_set_library/domain/image_set_catal
 import 'package:hentai_library/features/image_set_library/presentation/providers/image_set_browse_providers.dart';
 import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:material_symbols_icons/symbols.dart';
+
+const double _kSectionInset = 16;
+const double _kSortIconSlotWidth = 20;
+const double _kSortIconLabelGap = 8;
 
 /// Adaptive filter/sort sheet for Image set browse (owner query; not Comic facade).
 abstract final class ImageSetLibraryFilterSheet {
@@ -70,17 +76,16 @@ class _ImageSetFilterSortBody extends ConsumerStatefulWidget {
 
 class _ImageSetFilterSortBodyState
     extends ConsumerState<_ImageSetFilterSortBody> {
-  late ImageSetBrowsePreferences _draft;
   late TextEditingController _authors;
   late TextEditingController _tags;
   late TextEditingController _parodies;
   late TextEditingController _characters;
+  Timer? _facetDebounce;
   bool _ready = false;
 
   @override
   void initState() {
     super.initState();
-    _draft = ImageSetBrowsePreferences.defaults;
     _authors = TextEditingController();
     _tags = TextEditingController();
     _parodies = TextEditingController();
@@ -95,18 +100,20 @@ class _ImageSetFilterSortBodyState
     if (!mounted) {
       return;
     }
-    setState(() {
-      _draft = loaded;
-      _authors.text = loaded.authors.any.join(', ');
-      _tags.text = loaded.tags.any.join(', ');
-      _parodies.text = loaded.parodies.any.join(', ');
-      _characters.text = loaded.characters.any.join(', ');
-      _ready = true;
-    });
+    _syncFacetControllers(loaded);
+    setState(() => _ready = true);
+  }
+
+  void _syncFacetControllers(ImageSetBrowsePreferences prefs) {
+    _authors.text = prefs.authors.any.join(', ');
+    _tags.text = prefs.tags.any.join(', ');
+    _parodies.text = prefs.parodies.any.join(', ');
+    _characters.text = prefs.characters.any.join(', ');
   }
 
   @override
   void dispose() {
+    _facetDebounce?.cancel();
     _authors.dispose();
     _tags.dispose();
     _parodies.dispose();
@@ -120,34 +127,49 @@ class _ImageSetFilterSortBodyState
       .where((String s) => s.isNotEmpty)
       .toSet();
 
-  ImageSetBrowsePreferences _compose() => _draft.copyWith(
+  ImageSetBrowsePreferences _composeFacets(
+    ImageSetBrowsePreferences base,
+  ) => base.copyWith(
     authors: ImageSetFacetFilter(
       any: _parseNames(_authors.text),
-      unassigned: _draft.authors.unassigned,
+      unassigned: base.authors.unassigned,
     ),
     tags: ImageSetFacetFilter(
       any: _parseNames(_tags.text),
-      unassigned: _draft.tags.unassigned,
+      unassigned: base.tags.unassigned,
     ),
     parodies: ImageSetFacetFilter(
       any: _parseNames(_parodies.text),
-      unassigned: _draft.parodies.unassigned,
+      unassigned: base.parodies.unassigned,
     ),
     characters: ImageSetFacetFilter(
       any: _parseNames(_characters.text),
-      unassigned: _draft.characters.unassigned,
+      unassigned: base.characters.unassigned,
     ),
   );
 
-  Future<void> _apply() async {
-    final ImageSetBrowsePreferences next = _compose();
+  Future<void> _replace(ImageSetBrowsePreferences next) async {
     await ref.read(imageSetBrowsePreferencesProvider.notifier).replace(next);
     ref
         .read(imageSetCatalogPageIndexProvider.notifier)
         .setPage(widget.libraryId, 1);
-    if (mounted) {
-      Navigator.of(context).maybePop();
-    }
+  }
+
+  Future<void> _replaceFromFacets(ImageSetBrowsePreferences base) async {
+    await _replace(_composeFacets(base));
+  }
+
+  void _scheduleFacetCommit() {
+    _facetDebounce?.cancel();
+    _facetDebounce = Timer(const Duration(milliseconds: 300), () {
+      if (!mounted) {
+        return;
+      }
+      final ImageSetBrowsePreferences base = ref
+          .read(imageSetBrowsePreferencesProvider)
+          .requireValue;
+      unawaited(_replaceFromFacets(base));
+    });
   }
 
   Future<void> _reset() async {
@@ -155,36 +177,176 @@ class _ImageSetFilterSortBodyState
     ref
         .read(imageSetCatalogPageIndexProvider.notifier)
         .setPage(widget.libraryId, 1);
-    if (mounted) {
-      Navigator.of(context).maybePop();
+    if (!mounted) {
+      return;
     }
+    setState(
+      () => _syncFacetControllers(ImageSetBrowsePreferences.defaults),
+    );
+  }
+
+  void _setSortField(
+    ImageSetBrowsePreferences prefs,
+    ImageSetSortField field,
+  ) {
+    final ImageSetSortOption existing = prefs.sort;
+    final ImageSetSortOption next = existing.field == field
+        ? existing.copyWith(descending: !existing.descending)
+        : ImageSetSortOption(field: field, descending: false);
+    unawaited(_replace(prefs.copyWith(sort: next)));
   }
 
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
-    final M3EThemeData theme = M3ETheme.of(context);
-    if (!_ready) {
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final AsyncValue<ImageSetBrowsePreferences> prefsAsync = ref.watch(
+      imageSetBrowsePreferencesProvider,
+    );
+
+    if (!_ready || prefsAsync.isLoading) {
       return const Padding(
         padding: EdgeInsets.all(24),
         child: Center(child: CircularProgressIndicator()),
       );
     }
 
+    final ImageSetBrowsePreferences prefs =
+        prefsAsync.asData?.value ?? ImageSetBrowsePreferences.defaults;
+    final bool isDefault = prefs == ImageSetBrowsePreferences.defaults;
+
     return Padding(
-      padding: EdgeInsets.all(theme.spacing.md),
+      padding: const EdgeInsets.only(bottom: 24),
       child: Column(
         key: const ValueKey<String>('imageSetFilterSortBody'),
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: _kSectionInset),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: Text(
+                    l10n.libraryFilterSection,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: cs.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+                M3EIconButton(
+                  key: const ValueKey<String>('imageSetFilterReset'),
+                  icon: const Icon(Symbols.settings_backup_restore, size: 20),
+                  tooltip: l10n.libraryResetAllFilters,
+                  semanticLabel: l10n.libraryResetAllFilters,
+                  onPressed: isDefault ? null : _reset,
+                  variant: M3EIconButtonVariant.standard,
+                  size: M3EIconButtonSize.sm,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+          _ImageSetFilterFields(
+            prefs: prefs,
+            authors: _authors,
+            tags: _tags,
+            parodies: _parodies,
+            characters: _characters,
+            onFacetTextChanged: _scheduleFacetCommit,
+            onPrefsChanged: _replace,
+            onFacetPrefsChanged: _replaceFromFacets,
+          ),
+          const SizedBox(height: 24),
+          Padding(
+            padding: const EdgeInsets.only(left: _kSectionInset),
+            child: Text(
+              l10n.libraryGroupSection,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: cs.onSurfaceVariant,
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          _ImageSetGroupingSection(
+            grouping: prefs.grouping,
+            onSelected: (ImageSetGrouping grouping) =>
+                unawaited(_replace(prefs.copyWith(grouping: grouping))),
+          ),
+          const SizedBox(height: 24),
+          Padding(
+            padding: const EdgeInsets.only(left: _kSectionInset),
+            child: Text(
+              l10n.librarySortSection,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: cs.onSurfaceVariant,
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              for (final ImageSetSortField field in ImageSetSortField.values)
+                _ImageSetSortRow(
+                  field: field,
+                  sort: prefs.sort,
+                  onTap: () => _setSortField(prefs, field),
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ImageSetFilterFields extends StatelessWidget {
+  const _ImageSetFilterFields({
+    required this.prefs,
+    required this.authors,
+    required this.tags,
+    required this.parodies,
+    required this.characters,
+    required this.onFacetTextChanged,
+    required this.onPrefsChanged,
+    required this.onFacetPrefsChanged,
+  });
+
+  final ImageSetBrowsePreferences prefs;
+  final TextEditingController authors;
+  final TextEditingController tags;
+  final TextEditingController parodies;
+  final TextEditingController characters;
+  final VoidCallback onFacetTextChanged;
+  final Future<void> Function(ImageSetBrowsePreferences next) onPrefsChanged;
+  final Future<void> Function(ImageSetBrowsePreferences base) onFacetPrefsChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
+    final M3EThemeData theme = M3ETheme.of(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: _kSectionInset),
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           SwitchListTile(
             contentPadding: EdgeInsets.zero,
             title: Text(l10n.imageSetFilterRequireImages),
-            value: _draft.requireImages,
+            value: prefs.requireImages,
             onChanged: (bool value) =>
-                setState(() => _draft = _draft.copyWith(requireImages: value)),
+                unawaited(onPrefsChanged(prefs.copyWith(requireImages: value))),
           ),
-          Text(l10n.imageSetFilterCarrierShape, style: theme.typeScale.titleSmall),
+          Text(
+            l10n.imageSetFilterCarrierShape,
+            style: theme.typeScale.titleSmall,
+          ),
           SizedBox(height: theme.spacing.xs),
           SegmentedButton<ImageSetCarrierShape?>(
             segments: <ButtonSegment<ImageSetCarrierShape?>>[
@@ -201,130 +363,210 @@ class _ImageSetFilterSortBodyState
                 label: Text(l10n.imageSetFilterCarrierArchive),
               ),
             ],
-            selected: <ImageSetCarrierShape?>{_draft.carrierShape},
+            selected: <ImageSetCarrierShape?>{prefs.carrierShape},
             onSelectionChanged: (Set<ImageSetCarrierShape?> next) {
               final ImageSetCarrierShape? shape = next.first;
-              setState(() {
-                _draft = shape == null
-                    ? _draft.copyWith(clearCarrierShape: true)
-                    : _draft.copyWith(carrierShape: shape);
-              });
-            },
-          ),
-          SizedBox(height: theme.spacing.md),
-          Text(l10n.imageSetFilterSortField, style: theme.typeScale.titleSmall),
-          DropdownButton<ImageSetSortField>(
-            isExpanded: true,
-            value: _draft.sort.field,
-            items: <DropdownMenuItem<ImageSetSortField>>[
-              DropdownMenuItem(
-                value: ImageSetSortField.name,
-                child: Text(l10n.imageSetFilterSortName),
-              ),
-              DropdownMenuItem(
-                value: ImageSetSortField.imageCount,
-                child: Text(l10n.imageSetFilterSortImageCount),
-              ),
-              DropdownMenuItem(
-                value: ImageSetSortField.createdAt,
-                child: Text(l10n.imageSetFilterSortCreatedAt),
-              ),
-              DropdownMenuItem(
-                value: ImageSetSortField.relativePath,
-                child: Text(l10n.imageSetFilterSortRelativePath),
-              ),
-            ],
-            onChanged: (ImageSetSortField? field) {
-              if (field == null) {
-                return;
-              }
-              setState(
-                () => _draft = _draft.copyWith(
-                  sort: _draft.sort.copyWith(field: field),
+              unawaited(
+                onPrefsChanged(
+                  shape == null
+                      ? prefs.copyWith(clearCarrierShape: true)
+                      : prefs.copyWith(carrierShape: shape),
                 ),
               );
             },
           ),
-          SwitchListTile(
-            contentPadding: EdgeInsets.zero,
-            title: Text(l10n.imageSetFilterSortDescending),
-            value: _draft.sort.descending,
-            onChanged: (bool value) => setState(
-              () => _draft = _draft.copyWith(
-                sort: _draft.sort.copyWith(descending: value),
-              ),
-            ),
-          ),
-          SwitchListTile(
-            contentPadding: EdgeInsets.zero,
-            title: Text(l10n.imageSetFilterGroupByAuthor),
-            value: _draft.grouping == ImageSetGrouping.byAuthor,
-            onChanged: (bool value) => setState(
-              () => _draft = _draft.copyWith(
-                grouping: value
-                    ? ImageSetGrouping.byAuthor
-                    : ImageSetGrouping.none,
-              ),
-            ),
-          ),
           SizedBox(height: theme.spacing.md),
           _FacetField(
             label: l10n.imageSetFilterAuthors,
-            controller: _authors,
+            controller: authors,
             unassignedLabel: l10n.imageSetFilterAuthorsUnassigned,
-            unassigned: _draft.authors.unassigned,
-            onUnassignedChanged: (bool value) => setState(
-              () => _draft = _draft.copyWith(
-                authors: _draft.authors.copyWith(unassigned: value),
+            unassigned: prefs.authors.unassigned,
+            onChanged: onFacetTextChanged,
+            onUnassignedChanged: (bool value) => unawaited(
+              onFacetPrefsChanged(
+                prefs.copyWith(
+                  authors: prefs.authors.copyWith(unassigned: value),
+                ),
               ),
             ),
           ),
           _FacetField(
             label: l10n.imageSetFilterTags,
-            controller: _tags,
+            controller: tags,
             unassignedLabel: l10n.imageSetFilterTagsUnassigned,
-            unassigned: _draft.tags.unassigned,
-            onUnassignedChanged: (bool value) => setState(
-              () => _draft = _draft.copyWith(
-                tags: _draft.tags.copyWith(unassigned: value),
+            unassigned: prefs.tags.unassigned,
+            onChanged: onFacetTextChanged,
+            onUnassignedChanged: (bool value) => unawaited(
+              onFacetPrefsChanged(
+                prefs.copyWith(tags: prefs.tags.copyWith(unassigned: value)),
               ),
             ),
           ),
           _FacetField(
             label: l10n.imageSetFilterParodies,
-            controller: _parodies,
+            controller: parodies,
             unassignedLabel: l10n.imageSetFilterParodiesUnassigned,
-            unassigned: _draft.parodies.unassigned,
-            onUnassignedChanged: (bool value) => setState(
-              () => _draft = _draft.copyWith(
-                parodies: _draft.parodies.copyWith(unassigned: value),
+            unassigned: prefs.parodies.unassigned,
+            onChanged: onFacetTextChanged,
+            onUnassignedChanged: (bool value) => unawaited(
+              onFacetPrefsChanged(
+                prefs.copyWith(
+                  parodies: prefs.parodies.copyWith(unassigned: value),
+                ),
               ),
             ),
           ),
           _FacetField(
             label: l10n.imageSetFilterCharacters,
-            controller: _characters,
+            controller: characters,
             unassignedLabel: l10n.imageSetFilterCharactersUnassigned,
-            unassigned: _draft.characters.unassigned,
-            onUnassignedChanged: (bool value) => setState(
-              () => _draft = _draft.copyWith(
-                characters: _draft.characters.copyWith(unassigned: value),
+            unassigned: prefs.characters.unassigned,
+            onChanged: onFacetTextChanged,
+            onUnassignedChanged: (bool value) => unawaited(
+              onFacetPrefsChanged(
+                prefs.copyWith(
+                  characters: prefs.characters.copyWith(unassigned: value),
+                ),
               ),
             ),
           ),
-          SizedBox(height: theme.spacing.lg),
-          Row(
-            children: <Widget>[
-              TextButton(onPressed: _reset, child: Text(l10n.imageSetFilterReset)),
-              const Spacer(),
-              FilledButton(
-                key: const ValueKey<String>('imageSetFilterApply'),
-                onPressed: _apply,
-                child: Text(l10n.imageSetFilterApply),
-              ),
-            ],
-          ),
         ],
+      ),
+    );
+  }
+}
+
+class _ImageSetGroupingSection extends StatelessWidget {
+  const _ImageSetGroupingSection({
+    required this.grouping,
+    required this.onSelected,
+  });
+
+  final ImageSetGrouping grouping;
+  final ValueChanged<ImageSetGrouping> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        _GroupingRow(
+          label: l10n.libraryGroupNone,
+          selected: grouping == ImageSetGrouping.none,
+          onSelected: () => onSelected(ImageSetGrouping.none),
+        ),
+        _GroupingRow(
+          label: l10n.imageSetFilterGroupByAuthor,
+          selected: grouping == ImageSetGrouping.byAuthor,
+          onSelected: () => onSelected(ImageSetGrouping.byAuthor),
+        ),
+      ],
+    );
+  }
+}
+
+class _GroupingRow extends StatelessWidget {
+  const _GroupingRow({
+    required this.label,
+    required this.selected,
+    required this.onSelected,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    return InkWell(
+      onTap: onSelected,
+      hoverColor: theme.hoverColor,
+      splashColor: theme.splashColor,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: _kSectionInset,
+          vertical: 8,
+        ),
+        child: Row(
+          children: <Widget>[
+            SizedBox(
+              width: 24,
+              height: 24,
+              child: RadioGroup<bool>(
+                groupValue: selected,
+                onChanged: (_) => onSelected(),
+                child: Radio<bool>(value: true),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(child: Text(label, style: theme.textTheme.bodyMedium)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ImageSetSortRow extends StatelessWidget {
+  const _ImageSetSortRow({
+    required this.field,
+    required this.sort,
+    required this.onTap,
+  });
+
+  final ImageSetSortField field;
+  final ImageSetSortOption sort;
+  final VoidCallback onTap;
+
+  String _label(AppLocalizations l10n) => switch (field) {
+    ImageSetSortField.name => l10n.imageSetFilterSortName,
+    ImageSetSortField.imageCount => l10n.imageSetFilterSortImageCount,
+    ImageSetSortField.createdAt => l10n.imageSetFilterSortCreatedAt,
+    ImageSetSortField.relativePath => l10n.imageSetFilterSortRelativePath,
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme cs = theme.colorScheme;
+    final bool isSelected = sort.field == field;
+    final bool isAscending = !sort.descending;
+    return InkWell(
+      onTap: onTap,
+      hoverColor: theme.hoverColor,
+      splashColor: theme.splashColor,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: _kSectionInset,
+          vertical: 8,
+        ),
+        child: Row(
+          children: <Widget>[
+            SizedBox(
+              width: _kSortIconSlotWidth,
+              child: isSelected
+                  ? Icon(
+                      isAscending
+                          ? LucideIcons.chevronUp
+                          : LucideIcons.chevronDown,
+                      size: 14,
+                      color: cs.primary,
+                    )
+                  : null,
+            ),
+            const SizedBox(width: _kSortIconLabelGap),
+            Expanded(
+              child: Text(
+                _label(context.l10n),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: cs.onSurfaceVariant,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -336,6 +578,7 @@ class _FacetField extends StatelessWidget {
     required this.controller,
     required this.unassignedLabel,
     required this.unassigned,
+    required this.onChanged,
     required this.onUnassignedChanged,
   });
 
@@ -343,6 +586,7 @@ class _FacetField extends StatelessWidget {
   final TextEditingController controller;
   final String unassignedLabel;
   final bool unassigned;
+  final VoidCallback onChanged;
   final ValueChanged<bool> onUnassignedChanged;
 
   @override
@@ -356,6 +600,7 @@ class _FacetField extends StatelessWidget {
           TextField(
             controller: controller,
             decoration: InputDecoration(labelText: label),
+            onChanged: (_) => onChanged(),
           ),
           CheckboxListTile(
             contentPadding: EdgeInsets.zero,

@@ -19,7 +19,6 @@ import 'package:hentai_library/features/image_set_library/presentation/patterns/
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_image_tile.dart';
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_row_grid_sliver.dart';
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_submission_dialogs.dart';
-import 'package:hentai_library/features/image_set_library/presentation/views/image_set_submissions_section.dart';
 import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/application/errors/error_message.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
@@ -276,18 +275,20 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
             label: l10n.imageSetDetailContextSelect,
             onPressed: () => _enterSelection(image.imageSetImageId),
           ),
-          M3EMenuEntry(
-            label: l10n.imageSetDetailManageExclude,
-            onPressed: () => unawaited(
-              _setExcluded(targets, excluded: true),
+          if (!image.excluded)
+            M3EMenuEntry(
+              label: l10n.imageSetDetailManageExclude,
+              onPressed: () => unawaited(
+                _setExcluded(targets, excluded: true),
+              ),
             ),
-          ),
-          M3EMenuEntry(
-            label: l10n.imageSetDetailManageInclude,
-            onPressed: () => unawaited(
-              _setExcluded(targets, excluded: false),
+          if (image.excluded)
+            M3EMenuEntry(
+              label: l10n.imageSetDetailManageInclude,
+              onPressed: () => unawaited(
+                _setExcluded(targets, excluded: false),
+              ),
             ),
-          ),
           M3EMenuEntry(
             label: l10n.imageSetDetailContextCreateSubmission,
             onPressed: () => unawaited(_createSubmissionFrom(targets)),
@@ -312,10 +313,9 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
     final AppLocalizations l10n = context.l10n;
     final M3EThemeData theme = M3ETheme.of(context);
     final double horizontalInset = PageLayoutSpec.of(context).horizontalInset;
-    final AsyncValue<List<ImageSetImage>> images = ref.watch(
-      _selectionMode
-          ? imageSetWorkspaceImagesProvider(_imagesKey)
-          : imageSetImagesProvider(_imagesKey),
+    // Single workspace source; browse mode filters excluded client-side (anti-flash).
+    final AsyncValue<List<ImageSetImage>> workspace = ref.watch(
+      imageSetWorkspaceImagesProvider(_imagesKey),
     );
     final String title = _imageSet.name;
     final bool showDiskDelete = _selectionMode && _canMutateDisk;
@@ -326,6 +326,14 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
         imageSetSubmissionAffinityByImageId(
       submissionsAsync.asData?.value ?? const <ImageSetSubmission>[],
     );
+    final List<ImageSetImage>? workspaceList = workspace.asData?.value;
+    final List<ImageSetImage>? visibleList = workspaceList == null
+        ? null
+        : (_selectionMode
+            ? workspaceList
+            : workspaceList
+                .where((ImageSetImage i) => !i.excluded)
+                .toList(growable: false));
 
     return Scaffold(
       body: SafeArea(
@@ -337,77 +345,87 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
                 horizontal: horizontalInset,
                 vertical: theme.spacing.sm,
               ),
-              child: _selectionMode
-                  ? _SelectionToolbar(
-                      selectedCount: _selectedIds.length,
-                      hasSelection: _selectedIds.isNotEmpty,
-                      allIds: images.asData?.value
-                              .map((ImageSetImage i) => i.imageSetImageId)
-                              .toList() ??
-                          const <String>[],
-                      showDeleteOnDisk: showDiskDelete,
-                      onExit: _exitSelection,
-                      onExclude: () => unawaited(
-                        _setExcluded(
-                          _selectedIds.toList(growable: false),
-                          excluded: true,
-                        ),
-                      ),
-                      onInclude: () => unawaited(
-                        _setExcluded(
-                          _selectedIds.toList(growable: false),
-                          excluded: false,
-                        ),
-                      ),
-                      onDeleteOnDisk: () => unawaited(
-                        _deleteOnDisk(_selectedIds.toList(growable: false)),
-                      ),
-                      onSelectAll: (List<String> ids) =>
-                          setState(() => _selectedIds.addAll(ids)),
-                      onClearSelection: () =>
-                          setState(_selectedIds.clear),
-                    )
-                  : Row(
-                      children: <Widget>[
-                        DetailHeaderBackButton(
-                          onBack: () => Navigator.of(context).maybePop(),
-                        ),
-                        const Spacer(),
-                        DetailHeaderIconButton(
-                          icon: Symbols.edit,
-                          tooltip: l10n.imageSetMetadataEditEnter,
-                          semanticLabel: l10n.imageSetMetadataEditEnter,
-                          onPressed: _openMetadataEdit,
-                          iconColor: theme.colorScheme.onSurfaceVariant,
-                        ),
-                        if (_canCopyIn) ...<Widget>[
-                          SizedBox(width: theme.spacing.sm),
-                          M3EButton(
-                            key: const Key('imageSetDetailAdd'),
-                            onPressed: _copying ? null : _copyImagesIn,
-                            style: M3EButtonStyle.tonal,
-                            label: _copying
-                                ? const SizedBox(
-                                    width: 18,
-                                    height: 18,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                    ),
-                                  )
-                                : Text(l10n.imageSetMutationCopyImages),
+              child: ModeChromeTransition(
+                switchKey: _selectionMode,
+                reverse: !_selectionMode,
+                child: _selectionMode
+                    ? _SelectionToolbar(
+                        selectedCount: _selectedIds.length,
+                        hasSelection: _selectedIds.isNotEmpty,
+                        allIds: workspaceList
+                                ?.map((ImageSetImage i) => i.imageSetImageId)
+                                .toList(growable: false) ??
+                            const <String>[],
+                        canUnexclude: workspaceList?.any(
+                              (ImageSetImage i) =>
+                                  _selectedIds.contains(i.imageSetImageId) &&
+                                  i.excluded,
+                            ) ??
+                            false,
+                        showDeleteOnDisk: showDiskDelete,
+                        onExit: _exitSelection,
+                        onExclude: () => unawaited(
+                          _setExcluded(
+                            _selectedIds.toList(growable: false),
+                            excluded: true,
                           ),
+                        ),
+                        onInclude: () => unawaited(
+                          _setExcluded(
+                            _selectedIds.toList(growable: false),
+                            excluded: false,
+                          ),
+                        ),
+                        onDeleteOnDisk: () => unawaited(
+                          _deleteOnDisk(_selectedIds.toList(growable: false)),
+                        ),
+                        onSelectAll: (List<String> ids) =>
+                            setState(() => _selectedIds.addAll(ids)),
+                        onClearSelection: () =>
+                            setState(_selectedIds.clear),
+                      )
+                    : Row(
+                        children: <Widget>[
+                          DetailHeaderBackButton(
+                            onBack: () => Navigator.of(context).maybePop(),
+                          ),
+                          const Spacer(),
+                          DetailHeaderIconButton(
+                            icon: Symbols.edit,
+                            tooltip: l10n.imageSetMetadataEditEnter,
+                            semanticLabel: l10n.imageSetMetadataEditEnter,
+                            onPressed: _openMetadataEdit,
+                            iconColor: theme.colorScheme.onSurfaceVariant,
+                          ),
+                          if (_canCopyIn) ...<Widget>[
+                            SizedBox(width: theme.spacing.sm),
+                            M3EButton(
+                              key: const Key('imageSetDetailAdd'),
+                              onPressed: _copying ? null : _copyImagesIn,
+                              style: M3EButtonStyle.tonal,
+                              label: _copying
+                                  ? const SizedBox(
+                                      width: 18,
+                                      height: 18,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : Text(l10n.imageSetMutationCopyImages),
+                            ),
+                          ],
                         ],
-                      ],
-                    ),
+                      ),
+              ),
             ),
             Expanded(
-              child: images.when(
-                data: (List<ImageSetImage> list) => _buildBrowseScroll(
+              child: workspace.when(
+                data: (List<ImageSetImage> _) => _buildBrowseScroll(
                   l10n: l10n,
                   theme: theme,
                   horizontalInset: horizontalInset,
                   title: title,
-                  list: list,
+                  list: visibleList ?? const <ImageSetImage>[],
                   affinityByImage: affinityByImage,
                 ),
                 loading: () => const Center(child: CircularProgressIndicator()),
@@ -447,7 +465,26 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
         .take(kImageSetDetailImagePageSize)
         .toList(growable: false);
 
+    final Widget? pager = totalPages <= 1
+        ? null
+        : KeyedSubtree(
+            key: const Key('imageSetDetailPager'),
+            child: Pagination(
+              page: page,
+              totalPages: totalPages,
+              totalItems: list.length,
+              pageSize: kImageSetDetailImagePageSize,
+              onPageChanged: (int next) {
+                setState(() => _imagePage = next);
+                if (_browseScrollController.hasClients) {
+                  _browseScrollController.jumpTo(0);
+                }
+              },
+            ),
+          );
+
     return CustomScrollView(
+      key: const ValueKey<String>('imageSetDetailScroll'),
       controller: _browseScrollController,
       slivers: <Widget>[
         SliverPadding(
@@ -473,6 +510,10 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
                   imageSet: _imageSet,
                   carrierShape: widget.carrierShape,
                 ),
+                if (pager != null) ...<Widget>[
+                  SizedBox(height: theme.spacing.md),
+                  pager,
+                ],
               ],
             ),
           ),
@@ -482,12 +523,13 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
             hasScrollBody: false,
             child: Center(child: Text(l10n.imageSetDetailEmpty)),
           )
-        else ...<Widget>[
+        else
           ImageSetRowGridSliver(
+            key: const Key('imageSetDetailGallery'),
             itemCount: pageItems.length,
             itemBuilder: (BuildContext context, int index) {
               final ImageSetImage image = pageItems[index];
-              final int workspaceIndex = start + index;
+              final int catalogIndex = start + index;
               final bool selected = _selectedIds.contains(image.imageSetImageId);
               return ImageSetImageTile(
                 key: ValueKey<String>(image.imageSetImageId),
@@ -497,6 +539,15 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
                 selected: selected,
                 affinitySubmissionIndexes:
                     affinityByImage[image.imageSetImageId] ?? const <int>[],
+                onSelectionChanged: (bool value) {
+                  setState(() {
+                    if (value) {
+                      _selectedIds.add(image.imageSetImageId);
+                    } else {
+                      _selectedIds.remove(image.imageSetImageId);
+                    }
+                  });
+                },
                 onTap: () {
                   if (_selectionMode) {
                     _toggleSelection(image.imageSetImageId);
@@ -507,7 +558,7 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
                       libraryId: widget.libraryId,
                       imageSetId: _imageSet.imageSetId,
                       imageSetImageId: image.imageSetImageId,
-                      index: workspaceIndex,
+                      index: catalogIndex,
                     ),
                   );
                 },
@@ -520,37 +571,6 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
               );
             },
           ),
-          SliverPadding(
-            padding: EdgeInsets.fromLTRB(
-              horizontalInset,
-              theme.spacing.md,
-              horizontalInset,
-              theme.spacing.sm,
-            ),
-            sliver: SliverToBoxAdapter(
-              child: Pagination(
-                key: const Key('imageSetDetailPager'),
-                page: page,
-                totalPages: totalPages,
-                totalItems: list.length,
-                pageSize: kImageSetDetailImagePageSize,
-                onPageChanged: (int next) {
-                  setState(() => _imagePage = next);
-                  if (_browseScrollController.hasClients) {
-                    _browseScrollController.jumpTo(0);
-                  }
-                },
-              ),
-            ),
-          ),
-        ],
-        SliverToBoxAdapter(
-          child: ImageSetSubmissionsSection(
-            libraryId: widget.libraryId,
-            imageSet: _imageSet,
-            horizontalInset: horizontalInset,
-          ),
-        ),
         SliverToBoxAdapter(child: SizedBox(height: theme.spacing.lg)),
       ],
     );
@@ -562,6 +582,7 @@ class _SelectionToolbar extends StatelessWidget {
     required this.selectedCount,
     required this.hasSelection,
     required this.allIds,
+    required this.canUnexclude,
     required this.showDeleteOnDisk,
     required this.onExit,
     required this.onExclude,
@@ -574,6 +595,7 @@ class _SelectionToolbar extends StatelessWidget {
   final int selectedCount;
   final bool hasSelection;
   final List<String> allIds;
+  final bool canUnexclude;
   final bool showDeleteOnDisk;
   final VoidCallback onExit;
   final VoidCallback onExclude;
@@ -611,10 +633,11 @@ class _SelectionToolbar extends StatelessWidget {
             onPressed: hasSelection ? onExclude : null,
             child: Text(l10n.imageSetDetailManageExclude),
           ),
-          TextButton(
-            onPressed: hasSelection ? onInclude : null,
-            child: Text(l10n.imageSetDetailManageInclude),
-          ),
+          if (canUnexclude)
+            TextButton(
+              onPressed: hasSelection ? onInclude : null,
+              child: Text(l10n.imageSetDetailManageInclude),
+            ),
           if (showDeleteOnDisk)
             TextButton(
               onPressed: hasSelection ? onDeleteOnDisk : null,

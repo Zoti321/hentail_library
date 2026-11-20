@@ -60,7 +60,7 @@
   "imageSetDetailManageEnter": "管理工作区",
   "imageSetDetailManageExit": "完成",
   "imageSetDetailManageExclude": "排除",
-  "imageSetDetailManageInclude": "纳入",
+  "imageSetDetailManageInclude": "取消排除",
   "imageSetDetailManageSelectAll": "全选",
   "imageSetDetailManageClearSelection": "清除",
   "imageSetDetailManageSelectedCount": "已选 {count} 张",

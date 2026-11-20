@@ -233,7 +233,7 @@ abstract class AppLocalizations {
   /// No description provided for @imageSetDetailManageInclude.
   ///
   /// In zh, this message translates to:
-  /// **'纳入'**
+  /// **'取消排除'**
   String get imageSetDetailManageInclude;
 
   /// No description provided for @imageSetDetailManageSelectAll.

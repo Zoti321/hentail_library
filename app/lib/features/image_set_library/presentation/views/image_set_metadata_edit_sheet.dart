@@ -41,6 +41,7 @@ class _ImageSetMetadataEditSheetState
     implements MetadataEditSaveActions {
   late ImageSetMetadataEditDraft _draft;
   bool _saving = false;
+  int _tabIndex = 0;
 
   @override
   void initState() {
@@ -206,11 +207,27 @@ class _ImageSetMetadataEditSheetState
     });
   }
 
+  Widget _facetField({
+    required ImageSetNamedFacetKind kind,
+    required String label,
+    required List<String> selectedNames,
+  }) {
+    return ImageSetFacetMultiSelectField(
+      kind: kind,
+      label: label,
+      selectedNames: selectedNames,
+      onAdd: (String name) => _addFacet(kind, name),
+      onRemove: (String name) => _removeFacet(kind, name),
+      onClearAll: () => _clearFacet(kind),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     final M3EThemeData theme = M3ETheme.of(context);
-    final double gap = theme.spacing.lg;
+    final WindowSizeClass sizeClass = windowSizeClassOf(context);
+    final double gap = MetadataEditFormMetrics.sectionGap(sizeClass);
 
     return MetadataEditSurface(
       title: l10n.imageSetMetadataEditTitle,
@@ -219,78 +236,75 @@ class _ImageSetMetadataEditSheetState
       saveEnabled: _dirty && _draft.name.trim().isNotEmpty,
       onCancel: _handleCancel,
       onSave: _save,
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            OutlinedTextField(
-              label: l10n.imageSetMetadataEditNameLabel,
-              initialValue: _draft.name,
-              onChanged: (String value) =>
-                  setState(() => _draft = _draft.copyWith(name: value)),
-            ),
-            SizedBox(height: gap),
-            Material(
-              type: MaterialType.transparency,
-              child: SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(l10n.imageSetMetadataEditNameLockLabel),
-                subtitle: Text(
-                  l10n.imageSetMetadataEditNameLockHint,
-                  style: theme.typeScale.bodySmall.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
+      body: MetadataEditTabbedShell(
+        selectedIndex: _tabIndex,
+        onSelected: (int index) => setState(() => _tabIndex = index),
+        tabs: <MetadataEditTab>[
+          (
+            label: l10n.dialogEditMetadataTabGeneral,
+            body: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                OutlinedTextField(
+                  label: l10n.imageSetMetadataEditNameLabel,
+                  initialValue: _draft.name,
+                  onChanged: (String value) =>
+                      setState(() => _draft = _draft.copyWith(name: value)),
+                ),
+                SizedBox(height: gap),
+                Material(
+                  type: MaterialType.transparency,
+                  child: SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(l10n.imageSetMetadataEditNameLockLabel),
+                    subtitle: Text(
+                      l10n.imageSetMetadataEditNameLockHint,
+                      style: theme.typeScale.bodySmall.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    value: _draft.nameLocked,
+                    onChanged: (bool value) => setState(
+                      () => _draft = _draft.copyWith(nameLocked: value),
+                    ),
                   ),
                 ),
-                value: _draft.nameLocked,
-                onChanged: (bool value) =>
-                    setState(() => _draft = _draft.copyWith(nameLocked: value)),
-              ),
+              ],
             ),
-            SizedBox(height: gap),
-            ImageSetFacetMultiSelectField(
+          ),
+          (
+            label: l10n.comicDetailAuthors,
+            body: _facetField(
               kind: ImageSetNamedFacetKind.author,
               label: l10n.comicDetailAuthors,
               selectedNames: _draft.authors,
-              onAdd: (String name) =>
-                  _addFacet(ImageSetNamedFacetKind.author, name),
-              onRemove: (String name) =>
-                  _removeFacet(ImageSetNamedFacetKind.author, name),
-              onClearAll: () => _clearFacet(ImageSetNamedFacetKind.author),
             ),
-            SizedBox(height: gap),
-            ImageSetFacetMultiSelectField(
+          ),
+          (
+            label: l10n.metadataTabTags,
+            body: _facetField(
               kind: ImageSetNamedFacetKind.tag,
               label: l10n.metadataTabTags,
               selectedNames: _draft.tags,
-              onAdd: (String name) => _addFacet(ImageSetNamedFacetKind.tag, name),
-              onRemove: (String name) =>
-                  _removeFacet(ImageSetNamedFacetKind.tag, name),
-              onClearAll: () => _clearFacet(ImageSetNamedFacetKind.tag),
             ),
-            SizedBox(height: gap),
-            ImageSetFacetMultiSelectField(
+          ),
+          (
+            label: l10n.metadataTabParodies,
+            body: _facetField(
               kind: ImageSetNamedFacetKind.parody,
               label: l10n.metadataTabParodies,
               selectedNames: _draft.parodies,
-              onAdd: (String name) =>
-                  _addFacet(ImageSetNamedFacetKind.parody, name),
-              onRemove: (String name) =>
-                  _removeFacet(ImageSetNamedFacetKind.parody, name),
-              onClearAll: () => _clearFacet(ImageSetNamedFacetKind.parody),
             ),
-            SizedBox(height: gap),
-            ImageSetFacetMultiSelectField(
+          ),
+          (
+            label: l10n.metadataTabCharacters,
+            body: _facetField(
               kind: ImageSetNamedFacetKind.character,
               label: l10n.metadataTabCharacters,
               selectedNames: _draft.characters,
-              onAdd: (String name) =>
-                  _addFacet(ImageSetNamedFacetKind.character, name),
-              onRemove: (String name) =>
-                  _removeFacet(ImageSetNamedFacetKind.character, name),
-              onClearAll: () => _clearFacet(ImageSetNamedFacetKind.character),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

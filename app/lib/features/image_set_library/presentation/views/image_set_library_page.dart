@@ -9,13 +9,12 @@ import 'package:hentai_library/features/image_set_library/presentation/views/ima
 import 'package:hentai_library/shared/presentation/providers/app_navigator_provider.dart';
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_library_filter_sheet.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/patterns/library/library_page_header.dart';
 import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/application/errors/error_message.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/library_tab_page_size_settings.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
-import 'package:material_symbols_icons/symbols.dart';
 
 /// Image set 库浏览：header + paged body；会话内 card/list；同步 busy 投影。
 class ImageSetLibraryPage extends ConsumerStatefulWidget {
@@ -107,32 +106,15 @@ class _ImageSetLibraryPageState extends ConsumerState<ImageSetLibraryPage> {
           children: <Widget>[
             Padding(
               padding: EdgeInsets.symmetric(horizontal: horizontalInset),
-              child: LibraryToolbarRow(
-                title: PageTitle(widget.displayName),
-                trailing: <Widget>[
-                  _PageSizeButton(
-                    pageSize: pageSize,
-                    onPageSizeChanged: _setPageSize,
-                  ),
-                  M3EIconButton(
-                    key: const ValueKey<String>('imageSetFilterSort'),
-                    icon: Icon(
-                      Icons.filter_list,
-                      size: LibraryPageHeaderMetrics.actionIconSize,
-                      color: filterActive
-                          ? theme.colorScheme.primary
-                          : theme.colorScheme.onSurfaceVariant,
-                    ),
-                    variant: M3EIconButtonVariant.standard,
-                    size: M3EIconButtonSize.sm,
-                    tooltip: l10n.libraryFilterSortTooltip,
-                    semanticLabel: l10n.libraryFilterSortSemantic,
-                    onPressed: () => ImageSetLibraryFilterSheet.show(
-                      context,
-                      libraryId: widget.libraryId,
-                    ),
-                  ),
-                ],
+              child: LibraryPageHeader(
+                title: widget.displayName,
+                filterSortActive: filterActive,
+                pageSize: pageSize,
+                onPageSizeChanged: _setPageSize,
+                onFilterSort: () => ImageSetLibraryFilterSheet.show(
+                  context,
+                  libraryId: widget.libraryId,
+                ),
               ),
             ),
             if (busy) ...<Widget>[
@@ -331,48 +313,6 @@ class _CatalogBody extends StatelessWidget {
             ),
         ],
       ),
-    );
-  }
-}
-
-class _PageSizeButton extends StatelessWidget {
-  const _PageSizeButton({
-    required this.pageSize,
-    required this.onPageSizeChanged,
-  });
-
-  final int pageSize;
-  final ValueChanged<int> onPageSizeChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppLocalizations l10n = context.l10n;
-    final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
-    return AnchoredMenu(
-      position: M3EMenuAnchorPosition.bottomEnd,
-      children: <M3EMenuNode>[
-        for (final int option in kLibraryPageSizeOptions)
-          M3EMenuSelectable(
-            label: '$option',
-            value: option,
-            selected: option == pageSize,
-            onPressed: () => onPageSizeChanged(option),
-          ),
-      ],
-      anchorBuilder: (BuildContext context, VoidCallback open) {
-        return M3EIconButton(
-          icon: Icon(
-            Symbols.grid_view,
-            size: LibraryPageHeaderMetrics.actionIconSize,
-            color: scheme.onSurfaceVariant,
-          ),
-          variant: M3EIconButtonVariant.standard,
-          size: M3EIconButtonSize.sm,
-          tooltip: l10n.libraryPageSizeTooltip,
-          semanticLabel: l10n.libraryPageSizeSemantic,
-          onPressed: open,
-        );
-      },
     );
   }
 }

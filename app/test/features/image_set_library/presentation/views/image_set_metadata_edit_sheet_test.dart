@@ -143,6 +143,9 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    await tester.tap(find.text('作者'));
+    await tester.pumpAndSettle();
+
     final Finder clearAll = find.byKey(FacetMultiSelectField.clearAllButtonKey);
     await tester.scrollUntilVisible(
       clearAll.first,

@@ -86,7 +86,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get imageSetDetailManageExclude => '排除';
 
   @override
-  String get imageSetDetailManageInclude => '纳入';
+  String get imageSetDetailManageInclude => '取消排除';
 
   @override
   String get imageSetDetailManageSelectAll => '全选';

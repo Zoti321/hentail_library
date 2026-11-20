@@ -56,12 +56,13 @@ pub async fn create_image_set_submission(
     image_set_id: &str,
     name: &str,
 ) -> Result<ImageSetSubmissionDto, HentaiError> {
-    let name = require_name(name)?;
+    let now = millis_now();
+    let name = resolve_create_submission_name(name, now);
     with_library_write(|| async {
         let db = connection()?;
         let txn = db.begin().await.map_err(|e| map_db_err(&e))?;
         require_set(&txn, library_id, image_set_id).await?;
-        let submission_id = image_set_submission_id(library_id, image_set_id, &name, millis_now());
+        let submission_id = image_set_submission_id(library_id, image_set_id, &name, now);
         let row = image_set_submissions::ActiveModel {
             submission_id: Set(submission_id.clone()),
             library_id: Set(library_id.to_string()),
@@ -250,6 +251,15 @@ pub async fn reorder_image_set_submission_members(
         Ok(())
     })
     .await
+}
+
+fn resolve_create_submission_name(name: &str, now_ms: i64) -> String {
+    let trimmed = name.trim();
+    if trimmed.is_empty() {
+        format!("投稿-{now_ms}")
+    } else {
+        trimmed.to_string()
+    }
 }
 
 fn require_name(name: &str) -> Result<String, HentaiError> {

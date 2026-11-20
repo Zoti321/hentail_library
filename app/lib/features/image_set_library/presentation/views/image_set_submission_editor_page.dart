@@ -53,6 +53,7 @@ class _ImageSetSubmissionEditorPageState
       title: l10n.imageSetSubmissionRenameTitle,
       fieldLabel: l10n.imageSetSubmissionNameLabel,
       initialName: submission.name,
+      requireNonEmptyName: true,
     );
     if (name == null || !mounted) {
       return;

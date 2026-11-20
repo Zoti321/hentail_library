@@ -12,6 +12,7 @@ Future<String?> showImageSetSubmissionNameDialog({
   required String title,
   required String fieldLabel,
   String initialName = '',
+  bool requireNonEmptyName = false,
 }) async {
   return LabDialogPresenter.showBasic<String>(
     context,
@@ -19,6 +20,7 @@ Future<String?> showImageSetSubmissionNameDialog({
       title: title,
       fieldLabel: fieldLabel,
       initialName: initialName,
+      requireNonEmptyName: requireNonEmptyName,
     ),
   );
 }
@@ -28,11 +30,13 @@ class _ImageSetSubmissionNameDialog extends StatefulWidget {
     required this.title,
     required this.fieldLabel,
     required this.initialName,
+    required this.requireNonEmptyName,
   });
 
   final String title;
   final String fieldLabel;
   final String initialName;
+  final bool requireNonEmptyName;
 
   @override
   State<_ImageSetSubmissionNameDialog> createState() =>
@@ -57,7 +61,7 @@ class _ImageSetSubmissionNameDialogState
 
   void _submit() {
     final String value = _controller.text.trim();
-    if (value.isEmpty) {
+    if (widget.requireNonEmptyName && value.isEmpty) {
       return;
     }
     Navigator.of(context).pop(value);
@@ -66,7 +70,9 @@ class _ImageSetSubmissionNameDialogState
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
-    final bool canSave = _controller.text.trim().isNotEmpty;
+    final bool trimmedNonempty = _controller.text.trim().isNotEmpty;
+    final bool confirmEnabled =
+        !widget.requireNonEmptyName || trimmedNonempty;
 
     return M3EDialog(
       title: widget.title,
@@ -82,7 +88,7 @@ class _ImageSetSubmissionNameDialogState
         DialogActionBar(
           onCancel: () => Navigator.of(context).pop(),
           onConfirm: _submit,
-          confirmEnabled: canSave,
+          confirmEnabled: confirmEnabled,
           cancelLabel: l10n.commonCancel,
           confirmLabel: l10n.commonSave,
         ),

@@ -76,6 +76,41 @@ fn write_jpg(path: &Path, tag: &[u8]) {
 }
 
 #[test]
+fn create_submission_empty_name_assigns_default() {
+    common::with_global_db(|| {
+        let fixture = Fixture::new("sub_default_name.sqlite");
+        write_jpg(&fixture.root.join("album/a.jpg"), b"a");
+        fixture.sync();
+        let set_id = fixture.set_id();
+
+        let created = fixture
+            .runtime
+            .block_on(create_image_set_submission(
+                &fixture.library_id,
+                &set_id,
+                "   ",
+            ))
+            .expect("create");
+        assert!(!created.name.is_empty());
+        assert!(
+            created.name.starts_with("投稿-"),
+            "expected default prefix, got {}",
+            created.name
+        );
+
+        let err = fixture
+            .runtime
+            .block_on(rename_image_set_submission(
+                &fixture.library_id,
+                &created.submission_id,
+                "",
+            ))
+            .expect_err("rename empty");
+        assert_eq!(err.code, HentaiErrorCode::Validation);
+    });
+}
+
+#[test]
 fn create_rename_delete_and_list_submissions() {
     common::with_global_db(|| {
         let fixture = Fixture::new("sub_crud.sqlite");

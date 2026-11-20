@@ -93,7 +93,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get imageSetDetailManageExclude => 'Exclude';
 
   @override
-  String get imageSetDetailManageInclude => 'Include';
+  String get imageSetDetailManageInclude => 'Unexclude';
 
   @override
   String get imageSetDetailManageSelectAll => 'Select all';
