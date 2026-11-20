@@ -212,6 +212,162 @@ abstract class AppLocalizations {
   /// **'{count} 张'**
   String imageSetDetailImageCount(int count);
 
+  /// No description provided for @imageSetFilterSortTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'图集筛选与排序'**
+  String get imageSetFilterSortTitle;
+
+  /// No description provided for @imageSetFilterApply.
+  ///
+  /// In zh, this message translates to:
+  /// **'应用'**
+  String get imageSetFilterApply;
+
+  /// No description provided for @imageSetFilterReset.
+  ///
+  /// In zh, this message translates to:
+  /// **'重置'**
+  String get imageSetFilterReset;
+
+  /// No description provided for @imageSetFilterRequireImages.
+  ///
+  /// In zh, this message translates to:
+  /// **'仅显示有图片的图集'**
+  String get imageSetFilterRequireImages;
+
+  /// No description provided for @imageSetFilterCarrierShape.
+  ///
+  /// In zh, this message translates to:
+  /// **'载体形态'**
+  String get imageSetFilterCarrierShape;
+
+  /// No description provided for @imageSetFilterCarrierAny.
+  ///
+  /// In zh, this message translates to:
+  /// **'全部'**
+  String get imageSetFilterCarrierAny;
+
+  /// No description provided for @imageSetFilterCarrierDirectory.
+  ///
+  /// In zh, this message translates to:
+  /// **'目录图集'**
+  String get imageSetFilterCarrierDirectory;
+
+  /// No description provided for @imageSetFilterCarrierArchive.
+  ///
+  /// In zh, this message translates to:
+  /// **'根压缩包'**
+  String get imageSetFilterCarrierArchive;
+
+  /// No description provided for @imageSetFilterSortField.
+  ///
+  /// In zh, this message translates to:
+  /// **'排序'**
+  String get imageSetFilterSortField;
+
+  /// No description provided for @imageSetFilterSortName.
+  ///
+  /// In zh, this message translates to:
+  /// **'显示名称'**
+  String get imageSetFilterSortName;
+
+  /// No description provided for @imageSetFilterSortImageCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'图片数'**
+  String get imageSetFilterSortImageCount;
+
+  /// No description provided for @imageSetFilterSortCreatedAt.
+  ///
+  /// In zh, this message translates to:
+  /// **'入库时间'**
+  String get imageSetFilterSortCreatedAt;
+
+  /// No description provided for @imageSetFilterSortRelativePath.
+  ///
+  /// In zh, this message translates to:
+  /// **'相对路径'**
+  String get imageSetFilterSortRelativePath;
+
+  /// No description provided for @imageSetFilterSortDescending.
+  ///
+  /// In zh, this message translates to:
+  /// **'降序'**
+  String get imageSetFilterSortDescending;
+
+  /// No description provided for @imageSetFilterGroupByAuthor.
+  ///
+  /// In zh, this message translates to:
+  /// **'按作者分组'**
+  String get imageSetFilterGroupByAuthor;
+
+  /// No description provided for @imageSetFilterAuthors.
+  ///
+  /// In zh, this message translates to:
+  /// **'作者（逗号分隔）'**
+  String get imageSetFilterAuthors;
+
+  /// No description provided for @imageSetFilterTags.
+  ///
+  /// In zh, this message translates to:
+  /// **'标签（逗号分隔）'**
+  String get imageSetFilterTags;
+
+  /// No description provided for @imageSetFilterParodies.
+  ///
+  /// In zh, this message translates to:
+  /// **'原作（逗号分隔）'**
+  String get imageSetFilterParodies;
+
+  /// No description provided for @imageSetFilterCharacters.
+  ///
+  /// In zh, this message translates to:
+  /// **'角色（逗号分隔）'**
+  String get imageSetFilterCharacters;
+
+  /// No description provided for @imageSetFilterUnassigned.
+  ///
+  /// In zh, this message translates to:
+  /// **'未绑定'**
+  String get imageSetFilterUnassigned;
+
+  /// No description provided for @imageSetFilterAuthorsUnassigned.
+  ///
+  /// In zh, this message translates to:
+  /// **'未绑定作者'**
+  String get imageSetFilterAuthorsUnassigned;
+
+  /// No description provided for @imageSetFilterTagsUnassigned.
+  ///
+  /// In zh, this message translates to:
+  /// **'未绑定标签'**
+  String get imageSetFilterTagsUnassigned;
+
+  /// No description provided for @imageSetFilterParodiesUnassigned.
+  ///
+  /// In zh, this message translates to:
+  /// **'未绑定原作'**
+  String get imageSetFilterParodiesUnassigned;
+
+  /// No description provided for @imageSetFilterCharactersUnassigned.
+  ///
+  /// In zh, this message translates to:
+  /// **'未绑定角色'**
+  String get imageSetFilterCharactersUnassigned;
+
+  /// No description provided for @imageSetGroupAuthorLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'作者：{name}'**
+  String imageSetGroupAuthorLabel(String name);
+
+  /// No description provided for @imageSetGroupUnassignedAuthor.
+  ///
+  /// In zh, this message translates to:
+  /// **'未绑定作者'**
+  String get imageSetGroupUnassignedAuthor;
+
   /// No description provided for @sidebarAddRemoteLibrary.
   ///
   /// In zh, this message translates to:

@@ -57,6 +57,39 @@
       }
     }
   },
+  "imageSetFilterSortTitle": "Image set filter & sort",
+  "imageSetFilterApply": "Apply",
+  "imageSetFilterReset": "Reset",
+  "imageSetFilterRequireImages": "Only image sets with images",
+  "imageSetFilterCarrierShape": "Carrier shape",
+  "imageSetFilterCarrierAny": "Any",
+  "imageSetFilterCarrierDirectory": "Directory sets",
+  "imageSetFilterCarrierArchive": "Root archives",
+  "imageSetFilterSortField": "Sort by",
+  "imageSetFilterSortName": "Display name",
+  "imageSetFilterSortImageCount": "Image count",
+  "imageSetFilterSortCreatedAt": "Catalogued time",
+  "imageSetFilterSortRelativePath": "Relative path",
+  "imageSetFilterSortDescending": "Descending",
+  "imageSetFilterGroupByAuthor": "Group by Author",
+  "imageSetFilterAuthors": "Authors (comma-separated)",
+  "imageSetFilterTags": "Tags (comma-separated)",
+  "imageSetFilterParodies": "Parodies (comma-separated)",
+  "imageSetFilterCharacters": "Characters (comma-separated)",
+  "imageSetFilterUnassigned": "Unassigned",
+  "imageSetFilterAuthorsUnassigned": "Unassigned Author",
+  "imageSetFilterTagsUnassigned": "Unassigned Tag",
+  "imageSetFilterParodiesUnassigned": "Unassigned Parody",
+  "imageSetFilterCharactersUnassigned": "Unassigned Character",
+  "imageSetGroupAuthorLabel": "Author: {name}",
+  "@imageSetGroupAuthorLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "imageSetGroupUnassignedAuthor": "Unassigned Author",
   "sidebarAddRemoteLibrary": "Add remote library",
   "sidebarReorderLibraries": "Reorder",
   "sidebarExitReorder": "Done reordering",

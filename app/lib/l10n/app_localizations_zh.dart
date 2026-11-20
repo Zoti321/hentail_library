@@ -77,6 +77,86 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get imageSetFilterSortTitle => '图集筛选与排序';
+
+  @override
+  String get imageSetFilterApply => '应用';
+
+  @override
+  String get imageSetFilterReset => '重置';
+
+  @override
+  String get imageSetFilterRequireImages => '仅显示有图片的图集';
+
+  @override
+  String get imageSetFilterCarrierShape => '载体形态';
+
+  @override
+  String get imageSetFilterCarrierAny => '全部';
+
+  @override
+  String get imageSetFilterCarrierDirectory => '目录图集';
+
+  @override
+  String get imageSetFilterCarrierArchive => '根压缩包';
+
+  @override
+  String get imageSetFilterSortField => '排序';
+
+  @override
+  String get imageSetFilterSortName => '显示名称';
+
+  @override
+  String get imageSetFilterSortImageCount => '图片数';
+
+  @override
+  String get imageSetFilterSortCreatedAt => '入库时间';
+
+  @override
+  String get imageSetFilterSortRelativePath => '相对路径';
+
+  @override
+  String get imageSetFilterSortDescending => '降序';
+
+  @override
+  String get imageSetFilterGroupByAuthor => '按作者分组';
+
+  @override
+  String get imageSetFilterAuthors => '作者（逗号分隔）';
+
+  @override
+  String get imageSetFilterTags => '标签（逗号分隔）';
+
+  @override
+  String get imageSetFilterParodies => '原作（逗号分隔）';
+
+  @override
+  String get imageSetFilterCharacters => '角色（逗号分隔）';
+
+  @override
+  String get imageSetFilterUnassigned => '未绑定';
+
+  @override
+  String get imageSetFilterAuthorsUnassigned => '未绑定作者';
+
+  @override
+  String get imageSetFilterTagsUnassigned => '未绑定标签';
+
+  @override
+  String get imageSetFilterParodiesUnassigned => '未绑定原作';
+
+  @override
+  String get imageSetFilterCharactersUnassigned => '未绑定角色';
+
+  @override
+  String imageSetGroupAuthorLabel(String name) {
+    return '作者：$name';
+  }
+
+  @override
+  String get imageSetGroupUnassignedAuthor => '未绑定作者';
+
+  @override
   String get sidebarAddRemoteLibrary => '添加远程库';
 
   @override

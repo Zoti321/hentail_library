@@ -1,10 +1,12 @@
 import 'dart:typed_data';
 
 import 'package:hentai_library/features/image_set_library/domain/image_set.dart';
+import 'package:hentai_library/features/image_set_library/domain/image_set_catalog_query.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_image.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_library_gates.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_reader_session.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_submission.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 
 /// Image set catalog + workspace write contracts（owner：`image_set_library`）。
 abstract interface class ImageSetRepository {
@@ -12,6 +14,13 @@ abstract interface class ImageSetRepository {
 
   /// 至少有一张图片的图集，按 Image set catalog query 默认顺序（显示名称自然序）。
   Future<List<ImageSet>> listNonEmptyImageSets(String libraryId);
+
+  /// One page of the Image set catalog for [libraryId] under [preferences].
+  Future<PagedImageSetCatalog> fetchCatalogPage({
+    required String libraryId,
+    required PageRequest request,
+    required ImageSetBrowsePreferences preferences,
+  });
 
   Future<List<ImageSetImage>> listImageSetImages(
     String libraryId,

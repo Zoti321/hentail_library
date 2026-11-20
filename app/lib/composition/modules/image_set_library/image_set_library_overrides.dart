@@ -1,10 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/features/image_set_library/application/load_image_set_catalog_page_use_case.dart';
 import 'package:hentai_library/features/image_set_library/application/load_image_set_images_use_case.dart';
 import 'package:hentai_library/features/image_set_library/application/load_image_sets_use_case.dart';
 import 'package:hentai_library/features/image_set_library/application/open_image_set_reader_use_case.dart';
 import 'package:hentai_library/features/image_set_library/application/sync_image_set_library_use_case.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_reader_entry.dart';
+import 'package:hentai_library/features/image_set_library/infrastructure/repositories/image_set_browse_preferences_repository_impl.dart';
 import 'package:hentai_library/features/image_set_library/infrastructure/repositories/image_set_repository_impl.dart';
+import 'package:hentai_library/features/image_set_library/presentation/providers/image_set_browse_providers.dart';
 import 'package:hentai_library/features/image_set_library/presentation/providers/image_set_library_providers.dart';
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_reader_page.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
@@ -15,6 +18,8 @@ import 'package:riverpod/misc.dart' show Override;
 List<Override> imageSetLibraryOverrides() {
   const ImageSetRepositoryImpl repository = ImageSetRepositoryImpl();
   final LoadImageSetsUseCase loadSets = LoadImageSetsUseCase(repository);
+  final LoadImageSetCatalogPageUseCase loadCatalogPage =
+      LoadImageSetCatalogPageUseCase(repository);
   final LoadImageSetImagesUseCase loadImages = LoadImageSetImagesUseCase(
     repository,
   );
@@ -26,6 +31,10 @@ List<Override> imageSetLibraryOverrides() {
   );
   return <Override>[
     imageSetListQueryProvider.overrideWithValue(loadSets.call),
+    imageSetCatalogPageQueryProvider.overrideWithValue(loadCatalogPage.call),
+    imageSetBrowsePreferencesRepositoryProvider.overrideWithValue(
+      const ImageSetBrowsePreferencesRepositoryImpl(),
+    ),
     imageSetImagesQueryProvider.overrideWithValue(loadImages.call),
     syncImageSetLibraryCommandProvider.overrideWith(
       (Ref ref) =>

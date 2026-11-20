@@ -36,9 +36,7 @@ class ImageSetDetailPage extends ConsumerWidget {
     final AsyncValue<List<ImageSetImage>> images = ref.watch(
       imageSetImagesProvider(key),
     );
-    final String title = imageSet.isRoot
-        ? l10n.imageSetRootName
-        : imageSet.name;
+    final String title = imageSet.name;
 
     return Scaffold(
       body: SafeArea(

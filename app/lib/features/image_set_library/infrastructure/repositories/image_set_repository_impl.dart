@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:hentai_library/features/image_set_library/domain/image_set.dart';
+import 'package:hentai_library/features/image_set_library/domain/image_set_catalog_query.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_image.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_library_gates.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_reader_session.dart';
@@ -8,6 +9,7 @@ import 'package:hentai_library/features/image_set_library/domain/image_set_repos
 import 'package:hentai_library/features/image_set_library/domain/image_set_submission.dart';
 import 'package:hentai_library/features/image_set_library/infrastructure/mappers/image_set_frb_mapper.dart';
 import 'package:hentai_library/infrastructure/frb/frb_call_guard.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/src/rust/api/comic.dart' show PageRequestDto;
 import 'package:hentai_library/src/rust/api/image_set.dart' as rust;
 
@@ -28,34 +30,50 @@ class ImageSetRepositoryImpl implements ImageSetRepository {
   @override
   Future<List<ImageSet>> listNonEmptyImageSets(String libraryId) =>
       guardFrb(() async {
-        const rust.ImageSetFacetFilterDto anyFacet =
-            rust.ImageSetFacetFilterDto(any: <String>[], unassigned: false);
-        final rust.ImageSetFilterDto filter = rust.ImageSetFilterDto(
-          libraryId: libraryId,
-          authors: anyFacet,
-          tags: anyFacet,
-          parodies: anyFacet,
-          characters: anyFacet,
-          requireImages: true,
-        );
+        const ImageSetBrowsePreferences preferences =
+            ImageSetBrowsePreferences.defaults;
         final List<ImageSet> sets = <ImageSet>[];
         for (int page = 1; ; page++) {
-          final rust.PagedImageSetCatalogDto dto = await rust
-              .fetchImageSetsPageFrb(
+          final rust.PagedImageSetCatalogDto dto =
+              await rust.fetchImageSetsPageFrb(
                 request: PageRequestDto(page: page, pageSize: _catalogPageSize),
-                filter: filter,
-                sort: const rust.ImageSetSortOptionDto(
-                  field: rust.ImageSetSortFieldDto.name,
-                  descending: false,
+                filter: imageSetFilterToFrb(
+                  libraryId: libraryId,
+                  preferences: preferences,
                 ),
-                grouping: rust.ImageSetGroupingDto.none,
+                sort: imageSetSortToFrb(preferences.sort),
+                grouping: imageSetGroupingToFrb(preferences.grouping),
               );
-          sets.addAll(dto.items.map((item) => imageSetFromFrb(item.imageSet)));
-          if (dto.items.isEmpty || sets.length >= dto.totalCount) {
+          final PagedImageSetCatalog catalog = pagedImageSetCatalogFromFrb(dto);
+          sets.addAll(
+            catalog.items.map((ImageSetCatalogItem item) => item.imageSet),
+          );
+          if (catalog.items.isEmpty || sets.length >= catalog.totalCount) {
             return sets;
           }
         }
       }, fallbackMessage: '读取图集失败');
+
+  @override
+  Future<PagedImageSetCatalog> fetchCatalogPage({
+    required String libraryId,
+    required PageRequest request,
+    required ImageSetBrowsePreferences preferences,
+  }) => guardFrb(
+    () async {
+      final rust.PagedImageSetCatalogDto dto = await rust.fetchImageSetsPageFrb(
+        request: PageRequestDto(page: request.page, pageSize: request.pageSize),
+        filter: imageSetFilterToFrb(
+          libraryId: libraryId,
+          preferences: preferences,
+        ),
+        sort: imageSetSortToFrb(preferences.sort),
+        grouping: imageSetGroupingToFrb(preferences.grouping),
+      );
+      return pagedImageSetCatalogFromFrb(dto);
+    },
+    fallbackMessage: '读取图集失败',
+  );
 
   @override
   Future<List<ImageSetImage>> listImageSetImages(

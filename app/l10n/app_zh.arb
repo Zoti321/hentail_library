@@ -57,6 +57,39 @@
       }
     }
   },
+  "imageSetFilterSortTitle": "图集筛选与排序",
+  "imageSetFilterApply": "应用",
+  "imageSetFilterReset": "重置",
+  "imageSetFilterRequireImages": "仅显示有图片的图集",
+  "imageSetFilterCarrierShape": "载体形态",
+  "imageSetFilterCarrierAny": "全部",
+  "imageSetFilterCarrierDirectory": "目录图集",
+  "imageSetFilterCarrierArchive": "根压缩包",
+  "imageSetFilterSortField": "排序",
+  "imageSetFilterSortName": "显示名称",
+  "imageSetFilterSortImageCount": "图片数",
+  "imageSetFilterSortCreatedAt": "入库时间",
+  "imageSetFilterSortRelativePath": "相对路径",
+  "imageSetFilterSortDescending": "降序",
+  "imageSetFilterGroupByAuthor": "按作者分组",
+  "imageSetFilterAuthors": "作者（逗号分隔）",
+  "imageSetFilterTags": "标签（逗号分隔）",
+  "imageSetFilterParodies": "原作（逗号分隔）",
+  "imageSetFilterCharacters": "角色（逗号分隔）",
+  "imageSetFilterUnassigned": "未绑定",
+  "imageSetFilterAuthorsUnassigned": "未绑定作者",
+  "imageSetFilterTagsUnassigned": "未绑定标签",
+  "imageSetFilterParodiesUnassigned": "未绑定原作",
+  "imageSetFilterCharactersUnassigned": "未绑定角色",
+  "imageSetGroupAuthorLabel": "作者：{name}",
+  "@imageSetGroupAuthorLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "imageSetGroupUnassignedAuthor": "未绑定作者",
   "sidebarAddRemoteLibrary": "添加远程库",
   "sidebarReorderLibraries": "重新排序",
   "sidebarExitReorder": "退出排序",

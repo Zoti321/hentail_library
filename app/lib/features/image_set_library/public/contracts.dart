@@ -2,6 +2,8 @@
 library;
 
 export 'package:hentai_library/features/image_set_library/domain/image_set.dart';
+export 'package:hentai_library/features/image_set_library/domain/image_set_browse_preferences_repository.dart';
+export 'package:hentai_library/features/image_set_library/domain/image_set_catalog_query.dart';
 export 'package:hentai_library/features/image_set_library/domain/image_set_image.dart';
 export 'package:hentai_library/features/image_set_library/domain/image_set_library_gates.dart';
 export 'package:hentai_library/features/image_set_library/domain/image_set_reader_entry.dart';

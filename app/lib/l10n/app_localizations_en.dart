@@ -84,6 +84,86 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get imageSetFilterSortTitle => 'Image set filter & sort';
+
+  @override
+  String get imageSetFilterApply => 'Apply';
+
+  @override
+  String get imageSetFilterReset => 'Reset';
+
+  @override
+  String get imageSetFilterRequireImages => 'Only image sets with images';
+
+  @override
+  String get imageSetFilterCarrierShape => 'Carrier shape';
+
+  @override
+  String get imageSetFilterCarrierAny => 'Any';
+
+  @override
+  String get imageSetFilterCarrierDirectory => 'Directory sets';
+
+  @override
+  String get imageSetFilterCarrierArchive => 'Root archives';
+
+  @override
+  String get imageSetFilterSortField => 'Sort by';
+
+  @override
+  String get imageSetFilterSortName => 'Display name';
+
+  @override
+  String get imageSetFilterSortImageCount => 'Image count';
+
+  @override
+  String get imageSetFilterSortCreatedAt => 'Catalogued time';
+
+  @override
+  String get imageSetFilterSortRelativePath => 'Relative path';
+
+  @override
+  String get imageSetFilterSortDescending => 'Descending';
+
+  @override
+  String get imageSetFilterGroupByAuthor => 'Group by Author';
+
+  @override
+  String get imageSetFilterAuthors => 'Authors (comma-separated)';
+
+  @override
+  String get imageSetFilterTags => 'Tags (comma-separated)';
+
+  @override
+  String get imageSetFilterParodies => 'Parodies (comma-separated)';
+
+  @override
+  String get imageSetFilterCharacters => 'Characters (comma-separated)';
+
+  @override
+  String get imageSetFilterUnassigned => 'Unassigned';
+
+  @override
+  String get imageSetFilterAuthorsUnassigned => 'Unassigned Author';
+
+  @override
+  String get imageSetFilterTagsUnassigned => 'Unassigned Tag';
+
+  @override
+  String get imageSetFilterParodiesUnassigned => 'Unassigned Parody';
+
+  @override
+  String get imageSetFilterCharactersUnassigned => 'Unassigned Character';
+
+  @override
+  String imageSetGroupAuthorLabel(String name) {
+    return 'Author: $name';
+  }
+
+  @override
+  String get imageSetGroupUnassignedAuthor => 'Unassigned Author';
+
+  @override
   String get sidebarAddRemoteLibrary => 'Add remote library';
 
   @override
