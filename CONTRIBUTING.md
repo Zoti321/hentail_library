@@ -5,7 +5,7 @@
 1. 在仓库根运行 `./scripts/setup-dev.sh`（Linux、macOS 或 Windows Git Bash）。工具链版本以 `.github/workflows/gate.yml` 为准。
 2. 进入 `app/` 执行 `flutter pub get`。修改 Freezed / Riverpod 等代码生成输入后执行 `dart run build_runner build`；**仅改 ARB 时只跑** `flutter gen-l10n`，避免无输入变更时全量 `build_runner` 刷新无关 `theme_tailor` 产物。修改 Rust FRB API 后执行 `flutter_rust_bridge_codegen generate`。
 3. 硬门禁与 Nightly 只在 GitHub Actions 跑（见 `docs/engineering/gate.md`）。本地可按需跑受影响的 `cargo` / `flutter test`；工具链版本以 `.github/workflows/gate.yml` 为准，环境初始化见 `./scripts/setup-dev.sh`。
-4. 使用 [PR 模板](.github/pull_request_template.md)，写明行为变化、验证证据和未验证项。
+4. 使用 [PR 模板](.github/pull_request_template.md)，写明行为变化、验证证据和未验证项。显著用户可见变更写入根目录 [CHANGELOG.md](CHANGELOG.md) 的 `Unreleased`（[Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)）；发版时移入对应版本段落后再打 `v*` tag。
 
 Rust 侧补充：`core/` 为 Cargo workspace；体积说明见 [rust-binary-size.md](docs/engineering/rust-binary-size.md)；Nightly 含 fuzz / miri（`.github/workflows/nightly.yml`）。
 
