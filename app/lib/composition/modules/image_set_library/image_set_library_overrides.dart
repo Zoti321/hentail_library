@@ -1,9 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/image_set_library/application/load_image_set_catalog_page_use_case.dart';
 import 'package:hentai_library/features/image_set_library/application/load_image_set_facets_use_case.dart';
+import 'package:hentai_library/features/image_set_library/application/load_image_set_library_gates_use_case.dart';
 import 'package:hentai_library/features/image_set_library/application/load_image_set_images_use_case.dart';
 import 'package:hentai_library/features/image_set_library/application/add_image_set_submission_members_use_case.dart';
+import 'package:hentai_library/features/image_set_library/application/copy_images_into_image_set_use_case.dart';
 import 'package:hentai_library/features/image_set_library/application/create_image_set_submission_use_case.dart';
+import 'package:hentai_library/features/image_set_library/application/delete_image_set_images_on_disk_use_case.dart';
 import 'package:hentai_library/features/image_set_library/application/delete_image_set_submission_use_case.dart';
 import 'package:hentai_library/features/image_set_library/application/load_image_set_submissions_use_case.dart';
 import 'package:hentai_library/features/image_set_library/application/load_image_set_workspace_images_use_case.dart';
@@ -14,8 +17,11 @@ import 'package:hentai_library/features/image_set_library/application/load_image
 import 'package:hentai_library/features/image_set_library/application/open_image_set_reader_use_case.dart';
 import 'package:hentai_library/features/image_set_library/application/reorder_image_set_images_use_case.dart';
 import 'package:hentai_library/features/image_set_library/application/set_image_set_images_excluded_use_case.dart';
+import 'package:hentai_library/features/image_set_library/application/set_image_set_managed_layout_use_case.dart';
+import 'package:hentai_library/features/image_set_library/application/set_image_set_resource_mutation_use_case.dart';
 import 'package:hentai_library/features/image_set_library/application/set_image_set_name_locked_use_case.dart';
 import 'package:hentai_library/features/image_set_library/application/sync_image_set_library_use_case.dart';
+import 'package:hentai_library/features/image_set_library/application/take_over_image_set_managed_layout_use_case.dart';
 import 'package:hentai_library/features/image_set_library/application/update_image_set_facets_use_case.dart';
 import 'package:hentai_library/features/image_set_library/application/update_image_set_name_use_case.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_reader_entry.dart';
@@ -67,6 +73,12 @@ List<Override> imageSetLibraryOverrides() {
   final LoadImageSetPageBytesUseCase loadBytes = LoadImageSetPageBytesUseCase(
     repository,
   );
+  final LoadImageSetLibraryGatesUseCase loadGates =
+      LoadImageSetLibraryGatesUseCase(repository);
+  final SetImageSetResourceMutationUseCase setResourceMutation =
+      SetImageSetResourceMutationUseCase(repository);
+  final SetImageSetManagedLayoutUseCase setManagedLayout =
+      SetImageSetManagedLayoutUseCase(repository);
   return <Override>[
     imageSetListQueryProvider.overrideWithValue(loadSets.call),
     imageSetCatalogPageQueryProvider.overrideWithValue(loadCatalogPage.call),
@@ -88,6 +100,31 @@ List<Override> imageSetLibraryOverrides() {
     ),
     imageSetUpdateFacetsCommandProvider.overrideWith(
       (Ref ref) => UpdateImageSetFacetsUseCase(
+        repository,
+        ref.read(domainEventBusProvider),
+      ).call,
+    ),
+    imageSetLibraryGatesQueryProvider.overrideWithValue(loadGates.call),
+    imageSetSetResourceMutationCommandProvider.overrideWithValue(
+      setResourceMutation.call,
+    ),
+    imageSetSetManagedLayoutCommandProvider.overrideWithValue(
+      setManagedLayout.call,
+    ),
+    imageSetCopyImagesInCommandProvider.overrideWith(
+      (Ref ref) => CopyImagesIntoImageSetUseCase(
+        repository,
+        ref.read(domainEventBusProvider),
+      ).call,
+    ),
+    imageSetDeleteImagesOnDiskCommandProvider.overrideWith(
+      (Ref ref) => DeleteImageSetImagesOnDiskUseCase(
+        repository,
+        ref.read(domainEventBusProvider),
+      ).call,
+    ),
+    imageSetTakeOverManagedLayoutCommandProvider.overrideWith(
+      (Ref ref) => TakeOverImageSetManagedLayoutUseCase(
         repository,
         ref.read(domainEventBusProvider),
       ).call,

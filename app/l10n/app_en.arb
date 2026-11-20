@@ -112,6 +112,30 @@
   "imageSetFilterCarrierAny": "Any",
   "imageSetFilterCarrierDirectory": "Directory sets",
   "imageSetFilterCarrierArchive": "Root archives",
+  "imageSetLibraryGateResourceMutationTitle": "Allow resource changes",
+  "imageSetLibraryGateResourceMutationHint": "When enabled, you can copy images into directory sets and delete files on disk from image set details. Does not affect catalog exclude.",
+  "imageSetLibraryGateManagedLayoutTitle": "Managed layout",
+  "imageSetLibraryGateManagedLayoutHint": "When enabled together with resource changes, you can run a one-way takeover that flattens nested carriers into the set folder.",
+  "imageSetLibraryGatesLoadFailed": "Could not load image set library options.",
+  "imageSetLibraryGatesSaveFailed": "Could not save image set library options.",
+  "imageSetMutationRootArchiveUnsupported": "Resource changes are not supported for root-archive image sets.",
+  "imageSetMutationCopyImages": "Copy in images",
+  "imageSetMutationCopyPickTitle": "Pick images to copy into this image set",
+  "imageSetMutationDeleteOnDiskAction": "Delete on disk",
+  "imageSetMutationDeleteOnDiskTitle": "Delete images on disk?",
+  "imageSetMutationDeleteOnDiskBody": "Delete {count, plural, one{1 image} other{{count} images}} from disk? This removes files permanently and updates the catalog. Catalog exclude only hides images from browse.",
+  "@imageSetMutationDeleteOnDiskBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "imageSetMutationDeleteOnDiskConfirm": "Delete",
+  "imageSetMutationTakeoverAction": "Take over managed layout",
+  "imageSetMutationTakeoverTitle": "Take over managed layout?",
+  "imageSetMutationTakeoverBody": "Flatten nested carriers into this folder in workspace order. This cannot be undone and may rename files on disk.",
+  "imageSetMutationTakeoverConfirm": "Take over",
   "imageSetFilterSortField": "Sort by",
   "imageSetFilterSortName": "Display name",
   "imageSetFilterSortImageCount": "Image count",

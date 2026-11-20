@@ -2,7 +2,9 @@ import 'dart:typed_data';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set.dart';
+import 'package:hentai_library/features/image_set_library/domain/image_set_catalog_query.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_facets.dart';
+import 'package:hentai_library/features/image_set_library/domain/image_set_library_gates.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_facets_patch.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_image.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_reader_entry.dart';
@@ -71,6 +73,26 @@ typedef ImageSetSetNameLockedCommand =
     Future<void> Function(String imageSetId, {required bool locked});
 typedef ImageSetUpdateFacetsCommand =
     Future<void> Function(String imageSetId, ImageSetFacetsPatch patch);
+typedef ImageSetLibraryGatesQuery =
+    Future<ImageSetLibraryGates> Function(String libraryId);
+typedef ImageSetSetResourceMutationCommand =
+    Future<void> Function(String libraryId, {required bool enabled});
+typedef ImageSetSetManagedLayoutCommand =
+    Future<void> Function(String libraryId, {required bool enabled});
+typedef ImageSetCopyImagesInCommand =
+    Future<List<ImageSetImage>> Function(
+      String libraryId,
+      String imageSetId,
+      List<String> sourcePaths,
+    );
+typedef ImageSetDeleteImagesOnDiskCommand =
+    Future<void> Function(
+      String libraryId,
+      String imageSetId,
+      List<String> imageIds,
+    );
+typedef ImageSetTakeOverManagedLayoutCommand =
+    Future<void> Function(String libraryId, String imageSetId);
 
 /// Image set 目录读取 query（由 composition 绑定 use case）。
 final Provider<Future<List<ImageSet>> Function(String libraryId)>
@@ -103,6 +125,32 @@ imageSetSetNameLockedCommandProvider = requiredProvider(
 final Provider<ImageSetUpdateFacetsCommand>
 imageSetUpdateFacetsCommandProvider = requiredProvider(
   'imageSetUpdateFacetsCommandProvider',
+);
+
+final Provider<ImageSetLibraryGatesQuery> imageSetLibraryGatesQueryProvider =
+    requiredProvider('imageSetLibraryGatesQueryProvider');
+
+final Provider<ImageSetSetResourceMutationCommand>
+imageSetSetResourceMutationCommandProvider = requiredProvider(
+  'imageSetSetResourceMutationCommandProvider',
+);
+
+final Provider<ImageSetSetManagedLayoutCommand>
+imageSetSetManagedLayoutCommandProvider = requiredProvider(
+  'imageSetSetManagedLayoutCommandProvider',
+);
+
+final Provider<ImageSetCopyImagesInCommand> imageSetCopyImagesInCommandProvider =
+    requiredProvider('imageSetCopyImagesInCommandProvider');
+
+final Provider<ImageSetDeleteImagesOnDiskCommand>
+imageSetDeleteImagesOnDiskCommandProvider = requiredProvider(
+  'imageSetDeleteImagesOnDiskCommandProvider',
+);
+
+final Provider<ImageSetTakeOverManagedLayoutCommand>
+imageSetTakeOverManagedLayoutCommandProvider = requiredProvider(
+  'imageSetTakeOverManagedLayoutCommandProvider',
 );
 
 /// 手动同步 command：复用 library_admin 扫描 run 并映射终态。
@@ -207,6 +255,11 @@ final imageSetFacetsProvider = FutureProvider.autoDispose
     .family<ImageSetFacets, String>((Ref ref, String imageSetId) {
       ref.watch(libraryRevisionStateProvider.select((s) => s.revision));
       return ref.watch(imageSetFacetsQueryProvider)(imageSetId);
+    });
+
+final imageSetLibraryGatesProvider = FutureProvider.autoDispose
+    .family<ImageSetLibraryGates, String>((Ref ref, String libraryId) {
+      return ref.watch(imageSetLibraryGatesQueryProvider)(libraryId);
     });
 
 final imageSetSubmissionsProvider = FutureProvider.autoDispose

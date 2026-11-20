@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set.dart';
+import 'package:hentai_library/features/image_set_library/domain/image_set_catalog_query.dart';
+import 'package:hentai_library/features/image_set_library/domain/image_set_library_gates.dart';
+import 'package:hentai_library/features/image_set_library/presentation/views/image_set_detail_mutation_section.dart';
+import 'package:hentai_library/features/image_set_library/presentation/views/image_set_mutation_dialogs.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_facets.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_image.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_reader_entry.dart';
@@ -23,10 +27,12 @@ class ImageSetDetailPage extends ConsumerStatefulWidget {
     super.key,
     required this.libraryId,
     required this.imageSet,
+    this.carrierShape = ImageSetCarrierShape.directory,
   });
 
   final String libraryId;
   final ImageSet imageSet;
+  final ImageSetCarrierShape carrierShape;
 
   @override
   ConsumerState<ImageSetDetailPage> createState() => _ImageSetDetailPageState();
@@ -107,6 +113,30 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
     );
   }
 
+  Future<void> _deleteOnDisk() async {
+    if (_selectedIds.isEmpty) {
+      return;
+    }
+    final int count = _selectedIds.length;
+    final bool confirmed = await confirmDeleteImageSetImagesOnDisk(
+      context,
+      count: count,
+    );
+    if (!confirmed || !mounted) {
+      return;
+    }
+    final List<String> ids = _selectedIds.toList(growable: false);
+    await ref.read(imageSetDeleteImagesOnDiskCommandProvider)(
+      widget.libraryId,
+      _imageSet.imageSetId,
+      ids,
+    );
+    if (!mounted) {
+      return;
+    }
+    setState(_selectedIds.clear);
+  }
+
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
@@ -118,6 +148,12 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
           : imageSetImagesProvider(_imagesKey),
     );
     final String title = _imageSet.name;
+    final AsyncValue<ImageSetLibraryGates> gates = ref.watch(
+      imageSetLibraryGatesProvider(widget.libraryId),
+    );
+    final bool showDiskDelete = _manageMode &&
+        gates.asData?.value.resourceMutation == true &&
+        widget.carrierShape == ImageSetCarrierShape.directory;
 
     return Scaffold(
       body: SafeArea(
@@ -137,9 +173,11 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
                               .map((ImageSetImage i) => i.imageSetImageId)
                               .toList() ??
                           const <String>[],
+                      showDeleteOnDisk: showDiskDelete,
                       onExit: _exitManage,
                       onExclude: () => _setExcluded(true),
                       onInclude: () => _setExcluded(false),
+                      onDeleteOnDisk: _deleteOnDisk,
                       onSelectAll: (List<String> ids) =>
                           setState(() => _selectedIds.addAll(ids)),
                       onClearSelection: () =>
@@ -192,11 +230,22 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
                               theme.spacing.md,
                             ),
                             sliver: SliverToBoxAdapter(
-                              child: ImageSetDetailHeader(
-                                libraryId: widget.libraryId,
-                                imageSetId: _imageSet.imageSetId,
-                                title: title,
-                                imageCount: list.length,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  ImageSetDetailHeader(
+                                    libraryId: widget.libraryId,
+                                    imageSetId: _imageSet.imageSetId,
+                                    title: title,
+                                    imageCount: list.length,
+                                  ),
+                                  SizedBox(height: theme.spacing.sm),
+                                  ImageSetDetailMutationSection(
+                                    libraryId: widget.libraryId,
+                                    imageSet: _imageSet,
+                                    carrierShape: widget.carrierShape,
+                                  ),
+                                ],
                               ),
                             ),
                           ),
@@ -258,9 +307,11 @@ class _ManageToolbar extends StatelessWidget {
     required this.selectedCount,
     required this.hasSelection,
     required this.allIds,
+    required this.showDeleteOnDisk,
     required this.onExit,
     required this.onExclude,
     required this.onInclude,
+    required this.onDeleteOnDisk,
     required this.onSelectAll,
     required this.onClearSelection,
   });
@@ -268,9 +319,11 @@ class _ManageToolbar extends StatelessWidget {
   final int selectedCount;
   final bool hasSelection;
   final List<String> allIds;
+  final bool showDeleteOnDisk;
   final VoidCallback onExit;
   final VoidCallback onExclude;
   final VoidCallback onInclude;
+  final VoidCallback onDeleteOnDisk;
   final void Function(List<String> ids) onSelectAll;
   final VoidCallback onClearSelection;
 
@@ -307,6 +360,14 @@ class _ManageToolbar extends StatelessWidget {
             onPressed: hasSelection ? onInclude : null,
             child: Text(l10n.imageSetDetailManageInclude),
           ),
+          if (showDeleteOnDisk)
+            TextButton(
+              onPressed: hasSelection ? onDeleteOnDisk : null,
+              child: Text(
+                l10n.imageSetMutationDeleteOnDiskAction,
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ),
+            ),
           const Spacer(),
           Text(
             l10n.imageSetDetailManageSelectedCount(selectedCount),

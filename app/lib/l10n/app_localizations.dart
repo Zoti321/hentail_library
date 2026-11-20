@@ -416,6 +416,108 @@ abstract class AppLocalizations {
   /// **'根压缩包'**
   String get imageSetFilterCarrierArchive;
 
+  /// No description provided for @imageSetLibraryGateResourceMutationTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'允许资源变更'**
+  String get imageSetLibraryGateResourceMutationTitle;
+
+  /// No description provided for @imageSetLibraryGateResourceMutationHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'开启后，可在目录图集详情中复制图片入库，并从磁盘删除文件。与目录中仅隐藏浏览的「排除」无关。'**
+  String get imageSetLibraryGateResourceMutationHint;
+
+  /// No description provided for @imageSetLibraryGateManagedLayoutTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'托管布局'**
+  String get imageSetLibraryGateManagedLayoutTitle;
+
+  /// No description provided for @imageSetLibraryGateManagedLayoutHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'与资源变更同时开启时，可执行不可逆的接管，按工作区顺序将嵌套载体展平到图集文件夹。'**
+  String get imageSetLibraryGateManagedLayoutHint;
+
+  /// No description provided for @imageSetLibraryGatesLoadFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'无法加载图集库选项。'**
+  String get imageSetLibraryGatesLoadFailed;
+
+  /// No description provided for @imageSetLibraryGatesSaveFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'无法保存图集库选项。'**
+  String get imageSetLibraryGatesSaveFailed;
+
+  /// No description provided for @imageSetMutationRootArchiveUnsupported.
+  ///
+  /// In zh, this message translates to:
+  /// **'根目录压缩包图集不支持资源变更。'**
+  String get imageSetMutationRootArchiveUnsupported;
+
+  /// No description provided for @imageSetMutationCopyImages.
+  ///
+  /// In zh, this message translates to:
+  /// **'复制图片入库'**
+  String get imageSetMutationCopyImages;
+
+  /// No description provided for @imageSetMutationCopyPickTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择要复制到本图集的图片'**
+  String get imageSetMutationCopyPickTitle;
+
+  /// No description provided for @imageSetMutationDeleteOnDiskAction.
+  ///
+  /// In zh, this message translates to:
+  /// **'从磁盘删除'**
+  String get imageSetMutationDeleteOnDiskAction;
+
+  /// No description provided for @imageSetMutationDeleteOnDiskTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'从磁盘删除图片？'**
+  String get imageSetMutationDeleteOnDiskTitle;
+
+  /// No description provided for @imageSetMutationDeleteOnDiskBody.
+  ///
+  /// In zh, this message translates to:
+  /// **'从磁盘永久删除 {count} 张图片并更新目录？目录「排除」仅从浏览中隐藏，不删除文件。'**
+  String imageSetMutationDeleteOnDiskBody(int count);
+
+  /// No description provided for @imageSetMutationDeleteOnDiskConfirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除'**
+  String get imageSetMutationDeleteOnDiskConfirm;
+
+  /// No description provided for @imageSetMutationTakeoverAction.
+  ///
+  /// In zh, this message translates to:
+  /// **'接管托管布局'**
+  String get imageSetMutationTakeoverAction;
+
+  /// No description provided for @imageSetMutationTakeoverTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'接管托管布局？'**
+  String get imageSetMutationTakeoverTitle;
+
+  /// No description provided for @imageSetMutationTakeoverBody.
+  ///
+  /// In zh, this message translates to:
+  /// **'按工作区顺序将嵌套载体展平到本文件夹，可能重命名磁盘文件。此操作不可撤销。'**
+  String get imageSetMutationTakeoverBody;
+
+  /// No description provided for @imageSetMutationTakeoverConfirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'接管'**
+  String get imageSetMutationTakeoverConfirm;
+
   /// No description provided for @imageSetFilterSortField.
   ///
   /// In zh, this message translates to:

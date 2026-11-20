@@ -112,6 +112,30 @@
   "imageSetFilterCarrierAny": "全部",
   "imageSetFilterCarrierDirectory": "目录图集",
   "imageSetFilterCarrierArchive": "根压缩包",
+  "imageSetLibraryGateResourceMutationTitle": "允许资源变更",
+  "imageSetLibraryGateResourceMutationHint": "开启后，可在目录图集详情中复制图片入库，并从磁盘删除文件。与目录中仅隐藏浏览的「排除」无关。",
+  "imageSetLibraryGateManagedLayoutTitle": "托管布局",
+  "imageSetLibraryGateManagedLayoutHint": "与资源变更同时开启时，可执行不可逆的接管，按工作区顺序将嵌套载体展平到图集文件夹。",
+  "imageSetLibraryGatesLoadFailed": "无法加载图集库选项。",
+  "imageSetLibraryGatesSaveFailed": "无法保存图集库选项。",
+  "imageSetMutationRootArchiveUnsupported": "根目录压缩包图集不支持资源变更。",
+  "imageSetMutationCopyImages": "复制图片入库",
+  "imageSetMutationCopyPickTitle": "选择要复制到本图集的图片",
+  "imageSetMutationDeleteOnDiskAction": "从磁盘删除",
+  "imageSetMutationDeleteOnDiskTitle": "从磁盘删除图片？",
+  "imageSetMutationDeleteOnDiskBody": "从磁盘永久删除 {count} 张图片并更新目录？目录「排除」仅从浏览中隐藏，不删除文件。",
+  "@imageSetMutationDeleteOnDiskBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "imageSetMutationDeleteOnDiskConfirm": "删除",
+  "imageSetMutationTakeoverAction": "接管托管布局",
+  "imageSetMutationTakeoverTitle": "接管托管布局？",
+  "imageSetMutationTakeoverBody": "按工作区顺序将嵌套载体展平到本文件夹，可能重命名磁盘文件。此操作不可撤销。",
+  "imageSetMutationTakeoverConfirm": "接管",
   "imageSetFilterSortField": "排序",
   "imageSetFilterSortName": "显示名称",
   "imageSetFilterSortImageCount": "图片数",

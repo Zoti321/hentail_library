@@ -201,6 +201,73 @@ class AppLocalizationsEn extends AppLocalizations {
   String get imageSetFilterCarrierArchive => 'Root archives';
 
   @override
+  String get imageSetLibraryGateResourceMutationTitle =>
+      'Allow resource changes';
+
+  @override
+  String get imageSetLibraryGateResourceMutationHint =>
+      'When enabled, you can copy images into directory sets and delete files on disk from image set details. Does not affect catalog exclude.';
+
+  @override
+  String get imageSetLibraryGateManagedLayoutTitle => 'Managed layout';
+
+  @override
+  String get imageSetLibraryGateManagedLayoutHint =>
+      'When enabled together with resource changes, you can run a one-way takeover that flattens nested carriers into the set folder.';
+
+  @override
+  String get imageSetLibraryGatesLoadFailed =>
+      'Could not load image set library options.';
+
+  @override
+  String get imageSetLibraryGatesSaveFailed =>
+      'Could not save image set library options.';
+
+  @override
+  String get imageSetMutationRootArchiveUnsupported =>
+      'Resource changes are not supported for root-archive image sets.';
+
+  @override
+  String get imageSetMutationCopyImages => 'Copy in images';
+
+  @override
+  String get imageSetMutationCopyPickTitle =>
+      'Pick images to copy into this image set';
+
+  @override
+  String get imageSetMutationDeleteOnDiskAction => 'Delete on disk';
+
+  @override
+  String get imageSetMutationDeleteOnDiskTitle => 'Delete images on disk?';
+
+  @override
+  String imageSetMutationDeleteOnDiskBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count images',
+      one: '1 image',
+    );
+    return 'Delete $_temp0 from disk? This removes files permanently and updates the catalog. Catalog exclude only hides images from browse.';
+  }
+
+  @override
+  String get imageSetMutationDeleteOnDiskConfirm => 'Delete';
+
+  @override
+  String get imageSetMutationTakeoverAction => 'Take over managed layout';
+
+  @override
+  String get imageSetMutationTakeoverTitle => 'Take over managed layout?';
+
+  @override
+  String get imageSetMutationTakeoverBody =>
+      'Flatten nested carriers into this folder in workspace order. This cannot be undone and may rename files on disk.';
+
+  @override
+  String get imageSetMutationTakeoverConfirm => 'Take over';
+
+  @override
   String get imageSetFilterSortField => 'Sort by';
 
   @override

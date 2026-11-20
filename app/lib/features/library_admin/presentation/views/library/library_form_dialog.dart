@@ -16,6 +16,7 @@ import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:path/path.dart' as p;
+import 'package:hentai_library/features/image_set_library/public/widgets.dart';
 import 'package:hentai_library/features/resource_metadata/public/widgets.dart';
 
 enum LibraryFormMode { createLocal, createImageSetLocal, createRemote, edit }
@@ -264,6 +265,8 @@ class _LibraryFormState extends ConsumerState<_LibraryFormFields> {
         ),
         if (!_isRemote && !_form.isImageSet && widget.library != null)
           WritebackSetting(libraryId: widget.library!.libraryId),
+        if (!_isRemote && _form.isImageSet && widget.library != null)
+          ImageSetLibraryGatesSetting(libraryId: widget.library!.libraryId),
       ],
     );
 

@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set.dart';
+import 'package:hentai_library/features/image_set_library/domain/image_set_catalog_query.dart';
+import 'package:hentai_library/features/image_set_library/domain/image_set_library_gates.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_facets.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_image.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_reader_entry.dart';
@@ -83,9 +85,14 @@ class _Probe {
   String? lastFacetsImageSetId;
   final List<({List<String> ids, bool excluded})> excludeCalls =
       <({List<String> ids, bool excluded})>[];
+  final List<List<String>> deleteOnDiskCalls = <List<String>>[];
   final List<List<String>> reorderCalls = <List<String>>[];
   List<ImageSetSubmission> submissions = const <ImageSetSubmission>[];
   final List<String> createSubmissionNames = <String>[];
+  ImageSetLibraryGates gates = const ImageSetLibraryGates(
+    resourceMutation: false,
+    managedLayout: false,
+  );
 }
 
 List<Override> _overrides(
@@ -94,6 +101,7 @@ List<Override> _overrides(
   ImageSet imageSet = _alpha,
   List<ImageSetImage>? browseImages,
   List<ImageSetImage>? workspaceImages,
+  ImageSetLibraryGates? gates,
 }) {
   final List<ImageSetImage> browse =
       browseImages ??
@@ -135,6 +143,20 @@ List<Override> _overrides(
         probe.reorderCalls.add(List<String>.from(orderedIds));
       },
     ),
+    imageSetLibraryGatesQueryProvider.overrideWithValue(
+      (_) async => gates ?? probe.gates,
+    ),
+    imageSetDeleteImagesOnDiskCommandProvider.overrideWithValue(
+      (String libraryId, String imageSetId, List<String> imageIds) async {
+        probe.deleteOnDiskCalls.add(List<String>.from(imageIds));
+      },
+    ),
+    imageSetCopyImagesInCommandProvider.overrideWithValue(
+      (_, __, ___) async => const <ImageSetImage>[],
+    ),
+    imageSetTakeOverManagedLayoutCommandProvider.overrideWithValue(
+      (_, __) async {},
+    ),
     imageSetSubmissionsQueryProvider.overrideWithValue(
       (String libraryId, String imageSetId) async => probe.submissions,
     ),
@@ -172,10 +194,15 @@ Future<void> _pumpDetail(
   WidgetTester tester, {
   required List<Override> overrides,
   ImageSet imageSet = _alpha,
+  ImageSetCarrierShape carrierShape = ImageSetCarrierShape.directory,
 }) => pumpLocalizedApp(
   tester,
   overrides: overrides,
-  home: ImageSetDetailPage(libraryId: imageSet.libraryId, imageSet: imageSet),
+  home: ImageSetDetailPage(
+    libraryId: imageSet.libraryId,
+    imageSet: imageSet,
+    carrierShape: carrierShape,
+  ),
 );
 
 Future<void> _enterManage(WidgetTester tester) async {
@@ -360,6 +387,58 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(probe.createSubmissionNames, <String>['night set']);
+  });
+
+  testWidgets('root archive shows unsupported copy when mutation enabled', (
+    WidgetTester tester,
+  ) async {
+    final _Probe probe = _Probe()
+      ..gates = const ImageSetLibraryGates(
+        resourceMutation: true,
+        managedLayout: false,
+      );
+    await _pumpDetail(
+      tester,
+      overrides: _overrides(probe),
+      carrierShape: ImageSetCarrierShape.rootArchive,
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('根目录压缩包图集不支持资源变更。'), findsOneWidget);
+    expect(find.text('复制图片入库'), findsNothing);
+  });
+
+  testWidgets('delete on disk confirm invokes command', (
+    WidgetTester tester,
+  ) async {
+    final _Probe probe = _Probe()
+      ..gates = const ImageSetLibraryGates(
+        resourceMutation: true,
+        managedLayout: false,
+      );
+    _alphaImages = <ImageSetImage>[_image1, _image2];
+    await _pumpDetail(
+      tester,
+      overrides: _overrides(
+        probe,
+        workspaceImages: <ImageSetImage>[_image1, _image2],
+      ),
+    );
+    await tester.pumpAndSettle();
+    await _enterManage(tester);
+
+    await tester.tap(find.text('全选'));
+    await tester.pump();
+    await tester.tap(find.text('从磁盘删除'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(M3EButton, '删除'));
+    await tester.pumpAndSettle();
+
+    expect(probe.deleteOnDiskCalls, hasLength(1));
+    expect(
+      probe.deleteOnDiskCalls.single,
+      containsAll(<String>['i1', 'i2']),
+    );
   });
 
   testWidgets('exiting manage restores browse list without excluded', (

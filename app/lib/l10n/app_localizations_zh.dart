@@ -186,6 +186,62 @@ class AppLocalizationsZh extends AppLocalizations {
   String get imageSetFilterCarrierArchive => '根压缩包';
 
   @override
+  String get imageSetLibraryGateResourceMutationTitle => '允许资源变更';
+
+  @override
+  String get imageSetLibraryGateResourceMutationHint =>
+      '开启后，可在目录图集详情中复制图片入库，并从磁盘删除文件。与目录中仅隐藏浏览的「排除」无关。';
+
+  @override
+  String get imageSetLibraryGateManagedLayoutTitle => '托管布局';
+
+  @override
+  String get imageSetLibraryGateManagedLayoutHint =>
+      '与资源变更同时开启时，可执行不可逆的接管，按工作区顺序将嵌套载体展平到图集文件夹。';
+
+  @override
+  String get imageSetLibraryGatesLoadFailed => '无法加载图集库选项。';
+
+  @override
+  String get imageSetLibraryGatesSaveFailed => '无法保存图集库选项。';
+
+  @override
+  String get imageSetMutationRootArchiveUnsupported => '根目录压缩包图集不支持资源变更。';
+
+  @override
+  String get imageSetMutationCopyImages => '复制图片入库';
+
+  @override
+  String get imageSetMutationCopyPickTitle => '选择要复制到本图集的图片';
+
+  @override
+  String get imageSetMutationDeleteOnDiskAction => '从磁盘删除';
+
+  @override
+  String get imageSetMutationDeleteOnDiskTitle => '从磁盘删除图片？';
+
+  @override
+  String imageSetMutationDeleteOnDiskBody(int count) {
+    return '从磁盘永久删除 $count 张图片并更新目录？目录「排除」仅从浏览中隐藏，不删除文件。';
+  }
+
+  @override
+  String get imageSetMutationDeleteOnDiskConfirm => '删除';
+
+  @override
+  String get imageSetMutationTakeoverAction => '接管托管布局';
+
+  @override
+  String get imageSetMutationTakeoverTitle => '接管托管布局？';
+
+  @override
+  String get imageSetMutationTakeoverBody =>
+      '按工作区顺序将嵌套载体展平到本文件夹，可能重命名磁盘文件。此操作不可撤销。';
+
+  @override
+  String get imageSetMutationTakeoverConfirm => '接管';
+
+  @override
   String get imageSetFilterSortField => '排序';
 
   @override

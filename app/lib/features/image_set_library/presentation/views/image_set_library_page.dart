@@ -47,11 +47,14 @@ class _ImageSetLibraryPageState extends ConsumerState<ImageSetLibraryPage> {
     super.dispose();
   }
 
-  void _openDetail(ImageSet set) {
+  void _openDetail(ImageSetCatalogItem item) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) =>
-            ImageSetDetailPage(libraryId: widget.libraryId, imageSet: set),
+        builder: (_) => ImageSetDetailPage(
+          libraryId: widget.libraryId,
+          imageSet: item.imageSet,
+          carrierShape: item.carrierShape,
+        ),
       ),
     );
   }
@@ -225,7 +228,7 @@ class _CatalogBody extends StatelessWidget {
   final CatalogViewMode viewMode;
   final ScrollController scrollController;
   final double horizontalInset;
-  final ValueChanged<ImageSet> onOpen;
+  final ValueChanged<ImageSetCatalogItem> onOpen;
   final ValueChanged<int> onPageChanged;
 
   @override
@@ -287,7 +290,7 @@ class _CatalogBody extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        onTap: () => onOpen(set),
+                        onTap: () => onOpen(item),
                       ),
                     ],
                   );
@@ -300,13 +303,14 @@ class _CatalogBody extends StatelessWidget {
               hasSubtitle: false,
               itemBuilder:
                   (BuildContext context, int index, CatalogGridLayout _) {
-                    final ImageSet set = items[index].imageSet;
+                    final ImageSetCatalogItem item = items[index];
+                    final ImageSet set = item.imageSet;
                     return ImageSetCard(
                       key: ValueKey<String>('imageSet-${set.imageSetId}'),
                       libraryId: libraryId,
                       imageSetId: set.imageSetId,
                       title: set.name,
-                      onTap: () => onOpen(set),
+                      onTap: () => onOpen(item),
                     );
                   },
             ),
