@@ -2,8 +2,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/image_set_library/application/load_image_set_catalog_page_use_case.dart';
 import 'package:hentai_library/features/image_set_library/application/load_image_set_facets_use_case.dart';
 import 'package:hentai_library/features/image_set_library/application/load_image_set_images_use_case.dart';
+import 'package:hentai_library/features/image_set_library/application/load_image_set_workspace_images_use_case.dart';
 import 'package:hentai_library/features/image_set_library/application/load_image_sets_use_case.dart';
 import 'package:hentai_library/features/image_set_library/application/open_image_set_reader_use_case.dart';
+import 'package:hentai_library/features/image_set_library/application/reorder_image_set_images_use_case.dart';
+import 'package:hentai_library/features/image_set_library/application/set_image_set_images_excluded_use_case.dart';
 import 'package:hentai_library/features/image_set_library/application/sync_image_set_library_use_case.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_reader_entry.dart';
 import 'package:hentai_library/features/image_set_library/infrastructure/repositories/image_set_browse_preferences_repository_impl.dart';
@@ -27,6 +30,12 @@ List<Override> imageSetLibraryOverrides() {
   final LoadImageSetImagesUseCase loadImages = LoadImageSetImagesUseCase(
     repository,
   );
+  final LoadImageSetWorkspaceImagesUseCase loadWorkspaceImages =
+      LoadImageSetWorkspaceImagesUseCase(repository);
+  final SetImageSetImagesExcludedUseCase setExcluded =
+      SetImageSetImagesExcludedUseCase(repository);
+  final ReorderImageSetImagesUseCase reorderImages =
+      ReorderImageSetImagesUseCase(repository);
   final OpenImageSetReaderUseCase openReader = OpenImageSetReaderUseCase(
     repository,
   );
@@ -41,6 +50,11 @@ List<Override> imageSetLibraryOverrides() {
     ),
     imageSetFacetsQueryProvider.overrideWithValue(loadFacets.call),
     imageSetImagesQueryProvider.overrideWithValue(loadImages.call),
+    imageSetWorkspaceImagesQueryProvider.overrideWithValue(
+      loadWorkspaceImages.call,
+    ),
+    imageSetSetImagesExcludedCommandProvider.overrideWithValue(setExcluded.call),
+    imageSetReorderImagesCommandProvider.overrideWithValue(reorderImages.call),
     syncImageSetLibraryCommandProvider.overrideWith(
       (Ref ref) =>
           (String libraryId) => SyncImageSetLibraryUseCase(

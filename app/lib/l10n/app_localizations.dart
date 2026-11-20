@@ -212,6 +212,54 @@ abstract class AppLocalizations {
   /// **'{count} 张'**
   String imageSetDetailImageCount(int count);
 
+  /// No description provided for @imageSetDetailManageEnter.
+  ///
+  /// In zh, this message translates to:
+  /// **'管理工作区'**
+  String get imageSetDetailManageEnter;
+
+  /// No description provided for @imageSetDetailManageExit.
+  ///
+  /// In zh, this message translates to:
+  /// **'完成'**
+  String get imageSetDetailManageExit;
+
+  /// No description provided for @imageSetDetailManageExclude.
+  ///
+  /// In zh, this message translates to:
+  /// **'排除'**
+  String get imageSetDetailManageExclude;
+
+  /// No description provided for @imageSetDetailManageInclude.
+  ///
+  /// In zh, this message translates to:
+  /// **'纳入'**
+  String get imageSetDetailManageInclude;
+
+  /// No description provided for @imageSetDetailManageSelectAll.
+  ///
+  /// In zh, this message translates to:
+  /// **'全选'**
+  String get imageSetDetailManageSelectAll;
+
+  /// No description provided for @imageSetDetailManageClearSelection.
+  ///
+  /// In zh, this message translates to:
+  /// **'清除'**
+  String get imageSetDetailManageClearSelection;
+
+  /// No description provided for @imageSetDetailManageSelectedCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'已选 {count} 张'**
+  String imageSetDetailManageSelectedCount(int count);
+
+  /// No description provided for @imageSetDetailExcludedBadge.
+  ///
+  /// In zh, this message translates to:
+  /// **'已排除'**
+  String get imageSetDetailExcludedBadge;
+
   /// No description provided for @imageSetFilterSortTitle.
   ///
   /// In zh, this message translates to:

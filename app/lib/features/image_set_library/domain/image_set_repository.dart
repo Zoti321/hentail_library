@@ -31,6 +31,12 @@ abstract interface class ImageSetRepository {
     String imageSetId,
   );
 
+  /// Manage workspace: all members in user order with real `excluded`.
+  Future<List<ImageSetImage>> listWorkspaceImages(
+    String libraryId,
+    String imageSetId,
+  );
+
   /// 打开 Read session（只读，不写 Comic 阅读历史）。
   Future<ImageSetReaderSession> openReaderSession(
     String libraryId,

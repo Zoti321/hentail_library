@@ -84,6 +84,32 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get imageSetDetailManageEnter => 'Manage workspace';
+
+  @override
+  String get imageSetDetailManageExit => 'Done';
+
+  @override
+  String get imageSetDetailManageExclude => 'Exclude';
+
+  @override
+  String get imageSetDetailManageInclude => 'Include';
+
+  @override
+  String get imageSetDetailManageSelectAll => 'Select all';
+
+  @override
+  String get imageSetDetailManageClearSelection => 'Clear';
+
+  @override
+  String imageSetDetailManageSelectedCount(int count) {
+    return '$count selected';
+  }
+
+  @override
+  String get imageSetDetailExcludedBadge => 'Excluded';
+
+  @override
   String get imageSetFilterSortTitle => 'Image set filter & sort';
 
   @override

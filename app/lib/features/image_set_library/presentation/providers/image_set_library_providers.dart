@@ -14,6 +14,19 @@ typedef ImageSetSyncCommand = Future<ImageSetSyncOutcome> Function(
   String libraryId,
 );
 typedef ImageSetReaderEntryCommand = void Function(ImageSetReaderEntry entry);
+typedef ImageSetSetImagesExcludedCommand =
+    Future<void> Function(
+      String libraryId,
+      String imageSetId,
+      List<String> imageIds, {
+      required bool excluded,
+    });
+typedef ImageSetReorderImagesCommand =
+    Future<void> Function(
+      String libraryId,
+      String imageSetId,
+      List<String> orderedIds,
+    );
 typedef ImageSetImagesKey = ({String libraryId, String imageSetId});
 typedef ImageSetPageBytesKey = ({String libraryId, ImageSetImage image});
 typedef ImageSetFacetsQuery = Future<ImageSetFacets> Function(String imageSetId);
@@ -26,6 +39,13 @@ final Provider<
   Future<List<ImageSetImage>> Function(String libraryId, String imageSetId)
 >
 imageSetImagesQueryProvider = requiredProvider('imageSetImagesQueryProvider');
+
+final Provider<
+  Future<List<ImageSetImage>> Function(String libraryId, String imageSetId)
+>
+imageSetWorkspaceImagesQueryProvider = requiredProvider(
+  'imageSetWorkspaceImagesQueryProvider',
+);
 
 /// Facet bindings query（composition 绑定 use case；不走 Comic metadata）。
 final Provider<ImageSetFacetsQuery> imageSetFacetsQueryProvider =
@@ -55,6 +75,16 @@ imageSetPageBytesQueryProvider = requiredProvider(
 final Provider<ImageSetReaderEntryCommand> imageSetReaderEntryCommandProvider =
     requiredProvider('imageSetReaderEntryCommandProvider');
 
+final Provider<ImageSetSetImagesExcludedCommand>
+imageSetSetImagesExcludedCommandProvider = requiredProvider(
+  'imageSetSetImagesExcludedCommandProvider',
+);
+
+final Provider<ImageSetReorderImagesCommand>
+imageSetReorderImagesCommandProvider = requiredProvider(
+  'imageSetReorderImagesCommandProvider',
+);
+
 /// catalog 变更（sync 成功）后随 library revision 重新读取。
 final imageSetSetsProvider = FutureProvider.autoDispose
     .family<List<ImageSet>, String>((Ref ref, String libraryId) {
@@ -69,6 +99,18 @@ final imageSetImagesProvider = FutureProvider.autoDispose
     ) {
       ref.watch(libraryRevisionStateProvider.select((s) => s.revision));
       return ref.watch(imageSetImagesQueryProvider)(
+        key.libraryId,
+        key.imageSetId,
+      );
+    });
+
+final imageSetWorkspaceImagesProvider = FutureProvider.autoDispose
+    .family<List<ImageSetImage>, ImageSetImagesKey>((
+      Ref ref,
+      ImageSetImagesKey key,
+    ) {
+      ref.watch(libraryRevisionStateProvider.select((s) => s.revision));
+      return ref.watch(imageSetWorkspaceImagesQueryProvider)(
         key.libraryId,
         key.imageSetId,
       );

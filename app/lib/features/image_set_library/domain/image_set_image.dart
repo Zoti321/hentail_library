@@ -8,6 +8,7 @@ class ImageSetImage {
     required this.memberPath,
     required this.carrierKind,
     required this.name,
+    this.excluded = false,
   });
 
   final String imageSetImageId;
@@ -21,4 +22,7 @@ class ImageSetImage {
   /// `loose` | `zip` | `rar` | `sevenz`。
   final String carrierKind;
   final String name;
+
+  /// Workspace exclude flag; browse list always `false`.
+  final bool excluded;
 }

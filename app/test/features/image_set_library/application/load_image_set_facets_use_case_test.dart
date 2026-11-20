@@ -57,6 +57,12 @@ class _FakeRepository implements ImageSetRepository {
   ) => throw UnimplementedError();
 
   @override
+  Future<List<ImageSetImage>> listWorkspaceImages(
+    String libraryId,
+    String imageSetId,
+  ) => throw UnimplementedError();
+
+  @override
   Future<ImageSetReaderSession> openReaderSession(
     String libraryId,
     String imageSetId,

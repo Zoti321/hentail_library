@@ -57,6 +57,21 @@
       }
     }
   },
+  "imageSetDetailManageEnter": "管理工作区",
+  "imageSetDetailManageExit": "完成",
+  "imageSetDetailManageExclude": "排除",
+  "imageSetDetailManageInclude": "纳入",
+  "imageSetDetailManageSelectAll": "全选",
+  "imageSetDetailManageClearSelection": "清除",
+  "imageSetDetailManageSelectedCount": "已选 {count} 张",
+  "@imageSetDetailManageSelectedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "imageSetDetailExcludedBadge": "已排除",
   "imageSetFilterSortTitle": "图集筛选与排序",
   "imageSetFilterApply": "应用",
   "imageSetFilterReset": "重置",

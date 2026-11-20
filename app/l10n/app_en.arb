@@ -57,6 +57,21 @@
       }
     }
   },
+  "imageSetDetailManageEnter": "Manage workspace",
+  "imageSetDetailManageExit": "Done",
+  "imageSetDetailManageExclude": "Exclude",
+  "imageSetDetailManageInclude": "Include",
+  "imageSetDetailManageSelectAll": "Select all",
+  "imageSetDetailManageClearSelection": "Clear",
+  "imageSetDetailManageSelectedCount": "{count} selected",
+  "@imageSetDetailManageSelectedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "imageSetDetailExcludedBadge": "Excluded",
   "imageSetFilterSortTitle": "Image set filter & sort",
   "imageSetFilterApply": "Apply",
   "imageSetFilterReset": "Reset",

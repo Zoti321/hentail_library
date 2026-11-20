@@ -41,6 +41,7 @@ void main() {
       memberPath: '',
       carrierKind: 'loose',
       name: '0001.jpg',
+      excluded: true,
     );
     final ImageSetImage image = imageSetImageFromFrb(dto);
     final rust.ImageSetImageDto back = imageSetImageToFrb(image);
@@ -48,5 +49,7 @@ void main() {
     expect(back.carrierRelativePath, dto.carrierRelativePath);
     expect(back.carrierKind, dto.carrierKind);
     expect(back.name, dto.name);
+    expect(image.excluded, isTrue);
+    expect(back.excluded, isTrue);
   });
 }

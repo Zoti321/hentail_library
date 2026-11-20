@@ -29,16 +29,42 @@ const ImageSet _alpha = ImageSet(
   isRoot: false,
 );
 
-const List<ImageSetImage> _alphaImages = <ImageSetImage>[
-  ImageSetImage(
-    imageSetImageId: 'i1',
-    imageSetId: 'a',
-    libraryId: 'img-1',
-    carrierRelativePath: 'alpha/1.jpg',
-    memberPath: '',
-    carrierKind: 'loose',
-    name: '1.jpg',
-  ),
+const ImageSetImage _image1 = ImageSetImage(
+  imageSetImageId: 'i1',
+  imageSetId: 'a',
+  libraryId: 'img-1',
+  carrierRelativePath: 'alpha/1.jpg',
+  memberPath: '',
+  carrierKind: 'loose',
+  name: '1.jpg',
+);
+
+const ImageSetImage _image2 = ImageSetImage(
+  imageSetImageId: 'i2',
+  imageSetId: 'a',
+  libraryId: 'img-1',
+  carrierRelativePath: 'alpha/2.jpg',
+  memberPath: '',
+  carrierKind: 'loose',
+  name: '2.jpg',
+);
+
+const ImageSetImage _image2Excluded = ImageSetImage(
+  imageSetImageId: 'i2',
+  imageSetId: 'a',
+  libraryId: 'img-1',
+  carrierRelativePath: 'alpha/2.jpg',
+  memberPath: '',
+  carrierKind: 'loose',
+  name: '2.jpg',
+  excluded: true,
+);
+
+List<ImageSetImage> _alphaImages = <ImageSetImage>[_image1];
+
+List<ImageSetImage> _workspaceWithExcluded = <ImageSetImage>[
+  _image1,
+  _image2Excluded,
 ];
 
 final Uint8List _png1x1 = Uint8List.fromList(<int>[
@@ -53,29 +79,60 @@ final Uint8List _png1x1 = Uint8List.fromList(<int>[
 class _Probe {
   final List<ImageSetReaderEntry> entries = <ImageSetReaderEntry>[];
   String? lastFacetsImageSetId;
+  final List<({List<String> ids, bool excluded})> excludeCalls =
+      <({List<String> ids, bool excluded})>[];
+  final List<List<String>> reorderCalls = <List<String>>[];
 }
 
 List<Override> _overrides(
   _Probe probe, {
   ImageSetFacets facets = ImageSetFacets.empty,
   ImageSet imageSet = _alpha,
-}) => <Override>[
-  libraryRevisionStateProvider.overrideWithValue(const LibraryRevisionState()),
-  imageSetImagesQueryProvider.overrideWithValue(
-    (String libraryId, String imageSetId) async =>
-        imageSetId == _alpha.imageSetId
-        ? _alphaImages
-        : const <ImageSetImage>[],
-  ),
-  imageSetPageBytesQueryProvider.overrideWithValue(
-    (String libraryId, ImageSetImage image) async => _png1x1,
-  ),
-  imageSetFacetsQueryProvider.overrideWithValue((String imageSetId) async {
-    probe.lastFacetsImageSetId = imageSetId;
-    return facets;
-  }),
-  imageSetReaderEntryCommandProvider.overrideWithValue(probe.entries.add),
-];
+  List<ImageSetImage>? browseImages,
+  List<ImageSetImage>? workspaceImages,
+}) {
+  final List<ImageSetImage> browse =
+      browseImages ??
+      (imageSet.imageSetId == _alpha.imageSetId
+          ? _alphaImages
+          : const <ImageSetImage>[]);
+  final List<ImageSetImage> workspace =
+      workspaceImages ??
+      (imageSet.imageSetId == _alpha.imageSetId
+          ? _workspaceWithExcluded
+          : const <ImageSetImage>[]);
+  return <Override>[
+    libraryRevisionStateProvider.overrideWithValue(const LibraryRevisionState()),
+    imageSetImagesQueryProvider.overrideWithValue(
+      (String libraryId, String imageSetId) async =>
+          imageSetId == _alpha.imageSetId ? browse : const <ImageSetImage>[],
+    ),
+    imageSetWorkspaceImagesQueryProvider.overrideWithValue(
+      (String libraryId, String imageSetId) async =>
+          imageSetId == _alpha.imageSetId ? workspace : const <ImageSetImage>[],
+    ),
+    imageSetPageBytesQueryProvider.overrideWithValue(
+      (String libraryId, ImageSetImage image) async => _png1x1,
+    ),
+    imageSetFacetsQueryProvider.overrideWithValue((String imageSetId) async {
+      probe.lastFacetsImageSetId = imageSetId;
+      return facets;
+    }),
+    imageSetReaderEntryCommandProvider.overrideWithValue(probe.entries.add),
+    imageSetSetImagesExcludedCommandProvider.overrideWithValue(
+      (String libraryId, String imageSetId, List<String> imageIds, {
+        required bool excluded,
+      }) async {
+        probe.excludeCalls.add((ids: List<String>.from(imageIds), excluded: excluded));
+      },
+    ),
+    imageSetReorderImagesCommandProvider.overrideWithValue(
+      (String libraryId, String imageSetId, List<String> orderedIds) async {
+        probe.reorderCalls.add(List<String>.from(orderedIds));
+      },
+    ),
+  ];
+}
 
 Future<void> _pumpDetail(
   WidgetTester tester, {
@@ -87,7 +144,16 @@ Future<void> _pumpDetail(
   home: ImageSetDetailPage(libraryId: imageSet.libraryId, imageSet: imageSet),
 );
 
+Future<void> _enterManage(WidgetTester tester) async {
+  await tester.tap(find.bySemanticsLabel('管理工作区'));
+  await tester.pumpAndSettle();
+}
+
 void main() {
+  setUp(() {
+    _alphaImages = <ImageSetImage>[_image1];
+  });
+
   testWidgets('renders bound facet names from injected query', (
     WidgetTester tester,
   ) async {
@@ -162,5 +228,81 @@ void main() {
     expect(probe.entries.single.imageSetId, 'a');
     expect(probe.entries.single.imageSetImageId, 'i1');
     expect(probe.entries.single.index, 0);
+  });
+
+  testWidgets('manage mode lists excluded workspace members', (
+    WidgetTester tester,
+  ) async {
+    final _Probe probe = _Probe();
+    _alphaImages = <ImageSetImage>[_image1, _image2];
+    await _pumpDetail(tester, overrides: _overrides(probe));
+    await tester.pumpAndSettle();
+    await _enterManage(tester);
+
+    expect(find.text('2.jpg'), findsOneWidget);
+    expect(find.text('已排除'), findsOneWidget);
+  });
+
+  testWidgets('exclude command invoked from manage mode', (
+    WidgetTester tester,
+  ) async {
+    final _Probe probe = _Probe();
+    await _pumpDetail(tester, overrides: _overrides(probe));
+    await tester.pumpAndSettle();
+    await _enterManage(tester);
+
+    await tester.tap(find.text('全选'));
+    await tester.pump();
+    await tester.tap(find.text('排除'));
+    await tester.pump();
+
+    expect(probe.excludeCalls, hasLength(1));
+    expect(probe.excludeCalls.single.ids, containsAll(<String>['i1', 'i2']));
+    expect(probe.excludeCalls.single.excluded, isTrue);
+  });
+
+  testWidgets('reorder command invoked with full permutation', (
+    WidgetTester tester,
+  ) async {
+    final _Probe probe = _Probe();
+    _alphaImages = <ImageSetImage>[_image1, _image2];
+    await _pumpDetail(
+      tester,
+      overrides: _overrides(
+        probe,
+        workspaceImages: <ImageSetImage>[_image1, _image2],
+      ),
+    );
+    await tester.pumpAndSettle();
+    await _enterManage(tester);
+
+    final Finder firstRow = find.byKey(const ValueKey<String>('i1'));
+    await tester.longPress(firstRow);
+    await tester.pump(const Duration(milliseconds: 200));
+    await tester.drag(firstRow, const Offset(0, 120));
+    await tester.pumpAndSettle();
+
+    expect(probe.reorderCalls, hasLength(1));
+    expect(
+      probe.reorderCalls.single,
+      <String>['i2', 'i1'],
+    );
+  });
+
+  testWidgets('exiting manage restores browse list without excluded', (
+    WidgetTester tester,
+  ) async {
+    final _Probe probe = _Probe();
+    await _pumpDetail(tester, overrides: _overrides(probe));
+    await tester.pumpAndSettle();
+    await _enterManage(tester);
+    expect(find.text('2.jpg'), findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.close));
+    await tester.pumpAndSettle();
+
+    expect(find.text('1 张'), findsOneWidget);
+    expect(find.text('2.jpg'), findsNothing);
+    expect(find.text('已排除'), findsNothing);
   });
 }

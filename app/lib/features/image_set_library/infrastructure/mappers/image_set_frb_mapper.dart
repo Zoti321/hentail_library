@@ -101,6 +101,7 @@ ImageSetImage imageSetImageFromFrb(rust.ImageSetImageDto dto) => ImageSetImage(
   memberPath: dto.memberPath,
   carrierKind: dto.carrierKind,
   name: dto.name,
+  excluded: dto.excluded,
 );
 
 rust.ImageSetImageDto imageSetImageToFrb(ImageSetImage image) =>
@@ -112,6 +113,7 @@ rust.ImageSetImageDto imageSetImageToFrb(ImageSetImage image) =>
       memberPath: image.memberPath,
       carrierKind: image.carrierKind,
       name: image.name,
+      excluded: image.excluded,
     );
 
 ImageSetLibraryGates imageSetLibraryGatesFromFrb(

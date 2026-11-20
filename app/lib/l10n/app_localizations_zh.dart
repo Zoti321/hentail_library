@@ -77,6 +77,32 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get imageSetDetailManageEnter => '管理工作区';
+
+  @override
+  String get imageSetDetailManageExit => '完成';
+
+  @override
+  String get imageSetDetailManageExclude => '排除';
+
+  @override
+  String get imageSetDetailManageInclude => '纳入';
+
+  @override
+  String get imageSetDetailManageSelectAll => '全选';
+
+  @override
+  String get imageSetDetailManageClearSelection => '清除';
+
+  @override
+  String imageSetDetailManageSelectedCount(int count) {
+    return '已选 $count 张';
+  }
+
+  @override
+  String get imageSetDetailExcludedBadge => '已排除';
+
+  @override
   String get imageSetFilterSortTitle => '图集筛选与排序';
 
   @override

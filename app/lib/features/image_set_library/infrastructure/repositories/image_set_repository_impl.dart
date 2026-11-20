@@ -97,6 +97,18 @@ class ImageSetRepositoryImpl implements ImageSetRepository {
   );
 
   @override
+  Future<List<ImageSetImage>> listWorkspaceImages(
+    String libraryId,
+    String imageSetId,
+  ) => guardFrb(
+    () async => (await rust.listImageSetWorkspaceImagesFrb(
+      libraryId: libraryId,
+      imageSetId: imageSetId,
+    )).map(imageSetImageFromFrb).toList(),
+    fallbackMessage: '读取图集工作区失败',
+  );
+
+  @override
   Future<ImageSetReaderSession> openReaderSession(
     String libraryId,
     String imageSetId,

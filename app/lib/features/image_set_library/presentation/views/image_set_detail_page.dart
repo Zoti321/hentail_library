@@ -12,9 +12,10 @@ import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/application/errors/error_message.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
-/// Image set 详情：顶栏（标题/张数）+ 无标题按行顶对齐图流。
-class ImageSetDetailPage extends ConsumerWidget {
+/// Image set 详情：顶栏（标题/张数）+ 无标题按行顶对齐图流；可进入工作区管理。
+class ImageSetDetailPage extends ConsumerStatefulWidget {
   const ImageSetDetailPage({
     super.key,
     required this.libraryId,
@@ -25,18 +26,71 @@ class ImageSetDetailPage extends ConsumerWidget {
   final ImageSet imageSet;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ImageSetDetailPage> createState() => _ImageSetDetailPageState();
+}
+
+class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
+  bool _manageMode = false;
+  final Set<String> _selectedIds = <String>{};
+
+  ImageSetImagesKey get _imagesKey => (
+    libraryId: widget.libraryId,
+    imageSetId: widget.imageSet.imageSetId,
+  );
+
+  void _exitManage() {
+    setState(() {
+      _manageMode = false;
+      _selectedIds.clear();
+    });
+  }
+
+  void _toggleSelection(String imageId) {
+    setState(() {
+      if (_selectedIds.contains(imageId)) {
+        _selectedIds.remove(imageId);
+      } else {
+        _selectedIds.add(imageId);
+      }
+    });
+  }
+
+  Future<void> _setExcluded(bool excluded) async {
+    if (_selectedIds.isEmpty) {
+      return;
+    }
+    final List<String> ids = _selectedIds.toList(growable: false);
+    await ref.read(imageSetSetImagesExcludedCommandProvider)(
+      widget.libraryId,
+      widget.imageSet.imageSetId,
+      ids,
+      excluded: excluded,
+    );
+    if (!mounted) {
+      return;
+    }
+    setState(_selectedIds.clear);
+  }
+
+  Future<void> _persistReorder(List<ImageSetImage> ordered) async {
+    await ref.read(imageSetReorderImagesCommandProvider)(
+      widget.libraryId,
+      widget.imageSet.imageSetId,
+      ordered.map((ImageSetImage i) => i.imageSetImageId).toList(),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     final M3EThemeData theme = M3ETheme.of(context);
     final double horizontalInset = PageLayoutSpec.of(context).horizontalInset;
-    final ImageSetImagesKey key = (
-      libraryId: libraryId,
-      imageSetId: imageSet.imageSetId,
-    );
     final AsyncValue<List<ImageSetImage>> images = ref.watch(
-      imageSetImagesProvider(key),
+      _manageMode
+          ? imageSetWorkspaceImagesProvider(_imagesKey)
+          : imageSetImagesProvider(_imagesKey),
     );
-    final String title = imageSet.name;
+    final String title = widget.imageSet.name;
 
     return Scaffold(
       body: SafeArea(
@@ -48,62 +102,104 @@ class ImageSetDetailPage extends ConsumerWidget {
                 horizontal: horizontalInset,
                 vertical: theme.spacing.sm,
               ),
-              child: DetailHeaderBackButton(
-                onBack: () => Navigator.of(context).maybePop(),
-              ),
+              child: _manageMode
+                  ? _ManageToolbar(
+                      selectedCount: _selectedIds.length,
+                      hasSelection: _selectedIds.isNotEmpty,
+                      allIds: images.asData?.value
+                              .map((ImageSetImage i) => i.imageSetImageId)
+                              .toList() ??
+                          const <String>[],
+                      onExit: _exitManage,
+                      onExclude: () => _setExcluded(true),
+                      onInclude: () => _setExcluded(false),
+                      onSelectAll: (List<String> ids) =>
+                          setState(() => _selectedIds.addAll(ids)),
+                      onClearSelection: () =>
+                          setState(_selectedIds.clear),
+                    )
+                  : Row(
+                      children: <Widget>[
+                        DetailHeaderBackButton(
+                          onBack: () => Navigator.of(context).maybePop(),
+                        ),
+                        const Spacer(),
+                        DetailHeaderIconButton(
+                          icon: Symbols.tune,
+                          tooltip: l10n.imageSetDetailManageEnter,
+                          semanticLabel: l10n.imageSetDetailManageEnter,
+                          onPressed: images.asData?.value.isNotEmpty == true
+                              ? () => setState(() => _manageMode = true)
+                              : null,
+                          iconColor: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ],
+                    ),
             ),
             Expanded(
               child: images.when(
-                data: (List<ImageSetImage> list) => CustomScrollView(
-                  slivers: <Widget>[
-                    SliverPadding(
-                      padding: EdgeInsets.fromLTRB(
-                        horizontalInset,
-                        0,
-                        horizontalInset,
-                        theme.spacing.md,
-                      ),
-                      sliver: SliverToBoxAdapter(
-                        child: ImageSetDetailHeader(
-                          libraryId: libraryId,
-                          imageSetId: imageSet.imageSetId,
-                          title: title,
-                          imageCount: list.length,
-                        ),
-                      ),
-                    ),
-                    if (list.isEmpty)
-                      SliverFillRemaining(
-                        hasScrollBody: false,
-                        child: Center(child: Text(l10n.imageSetDetailEmpty)),
+                data: (List<ImageSetImage> list) => _manageMode
+                    ? _ManageImageList(
+                        libraryId: widget.libraryId,
+                        imageSet: widget.imageSet,
+                        images: list,
+                        selectedIds: _selectedIds,
+                        horizontalInset: horizontalInset,
+                        onToggleSelection: _toggleSelection,
+                        onReorder: _persistReorder,
                       )
-                    else
-                      ImageSetRowGridSliver(
-                        itemCount: list.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          final ImageSetImage image = list[index];
-                          return ImageSetImageTile(
-                            key: ValueKey<String>(image.imageSetImageId),
-                            libraryId: libraryId,
-                            image: image,
-                            onTap: () =>
-                                ref.read(imageSetReaderEntryCommandProvider)(
-                                  ImageSetReaderEntry(
-                                    libraryId: libraryId,
-                                    imageSetId: imageSet.imageSetId,
-                                    imageSetImageId: image.imageSetImageId,
-                                    index: index,
+                    : CustomScrollView(
+                        slivers: <Widget>[
+                          SliverPadding(
+                            padding: EdgeInsets.fromLTRB(
+                              horizontalInset,
+                              0,
+                              horizontalInset,
+                              theme.spacing.md,
+                            ),
+                            sliver: SliverToBoxAdapter(
+                              child: ImageSetDetailHeader(
+                                libraryId: widget.libraryId,
+                                imageSetId: widget.imageSet.imageSetId,
+                                title: title,
+                                imageCount: list.length,
+                              ),
+                            ),
+                          ),
+                          if (list.isEmpty)
+                            SliverFillRemaining(
+                              hasScrollBody: false,
+                              child: Center(
+                                child: Text(l10n.imageSetDetailEmpty),
+                              ),
+                            )
+                          else
+                            ImageSetRowGridSliver(
+                              itemCount: list.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                final ImageSetImage image = list[index];
+                                return ImageSetImageTile(
+                                  key: ValueKey<String>(image.imageSetImageId),
+                                  libraryId: widget.libraryId,
+                                  image: image,
+                                  onTap: () => ref.read(
+                                    imageSetReaderEntryCommandProvider,
+                                  )(
+                                    ImageSetReaderEntry(
+                                      libraryId: widget.libraryId,
+                                      imageSetId: widget.imageSet.imageSetId,
+                                      imageSetImageId: image.imageSetImageId,
+                                      index: index,
+                                    ),
                                   ),
-                                ),
-                          );
-                        },
+                                );
+                              },
+                            ),
+                          SliverToBoxAdapter(
+                            child: SizedBox(height: theme.spacing.lg),
+                          ),
+                        ],
                       ),
-                    // Bottom breathing room.
-                    SliverToBoxAdapter(
-                      child: SizedBox(height: theme.spacing.lg),
-                    ),
-                  ],
-                ),
                 loading: () => const Center(child: CircularProgressIndicator()),
                 error: (Object error, StackTrace _) =>
                     Center(child: Text(appErrorMessage(error))),
@@ -112,6 +208,222 @@ class ImageSetDetailPage extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _ManageToolbar extends StatelessWidget {
+  const _ManageToolbar({
+    required this.selectedCount,
+    required this.hasSelection,
+    required this.allIds,
+    required this.onExit,
+    required this.onExclude,
+    required this.onInclude,
+    required this.onSelectAll,
+    required this.onClearSelection,
+  });
+
+  final int selectedCount;
+  final bool hasSelection;
+  final List<String> allIds;
+  final VoidCallback onExit;
+  final VoidCallback onExclude;
+  final VoidCallback onInclude;
+  final void Function(List<String> ids) onSelectAll;
+  final VoidCallback onClearSelection;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
+  final TextTheme textTheme = Theme.of(context).textTheme;
+
+    return PinnedToolbarChrome(
+      child: Row(
+        children: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.close),
+            tooltip: l10n.imageSetDetailManageExit,
+            onPressed: onExit,
+          ),
+          TextButton(
+            onPressed: hasSelection
+                ? onClearSelection
+                : allIds.isEmpty
+                ? null
+                : () => onSelectAll(allIds),
+            child: Text(
+              hasSelection
+                  ? l10n.imageSetDetailManageClearSelection
+                  : l10n.imageSetDetailManageSelectAll,
+            ),
+          ),
+          TextButton(
+            onPressed: hasSelection ? onExclude : null,
+            child: Text(l10n.imageSetDetailManageExclude),
+          ),
+          TextButton(
+            onPressed: hasSelection ? onInclude : null,
+            child: Text(l10n.imageSetDetailManageInclude),
+          ),
+          const Spacer(),
+          Text(
+            l10n.imageSetDetailManageSelectedCount(selectedCount),
+            style: textTheme.titleSmall,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ManageImageList extends StatefulWidget {
+  const _ManageImageList({
+    required this.libraryId,
+    required this.imageSet,
+    required this.images,
+    required this.selectedIds,
+    required this.horizontalInset,
+    required this.onToggleSelection,
+    required this.onReorder,
+  });
+
+  final String libraryId;
+  final ImageSet imageSet;
+  final List<ImageSetImage> images;
+  final Set<String> selectedIds;
+  final double horizontalInset;
+  final void Function(String imageId) onToggleSelection;
+  final Future<void> Function(List<ImageSetImage> ordered) onReorder;
+
+  @override
+  State<_ManageImageList> createState() => _ManageImageListState();
+}
+
+class _ManageImageListState extends State<_ManageImageList> {
+  late List<ImageSetImage> _ordered;
+
+  @override
+  void initState() {
+    super.initState();
+    _ordered = List<ImageSetImage>.of(widget.images);
+  }
+
+  @override
+  void didUpdateWidget(covariant _ManageImageList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!_sameOrder(widget.images, _ordered)) {
+      _ordered = List<ImageSetImage>.of(widget.images);
+    }
+  }
+
+  bool _sameOrder(List<ImageSetImage> a, List<ImageSetImage> b) {
+    if (a.length != b.length) {
+      return false;
+    }
+    for (int i = 0; i < a.length; i++) {
+      if (a[i].imageSetImageId != b[i].imageSetImageId) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  Future<void> _onReorder(int oldIndex, int newIndex) async {
+    final List<ImageSetImage> next = applyReorder(
+      _ordered,
+      oldIndex,
+      newIndex,
+    );
+    setState(() => _ordered = next);
+    await widget.onReorder(next);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
+    final M3EThemeData theme = M3ETheme.of(context);
+
+    if (_ordered.isEmpty) {
+      return Center(child: Text(l10n.imageSetDetailEmpty));
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        Padding(
+          padding: EdgeInsets.fromLTRB(
+            widget.horizontalInset,
+            0,
+            widget.horizontalInset,
+            theme.spacing.md,
+          ),
+          child: ImageSetDetailHeader(
+            libraryId: widget.libraryId,
+            imageSetId: widget.imageSet.imageSetId,
+            title: widget.imageSet.name,
+            imageCount: _ordered.length,
+          ),
+        ),
+        Expanded(
+          child: ReorderableListView.builder(
+            padding: EdgeInsets.symmetric(horizontal: widget.horizontalInset),
+            itemCount: _ordered.length,
+            onReorder: (int oldIndex, int newIndex) {
+              // ignore: discarded_futures
+              _onReorder(oldIndex, newIndex);
+            },
+            itemBuilder: (BuildContext context, int index) {
+              final ImageSetImage image = _ordered[index];
+              final bool selected = widget.selectedIds.contains(
+                image.imageSetImageId,
+              );
+              return ReorderableDragStartListener(
+                key: ValueKey<String>(image.imageSetImageId),
+                index: index,
+                child: Padding(
+                  padding: EdgeInsets.only(bottom: theme.spacing.sm),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      ReorderExclude(
+                        child: Icon(
+                          Icons.drag_handle,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      SizedBox(width: theme.spacing.sm),
+                      ImageSetImageTile(
+                        libraryId: widget.libraryId,
+                        image: image,
+                        compactWidth: 72,
+                        selectionMode: true,
+                        selected: selected,
+                        onTap: () =>
+                            widget.onToggleSelection(image.imageSetImageId),
+                      ),
+                      SizedBox(width: theme.spacing.md),
+                      Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.only(top: theme.spacing.xs),
+                          child: Text(
+                            image.name,
+                            style: theme.typeScale.bodyMedium.copyWith(
+                              color: image.excluded
+                                  ? theme.colorScheme.onSurfaceVariant
+                                  : theme.colorScheme.onSurface,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }
