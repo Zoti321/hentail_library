@@ -168,7 +168,7 @@ pub async fn delete_image_set_images_on_disk(
     .await
 }
 
-async fn require_mutation_library<C: ConnectionTrait>(
+pub(crate) async fn require_mutation_library<C: ConnectionTrait>(
     db: &C,
     library_id: &str,
 ) -> Result<libraries::Model, HentaiError> {
@@ -188,7 +188,7 @@ async fn require_mutation_library<C: ConnectionTrait>(
     Ok(lib)
 }
 
-async fn refuse_root_archive<C: ConnectionTrait>(
+pub(crate) async fn refuse_root_archive<C: ConnectionTrait>(
     db: &C,
     library_id: &str,
     relative_path: &str,
@@ -232,7 +232,7 @@ fn validate_source_image(path: &Path) -> Result<(), HentaiError> {
     Ok(())
 }
 
-fn resolve_under_root(root: &str, relative: &str) -> Result<PathBuf, HentaiError> {
+pub(crate) fn resolve_under_root(root: &str, relative: &str) -> Result<PathBuf, HentaiError> {
     let rel = Path::new(relative);
     let safe = !relative.is_empty()
         && rel

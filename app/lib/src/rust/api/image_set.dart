@@ -223,6 +223,15 @@ Future<void> deleteImageSetImagesOnDiskFrb({
   imageIds: imageIds,
 );
 
+/// One-way managed layout takeover (requires resource mutation + managed layout).
+Future<void> takeOverImageSetManagedLayoutFrb({
+  required String libraryId,
+  required String imageSetId,
+}) => RustLib.instance.api.crateApiImageSetTakeOverImageSetManagedLayoutFrb(
+  libraryId: libraryId,
+  imageSetId: imageSetId,
+);
+
 class ImageSetAuthorGroupDto {
   final PlatformInt64 authorId;
   final String name;

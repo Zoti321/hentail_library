@@ -13,6 +13,7 @@ mod meta;
 mod orchestrator;
 mod plan;
 mod query;
+mod managed_layout;
 mod mutation;
 mod submissions;
 mod workspace;
@@ -33,6 +34,7 @@ pub use meta::{
     update_image_set_user_meta, ImageSetFacetsDto, SetImageSetMetaLocksDto,
     UpdateImageSetFacetsDto, UpdateImageSetUserMetaDto,
 };
+pub use managed_layout::take_over_image_set_managed_layout;
 pub use mutation::{copy_images_into_image_set, delete_image_set_images_on_disk};
 pub(crate) use orchestrator::sync_image_set_library;
 pub use query::fetch_image_sets_page;

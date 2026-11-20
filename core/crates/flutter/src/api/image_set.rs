@@ -17,6 +17,7 @@ use hentai_core::{
     set_image_set_managed_layout as core_set_managed_layout,
     set_image_set_meta_locks as core_set_meta_locks,
     set_image_set_resource_mutation as core_set_resource_mutation,
+    take_over_image_set_managed_layout as core_take_over_managed_layout,
     update_image_set_facets as core_update_facets, update_image_set_user_meta as core_update_meta,
     ImageSetDto as CoreImageSet, ImageSetFacetsDto as CoreFacets,
     ImageSetImageDto as CoreImageSetImage, ImageSetLibraryGatesDto as CoreGates,
@@ -573,6 +574,16 @@ pub async fn delete_image_set_images_on_disk_frb(
     image_ids: Vec<String>,
 ) -> Result<(), HentaiErrorDto> {
     core_delete_images_on_disk(&library_id, &image_set_id, &image_ids)
+        .await
+        .map_err(HentaiErrorDto::from)
+}
+
+/// One-way managed layout takeover (requires resource mutation + managed layout).
+pub async fn take_over_image_set_managed_layout_frb(
+    library_id: String,
+    image_set_id: String,
+) -> Result<(), HentaiErrorDto> {
+    core_take_over_managed_layout(&library_id, &image_set_id)
         .await
         .map_err(HentaiErrorDto::from)
 }
