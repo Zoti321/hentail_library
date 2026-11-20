@@ -103,6 +103,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get imageSetDetailExcludedBadge => '已排除';
 
   @override
+  String get imageSetDetailContextSelect => '选择';
+
+  @override
+  String get imageSetDetailContextCreateSubmission => '设为同一投稿';
+
+  @override
+  String get imageSetDetailContextAddToSubmission => '加入已有投稿';
+
+  @override
+  String get imageSetDetailPickSubmissionTitle => '选择投稿';
+
+  @override
   String get imageSetMetadataEditEnter => '编辑元数据';
 
   @override

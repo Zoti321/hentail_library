@@ -88,9 +88,10 @@ class _Probe {
   final List<({List<String> ids, bool excluded})> excludeCalls =
       <({List<String> ids, bool excluded})>[];
   final List<List<String>> deleteOnDiskCalls = <List<String>>[];
-  final List<List<String>> reorderCalls = <List<String>>[];
   List<ImageSetSubmission> submissions = const <ImageSetSubmission>[];
   final List<String> createSubmissionNames = <String>[];
+  final List<({String submissionId, List<String> ids})> addMemberCalls =
+      <({String submissionId, List<String> ids})>[];
   ImageSetLibraryGates gates = const ImageSetLibraryGates(
     resourceMutation: false,
     managedLayout: false,
@@ -141,9 +142,7 @@ List<Override> _overrides(
       },
     ),
     imageSetReorderImagesCommandProvider.overrideWithValue(
-      (String libraryId, String imageSetId, List<String> orderedIds) async {
-        probe.reorderCalls.add(List<String>.from(orderedIds));
-      },
+      (_, __, ___) async {},
     ),
     imageSetLibraryGatesQueryProvider.overrideWithValue(
       (_) async => gates ?? probe.gates,
@@ -181,7 +180,12 @@ List<Override> _overrides(
     ),
     imageSetDeleteSubmissionCommandProvider.overrideWithValue((_, __) async {}),
     imageSetAddSubmissionMembersCommandProvider.overrideWithValue(
-      (_, __, ___) async {},
+      (String libraryId, String submissionId, List<String> imageIds) async {
+        probe.addMemberCalls.add((
+          submissionId: submissionId,
+          ids: List<String>.from(imageIds),
+        ));
+      },
     ),
     imageSetRemoveSubmissionMembersCommandProvider.overrideWithValue(
       (_, __, ___) async {},
@@ -207,8 +211,8 @@ Future<void> _pumpDetail(
   ),
 );
 
-Future<void> _enterManage(WidgetTester tester) async {
-  await tester.tap(find.bySemanticsLabel('管理工作区'));
+Future<void> _enterSelectionViaLongPress(WidgetTester tester) async {
+  await tester.longPress(find.byKey(const ValueKey<String>('i1')));
   await tester.pumpAndSettle();
 }
 
@@ -293,27 +297,40 @@ void main() {
     expect(probe.entries.single.index, 0);
   });
 
-  testWidgets('manage mode lists excluded workspace members', (
+  testWidgets('no manage workspace entry on detail', (
     WidgetTester tester,
   ) async {
     final _Probe probe = _Probe();
-    _alphaImages = <ImageSetImage>[_image1, _image2];
     await _pumpDetail(tester, overrides: _overrides(probe));
     await tester.pumpAndSettle();
-    await _enterManage(tester);
 
-    expect(find.text('2.jpg'), findsOneWidget);
-    expect(find.text('已排除'), findsOneWidget);
+    expect(find.bySemanticsLabel('管理工作区'), findsNothing);
+    expect(find.text('管理工作区'), findsNothing);
   });
 
-  testWidgets('exclude command invoked from manage mode', (
+  testWidgets('long-press enters selection with excluded workspace members', (
     WidgetTester tester,
   ) async {
     final _Probe probe = _Probe();
     await _pumpDetail(tester, overrides: _overrides(probe));
     await tester.pumpAndSettle();
-    await _enterManage(tester);
+    await _enterSelectionViaLongPress(tester);
 
+    expect(find.text('已选 1 张'), findsOneWidget);
+    expect(find.text('已排除'), findsOneWidget);
+    expect(find.byKey(const ValueKey<String>('i2')), findsOneWidget);
+  });
+
+  testWidgets('exclude command invoked from selection toolbar', (
+    WidgetTester tester,
+  ) async {
+    final _Probe probe = _Probe();
+    await _pumpDetail(tester, overrides: _overrides(probe));
+    await tester.pumpAndSettle();
+    await _enterSelectionViaLongPress(tester);
+
+    await tester.tap(find.text('清除'));
+    await tester.pump();
     await tester.tap(find.text('全选'));
     await tester.pump();
     await tester.tap(find.text('排除'));
@@ -324,32 +341,22 @@ void main() {
     expect(probe.excludeCalls.single.excluded, isTrue);
   });
 
-  testWidgets('reorder command invoked with full permutation', (
+  testWidgets('empty selection disables bulk exclude', (
     WidgetTester tester,
   ) async {
     final _Probe probe = _Probe();
-    _alphaImages = <ImageSetImage>[_image1, _image2];
-    await _pumpDetail(
-      tester,
-      overrides: _overrides(
-        probe,
-        workspaceImages: <ImageSetImage>[_image1, _image2],
-      ),
-    );
+    await _pumpDetail(tester, overrides: _overrides(probe));
     await tester.pumpAndSettle();
-    await _enterManage(tester);
+    await _enterSelectionViaLongPress(tester);
 
-    final Finder firstRow = find.byKey(const ValueKey<String>('i1'));
-    await tester.longPress(firstRow);
-    await tester.pump(const Duration(milliseconds: 200));
-    await tester.drag(firstRow, const Offset(0, 120));
-    await tester.pumpAndSettle();
+    await tester.tap(find.text('清除'));
+    await tester.pump();
 
-    expect(probe.reorderCalls, hasLength(1));
-    expect(
-      probe.reorderCalls.single,
-      <String>['i2', 'i1'],
+    expect(find.text('已选 0 张'), findsOneWidget);
+    final TextButton exclude = tester.widget<TextButton>(
+      find.widgetWithText(TextButton, '排除'),
     );
+    expect(exclude.onPressed, isNull);
   });
 
   testWidgets('lists submissions with member counts and empty state', (
@@ -494,7 +501,7 @@ void main() {
     expect(find.byKey(const Key('imageSetDetailAdd')), findsNothing);
   });
 
-  testWidgets('delete on disk confirm invokes command', (
+  testWidgets('delete on disk from selection when mutation gated', (
     WidgetTester tester,
   ) async {
     final _Probe probe = _Probe()
@@ -502,7 +509,6 @@ void main() {
         resourceMutation: true,
         managedLayout: false,
       );
-    _alphaImages = <ImageSetImage>[_image1, _image2];
     await _pumpDetail(
       tester,
       overrides: _overrides(
@@ -511,8 +517,10 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    await _enterManage(tester);
+    await _enterSelectionViaLongPress(tester);
 
+    await tester.tap(find.text('清除'));
+    await tester.pump();
     await tester.tap(find.text('全选'));
     await tester.pump();
     await tester.tap(find.text('从磁盘删除'));
@@ -527,20 +535,31 @@ void main() {
     );
   });
 
-  testWidgets('exiting manage restores browse list without excluded', (
+  testWidgets('disk delete hidden when resource mutation off', (
     WidgetTester tester,
   ) async {
     final _Probe probe = _Probe();
     await _pumpDetail(tester, overrides: _overrides(probe));
     await tester.pumpAndSettle();
-    await _enterManage(tester);
-    expect(find.text('2.jpg'), findsOneWidget);
+    await _enterSelectionViaLongPress(tester);
+
+    expect(find.text('从磁盘删除'), findsNothing);
+  });
+
+  testWidgets('exiting selection restores browse list without excluded', (
+    WidgetTester tester,
+  ) async {
+    final _Probe probe = _Probe();
+    await _pumpDetail(tester, overrides: _overrides(probe));
+    await tester.pumpAndSettle();
+    await _enterSelectionViaLongPress(tester);
+    expect(find.byKey(const ValueKey<String>('i2')), findsOneWidget);
 
     await tester.tap(find.byIcon(Icons.close));
     await tester.pumpAndSettle();
 
     expect(find.text('1 张'), findsOneWidget);
-    expect(find.text('2.jpg'), findsNothing);
+    expect(find.byKey(const ValueKey<String>('i2')), findsNothing);
     expect(find.text('已排除'), findsNothing);
   });
 }

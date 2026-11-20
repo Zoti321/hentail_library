@@ -72,6 +72,10 @@
     }
   },
   "imageSetDetailExcludedBadge": "Excluded",
+  "imageSetDetailContextSelect": "Select",
+  "imageSetDetailContextCreateSubmission": "Same submission",
+  "imageSetDetailContextAddToSubmission": "Add to submission",
+  "imageSetDetailPickSubmissionTitle": "Choose submission",
   "imageSetMetadataEditEnter": "Edit metadata",
   "imageSetMetadataEditTitle": "Edit image set metadata",
   "imageSetMetadataEditNameLabel": "Display name",

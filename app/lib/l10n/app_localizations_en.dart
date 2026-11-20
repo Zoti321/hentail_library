@@ -110,6 +110,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get imageSetDetailExcludedBadge => 'Excluded';
 
   @override
+  String get imageSetDetailContextSelect => 'Select';
+
+  @override
+  String get imageSetDetailContextCreateSubmission => 'Same submission';
+
+  @override
+  String get imageSetDetailContextAddToSubmission => 'Add to submission';
+
+  @override
+  String get imageSetDetailPickSubmissionTitle => 'Choose submission';
+
+  @override
   String get imageSetMetadataEditEnter => 'Edit metadata';
 
   @override

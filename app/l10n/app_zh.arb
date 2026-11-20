@@ -72,6 +72,10 @@
     }
   },
   "imageSetDetailExcludedBadge": "已排除",
+  "imageSetDetailContextSelect": "选择",
+  "imageSetDetailContextCreateSubmission": "设为同一投稿",
+  "imageSetDetailContextAddToSubmission": "加入已有投稿",
+  "imageSetDetailPickSubmissionTitle": "选择投稿",
   "imageSetMetadataEditEnter": "编辑元数据",
   "imageSetMetadataEditTitle": "编辑图集元数据",
   "imageSetMetadataEditNameLabel": "显示名称",

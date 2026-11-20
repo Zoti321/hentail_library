@@ -260,6 +260,30 @@ abstract class AppLocalizations {
   /// **'已排除'**
   String get imageSetDetailExcludedBadge;
 
+  /// No description provided for @imageSetDetailContextSelect.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择'**
+  String get imageSetDetailContextSelect;
+
+  /// No description provided for @imageSetDetailContextCreateSubmission.
+  ///
+  /// In zh, this message translates to:
+  /// **'设为同一投稿'**
+  String get imageSetDetailContextCreateSubmission;
+
+  /// No description provided for @imageSetDetailContextAddToSubmission.
+  ///
+  /// In zh, this message translates to:
+  /// **'加入已有投稿'**
+  String get imageSetDetailContextAddToSubmission;
+
+  /// No description provided for @imageSetDetailPickSubmissionTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择投稿'**
+  String get imageSetDetailPickSubmissionTitle;
+
   /// No description provided for @imageSetMetadataEditEnter.
   ///
   /// In zh, this message translates to:

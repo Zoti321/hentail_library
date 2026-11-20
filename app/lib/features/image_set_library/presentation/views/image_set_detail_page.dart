@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/design-system/design_system.dart';
@@ -10,11 +12,13 @@ import 'package:hentai_library/features/image_set_library/presentation/views/ima
 import 'package:hentai_library/features/image_set_library/domain/image_set_facets.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_image.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_reader_entry.dart';
+import 'package:hentai_library/features/image_set_library/domain/image_set_submission.dart';
 import 'package:hentai_library/features/image_set_library/presentation/providers/image_set_library_providers.dart';
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_detail_header.dart';
 import 'package:hentai_library/features/image_set_library/presentation/patterns/metadata_edit/image_set_metadata_edit_present.dart';
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_image_tile.dart';
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_row_grid_sliver.dart';
+import 'package:hentai_library/features/image_set_library/presentation/views/image_set_submission_dialogs.dart';
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_submissions_section.dart';
 import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/application/errors/error_message.dart';
@@ -25,7 +29,7 @@ import 'package:material_symbols_icons/symbols.dart';
 /// Client-side page size for the detail image grid (button pager).
 const int kImageSetDetailImagePageSize = 24;
 
-/// Image set 详情：顶栏（标题/张数）+ 无标题按行顶对齐图流；可进入工作区管理。
+/// Image set 详情：顶栏 + 分页图流；长按进入选择，右键/次要点打开上下文菜单。
 class ImageSetDetailPage extends ConsumerStatefulWidget {
   const ImageSetDetailPage({
     super.key,
@@ -43,7 +47,7 @@ class ImageSetDetailPage extends ConsumerStatefulWidget {
 }
 
 class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
-  bool _manageMode = false;
+  bool _selectionMode = false;
   bool _copying = false;
   int _imagePage = 1;
   final ScrollController _browseScrollController = ScrollController();
@@ -62,7 +66,7 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
     _imageSet = widget.imageSet;
   }
 
-  bool get _canCopyIn {
+  bool get _canMutateDisk {
     final ImageSetLibraryGates? gates = ref
         .watch(imageSetLibraryGatesProvider(widget.libraryId))
         .asData
@@ -70,6 +74,8 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
     return gates?.resourceMutation == true &&
         widget.carrierShape == ImageSetCarrierShape.directory;
   }
+
+  bool get _canCopyIn => _canMutateDisk;
 
   Future<void> _copyImagesIn() async {
     if (_copying || !_canCopyIn) {
@@ -115,10 +121,17 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
     }
   }
 
-  void _exitManage() {
+  void _exitSelection() {
     setState(() {
-      _manageMode = false;
+      _selectionMode = false;
       _selectedIds.clear();
+    });
+  }
+
+  void _enterSelection(String imageId) {
+    setState(() {
+      _selectionMode = true;
+      _selectedIds.add(imageId);
     });
   }
 
@@ -132,11 +145,17 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
     });
   }
 
-  Future<void> _setExcluded(bool excluded) async {
-    if (_selectedIds.isEmpty) {
+  List<String> _targetsFor(String imageId) {
+    if (_selectedIds.contains(imageId) && _selectedIds.isNotEmpty) {
+      return _selectedIds.toList(growable: false);
+    }
+    return <String>[imageId];
+  }
+
+  Future<void> _setExcluded(List<String> ids, {required bool excluded}) async {
+    if (ids.isEmpty) {
       return;
     }
-    final List<String> ids = _selectedIds.toList(growable: false);
     await ref.read(imageSetSetImagesExcludedCommandProvider)(
       widget.libraryId,
       _imageSet.imageSetId,
@@ -149,27 +168,17 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
     setState(_selectedIds.clear);
   }
 
-  Future<void> _persistReorder(List<ImageSetImage> ordered) async {
-    await ref.read(imageSetReorderImagesCommandProvider)(
-      widget.libraryId,
-      _imageSet.imageSetId,
-      ordered.map((ImageSetImage i) => i.imageSetImageId).toList(),
-    );
-  }
-
-  Future<void> _deleteOnDisk() async {
-    if (_selectedIds.isEmpty) {
+  Future<void> _deleteOnDisk(List<String> ids) async {
+    if (ids.isEmpty || !_canMutateDisk) {
       return;
     }
-    final int count = _selectedIds.length;
     final bool confirmed = await confirmDeleteImageSetImagesOnDisk(
       context,
-      count: count,
+      count: ids.length,
     );
     if (!confirmed || !mounted) {
       return;
     }
-    final List<String> ids = _selectedIds.toList(growable: false);
     await ref.read(imageSetDeleteImagesOnDiskCommandProvider)(
       widget.libraryId,
       _imageSet.imageSetId,
@@ -181,23 +190,122 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
     setState(_selectedIds.clear);
   }
 
+  Future<void> _createSubmissionFrom(List<String> ids) async {
+    if (ids.isEmpty) {
+      return;
+    }
+    final AppLocalizations l10n = context.l10n;
+    final String? name = await showImageSetSubmissionNameDialog(
+      context: context,
+      title: l10n.imageSetSubmissionCreateTitle,
+      fieldLabel: l10n.imageSetSubmissionNameLabel,
+    );
+    if (name == null || !mounted) {
+      return;
+    }
+    final ImageSetSubmission created = await ref.read(
+      imageSetCreateSubmissionCommandProvider,
+    )(widget.libraryId, _imageSet.imageSetId, name);
+    await ref.read(imageSetAddSubmissionMembersCommandProvider)(
+      widget.libraryId,
+      created.submissionId,
+      ids,
+    );
+    if (!mounted) {
+      return;
+    }
+    setState(_selectedIds.clear);
+  }
+
+  Future<void> _addToExistingSubmission(List<String> ids) async {
+    if (ids.isEmpty) {
+      return;
+    }
+    final List<ImageSetSubmission> submissions =
+        await ref.read(imageSetSubmissionsProvider(_imagesKey).future);
+    if (!mounted) {
+      return;
+    }
+    if (submissions.isEmpty) {
+      return;
+    }
+    final ImageSetSubmission? picked = await showImageSetPickSubmissionDialog(
+      context: context,
+      submissions: submissions,
+    );
+    if (picked == null || !mounted) {
+      return;
+    }
+    await ref.read(imageSetAddSubmissionMembersCommandProvider)(
+      widget.libraryId,
+      picked.submissionId,
+      ids,
+    );
+    if (!mounted) {
+      return;
+    }
+    setState(_selectedIds.clear);
+  }
+
+  void _showImageContextMenu({
+    required ImageSetImage image,
+    required Offset globalPosition,
+  }) {
+    final AppLocalizations l10n = context.l10n;
+    final List<String> targets = _targetsFor(image.imageSetImageId);
+    final bool showDiskDelete = _canMutateDisk;
+    unawaited(
+      showPointerContextMenu<void>(
+        context: context,
+        globalPosition: globalPosition,
+        children: <M3EMenuNode>[
+          M3EMenuEntry(
+            label: l10n.imageSetDetailContextSelect,
+            onPressed: () => _enterSelection(image.imageSetImageId),
+          ),
+          M3EMenuEntry(
+            label: l10n.imageSetDetailManageExclude,
+            onPressed: () => unawaited(
+              _setExcluded(targets, excluded: true),
+            ),
+          ),
+          M3EMenuEntry(
+            label: l10n.imageSetDetailManageInclude,
+            onPressed: () => unawaited(
+              _setExcluded(targets, excluded: false),
+            ),
+          ),
+          M3EMenuEntry(
+            label: l10n.imageSetDetailContextCreateSubmission,
+            onPressed: () => unawaited(_createSubmissionFrom(targets)),
+          ),
+          M3EMenuEntry(
+            label: l10n.imageSetDetailContextAddToSubmission,
+            onPressed: () => unawaited(_addToExistingSubmission(targets)),
+          ),
+          if (showDiskDelete)
+            M3EMenuEntry(
+              label: l10n.imageSetMutationDeleteOnDiskAction,
+              isDestructive: true,
+              onPressed: () => unawaited(_deleteOnDisk(targets)),
+            ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     final M3EThemeData theme = M3ETheme.of(context);
     final double horizontalInset = PageLayoutSpec.of(context).horizontalInset;
     final AsyncValue<List<ImageSetImage>> images = ref.watch(
-      _manageMode
+      _selectionMode
           ? imageSetWorkspaceImagesProvider(_imagesKey)
           : imageSetImagesProvider(_imagesKey),
     );
     final String title = _imageSet.name;
-    final AsyncValue<ImageSetLibraryGates> gates = ref.watch(
-      imageSetLibraryGatesProvider(widget.libraryId),
-    );
-    final bool showDiskDelete = _manageMode &&
-        gates.asData?.value.resourceMutation == true &&
-        widget.carrierShape == ImageSetCarrierShape.directory;
+    final bool showDiskDelete = _selectionMode && _canMutateDisk;
 
     return Scaffold(
       body: SafeArea(
@@ -209,8 +317,8 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
                 horizontal: horizontalInset,
                 vertical: theme.spacing.sm,
               ),
-              child: _manageMode
-                  ? _ManageToolbar(
+              child: _selectionMode
+                  ? _SelectionToolbar(
                       selectedCount: _selectedIds.length,
                       hasSelection: _selectedIds.isNotEmpty,
                       allIds: images.asData?.value
@@ -218,10 +326,22 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
                               .toList() ??
                           const <String>[],
                       showDeleteOnDisk: showDiskDelete,
-                      onExit: _exitManage,
-                      onExclude: () => _setExcluded(true),
-                      onInclude: () => _setExcluded(false),
-                      onDeleteOnDisk: _deleteOnDisk,
+                      onExit: _exitSelection,
+                      onExclude: () => unawaited(
+                        _setExcluded(
+                          _selectedIds.toList(growable: false),
+                          excluded: true,
+                        ),
+                      ),
+                      onInclude: () => unawaited(
+                        _setExcluded(
+                          _selectedIds.toList(growable: false),
+                          excluded: false,
+                        ),
+                      ),
+                      onDeleteOnDisk: () => unawaited(
+                        _deleteOnDisk(_selectedIds.toList(growable: false)),
+                      ),
                       onSelectAll: (List<String> ids) =>
                           setState(() => _selectedIds.addAll(ids)),
                       onClearSelection: () =>
@@ -238,15 +358,6 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
                           tooltip: l10n.imageSetMetadataEditEnter,
                           semanticLabel: l10n.imageSetMetadataEditEnter,
                           onPressed: _openMetadataEdit,
-                          iconColor: theme.colorScheme.onSurfaceVariant,
-                        ),
-                        DetailHeaderIconButton(
-                          icon: Symbols.tune,
-                          tooltip: l10n.imageSetDetailManageEnter,
-                          semanticLabel: l10n.imageSetDetailManageEnter,
-                          onPressed: images.asData?.value.isNotEmpty == true
-                              ? () => setState(() => _manageMode = true)
-                              : null,
                           iconColor: theme.colorScheme.onSurfaceVariant,
                         ),
                         if (_canCopyIn) ...<Widget>[
@@ -271,23 +382,13 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
             ),
             Expanded(
               child: images.when(
-                data: (List<ImageSetImage> list) => _manageMode
-                    ? _ManageImageList(
-                        libraryId: widget.libraryId,
-                        imageSet: _imageSet,
-                        images: list,
-                        selectedIds: _selectedIds,
-                        horizontalInset: horizontalInset,
-                        onToggleSelection: _toggleSelection,
-                        onReorder: _persistReorder,
-                      )
-                    : _buildBrowseScroll(
-                        l10n: l10n,
-                        theme: theme,
-                        horizontalInset: horizontalInset,
-                        title: title,
-                        list: list,
-                      ),
+                data: (List<ImageSetImage> list) => _buildBrowseScroll(
+                  l10n: l10n,
+                  theme: theme,
+                  horizontalInset: horizontalInset,
+                  title: title,
+                  list: list,
+                ),
                 loading: () => const Center(child: CircularProgressIndicator()),
                 error: (Object error, StackTrace _) =>
                     Center(child: Text(appErrorMessage(error))),
@@ -365,18 +466,33 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
             itemBuilder: (BuildContext context, int index) {
               final ImageSetImage image = pageItems[index];
               final int workspaceIndex = start + index;
+              final bool selected = _selectedIds.contains(image.imageSetImageId);
               return ImageSetImageTile(
                 key: ValueKey<String>(image.imageSetImageId),
                 libraryId: widget.libraryId,
                 image: image,
-                onTap: () => ref.read(imageSetReaderEntryCommandProvider)(
-                  ImageSetReaderEntry(
-                    libraryId: widget.libraryId,
-                    imageSetId: _imageSet.imageSetId,
-                    imageSetImageId: image.imageSetImageId,
-                    index: workspaceIndex,
-                  ),
-                ),
+                selectionMode: _selectionMode,
+                selected: selected,
+                onTap: () {
+                  if (_selectionMode) {
+                    _toggleSelection(image.imageSetImageId);
+                    return;
+                  }
+                  ref.read(imageSetReaderEntryCommandProvider)(
+                    ImageSetReaderEntry(
+                      libraryId: widget.libraryId,
+                      imageSetId: _imageSet.imageSetId,
+                      imageSetImageId: image.imageSetImageId,
+                      index: workspaceIndex,
+                    ),
+                  );
+                },
+                onLongPress: () => _enterSelection(image.imageSetImageId),
+                onSecondaryTapDown: (TapDownDetails details) =>
+                    _showImageContextMenu(
+                      image: image,
+                      globalPosition: details.globalPosition,
+                    ),
               );
             },
           ),
@@ -417,8 +533,8 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
   }
 }
 
-class _ManageToolbar extends StatelessWidget {
-  const _ManageToolbar({
+class _SelectionToolbar extends StatelessWidget {
+  const _SelectionToolbar({
     required this.selectedCount,
     required this.hasSelection,
     required this.allIds,
@@ -445,7 +561,7 @@ class _ManageToolbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
-  final TextTheme textTheme = Theme.of(context).textTheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
 
     return PinnedToolbarChrome(
       child: Row(
@@ -490,157 +606,6 @@ class _ManageToolbar extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _ManageImageList extends StatefulWidget {
-  const _ManageImageList({
-    required this.libraryId,
-    required this.imageSet,
-    required this.images,
-    required this.selectedIds,
-    required this.horizontalInset,
-    required this.onToggleSelection,
-    required this.onReorder,
-  });
-
-  final String libraryId;
-  final ImageSet imageSet;
-  final List<ImageSetImage> images;
-  final Set<String> selectedIds;
-  final double horizontalInset;
-  final void Function(String imageId) onToggleSelection;
-  final Future<void> Function(List<ImageSetImage> ordered) onReorder;
-
-  @override
-  State<_ManageImageList> createState() => _ManageImageListState();
-}
-
-class _ManageImageListState extends State<_ManageImageList> {
-  late List<ImageSetImage> _ordered;
-
-  @override
-  void initState() {
-    super.initState();
-    _ordered = List<ImageSetImage>.of(widget.images);
-  }
-
-  @override
-  void didUpdateWidget(covariant _ManageImageList oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (!_sameOrder(widget.images, _ordered)) {
-      _ordered = List<ImageSetImage>.of(widget.images);
-    }
-  }
-
-  bool _sameOrder(List<ImageSetImage> a, List<ImageSetImage> b) {
-    if (a.length != b.length) {
-      return false;
-    }
-    for (int i = 0; i < a.length; i++) {
-      if (a[i].imageSetImageId != b[i].imageSetImageId) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  Future<void> _onReorder(int oldIndex, int newIndex) async {
-    final List<ImageSetImage> next = applyReorder(
-      _ordered,
-      oldIndex,
-      newIndex,
-    );
-    setState(() => _ordered = next);
-    await widget.onReorder(next);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final AppLocalizations l10n = context.l10n;
-    final M3EThemeData theme = M3ETheme.of(context);
-
-    if (_ordered.isEmpty) {
-      return Center(child: Text(l10n.imageSetDetailEmpty));
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        Padding(
-          padding: EdgeInsets.fromLTRB(
-            widget.horizontalInset,
-            0,
-            widget.horizontalInset,
-            theme.spacing.md,
-          ),
-          child: ImageSetDetailHeader(
-            libraryId: widget.libraryId,
-            imageSetId: widget.imageSet.imageSetId,
-            title: widget.imageSet.name,
-            imageCount: _ordered.length,
-          ),
-        ),
-        Expanded(
-          child: ReorderableListView.builder(
-            padding: EdgeInsets.symmetric(horizontal: widget.horizontalInset),
-            itemCount: _ordered.length,
-            onReorder: (int oldIndex, int newIndex) {
-              // ignore: discarded_futures
-              _onReorder(oldIndex, newIndex);
-            },
-            itemBuilder: (BuildContext context, int index) {
-              final ImageSetImage image = _ordered[index];
-              final bool selected = widget.selectedIds.contains(
-                image.imageSetImageId,
-              );
-              return ReorderableDragStartListener(
-                key: ValueKey<String>(image.imageSetImageId),
-                index: index,
-                child: Padding(
-                  padding: EdgeInsets.only(bottom: theme.spacing.sm),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      ReorderExclude(
-                        child: Icon(
-                          Icons.drag_handle,
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                      SizedBox(width: theme.spacing.sm),
-                      ImageSetImageTile(
-                        libraryId: widget.libraryId,
-                        image: image,
-                        compactWidth: 72,
-                        selectionMode: true,
-                        selected: selected,
-                        onTap: () =>
-                            widget.onToggleSelection(image.imageSetImageId),
-                      ),
-                      SizedBox(width: theme.spacing.md),
-                      Expanded(
-                        child: Padding(
-                          padding: EdgeInsets.only(top: theme.spacing.xs),
-                          child: Text(
-                            image.name,
-                            style: theme.typeScale.bodyMedium.copyWith(
-                              color: image.excluded
-                                  ? theme.colorScheme.onSurfaceVariant
-                                  : theme.colorScheme.onSurface,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-      ],
     );
   }
 }

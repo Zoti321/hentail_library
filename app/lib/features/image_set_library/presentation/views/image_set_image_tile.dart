@@ -16,6 +16,8 @@ class ImageSetImageTile extends ConsumerWidget {
     required this.libraryId,
     required this.image,
     this.onTap,
+    this.onLongPress,
+    this.onSecondaryTapDown,
     this.selected = false,
     this.selectionMode = false,
     this.compactWidth,
@@ -24,10 +26,12 @@ class ImageSetImageTile extends ConsumerWidget {
   final String libraryId;
   final ImageSetImage image;
   final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
+  final GestureTapDownCallback? onSecondaryTapDown;
   final bool selected;
   final bool selectionMode;
 
-  /// When set, tile uses fixed width (manage list); otherwise full width grid cell.
+  /// When set, tile uses fixed width; otherwise full width grid cell.
   final double? compactWidth;
 
   @override
@@ -108,6 +112,8 @@ class ImageSetImageTile extends ConsumerWidget {
       color: theme.colorScheme.surfaceContainerHigh,
       child: InkWell(
         onTap: onTap,
+        onLongPress: onLongPress,
+        onSecondaryTapDown: onSecondaryTapDown,
         child: compactWidth != null
             ? SizedBox(width: compactWidth, child: content)
             : content,
