@@ -72,6 +72,33 @@
     }
   },
   "imageSetDetailExcludedBadge": "Excluded",
+  "imageSetDetailSubmissionsTitle": "Submissions",
+  "imageSetDetailSubmissionsEmpty": "No submissions yet. Create one and pick members from this image set.",
+  "imageSetDetailSubmissionsCreate": "New",
+  "imageSetDetailSubmissionsMemberCount": "{count, plural, one{1 member} other{{count} members}}",
+  "@imageSetDetailSubmissionsMemberCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "imageSetSubmissionCreateTitle": "New submission",
+  "imageSetSubmissionRenameTitle": "Rename submission",
+  "imageSetSubmissionNameLabel": "Name",
+  "imageSetSubmissionDeleteTitle": "Delete submission",
+  "imageSetSubmissionDeleteBody": "Delete submission \"{name}\"? This updates the catalog only; no folders are created or removed on disk.",
+  "@imageSetSubmissionDeleteBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "imageSetSubmissionAddMembers": "Add members",
+  "imageSetSubmissionRemoveMember": "Remove from submission",
+  "imageSetSubmissionMembersEmpty": "This submission has no members yet.",
+  "imageSetSubmissionPickMembersTitle": "Pick images from this set",
   "imageSetFilterSortTitle": "Image set filter & sort",
   "imageSetFilterApply": "Apply",
   "imageSetFilterReset": "Reset",

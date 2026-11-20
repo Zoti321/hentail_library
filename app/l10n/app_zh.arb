@@ -72,6 +72,33 @@
     }
   },
   "imageSetDetailExcludedBadge": "已排除",
+  "imageSetDetailSubmissionsTitle": "投稿",
+  "imageSetDetailSubmissionsEmpty": "尚无投稿。可创建投稿并挑选本图集内的图片成员。",
+  "imageSetDetailSubmissionsCreate": "新建",
+  "imageSetDetailSubmissionsMemberCount": "{count} 张成员",
+  "@imageSetDetailSubmissionsMemberCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "imageSetSubmissionCreateTitle": "新建投稿",
+  "imageSetSubmissionRenameTitle": "重命名投稿",
+  "imageSetSubmissionNameLabel": "名称",
+  "imageSetSubmissionDeleteTitle": "删除投稿",
+  "imageSetSubmissionDeleteBody": "确定删除投稿「{name}」？此操作仅更新目录，不会在磁盘上创建或删除文件夹。",
+  "@imageSetSubmissionDeleteBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "imageSetSubmissionAddMembers": "添加成员",
+  "imageSetSubmissionRemoveMember": "移出投稿",
+  "imageSetSubmissionMembersEmpty": "此投稿尚无成员。",
+  "imageSetSubmissionPickMembersTitle": "从本图集挑选图片",
   "imageSetFilterSortTitle": "图集筛选与排序",
   "imageSetFilterApply": "应用",
   "imageSetFilterReset": "重置",

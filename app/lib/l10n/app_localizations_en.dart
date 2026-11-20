@@ -110,6 +110,57 @@ class AppLocalizationsEn extends AppLocalizations {
   String get imageSetDetailExcludedBadge => 'Excluded';
 
   @override
+  String get imageSetDetailSubmissionsTitle => 'Submissions';
+
+  @override
+  String get imageSetDetailSubmissionsEmpty =>
+      'No submissions yet. Create one and pick members from this image set.';
+
+  @override
+  String get imageSetDetailSubmissionsCreate => 'New';
+
+  @override
+  String imageSetDetailSubmissionsMemberCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count members',
+      one: '1 member',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get imageSetSubmissionCreateTitle => 'New submission';
+
+  @override
+  String get imageSetSubmissionRenameTitle => 'Rename submission';
+
+  @override
+  String get imageSetSubmissionNameLabel => 'Name';
+
+  @override
+  String get imageSetSubmissionDeleteTitle => 'Delete submission';
+
+  @override
+  String imageSetSubmissionDeleteBody(String name) {
+    return 'Delete submission \"$name\"? This updates the catalog only; no folders are created or removed on disk.';
+  }
+
+  @override
+  String get imageSetSubmissionAddMembers => 'Add members';
+
+  @override
+  String get imageSetSubmissionRemoveMember => 'Remove from submission';
+
+  @override
+  String get imageSetSubmissionMembersEmpty =>
+      'This submission has no members yet.';
+
+  @override
+  String get imageSetSubmissionPickMembersTitle => 'Pick images from this set';
+
+  @override
   String get imageSetFilterSortTitle => 'Image set filter & sort';
 
   @override

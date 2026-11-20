@@ -3,9 +3,11 @@ import 'dart:typed_data';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_facets.dart';
+import 'package:hentai_library/features/image_set_library/domain/image_set_facets_patch.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_image.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_reader_entry.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_reader_session.dart';
+import 'package:hentai_library/features/image_set_library/domain/image_set_submission.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_sync_outcome.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:hentai_library/shared/presentation/providers/required_provider.dart';
@@ -27,9 +29,48 @@ typedef ImageSetReorderImagesCommand =
       String imageSetId,
       List<String> orderedIds,
     );
+typedef ImageSetSubmissionsQuery =
+    Future<List<ImageSetSubmission>> Function(
+      String libraryId,
+      String imageSetId,
+    );
+typedef ImageSetCreateSubmissionCommand =
+    Future<ImageSetSubmission> Function(
+      String libraryId,
+      String imageSetId,
+      String name,
+    );
+typedef ImageSetRenameSubmissionCommand =
+    Future<void> Function(String libraryId, String submissionId, String name);
+typedef ImageSetDeleteSubmissionCommand =
+    Future<void> Function(String libraryId, String submissionId);
+typedef ImageSetAddSubmissionMembersCommand =
+    Future<void> Function(
+      String libraryId,
+      String submissionId,
+      List<String> imageIds,
+    );
+typedef ImageSetRemoveSubmissionMembersCommand =
+    Future<void> Function(
+      String libraryId,
+      String submissionId,
+      List<String> imageIds,
+    );
+typedef ImageSetReorderSubmissionMembersCommand =
+    Future<void> Function(
+      String libraryId,
+      String submissionId,
+      List<String> orderedIds,
+    );
 typedef ImageSetImagesKey = ({String libraryId, String imageSetId});
 typedef ImageSetPageBytesKey = ({String libraryId, ImageSetImage image});
 typedef ImageSetFacetsQuery = Future<ImageSetFacets> Function(String imageSetId);
+typedef ImageSetUpdateNameCommand =
+    Future<void> Function(String imageSetId, String name);
+typedef ImageSetSetNameLockedCommand =
+    Future<void> Function(String imageSetId, {required bool locked});
+typedef ImageSetUpdateFacetsCommand =
+    Future<void> Function(String imageSetId, ImageSetFacetsPatch patch);
 
 /// Image set 目录读取 query（由 composition 绑定 use case）。
 final Provider<Future<List<ImageSet>> Function(String libraryId)>
@@ -50,6 +91,19 @@ imageSetWorkspaceImagesQueryProvider = requiredProvider(
 /// Facet bindings query（composition 绑定 use case；不走 Comic metadata）。
 final Provider<ImageSetFacetsQuery> imageSetFacetsQueryProvider =
     requiredProvider('imageSetFacetsQueryProvider');
+
+final Provider<ImageSetUpdateNameCommand> imageSetUpdateNameCommandProvider =
+    requiredProvider('imageSetUpdateNameCommandProvider');
+
+final Provider<ImageSetSetNameLockedCommand>
+imageSetSetNameLockedCommandProvider = requiredProvider(
+  'imageSetSetNameLockedCommandProvider',
+);
+
+final Provider<ImageSetUpdateFacetsCommand>
+imageSetUpdateFacetsCommandProvider = requiredProvider(
+  'imageSetUpdateFacetsCommandProvider',
+);
 
 /// 手动同步 command：复用 library_admin 扫描 run 并映射终态。
 final Provider<ImageSetSyncCommand> syncImageSetLibraryCommandProvider =
@@ -83,6 +137,39 @@ imageSetSetImagesExcludedCommandProvider = requiredProvider(
 final Provider<ImageSetReorderImagesCommand>
 imageSetReorderImagesCommandProvider = requiredProvider(
   'imageSetReorderImagesCommandProvider',
+);
+
+final Provider<ImageSetSubmissionsQuery> imageSetSubmissionsQueryProvider =
+    requiredProvider('imageSetSubmissionsQueryProvider');
+
+final Provider<ImageSetCreateSubmissionCommand>
+imageSetCreateSubmissionCommandProvider = requiredProvider(
+  'imageSetCreateSubmissionCommandProvider',
+);
+
+final Provider<ImageSetRenameSubmissionCommand>
+imageSetRenameSubmissionCommandProvider = requiredProvider(
+  'imageSetRenameSubmissionCommandProvider',
+);
+
+final Provider<ImageSetDeleteSubmissionCommand>
+imageSetDeleteSubmissionCommandProvider = requiredProvider(
+  'imageSetDeleteSubmissionCommandProvider',
+);
+
+final Provider<ImageSetAddSubmissionMembersCommand>
+imageSetAddSubmissionMembersCommandProvider = requiredProvider(
+  'imageSetAddSubmissionMembersCommandProvider',
+);
+
+final Provider<ImageSetRemoveSubmissionMembersCommand>
+imageSetRemoveSubmissionMembersCommandProvider = requiredProvider(
+  'imageSetRemoveSubmissionMembersCommandProvider',
+);
+
+final Provider<ImageSetReorderSubmissionMembersCommand>
+imageSetReorderSubmissionMembersCommandProvider = requiredProvider(
+  'imageSetReorderSubmissionMembersCommandProvider',
 );
 
 /// catalog 变更（sync 成功）后随 library revision 重新读取。
@@ -120,6 +207,18 @@ final imageSetFacetsProvider = FutureProvider.autoDispose
     .family<ImageSetFacets, String>((Ref ref, String imageSetId) {
       ref.watch(libraryRevisionStateProvider.select((s) => s.revision));
       return ref.watch(imageSetFacetsQueryProvider)(imageSetId);
+    });
+
+final imageSetSubmissionsProvider = FutureProvider.autoDispose
+    .family<List<ImageSetSubmission>, ImageSetImagesKey>((
+      Ref ref,
+      ImageSetImagesKey key,
+    ) {
+      ref.watch(libraryRevisionStateProvider.select((s) => s.revision));
+      return ref.watch(imageSetSubmissionsQueryProvider)(
+        key.libraryId,
+        key.imageSetId,
+      );
     });
 
 final imageSetReaderSessionProvider = FutureProvider.autoDispose

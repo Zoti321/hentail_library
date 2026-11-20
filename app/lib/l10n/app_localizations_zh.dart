@@ -103,6 +103,49 @@ class AppLocalizationsZh extends AppLocalizations {
   String get imageSetDetailExcludedBadge => '已排除';
 
   @override
+  String get imageSetDetailSubmissionsTitle => '投稿';
+
+  @override
+  String get imageSetDetailSubmissionsEmpty => '尚无投稿。可创建投稿并挑选本图集内的图片成员。';
+
+  @override
+  String get imageSetDetailSubmissionsCreate => '新建';
+
+  @override
+  String imageSetDetailSubmissionsMemberCount(int count) {
+    return '$count 张成员';
+  }
+
+  @override
+  String get imageSetSubmissionCreateTitle => '新建投稿';
+
+  @override
+  String get imageSetSubmissionRenameTitle => '重命名投稿';
+
+  @override
+  String get imageSetSubmissionNameLabel => '名称';
+
+  @override
+  String get imageSetSubmissionDeleteTitle => '删除投稿';
+
+  @override
+  String imageSetSubmissionDeleteBody(String name) {
+    return '确定删除投稿「$name」？此操作仅更新目录，不会在磁盘上创建或删除文件夹。';
+  }
+
+  @override
+  String get imageSetSubmissionAddMembers => '添加成员';
+
+  @override
+  String get imageSetSubmissionRemoveMember => '移出投稿';
+
+  @override
+  String get imageSetSubmissionMembersEmpty => '此投稿尚无成员。';
+
+  @override
+  String get imageSetSubmissionPickMembersTitle => '从本图集挑选图片';
+
+  @override
   String get imageSetFilterSortTitle => '图集筛选与排序';
 
   @override

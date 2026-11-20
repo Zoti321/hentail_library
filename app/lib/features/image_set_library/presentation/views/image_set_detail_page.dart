@@ -8,6 +8,7 @@ import 'package:hentai_library/features/image_set_library/presentation/providers
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_detail_header.dart';
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_image_tile.dart';
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_row_grid_sliver.dart';
+import 'package:hentai_library/features/image_set_library/presentation/views/image_set_submissions_section.dart';
 import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/application/errors/error_message.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
@@ -195,6 +196,13 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
                                 );
                               },
                             ),
+                          SliverToBoxAdapter(
+                            child: ImageSetSubmissionsSection(
+                              libraryId: widget.libraryId,
+                              imageSet: widget.imageSet,
+                              horizontalInset: horizontalInset,
+                            ),
+                          ),
                           SliverToBoxAdapter(
                             child: SizedBox(height: theme.spacing.lg),
                           ),

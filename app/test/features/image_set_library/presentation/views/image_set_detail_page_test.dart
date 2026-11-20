@@ -1,11 +1,13 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_facets.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_image.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_reader_entry.dart';
+import 'package:hentai_library/features/image_set_library/domain/image_set_submission.dart';
 import 'package:hentai_library/features/image_set_library/presentation/providers/image_set_library_providers.dart';
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_detail_page.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
@@ -82,6 +84,8 @@ class _Probe {
   final List<({List<String> ids, bool excluded})> excludeCalls =
       <({List<String> ids, bool excluded})>[];
   final List<List<String>> reorderCalls = <List<String>>[];
+  List<ImageSetSubmission> submissions = const <ImageSetSubmission>[];
+  final List<String> createSubmissionNames = <String>[];
 }
 
 List<Override> _overrides(
@@ -130,6 +134,36 @@ List<Override> _overrides(
       (String libraryId, String imageSetId, List<String> orderedIds) async {
         probe.reorderCalls.add(List<String>.from(orderedIds));
       },
+    ),
+    imageSetSubmissionsQueryProvider.overrideWithValue(
+      (String libraryId, String imageSetId) async => probe.submissions,
+    ),
+    imageSetCreateSubmissionCommandProvider.overrideWithValue(
+      (String libraryId, String imageSetId, String name) async {
+        probe.createSubmissionNames.add(name);
+        final ImageSetSubmission created = ImageSetSubmission(
+          submissionId: 'new-${probe.createSubmissionNames.length}',
+          libraryId: libraryId,
+          imageSetId: imageSetId,
+          name: name,
+          memberImageIds: const <String>[],
+        );
+        probe.submissions = <ImageSetSubmission>[...probe.submissions, created];
+        return created;
+      },
+    ),
+    imageSetRenameSubmissionCommandProvider.overrideWithValue(
+      (_, __, ___) async {},
+    ),
+    imageSetDeleteSubmissionCommandProvider.overrideWithValue((_, __) async {}),
+    imageSetAddSubmissionMembersCommandProvider.overrideWithValue(
+      (_, __, ___) async {},
+    ),
+    imageSetRemoveSubmissionMembersCommandProvider.overrideWithValue(
+      (_, __, ___) async {},
+    ),
+    imageSetReorderSubmissionMembersCommandProvider.overrideWithValue(
+      (_, __, ___) async {},
     ),
   ];
 }
@@ -287,6 +321,45 @@ void main() {
       probe.reorderCalls.single,
       <String>['i2', 'i1'],
     );
+  });
+
+  testWidgets('lists submissions with member counts and empty state', (
+    WidgetTester tester,
+  ) async {
+    final _Probe probe = _Probe();
+    probe.submissions = const <ImageSetSubmission>[
+      ImageSetSubmission(
+        submissionId: 's1',
+        libraryId: 'img-1',
+        imageSetId: 'a',
+        name: 'Pack A',
+        memberImageIds: <String>['i1', 'i2'],
+      ),
+    ];
+    await _pumpDetail(tester, overrides: _overrides(probe));
+    await tester.pumpAndSettle();
+
+    expect(find.text('投稿'), findsOneWidget);
+    expect(find.text('Pack A'), findsOneWidget);
+    expect(find.text('2 张成员'), findsOneWidget);
+    expect(find.textContaining('尚无投稿'), findsNothing);
+  });
+
+  testWidgets('create submission invokes command with trimmed name', (
+    WidgetTester tester,
+  ) async {
+    final _Probe probe = _Probe();
+    await _pumpDetail(tester, overrides: _overrides(probe));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('新建'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), '  night set  ');
+    await tester.pump();
+    await tester.tap(find.widgetWithText(M3EButton, '保存'));
+    await tester.pumpAndSettle();
+
+    expect(probe.createSubmissionNames, <String>['night set']);
   });
 
   testWidgets('exiting manage restores browse list without excluded', (

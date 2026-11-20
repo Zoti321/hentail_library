@@ -260,6 +260,84 @@ abstract class AppLocalizations {
   /// **'已排除'**
   String get imageSetDetailExcludedBadge;
 
+  /// No description provided for @imageSetDetailSubmissionsTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'投稿'**
+  String get imageSetDetailSubmissionsTitle;
+
+  /// No description provided for @imageSetDetailSubmissionsEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'尚无投稿。可创建投稿并挑选本图集内的图片成员。'**
+  String get imageSetDetailSubmissionsEmpty;
+
+  /// No description provided for @imageSetDetailSubmissionsCreate.
+  ///
+  /// In zh, this message translates to:
+  /// **'新建'**
+  String get imageSetDetailSubmissionsCreate;
+
+  /// No description provided for @imageSetDetailSubmissionsMemberCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count} 张成员'**
+  String imageSetDetailSubmissionsMemberCount(int count);
+
+  /// No description provided for @imageSetSubmissionCreateTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'新建投稿'**
+  String get imageSetSubmissionCreateTitle;
+
+  /// No description provided for @imageSetSubmissionRenameTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'重命名投稿'**
+  String get imageSetSubmissionRenameTitle;
+
+  /// No description provided for @imageSetSubmissionNameLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'名称'**
+  String get imageSetSubmissionNameLabel;
+
+  /// No description provided for @imageSetSubmissionDeleteTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除投稿'**
+  String get imageSetSubmissionDeleteTitle;
+
+  /// No description provided for @imageSetSubmissionDeleteBody.
+  ///
+  /// In zh, this message translates to:
+  /// **'确定删除投稿「{name}」？此操作仅更新目录，不会在磁盘上创建或删除文件夹。'**
+  String imageSetSubmissionDeleteBody(String name);
+
+  /// No description provided for @imageSetSubmissionAddMembers.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加成员'**
+  String get imageSetSubmissionAddMembers;
+
+  /// No description provided for @imageSetSubmissionRemoveMember.
+  ///
+  /// In zh, this message translates to:
+  /// **'移出投稿'**
+  String get imageSetSubmissionRemoveMember;
+
+  /// No description provided for @imageSetSubmissionMembersEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'此投稿尚无成员。'**
+  String get imageSetSubmissionMembersEmpty;
+
+  /// No description provided for @imageSetSubmissionPickMembersTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'从本图集挑选图片'**
+  String get imageSetSubmissionPickMembersTitle;
+
   /// No description provided for @imageSetFilterSortTitle.
   ///
   /// In zh, this message translates to:

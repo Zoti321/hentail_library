@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_facets.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_image.dart';
+import 'package:hentai_library/features/image_set_library/domain/image_set_submission.dart';
 import 'package:hentai_library/features/image_set_library/presentation/providers/image_set_library_providers.dart';
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_detail_page.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
@@ -54,4 +55,26 @@ List<Override> _overrides({
         Md3eImageSetBrowsePreviewData.png1x1,
   ),
   imageSetReaderEntryCommandProvider.overrideWithValue((_) {}),
+  imageSetWorkspaceImagesQueryProvider.overrideWithValue(
+    (String libraryId, String imageSetId) async => images,
+  ),
+  imageSetSubmissionsQueryProvider.overrideWithValue(
+    (_, __) async => const <ImageSetSubmission>[],
+  ),
+  imageSetCreateSubmissionCommandProvider.overrideWithValue(
+    (_, __, ___) async => throw UnimplementedError('Lab preview'),
+  ),
+  imageSetRenameSubmissionCommandProvider.overrideWithValue(
+    (_, __, ___) async {},
+  ),
+  imageSetDeleteSubmissionCommandProvider.overrideWithValue((_, __) async {}),
+  imageSetAddSubmissionMembersCommandProvider.overrideWithValue(
+    (_, __, ___) async {},
+  ),
+  imageSetRemoveSubmissionMembersCommandProvider.overrideWithValue(
+    (_, __, ___) async {},
+  ),
+  imageSetReorderSubmissionMembersCommandProvider.overrideWithValue(
+    (_, __, ___) async {},
+  ),
 ];
