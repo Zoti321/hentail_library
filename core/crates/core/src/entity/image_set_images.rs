@@ -16,6 +16,10 @@ pub struct Model {
     pub sort_order: i64,
     /// When true, hidden from default workspace list/Read (ADR-0064).
     pub excluded: bool,
+    /// Pixel width observed at sync/copy; null when unknown (ADR-0066).
+    pub width: Option<i32>,
+    /// Pixel height observed at sync/copy; null when unknown (ADR-0066).
+    pub height: Option<i32>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

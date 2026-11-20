@@ -124,6 +124,8 @@ pub async fn take_over_image_set_managed_layout(
                 name: Set(file_name),
                 sort_order: Set(sort_order as i64),
                 excluded: Set(old.excluded),
+                width: Set(old.width),
+                height: Set(old.height),
             };
             row.insert(&txn).await.map_err(|e| map_db_err(&e))?;
         }

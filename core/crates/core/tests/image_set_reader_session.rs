@@ -205,6 +205,8 @@ fn session_rejects_carrier_paths_escaping_library_root() {
             carrier_kind: "loose".into(),
             name: "outside.jpg".into(),
             excluded: false,
+            width: None,
+            height: None,
         };
         let result = fixture
             .runtime

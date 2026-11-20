@@ -445,6 +445,8 @@ class ImageSetImageDto {
   final String carrierKind;
   final String name;
   final bool excluded;
+  final int? width;
+  final int? height;
 
   const ImageSetImageDto({
     required this.imageSetImageId,
@@ -455,6 +457,8 @@ class ImageSetImageDto {
     required this.carrierKind,
     required this.name,
     required this.excluded,
+    this.width,
+    this.height,
   });
 
   @override
@@ -466,7 +470,9 @@ class ImageSetImageDto {
       memberPath.hashCode ^
       carrierKind.hashCode ^
       name.hashCode ^
-      excluded.hashCode;
+      excluded.hashCode ^
+      width.hashCode ^
+      height.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -480,7 +486,9 @@ class ImageSetImageDto {
           memberPath == other.memberPath &&
           carrierKind == other.carrierKind &&
           name == other.name &&
-          excluded == other.excluded;
+          excluded == other.excluded &&
+          width == other.width &&
+          height == other.height;
 }
 
 class ImageSetLibraryGatesDto {

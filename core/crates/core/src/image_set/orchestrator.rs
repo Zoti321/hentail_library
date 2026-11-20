@@ -11,6 +11,7 @@ use crate::sync::{
     SyncLibraryRouteDto,
 };
 
+use super::dimensions::enrich_insert_dimensions;
 use super::discovery::{observe_library, PriorCarrierStats};
 use super::plan::{plan_image_set_sync, ImageSetPlan, PriorCatalog};
 use super::writer::apply_image_set_plan;
@@ -53,7 +54,8 @@ pub(crate) async fn sync_image_set_library(
     let Some(obs) = observe_library(root, &prior_stats, handle)? else {
         return Ok(None);
     };
-    let plan = plan_image_set_sync(library_id, &obs, &prior, now_ms());
+    let mut plan = plan_image_set_sync(library_id, &obs, &prior, now_ms());
+    enrich_insert_dimensions(root, &mut plan.images_insert);
     emit(progress(SyncLibraryPhaseDto::WritingDb, 0, None));
 
     let txn = db.begin().await.map_err(|e| map_db_err(&e))?;

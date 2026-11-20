@@ -12,6 +12,7 @@ use crate::library::is_image_set_catalog;
 use crate::library_write::with_library_write;
 use crate::resource::{basename, extension_lower, is_comic_image_extension};
 
+use super::dimensions::probe_image_file;
 use super::dto::{CarrierKind, ImageSetImageDto};
 use super::ids::image_set_image_id;
 use super::workspace::{load_set_images, require_set};
@@ -66,6 +67,10 @@ pub async fn copy_images_into_image_set(
 
             let carrier_relative_path =
                 format!("{}/{}", set.relative_path, file_name).replace('\\', "/");
+            let (width, height) = match probe_image_file(&dest) {
+                Some((w, h)) => (i32::try_from(w).ok(), i32::try_from(h).ok()),
+                None => (None, None),
+            };
             let row = image_set_images::Model {
                 image_set_image_id: image_set_image_id(library_id, &carrier_relative_path, ""),
                 library_id: library_id.to_string(),
@@ -76,6 +81,8 @@ pub async fn copy_images_into_image_set(
                 name: file_name.clone(),
                 sort_order: next_order,
                 excluded: false,
+                width,
+                height,
             };
             next_order = next_order.saturating_add(1);
             let active: image_set_images::ActiveModel = row.clone().into();
@@ -89,6 +96,8 @@ pub async fn copy_images_into_image_set(
                 carrier_kind: row.carrier_kind,
                 name: row.name,
                 excluded: row.excluded,
+                width: row.width.and_then(|v| u32::try_from(v).ok()),
+                height: row.height.and_then(|v| u32::try_from(v).ok()),
             });
         }
 

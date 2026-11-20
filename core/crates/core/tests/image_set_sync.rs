@@ -716,3 +716,42 @@ fn workspace_schema_has_submissions_and_library_gates() {
         });
     });
 }
+
+fn png_bytes(width: u32, height: u32) -> Vec<u8> {
+    use image::{ImageBuffer, Rgb};
+    use std::io::Cursor;
+    let img: ImageBuffer<Rgb<u8>, Vec<u8>> =
+        ImageBuffer::from_pixel(width, height, Rgb([0, 0, 0]));
+    let mut out = Vec::new();
+    img.write_to(&mut Cursor::new(&mut out), image::ImageFormat::Png)
+        .expect("encode png");
+    out
+}
+
+#[test]
+fn sync_persists_image_dimensions_for_valid_png_and_leaves_junk_null() {
+    common::with_global_db(|| {
+        let fixture = Fixture::new("image_dims.sqlite");
+        write_file(&fixture.root.join("album/wide.png"), &png_bytes(200, 100));
+        write_file(&fixture.root.join("album/junk.jpg"), b"not-an-image");
+        fixture.sync();
+        let set = fixture.set("album");
+        let images = fixture
+            .runtime
+            .block_on(list_image_set_images(&fixture.library_id, &set.image_set_id))
+            .expect("images");
+        assert_eq!(images.len(), 2);
+        let wide = images
+            .iter()
+            .find(|image| image.name == "wide.png")
+            .expect("wide");
+        assert_eq!(wide.width, Some(200));
+        assert_eq!(wide.height, Some(100));
+        let junk = images
+            .iter()
+            .find(|image| image.name == "junk.jpg")
+            .expect("junk");
+        assert_eq!(junk.width, None);
+        assert_eq!(junk.height, None);
+    });
+}

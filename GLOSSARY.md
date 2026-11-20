@@ -33,6 +33,9 @@ _Avoid_: album, Series, Comic, Library root image set, virtual Image set as a se
 **Image set image**: One catalogued image occurrence inside an Image set, anchored to its physical location (loose relative path under the set, or archive relative path plus entry path). Byte-identical copies at different locations are distinct Image set images until a later content-identity decision says otherwise.
 _Avoid_: Set image as content-hash identity, Comic page as the Image set catalog entity, cataloguing Library-root loose images.
 
+**Image set image dimensions**: The pixel width and height of one Image set image as catalog facts observed at sync or copy-in. They may be absent when probing fails or for rows catalogued before dimensions were stored. They are not a Reader decode cache.
+_Avoid_: layout page height, thumbnail size, Resource file size, Dart-only aspect peek as the catalog source of truth.
+
 **Image set workspace**: The logical management projection of one Image set: user order, exclude/include membership for browse and Read, and Image set submissions. It is not a separate catalog entity or ID; the physical Image set is the carrier. Default view is the full non-excluded membership in user order. ADR-0064.
 _Avoid_: virtual Image set, virtual album, Workspace row/ID, aggregating across multiple Image sets.
 

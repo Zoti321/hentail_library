@@ -50,6 +50,8 @@ pub struct ImageSetImageDto {
     pub carrier_kind: String,
     pub name: String,
     pub excluded: bool,
+    pub width: Option<u32>,
+    pub height: Option<u32>,
 }
 
 impl From<CoreImageSet> for ImageSetDto {
@@ -76,6 +78,8 @@ impl From<CoreImageSetImage> for ImageSetImageDto {
             carrier_kind: value.carrier_kind,
             name: value.name,
             excluded: value.excluded,
+            width: value.width,
+            height: value.height,
         }
     }
 }
@@ -408,6 +412,8 @@ pub async fn load_image_set_page_bytes_frb(
         carrier_kind: image.carrier_kind,
         name: image.name,
         excluded: image.excluded,
+        width: image.width,
+        height: image.height,
     };
     core_load_image_set_page_bytes(&library_id, &core_image)
         .await

@@ -14,11 +14,21 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 /// Reserved strip band height for submission affinity (reorder-ready cell geometry).
 const double kImageSetAffinityStripBandHeight = 8;
 
-/// Fallback aspect while page bytes / size probe are not ready yet.
+/// Fallback aspect while catalog dimensions are unknown.
 const double kImageSetGalleryFallbackAspectRatio = 2 / 3;
 
 /// Page bytes plus the aspect locked before paint (anti-jitter).
 typedef ImageSetGalleryPageLayout = ({Uint8List bytes, double aspectRatio});
+
+/// Catalog aspect for gallery reservation: known dims, else fallback 2:3.
+double imageSetGalleryCatalogAspectRatioOf(ImageSetImage image) {
+  final int? width = image.width;
+  final int? height = image.height;
+  if (width != null && height != null && width > 0 && height > 0) {
+    return width / height;
+  }
+  return kImageSetGalleryFallbackAspectRatio;
+}
 
 /// Resolves display aspect from [bytes]: header peek, else codec probe.
 Future<double> imageSetGalleryAspectRatioOf(Uint8List bytes) async {
@@ -49,11 +59,21 @@ final imageSetGalleryPageLayoutProvider = FutureProvider.autoDispose
       final Uint8List bytes = await ref.watch(
         imageSetPageBytesProvider(key).future,
       );
-      final double aspectRatio = await imageSetGalleryAspectRatioOf(bytes);
+      final double catalogAspect = imageSetGalleryCatalogAspectRatioOf(
+        key.image,
+      );
+      final bool hasCatalogDims =
+          key.image.width != null &&
+          key.image.height != null &&
+          key.image.width! > 0 &&
+          key.image.height! > 0;
+      final double aspectRatio = hasCatalogDims
+          ? catalogAspect
+          : await imageSetGalleryAspectRatioOf(bytes);
       return (bytes: bytes, aspectRatio: aspectRatio);
     });
 
-/// Image set detail gallery cell: size-probed skeleton, affinity band, selection.
+/// Image set detail gallery cell: catalog-sized skeleton, then page bytes.
 class ImageSetImageTile extends ConsumerWidget {
   const ImageSetImageTile({
     super.key,
@@ -88,24 +108,23 @@ class ImageSetImageTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final M3EThemeData theme = M3ETheme.of(context);
     final AppLocalizations l10n = context.l10n;
-    final ImageSetPageBytesKey bytesKey = (
-      libraryId: libraryId,
-      image: image,
-    );
+    final ImageSetPageBytesKey bytesKey = (libraryId: libraryId, image: image);
     final AsyncValue<ImageSetGalleryPageLayout> layout = ref.watch(
       imageSetGalleryPageLayoutProvider(bytesKey),
     );
     final double opacity = image.excluded ? 0.45 : 1;
     final Color skeletonColor = theme.colorScheme.surfaceContainerHighest;
+    final double reservedAspect = imageSetGalleryCatalogAspectRatioOf(image);
 
-    // Do not paint a fixed-grid skeleton: wait until aspect is probed, then
-    // lock AspectRatio and keep a solid fill under [Image.memory].
+    final Widget imageBody;
     if (layout.isLoading) {
-      return const SizedBox.shrink();
-    }
-    if (layout.hasError) {
-      return AspectRatio(
-        aspectRatio: kImageSetGalleryFallbackAspectRatio,
+      imageBody = AspectRatio(
+        aspectRatio: reservedAspect,
+        child: ColoredBox(color: skeletonColor),
+      );
+    } else if (layout.hasError) {
+      imageBody = AspectRatio(
+        aspectRatio: reservedAspect,
         child: ColoredBox(
           color: skeletonColor,
           child: Icon(
@@ -114,36 +133,38 @@ class ImageSetImageTile extends ConsumerWidget {
           ),
         ),
       );
-    }
-    final ImageSetGalleryPageLayout page = layout.requireValue;
-    final Widget imageBody = AspectRatio(
-      aspectRatio: page.aspectRatio,
-      child: Opacity(
-        opacity: opacity,
-        child: Stack(
-          fit: StackFit.expand,
-          children: <Widget>[
-            ColoredBox(color: skeletonColor),
-            Image.memory(
-              page.bytes,
-              fit: BoxFit.contain,
-              width: double.infinity,
-              height: double.infinity,
-              gaplessPlayback: true,
-              filterQuality: kCatalogImageFilterQuality,
-              errorBuilder: (
-                BuildContext context,
-                Object error,
-                StackTrace? stackTrace,
-              ) => Icon(
-                Icons.broken_image_outlined,
-                color: theme.colorScheme.onSurfaceVariant,
+    } else {
+      final ImageSetGalleryPageLayout page = layout.requireValue;
+      imageBody = AspectRatio(
+        aspectRatio: page.aspectRatio,
+        child: Opacity(
+          opacity: opacity,
+          child: Stack(
+            fit: StackFit.expand,
+            children: <Widget>[
+              ColoredBox(color: skeletonColor),
+              Image.memory(
+                page.bytes,
+                fit: BoxFit.contain,
+                width: double.infinity,
+                height: double.infinity,
+                gaplessPlayback: true,
+                filterQuality: kCatalogImageFilterQuality,
+                errorBuilder:
+                    (
+                      BuildContext context,
+                      Object error,
+                      StackTrace? stackTrace,
+                    ) => Icon(
+                      Icons.broken_image_outlined,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    }
 
     final Widget cell = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

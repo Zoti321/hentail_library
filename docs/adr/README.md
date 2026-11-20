@@ -144,3 +144,4 @@ Accepted | Superseded by ADR-000N | Deprecated
 | [0063](./0063-md3-standard-scheme-variant-and-contrast.md) | MD3 standard scheme variant and contrast | Accepted; partially supersedes ADR-0037 Decision §2 |
 | [0064](./0064-image-set-workspace-and-resource-mutation.md) | Image set workspace and resource mutation | Accepted |
 | [0065](./0065-page-image-max-edge-decode-safety.md) | Page image max-edge decode safety | Accepted; supersedes ADR-0060 decode-size-cap bullet |
+| [0066](./0066-image-set-image-dimensions.md) | Image set image dimensions in catalog | Accepted |

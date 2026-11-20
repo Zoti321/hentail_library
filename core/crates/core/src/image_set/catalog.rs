@@ -17,6 +17,8 @@ fn image_set_image_from_row(row: image_set_images::Model) -> ImageSetImageDto {
         carrier_kind: row.carrier_kind,
         name: row.name,
         excluded: row.excluded,
+        width: row.width.and_then(|v| u32::try_from(v).ok()),
+        height: row.height.and_then(|v| u32::try_from(v).ok()),
     }
 }
 

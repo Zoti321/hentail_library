@@ -42,6 +42,8 @@ void main() {
       carrierKind: 'loose',
       name: '0001.jpg',
       excluded: true,
+      width: 200,
+      height: 100,
     );
     final ImageSetImage image = imageSetImageFromFrb(dto);
     final rust.ImageSetImageDto back = imageSetImageToFrb(image);
@@ -51,5 +53,9 @@ void main() {
     expect(back.name, dto.name);
     expect(image.excluded, isTrue);
     expect(back.excluded, isTrue);
+    expect(image.width, 200);
+    expect(image.height, 100);
+    expect(back.width, 200);
+    expect(back.height, 100);
   });
 }

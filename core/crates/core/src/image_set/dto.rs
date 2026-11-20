@@ -29,6 +29,10 @@ pub struct ImageSetImageDto {
     pub name: String,
     /// Catalog workspace exclude flag (browse list is always `false`).
     pub excluded: bool,
+    /// Pixel width when known (ADR-0066); `None` when never probed or probe failed.
+    pub width: Option<u32>,
+    /// Pixel height when known (ADR-0066); `None` when never probed or probe failed.
+    pub height: Option<u32>,
 }
 
 /// Facet bucket of the catalog query: matches any bound name (case-insensitive) OR, when

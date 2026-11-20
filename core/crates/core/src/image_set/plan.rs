@@ -437,5 +437,7 @@ fn image_row(
         name: name.to_string(),
         sort_order: 0,
         excluded: false,
+        width: None,
+        height: None,
     }
 }

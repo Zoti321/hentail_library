@@ -7006,6 +7006,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  int dco_decode_box_autoadd_u_32(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as int;
+  }
+
+  @protected
   UpdateComicUserMetaFrbDto
   dco_decode_box_autoadd_update_comic_user_meta_frb_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
@@ -7439,8 +7445,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ImageSetImageDto dco_decode_image_set_image_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 8)
-      throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
+    if (arr.length != 10)
+      throw Exception('unexpected arr length: expect 10 but see ${arr.length}');
     return ImageSetImageDto(
       imageSetImageId: dco_decode_String(arr[0]),
       imageSetId: dco_decode_String(arr[1]),
@@ -7450,6 +7456,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       carrierKind: dco_decode_String(arr[5]),
       name: dco_decode_String(arr[6]),
       excluded: dco_decode_bool(arr[7]),
+      width: dco_decode_opt_box_autoadd_u_32(arr[8]),
+      height: dco_decode_opt_box_autoadd_u_32(arr[9]),
     );
   }
 
@@ -8143,6 +8151,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return raw == null
         ? null
         : dco_decode_box_autoadd_series_thumbnail_dto(raw);
+  }
+
+  @protected
+  int? dco_decode_opt_box_autoadd_u_32(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_u_32(raw);
   }
 
   @protected
@@ -8843,6 +8857,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  int dco_decode_u_32(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as int;
+  }
+
+  @protected
   BigInt dco_decode_u_64(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dcoDecodeU64(raw);
@@ -9479,6 +9499,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  int sse_decode_box_autoadd_u_32(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_u_32(deserializer));
+  }
+
+  @protected
   UpdateComicUserMetaFrbDto
   sse_decode_box_autoadd_update_comic_user_meta_frb_dto(
     SseDeserializer deserializer,
@@ -10025,6 +10051,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_carrierKind = sse_decode_String(deserializer);
     var var_name = sse_decode_String(deserializer);
     var var_excluded = sse_decode_bool(deserializer);
+    var var_width = sse_decode_opt_box_autoadd_u_32(deserializer);
+    var var_height = sse_decode_opt_box_autoadd_u_32(deserializer);
     return ImageSetImageDto(
       imageSetImageId: var_imageSetImageId,
       imageSetId: var_imageSetId,
@@ -10034,6 +10062,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       carrierKind: var_carrierKind,
       name: var_name,
       excluded: var_excluded,
+      width: var_width,
+      height: var_height,
     );
   }
 
@@ -11050,6 +11080,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  int? sse_decode_opt_box_autoadd_u_32(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_u_32(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
   List<String>? sse_decode_opt_list_String(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
@@ -11886,6 +11927,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  int sse_decode_u_32(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getUint32();
+  }
+
+  @protected
   BigInt sse_decode_u_64(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return deserializer.buffer.getBigUint64();
@@ -12626,6 +12673,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_u_32(int self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_32(self, serializer);
+  }
+
+  @protected
   void sse_encode_box_autoadd_update_comic_user_meta_frb_dto(
     UpdateComicUserMetaFrbDto self,
     SseSerializer serializer,
@@ -13053,6 +13106,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.carrierKind, serializer);
     sse_encode_String(self.name, serializer);
     sse_encode_bool(self.excluded, serializer);
+    sse_encode_opt_box_autoadd_u_32(self.width, serializer);
+    sse_encode_opt_box_autoadd_u_32(self.height, serializer);
   }
 
   @protected
@@ -13944,6 +13999,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_opt_box_autoadd_u_32(int? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_u_32(self, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_opt_list_String(
     List<String>? self,
     SseSerializer serializer,
@@ -14588,6 +14653,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_i_64(self.deletedAt, serializer);
     sse_encode_String(self.libraryName, serializer);
     sse_encode_String(self.libraryKind, serializer);
+  }
+
+  @protected
+  void sse_encode_u_32(int self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putUint32(self);
   }
 
   @protected

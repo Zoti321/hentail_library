@@ -7321,6 +7321,8 @@ impl SseDecode for crate::api::image_set::ImageSetImageDto {
         let mut var_carrierKind = <String>::sse_decode(deserializer);
         let mut var_name = <String>::sse_decode(deserializer);
         let mut var_excluded = <bool>::sse_decode(deserializer);
+        let mut var_width = <Option<u32>>::sse_decode(deserializer);
+        let mut var_height = <Option<u32>>::sse_decode(deserializer);
         return crate::api::image_set::ImageSetImageDto {
             image_set_image_id: var_imageSetImageId,
             image_set_id: var_imageSetId,
@@ -7330,6 +7332,8 @@ impl SseDecode for crate::api::image_set::ImageSetImageDto {
             carrier_kind: var_carrierKind,
             name: var_name,
             excluded: var_excluded,
+            width: var_width,
+            height: var_height,
         };
     }
 }
@@ -8349,6 +8353,17 @@ impl SseDecode for Option<crate::api::thumbnail::SeriesThumbnailDto> {
     }
 }
 
+impl SseDecode for Option<u32> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<u32>::sse_decode(deserializer));
+        } else {
+            return None;
+        }
+    }
+}
+
 impl SseDecode for Option<Vec<String>> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -9231,6 +9246,13 @@ impl SseDecode for crate::api::comic_trash::TrashedComicFrbDto {
             library_name: var_libraryName,
             library_kind: var_libraryKind,
         };
+    }
+}
+
+impl SseDecode for u32 {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        deserializer.cursor.read_u32::<NativeEndian>().unwrap()
     }
 }
 
@@ -11082,6 +11104,8 @@ impl flutter_rust_bridge::IntoDart for crate::api::image_set::ImageSetImageDto {
             self.carrier_kind.into_into_dart().into_dart(),
             self.name.into_into_dart().into_dart(),
             self.excluded.into_into_dart().into_dart(),
+            self.width.into_into_dart().into_dart(),
+            self.height.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -13569,6 +13593,8 @@ impl SseEncode for crate::api::image_set::ImageSetImageDto {
         <String>::sse_encode(self.carrier_kind, serializer);
         <String>::sse_encode(self.name, serializer);
         <bool>::sse_encode(self.excluded, serializer);
+        <Option<u32>>::sse_encode(self.width, serializer);
+        <Option<u32>>::sse_encode(self.height, serializer);
     }
 }
 
@@ -14340,6 +14366,16 @@ impl SseEncode for Option<crate::api::thumbnail::SeriesThumbnailDto> {
     }
 }
 
+impl SseEncode for Option<u32> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <u32>::sse_encode(value, serializer);
+        }
+    }
+}
+
 impl SseEncode for Option<Vec<String>> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -15018,6 +15054,13 @@ impl SseEncode for crate::api::comic_trash::TrashedComicFrbDto {
         <i64>::sse_encode(self.deleted_at, serializer);
         <String>::sse_encode(self.library_name, serializer);
         <String>::sse_encode(self.library_kind, serializer);
+    }
+}
+
+impl SseEncode for u32 {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        serializer.cursor.write_u32::<NativeEndian>(self).unwrap();
     }
 }
 

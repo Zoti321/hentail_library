@@ -9,6 +9,8 @@ class ImageSetImage {
     required this.carrierKind,
     required this.name,
     this.excluded = false,
+    this.width,
+    this.height,
   });
 
   final String imageSetImageId;
@@ -25,4 +27,10 @@ class ImageSetImage {
 
   /// Workspace exclude flag; browse list always `false`.
   final bool excluded;
+
+  /// Pixel width when known (ADR-0066).
+  final int? width;
+
+  /// Pixel height when known (ADR-0066).
+  final int? height;
 }

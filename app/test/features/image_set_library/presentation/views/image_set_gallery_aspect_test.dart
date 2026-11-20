@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hentai_library/features/image_set_library/domain/image_set_image.dart';
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_image_tile.dart';
 
 /// 1×1 PNG (IHDR width/height = 1).
@@ -23,9 +24,42 @@ final Uint8List _png2x1 = Uint8List.fromList(<int>[
   0x00, 0x00, 0x49, 0x45, 0x4E, 0x44, 0xAE, 0x42, 0x60, 0x82,
 ]);
 
+const ImageSetImage _base = ImageSetImage(
+  imageSetImageId: 'i1',
+  imageSetId: 'set',
+  libraryId: 'lib',
+  carrierRelativePath: 'album/a.png',
+  memberPath: '',
+  carrierKind: 'loose',
+  name: 'a.png',
+);
+
 void main() {
   test('imageSetGalleryAspectRatioOf peeks PNG IHDR before paint', () async {
     expect(await imageSetGalleryAspectRatioOf(_png1x1), 1);
     expect(await imageSetGalleryAspectRatioOf(_png2x1), 2);
+  });
+
+  test('imageSetGalleryCatalogAspectRatioOf uses catalog dims or 2:3', () {
+    expect(
+      imageSetGalleryCatalogAspectRatioOf(
+        ImageSetImage(
+          imageSetImageId: _base.imageSetImageId,
+          imageSetId: _base.imageSetId,
+          libraryId: _base.libraryId,
+          carrierRelativePath: _base.carrierRelativePath,
+          memberPath: _base.memberPath,
+          carrierKind: _base.carrierKind,
+          name: _base.name,
+          width: 200,
+          height: 100,
+        ),
+      ),
+      2,
+    );
+    expect(
+      imageSetGalleryCatalogAspectRatioOf(_base),
+      kImageSetGalleryFallbackAspectRatio,
+    );
   });
 }

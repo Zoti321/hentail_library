@@ -36,6 +36,7 @@ mod m20261118_000033_image_set_name_lock;
 mod m20261118_000034_image_set_facets;
 mod m20261118_000035_image_set_created_at;
 mod m20261120_000036_image_set_workspace;
+mod m20261120_000037_image_set_image_dimensions;
 
 pub struct Migrator;
 
@@ -78,6 +79,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20261118_000034_image_set_facets::Migration),
             Box::new(m20261118_000035_image_set_created_at::Migration),
             Box::new(m20261120_000036_image_set_workspace::Migration),
+            Box::new(m20261120_000037_image_set_image_dimensions::Migration),
         ]
     }
 }

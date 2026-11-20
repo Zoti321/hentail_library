@@ -5,6 +5,7 @@
 
 mod archive_list;
 mod catalog;
+mod dimensions;
 mod discovery;
 mod dto;
 mod gates;
