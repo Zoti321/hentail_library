@@ -562,4 +562,46 @@ void main() {
     expect(find.byKey(const ValueKey<String>('i2')), findsNothing);
     expect(find.text('已排除'), findsNothing);
   });
+
+  testWidgets('submission affinity strips only on member tiles', (
+    WidgetTester tester,
+  ) async {
+    final _Probe probe = _Probe();
+    _alphaImages = <ImageSetImage>[_image1, _image2];
+    probe.submissions = const <ImageSetSubmission>[
+      ImageSetSubmission(
+        submissionId: 's1',
+        libraryId: 'img-1',
+        imageSetId: 'a',
+        name: 'Pack A',
+        memberImageIds: <String>['i1'],
+      ),
+      ImageSetSubmission(
+        submissionId: 's2',
+        libraryId: 'img-1',
+        imageSetId: 'a',
+        name: 'Pack B',
+        memberImageIds: <String>['i1'],
+      ),
+    ];
+    await _pumpDetail(tester, overrides: _overrides(probe));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const Key('imageSetAffinityStrips-i1')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const Key('imageSetAffinityStrip-i1-0')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const Key('imageSetAffinityStrip-i1-1')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const Key('imageSetAffinityStrips-i2')),
+      findsNothing,
+    );
+  });
 }

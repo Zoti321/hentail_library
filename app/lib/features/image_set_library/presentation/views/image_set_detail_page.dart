@@ -29,6 +29,19 @@ import 'package:material_symbols_icons/symbols.dart';
 /// Client-side page size for the detail image grid (button pager).
 const int kImageSetDetailImagePageSize = 24;
 
+/// imageId → indexes into [submissions] (one membership load, no N+1).
+Map<String, List<int>> imageSetSubmissionAffinityByImageId(
+  List<ImageSetSubmission> submissions,
+) {
+  final Map<String, List<int>> byImage = <String, List<int>>{};
+  for (int i = 0; i < submissions.length; i++) {
+    for (final String imageId in submissions[i].memberImageIds) {
+      (byImage[imageId] ??= <int>[]).add(i);
+    }
+  }
+  return byImage;
+}
+
 /// Image set 详情：顶栏 + 分页图流；长按进入选择，右键/次要点打开上下文菜单。
 class ImageSetDetailPage extends ConsumerStatefulWidget {
   const ImageSetDetailPage({
@@ -306,6 +319,13 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
     );
     final String title = _imageSet.name;
     final bool showDiskDelete = _selectionMode && _canMutateDisk;
+    final AsyncValue<List<ImageSetSubmission>> submissionsAsync = ref.watch(
+      imageSetSubmissionsProvider(_imagesKey),
+    );
+    final Map<String, List<int>> affinityByImage =
+        imageSetSubmissionAffinityByImageId(
+      submissionsAsync.asData?.value ?? const <ImageSetSubmission>[],
+    );
 
     return Scaffold(
       body: SafeArea(
@@ -388,6 +408,7 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
                   horizontalInset: horizontalInset,
                   title: title,
                   list: list,
+                  affinityByImage: affinityByImage,
                 ),
                 loading: () => const Center(child: CircularProgressIndicator()),
                 error: (Object error, StackTrace _) =>
@@ -406,6 +427,7 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
     required double horizontalInset,
     required String title,
     required List<ImageSetImage> list,
+    required Map<String, List<int>> affinityByImage,
   }) {
     final int totalPages = list.isEmpty
         ? 1
@@ -473,6 +495,8 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
                 image: image,
                 selectionMode: _selectionMode,
                 selected: selected,
+                affinitySubmissionIndexes:
+                    affinityByImage[image.imageSetImageId] ?? const <int>[],
                 onTap: () {
                   if (_selectionMode) {
                     _toggleSelection(image.imageSetImageId);

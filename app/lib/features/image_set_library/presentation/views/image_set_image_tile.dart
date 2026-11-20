@@ -21,6 +21,7 @@ class ImageSetImageTile extends ConsumerWidget {
     this.selected = false,
     this.selectionMode = false,
     this.compactWidth,
+    this.affinitySubmissionIndexes = const <int>[],
   });
 
   final String libraryId;
@@ -33,6 +34,9 @@ class ImageSetImageTile extends ConsumerWidget {
 
   /// When set, tile uses fixed width; otherwise full width grid cell.
   final double? compactWidth;
+
+  /// Stable indexes into this Image set's submissions list (multi = stacked strips).
+  final List<int> affinitySubmissionIndexes;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -108,6 +112,31 @@ class ImageSetImageTile extends ConsumerWidget {
       ],
     );
 
+    final Widget tiled = affinitySubmissionIndexes.isEmpty
+        ? content
+        : Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              KeyedSubtree(
+                key: Key('imageSetAffinityStrips-${image.imageSetImageId}'),
+                child: Column(
+                  children: <Widget>[
+                    for (final int index in affinitySubmissionIndexes)
+                      ColoredBox(
+                        key: Key(
+                          'imageSetAffinityStrip-${image.imageSetImageId}-$index',
+                        ),
+                        color: _affinityStripColor(theme.colorScheme, index),
+                        child: SizedBox(height: theme.spacing.xs / 2),
+                      ),
+                  ],
+                ),
+              ),
+              content,
+            ],
+          );
+
     return Material(
       color: theme.colorScheme.surfaceContainerHigh,
       child: InkWell(
@@ -115,11 +144,21 @@ class ImageSetImageTile extends ConsumerWidget {
         onLongPress: onLongPress,
         onSecondaryTapDown: onSecondaryTapDown,
         child: compactWidth != null
-            ? SizedBox(width: compactWidth, child: content)
-            : content,
+            ? SizedBox(width: compactWidth, child: tiled)
+            : tiled,
       ),
     );
   }
+}
+
+Color _affinityStripColor(M3EColorScheme scheme, int submissionIndex) {
+  final List<Color> palette = <Color>[
+    scheme.primary,
+    scheme.secondary,
+    scheme.tertiary,
+    scheme.error,
+  ];
+  return palette[submissionIndex % palette.length];
 }
 
 class _TilePlaceholder extends StatelessWidget {
