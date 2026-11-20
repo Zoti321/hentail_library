@@ -110,6 +110,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get imageSetDetailExcludedBadge => 'Excluded';
 
   @override
+  String get imageSetMetadataEditEnter => 'Edit metadata';
+
+  @override
+  String get imageSetMetadataEditTitle => 'Edit image set metadata';
+
+  @override
+  String get imageSetMetadataEditNameLabel => 'Display name';
+
+  @override
+  String get imageSetMetadataEditNameLockLabel => 'Lock display name';
+
+  @override
+  String get imageSetMetadataEditNameLockHint =>
+      'When locked, sync keeps this name instead of the folder or archive filename.';
+
+  @override
   String get imageSetDetailSubmissionsTitle => 'Submissions';
 
   @override

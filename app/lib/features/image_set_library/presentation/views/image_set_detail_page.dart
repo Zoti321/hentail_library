@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set.dart';
+import 'package:hentai_library/features/image_set_library/domain/image_set_facets.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_image.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_reader_entry.dart';
 import 'package:hentai_library/features/image_set_library/presentation/providers/image_set_library_providers.dart';
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_detail_header.dart';
+import 'package:hentai_library/features/image_set_library/presentation/views/image_set_metadata_edit_sheet.dart';
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_image_tile.dart';
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_row_grid_sliver.dart';
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_submissions_section.dart';
@@ -33,11 +35,35 @@ class ImageSetDetailPage extends ConsumerStatefulWidget {
 class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
   bool _manageMode = false;
   final Set<String> _selectedIds = <String>{};
+  late ImageSet _imageSet;
+
+  @override
+  void initState() {
+    super.initState();
+    _imageSet = widget.imageSet;
+  }
 
   ImageSetImagesKey get _imagesKey => (
     libraryId: widget.libraryId,
-    imageSetId: widget.imageSet.imageSetId,
+    imageSetId: _imageSet.imageSetId,
   );
+
+  Future<void> _openMetadataEdit() async {
+    final ImageSetFacets facets = await ref.read(
+      imageSetFacetsQueryProvider,
+    )(_imageSet.imageSetId);
+    if (!mounted) {
+      return;
+    }
+    final ImageSet? updated = await showImageSetMetadataEditSheet(
+      context: context,
+      imageSet: _imageSet,
+      initialFacets: facets,
+    );
+    if (updated != null && mounted) {
+      setState(() => _imageSet = updated);
+    }
+  }
 
   void _exitManage() {
     setState(() {
@@ -63,7 +89,7 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
     final List<String> ids = _selectedIds.toList(growable: false);
     await ref.read(imageSetSetImagesExcludedCommandProvider)(
       widget.libraryId,
-      widget.imageSet.imageSetId,
+      _imageSet.imageSetId,
       ids,
       excluded: excluded,
     );
@@ -76,7 +102,7 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
   Future<void> _persistReorder(List<ImageSetImage> ordered) async {
     await ref.read(imageSetReorderImagesCommandProvider)(
       widget.libraryId,
-      widget.imageSet.imageSetId,
+      _imageSet.imageSetId,
       ordered.map((ImageSetImage i) => i.imageSetImageId).toList(),
     );
   }
@@ -91,7 +117,7 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
           ? imageSetWorkspaceImagesProvider(_imagesKey)
           : imageSetImagesProvider(_imagesKey),
     );
-    final String title = widget.imageSet.name;
+    final String title = _imageSet.name;
 
     return Scaffold(
       body: SafeArea(
@@ -126,6 +152,13 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
                         ),
                         const Spacer(),
                         DetailHeaderIconButton(
+                          icon: Symbols.edit,
+                          tooltip: l10n.imageSetMetadataEditEnter,
+                          semanticLabel: l10n.imageSetMetadataEditEnter,
+                          onPressed: _openMetadataEdit,
+                          iconColor: theme.colorScheme.onSurfaceVariant,
+                        ),
+                        DetailHeaderIconButton(
                           icon: Symbols.tune,
                           tooltip: l10n.imageSetDetailManageEnter,
                           semanticLabel: l10n.imageSetDetailManageEnter,
@@ -142,7 +175,7 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
                 data: (List<ImageSetImage> list) => _manageMode
                     ? _ManageImageList(
                         libraryId: widget.libraryId,
-                        imageSet: widget.imageSet,
+                        imageSet: _imageSet,
                         images: list,
                         selectedIds: _selectedIds,
                         horizontalInset: horizontalInset,
@@ -161,7 +194,7 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
                             sliver: SliverToBoxAdapter(
                               child: ImageSetDetailHeader(
                                 libraryId: widget.libraryId,
-                                imageSetId: widget.imageSet.imageSetId,
+                                imageSetId: _imageSet.imageSetId,
                                 title: title,
                                 imageCount: list.length,
                               ),
@@ -188,7 +221,7 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
                                   )(
                                     ImageSetReaderEntry(
                                       libraryId: widget.libraryId,
-                                      imageSetId: widget.imageSet.imageSetId,
+                                      imageSetId: _imageSet.imageSetId,
                                       imageSetImageId: image.imageSetImageId,
                                       index: index,
                                     ),
@@ -199,7 +232,7 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
                           SliverToBoxAdapter(
                             child: ImageSetSubmissionsSection(
                               libraryId: widget.libraryId,
-                              imageSet: widget.imageSet,
+                              imageSet: _imageSet,
                               horizontalInset: horizontalInset,
                             ),
                           ),

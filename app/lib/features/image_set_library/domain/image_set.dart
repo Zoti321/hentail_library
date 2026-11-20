@@ -21,4 +21,13 @@ class ImageSet {
 
   /// 名称的 Metadata field lock；锁定时同步保留用户名称。
   final bool nameLocked;
+
+  ImageSet copyWith({String? name, bool? nameLocked}) => ImageSet(
+    imageSetId: imageSetId,
+    libraryId: libraryId,
+    relativePath: relativePath,
+    name: name ?? this.name,
+    isRoot: isRoot,
+    nameLocked: nameLocked ?? this.nameLocked,
+  );
 }

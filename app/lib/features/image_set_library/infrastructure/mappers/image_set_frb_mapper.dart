@@ -1,6 +1,7 @@
 import 'package:hentai_library/features/image_set_library/domain/image_set.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_catalog_query.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_facets.dart';
+import 'package:hentai_library/features/image_set_library/domain/image_set_facets_patch.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_image.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_library_gates.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_submission.dart';
@@ -91,6 +92,14 @@ ImageSetFacets imageSetFacetsFromFrb(rust.ImageSetFacetsDto dto) =>
       tags: List<String>.from(dto.tags),
       parodies: List<String>.from(dto.parodies),
       characters: List<String>.from(dto.characters),
+    );
+
+rust.UpdateImageSetFacetsDto imageSetFacetsPatchToFrb(ImageSetFacetsPatch patch) =>
+    rust.UpdateImageSetFacetsDto(
+      authors: patch.authors,
+      tags: patch.tags,
+      parodies: patch.parodies,
+      characters: patch.characters,
     );
 
 ImageSetImage imageSetImageFromFrb(rust.ImageSetImageDto dto) => ImageSetImage(

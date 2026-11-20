@@ -260,6 +260,36 @@ abstract class AppLocalizations {
   /// **'已排除'**
   String get imageSetDetailExcludedBadge;
 
+  /// No description provided for @imageSetMetadataEditEnter.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑元数据'**
+  String get imageSetMetadataEditEnter;
+
+  /// No description provided for @imageSetMetadataEditTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑图集元数据'**
+  String get imageSetMetadataEditTitle;
+
+  /// No description provided for @imageSetMetadataEditNameLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'显示名称'**
+  String get imageSetMetadataEditNameLabel;
+
+  /// No description provided for @imageSetMetadataEditNameLockLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'锁定显示名称'**
+  String get imageSetMetadataEditNameLockLabel;
+
+  /// No description provided for @imageSetMetadataEditNameLockHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'锁定后，同步将保留此名称，而不会使用文件夹或压缩包文件名。'**
+  String get imageSetMetadataEditNameLockHint;
+
   /// No description provided for @imageSetDetailSubmissionsTitle.
   ///
   /// In zh, this message translates to:

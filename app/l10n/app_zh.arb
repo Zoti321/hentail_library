@@ -72,6 +72,11 @@
     }
   },
   "imageSetDetailExcludedBadge": "已排除",
+  "imageSetMetadataEditEnter": "编辑元数据",
+  "imageSetMetadataEditTitle": "编辑图集元数据",
+  "imageSetMetadataEditNameLabel": "显示名称",
+  "imageSetMetadataEditNameLockLabel": "锁定显示名称",
+  "imageSetMetadataEditNameLockHint": "锁定后，同步将保留此名称，而不会使用文件夹或压缩包文件名。",
   "imageSetDetailSubmissionsTitle": "投稿",
   "imageSetDetailSubmissionsEmpty": "尚无投稿。可创建投稿并挑选本图集内的图片成员。",
   "imageSetDetailSubmissionsCreate": "新建",

@@ -103,6 +103,22 @@ class AppLocalizationsZh extends AppLocalizations {
   String get imageSetDetailExcludedBadge => '已排除';
 
   @override
+  String get imageSetMetadataEditEnter => '编辑元数据';
+
+  @override
+  String get imageSetMetadataEditTitle => '编辑图集元数据';
+
+  @override
+  String get imageSetMetadataEditNameLabel => '显示名称';
+
+  @override
+  String get imageSetMetadataEditNameLockLabel => '锁定显示名称';
+
+  @override
+  String get imageSetMetadataEditNameLockHint =>
+      '锁定后，同步将保留此名称，而不会使用文件夹或压缩包文件名。';
+
+  @override
   String get imageSetDetailSubmissionsTitle => '投稿';
 
   @override

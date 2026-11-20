@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:hentai_library/features/image_set_library/domain/image_set.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_catalog_query.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_facets.dart';
+import 'package:hentai_library/features/image_set_library/domain/image_set_facets_patch.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_image.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_library_gates.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_reader_session.dart';
@@ -83,6 +84,32 @@ class ImageSetRepositoryImpl implements ImageSetRepository {
     ),
     fallbackMessage: '读取图集元数据失败',
   );
+
+  @override
+  Future<void> updateName(String imageSetId, String name) => guardFrb(
+    () => rust.updateImageSetNameFrb(imageSetId: imageSetId, name: name),
+    fallbackMessage: '更新图集名称失败',
+  );
+
+  @override
+  Future<void> setNameLocked(String imageSetId, {required bool locked}) =>
+      guardFrb(
+        () => rust.setImageSetNameLockedFrb(
+          imageSetId: imageSetId,
+          locked: locked,
+        ),
+        fallbackMessage: '更新图集名称锁失败',
+      );
+
+  @override
+  Future<void> updateFacets(String imageSetId, ImageSetFacetsPatch patch) =>
+      guardFrb(
+        () => rust.updateImageSetFacetsFrb(
+          imageSetId: imageSetId,
+          patch: imageSetFacetsPatchToFrb(patch),
+        ),
+        fallbackMessage: '更新图集元数据绑定失败',
+      );
 
   @override
   Future<List<ImageSetImage>> listImageSetImages(

@@ -72,6 +72,11 @@
     }
   },
   "imageSetDetailExcludedBadge": "Excluded",
+  "imageSetMetadataEditEnter": "Edit metadata",
+  "imageSetMetadataEditTitle": "Edit image set metadata",
+  "imageSetMetadataEditNameLabel": "Display name",
+  "imageSetMetadataEditNameLockLabel": "Lock display name",
+  "imageSetMetadataEditNameLockHint": "When locked, sync keeps this name instead of the folder or archive filename.",
   "imageSetDetailSubmissionsTitle": "Submissions",
   "imageSetDetailSubmissionsEmpty": "No submissions yet. Create one and pick members from this image set.",
   "imageSetDetailSubmissionsCreate": "New",
