@@ -11,7 +11,9 @@ import 'package:hentai_library/features/image_set_library/domain/image_set_image
 import 'package:hentai_library/features/image_set_library/domain/image_set_reader_entry.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_submission.dart';
 import 'package:hentai_library/features/image_set_library/presentation/providers/image_set_library_providers.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_detail_page.dart';
+import 'package:hentai_library/features/image_set_library/presentation/views/image_set_image_tile.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:riverpod/misc.dart' show Override;
 
@@ -407,6 +409,60 @@ void main() {
     expect(find.text('根目录压缩包图集不支持资源变更。'), findsOneWidget);
     expect(find.byKey(const Key('imageSetDetailAdd')), findsNothing);
     expect(find.text('复制图片入库'), findsNothing);
+  });
+
+  testWidgets('button pager pages grid and Reader uses workspace index', (
+    WidgetTester tester,
+  ) async {
+    configureTestView(tester, const Size(1280, 900));
+    final _Probe probe = _Probe();
+    final List<ImageSetImage> many = List<ImageSetImage>.generate(
+      kImageSetDetailImagePageSize + 1,
+      (int i) => ImageSetImage(
+        imageSetImageId: 'i$i',
+        imageSetId: 'a',
+        libraryId: 'img-1',
+        carrierRelativePath: 'alpha/$i.jpg',
+        memberPath: '',
+        carrierKind: 'loose',
+        name: '$i.jpg',
+      ),
+    );
+    _alphaImages = many;
+    await _pumpDetail(tester, overrides: _overrides(probe));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('imageSetDetailPager')), findsOneWidget);
+    expect(find.byKey(const ValueKey<String>('i0')), findsOneWidget);
+    expect(
+      find.byKey(ValueKey<String>('i$kImageSetDetailImagePageSize')),
+      findsNothing,
+    );
+
+    await tester.scrollUntilVisible(
+      find.byKey(const Key('imageSetDetailPager')),
+      200,
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(PaginationPageButton, '2'));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey<String>('i0')), findsNothing);
+    expect(
+      find.byKey(ValueKey<String>('i$kImageSetDetailImagePageSize')),
+      findsOneWidget,
+    );
+
+    await tester.tap(
+      find.byKey(ValueKey<String>('i$kImageSetDetailImagePageSize')),
+    );
+    await tester.pumpAndSettle();
+    expect(probe.entries, hasLength(1));
+    expect(probe.entries.single.index, kImageSetDetailImagePageSize);
+    expect(
+      probe.entries.single.imageSetImageId,
+      'i$kImageSetDetailImagePageSize',
+    );
   });
 
   testWidgets('detail cover is enlarged and tonal add shows when mutation on', (

@@ -22,6 +22,9 @@ import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+/// Client-side page size for the detail image grid (button pager).
+const int kImageSetDetailImagePageSize = 24;
+
 /// Image set 详情：顶栏（标题/张数）+ 无标题按行顶对齐图流；可进入工作区管理。
 class ImageSetDetailPage extends ConsumerStatefulWidget {
   const ImageSetDetailPage({
@@ -42,8 +45,16 @@ class ImageSetDetailPage extends ConsumerStatefulWidget {
 class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
   bool _manageMode = false;
   bool _copying = false;
+  int _imagePage = 1;
+  final ScrollController _browseScrollController = ScrollController();
   final Set<String> _selectedIds = <String>{};
   late ImageSet _imageSet;
+
+  @override
+  void dispose() {
+    _browseScrollController.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -270,75 +281,12 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
                         onToggleSelection: _toggleSelection,
                         onReorder: _persistReorder,
                       )
-                    : CustomScrollView(
-                        slivers: <Widget>[
-                          SliverPadding(
-                            padding: EdgeInsets.fromLTRB(
-                              horizontalInset,
-                              0,
-                              horizontalInset,
-                              theme.spacing.md,
-                            ),
-                            sliver: SliverToBoxAdapter(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  ImageSetDetailHeader(
-                                    libraryId: widget.libraryId,
-                                    imageSetId: _imageSet.imageSetId,
-                                    title: title,
-                                    imageCount: list.length,
-                                  ),
-                                  SizedBox(height: theme.spacing.sm),
-                                  ImageSetDetailMutationSection(
-                                    libraryId: widget.libraryId,
-                                    imageSet: _imageSet,
-                                    carrierShape: widget.carrierShape,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          if (list.isEmpty)
-                            SliverFillRemaining(
-                              hasScrollBody: false,
-                              child: Center(
-                                child: Text(l10n.imageSetDetailEmpty),
-                              ),
-                            )
-                          else
-                            ImageSetRowGridSliver(
-                              itemCount: list.length,
-                              itemBuilder: (BuildContext context, int index) {
-                                final ImageSetImage image = list[index];
-                                return ImageSetImageTile(
-                                  key: ValueKey<String>(image.imageSetImageId),
-                                  libraryId: widget.libraryId,
-                                  image: image,
-                                  onTap: () => ref.read(
-                                    imageSetReaderEntryCommandProvider,
-                                  )(
-                                    ImageSetReaderEntry(
-                                      libraryId: widget.libraryId,
-                                      imageSetId: _imageSet.imageSetId,
-                                      imageSetImageId: image.imageSetImageId,
-                                      index: index,
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          SliverToBoxAdapter(
-                            child: ImageSetSubmissionsSection(
-                              libraryId: widget.libraryId,
-                              imageSet: _imageSet,
-                              horizontalInset: horizontalInset,
-                            ),
-                          ),
-                          SliverToBoxAdapter(
-                            child: SizedBox(height: theme.spacing.lg),
-                          ),
-                        ],
+                    : _buildBrowseScroll(
+                        l10n: l10n,
+                        theme: theme,
+                        horizontalInset: horizontalInset,
+                        title: title,
+                        list: list,
                       ),
                 loading: () => const Center(child: CircularProgressIndicator()),
                 error: (Object error, StackTrace _) =>
@@ -348,6 +296,123 @@ class _ImageSetDetailPageState extends ConsumerState<ImageSetDetailPage> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildBrowseScroll({
+    required AppLocalizations l10n,
+    required M3EThemeData theme,
+    required double horizontalInset,
+    required String title,
+    required List<ImageSetImage> list,
+  }) {
+    final int totalPages = list.isEmpty
+        ? 1
+        : ((list.length + kImageSetDetailImagePageSize - 1) ~/
+              kImageSetDetailImagePageSize);
+    final int page = _imagePage.clamp(1, totalPages);
+    if (page != _imagePage) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          setState(() => _imagePage = page);
+        }
+      });
+    }
+    final int start = (page - 1) * kImageSetDetailImagePageSize;
+    final List<ImageSetImage> pageItems = list
+        .skip(start)
+        .take(kImageSetDetailImagePageSize)
+        .toList(growable: false);
+
+    return CustomScrollView(
+      controller: _browseScrollController,
+      slivers: <Widget>[
+        SliverPadding(
+          padding: EdgeInsets.fromLTRB(
+            horizontalInset,
+            0,
+            horizontalInset,
+            theme.spacing.md,
+          ),
+          sliver: SliverToBoxAdapter(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                ImageSetDetailHeader(
+                  libraryId: widget.libraryId,
+                  imageSetId: _imageSet.imageSetId,
+                  title: title,
+                  imageCount: list.length,
+                ),
+                SizedBox(height: theme.spacing.sm),
+                ImageSetDetailMutationSection(
+                  libraryId: widget.libraryId,
+                  imageSet: _imageSet,
+                  carrierShape: widget.carrierShape,
+                ),
+              ],
+            ),
+          ),
+        ),
+        if (list.isEmpty)
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Center(child: Text(l10n.imageSetDetailEmpty)),
+          )
+        else ...<Widget>[
+          ImageSetRowGridSliver(
+            itemCount: pageItems.length,
+            itemBuilder: (BuildContext context, int index) {
+              final ImageSetImage image = pageItems[index];
+              final int workspaceIndex = start + index;
+              return ImageSetImageTile(
+                key: ValueKey<String>(image.imageSetImageId),
+                libraryId: widget.libraryId,
+                image: image,
+                onTap: () => ref.read(imageSetReaderEntryCommandProvider)(
+                  ImageSetReaderEntry(
+                    libraryId: widget.libraryId,
+                    imageSetId: _imageSet.imageSetId,
+                    imageSetImageId: image.imageSetImageId,
+                    index: workspaceIndex,
+                  ),
+                ),
+              );
+            },
+          ),
+          SliverPadding(
+            padding: EdgeInsets.fromLTRB(
+              horizontalInset,
+              theme.spacing.md,
+              horizontalInset,
+              theme.spacing.sm,
+            ),
+            sliver: SliverToBoxAdapter(
+              child: Pagination(
+                key: const Key('imageSetDetailPager'),
+                page: page,
+                totalPages: totalPages,
+                totalItems: list.length,
+                pageSize: kImageSetDetailImagePageSize,
+                onPageChanged: (int next) {
+                  setState(() => _imagePage = next);
+                  if (_browseScrollController.hasClients) {
+                    _browseScrollController.jumpTo(0);
+                  }
+                },
+              ),
+            ),
+          ),
+        ],
+        SliverToBoxAdapter(
+          child: ImageSetSubmissionsSection(
+            libraryId: widget.libraryId,
+            imageSet: _imageSet,
+            horizontalInset: horizontalInset,
+          ),
+        ),
+        SliverToBoxAdapter(child: SizedBox(height: theme.spacing.lg)),
+      ],
     );
   }
 }
