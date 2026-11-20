@@ -138,8 +138,9 @@ Accepted | Superseded by ADR-000N | Deprecated
 | [0057](./0057-automatic-local-metadata-writeback.md) | Automatic Resource metadata embedding | Accepted; supersedes ADR-0007 Language cardinality and affected scan-source assumptions |
 | [0058](./0058-media-metadata-dashboard.md) | Media metadata dashboard | Accepted; supersedes ADR-0057 individual Comic inspection scope |
 | [0059](./0059-single-nightly-dart-test-run.md) | Single nightly Dart test run | Accepted; supersedes ADR-0018 separate nightly UI job |
-| [0060](./0060-page-image-fidelity-source-resolution.md) | Page image fidelity at source resolution | Accepted |
+| [0060](./0060-page-image-fidelity-source-resolution.md) | Page image fidelity at source resolution | Accepted; decode-size-cap bullet partially superseded by ADR-0065 |
 | [0061](./0061-read-session-capabilities.md) | Multi-source Read session and Capabilities | Accepted; partially supersedes ADR-0005 comicId-only entry wording |
 | [0062](./0062-image-set-discovery-boundary.md) | Image set discovery boundary | Accepted; supersedes first-iteration Library root image set mapping |
 | [0063](./0063-md3-standard-scheme-variant-and-contrast.md) | MD3 standard scheme variant and contrast | Accepted; partially supersedes ADR-0037 Decision §2 |
 | [0064](./0064-image-set-workspace-and-resource-mutation.md) | Image set workspace and resource mutation | Accepted |
+| [0065](./0065-page-image-max-edge-decode-safety.md) | Page image max-edge decode safety | Accepted; supersedes ADR-0060 decode-size-cap bullet |

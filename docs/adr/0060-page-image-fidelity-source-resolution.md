@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted
+Accepted; decode-size-cap bullet partially superseded by ADR-0065 (max-edge oversized safety; viewport caps remain forbidden)
 
 ## Context
 
@@ -24,5 +24,5 @@ GLOSSARY **Page image fidelity** previously locked Read session GPU sampling at 
 
 ### Negative
 
-- Large page bitmaps can increase memory use until #591 defines a safety valve.
+- Large page bitmaps can increase memory use; oversized max-edge safety is ADR-0065 / #591.
 - Screened artwork may show more moiré at rest than under the prior medium+mipmap policy.

@@ -36,7 +36,8 @@ void useReaderPrefetchWindow({
       // Defer warmWindow: useEffect can run during hook init/build, and
       // bumpGeneration must not modify providers mid-build (Riverpod assert).
       // Also lets viewport jumpToPage mount the landing page first.
-      // Page image fidelity: prefetch at source resolution (no cacheWidth).
+      // Page image fidelity: no viewport cacheWidth; max-edge safety is inside
+      // buildReaderImageProvider / ReaderPageDecodeImageProvider.
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!context.mounted) {
           return;

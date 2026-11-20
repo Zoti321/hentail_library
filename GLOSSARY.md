@@ -378,8 +378,8 @@ _Avoid_: Webtoon as a work classification or ambiguous mode name.
 **Paged layout**: Reader layout advancing through discrete pages rather than continuous scrolling.
 _Avoid_: single-page-only mode.
 
-**Page image fidelity**: Preserve source bitmap appearance in a Read session. Decode page images at source resolution (no viewport `cacheWidth` downdecode) and keep GPU sampling fixed at `FilterQuality.high`; do not change quality for scrolling/idle state, sharpen/beautify, or switch quality at rest. Catalog covers/thumbnails use their own high + display-sized `cacheWidth` policy and are outside this rule. Oversized-bitmap memory safety is a separate follow-up (#591), not a license to soften normal pages. This rule overrides Reader performance-tuning advice. See ADR-0060.
-_Avoid_: scroll quality reduction, idle quality boost, page-image `cacheWidth` downdecode, enhanced/sharpened reading.
+**Page image fidelity**: Preserve source bitmap appearance in a Read session. Decode page images at source resolution (no viewport `cacheWidth` downdecode) and keep GPU sampling fixed at `FilterQuality.high`; do not change quality for scrolling/idle state, sharpen/beautify, or switch quality at rest. When a source page’s longest edge exceeds the documented max-edge decode cap, proportionally scale the decoded bitmap so its longest edge equals that cap; ordinary pages stay at source resolution. Catalog covers/thumbnails use their own high + display-sized `cacheWidth` policy and are outside this rule. The max-edge exception is not a license to soft-decode normal pages or to reintroduce viewport downdecode. This rule overrides Reader performance-tuning advice. See ADR-0060 and ADR-0065.
+_Avoid_: scroll quality reduction, idle quality boost, page-image viewport `cacheWidth` downdecode, enhanced/sharpened reading.
 
 **Page image copy**: Copy a page bitmap from a Read session to the system clipboard, distinct from Comic covers/thumbnails or saving/exporting files.
 _Avoid_: share image, export page, save image.
