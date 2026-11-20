@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,10 +14,46 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 /// Reserved strip band height for submission affinity (reorder-ready cell geometry).
 const double kImageSetAffinityStripBandHeight = 8;
 
-/// Default cover aspect before bytes decode (anti-jitter).
-const double kImageSetGalleryAspectRatio = 2 / 3;
+/// Fallback aspect while page bytes / size probe are not ready yet.
+const double kImageSetGalleryFallbackAspectRatio = 2 / 3;
 
-/// Image set detail gallery cell: fixed aspect skeleton, affinity band, selection.
+/// Page bytes plus the aspect locked before paint (anti-jitter).
+typedef ImageSetGalleryPageLayout = ({Uint8List bytes, double aspectRatio});
+
+/// Resolves display aspect from [bytes]: header peek, else codec probe.
+Future<double> imageSetGalleryAspectRatioOf(Uint8List bytes) async {
+  final Size? peeked = peekCoverImageSize(bytes);
+  if (peeked != null && peeked.width > 0 && peeked.height > 0) {
+    return peeked.width / peeked.height;
+  }
+  final ui.Codec codec = await ui.instantiateImageCodec(bytes);
+  final ui.FrameInfo frame = await codec.getNextFrame();
+  try {
+    final int width = frame.image.width;
+    final int height = frame.image.height;
+    if (width <= 0 || height <= 0) {
+      return kImageSetGalleryFallbackAspectRatio;
+    }
+    return width / height;
+  } finally {
+    frame.image.dispose();
+  }
+}
+
+/// Bytes + locked aspect for one gallery cell (size known before [Image] paints).
+final imageSetGalleryPageLayoutProvider = FutureProvider.autoDispose
+    .family<ImageSetGalleryPageLayout, ImageSetPageBytesKey>((
+      Ref ref,
+      ImageSetPageBytesKey key,
+    ) async {
+      final Uint8List bytes = await ref.watch(
+        imageSetPageBytesProvider(key).future,
+      );
+      final double aspectRatio = await imageSetGalleryAspectRatioOf(bytes);
+      return (bytes: bytes, aspectRatio: aspectRatio);
+    });
+
+/// Image set detail gallery cell: size-probed skeleton, affinity band, selection.
 class ImageSetImageTile extends ConsumerWidget {
   const ImageSetImageTile({
     super.key,
@@ -51,43 +88,58 @@ class ImageSetImageTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final M3EThemeData theme = M3ETheme.of(context);
     final AppLocalizations l10n = context.l10n;
-    final AsyncValue<Uint8List> bytes = ref.watch(
-      imageSetPageBytesProvider((libraryId: libraryId, image: image)),
+    final ImageSetPageBytesKey bytesKey = (
+      libraryId: libraryId,
+      image: image,
+    );
+    final AsyncValue<ImageSetGalleryPageLayout> layout = ref.watch(
+      imageSetGalleryPageLayoutProvider(bytesKey),
     );
     final double opacity = image.excluded ? 0.45 : 1;
     final Color skeletonColor = theme.colorScheme.surfaceContainerHighest;
 
-    final Widget imageBody = AspectRatio(
-      aspectRatio: kImageSetGalleryAspectRatio,
-      child: Opacity(
-        opacity: opacity,
-        child: bytes.when(
-          data: (Uint8List data) => Image.memory(
-            data,
-            fit: BoxFit.cover,
-            width: double.infinity,
-            height: double.infinity,
-            gaplessPlayback: true,
-            filterQuality: kCatalogImageFilterQuality,
-            errorBuilder: (
-              BuildContext context,
-              Object error,
-              StackTrace? stackTrace,
-            ) => ColoredBox(
-              color: skeletonColor,
-              child: Icon(
-                Icons.broken_image_outlined,
-                color: theme.colorScheme.onSurfaceVariant,
+    // Aspect is locked from header/codec probe before paint; solid fill sits
+    // under [Image.memory] so decode does not reflow neighbors.
+    final Widget imageBody = layout.when(
+      data: (ImageSetGalleryPageLayout page) => AspectRatio(
+        aspectRatio: page.aspectRatio,
+        child: Opacity(
+          opacity: opacity,
+          child: Stack(
+            fit: StackFit.expand,
+            children: <Widget>[
+              ColoredBox(color: skeletonColor),
+              Image.memory(
+                page.bytes,
+                fit: BoxFit.contain,
+                width: double.infinity,
+                height: double.infinity,
+                gaplessPlayback: true,
+                filterQuality: kCatalogImageFilterQuality,
+                errorBuilder: (
+                  BuildContext context,
+                  Object error,
+                  StackTrace? stackTrace,
+                ) => Icon(
+                  Icons.broken_image_outlined,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
               ),
-            ),
+            ],
           ),
-          loading: () => ColoredBox(color: skeletonColor),
-          error: (Object _, StackTrace _) => ColoredBox(
-            color: skeletonColor,
-            child: Icon(
-              Icons.broken_image_outlined,
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
+        ),
+      ),
+      loading: () => AspectRatio(
+        aspectRatio: kImageSetGalleryFallbackAspectRatio,
+        child: ColoredBox(color: skeletonColor),
+      ),
+      error: (Object _, StackTrace _) => AspectRatio(
+        aspectRatio: kImageSetGalleryFallbackAspectRatio,
+        child: ColoredBox(
+          color: skeletonColor,
+          child: Icon(
+            Icons.broken_image_outlined,
+            color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
       ),
