@@ -72,6 +72,8 @@ core/vendor/**/libpdfium.dylib
 development.md
 .cursor/*
 !.cursor/mcp.json
+!.cursor/skills/
+!.cursor/skills/**
 .codex/
 .agents/
 .claude/
