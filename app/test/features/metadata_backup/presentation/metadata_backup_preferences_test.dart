@@ -50,7 +50,7 @@ void main() {
   test(
     'completion writes without constructing a last-backup notifier',
     () async {
-      expect(container.exists(metadataLastAutoBackupProvider), isFalse);
+      expect(container.read(metadataLastAutoBackupProvider.exists), isFalse);
       final at = DateTime(2026, 11, 13, 10);
       await container.read(runMetadataAutoBackupUseCaseProvider)(
         enabled: true,

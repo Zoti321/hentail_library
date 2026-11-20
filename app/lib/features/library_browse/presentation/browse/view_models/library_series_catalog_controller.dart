@@ -53,9 +53,9 @@ class LibrarySeriesCatalogController extends _$LibrarySeriesCatalogController {
     );
     // 随机排序每次查询顺序不同；库 revision 被动刷新不应触发重排。
     if (sortOption.field != LibrarySeriesSortField.random) {
+      // Watched revision stays subscribed for this catalog lifetime; no cached one-shot read.
+      // ignore: riverpod_lint/only_use_keep_alive_inside_keep_alive
       ref.watch(
-        // Watched revision stays subscribed for this catalog lifetime; no cached one-shot read.
-        // ignore: riverpod_lint/only_use_keep_alive_inside_keep_alive
         libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.series),
       );
     }

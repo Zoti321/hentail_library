@@ -15,7 +15,7 @@ List<Override> labSettingsProviderOverrides({
       _LabMemoryAppSettingRepository(initial: initial);
   return <Override>[
     appSettingRepositoryProvider.overrideWithValue(repository),
-    // ignore: scoped_providers_should_specify_dependencies
+    // ignore: riverpod_lint/scoped_providers_should_specify_dependencies
     settingsProvider.overrideWith(SettingsNotifier.new),
     installedAppVersionQueryProvider.overrideWithValue(() async => version),
   ];

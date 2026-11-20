@@ -257,9 +257,9 @@ class ReaderPrefetchNotifier extends _$ReaderPrefetchNotifier {
     required String comicId,
     int? resumePageOneBased,
   }) async {
+    // One-shot read of an active UI provider; do not retain its snapshot or extend its lifetime.
+    // ignore: riverpod_lint/only_use_keep_alive_inside_keep_alive
     final snapshot = await ref.read(
-      // One-shot read of an active UI provider; do not retain its snapshot or extend its lifetime.
-      // ignore: riverpod_lint/only_use_keep_alive_inside_keep_alive
       readerSessionOpenProvider(comicId: comicId).future,
     );
     final int center = resumePageOneBased ?? snapshot.resumePageIndex;

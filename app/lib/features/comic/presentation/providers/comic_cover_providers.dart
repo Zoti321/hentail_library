@@ -316,7 +316,8 @@ class ThumbnailEventCoordinator extends _$ThumbnailEventCoordinator {
       }
       ref.read(comicCoverThumbnailCacheProvider(comicId).notifier).set(bytes);
       // 避免为后台批量 Ready 凭空创建 cover provider。
-      if (ref.exists(comicCoverProvider(comicId))) {
+      // ignore: riverpod_lint/only_use_keep_alive_inside_keep_alive
+      if (ref.read(comicCoverProvider(comicId).exists)) {
         // One-shot read of an active UI provider; do not retain its snapshot or extend its lifetime.
         // ignore: riverpod_lint/only_use_keep_alive_inside_keep_alive
         ref.read(comicCoverProvider(comicId).notifier).setReady(bytes);

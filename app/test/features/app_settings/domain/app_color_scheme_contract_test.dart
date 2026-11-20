@@ -2,7 +2,6 @@ import 'package:test/test.dart';
 import 'package:hentai_library/features/app_settings/domain/app_color_scheme_preference.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting_defaults.dart';
-import 'package:hentai_library/shared/domain/models/enums.dart';
 
 void main() {
   group('color scheme and dynamic color contract fields', () {

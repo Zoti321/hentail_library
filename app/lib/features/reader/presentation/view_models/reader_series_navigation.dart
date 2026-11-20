@@ -29,15 +29,11 @@ class ReaderSeriesNavigation extends _$ReaderSeriesNavigation {
       incognito: currentSession.incognito,
       startFromFirstPage: currentSession.startFromFirstPage,
     );
+    // One-shot read of an active UI provider; do not retain its snapshot or extend its lifetime.
+    // ignore: riverpod_lint/only_use_keep_alive_inside_keep_alive
+    final readerVm = ref.read(readerViewModelProvider(viewKey));
     final bool carryAutoPlay =
-        ref
-            // One-shot read of an active UI provider; do not retain its snapshot or extend its lifetime.
-            // ignore: riverpod_lint/only_use_keep_alive_inside_keep_alive
-            .read(readerViewModelProvider(viewKey))
-            .asData
-            ?.value
-            .autoPlayEnabled ??
-        false;
+        readerVm.asData?.value.autoPlayEnabled ?? false;
     ref.read(readerAutoPlayCarryProvider.notifier).arm(carryAutoPlay);
 
     final ManageReadSessionUseCase sessions = ref.read(
@@ -45,13 +41,7 @@ class ReaderSeriesNavigation extends _$ReaderSeriesNavigation {
     );
     int? currentPageIndex;
     if (!currentSession.incognito) {
-      currentPageIndex = ref
-          // One-shot read of an active UI provider; do not retain its snapshot or extend its lifetime.
-          // ignore: riverpod_lint/only_use_keep_alive_inside_keep_alive
-          .read(readerViewModelProvider(viewKey))
-          .asData
-          ?.value
-          .currentIndex;
+      currentPageIndex = readerVm.asData?.value.currentIndex;
     }
     final SeriesSwitchPlan plan = await sessions.prepareSeriesSwitch(
       currentSession: currentSession,

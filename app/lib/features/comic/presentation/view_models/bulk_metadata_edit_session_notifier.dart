@@ -39,9 +39,9 @@ class BulkMetadataEditSessionNotifier
     extends _$BulkMetadataEditSessionNotifier {
   final BulkMetadataEditSession _session = BulkMetadataEditSession();
 
-  /// 当前草稿（仅 Notifier / 同 feature 命令路径读取）。
   // The edit session mutates only through commands; revision state triggers consumers.
   // ignore: riverpod_lint/avoid_public_notifier_properties
+  /// 当前草稿（仅 Notifier / 同 feature 命令路径读取）。
   BulkMetadataEditSession get session => _session;
 
   // The edit session mutates only through commands; revision state triggers consumers.
