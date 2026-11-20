@@ -11,7 +11,7 @@ import 'package:hentai_library/features/image_set_library/domain/image_set_image
 import 'package:hentai_library/features/image_set_library/domain/image_set_reader_entry.dart';
 import 'package:hentai_library/features/image_set_library/presentation/providers/image_set_library_providers.dart';
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_detail_header.dart';
-import 'package:hentai_library/features/image_set_library/presentation/views/image_set_metadata_edit_sheet.dart';
+import 'package:hentai_library/features/image_set_library/presentation/patterns/metadata_edit/image_set_metadata_edit_present.dart';
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_image_tile.dart';
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_row_grid_sliver.dart';
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_submissions_section.dart';

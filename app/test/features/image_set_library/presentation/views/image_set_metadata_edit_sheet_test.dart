@@ -9,7 +9,9 @@ import 'package:hentai_library/features/image_set_library/domain/image_set_facet
 import 'package:hentai_library/features/image_set_library/domain/image_set_named_facet_kind.dart';
 import 'package:hentai_library/features/image_set_library/presentation/providers/image_set_facet_dictionary_providers.dart';
 import 'package:hentai_library/features/image_set_library/presentation/providers/image_set_library_providers.dart';
+import 'package:hentai_library/features/image_set_library/presentation/patterns/metadata_edit/image_set_metadata_edit_present.dart';
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_metadata_edit_sheet.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 import '../../../../support/pump_localized_app.dart';
@@ -154,5 +156,66 @@ void main() {
 
     expect(probe.facetCalls, hasLength(1));
     expect(probe.facetCalls.single.patch.authors, isEmpty);
+  });
+
+  testWidgets('expanded window opens medium dialog shell', (
+    WidgetTester tester,
+  ) async {
+    final _Probe probe = _Probe();
+    configureTestView(tester, const Size(1280, 900));
+    await pumpLocalizedApp(
+      tester,
+      overrides: _overrides(probe),
+      home: Builder(
+        builder: (BuildContext context) => Scaffold(
+          body: TextButton(
+            onPressed: () {
+              showImageSetMetadataEdit(
+                context: context,
+                imageSet: _imageSet,
+                initialFacets: ImageSetFacets.empty,
+              );
+            },
+            child: const Text('open-edit'),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('open-edit'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(M3EDialog), findsOneWidget);
+    expect(find.byType(ImageSetMetadataEditSheet), findsOneWidget);
+    expect(find.byType(M3EFullScreenDialog), findsNothing);
+  });
+
+  testWidgets('compact window opens full-screen dialog shell', (
+    WidgetTester tester,
+  ) async {
+    final _Probe probe = _Probe();
+    configureTestView(tester, const Size(400, 800));
+    await pumpLocalizedApp(
+      tester,
+      overrides: _overrides(probe),
+      home: Builder(
+        builder: (BuildContext context) => Scaffold(
+          body: TextButton(
+            onPressed: () {
+              showImageSetMetadataEdit(
+                context: context,
+                imageSet: _imageSet,
+                initialFacets: ImageSetFacets.empty,
+              );
+            },
+            child: const Text('open-edit'),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('open-edit'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(M3EFullScreenDialog), findsOneWidget);
+    expect(find.byType(ImageSetMetadataEditSheet), findsOneWidget);
   });
 }

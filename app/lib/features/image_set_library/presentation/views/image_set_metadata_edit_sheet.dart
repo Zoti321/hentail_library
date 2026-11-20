@@ -11,6 +11,7 @@ import 'package:hentai_library/features/image_set_library/presentation/views/ima
 import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/application/errors/error_message.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_actions.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Image set 元数据编辑表（名称、名称锁、四类 facet 绑定）。
@@ -19,10 +20,16 @@ class ImageSetMetadataEditSheet extends ConsumerStatefulWidget {
     super.key,
     required this.imageSet,
     required this.initialFacets,
+    this.presentation = MetadataEditPresentation.embedded,
+    this.onCancel,
+    this.onSaved,
   });
 
   final ImageSet imageSet;
   final ImageSetFacets initialFacets;
+  final MetadataEditPresentation presentation;
+  final VoidCallback? onCancel;
+  final ValueChanged<ImageSet>? onSaved;
 
   @override
   ConsumerState<ImageSetMetadataEditSheet> createState() =>
@@ -30,7 +37,8 @@ class ImageSetMetadataEditSheet extends ConsumerStatefulWidget {
 }
 
 class _ImageSetMetadataEditSheetState
-    extends ConsumerState<ImageSetMetadataEditSheet> {
+    extends ConsumerState<ImageSetMetadataEditSheet>
+    implements MetadataEditSaveActions {
   late ImageSetMetadataEditDraft _draft;
   bool _saving = false;
 
@@ -69,6 +77,16 @@ class _ImageSetMetadataEditSheetState
 
   bool get _dirty => _nameChanged || _lockChanged || _facetsChanged;
 
+  @override
+  Future<void> saveAndPop() => _save();
+
+  void _handleCancel() {
+    widget.onCancel?.call();
+    if (widget.onCancel == null && Navigator.canPop(context)) {
+      Navigator.of(context).pop();
+    }
+  }
+
   Future<void> _save() async {
     if (_saving || !_dirty) {
       return;
@@ -105,9 +123,15 @@ class _ImageSetMetadataEditSheetState
         return;
       }
       final bool nameLocked = _nameChanged ? true : _draft.nameLocked;
-      Navigator.of(context).pop(
-        widget.imageSet.copyWith(name: trimmedName, nameLocked: nameLocked),
+      final ImageSet updated = widget.imageSet.copyWith(
+        name: trimmedName,
+        nameLocked: nameLocked,
       );
+      if (widget.onSaved != null) {
+        widget.onSaved!(updated);
+      } else {
+        Navigator.of(context).pop(updated);
+      }
     } on Object catch (error) {
       if (!mounted) {
         return;
@@ -190,13 +214,15 @@ class _ImageSetMetadataEditSheetState
 
     return MetadataEditSurface(
       title: l10n.imageSetMetadataEditTitle,
+      presentation: widget.presentation,
       saving: _saving,
       saveEnabled: _dirty && _draft.name.trim().isNotEmpty,
-      onCancel: () => Navigator.of(context).maybePop(),
+      onCancel: _handleCancel,
       onSave: _save,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
             OutlinedTextField(
               label: l10n.imageSetMetadataEditNameLabel,
               initialValue: _draft.name,
@@ -263,24 +289,9 @@ class _ImageSetMetadataEditSheetState
                   _removeFacet(ImageSetNamedFacetKind.character, name),
               onClearAll: () => _clearFacet(ImageSetNamedFacetKind.character),
             ),
-        ],
+          ],
+        ),
       ),
     );
   }
-}
-
-Future<ImageSet?> showImageSetMetadataEditSheet({
-  required BuildContext context,
-  required ImageSet imageSet,
-  required ImageSetFacets initialFacets,
-}) {
-  return Navigator.of(context).push<ImageSet>(
-    MaterialPageRoute<ImageSet>(
-      fullscreenDialog: true,
-      builder: (BuildContext context) => ImageSetMetadataEditSheet(
-        imageSet: imageSet,
-        initialFacets: initialFacets,
-      ),
-    ),
-  );
 }
