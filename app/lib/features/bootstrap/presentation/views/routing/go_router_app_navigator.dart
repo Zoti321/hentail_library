@@ -3,6 +3,7 @@ import 'dart:async';
 import 'route_transition_pages.dart';
 
 import 'package:go_router/go_router.dart';
+import 'package:hentai_library/features/image_set_library/presentation/routing/image_set_reader_route_args.dart';
 import 'package:hentai_library/shared/application/navigation/app_routes.dart';
 import 'package:hentai_library/features/reader/public.dart';
 import 'package:hentai_library/shared/application/contracts/app_navigator.dart';
@@ -82,6 +83,11 @@ class GoRouterAppNavigator implements AppNavigator {
       _router.push(AppRoutes.author(authorId));
 
   @override
+  void pushImageSetDetail(String libraryId, String imageSetId) {
+    unawaited(_router.push(AppRoutes.imageSetDetail(libraryId, imageSetId)));
+  }
+
+  @override
   void replaceComicDetail(String comicId, {bool reverse = false}) =>
       _router.pushReplacement(
         AppRoutes.comic(comicId),
@@ -125,6 +131,29 @@ class GoRouterAppNavigator implements AppNavigator {
             keepControlsOpen: keepControlsOpen,
             startFromFirstPage: startFromFirstPage,
           ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  void openImageSetReader({
+    required String libraryId,
+    required String imageSetId,
+    required int startIndex,
+    String? imageSetImageId,
+  }) {
+    unawaited(
+      _router.push(
+        AppRoutes.imageSetReaderLocation(
+          libraryId: libraryId,
+          imageSetId: imageSetId,
+          queryParameters: ImageSetReaderRouteArgs(
+            libraryId: libraryId,
+            imageSetId: imageSetId,
+            startIndex: startIndex,
+            imageSetImageId: imageSetImageId,
+          ).toQueryParameters(),
         ),
       ),
     );

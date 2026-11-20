@@ -4,12 +4,28 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:hentai_library/features/bootstrap/presentation/views/routing/app_router.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set.dart';
+import 'package:hentai_library/features/image_set_library/domain/image_set_browse_preferences_repository.dart';
+import 'package:hentai_library/features/image_set_library/domain/image_set_catalog_query.dart';
+import 'package:hentai_library/features/image_set_library/presentation/providers/image_set_browse_providers.dart';
 import 'package:hentai_library/features/image_set_library/presentation/providers/image_set_library_providers.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_library_page.dart';
 import 'package:hentai_library/features/library_admin/public/contracts.dart';
 import 'package:hentai_library/features/library_admin/public/providers/library_admin_state_providers.dart';
 
 import '../../../../../support/pump_localized_app.dart';
+
+class _MemoryPrefs implements ImageSetBrowsePreferencesRepository {
+  @override
+  Future<ImageSetBrowsePreferences> load() async =>
+      ImageSetBrowsePreferences.defaults;
+
+  @override
+  Future<void> reset() async {}
+
+  @override
+  Future<void> save(ImageSetBrowsePreferences preferences) async {}
+}
 
 const LocalLibrary _imageSetLibrary = (
   libraryId: 'img-1',
@@ -48,6 +64,22 @@ void main() {
         )),
         imageSetListQueryProvider.overrideWithValue(
           (String libraryId) async => const <ImageSet>[],
+        ),
+        imageSetBrowsePreferencesRepositoryProvider.overrideWithValue(
+          _MemoryPrefs(),
+        ),
+        imageSetCatalogPageQueryProvider.overrideWithValue(
+          ({
+            required String libraryId,
+            required PageRequest request,
+            required ImageSetBrowsePreferences preferences,
+          }) async =>
+              const PagedImageSetCatalog(
+            items: <ImageSetCatalogItem>[],
+            totalCount: 0,
+            page: 1,
+            pageSize: 20,
+          ),
         ),
       ];
       Widget app(Widget home) => ProviderScope(

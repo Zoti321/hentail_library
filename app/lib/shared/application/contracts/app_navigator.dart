@@ -50,6 +50,8 @@ abstract class AppNavigator {
 
   void pushAuthorDetail(int authorId);
 
+  void pushImageSetDetail(String libraryId, String imageSetId);
+
   /// 详情内同级切卷：替换当前详情页，保留底层栈。
   void replaceComicDetail(String comicId, {bool reverse = false});
 
@@ -67,6 +69,13 @@ abstract class AppNavigator {
     bool incognito = false,
     bool keepControlsOpen = false,
     bool startFromFirstPage = false,
+  });
+
+  void openImageSetReader({
+    required String libraryId,
+    required String imageSetId,
+    required int startIndex,
+    String? imageSetImageId,
   });
 
   // ---- stack ----

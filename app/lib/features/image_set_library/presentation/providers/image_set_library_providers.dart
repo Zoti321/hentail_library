@@ -94,6 +94,8 @@ typedef ImageSetDeleteImagesOnDiskCommand =
 typedef ImageSetTakeOverManagedLayoutCommand =
     Future<void> Function(String libraryId, String imageSetId);
 
+typedef ImageSetRouteKey = ({String libraryId, String imageSetId});
+
 /// Image set 目录读取 query（由 composition 绑定 use case）。
 final Provider<Future<List<ImageSet>> Function(String libraryId)>
 imageSetListQueryProvider = requiredProvider('imageSetListQueryProvider');
@@ -285,3 +287,17 @@ final imageSetPageBytesProvider = FutureProvider.autoDispose
       (Ref ref, ImageSetPageBytesKey key) =>
           ref.watch(imageSetPageBytesQueryProvider)(key.libraryId, key.image),
     );
+
+/// go_router 图集详情：在库目录中按 id 解析 [ImageSet]。
+final imageSetForRouteProvider = FutureProvider.autoDispose
+    .family<ImageSet?, ImageSetRouteKey>((Ref ref, ImageSetRouteKey key) async {
+      ref.watch(libraryRevisionStateProvider.select((s) => s.revision));
+      final List<ImageSet> sets =
+          await ref.watch(imageSetListQueryProvider)(key.libraryId);
+      for (final ImageSet set in sets) {
+        if (set.imageSetId == key.imageSetId) {
+          return set;
+        }
+      }
+      return null;
+    });

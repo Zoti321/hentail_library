@@ -6,7 +6,7 @@ import 'package:hentai_library/features/image_set_library/domain/image_set_catal
 import 'package:hentai_library/features/image_set_library/presentation/providers/image_set_browse_providers.dart';
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_card.dart';
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_cover.dart';
-import 'package:hentai_library/features/image_set_library/presentation/views/image_set_detail_page.dart';
+import 'package:hentai_library/shared/presentation/providers/app_navigator_provider.dart';
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_library_filter_sheet.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:hentai_library/l10n/app_localizations.dart';
@@ -48,15 +48,9 @@ class _ImageSetLibraryPageState extends ConsumerState<ImageSetLibraryPage> {
   }
 
   void _openDetail(ImageSetCatalogItem item) {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => ImageSetDetailPage(
-          libraryId: widget.libraryId,
-          imageSet: item.imageSet,
-          carrierShape: item.carrierShape,
-        ),
-      ),
-    );
+    ref
+        .read(appNavigatorProvider)
+        .pushImageSetDetail(widget.libraryId, item.imageSet.imageSetId);
   }
 
   void _setViewMode(CatalogViewMode mode) {

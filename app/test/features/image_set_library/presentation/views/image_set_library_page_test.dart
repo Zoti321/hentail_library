@@ -13,9 +13,12 @@ import 'package:hentai_library/features/image_set_library/presentation/providers
 import 'package:hentai_library/features/image_set_library/presentation/providers/image_set_library_providers.dart';
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_card.dart';
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_cover.dart';
+import 'package:hentai_library/features/image_set_library/presentation/views/image_set_detail_page.dart';
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_library_page.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
+import 'package:hentai_library/shared/application/contracts/app_navigator.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
+import 'package:hentai_library/shared/presentation/providers/app_navigator_provider.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 import '../../../../support/pump_localized_app.dart';
@@ -77,6 +80,34 @@ class _Probe {
   final List<ImageSetReaderEntry> entries = <ImageSetReaderEntry>[];
   ImageSetBrowsePreferences? lastPreferences;
   PageRequest? lastRequest;
+}
+
+final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
+
+class _TestAppNavigator implements AppNavigator {
+  _TestAppNavigator(this._key);
+
+  final GlobalKey<NavigatorState> _key;
+
+  @override
+  void pushImageSetDetail(String libraryId, String imageSetId) {
+    final ImageSet imageSet = switch (imageSetId) {
+      'a' => _alpha,
+      'root' => _root,
+      _ => throw StateError('unknown image set: $imageSetId'),
+    };
+    _key.currentState?.push(
+      MaterialPageRoute<void>(
+        builder: (_) => ImageSetDetailPage(
+          libraryId: libraryId,
+          imageSet: imageSet,
+        ),
+      ),
+    );
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => null;
 }
 
 class _MemoryPrefs implements ImageSetBrowsePreferencesRepository {
@@ -148,6 +179,7 @@ List<Override> _overrides(_Probe probe, {LibrarySyncState sync = _idle}) {
       (String libraryId, ImageSetImage image) async => _png1x1,
     ),
     imageSetReaderEntryCommandProvider.overrideWithValue(probe.entries.add),
+    appNavigatorProvider.overrideWithValue(_TestAppNavigator(_navigatorKey)),
   ];
 }
 
@@ -155,9 +187,14 @@ Future<void> _pumpPage(WidgetTester tester, List<Override> overrides) =>
     pumpLocalizedApp(
       tester,
       overrides: overrides,
-      home: const ImageSetLibraryPage(
-        libraryId: 'img-1',
-        displayName: 'Gallery',
+      home: Navigator(
+        key: _navigatorKey,
+        onGenerateRoute: (RouteSettings settings) => MaterialPageRoute<void>(
+          builder: (_) => const ImageSetLibraryPage(
+            libraryId: 'img-1',
+            displayName: 'Gallery',
+          ),
+        ),
       ),
     );
 

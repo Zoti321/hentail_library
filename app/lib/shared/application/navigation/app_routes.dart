@@ -19,6 +19,8 @@ abstract final class AppRoutes {
   static const String comicSegment = 'comic';
   static const String seriesSegment = 'series';
   static const String authorSegment = 'author';
+  static const String imageSetSegment = 'image-sets';
+  static const String imageSetReaderSegment = 'reader';
 
   /// 已退役的聚合浏览段；`/libraries/all` 永不作为真实 Library。
   static const String legacyAllSegment = 'all';
@@ -36,6 +38,8 @@ abstract final class AppRoutes {
   static const String settingsName = '设置';
   static const String metadataName = '管理';
   static const String comicDetailName = '漫画详情';
+  static const String imageSetDetailName = '图集详情';
+  static const String imageSetReaderName = '图集阅读';
   static const String seriesDetailName = '系列详情';
   static const String authorDetailName = '作者详情';
   static const String readerName = '阅读页面';
@@ -45,6 +49,20 @@ abstract final class AppRoutes {
 
   static String library(String libraryId) =>
       '$libraries/${Uri.encodeComponent(libraryId)}';
+
+  static String imageSetDetail(String libraryId, String imageSetId) =>
+      '${library(libraryId)}/$imageSetSegment/${Uri.encodeComponent(imageSetId)}';
+
+  static String imageSetReaderLocation({
+    required String libraryId,
+    required String imageSetId,
+    required Map<String, String> queryParameters,
+  }) =>
+      Uri(
+        path:
+            '${library(libraryId)}/$imageSetSegment/${Uri.encodeComponent(imageSetId)}/$imageSetReaderSegment',
+        queryParameters: queryParameters,
+      ).toString();
 
   static String comic(String comicId) =>
       '/$comicSegment/${Uri.encodeComponent(comicId)}';
@@ -70,22 +88,69 @@ abstract final class AppRoutes {
   static bool isComicDetailPath(String path) =>
       path.startsWith('/$comicSegment/');
 
+  static bool isImageSetLibraryPath(String path) {
+    if (!path.startsWith('$libraries/')) {
+      return false;
+    }
+    final String rest = path.substring('$libraries/'.length);
+    if (rest.isEmpty || rest.startsWith('$legacyAllSegment/')) {
+      return false;
+    }
+    final List<String> segments = rest.split('/');
+    return segments.length >= 2 &&
+        segments[1] == imageSetSegment &&
+        segments[0] != legacyAllSegment;
+  }
+
+  static bool isImageSetDetailPath(String path) {
+    if (!isImageSetLibraryPath(path)) {
+      return false;
+    }
+    final List<String> segments = _libraryPathSegments(path);
+    return segments.length == 3;
+  }
+
+  static bool isImageSetReaderPath(String path) {
+    if (!isImageSetLibraryPath(path)) {
+      return false;
+    }
+    final List<String> segments = _libraryPathSegments(path);
+    return segments.length >= 4 && segments[3] == imageSetReaderSegment;
+  }
+
   static bool isSeriesDetailPath(String path) =>
       path.startsWith('/$seriesSegment/');
 
   static bool isCatalogDetailPath(String path) =>
-      isComicDetailPath(path) || isSeriesDetailPath(path);
+      isComicDetailPath(path) ||
+      isSeriesDetailPath(path) ||
+      isImageSetDetailPath(path);
 
   static String? libraryIdFromPath(String path) {
     const String prefix = '$libraries/';
     if (!path.startsWith(prefix)) {
       return null;
     }
-    final String id = path.substring(prefix.length);
-    if (id.isEmpty || id.contains('/') || id == legacyAllSegment) {
+    final String rest = path.substring(prefix.length);
+    if (rest.isEmpty) {
       return null;
     }
-    return id;
+    final int slash = rest.indexOf('/');
+    final String id = slash < 0 ? rest : rest.substring(0, slash);
+    if (id.isEmpty || id == legacyAllSegment) {
+      return null;
+    }
+    return Uri.decodeComponent(id);
+  }
+
+  static List<String> _libraryPathSegments(String path) {
+    const String prefix = '$libraries/';
+    final String rest = path.substring(prefix.length);
+    return rest
+        .split('/')
+        .where((String s) => s.isNotEmpty)
+        .map(Uri.decodeComponent)
+        .toList();
   }
 
   /// 旧深链（`/local`、裸 `/libraries`、`/libraries/all`）统一回 Home。

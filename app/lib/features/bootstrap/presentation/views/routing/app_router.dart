@@ -1,6 +1,11 @@
 import 'dart:async';
 
+import 'package:animations/animations.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/routing/route_transition_pages.dart';
+import 'package:hentai_library/features/image_set_library/presentation/routing/image_set_reader_route_args.dart';
+import 'package:hentai_library/features/image_set_library/presentation/views/image_set_detail_route_page.dart';
+import 'package:hentai_library/features/image_set_library/presentation/views/image_set_reader_route_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
@@ -89,6 +94,55 @@ final GoRouter appRouter = GoRouter(
                   child: LibraryBrowsePage(libraryId: libraryId),
                 );
               },
+              routes: <RouteBase>[
+                GoRoute(
+                  path: '${AppRoutes.imageSetSegment}/:imageSetId',
+                  name: AppRoutes.imageSetDetailName,
+                  pageBuilder: (BuildContext context, GoRouterState state) {
+                    final String libraryId =
+                        state.pathParameters['libraryId'] ?? '';
+                    final String imageSetId = Uri.decodeComponent(
+                      state.pathParameters['imageSetId'] ?? '',
+                    );
+                    return buildCatalogDetailPage(
+                      state: state,
+                      child: ImageSetDetailRoutePage(
+                        libraryId: libraryId,
+                        imageSetId: imageSetId,
+                      ),
+                    );
+                  },
+                  routes: <RouteBase>[
+                    GoRoute(
+                      path: AppRoutes.imageSetReaderSegment,
+                      name: AppRoutes.imageSetReaderName,
+                      pageBuilder: (BuildContext context, GoRouterState state) {
+                        final String libraryId =
+                            state.pathParameters['libraryId'] ?? '';
+                        final String imageSetId = Uri.decodeComponent(
+                          state.pathParameters['imageSetId'] ?? '',
+                        );
+                        final ImageSetReaderRouteArgs args =
+                            ImageSetReaderRouteArgs.resolve(
+                              libraryId: libraryId,
+                              imageSetId: imageSetId,
+                              queryParameters: state.uri.queryParameters,
+                            );
+                        return buildSharedAxisPage(
+                          state: state,
+                          transitionType: SharedAxisTransitionType.scaled,
+                          fillColor: context.reader.readerBackground,
+                          transitionDuration: LabMotion.motionDurationOf(
+                            context,
+                            kSharedAxisRouteDuration,
+                          ),
+                          child: ImageSetReaderRoutePage(args: args),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ],
             ),
           ],
         ),

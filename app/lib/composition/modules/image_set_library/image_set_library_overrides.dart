@@ -30,9 +30,8 @@ import 'package:hentai_library/features/image_set_library/infrastructure/reposit
 import 'package:hentai_library/features/image_set_library/infrastructure/repositories/image_set_repository_impl.dart';
 import 'package:hentai_library/features/image_set_library/presentation/providers/image_set_browse_providers.dart';
 import 'package:hentai_library/features/image_set_library/presentation/providers/image_set_library_providers.dart';
-import 'package:hentai_library/features/image_set_library/presentation/views/image_set_reader_page.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
-import 'package:hentai_library/shared/ui/navigation/app_root_navigator_key.dart';
+import 'package:hentai_library/shared/presentation/providers/app_navigator_provider.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 /// image_set_library owner：目录 query、同步 command 与 Reader 入口回调绑定。
@@ -163,9 +162,16 @@ List<Override> imageSetLibraryOverrides() {
     ),
     imageSetReaderSessionQueryProvider.overrideWithValue(openReader.call),
     imageSetPageBytesQueryProvider.overrideWithValue(loadBytes.call),
-    imageSetReaderEntryCommandProvider.overrideWithValue(
-      (ImageSetReaderEntry entry) =>
-          pushImageSetReaderPage(appRootNavigatorKey.currentState, entry),
+    imageSetReaderEntryCommandProvider.overrideWith(
+      (Ref ref) => (ImageSetReaderEntry entry) {
+        final String imageId = entry.imageSetImageId.trim();
+        ref.read(appNavigatorProvider).openImageSetReader(
+              libraryId: entry.libraryId,
+              imageSetId: entry.imageSetId,
+              startIndex: entry.index,
+              imageSetImageId: imageId.isEmpty ? null : imageId,
+            );
+      },
     ),
   ];
 }
