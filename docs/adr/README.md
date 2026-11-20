@@ -141,3 +141,4 @@ Accepted | Superseded by ADR-000N | Deprecated
 | [0060](./0060-page-image-fidelity-source-resolution.md) | Page image fidelity at source resolution | Accepted |
 | [0061](./0061-read-session-capabilities.md) | Multi-source Read session and Capabilities | Accepted; partially supersedes ADR-0005 comicId-only entry wording |
 | [0062](./0062-image-set-discovery-boundary.md) | Image set discovery boundary | Accepted; supersedes first-iteration Library root image set mapping |
+| [0063](./0063-md3-standard-scheme-variant-and-contrast.md) | MD3 standard scheme variant and contrast | Accepted; partially supersedes ADR-0037 Decision §2 |

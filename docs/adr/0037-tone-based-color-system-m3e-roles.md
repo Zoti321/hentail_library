@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted
+Accepted; Decision §2 (variant / contrast) superseded by [ADR-0063](./0063-md3-standard-scheme-variant-and-contrast.md)
 
 ## Context
 

@@ -11,10 +11,11 @@ import 'package:material_ui/material_ui.dart' as material_ui;
 /// `AppColorSchemePreference.brand` 与 `violet` 共用此色；默认主题即紫罗兰。
 const Color kBrandSeedColor = Color(0xFF6750A4);
 
-/// Tone-based color system：seed → MCU fidelity scheme → M3E roles。
+/// Tone-based color system：seed → MCU tonalSpot + standard contrast → M3E roles。
 ///
-/// `M3EColorScheme.fromSeed` 不透传 variant，故经 material_ui
-/// [ColorScheme.fromSeed] 薄封装后再 [M3EColorScheme.fromColorScheme]。
+/// `M3EColorScheme.fromSeed` 不透传 variant / contrast，故经 material_ui
+/// [ColorScheme.fromSeed] 薄封装后再 [M3EColorScheme.fromColorScheme]
+///（ADR-0063：`tonalSpot` + [ContrastLevel.standard]）。
 M3EColorScheme m3eColorSchemeForBrightness(
   Brightness brightness, {
   Color seed = kBrandSeedColor,
@@ -22,7 +23,8 @@ M3EColorScheme m3eColorSchemeForBrightness(
   final material_ui.ColorScheme seeded = material_ui.ColorScheme.fromSeed(
     seedColor: seed,
     brightness: brightness,
-    dynamicSchemeVariant: material_ui.DynamicSchemeVariant.fidelity,
+    dynamicSchemeVariant: material_ui.DynamicSchemeVariant.tonalSpot,
+    contrastLevel: material_ui.ContrastLevel.standard,
   );
   return M3EColorScheme.fromColorScheme(seeded);
 }

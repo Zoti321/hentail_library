@@ -14,7 +14,7 @@ import 'app_m3e_theme.dart';
 import 'color/app_color_scheme_seeds.dart';
 import 'tokens/app_theme_tokens.dart';
 
-/// One seed → fidelity M3E + production [ThemeData]（ADR-0037 单次装配）。
+/// One seed → standard tonalSpot M3E + production [ThemeData]（ADR-0037 / 0063）。
 final class AssembledAppTheme {
   const AssembledAppTheme({
     required this.seed,

@@ -22,7 +22,7 @@ const Set<String> kKnownColorSchemeIds = <String>{
 /// Seed for [buildAppTheme] / [buildAppM3eThemeData] 的 `colorSchemeId`。
 ///
 /// `brand` 定稿为紫罗兰（[kBrandSeedColor]），与偏好 id `violet` 同色。
-/// 其余为适合 M3 fidelity 的饱和种子（Material 600 档或传统色参考），
+/// 其余为适合 M3 tonalSpot 的饱和种子（Material 600 档或传统色参考），
 /// 展示名见 l10n（青瓷色 / 矢车菊色等）。
 Color colorSchemeSeedForId(String colorSchemeId) {
   assert(
@@ -45,7 +45,7 @@ Color colorSchemeSeedForId(String colorSchemeId) {
     'pink' => const Color(0xFFD81B60),
     // 樱花色 — 略偏亮的粉红种子
     'sakura' => const Color(0xFFEC407A),
-    // 琥珀色 — amber 600（避免 Colors.yellow 过亮导致 fidelity 发灰绿）
+    // 琥珀色 — amber 600（避免 Colors.yellow 过亮导致 scheme 发灰绿）
     'yellow' => const Color(0xFFFFB300),
     // 金盏花色 — orange 600
     'orange' => const Color(0xFFFB8C00),

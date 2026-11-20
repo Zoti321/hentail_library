@@ -19,7 +19,7 @@ Color _seedFromDynamic(Object? dynamicSource) {
   return kBrandSeedColor;
 }
 
-/// Lab / Widgetbook：与生产同一 [assembleAppTheme] 入口（fidelity Tone-based）。
+/// Lab / Widgetbook：与生产同一 [assembleAppTheme] 入口（tonalSpot Tone-based）。
 M3EThemeData buildThemeData({
   Object? lightDynamic,
   Object? darkDynamic,
