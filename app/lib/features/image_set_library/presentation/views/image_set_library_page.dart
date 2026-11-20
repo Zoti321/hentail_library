@@ -284,6 +284,9 @@ class _CatalogBody extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
+                        subtitle: Text(
+                          l10n.imageSetDetailImageCount(item.imageCount),
+                        ),
                         onTap: () => onOpen(item),
                       ),
                     ],
@@ -294,7 +297,7 @@ class _CatalogBody extends StatelessWidget {
           else
             CatalogGridSliver(
               itemCount: items.length,
-              hasSubtitle: false,
+              hasSubtitle: true,
               itemBuilder:
                   (BuildContext context, int index, CatalogGridLayout _) {
                     final ImageSetCatalogItem item = items[index];
@@ -304,6 +307,7 @@ class _CatalogBody extends StatelessWidget {
                       libraryId: libraryId,
                       imageSetId: set.imageSetId,
                       title: set.name,
+                      imageCount: item.imageCount,
                       onTap: () => onOpen(item),
                     );
                   },

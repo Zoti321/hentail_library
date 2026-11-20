@@ -216,6 +216,8 @@ void main() {
     expect(find.text('legacy-root'), findsOneWidget);
     expect(find.text('未分类'), findsNothing);
     expect(find.text('alpha'), findsOneWidget);
+    expect(find.text('2 张'), findsOneWidget);
+    expect(find.text('0 张'), findsOneWidget);
     expect(find.byType(ListTile), findsNothing);
   });
 
