@@ -27,6 +27,8 @@ pub struct ImageSetImageDto {
     /// `loose` | `zip` | `rar` | `sevenz`.
     pub carrier_kind: String,
     pub name: String,
+    /// Catalog workspace exclude flag (browse list is always `false`).
+    pub excluded: bool,
 }
 
 /// Facet bucket of the catalog query: matches any bound name (case-insensitive) OR, when

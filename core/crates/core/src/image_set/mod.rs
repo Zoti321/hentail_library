@@ -19,7 +19,7 @@ mod submissions;
 mod workspace;
 mod writer;
 
-pub use catalog::{list_image_set_images, list_image_sets};
+pub use catalog::{list_image_set_images, list_image_set_workspace_images, list_image_sets};
 pub use dto::{
     ImageSetAuthorGroupDto, ImageSetCarrierShapeDto, ImageSetCatalogItemDto, ImageSetDto,
     ImageSetFacetFilterDto, ImageSetFilterDto, ImageSetGroupingDto, ImageSetImageDto,

@@ -4,137 +4,171 @@
 // FRB 2.13 RustArcStaticData has no inferable generic argument.
 // ignore_for_file: inference_failure_on_instance_creation
 
-
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../frb_generated.dart';
 import 'comic.dart';
 import 'init.dart';
+
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `clone`, `fmt`, `fmt`, `fmt`, `fmt`
 
-            // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `clone`, `fmt`, `fmt`, `fmt`, `fmt`
+Future<void> trashComicsFrb({required List<String> comicIds}) =>
+    RustLib.instance.api.crateApiComicTrashTrashComicsFrb(comicIds: comicIds);
 
+Future<void> restoreComicsFrb({required List<String> comicIds}) =>
+    RustLib.instance.api.crateApiComicTrashRestoreComicsFrb(comicIds: comicIds);
 
-            Future<void>  trashComicsFrb({required List<String> comicIds }) => RustLib.instance.api.crateApiComicTrashTrashComicsFrb(comicIds: comicIds);
+Future<ComicPurgeResultFrbDto> purgeComicsFrb({
+  required List<String> comicIds,
+}) => RustLib.instance.api.crateApiComicTrashPurgeComicsFrb(comicIds: comicIds);
 
-Future<void>  restoreComicsFrb({required List<String> comicIds }) => RustLib.instance.api.crateApiComicTrashRestoreComicsFrb(comicIds: comicIds);
+Future<PagedTrashedComicResultFrbDto> fetchTrashedComicsPageFrb({
+  required PageRequestDto request,
+}) => RustLib.instance.api.crateApiComicTrashFetchTrashedComicsPageFrb(
+  request: request,
+);
 
-Future<ComicPurgeResultFrbDto>  purgeComicsFrb({required List<String> comicIds }) => RustLib.instance.api.crateApiComicTrashPurgeComicsFrb(comicIds: comicIds);
+Future<TrashedComicCountsFrbDto> countTrashedComicsFrb() =>
+    RustLib.instance.api.crateApiComicTrashCountTrashedComicsFrb();
 
-Future<PagedTrashedComicResultFrbDto>  fetchTrashedComicsPageFrb({required PageRequestDto request }) => RustLib.instance.api.crateApiComicTrashFetchTrashedComicsPageFrb(request: request);
+Future<List<String>> listTrashedComicIdsFrb() =>
+    RustLib.instance.api.crateApiComicTrashListTrashedComicIdsFrb();
 
-Future<TrashedComicCountsFrbDto>  countTrashedComicsFrb() => RustLib.instance.api.crateApiComicTrashCountTrashedComicsFrb();
+class ComicPurgeResultFrbDto {
+  final int succeeded;
+  final int failed;
+  final List<String> errorSamples;
 
-Future<List<String>>  listTrashedComicIdsFrb() => RustLib.instance.api.crateApiComicTrashListTrashedComicIdsFrb();
+  const ComicPurgeResultFrbDto({
+    required this.succeeded,
+    required this.failed,
+    required this.errorSamples,
+  });
 
-            class ComicPurgeResultFrbDto  {
-                final int succeeded;
-final int failed;
-final List<String> errorSamples;
+  @override
+  int get hashCode =>
+      succeeded.hashCode ^ failed.hashCode ^ errorSamples.hashCode;
 
-                const ComicPurgeResultFrbDto({required this.succeeded ,required this.failed ,required this.errorSamples ,});
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ComicPurgeResultFrbDto &&
+          runtimeType == other.runtimeType &&
+          succeeded == other.succeeded &&
+          failed == other.failed &&
+          errorSamples == other.errorSamples;
+}
 
+class PagedTrashedComicResultFrbDto {
+  final List<TrashedComicFrbDto> items;
+  final PlatformInt64 totalCount;
+  final int page;
+  final int pageSize;
 
+  const PagedTrashedComicResultFrbDto({
+    required this.items,
+    required this.totalCount,
+    required this.page,
+    required this.pageSize,
+  });
 
+  @override
+  int get hashCode =>
+      items.hashCode ^ totalCount.hashCode ^ page.hashCode ^ pageSize.hashCode;
 
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PagedTrashedComicResultFrbDto &&
+          runtimeType == other.runtimeType &&
+          items == other.items &&
+          totalCount == other.totalCount &&
+          page == other.page &&
+          pageSize == other.pageSize;
+}
 
-        @override
-        int get hashCode => succeeded.hashCode^failed.hashCode^errorSamples.hashCode;
+class TrashedComicCountsFrbDto {
+  final PlatformInt64 total;
+  final PlatformInt64 local;
+  final PlatformInt64 remote;
 
+  const TrashedComicCountsFrbDto({
+    required this.total,
+    required this.local,
+    required this.remote,
+  });
 
+  @override
+  int get hashCode => total.hashCode ^ local.hashCode ^ remote.hashCode;
 
-        @override
-        bool operator ==(Object other) =>
-            identical(this, other) ||
-            other is ComicPurgeResultFrbDto &&
-                runtimeType == other.runtimeType
-                && succeeded == other.succeeded&& failed == other.failed&& errorSamples == other.errorSamples;
-
-            }
-
-class PagedTrashedComicResultFrbDto  {
-                final List<TrashedComicFrbDto> items;
-final PlatformInt64 totalCount;
-final int page;
-final int pageSize;
-
-                const PagedTrashedComicResultFrbDto({required this.items ,required this.totalCount ,required this.page ,required this.pageSize ,});
-
-
-
-
-
-        @override
-        int get hashCode => items.hashCode^totalCount.hashCode^page.hashCode^pageSize.hashCode;
-
-
-
-        @override
-        bool operator ==(Object other) =>
-            identical(this, other) ||
-            other is PagedTrashedComicResultFrbDto &&
-                runtimeType == other.runtimeType
-                && items == other.items&& totalCount == other.totalCount&& page == other.page&& pageSize == other.pageSize;
-
-            }
-
-class TrashedComicCountsFrbDto  {
-                final PlatformInt64 total;
-final PlatformInt64 local;
-final PlatformInt64 remote;
-
-                const TrashedComicCountsFrbDto({required this.total ,required this.local ,required this.remote ,});
-
-
-
-
-
-        @override
-        int get hashCode => total.hashCode^local.hashCode^remote.hashCode;
-
-
-
-        @override
-        bool operator ==(Object other) =>
-            identical(this, other) ||
-            other is TrashedComicCountsFrbDto &&
-                runtimeType == other.runtimeType
-                && total == other.total&& local == other.local&& remote == other.remote;
-
-            }
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TrashedComicCountsFrbDto &&
+          runtimeType == other.runtimeType &&
+          total == other.total &&
+          local == other.local &&
+          remote == other.remote;
+}
 
 /// 回收站列表行（Summary；不含 facet 与完整 Catalog DTO）。
-class TrashedComicFrbDto  {
-                final String comicId;
-final String path;
-final String resourceType;
-final PlatformInt64 resourceSize;
-final PlatformInt64 createdAt;
-final PlatformInt64 lastUpdatedAt;
-final String title;
-final int pageCount;
-final PlatformInt64 deletedAt;
-final String libraryName;
-final String libraryKind;
+class TrashedComicFrbDto {
+  final String comicId;
+  final String path;
+  final String resourceType;
+  final PlatformInt64 resourceSize;
+  final PlatformInt64 createdAt;
+  final PlatformInt64 lastUpdatedAt;
+  final String title;
+  final int pageCount;
+  final PlatformInt64 deletedAt;
+  final String libraryName;
+  final String libraryKind;
 
-                const TrashedComicFrbDto({required this.comicId ,required this.path ,required this.resourceType ,required this.resourceSize ,required this.createdAt ,required this.lastUpdatedAt ,required this.title ,required this.pageCount ,required this.deletedAt ,required this.libraryName ,required this.libraryKind ,});
+  const TrashedComicFrbDto({
+    required this.comicId,
+    required this.path,
+    required this.resourceType,
+    required this.resourceSize,
+    required this.createdAt,
+    required this.lastUpdatedAt,
+    required this.title,
+    required this.pageCount,
+    required this.deletedAt,
+    required this.libraryName,
+    required this.libraryKind,
+  });
 
+  @override
+  int get hashCode =>
+      comicId.hashCode ^
+      path.hashCode ^
+      resourceType.hashCode ^
+      resourceSize.hashCode ^
+      createdAt.hashCode ^
+      lastUpdatedAt.hashCode ^
+      title.hashCode ^
+      pageCount.hashCode ^
+      deletedAt.hashCode ^
+      libraryName.hashCode ^
+      libraryKind.hashCode;
 
-
-
-
-        @override
-        int get hashCode => comicId.hashCode^path.hashCode^resourceType.hashCode^resourceSize.hashCode^createdAt.hashCode^lastUpdatedAt.hashCode^title.hashCode^pageCount.hashCode^deletedAt.hashCode^libraryName.hashCode^libraryKind.hashCode;
-
-
-
-        @override
-        bool operator ==(Object other) =>
-            identical(this, other) ||
-            other is TrashedComicFrbDto &&
-                runtimeType == other.runtimeType
-                && comicId == other.comicId&& path == other.path&& resourceType == other.resourceType&& resourceSize == other.resourceSize&& createdAt == other.createdAt&& lastUpdatedAt == other.lastUpdatedAt&& title == other.title&& pageCount == other.pageCount&& deletedAt == other.deletedAt&& libraryName == other.libraryName&& libraryKind == other.libraryKind;
-
-            }
-            
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TrashedComicFrbDto &&
+          runtimeType == other.runtimeType &&
+          comicId == other.comicId &&
+          path == other.path &&
+          resourceType == other.resourceType &&
+          resourceSize == other.resourceSize &&
+          createdAt == other.createdAt &&
+          lastUpdatedAt == other.lastUpdatedAt &&
+          title == other.title &&
+          pageCount == other.pageCount &&
+          deletedAt == other.deletedAt &&
+          libraryName == other.libraryName &&
+          libraryKind == other.libraryKind;
+}

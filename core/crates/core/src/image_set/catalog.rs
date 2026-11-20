@@ -7,6 +7,27 @@ use crate::util::natural_sort::compare_filename_natural;
 
 use super::dto::{ImageSetDto, ImageSetImageDto};
 
+fn image_set_image_from_row(row: image_set_images::Model) -> ImageSetImageDto {
+    ImageSetImageDto {
+        image_set_image_id: row.image_set_image_id,
+        image_set_id: row.image_set_id,
+        library_id: row.library_id,
+        carrier_relative_path: row.carrier_relative_path,
+        member_path: row.member_path,
+        carrier_kind: row.carrier_kind,
+        name: row.name,
+        excluded: row.excluded,
+    }
+}
+
+fn sort_image_set_images(rows: &mut [image_set_images::Model]) {
+    rows.sort_by(|a, b| {
+        a.sort_order
+            .cmp(&b.sort_order)
+            .then_with(|| a.image_set_image_id.cmp(&b.image_set_image_id))
+    });
+}
+
 /// Image sets of one library in natural order by name (legacy `is_root` rows still sort first).
 pub async fn list_image_sets(library_id: &str) -> Result<Vec<ImageSetDto>, HentaiError> {
     let db = connection()?;
@@ -46,21 +67,28 @@ pub async fn list_image_set_images(
         .all(&db)
         .await
         .map_err(|e| map_db_err(&e))?;
-    rows.sort_by(|a, b| {
-        a.sort_order
-            .cmp(&b.sort_order)
-            .then_with(|| a.image_set_image_id.cmp(&b.image_set_image_id))
-    });
+    sort_image_set_images(&mut rows);
     Ok(rows
         .into_iter()
-        .map(|row| ImageSetImageDto {
-            image_set_image_id: row.image_set_image_id,
-            image_set_id: row.image_set_id,
-            library_id: row.library_id,
-            carrier_relative_path: row.carrier_relative_path,
-            member_path: row.member_path,
-            carrier_kind: row.carrier_kind,
-            name: row.name,
+        .map(|mut row| {
+            row.excluded = false;
+            image_set_image_from_row(row)
         })
         .collect())
+}
+
+/// Manage workspace view: all members in user `sort_order` with real `excluded` flag.
+pub async fn list_image_set_workspace_images(
+    library_id: &str,
+    image_set_id: &str,
+) -> Result<Vec<ImageSetImageDto>, HentaiError> {
+    let db = connection()?;
+    let mut rows = image_set_images::Entity::find()
+        .filter(image_set_images::Column::LibraryId.eq(library_id))
+        .filter(image_set_images::Column::ImageSetId.eq(image_set_id))
+        .all(&db)
+        .await
+        .map_err(|e| map_db_err(&e))?;
+    sort_image_set_images(&mut rows);
+    Ok(rows.into_iter().map(image_set_image_from_row).collect())
 }

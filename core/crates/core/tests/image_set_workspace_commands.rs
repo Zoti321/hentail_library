@@ -9,7 +9,8 @@ use std::path::Path;
 
 use hentai_core::{
     create_image_set_local_library, create_local_library, create_sync_handle,
-    get_image_set_library_gates, init_db_at_path, list_image_set_images, list_image_sets,
+    get_image_set_library_gates, init_db_at_path, list_image_set_images,
+    list_image_set_workspace_images, list_image_sets,
     reorder_image_set_images, set_image_set_images_excluded, set_image_set_managed_layout,
     set_image_set_resource_mutation, sync_library, HentaiErrorCode, SyncScanMode,
 };
@@ -273,5 +274,55 @@ fn reorder_rejects_partial_or_foreign_ids() {
             ))
             .expect_err("ghost");
         assert_eq!(err.code, HentaiErrorCode::Validation);
+    });
+}
+
+#[test]
+fn workspace_list_includes_excluded_default_list_omits() {
+    common::with_global_db(|| {
+        let fixture = Fixture::new("workspace_list.sqlite");
+        write_jpg(&fixture.root.join("album/a.jpg"), b"a");
+        write_jpg(&fixture.root.join("album/b.jpg"), b"b");
+        write_jpg(&fixture.root.join("album/c.jpg"), b"c");
+        fixture.sync();
+        let set_id = fixture.set_id();
+        let images = fixture
+            .runtime
+            .block_on(list_image_set_images(&fixture.library_id, &set_id))
+            .expect("list");
+        assert_eq!(images.len(), 3);
+        assert!(images.iter().all(|i| !i.excluded));
+
+        fixture
+            .runtime
+            .block_on(set_image_set_images_excluded(
+                &fixture.library_id,
+                &set_id,
+                &[images[1].image_set_image_id.clone()],
+                true,
+            ))
+            .expect("exclude");
+
+        let default = fixture
+            .runtime
+            .block_on(list_image_set_images(&fixture.library_id, &set_id))
+            .expect("default");
+        assert_eq!(default.len(), 2);
+        assert!(default.iter().all(|i| !i.excluded));
+
+        let workspace = fixture
+            .runtime
+            .block_on(list_image_set_workspace_images(
+                &fixture.library_id,
+                &set_id,
+            ))
+            .expect("workspace");
+        assert_eq!(workspace.len(), 3);
+        let excluded: Vec<_> = workspace
+            .iter()
+            .filter(|i| i.excluded)
+            .map(|i| i.name.as_str())
+            .collect();
+        assert_eq!(excluded, vec!["b.jpg"]);
     });
 }

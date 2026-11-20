@@ -96,6 +96,7 @@ pub use image_set::{
     add_image_set_submission_members, copy_images_into_image_set, create_image_set_submission,
     delete_image_set_images_on_disk, delete_image_set_submission, fetch_image_sets_page,
     get_image_set_facets, get_image_set_library_gates, list_image_set_images,
+    list_image_set_workspace_images,
     list_image_set_submissions, list_image_sets, remove_image_set_submission_members,
     rename_image_set_submission, reorder_image_set_images, reorder_image_set_submission_members,
     set_image_set_images_excluded, set_image_set_managed_layout, set_image_set_meta_locks,

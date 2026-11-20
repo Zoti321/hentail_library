@@ -88,6 +88,7 @@ pub async fn copy_images_into_image_set(
                 member_path: row.member_path,
                 carrier_kind: row.carrier_kind,
                 name: row.name,
+                excluded: row.excluded,
             });
         }
 

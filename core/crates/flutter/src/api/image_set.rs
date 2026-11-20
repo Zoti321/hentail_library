@@ -6,6 +6,7 @@ use hentai_core::{
     delete_image_set_submission as core_delete_submission,
     fetch_image_sets_page as core_fetch_page, get_image_set_facets as core_get_facets,
     get_image_set_library_gates as core_get_gates, list_image_set_images as core_list_images,
+    list_image_set_workspace_images as core_list_workspace_images,
     list_image_set_submissions as core_list_submissions, list_image_sets as core_list_sets,
     load_image_set_page_bytes as core_load_image_set_page_bytes,
     open_image_set_reader as core_open_image_set_reader,
@@ -48,6 +49,7 @@ pub struct ImageSetImageDto {
     pub member_path: String,
     pub carrier_kind: String,
     pub name: String,
+    pub excluded: bool,
 }
 
 impl From<CoreImageSet> for ImageSetDto {
@@ -73,6 +75,7 @@ impl From<CoreImageSetImage> for ImageSetImageDto {
             member_path: value.member_path,
             carrier_kind: value.carrier_kind,
             name: value.name,
+            excluded: value.excluded,
         }
     }
 }
@@ -89,6 +92,17 @@ pub async fn list_image_set_images_frb(
     image_set_id: String,
 ) -> Result<Vec<ImageSetImageDto>, HentaiErrorDto> {
     core_list_images(&library_id, &image_set_id)
+        .await
+        .map(|rows| rows.into_iter().map(ImageSetImageDto::from).collect())
+        .map_err(HentaiErrorDto::from)
+}
+
+/// Manage workspace list: all members in user order with real `excluded` flag.
+pub async fn list_image_set_workspace_images_frb(
+    library_id: String,
+    image_set_id: String,
+) -> Result<Vec<ImageSetImageDto>, HentaiErrorDto> {
+    core_list_workspace_images(&library_id, &image_set_id)
         .await
         .map(|rows| rows.into_iter().map(ImageSetImageDto::from).collect())
         .map_err(HentaiErrorDto::from)

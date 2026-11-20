@@ -25,6 +25,15 @@ Future<List<ImageSetImageDto>> listImageSetImagesFrb({
   imageSetId: imageSetId,
 );
 
+/// Manage workspace list: all members in user order with real `excluded` flag.
+Future<List<ImageSetImageDto>> listImageSetWorkspaceImagesFrb({
+  required String libraryId,
+  required String imageSetId,
+}) => RustLib.instance.api.crateApiImageSetListImageSetWorkspaceImagesFrb(
+  libraryId: libraryId,
+  imageSetId: imageSetId,
+);
+
 /// One clamped page of the Image set catalog (filter / sort / Author grouping).
 Future<PagedImageSetCatalogDto> fetchImageSetsPageFrb({
   required PageRequestDto request,
@@ -435,6 +444,7 @@ class ImageSetImageDto {
   final String memberPath;
   final String carrierKind;
   final String name;
+  final bool excluded;
 
   const ImageSetImageDto({
     required this.imageSetImageId,
@@ -444,6 +454,7 @@ class ImageSetImageDto {
     required this.memberPath,
     required this.carrierKind,
     required this.name,
+    required this.excluded,
   });
 
   @override
@@ -454,7 +465,8 @@ class ImageSetImageDto {
       carrierRelativePath.hashCode ^
       memberPath.hashCode ^
       carrierKind.hashCode ^
-      name.hashCode;
+      name.hashCode ^
+      excluded.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -467,7 +479,8 @@ class ImageSetImageDto {
           carrierRelativePath == other.carrierRelativePath &&
           memberPath == other.memberPath &&
           carrierKind == other.carrierKind &&
-          name == other.name;
+          name == other.name &&
+          excluded == other.excluded;
 }
 
 class ImageSetLibraryGatesDto {
