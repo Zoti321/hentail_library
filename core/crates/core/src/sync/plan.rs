@@ -304,14 +304,26 @@ async fn needs_thumbnail_generation(
     crate::thumbnail::thumbnail_needs_generation(db, comic).await
 }
 
+/// Fingerprint index for sync planning — never `SELECT` the thumbnail BLOB.
 pub async fn load_thumbnail_stats(
     db: &DatabaseConnection,
 ) -> Result<HashMap<String, (i64, i64)>, HentaiError> {
-    let rows = ComicThumbnails::find().all(db).await.map_err(|e| map_db_err(&e))?;
+    use crate::entity::comic_thumbnails;
+    use sea_orm::QuerySelect;
+
+    let rows: Vec<(String, Option<i64>, Option<i64>)> = ComicThumbnails::find()
+        .select_only()
+        .column(comic_thumbnails::Column::ComicId)
+        .column(comic_thumbnails::Column::SourceModifiedMs)
+        .column(comic_thumbnails::Column::SourceSize)
+        .into_tuple()
+        .all(db)
+        .await
+        .map_err(|e| map_db_err(&e))?;
     let mut map = HashMap::new();
-    for row in rows {
-        if let (Some(ms), Some(size)) = (row.source_modified_ms, row.source_size) {
-            map.insert(row.comic_id, (ms, size));
+    for (comic_id, ms, size) in rows {
+        if let (Some(ms), Some(size)) = (ms, size) {
+            map.insert(comic_id, (ms, size));
         }
     }
     Ok(map)

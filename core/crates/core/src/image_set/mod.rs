@@ -5,6 +5,7 @@
 
 mod archive_list;
 mod catalog;
+mod cover;
 mod dimensions;
 mod discovery;
 mod dto;
@@ -21,6 +22,11 @@ mod workspace;
 mod writer;
 
 pub use catalog::{list_image_set_images, list_image_set_workspace_images, list_image_sets};
+pub use cover::{
+    enqueue_image_set_covers_low, ensure_image_set_cover, find_image_set_cover,
+    invalidate_image_set_cover, list_image_set_cover_targets, store_image_set_cover,
+    watch_image_set_cover_events, ImageSetCoverDto, ImageSetCoverEvent,
+};
 pub use dto::{
     ImageSetAuthorGroupDto, ImageSetCarrierShapeDto, ImageSetCatalogItemDto, ImageSetDto,
     ImageSetFacetFilterDto, ImageSetFilterDto, ImageSetGroupingDto, ImageSetImageDto,

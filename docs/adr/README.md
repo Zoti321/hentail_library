@@ -145,3 +145,4 @@ Accepted | Superseded by ADR-000N | Deprecated
 | [0064](./0064-image-set-workspace-and-resource-mutation.md) | Image set workspace and resource mutation | Accepted |
 | [0065](./0065-page-image-max-edge-decode-safety.md) | Page image max-edge decode safety | Accepted; supersedes ADR-0060 decode-size-cap bullet |
 | [0066](./0066-image-set-image-dimensions.md) | Image set image dimensions in catalog | Accepted |
+| [0067](./0067-image-set-catalog-cover.md) | Image set catalog cover persistence | Accepted |

@@ -148,34 +148,32 @@ impl ThumbnailQueue {
     async fn process_one(self: &Arc<Self>, comic_id: &str, priority: ThumbnailPriority) {
         let force_retry = priority == ThumbnailPriority::Critical;
         let outcome = self.generate_for_comic_id(comic_id, force_retry).await;
-        let (ready, progress) = {
+        let (ready_bytes, progress) = {
             let mut inner = self.inner.lock().await;
             inner.in_flight.remove(comic_id);
-            if matches!(outcome, Ok(true)) {
-                inner.negative_cache.remove(comic_id);
-                inner.stats.done += 1;
-                (true, true)
-            } else {
-                inner
-                    .negative_cache
-                    .insert(comic_id.to_string(), Instant::now());
-                inner.stats.failed += 1;
-                inner.stats.done += 1;
-                (false, true)
+            match outcome {
+                Ok(Some(bytes)) => {
+                    inner.negative_cache.remove(comic_id);
+                    inner.stats.done += 1;
+                    (Some(bytes), true)
+                }
+                Ok(None) | Err(_) => {
+                    inner
+                        .negative_cache
+                        .insert(comic_id.to_string(), Instant::now());
+                    inner.stats.failed += 1;
+                    inner.stats.done += 1;
+                    (None, true)
+                }
             }
         };
         if progress {
             self.emit_progress().await;
         }
-        if ready {
-            let thumbnail = find_thumbnail_by_comic_id(comic_id)
-                .await
-                .ok()
-                .flatten()
-                .map(|row| row.thumbnail);
+        if let Some(thumbnail) = ready_bytes {
             let _ = self.events.send(ThumbnailEvent::Ready {
                 comic_id: comic_id.to_string(),
-                thumbnail,
+                thumbnail: Some(thumbnail),
             });
         }
         self.notify_waiters(comic_id).await;
@@ -188,23 +186,27 @@ impl ThumbnailQueue {
         }
     }
 
+    /// Returns written JPEG bytes when generation (or an already-current row) succeeds.
     async fn generate_for_comic_id(
         &self,
         comic_id: &str,
         force_retry: bool,
-    ) -> Result<bool, HentaiError> {
+    ) -> Result<Option<Vec<u8>>, HentaiError> {
         let db = connection()?;
         let Some(comic) = find_comic_by_id(comic_id).await? else {
-            return Ok(false);
+            return Ok(None);
         };
         if !thumbnail_needs_generation(&db, &comic).await? {
-            return Ok(true);
+            // Already current (or user-set): load bytes for Ready without regenerating.
+            return Ok(find_thumbnail_by_comic_id(comic_id)
+                .await?
+                .map(|row| row.thumbnail));
         }
         if !force_retry {
             let inner = self.inner.lock().await;
             if let Some(failed_at) = inner.negative_cache.get(comic_id) {
                 if failed_at.elapsed() < NEGATIVE_CACHE_RETRY {
-                    return Ok(false);
+                    return Ok(None);
                 }
             }
         }

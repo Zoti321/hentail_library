@@ -8,10 +8,12 @@ import 'package:hentai_library/features/image_set_library/domain/image_set_catal
 import 'package:hentai_library/features/image_set_library/domain/image_set_facets.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_image.dart';
 import 'package:hentai_library/features/image_set_library/presentation/providers/image_set_browse_providers.dart';
+import 'package:hentai_library/features/image_set_library/presentation/providers/image_set_cover_providers.dart';
 import 'package:hentai_library/features/image_set_library/presentation/providers/image_set_library_providers.dart';
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_library_filter_sheet.dart';
 import 'package:hentai_library/features/image_set_library/presentation/views/image_set_library_page.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
+import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:riverpod/misc.dart' show Override;
 
@@ -169,6 +171,16 @@ List<Override> _labOverrides({
     imageSetPageBytesQueryProvider.overrideWithValue(
       (String libraryId, ImageSetImage image) async =>
           Md3eImageSetBrowsePreviewData.png1x1,
+    ),
+    imageSetEnsureCoverQueryProvider.overrideWithValue(
+      ({
+        required String libraryId,
+        required String imageSetId,
+        required ThumbnailPriority priority,
+      }) async => Md3eImageSetBrowsePreviewData.png1x1,
+    ),
+    imageSetFindCoverQueryProvider.overrideWithValue(
+      (String imageSetId) async => Md3eImageSetBrowsePreviewData.png1x1,
     ),
     imageSetReaderEntryCommandProvider.overrideWithValue((_) {}),
   ];

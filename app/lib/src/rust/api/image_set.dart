@@ -11,8 +11,13 @@ import 'comic.dart';
 import 'init.dart';
 
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
+import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`
+import 'thumbnail.dart';
+part 'image_set.freezed.dart';
+
+// These functions are ignored because they are not marked as `pub`: `map_cover_event`, `map_cover_priority`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`
 
 Future<List<ImageSetDto>> listImageSetsFrb({required String libraryId}) =>
     RustLib.instance.api.crateApiImageSetListImageSetsFrb(libraryId: libraryId);
@@ -97,6 +102,25 @@ Future<Uint8List> loadImageSetPageBytesFrb({
   libraryId: libraryId,
   image: image,
 );
+
+/// Catalog cover JPEG (≤512); `None` when missing / still queued (non-critical).
+Future<ImageSetCoverDto?> findImageSetCoverFrb({required String imageSetId}) =>
+    RustLib.instance.api.crateApiImageSetFindImageSetCoverFrb(
+      imageSetId: imageSetId,
+    );
+
+Future<ImageSetCoverDto?> ensureImageSetCoverFrb({
+  required String libraryId,
+  required String imageSetId,
+  required ThumbnailPriorityDto priority,
+}) => RustLib.instance.api.crateApiImageSetEnsureImageSetCoverFrb(
+  libraryId: libraryId,
+  imageSetId: imageSetId,
+  priority: priority,
+);
+
+Stream<ImageSetCoverEventDto> watchImageSetCoverEventsFrb() =>
+    RustLib.instance.api.crateApiImageSetWatchImageSetCoverEventsFrb();
 
 Future<ImageSetLibraryGatesDto> getImageSetLibraryGatesFrb({
   required String libraryId,
@@ -294,6 +318,52 @@ class ImageSetCatalogItemDto {
           createdAt == other.createdAt &&
           carrierShape == other.carrierShape &&
           groupAuthor == other.groupAuthor;
+}
+
+class ImageSetCoverDto {
+  final Uint8List thumbnail;
+  final String sourceImageSetImageId;
+  final PlatformInt64 sourceModifiedMs;
+  final PlatformInt64 sourceSize;
+
+  const ImageSetCoverDto({
+    required this.thumbnail,
+    required this.sourceImageSetImageId,
+    required this.sourceModifiedMs,
+    required this.sourceSize,
+  });
+
+  @override
+  int get hashCode =>
+      thumbnail.hashCode ^
+      sourceImageSetImageId.hashCode ^
+      sourceModifiedMs.hashCode ^
+      sourceSize.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ImageSetCoverDto &&
+          runtimeType == other.runtimeType &&
+          thumbnail == other.thumbnail &&
+          sourceImageSetImageId == other.sourceImageSetImageId &&
+          sourceModifiedMs == other.sourceModifiedMs &&
+          sourceSize == other.sourceSize;
+}
+
+@freezed
+sealed class ImageSetCoverEventDto with _$ImageSetCoverEventDto {
+  const ImageSetCoverEventDto._();
+
+  const factory ImageSetCoverEventDto.ready({
+    required String imageSetId,
+    Uint8List? thumbnail,
+  }) = ImageSetCoverEventDto_Ready;
+  const factory ImageSetCoverEventDto.progress({
+    required int done,
+    required int total,
+    required int failed,
+  }) = ImageSetCoverEventDto_Progress;
 }
 
 class ImageSetDto {

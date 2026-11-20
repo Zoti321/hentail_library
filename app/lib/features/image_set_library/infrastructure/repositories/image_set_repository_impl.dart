@@ -11,9 +11,12 @@ import 'package:hentai_library/features/image_set_library/domain/image_set_repos
 import 'package:hentai_library/features/image_set_library/domain/image_set_submission.dart';
 import 'package:hentai_library/features/image_set_library/infrastructure/mappers/image_set_frb_mapper.dart';
 import 'package:hentai_library/infrastructure/frb/frb_call_guard.dart';
+import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/src/rust/api/comic.dart' show PageRequestDto;
 import 'package:hentai_library/src/rust/api/image_set.dart' as rust;
+import 'package:hentai_library/src/rust/api/thumbnail.dart'
+    show ThumbnailPriorityDto;
 
 class ImageSetRepositoryImpl implements ImageSetRepository {
   const ImageSetRepositoryImpl();
@@ -163,6 +166,34 @@ class ImageSetRepositoryImpl implements ImageSetRepository {
         ),
         fallbackMessage: '读取图片失败',
       );
+
+  @override
+  Future<Uint8List?> findCover(String imageSetId) => guardFrb(() async {
+    final rust.ImageSetCoverDto? row = await rust.findImageSetCoverFrb(
+      imageSetId: imageSetId,
+    );
+    if (row == null) {
+      return null;
+    }
+    return Uint8List.fromList(row.thumbnail);
+  }, fallbackMessage: '读取图集封面失败');
+
+  @override
+  Future<Uint8List?> ensureCover({
+    required String libraryId,
+    required String imageSetId,
+    required ThumbnailPriority priority,
+  }) => guardFrb(() async {
+    final rust.ImageSetCoverDto? row = await rust.ensureImageSetCoverFrb(
+      libraryId: libraryId,
+      imageSetId: imageSetId,
+      priority: _mapCoverPriority(priority),
+    );
+    if (row == null) {
+      return null;
+    }
+    return Uint8List.fromList(row.thumbnail);
+  }, fallbackMessage: '生成图集封面失败');
 
   @override
   Future<ImageSetLibraryGates> getLibraryGates(String libraryId) => guardFrb(
@@ -355,4 +386,12 @@ class ImageSetRepositoryImpl implements ImageSetRepository {
         ),
         fallbackMessage: '托管布局接管失败',
       );
+}
+
+ThumbnailPriorityDto _mapCoverPriority(ThumbnailPriority priority) {
+  return switch (priority) {
+    ThumbnailPriority.critical => ThumbnailPriorityDto.critical,
+    ThumbnailPriority.high => ThumbnailPriorityDto.high,
+    ThumbnailPriority.low => ThumbnailPriorityDto.low,
+  };
 }

@@ -16,6 +16,7 @@ Follow ADR-0035/0041/0042/0045/0048/0049/0051/0052. New business types belong to
 | `home` | Library alert dismissal (domain values; JSON/persistence in infrastructure) |
 | `app_settings` | Settings persistence/schema; Reader prefs via ReadingPreferencesRecord ACL (ADR-0046) |
 | `comic_trash` / `metadata_backup` | Trash lifecycle and metadata backups |
+| `image_set_library` | Image set catalog, workspace, submissions, catalog cover ensure/find and session cover cache |
 
 Within a feature, import its own domain directly. Across features, use `public/**` only. Removed shared re-export shims are not compatibility surfaces.
 

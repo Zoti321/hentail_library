@@ -10,6 +10,7 @@ import 'package:hentai_library/features/image_set_library/domain/image_set_libra
 import 'package:hentai_library/features/image_set_library/domain/image_set_reader_session.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_repository.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_submission.dart';
+import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:test/test.dart';
 
@@ -75,6 +76,16 @@ class _Repo implements ImageSetRepository {
   @override
   Future<Uint8List> loadPageBytes(String libraryId, ImageSetImage image) =>
       throw UnimplementedError();
+
+  @override
+  Future<Uint8List?> findCover(String imageSetId) => throw UnimplementedError();
+
+  @override
+  Future<Uint8List?> ensureCover({
+    required String libraryId,
+    required String imageSetId,
+    required ThumbnailPriority priority,
+  }) => throw UnimplementedError();
 
   @override
   Future<ImageSetLibraryGates> getLibraryGates(String libraryId) =>

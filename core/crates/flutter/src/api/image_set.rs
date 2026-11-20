@@ -4,10 +4,11 @@ use hentai_core::{
     create_image_set_submission as core_create_submission,
     delete_image_set_images_on_disk as core_delete_images_on_disk,
     delete_image_set_submission as core_delete_submission,
-    fetch_image_sets_page as core_fetch_page, get_image_set_facets as core_get_facets,
+    ensure_image_set_cover as core_ensure_cover, fetch_image_sets_page as core_fetch_page,
+    find_image_set_cover as core_find_cover, get_image_set_facets as core_get_facets,
     get_image_set_library_gates as core_get_gates, list_image_set_images as core_list_images,
-    list_image_set_workspace_images as core_list_workspace_images,
-    list_image_set_submissions as core_list_submissions, list_image_sets as core_list_sets,
+    list_image_set_submissions as core_list_submissions,
+    list_image_set_workspace_images as core_list_workspace_images, list_image_sets as core_list_sets,
     load_image_set_page_bytes as core_load_image_set_page_bytes,
     open_image_set_reader as core_open_image_set_reader,
     remove_image_set_submission_members as core_remove_submission_members,
@@ -20,15 +21,19 @@ use hentai_core::{
     set_image_set_resource_mutation as core_set_resource_mutation,
     take_over_image_set_managed_layout as core_take_over_managed_layout,
     update_image_set_facets as core_update_facets, update_image_set_user_meta as core_update_meta,
-    ImageSetDto as CoreImageSet, ImageSetFacetsDto as CoreFacets,
-    ImageSetImageDto as CoreImageSetImage, ImageSetLibraryGatesDto as CoreGates,
-    ImageSetReaderSessionDto as CoreImageSetReaderSession, ImageSetSortFieldDto as CoreSortField,
-    ImageSetSubmissionDto as CoreSubmission, SetImageSetMetaLocksDto as CoreSetMetaLocks,
+    watch_image_set_cover_events as core_watch_cover_events, ImageSetCoverDto as CoreCover,
+    ImageSetCoverEvent as CoreCoverEvent, ImageSetDto as CoreImageSet,
+    ImageSetFacetsDto as CoreFacets, ImageSetImageDto as CoreImageSetImage,
+    ImageSetLibraryGatesDto as CoreGates, ImageSetReaderSessionDto as CoreImageSetReaderSession,
+    ImageSetSortFieldDto as CoreSortField, ImageSetSubmissionDto as CoreSubmission,
+    SetImageSetMetaLocksDto as CoreSetMetaLocks, ThumbnailPriority as CorePriority,
     UpdateImageSetFacetsDto as CoreUpdateFacets, UpdateImageSetUserMetaDto as CoreUpdateMeta,
 };
 
 use super::comic::PageRequestDto;
 use super::init::HentaiErrorDto;
+use super::stream_watch::{emit_or_closed, normalize_watch_result};
+use super::thumbnail::ThumbnailPriorityDto;
 
 #[derive(Debug, Clone)]
 pub struct ImageSetDto {
@@ -418,6 +423,96 @@ pub async fn load_image_set_page_bytes_frb(
     core_load_image_set_page_bytes(&library_id, &core_image)
         .await
         .map_err(HentaiErrorDto::from)
+}
+
+#[derive(Debug, Clone)]
+pub struct ImageSetCoverDto {
+    pub thumbnail: Vec<u8>,
+    pub source_image_set_image_id: String,
+    pub source_modified_ms: i64,
+    pub source_size: i64,
+}
+
+impl From<CoreCover> for ImageSetCoverDto {
+    fn from(value: CoreCover) -> Self {
+        Self {
+            thumbnail: value.thumbnail,
+            source_image_set_image_id: value.source_image_set_image_id,
+            source_modified_ms: value.source_modified_ms,
+            source_size: value.source_size,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub enum ImageSetCoverEventDto {
+    Ready {
+        image_set_id: String,
+        thumbnail: Option<Vec<u8>>,
+    },
+    Progress {
+        done: i32,
+        total: i32,
+        failed: i32,
+    },
+}
+
+fn map_cover_priority(priority: ThumbnailPriorityDto) -> CorePriority {
+    match priority {
+        ThumbnailPriorityDto::Critical => CorePriority::Critical,
+        ThumbnailPriorityDto::High => CorePriority::High,
+        ThumbnailPriorityDto::Low => CorePriority::Low,
+    }
+}
+
+fn map_cover_event(event: CoreCoverEvent) -> ImageSetCoverEventDto {
+    match event {
+        CoreCoverEvent::Ready {
+            image_set_id,
+            thumbnail,
+        } => ImageSetCoverEventDto::Ready {
+            image_set_id,
+            thumbnail,
+        },
+        CoreCoverEvent::Progress {
+            done,
+            total,
+            failed,
+        } => ImageSetCoverEventDto::Progress {
+            done,
+            total,
+            failed,
+        },
+    }
+}
+
+/// Catalog cover JPEG (≤512); `None` when missing / still queued (non-critical).
+pub async fn find_image_set_cover_frb(
+    image_set_id: String,
+) -> Result<Option<ImageSetCoverDto>, HentaiErrorDto> {
+    core_find_cover(&image_set_id)
+        .await
+        .map(|opt| opt.map(ImageSetCoverDto::from))
+        .map_err(HentaiErrorDto::from)
+}
+
+pub async fn ensure_image_set_cover_frb(
+    library_id: String,
+    image_set_id: String,
+    priority: ThumbnailPriorityDto,
+) -> Result<Option<ImageSetCoverDto>, HentaiErrorDto> {
+    core_ensure_cover(&library_id, &image_set_id, map_cover_priority(priority))
+        .await
+        .map(|opt| opt.map(ImageSetCoverDto::from))
+        .map_err(HentaiErrorDto::from)
+}
+
+pub async fn watch_image_set_cover_events_frb(
+    sink: crate::frb_generated::StreamSink<ImageSetCoverEventDto>,
+) -> Result<(), HentaiErrorDto> {
+    normalize_watch_result(
+        core_watch_cover_events(|event| emit_or_closed(&sink, map_cover_event(event))).await,
+    )
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

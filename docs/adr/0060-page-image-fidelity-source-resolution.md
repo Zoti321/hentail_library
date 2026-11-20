@@ -12,8 +12,10 @@ GLOSSARY **Page image fidelity** previously locked Read session GPU sampling at 
 
 - Decode Read session page images without viewport `cacheWidth` (or equivalent decode-size caps) on the page render and prefetch paths.
 - Keep page-image GPU sampling fixed at `FilterQuality.high`; do not change quality for scroll/idle, and do not sharpen/beautify.
-- Catalog covers and detail thumbnails keep their own `FilterQuality.high` + display-sized `cacheWidth` policy; they are not governed by this ADR’s decode rule.
+- Catalog covers and detail thumbnails keep their own policy; they are not governed by this ADR’s decode rule.
 - Document the accepted oversized-bitmap risk in GLOSSARY and track a safety valve in #591; do not ship a user-facing quality preference in this decision.
+
+> **实现修订（2026-11-20）**：Catalog covers/thumbnails ship as pre-scaled JPEG (long edge ≤512) with `FilterQuality.medium` and **no** viewport `cacheWidth` (`kCatalogImageFilterQuality`, letterboxed card covers). The historical “high + display-sized `cacheWidth`” wording above is obsolete for catalog surfaces; Read session fidelity bullets are unchanged.
 
 ## Consequences
 

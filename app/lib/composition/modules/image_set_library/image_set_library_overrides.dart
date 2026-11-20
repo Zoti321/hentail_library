@@ -29,6 +29,7 @@ import 'package:hentai_library/shared/presentation/providers/domain_event_bus_pr
 import 'package:hentai_library/features/image_set_library/infrastructure/repositories/image_set_browse_preferences_repository_impl.dart';
 import 'package:hentai_library/features/image_set_library/infrastructure/repositories/image_set_repository_impl.dart';
 import 'package:hentai_library/features/image_set_library/presentation/providers/image_set_browse_providers.dart';
+import 'package:hentai_library/features/image_set_library/presentation/providers/image_set_cover_providers.dart';
 import 'package:hentai_library/features/image_set_library/presentation/providers/image_set_library_providers.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:hentai_library/shared/presentation/providers/app_navigator_provider.dart';
@@ -132,8 +133,44 @@ List<Override> imageSetLibraryOverrides() {
     imageSetWorkspaceImagesQueryProvider.overrideWithValue(
       loadWorkspaceImages.call,
     ),
-    imageSetSetImagesExcludedCommandProvider.overrideWithValue(setExcluded.call),
-    imageSetReorderImagesCommandProvider.overrideWithValue(reorderImages.call),
+    imageSetSetImagesExcludedCommandProvider.overrideWith((Ref ref) {
+      return (
+        String libraryId,
+        String imageSetId,
+        List<String> imageIds, {
+        required bool excluded,
+      }) async {
+        await setExcluded.call(
+          libraryId,
+          imageSetId,
+          imageIds,
+          excluded: excluded,
+        );
+        ref
+            .read(imageSetCoverThumbnailCacheProvider(imageSetId).notifier)
+            .clear();
+        ref.invalidate(
+          imageSetCoverBytesProvider((
+            libraryId: libraryId,
+            imageSetId: imageSetId,
+          )),
+        );
+      };
+    }),
+    imageSetReorderImagesCommandProvider.overrideWith((Ref ref) {
+      return (String libraryId, String imageSetId, List<String> orderedIds) async {
+        await reorderImages.call(libraryId, imageSetId, orderedIds);
+        ref
+            .read(imageSetCoverThumbnailCacheProvider(imageSetId).notifier)
+            .clear();
+        ref.invalidate(
+          imageSetCoverBytesProvider((
+            libraryId: libraryId,
+            imageSetId: imageSetId,
+          )),
+        );
+      };
+    }),
     imageSetSubmissionsQueryProvider.overrideWithValue(loadSubmissions.call),
     imageSetCreateSubmissionCommandProvider.overrideWithValue(
       createSubmission.call,
@@ -162,6 +199,12 @@ List<Override> imageSetLibraryOverrides() {
     ),
     imageSetReaderSessionQueryProvider.overrideWithValue(openReader.call),
     imageSetPageBytesQueryProvider.overrideWithValue(loadBytes.call),
+    imageSetEnsureCoverQueryProvider.overrideWithValue(
+      bindImageSetEnsureCover(repository),
+    ),
+    imageSetFindCoverQueryProvider.overrideWithValue(
+      bindImageSetFindCover(repository),
+    ),
     imageSetReaderEntryCommandProvider.overrideWith(
       (Ref ref) => (ImageSetReaderEntry entry) {
         final String imageId = entry.imageSetImageId.trim();

@@ -34,36 +34,46 @@ pub async fn thumbnail_needs_generation(
     else {
         return Ok(false);
     };
-    let cached = ComicThumbnails::find_by_id(comic.comic_id.clone())
-        .one(db)
-        .await
-        .map_err(|e| map_db_err(&e))?;
-    let Some(cached) = cached else {
+    // Fingerprint / user-set check only — never load the thumbnail BLOB.
+    use sea_orm::QuerySelect;
+    let cached: Option<(bool, Option<i64>, Option<i64>)> =
+        ComicThumbnails::find_by_id(comic.comic_id.clone())
+            .select_only()
+            .column(comic_thumbnails::Column::IsUserSet)
+            .column(comic_thumbnails::Column::SourceModifiedMs)
+            .column(comic_thumbnails::Column::SourceSize)
+            .into_tuple()
+            .one(db)
+            .await
+            .map_err(|e| map_db_err(&e))?;
+    let Some((is_user_set, source_modified_ms, source_size)) = cached else {
         return Ok(true);
     };
-    if cached.is_user_set {
+    if is_user_set {
         return Ok(false);
     }
-    Ok(cached.source_modified_ms != Some(modified_ms) || cached.source_size != Some(size))
+    Ok(source_modified_ms != Some(modified_ms) || source_size != Some(size))
 }
 
+/// Stores a generated catalog JPEG. On success returns the written bytes (command projection).
 pub async fn store_thumbnail_for_comic(
     db: &DatabaseConnection,
     comic: &ComicDto,
-) -> Result<bool, HentaiError> {
+) -> Result<Option<Vec<u8>>, HentaiError> {
     let resolved = resolve_access_for_comic(comic)?;
     store_thumbnail_for_comic_with(db, resolved.as_dyn(), comic).await
 }
 
+/// Stores a generated catalog JPEG. On success returns the written bytes (command projection).
 pub async fn store_thumbnail_for_comic_with(
     db: &DatabaseConnection,
     access: &dyn ResourceAccess,
     comic: &ComicDto,
-) -> Result<bool, HentaiError> {
+) -> Result<Option<Vec<u8>>, HentaiError> {
     let Some((modified_ms, size)) =
         read_source_stat_with(access, &comic.path, &comic.resource_type)?
     else {
-        return Ok(false);
+        return Ok(None);
     };
     let path = comic.path.clone();
     let resource_type = comic.resource_type.clone();
@@ -71,14 +81,14 @@ pub async fn store_thumbnail_for_comic_with(
     // or use local path helper when Local (resolved already used above for stat).
     let jpeg = generate_thumbnail_jpeg_with(access, &path, &resource_type)?;
     let Some(jpeg) = jpeg else {
-        return Ok(false);
+        return Ok(None);
     };
     let now = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
         .map_or(0, |d| crate::util::milliseconds_to_i64(d.as_millis()));
     let active = comic_thumbnails::ActiveModel {
         comic_id: Set(comic.comic_id.clone()),
-        thumbnail: Set(jpeg),
+        thumbnail: Set(jpeg.clone()),
         updated_at: Set(now),
         source_modified_ms: Set(Some(modified_ms)),
         source_size: Set(Some(size)),
@@ -100,7 +110,7 @@ pub async fn store_thumbnail_for_comic_with(
         .exec(db)
         .await
         .map_err(|e| map_db_err(&e))?;
-    Ok(true)
+    Ok(Some(jpeg))
 }
 
 pub fn generate_thumbnail_jpeg(

@@ -265,8 +265,8 @@ pub async fn generate_thumbnails(
         }
         on_progress(done, total, Some(comic.path.clone()));
         match store_thumbnail_for_comic(db, comic).await {
-            Ok(true) => {}
-            Ok(false) | Err(_) => failed += 1,
+            Ok(Some(_)) => {}
+            Ok(None) | Err(_) => failed += 1,
         }
         done += 1;
         on_progress(done, total, Some(comic.path.clone()));

@@ -8,6 +8,7 @@ import 'package:hentai_library/features/image_set_library/domain/image_set_image
 import 'package:hentai_library/features/image_set_library/domain/image_set_library_gates.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_reader_session.dart';
 import 'package:hentai_library/features/image_set_library/domain/image_set_submission.dart';
+import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 
 /// Image set catalog + workspace write contracts（owner：`image_set_library`）。
@@ -53,6 +54,16 @@ abstract interface class ImageSetRepository {
 
   /// 按 catalog 载体读取单页原始字节。
   Future<Uint8List> loadPageBytes(String libraryId, ImageSetImage image);
+
+  /// Catalog cover JPEG (≤512); null when missing.
+  Future<Uint8List?> findCover(String imageSetId);
+
+  /// Ensure catalog cover; may return null while queued (non-critical).
+  Future<Uint8List?> ensureCover({
+    required String libraryId,
+    required String imageSetId,
+    required ThumbnailPriority priority,
+  });
 
   Future<ImageSetLibraryGates> getLibraryGates(String libraryId);
 

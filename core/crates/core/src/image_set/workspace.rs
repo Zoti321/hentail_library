@@ -44,6 +44,8 @@ pub async fn set_image_set_images_excluded(
             .await
             .map_err(|e| map_db_err(&e))?;
         txn.commit().await.map_err(|e| map_db_err(&e))?;
+        // Exclude can change the default workspace first image (catalog cover source).
+        let _ = super::cover::invalidate_image_set_cover(image_set_id).await;
         crate::revision::notify_committed();
         Ok(())
     })
@@ -77,6 +79,8 @@ pub async fn reorder_image_set_images(
             active.update(&txn).await.map_err(|e| map_db_err(&e))?;
         }
         txn.commit().await.map_err(|e| map_db_err(&e))?;
+        // Reorder can change the default workspace first image (catalog cover source).
+        let _ = super::cover::invalidate_image_set_cover(image_set_id).await;
         crate::revision::notify_committed();
         Ok(())
     })

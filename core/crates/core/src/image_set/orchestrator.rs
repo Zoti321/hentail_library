@@ -76,13 +76,28 @@ pub(crate) async fn sync_image_set_library(
     txn.commit().await.map_err(|e| map_db_err(&e))?;
     crate::revision::notify_committed();
 
+    let cover_targets = super::cover::list_image_set_cover_targets(library_id).await?;
+    let thumbnail_total = crate::util::usize_to_i32(cover_targets.len());
+    if !cover_targets.is_empty() {
+        let jobs = cover_targets
+            .into_iter()
+            .map(|image_set_id| (library_id.to_string(), image_set_id))
+            .collect();
+        let _ = super::cover::enqueue_image_set_covers_low(jobs).await;
+    }
+
     tracing::info!(
         added = plan.images_insert.len(),
         removed = plan.images_delete.len(),
         warnings = plan.warnings.len(),
+        thumbnail_total,
         "image set sync write complete"
     );
-    Ok(Some(success_progress(&plan)))
+    let mut done = success_progress(&plan);
+    done.thumbnail_total = Some(thumbnail_total);
+    done.thumbnail_done = Some(0);
+    done.thumbnail_failed_count = Some(0);
+    Ok(Some(done))
 }
 
 async fn load_prior(

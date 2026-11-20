@@ -81,6 +81,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   RustStreamSink<int> dco_decode_StreamSink_i_32_Sse(dynamic raw);
 
   @protected
+  RustStreamSink<ImageSetCoverEventDto>
+  dco_decode_StreamSink_image_set_cover_event_dto_Sse(dynamic raw);
+
+  @protected
   RustStreamSink<List<AuthorIdentityFrbDto>>
   dco_decode_StreamSink_list_author_identity_frb_dto_Sse(dynamic raw);
 
@@ -196,6 +200,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ImageSetCarrierShapeDto dco_decode_box_autoadd_image_set_carrier_shape_dto(
     dynamic raw,
   );
+
+  @protected
+  ImageSetCoverDto dco_decode_box_autoadd_image_set_cover_dto(dynamic raw);
 
   @protected
   ImageSetFilterDto dco_decode_box_autoadd_image_set_filter_dto(dynamic raw);
@@ -362,6 +369,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ImageSetCatalogItemDto dco_decode_image_set_catalog_item_dto(dynamic raw);
+
+  @protected
+  ImageSetCoverDto dco_decode_image_set_cover_dto(dynamic raw);
+
+  @protected
+  ImageSetCoverEventDto dco_decode_image_set_cover_event_dto(dynamic raw);
 
   @protected
   ImageSetDto dco_decode_image_set_dto(dynamic raw);
@@ -610,6 +623,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   ImageSetCarrierShapeDto?
   dco_decode_opt_box_autoadd_image_set_carrier_shape_dto(dynamic raw);
+
+  @protected
+  ImageSetCoverDto? dco_decode_opt_box_autoadd_image_set_cover_dto(dynamic raw);
 
   @protected
   MatchTierDto? dco_decode_opt_box_autoadd_match_tier_dto(dynamic raw);
@@ -901,6 +917,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  RustStreamSink<ImageSetCoverEventDto>
+  sse_decode_StreamSink_image_set_cover_event_dto_Sse(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   RustStreamSink<List<AuthorIdentityFrbDto>>
   sse_decode_StreamSink_list_author_identity_frb_dto_Sse(
     SseDeserializer deserializer,
@@ -1060,6 +1082,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ImageSetCarrierShapeDto sse_decode_box_autoadd_image_set_carrier_shape_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  ImageSetCoverDto sse_decode_box_autoadd_image_set_cover_dto(
     SseDeserializer deserializer,
   );
 
@@ -1276,6 +1303,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ImageSetCatalogItemDto sse_decode_image_set_catalog_item_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  ImageSetCoverDto sse_decode_image_set_cover_dto(SseDeserializer deserializer);
+
+  @protected
+  ImageSetCoverEventDto sse_decode_image_set_cover_event_dto(
     SseDeserializer deserializer,
   );
 
@@ -1586,6 +1621,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   ImageSetCarrierShapeDto?
   sse_decode_opt_box_autoadd_image_set_carrier_shape_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  ImageSetCoverDto? sse_decode_opt_box_autoadd_image_set_cover_dto(
     SseDeserializer deserializer,
   );
 
@@ -1964,6 +2004,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_StreamSink_image_set_cover_event_dto_Sse(
+    RustStreamSink<ImageSetCoverEventDto> self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_StreamSink_list_author_identity_frb_dto_Sse(
     RustStreamSink<List<AuthorIdentityFrbDto>> self,
     SseSerializer serializer,
@@ -2152,6 +2198,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_box_autoadd_image_set_carrier_shape_dto(
     ImageSetCarrierShapeDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_box_autoadd_image_set_cover_dto(
+    ImageSetCoverDto self,
     SseSerializer serializer,
   );
 
@@ -2419,6 +2471,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_image_set_catalog_item_dto(
     ImageSetCatalogItemDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_image_set_cover_dto(
+    ImageSetCoverDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_image_set_cover_event_dto(
+    ImageSetCoverEventDto self,
     SseSerializer serializer,
   );
 
@@ -2812,6 +2876,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_opt_box_autoadd_image_set_carrier_shape_dto(
     ImageSetCarrierShapeDto? self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_opt_box_autoadd_image_set_cover_dto(
+    ImageSetCoverDto? self,
     SseSerializer serializer,
   );
 
