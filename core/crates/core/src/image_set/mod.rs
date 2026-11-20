@@ -13,6 +13,8 @@ mod meta;
 mod orchestrator;
 mod plan;
 mod query;
+mod mutation;
+mod submissions;
 mod workspace;
 mod writer;
 
@@ -31,6 +33,12 @@ pub use meta::{
     update_image_set_user_meta, ImageSetFacetsDto, SetImageSetMetaLocksDto,
     UpdateImageSetFacetsDto, UpdateImageSetUserMetaDto,
 };
+pub use mutation::{copy_images_into_image_set, delete_image_set_images_on_disk};
 pub(crate) use orchestrator::sync_image_set_library;
 pub use query::fetch_image_sets_page;
+pub use submissions::{
+    add_image_set_submission_members, create_image_set_submission, delete_image_set_submission,
+    list_image_set_submissions, remove_image_set_submission_members, rename_image_set_submission,
+    reorder_image_set_submission_members, ImageSetSubmissionDto,
+};
 pub use workspace::{reorder_image_set_images, set_image_set_images_excluded};

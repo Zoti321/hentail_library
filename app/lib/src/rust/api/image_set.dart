@@ -12,7 +12,7 @@ import 'init.dart';
 
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`
 
 Future<List<ImageSetDto>> listImageSetsFrb({required String libraryId}) =>
     RustLib.instance.api.crateApiImageSetListImageSetsFrb(libraryId: libraryId);
@@ -133,6 +133,94 @@ Future<void> reorderImageSetImagesFrb({
   libraryId: libraryId,
   imageSetId: imageSetId,
   orderedIds: orderedIds,
+);
+
+Future<List<ImageSetSubmissionDto>> listImageSetSubmissionsFrb({
+  required String libraryId,
+  required String imageSetId,
+}) => RustLib.instance.api.crateApiImageSetListImageSetSubmissionsFrb(
+  libraryId: libraryId,
+  imageSetId: imageSetId,
+);
+
+Future<ImageSetSubmissionDto> createImageSetSubmissionFrb({
+  required String libraryId,
+  required String imageSetId,
+  required String name,
+}) => RustLib.instance.api.crateApiImageSetCreateImageSetSubmissionFrb(
+  libraryId: libraryId,
+  imageSetId: imageSetId,
+  name: name,
+);
+
+Future<void> renameImageSetSubmissionFrb({
+  required String libraryId,
+  required String submissionId,
+  required String name,
+}) => RustLib.instance.api.crateApiImageSetRenameImageSetSubmissionFrb(
+  libraryId: libraryId,
+  submissionId: submissionId,
+  name: name,
+);
+
+Future<void> deleteImageSetSubmissionFrb({
+  required String libraryId,
+  required String submissionId,
+}) => RustLib.instance.api.crateApiImageSetDeleteImageSetSubmissionFrb(
+  libraryId: libraryId,
+  submissionId: submissionId,
+);
+
+Future<void> addImageSetSubmissionMembersFrb({
+  required String libraryId,
+  required String submissionId,
+  required List<String> imageIds,
+}) => RustLib.instance.api.crateApiImageSetAddImageSetSubmissionMembersFrb(
+  libraryId: libraryId,
+  submissionId: submissionId,
+  imageIds: imageIds,
+);
+
+Future<void> removeImageSetSubmissionMembersFrb({
+  required String libraryId,
+  required String submissionId,
+  required List<String> imageIds,
+}) => RustLib.instance.api.crateApiImageSetRemoveImageSetSubmissionMembersFrb(
+  libraryId: libraryId,
+  submissionId: submissionId,
+  imageIds: imageIds,
+);
+
+Future<void> reorderImageSetSubmissionMembersFrb({
+  required String libraryId,
+  required String submissionId,
+  required List<String> orderedIds,
+}) => RustLib.instance.api.crateApiImageSetReorderImageSetSubmissionMembersFrb(
+  libraryId: libraryId,
+  submissionId: submissionId,
+  orderedIds: orderedIds,
+);
+
+/// Copy local image files into a directory Image set (requires resource mutation).
+Future<List<ImageSetImageDto>> copyImagesIntoImageSetFrb({
+  required String libraryId,
+  required String imageSetId,
+  required List<String> sourcePaths,
+}) => RustLib.instance.api.crateApiImageSetCopyImagesIntoImageSetFrb(
+  libraryId: libraryId,
+  imageSetId: imageSetId,
+  sourcePaths: sourcePaths,
+);
+
+/// Delete loose Image set image files on disk and catalog rows (requires resource mutation).
+Future<void> deleteImageSetImagesOnDiskFrb({
+  required String libraryId,
+  required String imageSetId,
+  required List<String> imageIds,
+}) => RustLib.instance.api.crateApiImageSetDeleteImageSetImagesOnDiskFrb(
+  libraryId: libraryId,
+  imageSetId: imageSetId,
+  imageIds: imageIds,
 );
 
 class ImageSetAuthorGroupDto {
@@ -451,6 +539,41 @@ class ImageSetSortOptionDto {
           runtimeType == other.runtimeType &&
           field == other.field &&
           descending == other.descending;
+}
+
+class ImageSetSubmissionDto {
+  final String submissionId;
+  final String libraryId;
+  final String imageSetId;
+  final String name;
+  final List<String> memberImageIds;
+
+  const ImageSetSubmissionDto({
+    required this.submissionId,
+    required this.libraryId,
+    required this.imageSetId,
+    required this.name,
+    required this.memberImageIds,
+  });
+
+  @override
+  int get hashCode =>
+      submissionId.hashCode ^
+      libraryId.hashCode ^
+      imageSetId.hashCode ^
+      name.hashCode ^
+      memberImageIds.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ImageSetSubmissionDto &&
+          runtimeType == other.runtimeType &&
+          submissionId == other.submissionId &&
+          libraryId == other.libraryId &&
+          imageSetId == other.imageSetId &&
+          name == other.name &&
+          memberImageIds == other.memberImageIds;
 }
 
 class PagedImageSetCatalogDto {

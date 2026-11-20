@@ -20,3 +20,15 @@ pub fn image_set_image_id(
         "image_set_image:{library_id}:{carrier_relative_path}:{member_path}"
     ))
 }
+
+/// Opaque submission id (name may change; millis avoids collide on recreate).
+pub fn image_set_submission_id(
+    library_id: &str,
+    image_set_id: &str,
+    name: &str,
+    millis: i64,
+) -> String {
+    sha1_hex(&format!(
+        "image_set_submission:{library_id}:{image_set_id}:{millis}:{name}"
+    ))
+}

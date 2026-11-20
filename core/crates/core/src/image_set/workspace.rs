@@ -110,7 +110,7 @@ fn validate_full_permutation(
     Ok(())
 }
 
-async fn require_set<C: ConnectionTrait>(
+pub(crate) async fn require_set<C: ConnectionTrait>(
     db: &C,
     library_id: &str,
     image_set_id: &str,
@@ -126,7 +126,7 @@ async fn require_set<C: ConnectionTrait>(
     Ok(set)
 }
 
-async fn load_set_images<C: ConnectionTrait>(
+pub(crate) async fn load_set_images<C: ConnectionTrait>(
     db: &C,
     library_id: &str,
     image_set_id: &str,

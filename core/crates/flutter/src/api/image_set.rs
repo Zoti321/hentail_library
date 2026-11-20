@@ -1,9 +1,18 @@
 use hentai_core::{
+    add_image_set_submission_members as core_add_submission_members,
+    copy_images_into_image_set as core_copy_images,
+    create_image_set_submission as core_create_submission,
+    delete_image_set_images_on_disk as core_delete_images_on_disk,
+    delete_image_set_submission as core_delete_submission,
     fetch_image_sets_page as core_fetch_page, get_image_set_facets as core_get_facets,
     get_image_set_library_gates as core_get_gates, list_image_set_images as core_list_images,
-    list_image_sets as core_list_sets, load_image_set_page_bytes as core_load_image_set_page_bytes,
+    list_image_set_submissions as core_list_submissions, list_image_sets as core_list_sets,
+    load_image_set_page_bytes as core_load_image_set_page_bytes,
     open_image_set_reader as core_open_image_set_reader,
+    remove_image_set_submission_members as core_remove_submission_members,
+    rename_image_set_submission as core_rename_submission,
     reorder_image_set_images as core_reorder_images,
+    reorder_image_set_submission_members as core_reorder_submission_members,
     set_image_set_images_excluded as core_set_excluded,
     set_image_set_managed_layout as core_set_managed_layout,
     set_image_set_meta_locks as core_set_meta_locks,
@@ -12,8 +21,8 @@ use hentai_core::{
     ImageSetDto as CoreImageSet, ImageSetFacetsDto as CoreFacets,
     ImageSetImageDto as CoreImageSetImage, ImageSetLibraryGatesDto as CoreGates,
     ImageSetReaderSessionDto as CoreImageSetReaderSession, ImageSetSortFieldDto as CoreSortField,
-    SetImageSetMetaLocksDto as CoreSetMetaLocks, UpdateImageSetFacetsDto as CoreUpdateFacets,
-    UpdateImageSetUserMetaDto as CoreUpdateMeta,
+    ImageSetSubmissionDto as CoreSubmission, SetImageSetMetaLocksDto as CoreSetMetaLocks,
+    UpdateImageSetFacetsDto as CoreUpdateFacets, UpdateImageSetUserMetaDto as CoreUpdateMeta,
 };
 
 use super::comic::PageRequestDto;
@@ -450,6 +459,120 @@ pub async fn reorder_image_set_images_frb(
     ordered_ids: Vec<String>,
 ) -> Result<(), HentaiErrorDto> {
     core_reorder_images(&library_id, &image_set_id, &ordered_ids)
+        .await
+        .map_err(HentaiErrorDto::from)
+}
+
+#[derive(Debug, Clone)]
+pub struct ImageSetSubmissionDto {
+    pub submission_id: String,
+    pub library_id: String,
+    pub image_set_id: String,
+    pub name: String,
+    pub member_image_ids: Vec<String>,
+}
+
+impl From<CoreSubmission> for ImageSetSubmissionDto {
+    fn from(value: CoreSubmission) -> Self {
+        Self {
+            submission_id: value.submission_id,
+            library_id: value.library_id,
+            image_set_id: value.image_set_id,
+            name: value.name,
+            member_image_ids: value.member_image_ids,
+        }
+    }
+}
+
+pub async fn list_image_set_submissions_frb(
+    library_id: String,
+    image_set_id: String,
+) -> Result<Vec<ImageSetSubmissionDto>, HentaiErrorDto> {
+    core_list_submissions(&library_id, &image_set_id)
+        .await
+        .map(|rows| rows.into_iter().map(ImageSetSubmissionDto::from).collect())
+        .map_err(HentaiErrorDto::from)
+}
+
+pub async fn create_image_set_submission_frb(
+    library_id: String,
+    image_set_id: String,
+    name: String,
+) -> Result<ImageSetSubmissionDto, HentaiErrorDto> {
+    core_create_submission(&library_id, &image_set_id, &name)
+        .await
+        .map(ImageSetSubmissionDto::from)
+        .map_err(HentaiErrorDto::from)
+}
+
+pub async fn rename_image_set_submission_frb(
+    library_id: String,
+    submission_id: String,
+    name: String,
+) -> Result<(), HentaiErrorDto> {
+    core_rename_submission(&library_id, &submission_id, &name)
+        .await
+        .map_err(HentaiErrorDto::from)
+}
+
+pub async fn delete_image_set_submission_frb(
+    library_id: String,
+    submission_id: String,
+) -> Result<(), HentaiErrorDto> {
+    core_delete_submission(&library_id, &submission_id)
+        .await
+        .map_err(HentaiErrorDto::from)
+}
+
+pub async fn add_image_set_submission_members_frb(
+    library_id: String,
+    submission_id: String,
+    image_ids: Vec<String>,
+) -> Result<(), HentaiErrorDto> {
+    core_add_submission_members(&library_id, &submission_id, &image_ids)
+        .await
+        .map_err(HentaiErrorDto::from)
+}
+
+pub async fn remove_image_set_submission_members_frb(
+    library_id: String,
+    submission_id: String,
+    image_ids: Vec<String>,
+) -> Result<(), HentaiErrorDto> {
+    core_remove_submission_members(&library_id, &submission_id, &image_ids)
+        .await
+        .map_err(HentaiErrorDto::from)
+}
+
+pub async fn reorder_image_set_submission_members_frb(
+    library_id: String,
+    submission_id: String,
+    ordered_ids: Vec<String>,
+) -> Result<(), HentaiErrorDto> {
+    core_reorder_submission_members(&library_id, &submission_id, &ordered_ids)
+        .await
+        .map_err(HentaiErrorDto::from)
+}
+
+/// Copy local image files into a directory Image set (requires resource mutation).
+pub async fn copy_images_into_image_set_frb(
+    library_id: String,
+    image_set_id: String,
+    source_paths: Vec<String>,
+) -> Result<Vec<ImageSetImageDto>, HentaiErrorDto> {
+    core_copy_images(&library_id, &image_set_id, &source_paths)
+        .await
+        .map(|rows| rows.into_iter().map(ImageSetImageDto::from).collect())
+        .map_err(HentaiErrorDto::from)
+}
+
+/// Delete loose Image set image files on disk and catalog rows (requires resource mutation).
+pub async fn delete_image_set_images_on_disk_frb(
+    library_id: String,
+    image_set_id: String,
+    image_ids: Vec<String>,
+) -> Result<(), HentaiErrorDto> {
+    core_delete_images_on_disk(&library_id, &image_set_id, &image_ids)
         .await
         .map_err(HentaiErrorDto::from)
 }

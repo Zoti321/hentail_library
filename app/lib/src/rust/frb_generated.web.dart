@@ -391,6 +391,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ImageSetSortOptionDto dco_decode_image_set_sort_option_dto(dynamic raw);
 
   @protected
+  ImageSetSubmissionDto dco_decode_image_set_submission_dto(dynamic raw);
+
+  @protected
   ImportComicMetadataResultDto dco_decode_import_comic_metadata_result_dto(
     dynamic raw,
   );
@@ -468,6 +471,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<ImageSetImageDto> dco_decode_list_image_set_image_dto(dynamic raw);
+
+  @protected
+  List<ImageSetSubmissionDto> dco_decode_list_image_set_submission_dto(
+    dynamic raw,
+  );
 
   @protected
   List<LibraryDto> dco_decode_list_library_dto(dynamic raw);
@@ -1306,6 +1314,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  ImageSetSubmissionDto sse_decode_image_set_submission_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   ImportComicMetadataResultDto sse_decode_import_comic_metadata_result_dto(
     SseDeserializer deserializer,
   );
@@ -1399,6 +1412,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<ImageSetImageDto> sse_decode_list_image_set_image_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  List<ImageSetSubmissionDto> sse_decode_list_image_set_submission_dto(
     SseDeserializer deserializer,
   );
 
@@ -2441,6 +2459,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_image_set_submission_dto(
+    ImageSetSubmissionDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_import_comic_metadata_result_dto(
     ImportComicMetadataResultDto self,
     SseSerializer serializer,
@@ -2554,6 +2578,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_image_set_image_dto(
     List<ImageSetImageDto> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_image_set_submission_dto(
+    List<ImageSetSubmissionDto> self,
     SseSerializer serializer,
   );
 
