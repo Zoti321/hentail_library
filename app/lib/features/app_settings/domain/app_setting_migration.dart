@@ -1,3 +1,4 @@
+import 'package:hentai_library/features/app_settings/domain/app_setting_defaults.dart';
 import 'package:hentai_library/features/app_settings/domain/reading_preferences_schema.dart';
 
 /// Normalizes legacy `settings.json` / aggregate JSON into [AppSetting] shape.
@@ -30,18 +31,31 @@ Map<String, dynamic> migrateAppSettingJson(Map<String, dynamic> json) {
   migrated.remove('autoScan');
   migrated.remove('enabledFormatGroups');
   migrated.remove('libraryCatalogSortFlipEnabled');
-  migrated.putIfAbsent('useDynamicColor', () => false);
-  migrated.putIfAbsent('colorSchemePreference', () => 'brand');
+  migrated.putIfAbsent(
+    'useDynamicColor',
+    () => AppSettingDefaults.useDynamicColor,
+  );
+  migrated.putIfAbsent(
+    'colorSchemePreference',
+    () => AppSettingDefaults.colorSchemePreferenceJsonId,
+  );
   migrated.putIfAbsent('preferLibraryRootSeries', () => true);
-  migrated.putIfAbsent('fontPreference', () => 'notoSans');
-  migrated.putIfAbsent('defaultLibraryDisplayTarget', () => 'comics');
+  migrated.putIfAbsent(
+    'fontPreference',
+    () => AppSettingDefaults.fontPreferenceJsonId,
+  );
+  migrated.putIfAbsent(
+    'defaultLibraryDisplayTarget',
+    () => AppSettingDefaults.defaultLibraryDisplayTargetJsonId,
+  );
   // 设置项仅保留 miSans / notoSans；旧 SC/JP 选项并入 Noto Sans。
   final Object? rawFont = migrated['fontPreference'];
   if (rawFont == 'notoSansSc' || rawFont == 'notoSansJp') {
-    migrated['fontPreference'] = 'notoSans';
+    migrated['fontPreference'] = AppSettingDefaults.fontPreferenceJsonId;
   }
-  if (migrated['version'] is int && (migrated['version'] as int) < 6) {
-    migrated['version'] = 6;
+  if (migrated['version'] is int &&
+      (migrated['version'] as int) < AppSettingDefaults.schemaVersion) {
+    migrated['version'] = AppSettingDefaults.schemaVersion;
   }
   return migrated;
 }

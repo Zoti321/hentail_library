@@ -7,14 +7,12 @@ import 'package:hentai_library/features/app_settings/presentation/patterns/setti
 import 'package:material_symbols_icons/symbols.dart';
 
 /// 生产或 Lab 注入某分类的 section 列表（每项为 [SettingsSection] 等组件）。
-typedef SettingsSectionsBuilder = List<Widget> Function(
-  BuildContext context,
-  SettingsCategory category,
-);
+typedef SettingsSectionsBuilder =
+    List<Widget> Function(BuildContext context, SettingsCategory category);
 
 /// Detail pane for one [SettingsCategory].
 ///
-/// 未提供 [sectionsBuilder] 时使用 Lab 的 mock 内容（[labState] 驱动）。
+/// 未提供 [sectionsBuilder] 时使用 Lab mock（仅 reading / metadataBackup 有内容）。
 class SettingsDetailPane extends StatelessWidget {
   const SettingsDetailPane({
     super.key,
@@ -43,13 +41,13 @@ class SettingsDetailPane extends StatelessWidget {
     final SettingsCategoryInfo info = settingsCategoryInfo(category);
     final List<Widget> sections =
         sectionsBuilder?.call(context, category) ??
-        _sectionsForCategory(
+        labMockSectionsForCategory(
           context,
           category,
-          labState,
-          onLabStateChanged ?? (SettingsLabState _) {},
-          optionLabels,
-          showUnwiredTiles,
+          labState: labState,
+          onLabStateChanged: onLabStateChanged ?? (SettingsLabState _) {},
+          optionLabels: optionLabels,
+          showUnwiredTiles: showUnwiredTiles,
         );
     final Widget body = SettingsList(
       maxWidth: SettingsPageMetrics.detailListMaxWidth,
@@ -74,91 +72,18 @@ class SettingsDetailPane extends StatelessWidget {
   }
 }
 
-List<Widget> _sectionsForCategory(
+/// In-memory Lab mocks for categories that are not yet faked via [settingsProvider].
+List<Widget> labMockSectionsForCategory(
   BuildContext context,
-  SettingsCategory category,
-  SettingsLabState labState,
-  ValueChanged<SettingsLabState> onChanged,
-  SettingsOptionLabels optionLabels,
-  bool showUnwiredTiles,
-) {
+  SettingsCategory category, {
+  required SettingsLabState labState,
+  required ValueChanged<SettingsLabState> onLabStateChanged,
+  SettingsOptionLabels optionLabels = const SettingsOptionLabels(),
+  bool showUnwiredTiles = true,
+}) {
   final AppLocalizations l10n = context.l10n;
+  final ValueChanged<SettingsLabState> onChanged = onLabStateChanged;
   return switch (category) {
-    SettingsCategory.appearance => <Widget>[
-      SettingsSection(
-        tiles: <Widget>[
-          SettingsNavigationTile(
-            leading: Symbols.dark_mode,
-            title: Text(l10n.settingsThemeLabel),
-            value: Text(labState.themeLabel),
-            onTap: () {
-              onChanged(
-                labState.copyWith(
-                  themeLabel: nextOption(
-                    labState.themeLabel,
-                    optionLabels.themeOptions,
-                  ),
-                ),
-              );
-            },
-          ),
-          SettingsNavigationTile(
-            leading: Symbols.text_fields,
-            title: Text(l10n.settingsFontLabel),
-            value: Text(labState.fontLabel),
-            onTap: () {
-              onChanged(
-                labState.copyWith(
-                  fontLabel: nextOption(
-                    labState.fontLabel,
-                    optionLabels.fontOptions,
-                  ),
-                ),
-              );
-            },
-          ),
-          SettingsNavigationTile(
-            leading: Symbols.language,
-            title: Text(l10n.settingsLanguageLabel),
-            value: Text(labState.localeLabel),
-            onTap: () {
-              onChanged(
-                labState.copyWith(
-                  localeLabel: nextOption(
-                    labState.localeLabel,
-                    optionLabels.localeOptions,
-                  ),
-                ),
-              );
-            },
-          ),
-        ],
-      ),
-    ],
-    SettingsCategory.interface => <Widget>[
-      SettingsSection(
-        tiles: <Widget>[
-          SettingsNavigationTile(
-            leading: Symbols.tab,
-            title: Text(l10n.settingsDefaultLibraryDisplayTargetLabel),
-            description: Text(
-              l10n.settingsDefaultLibraryDisplayTargetDescription,
-            ),
-            value: Text(labState.defaultLibraryDisplayTargetLabel),
-            onTap: () {
-              onChanged(
-                labState.copyWith(
-                  defaultLibraryDisplayTargetLabel: nextOption(
-                    labState.defaultLibraryDisplayTargetLabel,
-                    optionLabels.defaultLibraryDisplayTargetOptions,
-                  ),
-                ),
-              );
-            },
-          ),
-        ],
-      ),
-    ],
     SettingsCategory.reading => <Widget>[
       SettingsSection(
         title: Text(l10n.readerSettingsReadingMode),
@@ -269,22 +194,6 @@ List<Widget> _sectionsForCategory(
         ],
       ),
     ],
-    SettingsCategory.libraryBrowse => <Widget>[
-      if (showUnwiredTiles)
-        SettingsSection(
-          tiles: <Widget>[
-            SettingsSwitchTile(
-              leading: Symbols.shield,
-              title: Text(l10n.settingsHealthyModeLabel),
-              description: Text(l10n.settingsHealthyModeDescription),
-              value: labState.healthyMode,
-              onChanged: (bool value) {
-                onChanged(labState.copyWith(healthyMode: value));
-              },
-            ),
-          ],
-        ),
-    ],
     SettingsCategory.metadataBackup => <Widget>[
       SettingsSection(
         title: Text(l10n.settingsMetadataBackupAutoGroupTitle),
@@ -324,64 +233,7 @@ List<Widget> _sectionsForCategory(
         ],
       ),
     ],
-    SettingsCategory.about => <Widget>[
-      SettingsSection(
-        tiles: <Widget>[
-          SettingsNavigationTile(
-            leading: Symbols.info,
-            title: Text(l10n.settingsMetadataBackupImportManifestAppVersion),
-            value: Text(l10n.settingsCurrentVersion('0.0.0-lab')),
-          ),
-        ],
-      ),
-    ],
-    SettingsCategory.updates => <Widget>[
-      SettingsSection(
-        tiles: <Widget>[
-          SettingsSwitchTile(
-            leading: Symbols.download,
-            title: Text(l10n.settingsAutoUpdateLabel),
-            value: labState.autoUpdate,
-            onChanged: (bool value) {
-              onChanged(labState.copyWith(autoUpdate: value));
-            },
-          ),
-          if (showUnwiredTiles)
-            SettingsNavigationTile(
-              leading: Symbols.system_update,
-              title: Text(l10n.settingsCheckForUpdatesLabel),
-              value: Text(l10n.settingsCurrentVersion('0.0.0-lab')),
-              onTap: () {},
-            ),
-        ],
-      ),
-    ],
-    SettingsCategory.storageAndLogs => <Widget>[
-      SettingsSection(
-        title: Text(l10n.settingsSectionDiagnostics),
-        tiles: <Widget>[
-          SettingsSwitchTile(
-            leading: Symbols.bug_report,
-            title: Text(l10n.settingsDiagnosticModeLabel),
-            description: Text(
-              labState.diagnosticMode
-                  ? l10n.settingsDiagnosticModeDescriptionEnabled
-                  : l10n.settingsDiagnosticModeDescriptionDisabled,
-            ),
-            value: labState.diagnosticMode,
-            onChanged: (bool value) {
-              onChanged(labState.copyWith(diagnosticMode: value));
-            },
-          ),
-          if (showUnwiredTiles)
-            SettingsNavigationTile(
-              leading: Symbols.article,
-              title: Text(l10n.settingsExportLogsLabel),
-              onTap: () {},
-            ),
-        ],
-      ),
-    ],
+    _ => const <Widget>[],
   };
 }
 
@@ -408,13 +260,9 @@ const List<String> kSettingsWebtoonMarginLabels = <String>[
 
 const List<String> kSettingsWebtoonZoomLabels = <String>['适应宽度', '原始尺寸'];
 
-/// 设置页可选项文案：Lab 使用默认值，生产 Pilot 注入 l10n 文案（顺序与枚举 `values` 一致）。
+/// Lab mock option labels for reading / metadataBackup previews only.
 class SettingsOptionLabels {
   const SettingsOptionLabels({
-    this.themeOptions = const <String>['深色', '浅色'],
-    this.localeOptions = const <String>['简体中文', 'English'],
-    this.fontOptions = const <String>['MI_Sans_Regular', 'Noto Sans'],
-    this.defaultLibraryDisplayTargetOptions = const <String>['漫画', '系列'],
     this.readingModeOptions = kSettingsReadingModeLabels,
     this.autoPlayModeOptions = kSettingsAutoPlayModeLabels,
     this.pagedLayoutOptions = kSettingsPagedLayoutLabels,
@@ -422,10 +270,6 @@ class SettingsOptionLabels {
     this.webtoonZoomOptions = kSettingsWebtoonZoomLabels,
   });
 
-  final List<String> themeOptions;
-  final List<String> localeOptions;
-  final List<String> fontOptions;
-  final List<String> defaultLibraryDisplayTargetOptions;
   final List<String> readingModeOptions;
   final List<String> autoPlayModeOptions;
   final List<String> pagedLayoutOptions;
@@ -439,12 +283,9 @@ String nextOption(String current, List<String> options) {
   return options[(index + 1) % options.length];
 }
 
+/// In-memory Lab state for categories that still use mock sections.
 class SettingsLabState {
   const SettingsLabState({
-    this.themeLabel = '深色',
-    this.localeLabel = '简体中文',
-    this.fontLabel = 'Noto Sans',
-    this.defaultLibraryDisplayTargetLabel = '漫画',
     this.autoMetadataBackup = true,
     this.diagnosticMode = false,
     this.autoUpdate = true,
@@ -457,10 +298,6 @@ class SettingsLabState {
     this.healthyMode = false,
   });
 
-  final String themeLabel;
-  final String localeLabel;
-  final String fontLabel;
-  final String defaultLibraryDisplayTargetLabel;
   final bool autoMetadataBackup;
   final bool diagnosticMode;
   final bool autoUpdate;
@@ -473,10 +310,6 @@ class SettingsLabState {
   final bool healthyMode;
 
   SettingsLabState copyWith({
-    String? themeLabel,
-    String? localeLabel,
-    String? fontLabel,
-    String? defaultLibraryDisplayTargetLabel,
     bool? autoMetadataBackup,
     bool? diagnosticMode,
     bool? autoUpdate,
@@ -489,12 +322,6 @@ class SettingsLabState {
     bool? healthyMode,
   }) {
     return SettingsLabState(
-      themeLabel: themeLabel ?? this.themeLabel,
-      localeLabel: localeLabel ?? this.localeLabel,
-      fontLabel: fontLabel ?? this.fontLabel,
-      defaultLibraryDisplayTargetLabel:
-          defaultLibraryDisplayTargetLabel ??
-          this.defaultLibraryDisplayTargetLabel,
       autoMetadataBackup: autoMetadataBackup ?? this.autoMetadataBackup,
       diagnosticMode: diagnosticMode ?? this.diagnosticMode,
       autoUpdate: autoUpdate ?? this.autoUpdate,

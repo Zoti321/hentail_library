@@ -3,4 +3,5 @@ library;
 
 export 'package:hentai_library/features/app_settings/domain/app_color_scheme_preference.dart';
 export 'package:hentai_library/features/app_settings/domain/app_setting.dart';
+export 'package:hentai_library/features/app_settings/domain/app_setting_defaults.dart';
 export 'package:hentai_library/features/app_settings/domain/app_setting_repository.dart';

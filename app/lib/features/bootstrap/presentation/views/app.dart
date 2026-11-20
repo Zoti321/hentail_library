@@ -58,11 +58,14 @@ class _AppRootState extends ConsumerState<_AppRoot> {
         final AppSetting? setting = async.asData?.value;
         return (
           themePreference:
-              setting?.themePreference ?? AppThemePreference.system,
+              setting?.themePreference ?? AppSettingDefaults.themePreference,
           colorSchemePreference:
-              setting?.colorSchemePreference ?? AppColorSchemePreference.brand,
-          useDynamicColor: setting?.useDynamicColor ?? false,
-          fontPreference: setting?.fontPreference ?? AppFontPreference.notoSans,
+              setting?.colorSchemePreference ??
+              AppSettingDefaults.colorSchemePreference,
+          useDynamicColor:
+              setting?.useDynamicColor ?? AppSettingDefaults.useDynamicColor,
+          fontPreference:
+              setting?.fontPreference ?? AppSettingDefaults.fontPreference,
         );
       }),
     );

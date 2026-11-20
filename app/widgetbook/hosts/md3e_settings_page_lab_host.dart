@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/features/app_settings/presentation/views/settings_page/settings_page_body.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/features/app_settings/presentation/lab/lab_settings_provider_overrides.dart';
+import 'package:hentai_library/features/app_settings/presentation/lab/lab_settings_sections.dart';
 import 'package:hentai_library/features/app_settings/presentation/patterns/settings/settings_catalog.dart';
+import 'package:hentai_library/features/app_settings/presentation/patterns/settings/settings_detail_panes.dart';
+import 'package:hentai_library/features/app_settings/presentation/views/settings_page/settings_page_body.dart';
 
-/// Lab / Widgetbook：设置页 preview 状态由 Host 持有（阅读偏好、Healthy mode 等 tile 仅内存，不写 AppSetting）。
+/// Lab / Widgetbook：生产 sections + in-memory [settingsProvider]；阅读 / 元数据备份仍为 mock。
 class SettingsPageLabHost extends StatefulWidget {
   const SettingsPageLabHost({
     super.key,
@@ -28,11 +32,22 @@ class _Md3eSettingsPageLabHostState extends State<SettingsPageLabHost> {
 
   @override
   Widget build(BuildContext context) {
-    return SettingsLayout(
-      initialCategory: widget.initialCategory,
-      labState: _labState,
-      onLabStateChanged: _onLabStateChanged,
-      onBack: widget.onBack,
+    return ProviderScope(
+      overrides: labSettingsProviderOverrides(),
+      child: SettingsLayout(
+        initialCategory: widget.initialCategory,
+        labState: _labState,
+        onLabStateChanged: _onLabStateChanged,
+        onBack: widget.onBack,
+        sectionsBuilder: (BuildContext context, SettingsCategory category) {
+          return labSettingsSectionsFor(
+            context,
+            category,
+            labState: _labState,
+            onLabStateChanged: _onLabStateChanged,
+          );
+        },
+      ),
     );
   }
 }

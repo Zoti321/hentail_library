@@ -7,11 +7,14 @@ import 'package:hentai_library/features/app_settings/presentation/view_models/ap
 import 'package:hentai_library/features/app_settings/presentation/providers/installed_app_version_providers.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/diagnostic_mode_notifier.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
+import 'package:hentai_library/features/app_settings/presentation/patterns/settings/appearance_preference_schema.dart';
 import 'package:hentai_library/features/app_settings/presentation/patterns/settings/settings_catalog.dart';
+import 'package:hentai_library/features/app_settings/presentation/patterns/settings/settings_enum_navigation_tile.dart';
 import 'package:hentai_library/features/app_settings/presentation/views/dialogs/color_scheme_picker_dialog.dart';
 import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/shared/ui/l10n/library_display_target_l10n.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
+import 'package:hentai_library/features/app_settings/domain/app_setting_defaults.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:hentai_library/features/app_settings/presentation/l10n/app_settings_l10n.dart';
@@ -19,7 +22,7 @@ import 'package:hentai_library/features/app_settings/presentation/l10n/app_setti
 /// 生产设置页某分类的 MD3E section 列表。
 ///
 /// 状态由各 tile（ConsumerWidget）自行 watch，section 本身无状态。
-/// 选项循环使用枚举 `values`，不经过字符串 label 反查。
+/// 外观枚举项由 [AppearancePreferenceSchema] 驱动；配色对话框与动态色开关仍专用。
 List<Widget> settingsSectionsFor(
   SettingsCategory category,
   BuildContext context,
@@ -29,11 +32,11 @@ List<Widget> settingsSectionsFor(
     SettingsCategory.appearance => const <Widget>[
       SettingsSection(
         tiles: <Widget>[
-          _ThemeTile(),
+          _AppearanceEnumNavTile(AppearanceEnumPreferenceKind.theme),
           _ColorSchemeTile(),
           _DynamicColorTile(),
-          _FontTile(),
-          _LocaleTile(),
+          _AppearanceEnumNavTile(AppearanceEnumPreferenceKind.font),
+          _AppearanceEnumNavTile(AppearanceEnumPreferenceKind.locale),
         ],
       ),
     ],
@@ -65,6 +68,68 @@ List<Widget> settingsSectionsFor(
   };
 }
 
+class _AppearanceEnumNavTile extends ConsumerWidget {
+  const _AppearanceEnumNavTile(this.kind);
+
+  final AppearanceEnumPreferenceKind kind;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AppLocalizations l10n = context.l10n;
+    final SettingsNotifier notifier = ref.read(settingsProvider.notifier);
+    return switch (kind) {
+      AppearanceEnumPreferenceKind.theme => SettingsEnumNavigationTile<
+        AppThemePreference
+      >(
+        leading: AppearancePreferenceSchema.leading(kind),
+        title: Text(AppearancePreferenceSchema.titleOf(kind, l10n)),
+        preference: ref.watch(
+          settingsProvider.select(
+            (AsyncValue<AppSetting> async) =>
+                async.asData?.value.themePreference ??
+                AppSettingDefaults.themePreference,
+          ),
+        ),
+        options: AppThemePreference.values,
+        labelOf: l10n.themePreferenceLabel,
+        onSelected: notifier.setThemePreference,
+      ),
+      AppearanceEnumPreferenceKind.font => SettingsEnumNavigationTile<
+        AppFontPreference
+      >(
+        leading: AppearancePreferenceSchema.leading(kind),
+        title: Text(AppearancePreferenceSchema.titleOf(kind, l10n)),
+        preference: ref.watch(
+          settingsProvider.select(
+            (AsyncValue<AppSetting> async) =>
+                async.asData?.value.fontPreference ??
+                AppSettingDefaults.fontPreference,
+          ),
+        ),
+        options: AppFontPreference.values,
+        labelOf: l10n.fontPreferenceLabel,
+        onSelected: notifier.setFontPreference,
+      ),
+      AppearanceEnumPreferenceKind.locale => SettingsEnumNavigationTile<
+        AppLocalePreference
+      >(
+        leading: AppearancePreferenceSchema.leading(kind),
+        title: Text(AppearancePreferenceSchema.titleOf(kind, l10n)),
+        preference: ref.watch(
+          settingsProvider.select(
+            (AsyncValue<AppSetting> async) =>
+                async.asData?.value.localePreference ??
+                AppSettingDefaults.localePreference,
+          ),
+        ),
+        options: AppLocalePreference.values,
+        labelOf: l10n.localePreferenceLabel,
+        onSelected: notifier.setLocalePreference,
+      ),
+    };
+  }
+}
+
 class _AboutVersionSection extends ConsumerWidget {
   const _AboutVersionSection();
 
@@ -90,33 +155,6 @@ class _AboutVersionSection extends ConsumerWidget {
   }
 }
 
-class _ThemeTile extends ConsumerWidget {
-  const _ThemeTile();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final AppLocalizations l10n = context.l10n;
-    final AppThemePreference preference = ref.watch(
-      settingsProvider.select(
-        (AsyncValue<AppSetting> async) =>
-            async.asData?.value.themePreference ?? AppThemePreference.system,
-      ),
-    );
-    return SettingsNavigationTile(
-      leading: Symbols.dark_mode,
-      title: Text(l10n.settingsThemeLabel),
-      value: Text(l10n.themePreferenceLabel(preference)),
-      onTap: () => pickAnchoredOption<AppThemePreference>(
-        context,
-        options: AppThemePreference.values,
-        selected: preference,
-        labelOf: l10n.themePreferenceLabel,
-        onSelected: ref.read(settingsProvider.notifier).setThemePreference,
-      ),
-    );
-  }
-}
-
 class _DynamicColorTile extends ConsumerWidget {
   const _DynamicColorTile();
 
@@ -126,7 +164,8 @@ class _DynamicColorTile extends ConsumerWidget {
     final bool enabled = ref.watch(
       settingsProvider.select(
         (AsyncValue<AppSetting> async) =>
-            async.asData?.value.useDynamicColor ?? false,
+            async.asData?.value.useDynamicColor ??
+            AppSettingDefaults.useDynamicColor,
       ),
     );
     return SettingsSwitchTile(
@@ -168,8 +207,9 @@ class _ColorSchemeTile extends ConsumerWidget {
             return (
               preference:
                   setting?.colorSchemePreference ??
-                  AppColorSchemePreference.brand,
-              useDynamicColor: setting?.useDynamicColor ?? false,
+                  AppSettingDefaults.colorSchemePreference,
+              useDynamicColor:
+                  setting?.useDynamicColor ?? AppSettingDefaults.useDynamicColor,
             );
           }),
         );
@@ -179,60 +219,6 @@ class _ColorSchemeTile extends ConsumerWidget {
       value: Text(l10n.colorSchemePreferenceLabel(state.preference)),
       enabled: !state.useDynamicColor,
       onTap: () => _handleTap(context, ref, state.preference),
-    );
-  }
-}
-
-class _FontTile extends ConsumerWidget {
-  const _FontTile();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final AppLocalizations l10n = context.l10n;
-    final AppFontPreference preference = ref.watch(
-      settingsProvider.select(
-        (AsyncValue<AppSetting> async) =>
-            async.asData?.value.fontPreference ?? AppFontPreference.notoSans,
-      ),
-    );
-    return SettingsNavigationTile(
-      leading: Symbols.text_fields,
-      title: Text(l10n.settingsFontLabel),
-      value: Text(l10n.fontPreferenceLabel(preference)),
-      onTap: () => pickAnchoredOption<AppFontPreference>(
-        context,
-        options: AppFontPreference.values,
-        selected: preference,
-        labelOf: l10n.fontPreferenceLabel,
-        onSelected: ref.read(settingsProvider.notifier).setFontPreference,
-      ),
-    );
-  }
-}
-
-class _LocaleTile extends ConsumerWidget {
-  const _LocaleTile();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final AppLocalizations l10n = context.l10n;
-    final AppLocalePreference preference = ref.watch(
-      settingsProvider.select(
-        (AsyncValue<AppSetting> async) =>
-            async.asData?.value.localePreference ?? AppLocalePreference.system,
-      ),
-    );
-    return SettingsNavigationTile(
-      leading: Symbols.language,
-      title: Text(l10n.settingsLanguageLabel),
-      value: Text(l10n.localePreferenceLabel(preference)),
-      onTap: () => pickAnchoredOption<AppLocalePreference>(
-        context,
-        options: AppLocalePreference.values,
-        selected: preference,
-        labelOf: l10n.localePreferenceLabel,
-        onSelected: ref.read(settingsProvider.notifier).setLocalePreference,
-      ),
     );
   }
 }
@@ -247,23 +233,19 @@ class _DefaultLibraryDisplayTargetTile extends ConsumerWidget {
       settingsProvider.select(
         (AsyncValue<AppSetting> async) =>
             async.asData?.value.defaultLibraryDisplayTarget ??
-            LibraryDisplayTarget.comics,
+            AppSettingDefaults.defaultLibraryDisplayTarget,
       ),
     );
-    return SettingsNavigationTile(
+    return SettingsEnumNavigationTile<LibraryDisplayTarget>(
       leading: Symbols.tab,
       title: Text(l10n.settingsDefaultLibraryDisplayTargetLabel),
       description: Text(l10n.settingsDefaultLibraryDisplayTargetDescription),
-      value: Text(l10n.libraryDisplayTargetTabLabel(preference)),
-      onTap: () => pickAnchoredOption<LibraryDisplayTarget>(
-        context,
-        options: LibraryDisplayTarget.values,
-        selected: preference,
-        labelOf: l10n.libraryDisplayTargetTabLabel,
-        onSelected: ref
-            .read(settingsProvider.notifier)
-            .setDefaultLibraryDisplayTarget,
-      ),
+      preference: preference,
+      options: LibraryDisplayTarget.values,
+      labelOf: l10n.libraryDisplayTargetTabLabel,
+      onSelected: ref
+          .read(settingsProvider.notifier)
+          .setDefaultLibraryDisplayTarget,
     );
   }
 }

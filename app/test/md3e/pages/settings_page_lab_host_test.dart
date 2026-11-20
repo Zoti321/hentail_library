@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/features/app_settings/presentation/patterns/settings/settings_catalog.dart';
 
 import '../../../widgetbook/hosts/md3e_settings_page_lab_host.dart';
@@ -39,7 +39,16 @@ void main() {
       ),
     );
 
-    Switch healthySwitch() => tester.widget<Switch>(find.byType(Switch).first);
+    // Production libraryBrowse has multiple switches; target the healthy-mode tile.
+    Switch healthySwitch() {
+      final Finder tile = find.ancestor(
+        of: find.text('健康模式'),
+        matching: find.byType(SettingsTileShell),
+      );
+      return tester.widget<Switch>(
+        find.descendant(of: tile, matching: find.byType(Switch)),
+      );
+    }
 
     expect(find.text('健康模式'), findsOneWidget);
     expect(healthySwitch().value, isFalse);

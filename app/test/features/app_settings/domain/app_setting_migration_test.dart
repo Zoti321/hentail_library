@@ -1,5 +1,6 @@
 import 'package:test/test.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
+import 'package:hentai_library/features/app_settings/domain/app_setting_defaults.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting_migration.dart';
 import 'package:hentai_library/features/app_settings/domain/reading_preferences_schema.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
@@ -53,9 +54,12 @@ void main() {
         'themePreference': 'light',
       });
 
-      expect(setting.version, 6);
-      expect(setting.fontPreference, AppFontPreference.notoSans);
-      expect(setting.toJson()['fontPreference'], 'notoSans');
+      expect(setting.version, AppSettingDefaults.schemaVersion);
+      expect(setting.fontPreference, AppSettingDefaults.fontPreference);
+      expect(
+        setting.toJson()['fontPreference'],
+        AppSettingDefaults.fontPreferenceJsonId,
+      );
     });
 
     test('round-trips explicit fontPreference', () {
@@ -89,12 +93,15 @@ void main() {
           'themePreference': 'light',
         });
 
-        expect(setting.version, 6);
+        expect(setting.version, AppSettingDefaults.schemaVersion);
         expect(
           setting.defaultLibraryDisplayTarget,
-          LibraryDisplayTarget.comics,
+          AppSettingDefaults.defaultLibraryDisplayTarget,
         );
-        expect(setting.toJson()['defaultLibraryDisplayTarget'], 'comics');
+        expect(
+          setting.toJson()['defaultLibraryDisplayTarget'],
+          AppSettingDefaults.defaultLibraryDisplayTargetJsonId,
+        );
       },
     );
 

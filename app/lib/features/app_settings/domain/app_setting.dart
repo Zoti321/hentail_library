@@ -1,7 +1,11 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:hentai_library/features/app_settings/domain/app_preferences.dart';
+import 'package:hentai_library/features/app_settings/domain/app_setting_defaults.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting_migration.dart';
 import 'package:hentai_library/features/app_settings/domain/reading_preferences_schema.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
+
+export 'package:hentai_library/features/app_settings/domain/app_preferences.dart';
 
 part 'app_setting.freezed.dart';
 part 'app_setting.g.dart';
@@ -23,15 +27,18 @@ String defaultLibraryDisplayTargetToJson(LibraryDisplayTarget value) {
 @freezed
 abstract class AppSetting with _$AppSetting {
   factory AppSetting({
-    @Default(6) int version,
-    @Default(AppThemePreference.system) AppThemePreference themePreference,
-    @Default(AppColorSchemePreference.brand)
+    @Default(AppSettingDefaults.schemaVersion) int version,
+    @Default(AppSettingDefaults.themePreference)
+    AppThemePreference themePreference,
+    @Default(AppSettingDefaults.colorSchemePreference)
     AppColorSchemePreference colorSchemePreference,
 
     /// 系统动态配色：开启后以平台强调色为 seed（ADR-0037）。
-    @Default(false) bool useDynamicColor,
-    @Default(AppLocalePreference.system) AppLocalePreference localePreference,
-    @Default(AppFontPreference.notoSans) AppFontPreference fontPreference,
+    @Default(AppSettingDefaults.useDynamicColor) bool useDynamicColor,
+    @Default(AppSettingDefaults.localePreference)
+    AppLocalePreference localePreference,
+    @Default(AppSettingDefaults.fontPreference)
+    AppFontPreference fontPreference,
 
     /// 阅读模式持久化 id（`reader` 的 `ReadingMode` 值域，见 [ReadingPreferenceSchema]）。
     @JsonKey(name: 'readingMode')
@@ -69,7 +76,7 @@ abstract class AppSetting with _$AppSetting {
     @Default(true) bool preferLibraryRootSeries,
 
     /// Default library display target：进入库浏览时默认 Comics / Series。
-    @Default(LibraryDisplayTarget.comics)
+    @Default(AppSettingDefaults.defaultLibraryDisplayTarget)
     // fromJson/toJson 需落在 factory 参数上，非 target 注解位置。
     // ignore: invalid_annotation_target
     @JsonKey(
@@ -127,67 +134,3 @@ abstract class AppSetting with _$AppSetting {
   }
 }
 
-/// 应用外观：浅色 / 深色 / 跟随系统。
-@JsonEnum(alwaysCreate: true)
-enum AppThemePreference {
-  @JsonValue('system')
-  system,
-  @JsonValue('light')
-  light,
-  @JsonValue('dark')
-  dark,
-}
-
-/// 固定配色方案 id（非 Material Dynamic Color 运行时）；与 [AppThemePreference] 正交。
-///
-/// Seed 色映射见 `shared/ui/theme` 的 [colorSchemeSeedForId]；`brand` 为产品默认
-///（定稿紫罗兰 / 与 `violet` 同 seed）。展示名用植物 / 矿物色名（如青瓷色）。
-@JsonEnum(alwaysCreate: true)
-enum AppColorSchemePreference {
-  @JsonValue('brand')
-  brand,
-  @JsonValue('teal')
-  teal,
-  @JsonValue('cyan')
-  cyan,
-  @JsonValue('blue')
-  blue,
-  @JsonValue('indigo')
-  indigo,
-  @JsonValue('deepPurple')
-  deepPurple,
-  @JsonValue('violet')
-  violet,
-  @JsonValue('pink')
-  pink,
-  @JsonValue('sakura')
-  sakura,
-  @JsonValue('yellow')
-  yellow,
-  @JsonValue('orange')
-  orange,
-  @JsonValue('deepOrange')
-  deepOrange,
-  @JsonValue('green')
-  green,
-}
-
-/// 应用语言：中文 / English / 跟随系统。
-@JsonEnum(alwaysCreate: true)
-enum AppLocalePreference {
-  @JsonValue('system')
-  system,
-  @JsonValue('zh_CN')
-  zhCn,
-  @JsonValue('en')
-  en,
-}
-
-/// UI 字体族：MI_Sans_Regular / Noto Sans（SC/JP 仅作 i18n fallback，不进设置项）。
-@JsonEnum(alwaysCreate: true)
-enum AppFontPreference {
-  @JsonValue('miSans')
-  miSans,
-  @JsonValue('notoSans')
-  notoSans,
-}
