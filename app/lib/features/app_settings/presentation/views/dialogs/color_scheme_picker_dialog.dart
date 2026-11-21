@@ -46,7 +46,7 @@ class _ColorSchemePickerDialog extends StatelessWidget {
                 (ColorSchemePaletteOption.tileMinWidth +
                     ColorSchemePaletteOption.gap))
             .floor();
-    return columns.clamp(3, AppColorSchemePreference.values.length);
+    return columns.clamp(3, kColorSchemePickerOrder.length);
   }
 
   @override
@@ -54,13 +54,8 @@ class _ColorSchemePickerDialog extends StatelessWidget {
     final AppLocalizations l10n = context.l10n;
     final M3EThemeData theme = M3ETheme.of(context);
     final M3ESpacing spacing = theme.spacing;
-    // `violet` 与 brand 同色；UI 只展示 brand（文案为紫罗兰色），JSON 仍保留 violet。
-    final List<AppColorSchemePreference> preferences = AppColorSchemePreference
-        .values
-        .where(
-          (AppColorSchemePreference p) => p != AppColorSchemePreference.violet,
-        )
-        .toList(growable: false);
+    // 色相环顺序；`violet` 与 brand 同色，仅展示 brand（文案为紫罗兰色）。
+    final List<AppColorSchemePreference> preferences = kColorSchemePickerOrder;
     final AppColorSchemePreference effectiveSelected =
         selected == AppColorSchemePreference.violet
         ? AppColorSchemePreference.brand

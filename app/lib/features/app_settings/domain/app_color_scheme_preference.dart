@@ -18,3 +18,23 @@ String colorSchemeIdForPreference(AppColorSchemePreference preference) {
     AppColorSchemePreference.green => 'green',
   };
 }
+
+/// 配色弹窗展示顺序：按 seed 色相环（HCT hue）升序，相近色系相邻。
+///
+/// 暖色（朱砂→琥珀）→ 绿 → 青 → 蓝紫 → 品红；不含与 brand 同色的 [AppColorSchemePreference.violet]。
+const List<AppColorSchemePreference> kColorSchemePickerOrder =
+    <AppColorSchemePreference>[
+      AppColorSchemePreference.deepOrange,
+      AppColorSchemePreference.orange,
+      AppColorSchemePreference.yellow,
+      AppColorSchemePreference.green,
+      AppColorSchemePreference.teal,
+      AppColorSchemePreference.cyan,
+      AppColorSchemePreference.blue,
+      AppColorSchemePreference.indigo,
+      AppColorSchemePreference.deepPurple,
+      AppColorSchemePreference.brand,
+      AppColorSchemePreference.pink,
+      AppColorSchemePreference.sakura,
+    ];
+
