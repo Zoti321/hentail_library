@@ -94,7 +94,17 @@ class OpenReadSessionUseCase {
   }) async {
     final String sessionKey = source.sessionKey;
     final Object lifetime = _lifetimes.putIfAbsent(sessionKey, Object.new);
-    final _OpenedPages opened = await _openPages(source);
+    final Future<_OpenedPages> pagesFuture = _openPages(source);
+    // 续读与列页并行，缩短 comic 打开总等待；Image set / 无痕 / 首页起读不查 history。
+    final Future<int?>? resumeFuture = switch (source) {
+      ImageSetReadSessionSource() => null,
+      ComicReadSessionSource() when incognito || startFromFirstPage => null,
+      ComicReadSessionSource() => _readResumePage(sessionKey),
+    };
+    final _OpenedPages opened = await pagesFuture;
+    final int? storedResume = resumeFuture == null
+        ? null
+        : await resumeFuture;
     final ReadSessionCapabilities capabilities = ReadSessionCapabilities.from(
       source,
       incognito: incognito,
@@ -105,7 +115,7 @@ class OpenReadSessionUseCase {
         (incognito || startFromFirstPage)
             ? 1
             : clampOneBasedResumeIndex(
-                storedPageIndex: await _readResumePage(sessionKey),
+                storedPageIndex: storedResume,
                 totalPages: opened.pages.length,
               ),
     };

@@ -20,23 +20,19 @@ typedef ReaderPageViewShell = ({
   int totalPages,
 });
 
-/// 合并 ViewModel 外壳与系列会话上下文；任一侧 error/loading 则整体同态。
-AsyncValue<ReaderPageShellData> combineReaderPageShell(
-  AsyncValue<ReaderPageViewShell> viewShell,
-  AsyncValue<ReadSessionContextData> session,
-) {
+/// 仅由 ViewModel 外壳决定就绪；系列上下文渐进填充，loading/error 不挡首屏。
+AsyncValue<ReaderPageShellData> readerPageShellFromView(
+  AsyncValue<ReaderPageViewShell> viewShell, {
+  required ReadSessionContextData sessionContext,
+}) {
   if (viewShell.hasError) {
     return AsyncError<ReaderPageShellData>(
       viewShell.error!,
       viewShell.stackTrace!,
     );
   }
-  if (session.hasError) {
-    return AsyncError<ReaderPageShellData>(session.error!, session.stackTrace!);
-  }
   final ReaderPageViewShell? view = viewShell.asData?.value;
-  final ReadSessionContextData? sessionData = session.asData?.value;
-  if (view == null || sessionData == null) {
+  if (view == null) {
     return const AsyncLoading<ReaderPageShellData>();
   }
   return AsyncData<ReaderPageShellData>((
@@ -44,6 +40,20 @@ AsyncValue<ReaderPageShellData> combineReaderPageShell(
     comic: view.comic,
     capabilities: view.capabilities,
     totalPages: view.totalPages,
-    sessionContext: sessionData,
+    sessionContext: sessionContext,
   ));
+}
+
+/// 合并 ViewModel 外壳与系列会话上下文。
+///
+/// 系列侧 loading/error 回落为空上下文，不挡就绪壳；仅 ViewModel error/loading
+/// 决定整体同态。
+AsyncValue<ReaderPageShellData> combineReaderPageShell(
+  AsyncValue<ReaderPageViewShell> viewShell,
+  AsyncValue<ReadSessionContextData> session, {
+  required String sessionKey,
+}) {
+  final ReadSessionContextData sessionContext =
+      session.asData?.value ?? emptyReadSessionContextData(sessionKey);
+  return readerPageShellFromView(viewShell, sessionContext: sessionContext);
 }

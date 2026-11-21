@@ -89,6 +89,7 @@ void main() {
     final AsyncValue<ReaderPageShellData> shellAsync = combineReaderPageShell(
       _watchViewShell(container),
       container.read(readSessionContextForReaderProvider(comicId: _comicId)),
+      sessionKey: _comicId,
     );
     final ReaderPageShellData shell = shellAsync.requireValue;
     expect(shell.subject.title, 'Ready');
@@ -104,6 +105,48 @@ void main() {
       ),
       SeriesBoundaryPrompt.none,
     );
+  });
+
+  test('session loading does not block ready shell', () {
+    final AsyncValue<ReaderPageShellData> shellAsync = combineReaderPageShell(
+      AsyncData<ReaderPageViewShell>((
+        subject: const ReadSessionSubject(
+          sessionKey: _comicId,
+          title: 'Ready',
+          pageCount: 10,
+        ),
+        comic: _comic(),
+        capabilities: ReadSessionCapabilities.from(
+          const ComicReadSessionSource(_comicId),
+        ),
+        totalPages: 10,
+      )),
+      const AsyncLoading<ReadSessionContextData>(),
+      sessionKey: _comicId,
+    );
+    expect(shellAsync.hasValue, isTrue);
+    expect(shellAsync.requireValue.sessionContext.hasSeriesContext, isFalse);
+  });
+
+  test('session error falls back to empty context without blocking', () {
+    final AsyncValue<ReaderPageShellData> shellAsync = combineReaderPageShell(
+      AsyncData<ReaderPageViewShell>((
+        subject: const ReadSessionSubject(
+          sessionKey: _comicId,
+          title: 'Ready',
+          pageCount: 10,
+        ),
+        comic: _comic(),
+        capabilities: ReadSessionCapabilities.from(
+          const ComicReadSessionSource(_comicId),
+        ),
+        totalPages: 10,
+      )),
+      AsyncError<ReadSessionContextData>(StateError('series'), StackTrace.empty),
+      sessionKey: _comicId,
+    );
+    expect(shellAsync.hasValue, isTrue);
+    expect(shellAsync.requireValue.subject.title, 'Ready');
   });
 
   test('page turns do not notify shell-select listeners', () async {

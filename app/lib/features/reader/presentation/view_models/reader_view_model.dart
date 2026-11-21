@@ -98,13 +98,22 @@ class ReaderViewModel extends _$ReaderViewModel
     final ReadSessionSource source = key.source;
     final bool incognito = key.incognito;
     final bool startFromFirstPage = key.startFromFirstPage;
-    final OpenedReadSession snapshot = await ref.watch(
+    // Do not await `.future` alone: on open failure it can hang in loading.
+    // Watch AsyncValue, rethrow errors, and requireValue while still loading.
+    final AsyncValue<OpenedReadSession> openAsync = ref.watch(
       readerSessionOpenFromSourceProvider(
         source: source,
         incognito: incognito,
         startFromFirstPage: startFromFirstPage,
-      ).future,
+      ),
     );
+    if (openAsync.hasError) {
+      Error.throwWithStackTrace(
+        openAsync.error!,
+        openAsync.stackTrace ?? StackTrace.current,
+      );
+    }
+    final OpenedReadSession snapshot = openAsync.requireValue;
     final ReadingMode initialMode =
         (await _resolveInitialReadingPreferences()).readingMode;
     ref.listen(readingPreferencesProvider, (previous, next) {

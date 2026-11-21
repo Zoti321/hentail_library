@@ -243,6 +243,18 @@ ReaderViewModel _controller(
 ReaderUiState? _state(ProviderContainer container, ReaderViewModelKey key) =>
     container.read(readerViewModelProvider(key)).asData?.value;
 
+/// Keep a listen alive for the container lifetime (autoDispose + requireValue).
+Future<ReaderUiState> _awaitViewModel(
+  ProviderContainer container,
+  ReaderViewModelKey key,
+) async {
+  container.listen(
+    readerViewModelProvider(key),
+    (AsyncValue<ReaderUiState>? previous, AsyncValue<ReaderUiState> next) {},
+  );
+  return container.read(readerViewModelProvider(key).future);
+}
+
 void main() {
   group('auto-play session state', () {
     test('opens with autoPlayEnabled false', () async {
@@ -251,9 +263,7 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      final ReaderUiState state = await container.read(
-        readerViewModelProvider(_key).future,
-      );
+      final ReaderUiState state = await _awaitViewModel(container, _key);
 
       expect(state.autoPlayEnabled, isFalse);
     });
@@ -266,7 +276,7 @@ void main() {
         );
         addTearDown(container.dispose);
 
-        await container.read(readerViewModelProvider(_key).future);
+        await _awaitViewModel(container, _key);
         _controller(container, _key).setAutoPlayEnabled(true);
 
         expect(_state(container, _key)?.autoPlayEnabled, isTrue);
@@ -328,11 +338,12 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      await container.read(readerViewModelProvider(_key).future);
+      await _awaitViewModel(container, _key);
       _controller(container, _key).setAutoPlayEnabled(true);
 
-      final ReaderUiState otherState = await container.read(
-        readerViewModelProvider(otherKey).future,
+      final ReaderUiState otherState = await _awaitViewModel(
+        container,
+        otherKey,
       );
 
       expect(_state(container, _key)?.autoPlayEnabled, isTrue);
@@ -345,7 +356,7 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      await container.read(readerViewModelProvider(_key).future);
+      await _awaitViewModel(container, _key);
       final ReaderViewModel controller = _controller(container, _key);
       controller.setAutoPlayEnabled(true);
       controller.setReadingMode(ReadingMode.webtoon);
@@ -405,9 +416,7 @@ void main() {
       addTearDown(container.dispose);
 
       container.read(readerAutoPlayCarryProvider.notifier).arm(true);
-      final ReaderUiState state = await container.read(
-        readerViewModelProvider(otherKey).future,
-      );
+      final ReaderUiState state = await _awaitViewModel(container, otherKey);
 
       expect(state.autoPlayEnabled, isTrue);
       expect(container.read(readerAutoPlayCarryProvider), isFalse);
@@ -423,9 +432,7 @@ void main() {
         );
         addTearDown(container.dispose);
 
-        final ReaderUiState state = await container.read(
-          readerViewModelProvider(_key).future,
-        );
+        final ReaderUiState state = await _awaitViewModel(container, _key);
 
         expect(state.readingMode, ReadingMode.webtoon);
       },
@@ -437,7 +444,7 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      await container.read(readerViewModelProvider(_key).future);
+      await _awaitViewModel(container, _key);
       await container
           .read(readingPreferencesControllerProvider)
           .setReadingModeId(ReadingPreferenceSchema.readingModeWebtoonId);
@@ -455,7 +462,7 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      await container.read(readerViewModelProvider(_incognitoKey).future);
+      await _awaitViewModel(container, _incognitoKey);
       _controller(container, _incognitoKey).setReadingMode(ReadingMode.webtoon);
 
       final ReaderUiState? state = _state(container, _incognitoKey);
@@ -471,7 +478,7 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      await container.read(readerViewModelProvider(_incognitoKey).future);
+      await _awaitViewModel(container, _incognitoKey);
       _controller(container, _incognitoKey).setReadingMode(ReadingMode.webtoon);
 
       expect(_state(container, _incognitoKey)?.currentIndex, 4);
@@ -485,7 +492,7 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      await container.read(readerViewModelProvider(_incognitoKey).future);
+      await _awaitViewModel(container, _incognitoKey);
       final ReaderViewModel controller = _controller(container, _incognitoKey);
 
       controller.prevPage();
@@ -507,7 +514,7 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      await container.read(readerViewModelProvider(_incognitoKey).future);
+      await _awaitViewModel(container, _incognitoKey);
       final ReaderViewModel controller = _controller(container, _incognitoKey);
 
       controller.setIndex(0);
@@ -543,7 +550,7 @@ void main() {
         );
         addTearDown(container.dispose);
 
-        await container.read(readerViewModelProvider(_incognitoKey).future);
+        await _awaitViewModel(container, _incognitoKey);
         final ReaderViewModel controller = _controller(
           container,
           _incognitoKey,
@@ -577,7 +584,7 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      await container.read(readerViewModelProvider(_incognitoKey).future);
+      await _awaitViewModel(container, _incognitoKey);
       final ReaderViewModel controller = _controller(container, _incognitoKey);
       final ReaderNavContextData nav = _navContext(
         previousComicId: previousComicId,
@@ -605,7 +612,7 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      await container.read(readerViewModelProvider(_incognitoKey).future);
+      await _awaitViewModel(container, _incognitoKey);
       final ReaderViewModel controller = _controller(container, _incognitoKey);
 
       await controller.requestPrevPage(
@@ -631,7 +638,7 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      await container.read(readerViewModelProvider(_incognitoKey).future);
+      await _awaitViewModel(container, _incognitoKey);
       final ReaderViewModel controller = _controller(container, _incognitoKey);
 
       await controller.requestPrevPage(
@@ -674,7 +681,7 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      await container.read(readerViewModelProvider(_incognitoKey).future);
+      await _awaitViewModel(container, _incognitoKey);
       final ReaderViewModel controller = _controller(container, _incognitoKey);
       controller.setAutoPlayEnabled(true);
 
@@ -708,7 +715,7 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      await container.read(readerViewModelProvider(_incognitoKey).future);
+      await _awaitViewModel(container, _incognitoKey);
       final ReaderViewModel controller = _controller(container, _incognitoKey);
       controller.setAutoPlayEnabled(true);
 
@@ -737,7 +744,7 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      await container.read(readerViewModelProvider(_incognitoKey).future);
+      await _awaitViewModel(container, _incognitoKey);
       final ReaderViewModel controller = _controller(container, _incognitoKey);
       controller.setAutoPlayEnabled(true);
 
@@ -765,7 +772,7 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      await container.read(readerViewModelProvider(_incognitoKey).future);
+      await _awaitViewModel(container, _incognitoKey);
       final ReaderViewModel controller = _controller(container, _incognitoKey);
       controller.setAutoPlayEnabled(true);
 

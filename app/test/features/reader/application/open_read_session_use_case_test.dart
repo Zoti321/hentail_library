@@ -524,6 +524,34 @@ void main() {
       },
     );
 
+    test('resume lookup runs in parallel with native open', () async {
+      final openHang = Completer<void>();
+      final resumeEntered = Completer<void>();
+      final resume = Completer<int?>();
+      final service = OpenReadSessionUseCase(
+        comicLookup: createComicReadQuery(
+          _FakeComicRepository(comic: _inputComic()),
+        ),
+        pageSource: _FakeComicPageSourcePort(
+          pages: <ReadSessionPage>[
+            ReadSessionArchivePage(comicId: 'c1', pageIndex: 0),
+            ReadSessionArchivePage(comicId: 'c1', pageIndex: 1),
+          ],
+        ),
+        readResumePage: (_) {
+          resumeEntered.complete();
+          return resume.future;
+        },
+        sessionPort: _FakeNativeReaderPort(openHang: openHang.future),
+      );
+      final Future<OpenedReadSession> opening = service.open(comicId: 'c1');
+      await resumeEntered.future;
+      expect(openHang.isCompleted, isFalse);
+      openHang.complete();
+      resume.complete(2);
+      expect((await opening).resumePageIndex, 2);
+    });
+
     test('open throws when comic is missing', () async {
       final OpenReadSessionUseCase service = _service(comic: null);
       expect(

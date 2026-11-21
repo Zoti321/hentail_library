@@ -23,6 +23,7 @@ import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/features/reader/presentation/views/reader/reader_layout.dart';
 import 'package:hentai_library/features/reader/presentation/patterns/reader/reader_series_catalog_sheet.dart';
 import 'package:hentai_library/features/reader/presentation/patterns/reader/reader_series_volume.dart';
+import 'package:hentai_library/features/reader/presentation/patterns/reader/reader_tap_zone.dart';
 import 'package:hentai_library/features/reader/presentation/patterns/reader/reader_viewport_status.dart';
 import 'package:hentai_library/features/reader/application/open_reader_args.dart';
 import 'package:hentai_library/features/reader/domain/read_session_capabilities.dart';
@@ -119,6 +120,7 @@ class ReaderPage extends HookConsumerWidget {
             ));
           }),
     );
+    // 系列上下文与会话打开并行拉取，但不挡就绪壳（loading/error 回落为空导航）。
     final AsyncValue<ReadSessionContextData> sessionAsync = ref.watch(
       readSessionContextForReaderProvider(
         comicId: routeContext.sessionKey,
@@ -130,6 +132,7 @@ class ReaderPage extends HookConsumerWidget {
     final AsyncValue<ReaderPageShellData> shellAsync = combineReaderPageShell(
       viewShellAsync,
       sessionAsync,
+      sessionKey: routeContext.sessionKey,
     );
     final bool readerFullscreen = ref.watch(readerChromeNotifierProvider);
     final SeriesBoundaryPrompt seriesBoundaryPrompt = ref.watch(
@@ -142,6 +145,7 @@ class ReaderPage extends HookConsumerWidget {
 
     final bool readerReady = shellAsync.hasValue;
     final ReaderPageShellData? loadedShell = shellAsync.asData?.value;
+    final ValueNotifier<bool> openingChromeVisible = useState<bool>(true);
     final ObjectRef<int?> frozenInitialPage = useRef<int?>(null);
     final ObjectRef<String?> frozenSessionKey = useRef<String?>(null);
     final String sessionKey =
@@ -254,11 +258,25 @@ class ReaderPage extends HookConsumerWidget {
           child: Scaffold(
             backgroundColor: theme.reader.readerBackground,
             body: shellAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (Object e, StackTrace st) => ReaderOpenErrorPanel(
-                error: e,
-                onBackToDetail: () => unawaited(exitReader()),
-                onRetry: () => _retryOpen(ref, viewKey, routeContext),
+              loading: () => _ReaderOpeningShell(
+                chromeVisible: openingChromeVisible.value,
+                onToggleChrome: () {
+                  openingChromeVisible.value = !openingChromeVisible.value;
+                },
+                onBack: () => unawaited(exitReader()),
+                viewportStatus: ReaderViewportStatus.loading,
+              ),
+              error: (Object e, StackTrace st) => _ReaderOpeningShell(
+                chromeVisible: openingChromeVisible.value,
+                onToggleChrome: () {
+                  openingChromeVisible.value = !openingChromeVisible.value;
+                },
+                onBack: () => unawaited(exitReader()),
+                contentBuilder: (FocusNode _) => ReaderOpenErrorPanel(
+                  error: e,
+                  onBackToDetail: () => unawaited(exitReader()),
+                  onRetry: () => _retryOpen(ref, viewKey, routeContext),
+                ),
               ),
               // 翻页 chrome 下沉到 [_ReaderReadyBody]，避免根节点订阅 currentIndex。
               data: (ReaderPageShellData shell) => _ReaderReadyBody(
@@ -302,6 +320,42 @@ class ReaderPage extends HookConsumerWidget {
     if (routeContext.source.isComic) {
       ref.invalidate(comicImagesProvider(comicId: routeContext.comicId));
     }
+  }
+}
+
+/// 打开中 / 打开失败：仍挂 [ReaderLayout] 顶底栏，保证桌面端可退出。
+class _ReaderOpeningShell extends StatelessWidget {
+  const _ReaderOpeningShell({
+    required this.chromeVisible,
+    required this.onToggleChrome,
+    required this.onBack,
+    this.viewportStatus = ReaderViewportStatus.ready,
+    this.contentBuilder,
+  });
+
+  final bool chromeVisible;
+  final VoidCallback onToggleChrome;
+  final VoidCallback onBack;
+  final ReaderViewportStatus viewportStatus;
+  final Widget Function(FocusNode focusNode)? contentBuilder;
+
+  @override
+  Widget build(BuildContext context) {
+    return ReaderLayout(
+      title: '',
+      currentPage: 1,
+      totalPages: 1,
+      chromeVisible: chromeVisible,
+      viewportStatus: viewportStatus,
+      onBack: onBack,
+      onToggleChromeFromKeyboard: onToggleChrome,
+      onTapZone: (ReaderViewportTapZone zone) {
+        if (zone == ReaderViewportTapZone.center) {
+          onToggleChrome();
+        }
+      },
+      contentBuilder: contentBuilder,
+    );
   }
 }
 
