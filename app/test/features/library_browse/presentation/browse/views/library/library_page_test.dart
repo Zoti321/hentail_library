@@ -249,6 +249,32 @@ void main() {
     }
   });
 
+  testWidgets('right-clicking a series card opens the series action menu', (
+    WidgetTester tester,
+  ) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.windows;
+    try {
+      await _pumpLibraryPage(
+        tester,
+        target: LibraryDisplayTarget.series,
+        comics: const <ComicBrowseViewObject>[],
+        series: <SeriesBrowseViewObject>[
+          _seriesViewObject('s1', 'Series Alpha'),
+        ],
+      );
+
+      await tester.tap(find.byType(ComicCard), buttons: kSecondaryButton);
+      await tester.pumpAndSettle();
+
+      expect(find.text(l10n.comicDetailShowInExplorer), findsOneWidget);
+      expect(find.text(l10n.comicDetailEditMetadata), findsOneWidget);
+      expect(find.text(l10n.comicDetailRead), findsNothing);
+      expect(find.text(l10n.comicDetailDelete), findsNothing);
+    } finally {
+      debugDefaultTargetPlatformOverride = null;
+    }
+  });
+
   testWidgets('empty comics catalog shows the empty-library title', (
     WidgetTester tester,
   ) async {

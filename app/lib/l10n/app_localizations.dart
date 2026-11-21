@@ -1229,7 +1229,7 @@ abstract class AppLocalizations {
   /// No description provided for @homeTrashCardCaption.
   ///
   /// In zh, this message translates to:
-  /// **'可恢复删除'**
+  /// **'可恢复或永久删除'**
   String get homeTrashCardCaption;
 
   /// No description provided for @homeScanLibrary.
@@ -2795,7 +2795,7 @@ abstract class AppLocalizations {
   /// No description provided for @comicDetailEditMetadata.
   ///
   /// In zh, this message translates to:
-  /// **'编辑元数据'**
+  /// **'编辑'**
   String get comicDetailEditMetadata;
 
   /// No description provided for @refreshMetadata.
@@ -2825,13 +2825,13 @@ abstract class AppLocalizations {
   /// No description provided for @comicDetailShowInExplorer.
   ///
   /// In zh, this message translates to:
-  /// **'在资源管理器中显示'**
+  /// **'在资源管理器中打开'**
   String get comicDetailShowInExplorer;
 
   /// No description provided for @comicDetailShowInExplorerFailed.
   ///
   /// In zh, this message translates to:
-  /// **'无法在文件资源管理器中显示该项目'**
+  /// **'无法在文件资源管理器中打开该项目'**
   String get comicDetailShowInExplorerFailed;
 
   /// No description provided for @comicDetailDelete.
@@ -4825,7 +4825,7 @@ abstract class AppLocalizations {
   /// No description provided for @navTrash.
   ///
   /// In zh, this message translates to:
-  /// **'垃圾桶'**
+  /// **'回收站'**
   String get navTrash;
 
   /// No description provided for @readerOpenComicTrashed.
@@ -4837,13 +4837,13 @@ abstract class AppLocalizations {
   /// No description provided for @comicTrashConfirmContent.
   ///
   /// In zh, this message translates to:
-  /// **'「{title}」将移入「已删除」，可随时在那里恢复。'**
+  /// **'「{title}」将移入「回收站」，可随时在那里恢复。'**
   String comicTrashConfirmContent(String title);
 
   /// No description provided for @comicTrashedToast.
   ///
   /// In zh, this message translates to:
-  /// **'已移入「已删除」'**
+  /// **'已移入「回收站」'**
   String get comicTrashedToast;
 
   /// No description provided for @trashPageSummary.
@@ -4855,13 +4855,13 @@ abstract class AppLocalizations {
   /// No description provided for @trashEmptyTitle.
   ///
   /// In zh, this message translates to:
-  /// **'没有已删除的漫画'**
+  /// **'回收站是空的'**
   String get trashEmptyTitle;
 
   /// No description provided for @trashEmptyDescription.
   ///
   /// In zh, this message translates to:
-  /// **'删除的漫画会先放在这里，可恢复或永久删除。'**
+  /// **'删除的漫画会先放进回收站，可恢复或永久删除。'**
   String get trashEmptyDescription;
 
   /// No description provided for @trashRestore.
@@ -4939,13 +4939,13 @@ abstract class AppLocalizations {
   /// No description provided for @trashPurgePartialToast.
   ///
   /// In zh, this message translates to:
-  /// **'已永久删除 {succeeded} 本，{failed} 本失败（仍保留在「已删除」中）'**
+  /// **'已永久删除 {succeeded} 本，{failed} 本失败（仍保留在「回收站」中）'**
   String trashPurgePartialToast(int succeeded, int failed);
 
   /// No description provided for @trashPurgeFailedToast.
   ///
   /// In zh, this message translates to:
-  /// **'{count, plural, other{{count} 本永久删除失败，仍保留在「已删除」中}}'**
+  /// **'{count, plural, other{{count} 本永久删除失败，仍保留在「回收站」中}}'**
   String trashPurgeFailedToast(int count);
 
   /// No description provided for @comicPurgeTitle.

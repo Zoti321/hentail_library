@@ -5,7 +5,7 @@ import 'package:hentai_library/features/comic_trash/domain/trashed_comic.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
 
-/// Comic trash / restore / purge 与「已删除」列表（FRB owner：comic_trash API）。
+/// Comic trash / restore / purge 与回收站列表（FRB owner：comic_trash API）。
 class ComicTrashRepositoryImpl implements ComicTrashRepository {
   const ComicTrashRepositoryImpl({ComicTrashFrbAdapter? adapter})
     : _adapter = adapter ?? const ComicTrashFrbAdapter();

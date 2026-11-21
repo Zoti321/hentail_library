@@ -17,7 +17,7 @@ import 'package:material_symbols_icons/symbols.dart';
 
 const double _kTrashLoadMoreThreshold = 400;
 
-/// 「已删除」页（MD3E 生产版）：跨全部 Library 的 Comic trash，可恢复或永久删除。
+/// 回收站页（MD3E 生产版）：跨全部 Library 的 Comic trash，可恢复或永久删除。
 ///
 /// 页头与列表各自细粒度 select，避免勾选或 `isLoadingMore` 带动整页重建。
 class TrashPage extends ConsumerWidget {
@@ -39,24 +39,26 @@ class TrashPage extends ConsumerWidget {
 
     return ColoredBox(
       color: labBrowseCanvasColor(scheme),
-      child: NotificationListener<ScrollUpdateNotification>(
-        onNotification: (ScrollUpdateNotification notification) =>
-            _handleScroll(notification, ref),
-        child: CustomScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          slivers: <Widget>[
-            SliverPersistentHeader(
-              pinned: true,
-              delegate: PageHeaderDelegate(
-                layout: layout,
-                child: _TrashHeader(
-                  onOpenNavigation: appShellPageNavigationOpener(context),
-                  onBack: () => popOrGoHome(context),
+      child: SafeArea(
+        child: NotificationListener<ScrollUpdateNotification>(
+          onNotification: (ScrollUpdateNotification notification) =>
+              _handleScroll(notification, ref),
+          child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: <Widget>[
+              SliverPersistentHeader(
+                pinned: true,
+                delegate: PageHeaderDelegate(
+                  layout: layout,
+                  child: _TrashHeader(
+                    onOpenNavigation: appShellPageNavigationOpener(context),
+                    onBack: () => popOrGoHome(context),
+                  ),
                 ),
               ),
-            ),
-            const _TrashBody(),
-          ],
+              const _TrashBody(),
+            ],
+          ),
         ),
       ),
     );
@@ -71,7 +73,8 @@ class _TrashBody extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final PageLayoutSpec layout = PageLayoutSpec.of(context);
     final double horizontal = layout.horizontalInset;
-    final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
+    final M3EThemeData theme = M3ETheme.of(context);
+    final M3EColorScheme scheme = theme.colorScheme;
     final AppLocalizations l10n = context.l10n;
     final EdgeInsets padding = EdgeInsets.fromLTRB(
       horizontal,
@@ -124,7 +127,7 @@ class _TrashBody extends ConsumerWidget {
         sliver: SliverToBoxAdapter(
           child: Padding(
             padding: EdgeInsets.only(top: layout.stateTopInset),
-            child: const Center(child: CircularProgressIndicator()),
+            child: const Center(child: M3EProgressIndicator.circular()),
           ),
         ),
       );
@@ -135,11 +138,24 @@ class _TrashBody extends ConsumerWidget {
         padding: padding,
         sliver: SliverToBoxAdapter(
           child: Padding(
-            padding: EdgeInsets.only(top: layout.stateTopInset),
+            padding: EdgeInsets.symmetric(vertical: layout.stateTopInset),
             child: Center(
-              child: Text(
-                l10n.shellLoadFailed,
-                style: TextStyle(color: scheme.onSurfaceVariant),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 360),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Icon(Symbols.cloud_off, size: 48, color: scheme.outline),
+                    SizedBox(height: theme.spacing.sm),
+                    Text(
+                      l10n.shellLoadFailed,
+                      textAlign: TextAlign.center,
+                      style: theme.typeScale.titleMedium.copyWith(
+                        color: scheme.onSurface,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -150,7 +166,7 @@ class _TrashBody extends ConsumerWidget {
     if (items.isEmpty) {
       return SliverPadding(
         padding: padding,
-        sliver: SliverToBoxAdapter(child: _TrashEmptyState(scheme: scheme)),
+        sliver: const SliverToBoxAdapter(child: _TrashEmptyState()),
       );
     }
 
@@ -165,8 +181,9 @@ class _TrashBody extends ConsumerWidget {
           SliverToBoxAdapter(
             child: Text(
               l10n.trashPageSummary(totalCount),
-              style: Theme.of(context).textTheme.bodySmall
-                  ?.copyWith(color: scheme.onSurfaceVariant),
+              style: theme.typeScale.bodyMedium.copyWith(
+                color: scheme.onSurfaceVariant,
+              ),
             ),
           ),
           SliverToBoxAdapter(child: SizedBox(height: layout.listItemGap)),
@@ -187,7 +204,7 @@ class _TrashBody extends ConsumerWidget {
             const SliverToBoxAdapter(
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 24),
-                child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                child: Center(child: M3EProgressIndicator.circular()),
               ),
             ),
         ],
@@ -204,7 +221,8 @@ class _TrashHeader extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
+    final M3EThemeData theme = M3ETheme.of(context);
+    final M3EColorScheme scheme = theme.colorScheme;
     final AppLocalizations l10n = context.l10n;
     final bool hasItems = ref.watch(
       trashPageControllerProvider.select((AsyncValue<TrashPageState> async) {
@@ -233,10 +251,21 @@ class _TrashHeader extends ConsumerWidget {
         if (hasSelection)
           Padding(
             padding: const EdgeInsets.only(right: 8),
-            child: Text(
-              l10n.trashSelectedCount(selectedCount),
-              style: Theme.of(context).textTheme.bodyMedium
-                  ?.copyWith(color: scheme.onSurfaceVariant),
+            child: Material(
+              color: scheme.surfaceContainerHigh,
+              borderRadius: BorderRadius.circular(999),
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: theme.spacing.sm + 2,
+                  vertical: theme.spacing.xs,
+                ),
+                child: Text(
+                  l10n.trashSelectedCount(selectedCount),
+                  style: theme.typeScale.labelLarge.copyWith(
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
             ),
           ),
         M3EIconButton(
@@ -318,33 +347,41 @@ class _TrashHeader extends ConsumerWidget {
 }
 
 class _TrashEmptyState extends StatelessWidget {
-  const _TrashEmptyState({required this.scheme});
-
-  final M3EColorScheme scheme;
+  const _TrashEmptyState();
 
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
+    final M3EThemeData theme = M3ETheme.of(context);
+    final M3EColorScheme scheme = theme.colorScheme;
     return Padding(
       padding: EdgeInsets.only(top: PageLayoutSpec.of(context).stateTopInset),
       child: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          spacing: 8,
-          children: <Widget>[
-            Icon(Symbols.delete, size: 48, color: scheme.outline),
-            Text(
-              l10n.trashEmptyTitle,
-              style: Theme.of(context).textTheme.titleMedium
-                  ?.copyWith(color: scheme.onSurface),
-            ),
-            Text(
-              l10n.trashEmptyDescription,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium
-                  ?.copyWith(color: scheme.onSurfaceVariant),
-            ),
-          ],
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 360),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Icon(Symbols.delete_sweep, size: 48, color: scheme.outline),
+              SizedBox(height: theme.spacing.sm),
+              Text(
+                l10n.trashEmptyTitle,
+                textAlign: TextAlign.center,
+                style: theme.typeScale.titleMedium.copyWith(
+                  color: scheme.onSurface,
+                ),
+              ),
+              SizedBox(height: theme.spacing.xs),
+              Text(
+                l10n.trashEmptyDescription,
+                textAlign: TextAlign.center,
+                style: theme.typeScale.bodyMedium.copyWith(
+                  color: scheme.onSurfaceVariant,
+                  height: 1.35,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

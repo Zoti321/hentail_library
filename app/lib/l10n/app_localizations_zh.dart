@@ -611,7 +611,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get homeHistoryCardCaption => '查看阅读记录';
 
   @override
-  String get homeTrashCardCaption => '可恢复删除';
+  String get homeTrashCardCaption => '可恢复或永久删除';
 
   @override
   String get homeScanLibrary => '扫描漫画库';
@@ -1504,7 +1504,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get comicDetailReadIncognito => '无痕阅读';
 
   @override
-  String get comicDetailEditMetadata => '编辑元数据';
+  String get comicDetailEditMetadata => '编辑';
 
   @override
   String get refreshMetadata => '刷新元数据';
@@ -1519,10 +1519,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get refreshMetadataBusy => '库同步或元数据刷新进行中';
 
   @override
-  String get comicDetailShowInExplorer => '在资源管理器中显示';
+  String get comicDetailShowInExplorer => '在资源管理器中打开';
 
   @override
-  String get comicDetailShowInExplorerFailed => '无法在文件资源管理器中显示该项目';
+  String get comicDetailShowInExplorerFailed => '无法在文件资源管理器中打开该项目';
 
   @override
   String get comicDetailDelete => '删除';
@@ -2670,18 +2670,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get bulkEditMetadataFieldSummaryClear => '清除';
 
   @override
-  String get navTrash => '垃圾桶';
+  String get navTrash => '回收站';
 
   @override
   String get readerOpenComicTrashed => '该漫画已删除，恢复后才能阅读。';
 
   @override
   String comicTrashConfirmContent(String title) {
-    return '「$title」将移入「已删除」，可随时在那里恢复。';
+    return '「$title」将移入「回收站」，可随时在那里恢复。';
   }
 
   @override
-  String get comicTrashedToast => '已移入「已删除」';
+  String get comicTrashedToast => '已移入「回收站」';
 
   @override
   String trashPageSummary(int count) {
@@ -2694,10 +2694,10 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get trashEmptyTitle => '没有已删除的漫画';
+  String get trashEmptyTitle => '回收站是空的';
 
   @override
-  String get trashEmptyDescription => '删除的漫画会先放在这里，可恢复或永久删除。';
+  String get trashEmptyDescription => '删除的漫画会先放进回收站，可恢复或永久删除。';
 
   @override
   String get trashRestore => '恢复';
@@ -2760,7 +2760,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String trashPurgePartialToast(int succeeded, int failed) {
-    return '已永久删除 $succeeded 本，$failed 本失败（仍保留在「已删除」中）';
+    return '已永久删除 $succeeded 本，$failed 本失败（仍保留在「回收站」中）';
   }
 
   @override
@@ -2768,7 +2768,7 @@ class AppLocalizationsZh extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count 本永久删除失败，仍保留在「已删除」中',
+      other: '$count 本永久删除失败，仍保留在「回收站」中',
     );
     return '$_temp0';
   }

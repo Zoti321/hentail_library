@@ -5,7 +5,7 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 ///
   /// 不用 `tertiaryContainer`：紫罗兰 seed 下 tertiary 易偏芥末黄，与品牌紫不协调。
 abstract final class HomeShortcutCardColors {
-  /// 柔和 surface 阶，介于漫画 [primaryContainer] 与垃圾桶 [secondaryContainer] 之间。
+  /// 柔和 surface 阶，介于漫画 [primaryContainer] 与回收站 [secondaryContainer] 之间。
   static Color historyBackground(M3EColorScheme scheme) =>
       scheme.surfaceContainerHigh;
 
@@ -17,7 +17,7 @@ abstract final class HomeShortcutCardColors {
   static Color trashForeground(M3EColorScheme scheme) =>
       scheme.onSecondaryContainer;
 
-  /// 与媒体页资源总览卡同系 primaryContainer，和历史 / 垃圾桶错开色阶。
+  /// 与媒体页资源总览卡同系 primaryContainer，和历史 / 回收站错开色阶。
   static Color mediaBackground(M3EColorScheme scheme) =>
       scheme.primaryContainer;
 

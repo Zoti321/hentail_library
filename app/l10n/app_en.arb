@@ -747,13 +747,13 @@
   "comicDetailUpdatedAt": "Updated",
   "comicDetailRead": "Read",
   "comicDetailReadIncognito": "Read incognito",
-  "comicDetailEditMetadata": "Edit metadata",
+  "comicDetailEditMetadata": "Edit",
   "refreshMetadata": "Refresh metadata",
   "refreshMetadataComicSuccess": "Metadata refreshed",
   "refreshMetadataComicFailed": "Failed to refresh metadata",
   "refreshMetadataBusy": "Library sync or metadata refresh is in progress",
-  "comicDetailShowInExplorer": "Show in file explorer",
-  "comicDetailShowInExplorerFailed": "Could not show this item in File Explorer",
+  "comicDetailShowInExplorer": "Open in file explorer",
+  "comicDetailShowInExplorerFailed": "Could not open this item in File Explorer",
   "comicDetailDelete": "Delete",
   "comicDetailDeleteTitle": "Delete comic?",
   "comicDetailDeleteLocalConfirm": "\"{title}\" will be removed from the library and its disk resource (file or image folder) will be permanently deleted. This cannot be undone.",
@@ -1367,7 +1367,7 @@
   "bulkEditMetadataFieldSummaryClear": "Clear",
   "navTrash": "Trash",
   "readerOpenComicTrashed": "This comic has been deleted. Restore it to read.",
-  "comicTrashConfirmContent": "\"{title}\" will be moved to Deleted. You can restore it from there at any time.",
+  "comicTrashConfirmContent": "\"{title}\" will be moved to Trash. You can restore it from there at any time.",
   "@comicTrashConfirmContent": {
     "placeholders": {
       "title": {
@@ -1375,7 +1375,7 @@
       }
     }
   },
-  "comicTrashedToast": "Moved to Deleted",
+  "comicTrashedToast": "Moved to Trash",
   "trashPageSummary": "{count, plural, one{1 comic · restore or delete permanently} other{{count} comics · restore or delete permanently}}",
   "@trashPageSummary": {
     "placeholders": {
@@ -1384,8 +1384,8 @@
       }
     }
   },
-  "trashEmptyTitle": "No deleted comics",
-  "trashEmptyDescription": "Deleted comics are kept here first. You can restore them or delete them permanently.",
+  "trashEmptyTitle": "Trash is empty",
+  "trashEmptyDescription": "Deleted comics are kept in Trash first. You can restore them or delete them permanently.",
   "trashRestore": "Restore",
   "trashPurge": "Delete permanently",
   "trashPurgeAll": "Delete all",
@@ -1426,7 +1426,7 @@
       }
     }
   },
-  "trashPurgePartialToast": "Permanently deleted {succeeded}; {failed} failed and remain in Deleted",
+  "trashPurgePartialToast": "Permanently deleted {succeeded}; {failed} failed and remain in Trash",
   "@trashPurgePartialToast": {
     "placeholders": {
       "succeeded": {
@@ -1437,7 +1437,7 @@
       }
     }
   },
-  "trashPurgeFailedToast": "{count, plural, one{1 comic could not be deleted and remains in Deleted} other{{count} comics could not be deleted and remain in Deleted}}",
+  "trashPurgeFailedToast": "{count, plural, one{1 comic could not be deleted and remains in Trash} other{{count} comics could not be deleted and remain in Trash}}",
   "@trashPurgeFailedToast": {
     "placeholders": {
       "count": {

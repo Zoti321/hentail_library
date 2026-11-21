@@ -1601,7 +1601,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get comicDetailReadIncognito => 'Read incognito';
 
   @override
-  String get comicDetailEditMetadata => 'Edit metadata';
+  String get comicDetailEditMetadata => 'Edit';
 
   @override
   String get refreshMetadata => 'Refresh metadata';
@@ -1617,11 +1617,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'Library sync or metadata refresh is in progress';
 
   @override
-  String get comicDetailShowInExplorer => 'Show in file explorer';
+  String get comicDetailShowInExplorer => 'Open in file explorer';
 
   @override
   String get comicDetailShowInExplorerFailed =>
-      'Could not show this item in File Explorer';
+      'Could not open this item in File Explorer';
 
   @override
   String get comicDetailDelete => 'Delete';
@@ -2818,11 +2818,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String comicTrashConfirmContent(String title) {
-    return '\"$title\" will be moved to Deleted. You can restore it from there at any time.';
+    return '\"$title\" will be moved to Trash. You can restore it from there at any time.';
   }
 
   @override
-  String get comicTrashedToast => 'Moved to Deleted';
+  String get comicTrashedToast => 'Moved to Trash';
 
   @override
   String trashPageSummary(int count) {
@@ -2836,11 +2836,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get trashEmptyTitle => 'No deleted comics';
+  String get trashEmptyTitle => 'Trash is empty';
 
   @override
   String get trashEmptyDescription =>
-      'Deleted comics are kept here first. You can restore them or delete them permanently.';
+      'Deleted comics are kept in Trash first. You can restore them or delete them permanently.';
 
   @override
   String get trashRestore => 'Restore';
@@ -2905,7 +2905,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String trashPurgePartialToast(int succeeded, int failed) {
-    return 'Permanently deleted $succeeded; $failed failed and remain in Deleted';
+    return 'Permanently deleted $succeeded; $failed failed and remain in Trash';
   }
 
   @override
@@ -2913,8 +2913,8 @@ class AppLocalizationsEn extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count comics could not be deleted and remain in Deleted',
-      one: '1 comic could not be deleted and remains in Deleted',
+      other: '$count comics could not be deleted and remain in Trash',
+      one: '1 comic could not be deleted and remains in Trash',
     );
     return '$_temp0';
   }

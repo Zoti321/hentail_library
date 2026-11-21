@@ -1,6 +1,7 @@
 /// series: widgets.
 library;
 
+export 'package:hentai_library/features/series/public/ui/series_card_actions.dart';
 export 'package:hentai_library/features/series/public/ui/series_cover_content.dart';
 export 'package:hentai_library/features/series/public/ui/series_detail_page.dart';
 export 'package:hentai_library/features/series/public/ui/series_detail_view_object.dart';

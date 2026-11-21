@@ -11,7 +11,7 @@ import 'package:hentai_library/features/library_admin/public.dart';
 
 part 'trash_page_controller.g.dart';
 
-/// 「已删除」页 ViewModel：分页加载、多选、恢复 / 永久删除。
+/// 回收站页 ViewModel：分页加载、多选、恢复 / 永久删除。
 @riverpod
 class TrashPageController extends _$TrashPageController {
   static const int _pageSize = kDefaultPageSize;

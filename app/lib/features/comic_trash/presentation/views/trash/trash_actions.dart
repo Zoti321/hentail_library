@@ -9,7 +9,7 @@ import 'package:hentai_library/features/comic_trash/presentation/views/trash/tra
 import 'package:hentai_library/features/comic_trash/domain/comic_purge_strategy.dart';
 import 'package:hentai_library/features/comic_trash/domain/trashed_comic.dart';
 
-/// 「已删除」页的恢复 / 永久删除入口（MD3E 页面共用，业务经 [trashPageControllerProvider]）。
+/// 回收站页的恢复 / 永久删除入口（MD3E 页面共用，业务经 [trashPageControllerProvider]）。
 Future<void> restoreTrashedComics(
   BuildContext context,
   WidgetRef ref,

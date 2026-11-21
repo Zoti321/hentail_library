@@ -95,8 +95,8 @@ void main() {
     expect(find.text('阅读时长'), findsOneWidget);
     expect(find.text('阅读历史'), findsOneWidget);
     expect(find.text('查看阅读记录'), findsOneWidget);
-    expect(find.text('垃圾桶'), findsOneWidget);
-    expect(find.text('可恢复删除'), findsOneWidget);
+    expect(find.text('回收站'), findsOneWidget);
+    expect(find.text('可恢复或永久删除'), findsOneWidget);
     expect(find.text('媒体'), findsOneWidget);
     expect(find.text('查看本地漫画资源的元数据写入概况。'), findsOneWidget);
     expect(find.text('进入'), findsNothing);

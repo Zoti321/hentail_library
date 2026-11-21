@@ -8,7 +8,7 @@ import 'package:hentai_library/features/comic_trash/domain/comic_trash_repositor
 
 typedef ComicPurgeOutcome = ({ComicPurgeResult result, List<String> purgedIds});
 
-/// Comic trash / restore / purge 与「已删除」列表查询（ADR-0023）。
+/// Comic trash / restore / purge 与回收站列表查询（ADR-0023）。
 ///
 /// 写入成功后发布 `ComicsTrashed` / `ComicsRestored`（ADR-0039）。
 class ComicTrashService {

@@ -280,7 +280,7 @@
   "homeTitle": "首页",
   "homeShortcutsSectionTitle": "快捷入口",
   "homeHistoryCardCaption": "查看阅读记录",
-  "homeTrashCardCaption": "可恢复删除",
+  "homeTrashCardCaption": "可恢复或永久删除",
   "homeScanLibrary": "扫描漫画库",
   "homeGreetingLateNight": "凌晨好",
   "homeGreetingEarlyMorning": "早上好",
@@ -749,13 +749,13 @@
   "comicDetailUpdatedAt": "更新时间",
   "comicDetailRead": "阅读",
   "comicDetailReadIncognito": "无痕阅读",
-  "comicDetailEditMetadata": "编辑元数据",
+  "comicDetailEditMetadata": "编辑",
   "refreshMetadata": "刷新元数据",
   "refreshMetadataComicSuccess": "已刷新元数据",
   "refreshMetadataComicFailed": "刷新元数据失败",
   "refreshMetadataBusy": "库同步或元数据刷新进行中",
-  "comicDetailShowInExplorer": "在资源管理器中显示",
-  "comicDetailShowInExplorerFailed": "无法在文件资源管理器中显示该项目",
+  "comicDetailShowInExplorer": "在资源管理器中打开",
+  "comicDetailShowInExplorerFailed": "无法在文件资源管理器中打开该项目",
   "comicDetailDelete": "删除",
   "comicDetailDeleteTitle": "删除漫画？",
   "comicDetailDeleteLocalConfirm": "将从库中移除「{title}」，并永久删除其在磁盘上的资源（文件或图片文件夹）。此操作不可撤销。",
@@ -1367,9 +1367,9 @@
   },
   "bulkEditMetadataFieldSummaryReplace": "替换",
   "bulkEditMetadataFieldSummaryClear": "清除",
-  "navTrash": "垃圾桶",
+  "navTrash": "回收站",
   "readerOpenComicTrashed": "该漫画已删除，恢复后才能阅读。",
-  "comicTrashConfirmContent": "「{title}」将移入「已删除」，可随时在那里恢复。",
+  "comicTrashConfirmContent": "「{title}」将移入「回收站」，可随时在那里恢复。",
   "@comicTrashConfirmContent": {
     "placeholders": {
       "title": {
@@ -1377,7 +1377,7 @@
       }
     }
   },
-  "comicTrashedToast": "已移入「已删除」",
+  "comicTrashedToast": "已移入「回收站」",
   "trashPageSummary": "{count, plural, other{共 {count} 本 • 可恢复或永久删除}}",
   "@trashPageSummary": {
     "placeholders": {
@@ -1386,8 +1386,8 @@
       }
     }
   },
-  "trashEmptyTitle": "没有已删除的漫画",
-  "trashEmptyDescription": "删除的漫画会先放在这里，可恢复或永久删除。",
+  "trashEmptyTitle": "回收站是空的",
+  "trashEmptyDescription": "删除的漫画会先放进回收站，可恢复或永久删除。",
   "trashRestore": "恢复",
   "trashPurge": "永久删除",
   "trashPurgeAll": "全部删除",
@@ -1428,7 +1428,7 @@
       }
     }
   },
-  "trashPurgePartialToast": "已永久删除 {succeeded} 本，{failed} 本失败（仍保留在「已删除」中）",
+  "trashPurgePartialToast": "已永久删除 {succeeded} 本，{failed} 本失败（仍保留在「回收站」中）",
   "@trashPurgePartialToast": {
     "placeholders": {
       "succeeded": {
@@ -1439,7 +1439,7 @@
       }
     }
   },
-  "trashPurgeFailedToast": "{count, plural, other{{count} 本永久删除失败，仍保留在「已删除」中}}",
+  "trashPurgeFailedToast": "{count, plural, other{{count} 本永久删除失败，仍保留在「回收站」中}}",
   "@trashPurgeFailedToast": {
     "placeholders": {
       "count": {

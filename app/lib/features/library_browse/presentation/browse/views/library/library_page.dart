@@ -6,6 +6,7 @@ import 'package:hentai_library/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/models/comic_browse_view_object.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/models/series_browse_view_object.dart';
+import 'package:hentai_library/features/series/public/ui/series_card_actions.dart';
 import 'package:hentai_library/features/series/public/ui/series_cover_content.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_inactive_subscription.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_selectors.dart';
@@ -605,15 +606,21 @@ abstract final class _LibraryCatalogSlivers {
               itemCount: series.length,
               itemBuilder: (BuildContext context, int index) {
                 final SeriesBrowseViewObject s = series[index];
-                return ComicListItem(
-                  title: s.name,
-                  pageLabel: context.l10n.seriesVolumeCountLabel(s.volumeCount),
-                  cover: SeriesCoverContent(
-                    seriesId: s.id,
-                    gridIndex: index,
-                    coverViewportScope: CoverViewportScopes.library,
+                return SeriesCardActions.fromBrowse(
+                  item: (seriesId: s.id, name: s.name),
+                  enabled: !librarySelection,
+                  child: ComicListItem(
+                    title: s.name,
+                    pageLabel: context.l10n.seriesVolumeCountLabel(
+                      s.volumeCount,
+                    ),
+                    cover: SeriesCoverContent(
+                      seriesId: s.id,
+                      gridIndex: index,
+                      coverViewportScope: CoverViewportScopes.library,
+                    ),
+                    onTap: () => _openSeriesDetail(ref, s.id),
                   ),
-                  onTap: () => _openSeriesDetail(ref, s.id),
                 );
               },
             ),
@@ -627,18 +634,22 @@ abstract final class _LibraryCatalogSlivers {
             itemBuilder:
                 (BuildContext context, int index, CatalogGridLayout _) {
                   final SeriesBrowseViewObject s = series[index];
-                  return ComicCard(
+                  return SeriesCardActions.fromBrowse(
                     key: ValueKey<String>('library-series-${s.id}'),
-                    title: s.name,
-                    subtitle: context.l10n.seriesVolumeCountLabel(
-                      s.volumeCount,
+                    item: (seriesId: s.id, name: s.name),
+                    enabled: !librarySelection,
+                    child: ComicCard(
+                      title: s.name,
+                      subtitle: context.l10n.seriesVolumeCountLabel(
+                        s.volumeCount,
+                      ),
+                      cover: SeriesCoverContent(
+                        seriesId: s.id,
+                        gridIndex: index,
+                        coverViewportScope: CoverViewportScopes.library,
+                      ),
+                      onTap: () => _openSeriesDetail(ref, s.id),
                     ),
-                    cover: SeriesCoverContent(
-                      seriesId: s.id,
-                      gridIndex: index,
-                      coverViewportScope: CoverViewportScopes.library,
-                    ),
-                    onTap: () => _openSeriesDetail(ref, s.id),
                   );
                 },
           ),

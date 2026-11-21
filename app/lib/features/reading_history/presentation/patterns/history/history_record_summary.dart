@@ -17,7 +17,9 @@ class HistoryRecordSummary extends StatelessWidget {
 
     return Text(
       l10n.historyRecordSummary(totalCount),
-      style: theme.typeScale.bodySmall.copyWith(color: scheme.onSurfaceVariant),
+      style: theme.typeScale.bodyMedium.copyWith(
+        color: scheme.onSurfaceVariant,
+      ),
     );
   }
 }

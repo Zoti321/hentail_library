@@ -13,7 +13,7 @@ export 'package:hentai_library/features/comic_trash/presentation/views/trash/wid
 /// 列表项内复选框列宽（与 M3E 触控目标对齐）。
 const double kTrashListCheckboxColumnWidth = 48;
 
-/// 「已删除」列表行：catalog 卡片内左侧 [M3ECheckbox] 列 + 封面与文案。
+/// 回收站列表行：catalog 卡片内左侧 [M3ECheckbox] 列 + 封面与文案。
 class TrashListItem extends StatelessWidget {
   const TrashListItem({
     super.key,

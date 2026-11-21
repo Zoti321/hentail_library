@@ -23,7 +23,7 @@ typedef ComicCardProjection = ({
 });
 
 /// 包裹 MD3E 漫画卡片：仅桌面端鼠标右键弹出 [M3EMenu]（与详情页顶栏 ⋮ 同款
-/// 宽度与样式：阅读、编辑元数据、在资源管理器中显示、删除）；移动端无上下文菜单。
+/// 宽度与样式：阅读、编辑、在资源管理器中打开、删除）；移动端无上下文菜单。
 ///
 /// 库页传入 [ComicCardProjection]；详情等仍可传完整 [Comic]。
 class ComicCardActions extends ConsumerWidget {

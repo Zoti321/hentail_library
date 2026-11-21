@@ -1,6 +1,6 @@
 import 'package:hentai_library/features/comic/public/comic.dart';
 
-/// 处于 Comic trash 的漫画（「已删除」页列表项）。
+/// 处于 Comic trash 的漫画（回收站页列表项）。
 typedef TrashedComic = ({
   Comic comic,
   DateTime deletedAt,
@@ -10,7 +10,7 @@ typedef TrashedComic = ({
   bool isRemote,
 });
 
-/// 「已删除」中的漫画总数及 Local / Remote 拆分。
+/// 回收站中的漫画总数及 Local / Remote 拆分。
 typedef TrashedComicCounts = ({int total, int local, int remote});
 
 /// Comic purge 逐本处理的汇总结果。

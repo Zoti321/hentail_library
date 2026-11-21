@@ -1,7 +1,7 @@
 import 'package:hentai_library/features/comic_trash/domain/comic_purge_strategy.dart';
 import 'package:hentai_library/features/comic_trash/domain/trashed_comic.dart';
 
-/// 「已删除」页状态：分页列表 + 多选。
+/// 回收站页状态：分页列表 + 多选。
 class TrashPageState {
   const TrashPageState({
     this.items = const <TrashedComic>[],

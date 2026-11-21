@@ -98,8 +98,8 @@ void main() {
   ) async {
     await _pumpTrash(tester, const <TrashedComic>[]);
 
-    expect(find.text('没有已删除的漫画'), findsOneWidget);
-    expect(find.text('删除的漫画会先放在这里，可恢复或永久删除。'), findsOneWidget);
+    expect(find.text('回收站是空的'), findsOneWidget);
+    expect(find.text('删除的漫画会先放进回收站，可恢复或永久删除。'), findsOneWidget);
   });
 
   testWidgets('lists trashed comics with library and Local / Remote badge', (

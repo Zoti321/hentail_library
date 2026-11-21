@@ -35,6 +35,7 @@ class HomeLibraryRowMoreMenu extends StatelessWidget {
       if (comicCatalog || imageSetCatalog)
         M3EMenuEntry(
           label: l10n.sidebarScanLibrary,
+          leading: const Icon(LucideIcons.scanSearch),
           enabled: scanEnabled,
           onPressed: scanEnabled
               ? () => emit(HomeLibraryManagementAction.scan)
@@ -43,6 +44,7 @@ class HomeLibraryRowMoreMenu extends StatelessWidget {
       if (comicCatalog)
         M3EMenuEntry(
           label: l10n.sidebarDeepScanLibrary,
+          leading: const Icon(LucideIcons.radar),
           enabled: scanEnabled,
           onPressed: scanEnabled
               ? () => emit(HomeLibraryManagementAction.deepScan)
@@ -51,6 +53,7 @@ class HomeLibraryRowMoreMenu extends StatelessWidget {
       if (comicCatalog)
         M3EMenuEntry(
           label: l10n.refreshMetadata,
+          leading: const Icon(LucideIcons.refreshCw),
           enabled: menuEnabled && !row.metadataRefreshInProgress,
           onPressed: menuEnabled && !row.metadataRefreshInProgress
               ? () => emit(HomeLibraryManagementAction.refreshMetadata)
@@ -60,6 +63,7 @@ class HomeLibraryRowMoreMenu extends StatelessWidget {
         label: row.kind == HomeLibraryKind.remote
             ? l10n.sidebarEditLibraryConnection
             : l10n.sidebarEditLibrary,
+        leading: const Icon(LucideIcons.squarePen),
         enabled: menuEnabled,
         onPressed: menuEnabled
             ? () => emit(HomeLibraryManagementAction.edit)
