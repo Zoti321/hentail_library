@@ -61,6 +61,9 @@ class GoRouterAppNavigator implements AppNavigator {
   void pushTrash() => _router.push(AppRoutes.trash);
 
   @override
+  void pushMedia() => _router.push(AppRoutes.media);
+
+  @override
   void goSettings() => _router.go(AppRoutes.settings);
 
   @override

@@ -91,6 +91,7 @@ void main() {
       final gateway = ResourceMetadataTestGateway();
       await _pump(tester, gateway);
       final l10n = AppLocalizations.of(tester.element(find.byType(MediaPage)));
+      expect(find.byType(PageHeaderBackButton), findsOneWidget);
       expect(find.text('24'), findsOneWidget);
       expect(find.text('12'), findsOneWidget);
       expect(find.text('6'), findsOneWidget);

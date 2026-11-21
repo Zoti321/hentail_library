@@ -36,6 +36,9 @@ abstract class AppNavigator {
 
   void pushTrash();
 
+  /// 首页下钻媒体概览（压栈；与 [pushHistory] / [pushTrash] 同款）。
+  void pushMedia();
+
   void goSettings();
 
   // ---- detail intents ----
