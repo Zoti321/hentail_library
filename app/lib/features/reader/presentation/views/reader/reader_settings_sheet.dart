@@ -1,22 +1,23 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:hentai_library/l10n/app_localizations.dart';
-import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
+import 'package:hentai_library/design-system/design_system.dart';
 import 'package:hentai_library/features/app_settings/public/providers/app_settings_providers.dart';
+import 'package:hentai_library/features/reader/application/reading_preferences_acl.dart';
 import 'package:hentai_library/features/reader/domain/auto_play_interval.dart';
 import 'package:hentai_library/features/reader/domain/auto_play_mode.dart';
 import 'package:hentai_library/features/reader/domain/reading_mode.dart';
 import 'package:hentai_library/features/reader/domain/reading_preferences.dart';
-import 'package:hentai_library/features/reader/presentation/patterns/reader/reader_adaptive_panel.dart';
 import 'package:hentai_library/features/reader/presentation/l10n/reading_preference_l10n.dart';
-import 'package:hentai_library/features/reader/application/reading_preferences_acl.dart';
+import 'package:hentai_library/features/reader/presentation/patterns/reader/reader_adaptive_panel.dart';
 import 'package:hentai_library/features/reader/presentation/providers/reading_preferences_providers.dart';
-import 'package:hentai_library/design-system/design_system.dart';
+import 'package:hentai_library/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-/// 阅读设置面板（MD3E，#393 第三批）：与设置页「阅读」分类共用唯一写入口
+/// 阅读设置面板（MD3E）：与设置页「阅读」分类共用唯一写入口
 /// [readingPreferencesControllerProvider]（ADR-0046）。
 abstract final class ReaderSettingsSheet {
   ReaderSettingsSheet._();
@@ -27,7 +28,11 @@ abstract final class ReaderSettingsSheet {
   }) {
     return ReaderAdaptivePanel.show<void>(
       context,
+      // expanded+ side sheet 仍需 title（dialog 名）；关闭钮与 bottom 全屏头关闭。
       title: context.l10n.readerSettingsTitle,
+      expandToFullScreen: false,
+      showCloseButton: false,
+      scrollable: false,
       body: _ReaderSettingsBody(seriesAutoPlayModes: seriesAutoPlayModes),
     );
   }
@@ -47,6 +52,8 @@ class _ReaderSettingsBody extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
+    final M3EThemeData m3e = M3ETheme.of(context);
+    final M3ESpacing spacing = m3e.spacing;
     final ReadingPreferences prefs = ref.watch(readingPreferencesProvider);
     final ReadingPreferencesController controller = ref.read(
       readingPreferencesControllerProvider,
@@ -59,6 +66,12 @@ class _ReaderSettingsBody extends ConsumerWidget {
     final ReaderModeCategory category = mode.category;
     final PagedLayout pagedLayout = mode.pagedLayout ?? PagedLayout.single;
     final int interval = prefs.autoPlayIntervalSeconds;
+    final bool marginEnabled =
+        prefs.webtoonZoomMode == WebtoonZoomMode.fitWidth;
+    final AutoPlayMode selectedAutoPlay =
+        autoPlayOptions.contains(prefs.autoPlayMode)
+        ? prefs.autoPlayMode
+        : AutoPlayMode.comicOnce;
 
     void applyReadingMode(ReadingMode value) {
       unawaited(
@@ -69,46 +82,37 @@ class _ReaderSettingsBody extends ConsumerWidget {
       );
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+    return ListView(
+      padding: EdgeInsets.fromLTRB(
+        spacing.md,
+        spacing.sm,
+        spacing.md,
+        spacing.lg,
+      ),
       children: <Widget>[
-        ContentSection.group(
+        _ReaderSettingSection(
           title: l10n.readerSettingsReadingMode,
-          children: <Widget>[
-            SettingsNavigationTile(
-              leading: Symbols.menu_book,
-              title: Text(l10n.readerSettingsReadingMode),
-              value: Text(l10n.readerModeCategoryLabel(category)),
-              onTap: () => _pickOption<ReaderModeCategory>(
-                context,
-                title: l10n.readerSettingsReadingMode,
-                options: ReaderModeCategory.values,
-                current: category,
-                labelOf: l10n.readerModeCategoryLabel,
-                onSelected: (ReaderModeCategory value) {
-                  applyReadingMode(switch (value) {
-                    ReaderModeCategory.paged => pagedLayout.toReadingMode(),
-                    ReaderModeCategory.webtoon => ReadingMode.webtoon,
-                  });
-                },
-              ),
-            ),
-          ],
+          child: _ReaderSettingChipGroup<ReaderModeCategory>(
+            options: ReaderModeCategory.values,
+            selected: category,
+            labelOf: l10n.readerModeCategoryLabel,
+            onSelected: (ReaderModeCategory value) {
+              applyReadingMode(switch (value) {
+                ReaderModeCategory.paged => pagedLayout.toReadingMode(),
+                ReaderModeCategory.webtoon => ReadingMode.webtoon,
+              });
+            },
+          ),
         ),
-        ContentSection.group(
+        SizedBox(height: spacing.lg),
+        _ReaderSettingSection(
           title: l10n.readerSettingsAutoPlay,
-          children: <Widget>[
-            SettingsNavigationTile(
-              leading: Symbols.repeat,
-              title: Text(l10n.readerSettingsAutoPlayMode),
-              value: Text(l10n.autoPlayModeLabel(prefs.autoPlayMode)),
-              onTap: () => _pickOption<AutoPlayMode>(
-                context,
-                title: l10n.readerSettingsAutoPlayMode,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              _ReaderSettingChipGroup<AutoPlayMode>(
                 options: autoPlayOptions,
-                current: autoPlayOptions.contains(prefs.autoPlayMode)
-                    ? prefs.autoPlayMode
-                    : AutoPlayMode.comicOnce,
+                selected: selectedAutoPlay,
                 labelOf: l10n.autoPlayModeLabel,
                 onSelected: (AutoPlayMode value) {
                   unawaited(
@@ -120,85 +124,62 @@ class _ReaderSettingsBody extends ConsumerWidget {
                   );
                 },
               ),
-            ),
-            SettingsNavigationTile(
-              leading: Symbols.timer,
-              title: Text(l10n.readerSettingsPlayInterval),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  IconButton(
-                    icon: const Icon(Symbols.remove),
-                    onPressed: interval <= kReaderAutoPlayIntervalMin
-                        ? null
-                        : () => unawaited(
-                            controller.setAutoPlayIntervalSeconds(interval - 1),
-                          ),
-                  ),
-                  Text('$interval ${l10n.readerSettingsSecondsSuffix}'),
-                  IconButton(
-                    icon: const Icon(Symbols.add),
-                    onPressed: interval >= kReaderAutoPlayIntervalMax
-                        ? null
-                        : () => unawaited(
-                            controller.setAutoPlayIntervalSeconds(interval + 1),
-                          ),
-                  ),
-                ],
+              SizedBox(height: spacing.md),
+              _AutoPlayIntervalRow(
+                label: l10n.readerSettingsPlayInterval,
+                interval: interval,
+                secondsSuffix: l10n.readerSettingsSecondsSuffix,
+                onDecrement: interval <= kReaderAutoPlayIntervalMin
+                    ? null
+                    : () => unawaited(
+                        controller.setAutoPlayIntervalSeconds(interval - 1),
+                      ),
+                onIncrement: interval >= kReaderAutoPlayIntervalMax
+                    ? null
+                    : () => unawaited(
+                        controller.setAutoPlayIntervalSeconds(interval + 1),
+                      ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-        ContentSection.group(
+        SizedBox(height: spacing.lg),
+        _ReaderSettingSection(
           title: l10n.readerSettingsPagedOptions,
-          children: <Widget>[
-            SettingsNavigationTile(
-              leading: Symbols.view_day,
-              title: Text(l10n.readerSettingsPageLayout),
-              value: Text(l10n.pagedLayoutLabel(pagedLayout)),
-              onTap: () => _pickOption<PagedLayout>(
-                context,
-                title: l10n.readerSettingsPageLayout,
-                options: PagedLayout.values,
-                current: pagedLayout,
-                labelOf: l10n.pagedLayoutLabel,
-                onSelected: (PagedLayout value) {
-                  applyReadingMode(value.toReadingMode());
-                },
-              ),
-            ),
-          ],
+          child: _ReaderSettingChipGroup<PagedLayout>(
+            options: PagedLayout.values,
+            selected: pagedLayout,
+            labelOf: l10n.pagedLayoutLabel,
+            onSelected: (PagedLayout value) {
+              applyReadingMode(value.toReadingMode());
+            },
+          ),
         ),
-        ContentSection.group(
+        SizedBox(height: spacing.lg),
+        _ReaderSettingSection(
           title: l10n.readerSettingsWebtoonMode,
-          children: <Widget>[
-            SettingsNavigationTile(
-              leading: Symbols.width_normal,
-              title: Text(l10n.readerSettingsHorizontalMargin),
-              enabled: prefs.webtoonZoomMode == WebtoonZoomMode.fitWidth,
-              value: Text(
-                l10n.readerWebtoonMarginLabel(prefs.webtoonMarginPercent),
-              ),
-              onTap: () => _pickOption<int>(
-                context,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              _ReaderSettingSubheader(
                 title: l10n.readerSettingsHorizontalMargin,
+              ),
+              SizedBox(height: spacing.sm),
+              _ReaderSettingChipGroup<int>(
                 options: _kWebtoonMarginOptions,
-                current: prefs.webtoonMarginPercent,
+                selected: prefs.webtoonMarginPercent,
                 labelOf: l10n.readerWebtoonMarginLabel,
+                enabled: marginEnabled,
                 onSelected: (int value) {
                   unawaited(controller.setWebtoonMarginPercent(value));
                 },
               ),
-            ),
-            SettingsNavigationTile(
-              leading: Symbols.zoom_in,
-              title: Text(l10n.readerSettingsZoomMode),
-              value: Text(l10n.webtoonZoomModeLabel(prefs.webtoonZoomMode)),
-              onTap: () => _pickOption<WebtoonZoomMode>(
-                context,
-                title: l10n.readerSettingsZoomMode,
+              SizedBox(height: spacing.md),
+              _ReaderSettingSubheader(title: l10n.readerSettingsZoomMode),
+              SizedBox(height: spacing.sm),
+              _ReaderSettingChipGroup<WebtoonZoomMode>(
                 options: WebtoonZoomMode.values,
-                current: prefs.webtoonZoomMode,
+                selected: prefs.webtoonZoomMode,
                 labelOf: l10n.webtoonZoomModeLabel,
                 onSelected: (WebtoonZoomMode value) {
                   unawaited(
@@ -210,44 +191,132 @@ class _ReaderSettingsBody extends ConsumerWidget {
                   );
                 },
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ],
     );
   }
 }
 
-/// 二级选项列表：选中后关闭自身并回调。
-Future<void> _pickOption<T>(
-  BuildContext context, {
-  required String title,
-  required List<T> options,
-  required T current,
-  required String Function(T value) labelOf,
-  required ValueChanged<T> onSelected,
-}) {
-  return ReaderAdaptivePanel.show<void>(
-    context,
-    title: title,
-    body: Builder(
-      builder: (BuildContext sheetContext) {
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            for (final T option in options)
-              ListTile(
-                title: Text(labelOf(option)),
-                trailing: option == current ? const Icon(Symbols.check) : null,
-                onTap: () {
-                  Navigator.of(sheetContext).pop();
-                  onSelected(option);
-                },
-              ),
-          ],
-        );
-      },
-    ),
-  );
+class _ReaderSettingSection extends StatelessWidget {
+  const _ReaderSettingSection({required this.title, required this.child});
+
+  final String title;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final M3EThemeData m3e = M3ETheme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        Semantics(
+          header: true,
+          child: Text(
+            title,
+            style: m3e.typeScale.titleSmall.copyWith(
+              color: m3e.colorScheme.onSurfaceVariant,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        SizedBox(height: m3e.spacing.sm),
+        child,
+      ],
+    );
+  }
+}
+
+class _ReaderSettingSubheader extends StatelessWidget {
+  const _ReaderSettingSubheader({required this.title});
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    final M3EThemeData m3e = M3ETheme.of(context);
+    return Text(
+      title,
+      style: m3e.typeScale.bodyMedium.copyWith(
+        color: m3e.colorScheme.onSurfaceVariant,
+        fontWeight: FontWeight.w600,
+      ),
+    );
+  }
+}
+
+class _ReaderSettingChipGroup<T> extends StatelessWidget {
+  const _ReaderSettingChipGroup({
+    required this.options,
+    required this.selected,
+    required this.labelOf,
+    required this.onSelected,
+    this.enabled = true,
+  });
+
+  final List<T> options;
+  final T selected;
+  final String Function(T value) labelOf;
+  final ValueChanged<T> onSelected;
+  final bool enabled;
+
+  @override
+  Widget build(BuildContext context) {
+    final M3ESpacing spacing = M3ETheme.of(context).spacing;
+    return Wrap(
+      spacing: spacing.sm,
+      runSpacing: spacing.sm,
+      children: <Widget>[
+        for (final T option in options)
+          M3EChip(
+            label: labelOf(option),
+            type: M3EChipType.filter,
+            selected: option == selected,
+            onPressed: enabled ? () => onSelected(option) : null,
+          ),
+      ],
+    );
+  }
+}
+
+class _AutoPlayIntervalRow extends StatelessWidget {
+  const _AutoPlayIntervalRow({
+    required this.label,
+    required this.interval,
+    required this.secondsSuffix,
+    required this.onDecrement,
+    required this.onIncrement,
+  });
+
+  final String label;
+  final int interval;
+  final String secondsSuffix;
+  final VoidCallback? onDecrement;
+  final VoidCallback? onIncrement;
+
+  @override
+  Widget build(BuildContext context) {
+    final M3EThemeData m3e = M3ETheme.of(context);
+    return Row(
+      children: <Widget>[
+        Expanded(
+          child: Text(
+            label,
+            style: m3e.typeScale.bodyLarge.copyWith(
+              color: m3e.colorScheme.onSurface,
+            ),
+          ),
+        ),
+        IconButton(icon: const Icon(Symbols.remove), onPressed: onDecrement),
+        Text(
+          '$interval $secondsSuffix',
+          style: m3e.typeScale.bodyLarge.copyWith(
+            color: m3e.colorScheme.onSurface,
+          ),
+        ),
+        IconButton(icon: const Icon(Symbols.add), onPressed: onIncrement),
+      ],
+    );
+  }
 }

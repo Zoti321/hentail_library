@@ -31,11 +31,16 @@ abstract final class ReaderAdaptivePanel {
     return 400;
   }
 
+  /// [expandToFullScreen] / [showCloseButton] 控制标题栏 chrome；阅读设置可关掉。
+  /// [scrollable] 为 false 时由 [body] 自行滚动（如内部 [ListView]）。
   static Future<T?> show<T>(
     BuildContext context, {
     required String title,
     required Widget body,
     bool useRootNavigator = false,
+    bool expandToFullScreen = true,
+    bool showCloseButton = true,
+    bool scrollable = true,
   }) {
     final double viewportWidth = MediaQuery.sizeOf(context).width;
     final M3EThemeData m3e = M3ETheme.of(context);
@@ -48,8 +53,8 @@ abstract final class ReaderAdaptivePanel {
       return M3EBottomSheet.show<T>(
         context,
         useRootNavigator: useRootNavigator,
-        expandToFullScreen: true,
-        fullScreenTitle: title,
+        expandToFullScreen: expandToFullScreen,
+        fullScreenTitle: expandToFullScreen ? title : null,
         theme: m3e.bottomSheetTheme,
         builder: (BuildContext sheetContext) {
           return PrimaryScrollController.none(child: scopedBody);
@@ -60,10 +65,11 @@ abstract final class ReaderAdaptivePanel {
     return M3ESideSheet.show<T>(
       context,
       title: title,
+      showCloseButton: showCloseButton,
       width: sideSheetWidthFor(viewportWidth),
       detached: sideSheetDetachedFor(viewportWidth),
       theme: sideSheetTheme(m3e),
-      scrollable: true,
+      scrollable: scrollable,
       useRootNavigator: useRootNavigator,
       body: scopedBody,
     );
