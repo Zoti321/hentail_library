@@ -82,7 +82,12 @@ export 'components/catalog/comic_list_item.dart'
         kComicListItemTitleSlotHeight,
         kComicListItemVerticalPadding;
 export 'components/catalog/overflow_title_hover_label.dart'
-    show OverflowTitleHoverLabel, kOverflowTitleHoverWait;
+    show
+        OverflowTitleHoverLabel,
+        kOverflowTitleHoverCursorOffset,
+        kOverflowTitleHoverLabelStyle,
+        kOverflowTitleHoverMaxWidth,
+        kOverflowTitleHoverWait;
 export 'components/catalog/cover_read_progress_strip.dart'
     show
         CoverReadProgressStrip,

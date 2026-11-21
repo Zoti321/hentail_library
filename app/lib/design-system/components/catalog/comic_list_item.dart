@@ -30,14 +30,11 @@ double get kComicListItemMinHeight =>
 /// Max width of the read-progress bar when shown under meta (list-only layout).
 const double kComicListItemProgressMaxWidth = 160;
 
-/// Gap between meta line and list progress bar.
-const double kComicListItemProgressTopGap = 6;
+/// Gap between meta line and list progress bar (progress sits on cover bottom).
+const double kComicListItemProgressTopGap = 4;
 
-/// Gap above the Tag chip row.
-const double kComicListItemTagTopGap = 4;
-
-/// Gap above the meta / page-label row.
-const double kComicListItemMetaTopGap = 4;
+/// Gap between title and Tag chip row (tags sit under title).
+const double kComicListItemTagTopGap = 6;
 
 /// Fixed title slot height (single-line titleSmall).
 const double kComicListItemTitleSlotHeight = 20;
@@ -229,87 +226,93 @@ class ComicListItem extends StatelessWidget {
     final TextStyle titleStyle = comicCatalogTitleStyle(type, scheme);
     final TextStyle metaStyle = comicCatalogSubtitleStyle(type, scheme);
 
-    final Widget infoColumn = Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        SizedBox(
-          height: kComicListItemTitleSlotHeight,
-          width: double.infinity,
-          child: Align(
-            alignment: AlignmentDirectional.centerStart,
-            child: OverflowTitleHoverLabel(text: title, style: titleStyle),
+    // Info column matches cover height: title top-aligned, progress bottom-aligned;
+    // Tag under title, meta above progress, flexible space between.
+    final Widget infoColumn = SizedBox(
+      height: kComicListItemCoverHeight,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          SizedBox(
+            height: kComicListItemTitleSlotHeight,
+            width: double.infinity,
+            child: Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: OverflowTitleHoverLabel(text: title, style: titleStyle),
+            ),
           ),
-        ),
-        const SizedBox(height: kComicListItemTagTopGap),
-        SizedBox(
-          key: kComicListItemTagSlotKey,
-          height: kComicListItemTagSlotHeight,
-          width: double.infinity,
-          child: visibleTags.isEmpty
-              ? null
-              : Align(
-                  alignment: AlignmentDirectional.centerStart,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      for (int i = 0; i < visibleTags.length; i++) ...<Widget>[
-                        if (i > 0)
-                          const SizedBox(width: kComicListItemTagChipGap),
-                        OutlinedMetaChip(
-                          text: visibleTags[i],
-                          compact: true,
-                        ),
+          const SizedBox(height: kComicListItemTagTopGap),
+          SizedBox(
+            key: kComicListItemTagSlotKey,
+            height: kComicListItemTagSlotHeight,
+            width: double.infinity,
+            child: visibleTags.isEmpty
+                ? null
+                : Align(
+                    alignment: AlignmentDirectional.centerStart,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        for (int i = 0; i < visibleTags.length; i++) ...<Widget>[
+                          if (i > 0)
+                            const SizedBox(width: kComicListItemTagChipGap),
+                          OutlinedMetaChip(
+                            text: visibleTags[i],
+                            compact: true,
+                          ),
+                        ],
                       ],
-                    ],
+                    ),
                   ),
-                ),
-        ),
-        const SizedBox(height: kComicListItemMetaTopGap),
-        SizedBox(
-          height: kComicListItemMetaSlotHeight,
-          width: double.infinity,
-          child: meta == null
-              ? null
-              : Align(
-                  alignment: AlignmentDirectional.centerStart,
-                  child: Text(
-                    meta,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: metaStyle,
+          ),
+          const Spacer(),
+          SizedBox(
+            height: kComicListItemMetaSlotHeight,
+            width: double.infinity,
+            child: meta == null
+                ? null
+                : Align(
+                    alignment: AlignmentDirectional.centerStart,
+                    child: Text(
+                      meta,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: metaStyle,
+                    ),
                   ),
-                ),
-        ),
-        const SizedBox(height: kComicListItemProgressTopGap),
-        SizedBox(
-          key: kComicListItemInfoProgressSlotKey,
-          height: kCoverReadProgressHeight,
-          width: double.infinity,
-          child: showListProgress
-              ? LayoutBuilder(
-                  builder: (BuildContext context, BoxConstraints constraints) {
-                    final double progressWidth = infoProgressWidthFor(
-                      constraints.maxWidth,
-                    );
-                    return Align(
-                      alignment: AlignmentDirectional.centerStart,
-                      child: SizedBox(
-                        width: progressWidth,
-                        height: kCoverReadProgressHeight,
-                        child: CoverReadProgressStrip(
-                          key: kComicListItemInfoProgressKey,
-                          progress: readProgress!,
-                          activeColor: scheme.primary,
-                          trackColor: scheme.onSurface.withValues(alpha: 0.24),
+          ),
+          const SizedBox(height: kComicListItemProgressTopGap),
+          SizedBox(
+            key: kComicListItemInfoProgressSlotKey,
+            height: kCoverReadProgressHeight,
+            width: double.infinity,
+            child: showListProgress
+                ? LayoutBuilder(
+                    builder:
+                        (BuildContext context, BoxConstraints constraints) {
+                      final double progressWidth = infoProgressWidthFor(
+                        constraints.maxWidth,
+                      );
+                      return Align(
+                        alignment: AlignmentDirectional.centerStart,
+                        child: SizedBox(
+                          width: progressWidth,
+                          height: kCoverReadProgressHeight,
+                          child: CoverReadProgressStrip(
+                            key: kComicListItemInfoProgressKey,
+                            progress: readProgress!,
+                            activeColor: scheme.primary,
+                            trackColor:
+                                scheme.onSurface.withValues(alpha: 0.24),
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                )
-              : null,
-        ),
-      ],
+                      );
+                    },
+                  )
+                : null,
+          ),
+        ],
+      ),
     );
 
     final Widget row = Padding(
@@ -320,14 +323,17 @@ class ComicListItem extends StatelessWidget {
         kComicListItemVerticalPadding,
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           coverLayer,
           SizedBox(width: spacing.md),
           Expanded(child: infoColumn),
           if (trailingMore != null) ...<Widget>[
             const SizedBox(width: 4),
-            trailingMore,
+            SizedBox(
+              height: kComicListItemCoverHeight,
+              child: Center(child: trailingMore),
+            ),
           ],
         ],
       ),
