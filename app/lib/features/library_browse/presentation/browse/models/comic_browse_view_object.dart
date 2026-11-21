@@ -4,4 +4,5 @@ typedef ComicBrowseViewObject = ({
   String title,
   int pageCount,
   String path,
+  List<String> tagNames,
 });

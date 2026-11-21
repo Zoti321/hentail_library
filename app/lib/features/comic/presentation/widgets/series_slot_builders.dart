@@ -41,6 +41,7 @@ Widget buildSeriesMemberCardSlot(SeriesMemberCardArgs args, Widget child) {
       title: args.title,
       pageCount: args.pageCount ?? 0,
       path: args.path,
+      tagNames: const <String>[],
     ),
     child: child,
   );

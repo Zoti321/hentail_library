@@ -47,6 +47,10 @@ class LibraryPage extends ConsumerStatefulWidget {
 class _LibraryPageState extends ConsumerState<LibraryPage> {
   final ScrollController _comicsScrollController = ScrollController();
   final ScrollController _seriesScrollController = ScrollController();
+  final TextEditingController _comicsSearchPlaceholderController =
+      TextEditingController();
+  final TextEditingController _seriesSearchPlaceholderController =
+      TextEditingController();
   CatalogViewMode _viewMode = CatalogViewMode.grid;
 
   /// 首帧后再挂非活跃 Tab / 预热其 catalog，避免与活跃 Tab 抢首屏。
@@ -71,6 +75,8 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
   void dispose() {
     _comicsScrollController.dispose();
     _seriesScrollController.dispose();
+    _comicsSearchPlaceholderController.dispose();
+    _seriesSearchPlaceholderController.dispose();
     super.dispose();
   }
 
@@ -161,6 +167,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                           target: LibraryDisplayTarget.comics,
                           viewMode: _viewMode,
                           warmPeerCounts: _warmInactiveCatalogs,
+                          searchController: _comicsSearchPlaceholderController,
                           onViewModeChanged: _handleViewModeChanged,
                         )
                       : const SizedBox.shrink(),
@@ -173,6 +180,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                           target: LibraryDisplayTarget.series,
                           viewMode: _viewMode,
                           warmPeerCounts: _warmInactiveCatalogs,
+                          searchController: _seriesSearchPlaceholderController,
                           onViewModeChanged: _handleViewModeChanged,
                         )
                       : const SizedBox.shrink(),
@@ -207,6 +215,7 @@ class _LibraryTabScrollView extends ConsumerWidget {
     required this.target,
     required this.viewMode,
     required this.warmPeerCounts,
+    required this.searchController,
     required this.onViewModeChanged,
   });
 
@@ -214,6 +223,7 @@ class _LibraryTabScrollView extends ConsumerWidget {
   final LibraryDisplayTarget target;
   final CatalogViewMode viewMode;
   final bool warmPeerCounts;
+  final TextEditingController searchController;
   final ValueChanged<CatalogViewMode> onViewModeChanged;
 
   @override
@@ -252,12 +262,21 @@ class _LibraryTabScrollView extends ConsumerWidget {
             0,
           ),
           sliver: SliverToBoxAdapter(
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: CatalogViewModeButtonGroup(
-                mode: viewMode,
-                onModeChanged: onViewModeChanged,
-              ),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: AppDenseSearchBar(
+                    controller: searchController,
+                    hintText: '',
+                    onChanged: (_) {},
+                  ),
+                ),
+                const SizedBox(width: 12),
+                CatalogViewModeButtonGroup(
+                  mode: viewMode,
+                  onModeChanged: onViewModeChanged,
+                ),
+              ],
             ),
           ),
         ),
@@ -531,6 +550,7 @@ abstract final class _LibraryCatalogSlivers {
                   child: ComicListItem(
                     title: comic.title,
                     pageLabel: l10n.comicDetailPageCount(comic.pageCount),
+                    tagLabels: comic.tagNames,
                     cover: ComicCoverContent(
                       comicId: comic.comicId,
                       gridIndex: index,

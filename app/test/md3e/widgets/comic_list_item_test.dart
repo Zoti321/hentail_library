@@ -56,7 +56,7 @@ void main() {
     expect(tapped, isTrue);
   });
 
-  testWidgets('ComicListItem hides info progress when readProgress is 0', (
+  testWidgets('ComicListItem reserves progress slot without strip when unread', (
     WidgetTester tester,
   ) async {
     await pumpDesignSystemApp(
@@ -67,6 +67,7 @@ void main() {
         cover: const ColoredBox(color: Color(0xFFE0E0E0)),
       ),
     );
+    expect(find.byKey(kComicListItemInfoProgressSlotKey), findsOneWidget);
     expect(find.byKey(kComicListItemInfoProgressKey), findsNothing);
   });
 
@@ -81,7 +82,41 @@ void main() {
         cover: const ColoredBox(color: Color(0xFFE0E0E0)),
       ),
     );
+    expect(find.byKey(kComicListItemInfoProgressSlotKey), findsOneWidget);
     expect(find.byKey(kComicListItemInfoProgressKey), findsOneWidget);
+  });
+
+  testWidgets('ComicListItem reserves tag slot and paints up to three chips', (
+    WidgetTester tester,
+  ) async {
+    await pumpDesignSystemApp(
+      tester,
+      home: ComicListItem(
+        title: '有标签',
+        pageLabel: '12 页',
+        tagLabels: const <String>['alpha', 'beta', 'gamma', 'delta'],
+        cover: const ColoredBox(color: Color(0xFFE0E0E0)),
+      ),
+    );
+    expect(find.byKey(kComicListItemTagSlotKey), findsOneWidget);
+    expect(find.text('alpha'), findsOneWidget);
+    expect(find.text('beta'), findsOneWidget);
+    expect(find.text('gamma'), findsOneWidget);
+    expect(find.text('delta'), findsNothing);
+  });
+
+  testWidgets('ComicListItem keeps tag slot when tags are empty', (
+    WidgetTester tester,
+  ) async {
+    await pumpDesignSystemApp(
+      tester,
+      home: ComicListItem(
+        title: '无标签',
+        cover: const ColoredBox(color: Color(0xFFE0E0E0)),
+      ),
+    );
+    expect(find.byKey(kComicListItemTagSlotKey), findsOneWidget);
+    expect(find.byType(OutlinedMetaChip), findsNothing);
   });
 
   testWidgets('ComicListItem shows more menu and opens on tap', (

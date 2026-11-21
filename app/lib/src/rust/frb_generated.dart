@@ -7198,13 +7198,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ComicBrowseItemDto dco_decode_comic_browse_item_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 4)
-      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
     return ComicBrowseItemDto(
       comicId: dco_decode_String(arr[0]),
       path: dco_decode_String(arr[1]),
       title: dco_decode_String(arr[2]),
       pageCount: dco_decode_i_32(arr[3]),
+      tagNames: dco_decode_list_String(arr[4]),
     );
   }
 
@@ -9757,11 +9758,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_path = sse_decode_String(deserializer);
     var var_title = sse_decode_String(deserializer);
     var var_pageCount = sse_decode_i_32(deserializer);
+    var var_tagNames = sse_decode_list_String(deserializer);
     return ComicBrowseItemDto(
       comicId: var_comicId,
       path: var_path,
       title: var_title,
       pageCount: var_pageCount,
+      tagNames: var_tagNames,
     );
   }
 
@@ -13015,6 +13018,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.path, serializer);
     sse_encode_String(self.title, serializer);
     sse_encode_i_32(self.pageCount, serializer);
+    sse_encode_list_String(self.tagNames, serializer);
   }
 
   @protected

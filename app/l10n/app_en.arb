@@ -267,7 +267,6 @@
   "pageTitleReader": "Reading",
   "pageTitleComicDetail": "Comic details",
   "pageTitleSeriesDetail": "Series details",
-  "pageTitleSearchResults": "Search results",
   "pageTitleNotFound": "Page not found",
   "shellOpenNavMenu": "Open navigation menu",
   "shellLoadFailed": "Failed to load",
@@ -703,15 +702,6 @@
       },
       "migrated": {
         "type": "int"
-      }
-    }
-  },
-  "searchResultsTitle": "Search results",
-  "searchResultsForQuery": "Search results for \"{query}\"",
-  "@searchResultsForQuery": {
-    "placeholders": {
-      "query": {
-        "type": "String"
       }
     }
   },

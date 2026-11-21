@@ -6951,11 +6951,13 @@ impl SseDecode for crate::api::comic::ComicBrowseItemDto {
         let mut var_path = <String>::sse_decode(deserializer);
         let mut var_title = <String>::sse_decode(deserializer);
         let mut var_pageCount = <i32>::sse_decode(deserializer);
+        let mut var_tagNames = <Vec<String>>::sse_decode(deserializer);
         return crate::api::comic::ComicBrowseItemDto {
             comic_id: var_comicId,
             path: var_path,
             title: var_title,
             page_count: var_pageCount,
+            tag_names: var_tagNames,
         };
     }
 }
@@ -10705,6 +10707,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::comic::ComicBrowseItemDto {
             self.path.into_into_dart().into_dart(),
             self.title.into_into_dart().into_dart(),
             self.page_count.into_into_dart().into_dart(),
+            self.tag_names.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -13516,6 +13519,7 @@ impl SseEncode for crate::api::comic::ComicBrowseItemDto {
         <String>::sse_encode(self.path, serializer);
         <String>::sse_encode(self.title, serializer);
         <i32>::sse_encode(self.page_count, serializer);
+        <Vec<String>>::sse_encode(self.tag_names, serializer);
     }
 }
 

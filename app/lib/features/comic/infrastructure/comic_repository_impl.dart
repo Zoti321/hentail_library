@@ -52,7 +52,15 @@ class ComicRepositoryImpl
 
   @override
   Future<
-    PagedResult<({String comicId, String title, int pageCount, String path})>
+    PagedResult<
+      ({
+        String comicId,
+        String title,
+        int pageCount,
+        String path,
+        List<String> tagNames,
+      })
+    >
   >
   fetchComicsBrowsePage({
     required PageRequest request,
@@ -70,17 +78,33 @@ class ComicRepositoryImpl
       fallbackMessage: '读取漫画浏览分页失败',
     );
     return PagedResult<
-      ({String comicId, String title, int pageCount, String path})
+      ({
+        String comicId,
+        String title,
+        int pageCount,
+        String path,
+        List<String> tagNames,
+      })
     >(
-      items: <({String comicId, String title, int pageCount, String path})>[
-        for (final rust.ComicBrowseItemDto item in page.items)
-          (
-            comicId: item.comicId,
-            title: item.title,
-            pageCount: item.pageCount,
-            path: item.path,
-          ),
-      ],
+      items:
+          <
+            ({
+              String comicId,
+              String title,
+              int pageCount,
+              String path,
+              List<String> tagNames,
+            })
+          >[
+            for (final rust.ComicBrowseItemDto item in page.items)
+              (
+                comicId: item.comicId,
+                title: item.title,
+                pageCount: item.pageCount,
+                path: item.path,
+                tagNames: item.tagNames,
+              ),
+          ],
       page: page.page,
       pageSize: page.pageSize,
       totalCount: page.totalCount.toInt(),

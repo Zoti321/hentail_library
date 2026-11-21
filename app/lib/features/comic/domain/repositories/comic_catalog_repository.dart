@@ -16,11 +16,19 @@ abstract class ComicCatalogRepository {
     required LibraryComicSortOption sortOption,
   });
 
-  /// 库浏览列表瘦投影（跳过 authors/tags 等关系载荷）。
+  /// 库浏览列表瘦投影（跳过 authors 等关系载荷；附带自然序 Tag 名最多 3 个）。
   ///
   /// record 形状被壳的 `ComicBrowseViewObject` typedef 镜像（ADR-0040）。
   Future<
-    PagedResult<({String comicId, String title, int pageCount, String path})>
+    PagedResult<
+      ({
+        String comicId,
+        String title,
+        int pageCount,
+        String path,
+        List<String> tagNames,
+      })
+    >
   >
   fetchComicsBrowsePage({
     required PageRequest request,

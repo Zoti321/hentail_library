@@ -569,7 +569,7 @@ pub async fn load_comics_ordered(
     Ok(result)
 }
 
-/// 浏览列表瘦加载：仅 comics + `comic_meta` 的标题/页数，不拉关系表。
+/// 浏览列表瘦加载：comics + `comic_meta` 标题/页数，并批量附带自然序 Tag 名最多 3 个。
 async fn load_comics_browse_ordered(
     db: &DatabaseConnection,
     comic_ids: Vec<String>,
@@ -587,6 +587,22 @@ async fn load_comics_browse_ordered(
         .all(db)
         .await
         .map_err(|e| map_db_err(&e))?;
+    let tag_rows = ComicTags::find()
+        .filter(Expr::col(comic_tags::Column::ComicId).is_in(comic_ids.clone()))
+        .all(db)
+        .await
+        .map_err(|e| map_db_err(&e))?;
+    let mut tags_by_id: HashMap<String, Vec<String>> = HashMap::new();
+    for row in tag_rows {
+        tags_by_id
+            .entry(row.comic_id)
+            .or_default()
+            .push(row.tag_name);
+    }
+    for names in tags_by_id.values_mut() {
+        names.sort_by(|a, b| crate::util::compare_filename_natural(a, b));
+        names.truncate(3);
+    }
     let mut by_id: HashMap<String, comics::Model> = models
         .into_iter()
         .map(|m| (m.comic_id.clone(), m))
@@ -603,11 +619,13 @@ async fn load_comics_browse_ordered(
         let Some(meta) = meta_by_id.get(&model.comic_id) else {
             continue;
         };
+        let tag_names = tags_by_id.remove(&model.comic_id).unwrap_or_default();
         result.push(ComicBrowseItemDto {
             comic_id: model.comic_id,
             path: model.path,
             title: meta.title.clone(),
             page_count: meta.page_count,
+            tag_names,
         });
     }
     Ok(result)

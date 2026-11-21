@@ -69,11 +69,20 @@ export 'components/catalog/comic_list_item.dart'
         kComicListItemCoverHeight,
         kComicListItemCoverWidth,
         kComicListItemInfoProgressKey,
+        kComicListItemInfoProgressSlotKey,
         kComicListItemMetaSeparator,
+        kComicListItemMetaSlotHeight,
         kComicListItemMinHeight,
         kComicListItemProgressMaxWidth,
         kComicListItemProgressTopGap,
+        kComicListItemTagChipGap,
+        kComicListItemTagSlotHeight,
+        kComicListItemTagSlotKey,
+        kComicListItemTagTopGap,
+        kComicListItemTitleSlotHeight,
         kComicListItemVerticalPadding;
+export 'components/catalog/overflow_title_hover_label.dart'
+    show OverflowTitleHoverLabel, kOverflowTitleHoverWait;
 export 'components/catalog/cover_read_progress_strip.dart'
     show
         CoverReadProgressStrip,

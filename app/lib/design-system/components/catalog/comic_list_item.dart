@@ -2,10 +2,12 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../chips/outlined_meta_chip.dart';
 import '../menu/anchored_menu.dart';
 import 'comic_catalog_card_shell.dart';
 import 'comic_card.dart';
 import 'cover_read_progress_strip.dart';
+import 'overflow_title_hover_label.dart';
 
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -31,8 +33,34 @@ const double kComicListItemProgressMaxWidth = 160;
 /// Gap between meta line and list progress bar.
 const double kComicListItemProgressTopGap = 6;
 
+/// Gap above the Tag chip row.
+const double kComicListItemTagTopGap = 4;
+
+/// Gap above the meta / page-label row.
+const double kComicListItemMetaTopGap = 4;
+
+/// Fixed title slot height (single-line titleSmall).
+const double kComicListItemTitleSlotHeight = 20;
+
+/// Fixed Tag chip row height (compact [OutlinedMetaChip]).
+const double kComicListItemTagSlotHeight = 24;
+
+/// Fixed meta / page-label slot height (single-line labelSmall).
+const double kComicListItemMetaSlotHeight = 16;
+
+/// Horizontal gap between list Tag chips.
+const double kComicListItemTagChipGap = 6;
+
 /// Key for list-row progress strip in tests (under title/meta, not on cover).
 const Key kComicListItemInfoProgressKey = Key('_comic_list_item_info_progress');
+
+/// Key for the reserved progress slot (always present).
+const Key kComicListItemInfoProgressSlotKey = Key(
+  '_comic_list_item_info_progress_slot',
+);
+
+/// Key for the reserved Tag chip slot (always present).
+const Key kComicListItemTagSlotKey = Key('_comic_list_item_tag_slot');
 
 /// One action in the trailing overflow ([Icons.more_vert]) menu.
 class ComicListMoreMenuEntry {
@@ -62,6 +90,7 @@ class ComicListItem extends StatelessWidget {
     required this.cover,
     this.author,
     this.pageLabel,
+    this.tagLabels = const <String>[],
     this.onTap,
     this.enabled = true,
     this.visualState,
@@ -103,6 +132,9 @@ class ComicListItem extends StatelessWidget {
   final String title;
   final String? author;
   final String? pageLabel;
+
+  /// Up to three Tag labels for the middle chip row; empty skips painting chips.
+  final List<String> tagLabels;
   final Widget cover;
   final VoidCallback? onTap;
 
@@ -133,6 +165,11 @@ class ComicListItem extends StatelessWidget {
         enabled && visualState != ComicListItemVisualState.disabled;
     final String? meta = metaLine(author: author, pageLabel: pageLabel);
     final bool showListProgress = showsReadProgressStrip(readProgress);
+    final List<String> visibleTags = tagLabels
+        .map((String label) => label.trim())
+        .where((String label) => label.isNotEmpty)
+        .take(3)
+        .toList(growable: false);
 
     final Widget coverLayer = ClipRRect(
       borderRadius: const BorderRadius.all(Radius.circular(kComicCardRadius)),
@@ -189,45 +226,89 @@ class ComicListItem extends StatelessWidget {
       );
     }
 
+    final TextStyle titleStyle = comicCatalogTitleStyle(type, scheme);
+    final TextStyle metaStyle = comicCatalogSubtitleStyle(type, scheme);
+
     final Widget infoColumn = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        Text(
-          title,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: comicCatalogTitleStyle(type, scheme),
+        SizedBox(
+          height: kComicListItemTitleSlotHeight,
+          width: double.infinity,
+          child: Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: OverflowTitleHoverLabel(text: title, style: titleStyle),
+          ),
         ),
-        if (meta != null) ...<Widget>[
-          const SizedBox(height: 4),
-          Text(
-            meta,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: comicCatalogSubtitleStyle(type, scheme),
-          ),
-        ],
-        if (showListProgress) ...<Widget>[
-          SizedBox(height: kComicListItemProgressTopGap),
-          LayoutBuilder(
-            builder: (BuildContext context, BoxConstraints constraints) {
-              final double progressWidth = infoProgressWidthFor(
-                constraints.maxWidth,
-              );
-              return SizedBox(
-                width: progressWidth,
-                height: kCoverReadProgressHeight,
-                child: CoverReadProgressStrip(
-                  key: kComicListItemInfoProgressKey,
-                  progress: readProgress!,
-                  activeColor: scheme.primary,
-                  trackColor: scheme.onSurface.withValues(alpha: 0.24),
+        const SizedBox(height: kComicListItemTagTopGap),
+        SizedBox(
+          key: kComicListItemTagSlotKey,
+          height: kComicListItemTagSlotHeight,
+          width: double.infinity,
+          child: visibleTags.isEmpty
+              ? null
+              : Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      for (int i = 0; i < visibleTags.length; i++) ...<Widget>[
+                        if (i > 0)
+                          const SizedBox(width: kComicListItemTagChipGap),
+                        OutlinedMetaChip(
+                          text: visibleTags[i],
+                          compact: true,
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
-              );
-            },
-          ),
-        ],
+        ),
+        const SizedBox(height: kComicListItemMetaTopGap),
+        SizedBox(
+          height: kComicListItemMetaSlotHeight,
+          width: double.infinity,
+          child: meta == null
+              ? null
+              : Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: Text(
+                    meta,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: metaStyle,
+                  ),
+                ),
+        ),
+        const SizedBox(height: kComicListItemProgressTopGap),
+        SizedBox(
+          key: kComicListItemInfoProgressSlotKey,
+          height: kCoverReadProgressHeight,
+          width: double.infinity,
+          child: showListProgress
+              ? LayoutBuilder(
+                  builder: (BuildContext context, BoxConstraints constraints) {
+                    final double progressWidth = infoProgressWidthFor(
+                      constraints.maxWidth,
+                    );
+                    return Align(
+                      alignment: AlignmentDirectional.centerStart,
+                      child: SizedBox(
+                        width: progressWidth,
+                        height: kCoverReadProgressHeight,
+                        child: CoverReadProgressStrip(
+                          key: kComicListItemInfoProgressKey,
+                          progress: readProgress!,
+                          activeColor: scheme.primary,
+                          trackColor: scheme.onSurface.withValues(alpha: 0.24),
+                        ),
+                      ),
+                    );
+                  },
+                )
+              : null,
+        ),
       ],
     );
 

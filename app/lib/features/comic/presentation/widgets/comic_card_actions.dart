@@ -20,6 +20,7 @@ typedef ComicCardProjection = ({
   String title,
   int pageCount,
   String path,
+  List<String> tagNames,
 });
 
 /// 包裹 MD3E 漫画卡片：仅桌面端鼠标右键弹出 [M3EMenu]（与详情页顶栏 ⋮ 同款

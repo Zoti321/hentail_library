@@ -193,23 +193,29 @@ class ComicAuthorDto {
           name == other.name;
 }
 
-/// 库浏览列表瘦 DTO：不含 authors/tags 等关系字段。
+/// 库浏览列表瘦 DTO：卡面字段 + 自然序 Tag 名最多 3 个。
 class ComicBrowseItemDto {
   final String comicId;
   final String path;
   final String title;
   final int pageCount;
+  final List<String> tagNames;
 
   const ComicBrowseItemDto({
     required this.comicId,
     required this.path,
     required this.title,
     required this.pageCount,
+    required this.tagNames,
   });
 
   @override
   int get hashCode =>
-      comicId.hashCode ^ path.hashCode ^ title.hashCode ^ pageCount.hashCode;
+      comicId.hashCode ^
+      path.hashCode ^
+      title.hashCode ^
+      pageCount.hashCode ^
+      tagNames.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -219,7 +225,8 @@ class ComicBrowseItemDto {
           comicId == other.comicId &&
           path == other.path &&
           title == other.title &&
-          pageCount == other.pageCount;
+          pageCount == other.pageCount &&
+          tagNames == other.tagNames;
 }
 
 class ComicDto {

@@ -65,6 +65,8 @@ class LibraryBrowseLayout extends StatefulWidget {
 class _Md3eLibraryBrowsePageState extends State<LibraryBrowseLayout> {
   late final ScrollController _scrollController;
   late final bool _ownsScrollController;
+  final TextEditingController _searchPlaceholderController =
+      TextEditingController();
 
   @override
   void initState() {
@@ -88,6 +90,7 @@ class _Md3eLibraryBrowsePageState extends State<LibraryBrowseLayout> {
     if (_ownsScrollController) {
       _scrollController.dispose();
     }
+    _searchPlaceholderController.dispose();
     super.dispose();
   }
 
@@ -146,12 +149,21 @@ class _Md3eLibraryBrowsePageState extends State<LibraryBrowseLayout> {
                 0,
               ),
               sliver: SliverToBoxAdapter(
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: CatalogViewModeButtonGroup(
-                    mode: widget.viewMode,
-                    onModeChanged: widget.onViewModeChanged ?? (_) {},
-                  ),
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: AppDenseSearchBar(
+                        controller: _searchPlaceholderController,
+                        hintText: '',
+                        onChanged: (_) {},
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    CatalogViewModeButtonGroup(
+                      mode: widget.viewMode,
+                      onModeChanged: widget.onViewModeChanged ?? (_) {},
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -343,6 +355,13 @@ class _Md3eLibraryBrowseListItem extends StatelessWidget {
         title: copy.title,
         author: copy.listAuthor ?? '',
         pageLabel: copy.subtitle,
+        tagLabels: displayTarget == LibraryDisplayTarget.comics
+            ? <String>[
+                'tag${index + 1}',
+                if (index.isEven) 'demo',
+                if (index % 3 == 0) 'sample',
+              ]
+            : const <String>[],
         readProgress: readProgress,
         moreMenuEntries: const <ComicListMoreMenuEntry>[
           ComicListMoreMenuEntry(label: '继续阅读'),

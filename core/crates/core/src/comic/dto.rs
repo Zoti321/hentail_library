@@ -250,13 +250,15 @@ pub struct PagedComicResultDto {
     pub page_size: i32,
 }
 
-/// 库浏览列表瘦投影：卡面所需字段，不含 authors/tags 等关系。
+/// 库浏览列表瘦投影：卡面字段 + 自然序 Tag 名最多 3 个（不含 authors 等其它关系）。
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ComicBrowseItemDto {
     pub comic_id: String,
     pub path: String,
     pub title: String,
     pub page_count: i32,
+    /// Natural-sorted Tag names, capped at 3 for list-card chips.
+    pub tag_names: Vec<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

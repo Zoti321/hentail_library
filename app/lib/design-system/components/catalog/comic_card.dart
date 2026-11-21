@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'comic_catalog_card_shell.dart';
 import 'cover_read_progress_strip.dart';
+import 'overflow_title_hover_label.dart';
 
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -175,10 +176,8 @@ class ComicCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             spacing: titleSubtitleGap,
             children: <Widget>[
-              Text(
-                title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              OverflowTitleHoverLabel(
+                text: title,
                 style: comicCatalogTitleStyle(type, scheme),
               ),
               if (subtitle != null)

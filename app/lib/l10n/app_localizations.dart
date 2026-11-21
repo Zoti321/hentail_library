@@ -1148,12 +1148,6 @@ abstract class AppLocalizations {
   /// **'系列详情'**
   String get pageTitleSeriesDetail;
 
-  /// No description provided for @pageTitleSearchResults.
-  ///
-  /// In zh, this message translates to:
-  /// **'搜索结果'**
-  String get pageTitleSearchResults;
-
   /// No description provided for @pageTitleNotFound.
   ///
   /// In zh, this message translates to:
@@ -2671,18 +2665,6 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'应用启动时扫描完成：新增 {added}，移除 {removed}，迁移 {migrated}'**
   String libraryStartupScanCompleteStats(int added, int removed, int migrated);
-
-  /// No description provided for @searchResultsTitle.
-  ///
-  /// In zh, this message translates to:
-  /// **'搜索结果'**
-  String get searchResultsTitle;
-
-  /// No description provided for @searchResultsForQuery.
-  ///
-  /// In zh, this message translates to:
-  /// **'\"{query}\"的搜索结果'**
-  String searchResultsForQuery(String query);
 
   /// No description provided for @searchEnterKeyword.
   ///

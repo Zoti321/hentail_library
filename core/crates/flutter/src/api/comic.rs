@@ -242,13 +242,14 @@ impl From<hentai_core::PagedComicResultDto> for PagedComicResultDto {
     }
 }
 
-/// 库浏览列表瘦 DTO：不含 authors/tags 等关系字段。
+/// 库浏览列表瘦 DTO：卡面字段 + 自然序 Tag 名最多 3 个。
 #[derive(Debug, Clone)]
 pub struct ComicBrowseItemDto {
     pub comic_id: String,
     pub path: String,
     pub title: String,
     pub page_count: i32,
+    pub tag_names: Vec<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -266,6 +267,7 @@ impl From<hentai_core::ComicBrowseItemDto> for ComicBrowseItemDto {
             path: value.path,
             title: value.title,
             page_count: value.page_count,
+            tag_names: value.tag_names,
         }
     }
 }

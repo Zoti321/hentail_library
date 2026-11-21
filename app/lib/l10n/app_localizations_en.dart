@@ -606,9 +606,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pageTitleSeriesDetail => 'Series details';
 
   @override
-  String get pageTitleSearchResults => 'Search results';
-
-  @override
   String get pageTitleNotFound => 'Page not found';
 
   @override
@@ -1526,14 +1523,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String libraryStartupScanCompleteStats(int added, int removed, int migrated) {
     return 'Startup scan complete: added $added, removed $removed, migrated $migrated';
-  }
-
-  @override
-  String get searchResultsTitle => 'Search results';
-
-  @override
-  String searchResultsForQuery(String query) {
-    return 'Search results for \"$query\"';
   }
 
   @override

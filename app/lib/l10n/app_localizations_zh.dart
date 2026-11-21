@@ -572,9 +572,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get pageTitleSeriesDetail => '系列详情';
 
   @override
-  String get pageTitleSearchResults => '搜索结果';
-
-  @override
   String get pageTitleNotFound => '页面不存在';
 
   @override
@@ -1430,14 +1427,6 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String libraryStartupScanCompleteStats(int added, int removed, int migrated) {
     return '应用启动时扫描完成：新增 $added，移除 $removed，迁移 $migrated';
-  }
-
-  @override
-  String get searchResultsTitle => '搜索结果';
-
-  @override
-  String searchResultsForQuery(String query) {
-    return '\"$query\"的搜索结果';
   }
 
   @override

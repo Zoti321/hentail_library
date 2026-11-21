@@ -267,7 +267,6 @@
   "pageTitleReader": "阅读",
   "pageTitleComicDetail": "漫画详情",
   "pageTitleSeriesDetail": "系列详情",
-  "pageTitleSearchResults": "搜索结果",
   "pageTitleNotFound": "页面不存在",
   "shellOpenNavMenu": "打开导航菜单",
   "shellLoadFailed": "加载失败",
@@ -705,15 +704,6 @@
       },
       "migrated": {
         "type": "int"
-      }
-    }
-  },
-  "searchResultsTitle": "搜索结果",
-  "searchResultsForQuery": "\"{query}\"的搜索结果",
-  "@searchResultsForQuery": {
-    "placeholders": {
-      "query": {
-        "type": "String"
       }
     }
   },
