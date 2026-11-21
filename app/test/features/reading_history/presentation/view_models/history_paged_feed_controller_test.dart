@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/features/reading_history/domain/reading_history_section_counts.dart';
 import 'package:hentai_library/features/reading_history/public.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
@@ -22,6 +23,14 @@ class _FakeReadingHistoryRepo implements ReadingHistoryRepository {
   bool failNextFetch = false;
   Completer<PagedResult<ReadingHistory>>? pageTwoCompleter;
   final pendingPages = <String, Completer<PagedResult<ReadingHistory>>>{};
+  ReadingHistorySectionCounts sectionCounts = const ReadingHistorySectionCounts(
+    today: 3,
+    yesterday: 0,
+    thisWeek: 0,
+    thisMonth: 0,
+    earlier: 0,
+  );
+  int sectionCountsCalls = 0;
 
   void emitHistoryChange() {
     _changesController.add(null);
@@ -32,6 +41,14 @@ class _FakeReadingHistoryRepo implements ReadingHistoryRepository {
 
   @override
   Future<Map<String, int>> listReadPageIndexes() async => const <String, int>{};
+
+  @override
+  Future<ReadingHistorySectionCounts> fetchSectionCounts({
+    String? keyword,
+  }) async {
+    sectionCountsCalls++;
+    return sectionCounts;
+  }
 
   @override
   Future<PagedResult<ReadingHistory>> fetchHistoryPage(
@@ -48,6 +65,33 @@ class _FakeReadingHistoryRepo implements ReadingHistoryRepository {
     }
     if (request.page == 2 && pageTwoCompleter != null) {
       return pageTwoCompleter!.future;
+    }
+    // Silent-refresh window: page 1 with pageSize > default concatenates pages.
+    if (request.page == 1 && request.pageSize > kDefaultPageSize) {
+      final List<ReadingHistory> items = <ReadingHistory>[];
+      int totalCount = 0;
+      for (int page = 1; items.length < request.pageSize; page++) {
+        final List<PagedResult<ReadingHistory>>? pages =
+            pagesByKey[_pageKey(page, keyword)];
+        if (pages == null || pages.isEmpty) {
+          break;
+        }
+        final PagedResult<ReadingHistory> chunk = pages.first;
+        totalCount = chunk.totalCount;
+        items.addAll(chunk.items);
+        if (items.length >= totalCount) {
+          break;
+        }
+      }
+      final List<ReadingHistory> window = items.length > request.pageSize
+          ? items.sublist(0, request.pageSize)
+          : items;
+      return PagedResult<ReadingHistory>(
+        items: window,
+        totalCount: totalCount,
+        page: 1,
+        pageSize: request.pageSize,
+      );
     }
     final String key = _pageKey(request.page, keyword);
     final List<PagedResult<ReadingHistory>>? pages = pagesByKey[key];
@@ -690,8 +734,57 @@ void main() {
       expect(state()?.loadedPage, 1);
       expect(repo.requests.length, greaterThanOrEqualTo(2));
       expect(repo.requests.last.page, 1);
+      expect(repo.sectionCountsCalls, greaterThanOrEqualTo(2));
     },
   );
+
+  test('silent refresh preserves loadMore window depth', () async {
+    await container.read(historyPagedFeedControllerProvider.future);
+    await notifier().loadMore();
+    expect(state()?.loadedPage, 2);
+    expect(state()?.items, hasLength(3));
+
+    // Keep totalCount above one default page so loadedPage stays at 2.
+    const int windowTotal = kDefaultPageSize + 10;
+    repo.pagesByKey['1:'] = <PagedResult<ReadingHistory>>[
+      _page(
+        page: 1,
+        totalCount: windowTotal,
+        items: <ReadingHistory>[
+          _history(comicId: 'c1b', title: 'Alpha2', lastReadTimeMs: 3100),
+          _history(comicId: 'c2', title: 'Beta', lastReadTimeMs: 2000),
+        ],
+      ),
+    ];
+    repo.pagesByKey['2:'] = <PagedResult<ReadingHistory>>[
+      _page(
+        page: 2,
+        totalCount: windowTotal,
+        items: <ReadingHistory>[
+          _history(comicId: 'c3', title: 'Gamma', lastReadTimeMs: 1000),
+        ],
+      ),
+    ];
+    repo.sectionCounts = const ReadingHistorySectionCounts(
+      today: 1,
+      yesterday: 1,
+      thisWeek: 1,
+      thisMonth: 0,
+      earlier: 0,
+    );
+    repo.emitHistoryChange();
+    await Future<void>.delayed(const Duration(milliseconds: 250));
+    await Future<void>.delayed(Duration.zero);
+
+    expect(state()?.loadedPage, 2);
+    expect(
+      state()?.items.map((item) => item.comicId).toList(),
+      <String>['c1b', 'c2', 'c3'],
+    );
+    expect(state()?.sectionCounts.today, 1);
+    expect(repo.requests.last.page, 1);
+    expect(repo.requests.last.pageSize, kDefaultPageSize * 2);
+  });
 
   test('silent refresh discards stale loadMore result', () async {
     final Completer<PagedResult<ReadingHistory>> pageTwoCompleter =

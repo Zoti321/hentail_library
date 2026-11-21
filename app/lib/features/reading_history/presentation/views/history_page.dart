@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/shared/ui/l10n/app_localizations_x.dart';
+import 'package:hentai_library/features/reading_history/domain/reading_history_section_counts.dart';
 import 'package:hentai_library/features/reading_history/presentation/models/history_card_item.dart';
 import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_browse_page.dart';
 import 'package:hentai_library/features/reading_history/presentation/view_models/history_load_more_throttle.dart';
@@ -137,6 +138,13 @@ class _HistoryBrowseFeed extends ConsumerWidget {
             async.asData?.value.isLoadingMore ?? false,
       ),
     );
+    final ReadingHistorySectionCounts sectionCounts = ref.watch(
+      historyPagedFeedControllerProvider.select(
+        (AsyncValue<HistoryPagedFeedState> async) =>
+            async.asData?.value.sectionCounts ??
+            ReadingHistorySectionCounts.zero,
+      ),
+    );
 
     final Map<String, int> coverIndexById = <String, int>{
       for (int i = 0; i < items.length; i++) items[i].comicId: i,
@@ -146,6 +154,7 @@ class _HistoryBrowseFeed extends ConsumerWidget {
     return HistoryBrowsePage<HistoryCardItem>(
       items: items,
       totalCount: totalCount,
+      sectionCounts: sectionCounts,
       lastReadTimeOf: (HistoryCardItem item) => item.lastReadTime,
       isLoadingMore: isLoadingMore,
       useLabBrowseCanvas: true,

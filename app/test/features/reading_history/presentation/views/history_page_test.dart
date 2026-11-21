@@ -4,6 +4,7 @@ import 'package:hentai_library/composition/composition_overrides.dart';
 import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_browse_page.dart';
 import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_page_header.dart';
 import 'package:hentai_library/features/reading_history/presentation/widgets/history_list_item.dart';
+import 'package:hentai_library/features/reading_history/domain/reading_history_section_counts.dart';
 import 'package:hentai_library/features/reading_history/public.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
@@ -187,6 +188,23 @@ class _FakeReadingHistoryRepo implements ReadingHistoryRepository {
       totalCount: items.length,
       page: request.page,
       pageSize: request.pageSize,
+    );
+  }
+
+  @override
+  Future<ReadingHistorySectionCounts> fetchSectionCounts({
+    String? keyword,
+  }) async {
+    final PagedResult<ReadingHistory> page = await fetchHistoryPage(
+      pageRequest(page: 1, pageSize: 50),
+      keyword: keyword,
+    );
+    return ReadingHistorySectionCounts(
+      today: 0,
+      yesterday: 0,
+      thisWeek: 0,
+      thisMonth: 0,
+      earlier: page.totalCount,
     );
   }
 

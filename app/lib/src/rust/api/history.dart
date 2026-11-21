@@ -12,7 +12,7 @@ import 'init.dart';
 
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `clone`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`
 
 Future<void> recordReadingFrb({required ReadingHistoryDto history}) =>
     RustLib.instance.api.crateApiHistoryRecordReadingFrb(history: history);
@@ -28,6 +28,14 @@ Future<PagedReadingHistoryDto> fetchReadingPageFrb({
 }) => RustLib.instance.api.crateApiHistoryFetchReadingPageFrb(
   request: request,
   keyword: keyword,
+);
+
+Future<ReadingHistoryTimeSectionCountsDto> fetchReadingHistorySectionCountsFrb({
+  String? keyword,
+  required int clientTimezoneOffsetMinutes,
+}) => RustLib.instance.api.crateApiHistoryFetchReadingHistorySectionCountsFrb(
+  keyword: keyword,
+  clientTimezoneOffsetMinutes: clientTimezoneOffsetMinutes,
 );
 
 Future<List<ReadPageIndexDto>> listReadPageIndexesFrb() =>
@@ -126,4 +134,39 @@ class ReadingHistoryDto {
           lastReadTimeMs == other.lastReadTimeMs &&
           pageIndex == other.pageIndex &&
           pageCount == other.pageCount;
+}
+
+class ReadingHistoryTimeSectionCountsDto {
+  final PlatformInt64 today;
+  final PlatformInt64 yesterday;
+  final PlatformInt64 thisWeek;
+  final PlatformInt64 thisMonth;
+  final PlatformInt64 earlier;
+
+  const ReadingHistoryTimeSectionCountsDto({
+    required this.today,
+    required this.yesterday,
+    required this.thisWeek,
+    required this.thisMonth,
+    required this.earlier,
+  });
+
+  @override
+  int get hashCode =>
+      today.hashCode ^
+      yesterday.hashCode ^
+      thisWeek.hashCode ^
+      thisMonth.hashCode ^
+      earlier.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ReadingHistoryTimeSectionCountsDto &&
+          runtimeType == other.runtimeType &&
+          today == other.today &&
+          yesterday == other.yesterday &&
+          thisWeek == other.thisWeek &&
+          thisMonth == other.thisMonth &&
+          earlier == other.earlier;
 }

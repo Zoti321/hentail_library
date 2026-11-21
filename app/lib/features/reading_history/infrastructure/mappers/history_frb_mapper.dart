@@ -1,4 +1,5 @@
 import 'package:hentai_library/features/reading_history/domain/reading_history.dart';
+import 'package:hentai_library/features/reading_history/domain/reading_history_section_counts.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/src/rust/api/history.dart' as rust;
 
@@ -31,5 +32,17 @@ PagedResult<ReadingHistory> mapPagedReadingHistory(
     totalCount: dto.totalCount.toInt(),
     page: dto.page,
     pageSize: dto.pageSize,
+  );
+}
+
+ReadingHistorySectionCounts mapReadingHistorySectionCounts(
+  rust.ReadingHistoryTimeSectionCountsDto dto,
+) {
+  return ReadingHistorySectionCounts(
+    today: dto.today.toInt(),
+    yesterday: dto.yesterday.toInt(),
+    thisWeek: dto.thisWeek.toInt(),
+    thisMonth: dto.thisMonth.toInt(),
+    earlier: dto.earlier.toInt(),
   );
 }

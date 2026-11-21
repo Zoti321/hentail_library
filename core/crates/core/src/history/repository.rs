@@ -1,7 +1,7 @@
 use sea_orm::sea_query::{Expr, Func};
 use sea_orm::{
     ActiveModelTrait, ColumnTrait, ConnectionTrait, EntityTrait, PaginatorTrait, QueryFilter,
-    QueryOrder, Set, TransactionTrait,
+    QueryOrder, Set, Statement, TransactionTrait,
 };
 
 use crate::comic::now_ms;
@@ -13,9 +13,10 @@ use crate::library_write::with_library_write;
 use crate::util::decode_basic_html_entities;
 use std::collections::HashMap;
 
-use super::dto::{PagedReadingHistoryDto, ReadingHistoryDto};
+use super::dto::{PagedReadingHistoryDto, ReadingHistoryDto, ReadingHistoryTimeSectionCountsDto};
 use super::retention::reading_history_retention_cutoff_ms;
 use super::retention::reading_history_within_retention;
+use super::section_bounds::reading_history_section_bounds;
 
 pub async fn record_reading(dto: &ReadingHistoryDto) -> Result<(), HentaiError> {
     let db = connection()?;
@@ -136,6 +137,81 @@ pub async fn list_all_reading() -> Result<Vec<ReadingHistoryDto>, HentaiError> {
         .map_err(|e| map_db_err(&e))?;
     let items: Vec<ReadingHistoryDto> = rows.into_iter().map(map_reading_row).collect();
     enrich_page_counts(&db, items).await
+}
+
+/// Count reading-history rows in each local-calendar time section.
+///
+/// # Errors
+///
+/// Returns database errors when the aggregate query fails.
+pub async fn fetch_reading_history_section_counts(
+    keyword: Option<String>,
+    client_timezone_offset_minutes: i32,
+) -> Result<ReadingHistoryTimeSectionCountsDto, HentaiError> {
+    let db = connection()?;
+    let now = now_ms();
+    let bounds = reading_history_section_bounds(now, client_timezone_offset_minutes);
+    let cutoff = reading_history_retention_cutoff_ms(now);
+    let not_trashed = comic_id_not_trashed_sql("comic_reading_histories.comic_id");
+
+    let mut sql = format!(
+        "SELECT \
+            SUM(CASE WHEN last_read_time >= ? THEN 1 ELSE 0 END), \
+            SUM(CASE WHEN last_read_time >= ? AND last_read_time < ? THEN 1 ELSE 0 END), \
+            SUM(CASE WHEN last_read_time >= ? AND last_read_time < ? THEN 1 ELSE 0 END), \
+            SUM(CASE WHEN last_read_time >= ? AND last_read_time < ? THEN 1 ELSE 0 END), \
+            SUM(CASE WHEN last_read_time >= ? AND last_read_time < ? THEN 1 ELSE 0 END) \
+         FROM comic_reading_histories \
+         WHERE last_read_time >= ? AND ({not_trashed})"
+    );
+    let mut values: Vec<sea_orm::Value> = vec![
+        bounds.today_start_ms.into(),
+        bounds.yesterday_start_ms.into(),
+        bounds.today_start_ms.into(),
+        bounds.week_start_ms.into(),
+        bounds.yesterday_start_ms.into(),
+        bounds.month_start_ms.into(),
+        bounds.week_start_ms.into(),
+        cutoff.into(),
+        bounds.month_start_ms.into(),
+        cutoff.into(),
+    ];
+
+    let normalized = keyword
+        .as_deref()
+        .map(str::trim)
+        .filter(|value| !value.is_empty());
+    if let Some(keyword) = normalized {
+        sql.push_str(" AND LOWER(title) LIKE ?");
+        values.push(format!("%{}%", keyword.to_lowercase()).into());
+    }
+
+    let row = db
+        .query_one(Statement::from_sql_and_values(
+            sea_orm::DatabaseBackend::Sqlite,
+            sql,
+            values,
+        ))
+        .await
+        .map_err(|e| map_db_err(&e))?;
+
+    let Some(row) = row else {
+        return Ok(ReadingHistoryTimeSectionCountsDto::default());
+    };
+
+    let read_i64 = |index: usize| -> Result<i64, HentaiError> {
+        row.try_get_by_index::<Option<i64>>(index)
+            .map(|v| v.unwrap_or(0))
+            .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))
+    };
+
+    Ok(ReadingHistoryTimeSectionCountsDto {
+        today: read_i64(0)?,
+        yesterday: read_i64(1)?,
+        this_week: read_i64(2)?,
+        this_month: read_i64(3)?,
+        earlier: read_i64(4)?,
+    })
 }
 
 pub async fn fetch_reading_page(

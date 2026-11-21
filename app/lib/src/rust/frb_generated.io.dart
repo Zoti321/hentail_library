@@ -735,6 +735,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ReadingHistoryDto dco_decode_reading_history_dto(dynamic raw);
 
   @protected
+  ReadingHistoryTimeSectionCountsDto
+  dco_decode_reading_history_time_section_counts_dto(dynamic raw);
+
+  @protected
   RefreshLibraryResultFrbDto dco_decode_refresh_library_result_frb_dto(
     dynamic raw,
   );
@@ -1759,6 +1763,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ReadingHistoryDto sse_decode_reading_history_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  ReadingHistoryTimeSectionCountsDto
+  sse_decode_reading_history_time_section_counts_dto(
     SseDeserializer deserializer,
   );
 
@@ -3045,6 +3055,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_reading_history_dto(
     ReadingHistoryDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_reading_history_time_section_counts_dto(
+    ReadingHistoryTimeSectionCountsDto self,
     SseSerializer serializer,
   );
 

@@ -28,18 +28,49 @@ class ReadingHistoryGroupedList<T> extends StatefulWidget {
 
 class _ReadingHistoryGroupedListState<T>
     extends State<ReadingHistoryGroupedList<T>> {
+  /// Empty buckets start collapsed; non-empty start expanded (absent = expanded).
   final Set<HistoryTimeSection> _collapsed = <HistoryTimeSection>{};
+  final Set<HistoryTimeSection> _expandedOverride = <HistoryTimeSection>{};
+  bool _seededEmptyCollapse = false;
 
-  bool _isExpanded(HistoryTimeSection section) {
-    return !_collapsed.contains(section);
+  @override
+  void didUpdateWidget(ReadingHistoryGroupedList<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!identical(oldWidget.groups, widget.groups)) {
+      _seedEmptyCollapsedDefaults();
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _seedEmptyCollapsedDefaults();
+  }
+
+  void _seedEmptyCollapsedDefaults() {
+    for (final HistoryTimeGroup<T> group in widget.groups) {
+      if (group.items.isEmpty && !_expandedOverride.contains(group.section)) {
+        _collapsed.add(group.section);
+      }
+    }
+    _seededEmptyCollapse = true;
+  }
+
+  bool _isExpanded(HistoryTimeGroup<T> group) {
+    if (!_seededEmptyCollapse) {
+      _seedEmptyCollapsedDefaults();
+    }
+    return !_collapsed.contains(group.section);
   }
 
   void _toggle(HistoryTimeSection section) {
     setState(() {
       if (_collapsed.contains(section)) {
         _collapsed.remove(section);
+        _expandedOverride.add(section);
       } else {
         _collapsed.add(section);
+        _expandedOverride.remove(section);
       }
     });
   }
@@ -55,7 +86,7 @@ class _ReadingHistoryGroupedListState<T>
             SliverToBoxAdapter(child: SizedBox(height: spacing.md)),
           _HistoryGroupSection<T>(
             group: widget.groups[index],
-            expanded: _isExpanded(widget.groups[index].section),
+            expanded: _isExpanded(widget.groups[index]),
             onHeaderPressed: () => _toggle(widget.groups[index].section),
             itemBuilder: widget.itemBuilder,
           ),
@@ -87,7 +118,7 @@ class _HistoryGroupSection<T> extends StatelessWidget {
         SliverToBoxAdapter(
           child: _HistorySectionHeader(
             section: group.section,
-            itemCount: group.items.length,
+            itemCount: group.totalCount,
             expanded: expanded,
             onPressed: onHeaderPressed,
           ),
@@ -97,12 +128,14 @@ class _HistoryGroupSection<T> extends StatelessWidget {
             expanded: expanded,
             child: Padding(
               padding: EdgeInsets.only(top: spacing.xs),
-              child: ReadingHistoryListGrid(
-                itemCount: group.items.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return itemBuilder(context, group.items[index]);
-                },
-              ),
+              child: group.items.isEmpty
+                  ? const SizedBox.shrink()
+                  : ReadingHistoryListGrid(
+                      itemCount: group.items.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return itemBuilder(context, group.items[index]);
+                      },
+                    ),
             ),
           ),
         ),

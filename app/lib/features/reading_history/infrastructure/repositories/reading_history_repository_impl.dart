@@ -5,6 +5,7 @@ import 'package:hentai_library/features/reading_history/infrastructure/mappers/h
 import 'package:hentai_library/features/reading_history/domain/reading_history.dart';
 import 'package:hentai_library/features/reading_history/domain/reading_history_repository.dart';
 import 'package:hentai_library/features/reading_history/domain/reading_history_search_specification.dart';
+import 'package:hentai_library/features/reading_history/domain/reading_history_section_counts.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/src/rust/api/comic.dart' as rust_comic;
@@ -83,6 +84,22 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
       fallbackMessage: '读取阅读历史失败',
     );
     return mapPagedReadingHistory(page);
+  }
+
+  @override
+  Future<ReadingHistorySectionCounts> fetchSectionCounts({
+    String? keyword,
+  }) async {
+    final String? normalizedKeyword =
+        ReadingHistorySearchSpecification.normalizeKeyword(keyword);
+    final rust.ReadingHistoryTimeSectionCountsDto counts = await guardFrb(
+      () => rust.fetchReadingHistorySectionCountsFrb(
+        keyword: normalizedKeyword,
+        clientTimezoneOffsetMinutes: DateTime.now().timeZoneOffset.inMinutes,
+      ),
+      fallbackMessage: '读取阅读历史分桶计数失败',
+    );
+    return mapReadingHistorySectionCounts(counts);
   }
 
   @override

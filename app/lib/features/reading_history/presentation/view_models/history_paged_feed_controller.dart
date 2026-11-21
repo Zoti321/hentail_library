@@ -1,12 +1,15 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:hentai_library/core/util/debouncer.dart';
 
 import 'package:hentai_library/shared/application/logging/app_log.dart';
+import 'package:hentai_library/features/reading_history/domain/reading_history_section_counts.dart';
 import 'package:hentai_library/features/reading_history/public.dart' as entity;
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/features/reading_history/presentation/models/history_card_item.dart';
+import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_time_grouping.dart';
 import 'package:hentai_library/features/reading_history/public/providers/reading_history_repository_providers.dart';
 import 'package:hentai_library/features/reading_history/presentation/view_models/history_paged_feed_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -50,7 +53,7 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
       unawaited(_historyChangesSubscription?.cancel());
       _historyChangesSubscription = null;
     });
-    final HistoryPagedFeedState initial = await _loadPage(page: 1);
+    final HistoryPagedFeedState initial = await _loadWindow(windowPages: 1);
     if (ref.mounted && generation == _fetchGeneration && _refreshPending) {
       _refreshPending = false;
       unawaited(Future<void>.microtask(_silentRefresh));
@@ -174,15 +177,30 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
     if (current == null) {
       return;
     }
-    final List<HistoryCardItem> items = current.items
-        .where((HistoryCardItem item) => item.comicId != comicId)
-        .toList(growable: false);
+    HistoryCardItem? removed;
+    final List<HistoryCardItem> items = <HistoryCardItem>[];
+    for (final HistoryCardItem item in current.items) {
+      if (item.comicId == comicId) {
+        removed = item;
+      } else {
+        items.add(item);
+      }
+    }
+    if (removed == null) {
+      state = AsyncData<HistoryPagedFeedState>(
+        current.copyWith(isLoadingMore: false),
+      );
+      return;
+    }
+    final HistoryTimeSection section = historyTimeSectionFor(
+      removed.lastReadTime,
+      DateTime.now(),
+    );
     state = AsyncData<HistoryPagedFeedState>(
       current.copyWith(
         items: items,
-        totalCount: items.length == current.items.length
-            ? current.totalCount
-            : (current.totalCount - 1).clamp(0, current.totalCount),
+        totalCount: (current.totalCount - 1).clamp(0, current.totalCount),
+        sectionCounts: decrementSectionCount(current.sectionCounts, section),
         isLoadingMore: false,
       ),
     );
@@ -193,6 +211,7 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
       HistoryPagedFeedState(
         items: const <HistoryCardItem>[],
         totalCount: 0,
+        sectionCounts: ReadingHistorySectionCounts.zero,
         loadedPage: 0,
         hasReachedEnd: true,
         keyword: _effectiveKeyword,
@@ -225,7 +244,10 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
     _isRefreshing = true;
 
     try {
-      final HistoryPagedFeedState refreshed = await _loadPage(page: 1);
+      final int windowPages = math.max(1, current.loadedPage);
+      final HistoryPagedFeedState refreshed = await _loadWindow(
+        windowPages: windowPages,
+      );
       if (!ref.mounted || generation != _fetchGeneration) {
         return;
       }
@@ -246,15 +268,31 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
     }
   }
 
-  Future<HistoryPagedFeedState> _loadPage({required int page}) async {
-    final keyword = _effectiveKeyword;
-    final PagedResult<entity.ReadingHistory> result = await ref
+  Future<HistoryPagedFeedState> _loadWindow({required int windowPages}) async {
+    final String keyword = _effectiveKeyword;
+    final int pageSize = math.max(1, windowPages) * _pageSize;
+    final Future<PagedResult<entity.ReadingHistory>> pageFuture = ref
         .read(readingHistoryRepoProvider)
         .fetchHistoryPage(
-          pageRequest(page: page, pageSize: _pageSize),
+          pageRequest(page: 1, pageSize: pageSize),
           keyword: keyword.isEmpty ? null : keyword,
         );
-    return _stateFromPage(result, loadedPage: result.page, keyword: keyword);
+    final Future<ReadingHistorySectionCounts> countsFuture = ref
+        .read(readingHistoryRepoProvider)
+        .fetchSectionCounts(keyword: keyword.isEmpty ? null : keyword);
+    final List<Object> results = await Future.wait<Object>(
+      <Future<Object>>[pageFuture, countsFuture],
+    );
+    final PagedResult<entity.ReadingHistory> page =
+        results[0] as PagedResult<entity.ReadingHistory>;
+    final ReadingHistorySectionCounts sectionCounts =
+        results[1] as ReadingHistorySectionCounts;
+    return _stateFromPage(
+      page,
+      sectionCounts: sectionCounts,
+      requestedWindowPages: windowPages,
+      keyword: keyword,
+    );
   }
 
   String? _keywordOrNull() {
@@ -263,17 +301,45 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
 
   HistoryPagedFeedState _stateFromPage(
     PagedResult<entity.ReadingHistory> page, {
-    required int loadedPage,
+    required ReadingHistorySectionCounts sectionCounts,
+    required int requestedWindowPages,
     required String keyword,
   }) {
     final List<HistoryCardItem> items = page.items
         .map(_mapHistoryItem)
         .toList(growable: false);
+    if (page.totalCount <= 0) {
+      return HistoryPagedFeedState(
+        items: const <HistoryCardItem>[],
+        totalCount: 0,
+        sectionCounts: sectionCounts,
+        loadedPage: 0,
+        hasReachedEnd: true,
+        keyword: keyword,
+      );
+    }
+    // First page: trust result page metadata (same as pre-window refresh).
+    if (requestedWindowPages <= 1) {
+      return HistoryPagedFeedState(
+        items: items,
+        totalCount: page.totalCount,
+        sectionCounts: sectionCounts,
+        loadedPage: page.page,
+        hasReachedEnd: !page.hasNextPage,
+        keyword: keyword,
+      );
+    }
+    // Silent-refresh window: keep scroll depth; end when the window covers total.
+    final int maxPage = math.max(
+      1,
+      (page.totalCount + _pageSize - 1) ~/ _pageSize,
+    );
     return HistoryPagedFeedState(
       items: items,
       totalCount: page.totalCount,
-      loadedPage: loadedPage,
-      hasReachedEnd: !page.hasNextPage,
+      sectionCounts: sectionCounts,
+      loadedPage: math.min(requestedWindowPages, maxPage),
+      hasReachedEnd: items.length >= page.totalCount,
       keyword: keyword,
     );
   }
@@ -293,6 +359,7 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
     return HistoryPagedFeedState(
       items: items,
       totalCount: page.totalCount,
+      sectionCounts: current.sectionCounts,
       loadedPage: loadedPage,
       hasReachedEnd: !page.hasNextPage,
       keyword: current.keyword,

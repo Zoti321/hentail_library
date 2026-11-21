@@ -21,3 +21,19 @@ pub struct PagedReadingHistoryDto {
     pub page: i32,
     pub page_size: i32,
 }
+
+/// Per time-section counts for the reading history list (same filters as the page query).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub struct ReadingHistoryTimeSectionCountsDto {
+    pub today: i64,
+    pub yesterday: i64,
+    pub this_week: i64,
+    pub this_month: i64,
+    pub earlier: i64,
+}
+
+impl ReadingHistoryTimeSectionCountsDto {
+    pub fn total(self) -> i64 {
+        self.today + self.yesterday + self.this_week + self.this_month + self.earlier
+    }
+}

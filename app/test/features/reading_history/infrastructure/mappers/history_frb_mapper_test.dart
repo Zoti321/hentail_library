@@ -75,4 +75,23 @@ void main() {
     expect(result.page, 2);
     expect(result.pageSize, 5);
   });
+
+  test('mapReadingHistorySectionCounts maps five buckets', () {
+    final rust.ReadingHistoryTimeSectionCountsDto dto =
+        rust.ReadingHistoryTimeSectionCountsDto(
+          today: PlatformInt64Util.from(1),
+          yesterday: PlatformInt64Util.from(2),
+          thisWeek: PlatformInt64Util.from(3),
+          thisMonth: PlatformInt64Util.from(4),
+          earlier: PlatformInt64Util.from(5),
+        );
+
+    final counts = mapReadingHistorySectionCounts(dto);
+    expect(counts.today, 1);
+    expect(counts.yesterday, 2);
+    expect(counts.thisWeek, 3);
+    expect(counts.thisMonth, 4);
+    expect(counts.earlier, 5);
+    expect(counts.total, 15);
+  });
 }

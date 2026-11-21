@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/features/reading_history/domain/reading_history_section_counts.dart';
 import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_browse_content.dart';
 import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_page_header.dart';
 import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_time_grouping.dart';
@@ -13,6 +14,7 @@ class HistoryBrowsePage<T> extends StatefulWidget {
     required this.totalCount,
     required this.lastReadTimeOf,
     required this.itemBuilder,
+    this.sectionCounts,
     this.onClearAll,
     this.onOpenNavigation,
     this.onBack,
@@ -26,6 +28,7 @@ class HistoryBrowsePage<T> extends StatefulWidget {
 
   final List<T> items;
   final int totalCount;
+  final ReadingHistorySectionCounts? sectionCounts;
   final DateTime Function(T item) lastReadTimeOf;
   final Widget Function(BuildContext context, T item) itemBuilder;
   final VoidCallback? onClearAll;
@@ -50,19 +53,23 @@ class _HistoryBrowsePageState<T> extends State<HistoryBrowsePage<T>> {
   List<HistoryTimeGroup<T>>? _cachedGroups;
   List<T>? _cachedGroupSourceItems;
   DateTime? _cachedGroupClock;
+  ReadingHistorySectionCounts? _cachedSectionCounts;
 
   List<HistoryTimeGroup<T>> _resolveGroups() {
     if (identical(_cachedGroupSourceItems, widget.items) &&
         _cachedGroupClock == widget.clock &&
+        identical(_cachedSectionCounts, widget.sectionCounts) &&
         _cachedGroups != null) {
       return _cachedGroups!;
     }
     _cachedGroupSourceItems = widget.items;
     _cachedGroupClock = widget.clock;
+    _cachedSectionCounts = widget.sectionCounts;
     _cachedGroups = groupHistoryByTimeSection<T>(
       widget.items,
       widget.lastReadTimeOf,
       clock: widget.clock,
+      sectionCounts: widget.sectionCounts,
     );
     return _cachedGroups!;
   }

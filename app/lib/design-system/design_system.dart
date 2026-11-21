@@ -259,6 +259,8 @@ export 'components/selection/segmented_capsule_bar.dart'
     show SegmentedCapsuleBar, SegmentedCapsuleSegment;
 export 'components/selection/segmented_capsule_bar_metrics.dart'
     show SegmentedCapsuleBarMetrics;
+export 'components/settings/color_scheme_palette_option.dart'
+    show ColorSchemePaletteOption;
 export 'components/settings/content_section.dart' show ContentSection;
 export 'components/settings/settings_category_tile.dart'
     show SettingsCategoryTile;

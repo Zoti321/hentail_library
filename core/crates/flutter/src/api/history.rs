@@ -1,10 +1,12 @@
 use hentai_core::{
     self, clear_all_reading as core_clear_all, delete_reading_by_comic_id as core_delete_reading,
     delete_reading_by_comic_ids as core_delete_readings,
+    fetch_reading_history_section_counts as core_fetch_section_counts,
     fetch_reading_page as core_fetch_reading_page, get_reading_by_comic_id as core_get_reading,
     list_read_page_indexes as core_list_read_page_indexes, record_reading as core_record_reading,
     PagedReadingHistoryDto as CorePagedReading, ReadPageIndexDto as CoreReadPageIndex,
     ReadingHistoryDto as CoreReading,
+    ReadingHistoryTimeSectionCountsDto as CoreSectionCounts,
 };
 
 use super::comic::PageRequestDto;
@@ -31,6 +33,27 @@ pub struct PagedReadingHistoryDto {
     pub total_count: i64,
     pub page: i32,
     pub page_size: i32,
+}
+
+#[derive(Debug, Clone)]
+pub struct ReadingHistoryTimeSectionCountsDto {
+    pub today: i64,
+    pub yesterday: i64,
+    pub this_week: i64,
+    pub this_month: i64,
+    pub earlier: i64,
+}
+
+impl From<CoreSectionCounts> for ReadingHistoryTimeSectionCountsDto {
+    fn from(v: CoreSectionCounts) -> Self {
+        Self {
+            today: v.today,
+            yesterday: v.yesterday,
+            this_week: v.this_week,
+            this_month: v.this_month,
+            earlier: v.earlier,
+        }
+    }
 }
 
 impl From<CoreReading> for ReadingHistoryDto {
@@ -102,6 +125,17 @@ pub async fn fetch_reading_page_frb(
     core_fetch_reading_page(request.into(), keyword)
         .await
         .map(PagedReadingHistoryDto::from)
+        .map_err(HentaiErrorDto::from)
+}
+
+#[flutter_rust_bridge::frb]
+pub async fn fetch_reading_history_section_counts_frb(
+    keyword: Option<String>,
+    client_timezone_offset_minutes: i32,
+) -> Result<ReadingHistoryTimeSectionCountsDto, HentaiErrorDto> {
+    core_fetch_section_counts(keyword, client_timezone_offset_minutes)
+        .await
+        .map(ReadingHistoryTimeSectionCountsDto::from)
         .map_err(HentaiErrorDto::from)
 }
 

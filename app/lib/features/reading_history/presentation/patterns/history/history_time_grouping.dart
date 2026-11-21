@@ -1,3 +1,4 @@
+import 'package:hentai_library/features/reading_history/domain/reading_history_section_counts.dart';
 import 'package:hentai_library/l10n/app_localizations.dart';
 
 /// 阅读历史五档时间分桶（对齐最长保留 1 年；纯逻辑 + 分桶标题文案）。
@@ -5,7 +6,7 @@ import 'package:hentai_library/l10n/app_localizations.dart';
 /// 顺序：今天 → 昨天 → 本周 → 本月 → 更早（年内其余）。
 enum HistoryTimeSection { today, yesterday, thisWeek, thisMonth, earlier }
 
-/// 展示顺序（仅渲染非空分组）。
+/// 展示顺序（含空桶占位）。
 const List<HistoryTimeSection> kHistoryTimeSectionOrder = <HistoryTimeSection>[
   HistoryTimeSection.today,
   HistoryTimeSection.yesterday,
@@ -16,10 +17,17 @@ const List<HistoryTimeSection> kHistoryTimeSectionOrder = <HistoryTimeSection>[
 
 /// 同一分桶内的一条记录（泛型承载业务/预览模型）。
 class HistoryTimeGroup<T> {
-  const HistoryTimeGroup({required this.section, required this.items});
+  const HistoryTimeGroup({
+    required this.section,
+    required this.items,
+    required this.totalCount,
+  });
 
   final HistoryTimeSection section;
   final List<T> items;
+
+  /// 服务端全量桶计数；无服务端数据时可用 [items.length]。
+  final int totalCount;
 }
 
 DateTime _startOfLocalDay(DateTime value) {
@@ -50,15 +58,48 @@ HistoryTimeSection historyTimeSectionFor(DateTime lastReadAt, DateTime clock) {
   return HistoryTimeSection.earlier;
 }
 
-/// 按五档分桶分组；空桶省略；桶内保持 [items] 原顺序。
+int sectionCountFor(
+  ReadingHistorySectionCounts counts,
+  HistoryTimeSection section,
+) {
+  return switch (section) {
+    HistoryTimeSection.today => counts.today,
+    HistoryTimeSection.yesterday => counts.yesterday,
+    HistoryTimeSection.thisWeek => counts.thisWeek,
+    HistoryTimeSection.thisMonth => counts.thisMonth,
+    HistoryTimeSection.earlier => counts.earlier,
+  };
+}
+
+ReadingHistorySectionCounts decrementSectionCount(
+  ReadingHistorySectionCounts counts,
+  HistoryTimeSection section,
+) {
+  return switch (section) {
+    HistoryTimeSection.today =>
+      counts.copyWith(today: (counts.today - 1).clamp(0, counts.today)),
+    HistoryTimeSection.yesterday => counts.copyWith(
+      yesterday: (counts.yesterday - 1).clamp(0, counts.yesterday),
+    ),
+    HistoryTimeSection.thisWeek =>
+      counts.copyWith(thisWeek: (counts.thisWeek - 1).clamp(0, counts.thisWeek)),
+    HistoryTimeSection.thisMonth => counts.copyWith(
+      thisMonth: (counts.thisMonth - 1).clamp(0, counts.thisMonth),
+    ),
+    HistoryTimeSection.earlier =>
+      counts.copyWith(earlier: (counts.earlier - 1).clamp(0, counts.earlier)),
+  };
+}
+
+/// 按五档分桶分组；**始终输出五档**（空桶 `items` 为空）；桶内保持 [items] 原顺序。
+///
+/// [sectionCounts] 提供标题用全量计数；缺省时用已加载 [items] 长度。
 List<HistoryTimeGroup<T>> groupHistoryByTimeSection<T>(
   List<T> items,
   DateTime Function(T item) lastReadAt, {
   DateTime? clock,
+  ReadingHistorySectionCounts? sectionCounts,
 }) {
-  if (items.isEmpty) {
-    return <HistoryTimeGroup<T>>[];
-  }
   final DateTime now = clock ?? DateTime.now();
   final Map<HistoryTimeSection, List<T>> buckets =
       <HistoryTimeSection, List<T>>{
@@ -74,8 +115,13 @@ List<HistoryTimeGroup<T>> groupHistoryByTimeSection<T>(
   }
   return <HistoryTimeGroup<T>>[
     for (final HistoryTimeSection section in kHistoryTimeSectionOrder)
-      if (buckets[section]!.isNotEmpty)
-        HistoryTimeGroup<T>(section: section, items: buckets[section]!),
+      HistoryTimeGroup<T>(
+        section: section,
+        items: buckets[section]!,
+        totalCount: sectionCounts != null
+            ? sectionCountFor(sectionCounts, section)
+            : buckets[section]!.length,
+      ),
   ];
 }
 

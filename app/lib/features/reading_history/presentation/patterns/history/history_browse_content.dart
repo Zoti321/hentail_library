@@ -39,7 +39,9 @@ class HistoryBrowseContent<T> extends StatelessWidget {
           SliverToBoxAdapter(child: searchField!),
         ],
         SliverToBoxAdapter(child: SizedBox(height: layout.headerToBodyGap)),
-        if (groups.isEmpty)
+        if (totalCount <= 0)
+          // Prefer totalCount over groups.isEmpty: five-bucket placeholders
+          // always yield five groups even when the library has no history.
           SliverToBoxAdapter(child: HistoryEmptyBody(message: emptyMessage))
         else
           ReadingHistoryGroupedList<T>(
